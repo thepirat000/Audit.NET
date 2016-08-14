@@ -57,14 +57,35 @@ It will generate an output (event) for each operation, for example:
 }
 ```
 
-You decide where to save the events by injecting your own persistence mechanism or by using one of the configurable mechanisms provided:
+###Persistence of events
 
-- File Log
-- Windows Event Log
-- Mongo DB
-- Sql Server
-- Azure Document DB
+You decide where to save the events by using one of the configurable mechanisms provided:
 
+- [File Log]()
+- [Windows Event Log]()
+- [Mongo DB]()
+- [Sql Server]()
+- [Azure Document DB]()
+
+Or inject a custom persistence mechanism, by coding a class that inherits from `AuditDataAccessBase`, for example:
+
+```c#
+public class FileDataAccess : AuditDataAccessBase
+{
+    public override void Save(AuditEvent auditEvent)
+    {
+        var fileName = Settings.AuditEventTable + "_" + DateTime.Now.ToString("yyyyMMddmmssffff") + ".json";
+        var fullPath = Path.Combine(Settings.AuditConnectionString ?? "", fileName);
+        var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+        File.WriteAllText(fullPath, json);
+    }
+
+    public override bool TestConnection()
+    {
+        return true;
+    }
+}
+```
 
 
 ```c#
