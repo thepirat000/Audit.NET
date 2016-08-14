@@ -9,7 +9,27 @@ With Audit.NET you can easily generate tracking information about an operation b
 
 Surround the operation code you want to audit with a `using` block, indicating the object(s) to track.
 
-The library will gather contextual information about the user and the machine, as well as the tracked object's state, and optionally [Comments]() and [Custom Fields]() provided.
+Suppose you have the following code to update an order status:
+
+```c#
+Order order = Db.GetOrder(orderId);
+order.Status = 4;
+order = Db.OrderUpdate(order);
+```
+
+To audit the operation tracking the order object, you can add the following `using` statement:
+```c#
+Order order = Db.GetOrder(orderId);
+using (AuditScope.Create("Order:Update", () => order, orderId))
+{
+    order.Status = 4;
+    order = Db.OrderUpdate(order);
+}
+```
+
+The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track, and the third is a string that identifies the object to track.
+
+The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments]() and [Custom Fields]() provided.
 
 It will generate an output (event) for each operation. You decide where to save the events by injecting your own persistence mechanism or by using one of the configurable mechanisms provided:
 
@@ -19,6 +39,22 @@ It will generate an output (event) for each operation. You decide where to save 
 - Sql Server
 - Azure Document DB
 
+
+
+```c#
+Order order = Db.GetOrder(orderId);
+using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
+{
+    audit.SetCustomField("Items", order.OrderItems);
+    order.Status = 4;
+    order = Db.OrderUpdate(order);
+    audit.Comment("Status Updated to Submitted");
+}
+```
+
+With `SetCustomField()` you can store an object state as a custom field. The object state is serialized by this method, so further changes to the object will not be reflected on the field value.
+
+With `Comment()` you can add textual comments to the scope.
 
 
 
