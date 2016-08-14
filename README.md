@@ -31,7 +31,33 @@ The first parameter of the `Create` method is an event type name. The second is 
 
 The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments]() and [Custom Fields]() provided.
 
-It will generate an output (event) for each operation. You decide where to save the events by injecting your own persistence mechanism or by using one of the configurable mechanisms provided:
+It will generate an output (event) for each operation, for example:
+
+```json
+{
+  "EventType": "Order:Update",
+  "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+  "UserName": "Federico",
+  "MachineName": "HP1234",
+  "DomainName": "MyCompany",
+  "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
+  "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
+  "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+  "Target": {
+    "Type": "Order",
+    "Old": {
+      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+      "Status": 2
+    },
+    "New": {
+      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+      "Status": 4
+    }
+  }
+}
+```
+
+You decide where to save the events by injecting your own persistence mechanism or by using one of the configurable mechanisms provided:
 
 - File Log
 - Windows Event Log
