@@ -70,7 +70,7 @@ You decide where to save the events by using one of the configurable mechanisms 
 Or injecting a custom persistence mechanism, by creating a class that inherits from `AuditDataAccessBase`, for example:
 
 ```c#
-public class FileDataAccess : AuditDataAccessBase
+public class NaiveFileDataAccess : AuditDataAccessBase
 {
     public override void Save(AuditEvent auditEvent)
     {
