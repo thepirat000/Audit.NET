@@ -67,17 +67,16 @@ You decide where to save the events by using one of the configurable mechanisms 
 - [Sql Server]()
 - [Azure Document DB]()
 
-Or inject a custom persistence mechanism, by coding a class that inherits from `AuditDataAccessBase`, for example:
+Or injecting a custom persistence mechanism, by creating a class that inherits from `AuditDataAccessBase`, for example:
 
 ```c#
 public class FileDataAccess : AuditDataAccessBase
 {
     public override void Save(AuditEvent auditEvent)
     {
-        var fileName = Settings.AuditEventTable + "_" + DateTime.Now.ToString("yyyyMMddmmssffff") + ".json";
-        var fullPath = Path.Combine(Settings.AuditConnectionString ?? "", fileName);
-        var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
-        File.WriteAllText(fullPath, json);
+        // AuditEvent has a ToJson method
+        var json = auditEvent.ToJson();
+        File.AppendAllText(path, json);
     }
 
     public override bool TestConnection()
