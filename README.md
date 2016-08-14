@@ -75,7 +75,7 @@ public class NaiveFileDataAccess : AuditDataAccessBase
     public override void Save(AuditEvent auditEvent)
     {
         // AuditEvent has a ToJson method
-        var json = auditEvent.ToJson();
+        string json = auditEvent.ToJson();
         File.AppendAllText(path, json);
     }
 
