@@ -33,7 +33,7 @@ The library will gather contextual information about the user and the machine, a
 
 It will generate an output (event) for each operation, for example (JSON):
 
-```json
+```javascript
 {
   "EventType": "Order:Update",
   "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
@@ -98,7 +98,9 @@ With `SetCustomField()` you can store any object state as a custom field. The ob
 
 With `Comment()` you can add textual comments to the scope.
 
-```json
+An example of the output of the previous example would be:
+
+```javascript
 {
   "EventType": "Order:Update",
   "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
