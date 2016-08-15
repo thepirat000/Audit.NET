@@ -162,12 +162,12 @@ Key: **AuditDataAccessType**
 
 Description: Indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class to use.
 
-To use one of the data access classes provided with the library, you can use:
+To use one of the data access classes provided with the library, you can use the following values for _AuditDataAccessType_:
 
-For MongoDB: "Audit.MongoDB.MongoDataAccess,Audit.NET.MongoDB"
-For Azure DocumentDB: "Audit.AzureDocumentDB.AzureDbDataAccess,Audit.NET.AzureDocumentDB"
-For SQL Server: "Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"
-For SQL Server: "Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"
+- For MongoDB: "Audit.MongoDB.MongoDataAccess,Audit.NET.MongoDB"
+- For Azure DocumentDB: "Audit.AzureDocumentDB.AzureDbDataAccess,Audit.NET.AzureDocumentDB"
+- For SQL Server: "Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"
+- For SQL Server: "Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"
 
 
 
