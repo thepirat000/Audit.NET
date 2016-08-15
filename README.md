@@ -150,7 +150,7 @@ Or by code:
 Global.Settings.AuditDataAccessType = typeof(NaiveFileDataAccess);
 ```
 
-###Settings:
+###Settings
 
 Key: **AuditDataAccessType**
 
@@ -158,12 +158,8 @@ Description: Indicate the [Assembly Qualified Type Name](https://msdn.microsoft.
 
 To use one of the data access classes provided with the library, you can use the following values for _AuditDataAccessType_:
 
-- For MongoDB: `"Audit.MongoDB.MongoDataAccess,Audit.NET.MongoDB"`
-- For Azure DocumentDB: `"Audit.AzureDocumentDB.AzureDbDataAccess,Audit.NET.AzureDocumentDB"`
-- For SQL Server: `"Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"`
-- For SQL Server: `"Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"`
-
-
+- File: `"Audit.Core.FileDataAccess,Audit.Core"`
+- EventLog: `"Audit.Core.EventLogDataAccess,Audit.Core"`
 
 Key: `**AuditValidateDatabaseConnection**`
 Values: _True|False_
