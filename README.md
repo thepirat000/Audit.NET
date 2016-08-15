@@ -57,31 +57,13 @@ It will generate an output (event) for each operation, for example (JSON):
 }
 ```
 
-###Persistence of events
-
-You decide where to save the events by [configuring]() one of the mechanisms provided:
-
-- [File Log]()
-- [Windows Event Log]()
-- [Mongo DB]()
-- [Sql Server]()
-- [Azure Document DB]()
-
-Or by injecting a custom persistence mechanism, creating a class that inherits from `AuditDataAccessBase`, for example:
-
-```c#
-public class NaiveFileDataAccess : AuditDataAccessBase
-{
-    public override void Save(AuditEvent auditEvent)
-    {
-        // AuditEvent has a ToJson method
-        string json = auditEvent.ToJson();
-        File.AppendAllText(path, json);
-    }
-}
-```
-
 ##Custom Fields and Comments
+
+The `AuditScope` object provides two methods to extend the event output.
+
+With `SetCustomField()` you can store any object state as a custom field. (The object is serialized upon this method, so further changes to the object are not reflected on the field value).
+
+With `Comment()` you can add textual comments to the scope.
 
 ```c#
 Order order = Db.GetOrder(orderId);
@@ -93,11 +75,6 @@ using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
     audit.Comment("Status Updated to Submitted");
 }
 ```
-
-With `SetCustomField()` you can store any object state as a custom field. The object is serialized upon this method, so further changes to the object are not reflected on the field value.
-
-With `Comment()` you can add textual comments to the scope.
-
 An example of the output of the previous example would be:
 
 ```javascript
@@ -132,4 +109,30 @@ An example of the output of the previous example would be:
     ]
 }
 ```
+
+
+###Persistence of events
+
+You decide where to save the events by [configuring]() one of the mechanisms provided:
+
+- [File Log]()
+- [Windows Event Log]()
+- [Mongo DB]()
+- [Sql Server]()
+- [Azure Document DB]()
+
+Or by injecting a custom persistence mechanism, creating a class that inherits from `AuditDataAccessBase`, for example:
+
+```c#
+public class NaiveFileDataAccess : AuditDataAccessBase
+{
+    public override void Save(AuditEvent auditEvent)
+    {
+        // AuditEvent has a ToJson method
+        string json = auditEvent.ToJson();
+        File.AppendAllText(path, json);
+    }
+}
+```
+
 
