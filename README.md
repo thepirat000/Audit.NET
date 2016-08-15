@@ -1,13 +1,13 @@
 # Audit.NET
-A small framework to audit .NET object changes
+A small framework to audit an operation being executed.
 
-Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected a specific operation or procedure. 
+Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
 With Audit.NET you can easily generate tracking information about an operation being executed.
 
 ###Usage
 
-Surround the operation code you want to audit with a `using` block, indicating the object(s) to track.
+Surround the operation code you want to audit with a `using` block, indicating the object to track.
 
 Suppose you have the following code to update an order status:
 
@@ -29,9 +29,9 @@ using (AuditScope.Create("Order:Update", () => order, orderId))
 
 The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track, and the third is a string that identifies the object to track.
 
-The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments]() and [Custom Fields]() provided.
+The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields]() provided.
 
-It will generate an output (event) for each operation, for example:
+It will generate an output (event) for each operation, for example (JSON):
 
 ```json
 {
@@ -59,7 +59,7 @@ It will generate an output (event) for each operation, for example:
 
 ###Persistence of events
 
-You decide where to save the events by using one of the configurable mechanisms provided:
+You decide where to save the events by [configuring]() one of the mechanisms provided:
 
 - [File Log]()
 - [Windows Event Log]()
@@ -67,7 +67,7 @@ You decide where to save the events by using one of the configurable mechanisms 
 - [Sql Server]()
 - [Azure Document DB]()
 
-Or injecting a custom persistence mechanism, by creating a class that inherits from `AuditDataAccessBase`, for example:
+Or by injecting a custom persistence mechanism, creating a class that inherits from `AuditDataAccessBase`, for example:
 
 ```c#
 public class NaiveFileDataAccess : AuditDataAccessBase
@@ -78,29 +78,56 @@ public class NaiveFileDataAccess : AuditDataAccessBase
         string json = auditEvent.ToJson();
         File.AppendAllText(path, json);
     }
-
-    public override bool TestConnection()
-    {
-        return true;
-    }
 }
 ```
 
+##Custom Fields and Comments
 
 ```c#
 Order order = Db.GetOrder(orderId);
 using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
 {
-    audit.SetCustomField("Items", order.OrderItems);
+    audit.SetCustomField("ItemsCatalog", ItemsList);
     order.Status = 4;
     order = Db.OrderUpdate(order);
     audit.Comment("Status Updated to Submitted");
 }
 ```
 
-With `SetCustomField()` you can store an object state as a custom field. The object state is serialized by this method, so further changes to the object will not be reflected on the field value.
+With `SetCustomField()` you can store any object state as a custom field. The object is serialized upon this method, so further changes to the object are not reflected on the field value.
 
 With `Comment()` you can add textual comments to the scope.
 
-
+```json
+{
+  "EventType": "Order:Update",
+  "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+  "UserName": "Federico",
+  "MachineName": "HP1234",
+  "DomainName": "MyCompany",
+  "Target": {
+    "Type": "Order",
+    "Old": {
+      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+      "Status": 2,
+    },
+    "New": {
+      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+      "Status": 4,
+    }
+  },
+  "Comments": [
+    "Status Updated to Submitted"
+  ],
+  "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
+  "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
+  "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+  "ItemsCatalog": [
+    {
+      "Sku": "1002",
+      "Description": "Some product description"
+    }
+    ]
+}
+```
 
