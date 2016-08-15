@@ -156,14 +156,29 @@ Or by code:
 Global.Settings.AuditDataAccessType = typeof(NaiveFileDataAccess).AssemblyQualifiedName;
 ```
 
-###Other settings:
+###Settings:
+
+Key: **AuditDataAccessType**
+
+Description: Indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class to use.
+
+To use one of the data access classes provided with the library, you can use:
+
+For MongoDB: "Audit.MongoDB.MongoDataAccess,Audit.NET.MongoDB"
+For Azure DocumentDB: "Audit.AzureDocumentDB.AzureDbDataAccess,Audit.NET.AzureDocumentDB"
+For SQL Server: "Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"
+For SQL Server: "Audit.SqlServer.SqlDataAccess,Audit.NET.SqlServer"
 
 
-**AuditValidateDatabaseConnection: True|False**
 
-To indicate
+Key: **AuditValidateDatabaseConnection** 
+Values: _True|False_
+Description: To indicate if the library should test the data connection when creating a scope.
 
-AuditConnectionString
+**AuditConnectionString**
+
+When using
+
 AuditDatabase
 AuditEventTable
 AuditAuthKey
