@@ -1,5 +1,5 @@
 # Audit.NET
-A small framework to audit an operation being executed.
+A small framework to audit executing operations in .NET.
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
@@ -31,7 +31,7 @@ The first parameter of the `Create` method is an event type name. The second is 
 
 The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields]() provided.
 
-It will generate an output (event) for each operation, for example (JSON):
+It will generate and store an output (event) for each operation, for example (JSON):
 
 ```javascript
 {
@@ -65,6 +65,8 @@ With `SetCustomField()` you can store any object state as a custom field. (The o
 
 With `Comment()` you can add textual comments to the scope.
 
+For example:
+
 ```c#
 Order order = Db.GetOrder(orderId);
 using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
@@ -75,7 +77,7 @@ using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
     audit.Comment("Status Updated to Submitted");
 }
 ```
-An example of the output of the previous example would be:
+The output of the previous example would be:
 
 ```javascript
 {
@@ -112,15 +114,7 @@ An example of the output of the previous example would be:
 
 ##Persistence of events
 
-You decide where to save the events by [configuring]() one of the mechanisms provided:
-
-- [File Log]()
-- [Windows Event Log]()
-- [Mongo DB]()
-- [Sql Server]()
-- [Azure Document DB]()
-
-Or by injecting a custom persistence mechanism, creating a class that inherits from `AuditDataAccessBase`, for example:
+You decide where to save the events by [configuring]() one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataAccessBase`, for example:
 
 ```c#
 public class NaiveFileDataAccess : AuditDataAccessBase
@@ -129,14 +123,14 @@ public class NaiveFileDataAccess : AuditDataAccessBase
     {
         // AuditEvent has a ToJson method
         string json = auditEvent.ToJson();
-        File.AppendAllText(path, json);
+        File.AppendAllText("audit.json", json);
     }
 }
 ```
 
 ##Configuration
 
-The library configuration can be provided in the AppSettings section of your `web/app.config` or by code with the `Global.Settings` object properties.
+The library configuration can be provided in the AppSettings section of your `web/app.config` or programmatically with the `Global.Settings` object properties.
 
 The most important setting is the `AuditDataAccessType` where you indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class; the class that will handle the output.
 
@@ -153,7 +147,7 @@ For example:
 Or by code:
 
 ```c#
-Global.Settings.AuditDataAccessType = typeof(NaiveFileDataAccess).AssemblyQualifiedName;
+Global.Settings.AuditDataAccessType = typeof(NaiveFileDataAccess);
 ```
 
 ###Settings:
