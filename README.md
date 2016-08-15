@@ -5,7 +5,7 @@ Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence
 
 With Audit.NET you can easily generate tracking information about an operation being executed.
 
-###Usage
+##Usage
 
 Surround the operation code you want to audit with a `using` block, indicating the object to track.
 
@@ -110,8 +110,7 @@ An example of the output of the previous example would be:
 }
 ```
 
-
-###Persistence of events
+##Persistence of events
 
 You decide where to save the events by [configuring]() one of the mechanisms provided:
 
@@ -134,5 +133,45 @@ public class NaiveFileDataAccess : AuditDataAccessBase
     }
 }
 ```
+
+##Configuration
+
+The library configuration can be provided in the AppSettings section of your `web/app.config` or by code with the `Global.Settings` object properties.
+
+The most important setting is the `AuditDataAccessType` where you indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class; the class that will handle the output.
+
+For example:
+
+```xml
+<configuration>
+  <appSettings>
+      <add key="AuditDataAccessType" value="MyNamespace.NaiveFileDataAccess,MyAssembly" /> 
+  </appSettings>
+</configuration>
+```
+
+Or by code:
+
+```c#
+Global.Settings.AuditDataAccessType = typeof(NaiveFileDataAccess).AssemblyQualifiedName;
+```
+
+###Other settings:
+
+
+**AuditValidateDatabaseConnection: True|False**
+
+To indicate
+
+AuditConnectionString
+AuditDatabase
+AuditEventTable
+AuditAuthKey
+
+
+
+
+
+
 
 
