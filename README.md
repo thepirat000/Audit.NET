@@ -9,11 +9,12 @@ With Audit.NET you can easily generate tracking information about an operation b
 
 Surround the operation code you want to audit with a `using` block, indicating the object to track.
 
-Suppose you have the following code to update an order status:
+Suppose you have the following code to cancel an order:
 
 ```c#
 Order order = Db.GetOrder(orderId);
-order.Status = 4;
+order.Status = -1;
+order.OrderItems = null;
 order = Db.OrderUpdate(order);
 ```
 
@@ -22,7 +23,8 @@ To audit the operation tracking the order object, you can add the following `usi
 Order order = Db.GetOrder(orderId);
 using (AuditScope.Create("Order:Update", () => order, orderId))
 {
-    order.Status = 4;
+    order.Status = -1;
+    order.OrderItems = null;
     order = Db.OrderUpdate(order);
 }
 ```
@@ -47,11 +49,18 @@ It will generate and store an output (event) for each operation, for example (JS
     "Type": "Order",
     "Old": {
       "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": 2
+      "Status": 2,
+      "OrderItems": [
+        {
+          "Sku": "1002",
+          "Quantity": 3.0
+        }
+      ]    
     },
     "New": {
       "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": 4
+      "Status": -1,
+      "OrderItems": null
     }
   }
 }
@@ -72,9 +81,9 @@ Order order = Db.GetOrder(orderId);
 using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
 {
     audit.SetCustomField("ItemsCatalog", ItemsList);
-    order.Status = 4;
+    order.Status = -1;
     order = Db.OrderUpdate(order);
-    audit.Comment("Status Updated to Submitted");
+    audit.Comment("Status Updated to Cancelled");
 }
 ```
 The output of the previous example would be:
@@ -94,7 +103,7 @@ The output of the previous example would be:
     },
     "New": {
       "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": 4,
+      "Status": -1,
     }
   },
   "Comments": [
@@ -108,7 +117,7 @@ The output of the previous example would be:
       "Sku": "1002",
       "Description": "Some product description"
     }
-    ]
+  ]
 }
 ```
 
