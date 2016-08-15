@@ -107,7 +107,7 @@ The output of the previous example would be:
     }
   },
   "Comments": [
-    "Status Updated to Submitted"
+    "Status Updated to Cancelled"
   ],
   "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
   "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
