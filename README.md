@@ -33,7 +33,9 @@ The first parameter of the `Create` method is an event type name. The second is 
 
 The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields]() provided.
 
-It will generate and store an output (event) for each operation, for example (JSON):
+It will generate and store an output (event) for each operation.
+
+An example of the output in JSON:
 
 ```javascript
 {
@@ -123,10 +125,10 @@ The output of the previous example would be:
 
 ##Persistence of events
 
-You decide where to save the events by [configuring]() one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataAccessBase`, for example:
+You decide where to save the events by [configuring]() one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataAccess`, for example:
 
 ```c#
-public class NaiveFileDataAccess : AuditDataAccessBase
+public class NaiveFileDataAccess : AuditDataAccess
 {
     public override void Save(AuditEvent auditEvent)
     {
@@ -139,9 +141,9 @@ public class NaiveFileDataAccess : AuditDataAccessBase
 
 ##Configuration
 
-The library configuration can be provided in the AppSettings section of your `web/app.config` or programmatically with the `Global.Settings` object properties.
+The library configuration can be provided in the AppSettings section of your `web/app.config` or programmatically with the `AuditSettings.Current` object properties.
 
-The most important setting is the `AuditDataAccessType` where you indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class; the class that will handle the output.
+The most important setting is the `AuditDataAccessType` where you indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class to use; the class that will handle the output.
 
 For example:
 
@@ -156,12 +158,12 @@ For example:
 Or by code:
 
 ```c#
-Global.Settings.AuditDataAccessType = typeof(NaiveFileDataAccess);
+AuditSettings.Current.AuditDataAccessType = typeof(NaiveFileDataAccess);
 ```
 
 ###Settings
 
-Key: **AuditDataAccessType**
+####Key: **AuditDataAccessType**
 
 Description: Indicate the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname(v=vs.110).aspx#Anchor_1) of the data access class to use.
 
@@ -170,17 +172,25 @@ To use one of the data access classes provided with the library, you can use the
 - File: `"Audit.Core.FileDataAccess,Audit.Core"`
 - EventLog: `"Audit.Core.EventLogDataAccess,Audit.Core"`
 
-Key: `**AuditValidateDatabaseConnection**`
-Values: _True|False_
+####Key: **AuditValidateDatabaseConnection**
+
+Values: _True_|_False_
+
 Description: To indicate if the library should test the data connection when creating a scope.
 
-**AuditConnectionString**
+####Key: **AuditSourcePath**
 
-When using
+Description: The EventLog Source name (for EventLogDataAccess) or the File path (for FileDataAccess)
 
-AuditDatabase
-AuditEventTable
-AuditAuthKey
+Default value: "Application" (for EventLogDataAccess), Current directory (for FileDataAccess)
+
+####Key: **AuditLogName**
+
+Description: The EventLog Log name (for EventLogDataAccess) or the FileName prefix (for FileDataAccess)
+
+Default value: "Application" (for EventLogDataAccess), "" (for FileDataAccess)
+
+
 
 
 
