@@ -176,17 +176,17 @@ To use one of the data access classes provided with the library, you can use the
 
 Values: _True_|_False_
 
-Description: To indicate if the library should test the data connection when creating a scope.
+To indicate if the library should test the data connection when creating a scope.
 
 ####Key: **AuditSourcePath**
 
-Description: The EventLog Source name (for EventLogDataAccess) or the File path (for FileDataAccess)
+To indicate the EventLog Source name (for EventLogDataAccess) or the File path (for FileDataAccess)
 
 Default value: "Application" (for EventLogDataAccess), Current directory (for FileDataAccess)
 
 ####Key: **AuditLogName**
 
-Description: The EventLog Log name (for EventLogDataAccess) or the FileName prefix (for FileDataAccess)
+The EventLog Log name (for EventLogDataAccess) or the FileName prefix (for FileDataAccess)
 
 Default value: "Application" (for EventLogDataAccess), "" (for FileDataAccess)
 
