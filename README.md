@@ -190,10 +190,28 @@ The EventLog Log name (for EventLogDataAccess) or the FileName prefix (for FileD
 
 Default value: "Application" (for EventLogDataAccess), "" (for FileDataAccess)
 
+An example of the config file to use the Windows Event Log, logging to the "Application" log:
 
+```xml
+<configuration>
+  <appSettings>
+    <add key="AuditDataAccessType" value="Audit.EventLogDataAccess,Audit.Core" />
+    <add key="AuditLogName" value="Application" />
+    <add key="AuditSourcePath" value="My Application" />
+  </appSettings>
+</configuration>
+```
 
+An example of the config file using the File output:
 
-
+```xml
+<configuration>
+  <appSettings>
+    <add key="AuditDataAccessType" value="Audit.FileDataAccess,Audit.Core" />
+    <add key="AuditSourcePath" value="C:\AuditLogs" />
+  </appSettings>
+</configuration>
+```
 
 
 
