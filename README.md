@@ -5,6 +5,13 @@ Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence
 
 With Audit.NET you can easily generate tracking information about an operation being executed.
 
+##Install
+
+**[NuGet Package](https://www.nuget.org/packages/Audit.NET/)**
+```
+PM> Install-Package Audit.NET
+```
+
 ##Usage
 
 Surround the operation code you want to audit with a `using` block, indicating the object to track.
@@ -152,14 +159,14 @@ public class MyFileDataProvider : AuditDataProvider
 
 ##Configuration
 
-The data provider should be set prior to the `AuditScope` creation, by calling the `AuditConfiguration.SetDataProvider` method.
+Call the static `AuditConfiguration.SetDataProvider` method to set the data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
 
-For example, to set your own:
+For example, to set your own provider:
 ```c#
 AuditConfiguration.SetDataProvider(new MyFileDataProvider());
 ```
 
-Example to use the Event Log provider (save the events to the Windows Event Log):
+Initialization example to use the Event Log provider (save the events to the Windows Event Log):
 ```c#
 AuditConfiguration.SetDataProvider(new EventLogDataProvider()
 {
@@ -169,6 +176,27 @@ AuditConfiguration.SetDataProvider(new EventLogDataProvider()
 });
 ```
 
+Initialization example to use the File Log provider (save the events to files):
+```c#
+AuditConfiguration.SetDataProvider(new FileDataProvider()
+{
+    FilenamePrefix = "Event_",
+    DirectoryPath = @"C:\AuditLogs\1"
+});
+```
+
+##More providers
+
+Apart from the _File_ and _EventLog_ providers, there are other providers included in different packages:
+
+**[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/README.SqlServer.md#auditnetsqlserver)**
+Store the events as rows in a SQL Table, in JSON format. 
+
+**[Mongo DB](https://github.com/thepirat000/Audit.NET/blob/master/README.MongoDB.md#auditnetmongodb)**
+Store the events in a Mongo DB Collection, in BSON format.
+
+**[Azure Document DB](https://github.com/thepirat000/Audit.NET/blob/master/README.DocumentDB.md#auditnetazuredocumentdb)**
+Store the events in an Azure Document DB Collection, in JSON format.
 
 
 
