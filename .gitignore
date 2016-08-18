@@ -252,3 +252,4 @@ paket-files/
 *.sln.iml
 /AuditFw.pptx
 /Thumbs.db
+AuditTests.cs 
