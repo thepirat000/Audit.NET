@@ -138,9 +138,31 @@ The output of the previous example would be:
 }
 ```
 
+###Discard option
+
+The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain conditions.
+
+For example, if you want to avoid saving the audit event if an exception is thrown:
+
+```c#
+using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
+{
+    try
+    {
+        //some operation
+        Critical.Operation(123);
+    }
+    catch (Exception ex)
+    {
+        //If an exception is thown, discard the audit event
+        scope.Discard();
+    }
+}
+```
+
 ##Event output
 
-You decide what to do with the events by configuring one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
 public class MyFileDataProvider : AuditDataProvider
@@ -189,13 +211,13 @@ AuditConfiguration.SetDataProvider(new FileDataProvider()
 
 Apart from the _File_ and _EventLog_ providers, there are other providers included in different packages:
 
-**[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/README.SqlServer.md#auditnetsqlserver)**
+**[Sql Server](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Sql#auditnetsqlserver)**
 Store the events as rows in a SQL Table, in JSON format. 
 
-**[Mongo DB](https://github.com/thepirat000/Audit.NET/blob/master/README.MongoDB.md#auditnetmongodb)**
+**[Mongo DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.MongoDB#auditnetmongodb)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-**[Azure Document DB](https://github.com/thepirat000/Audit.NET/blob/master/README.DocumentDB.md#auditnetazuredocumentdb)**
+**[Azure Document DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
 
