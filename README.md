@@ -138,6 +138,28 @@ The output of the previous example would be:
 }
 ```
 
+###Discard option
+
+The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain conditions.
+
+For example, if you want to avoid saving the audit event if an exception is thrown:
+
+```c#
+using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
+{
+    try
+    {
+        //some operation
+        Critical.Operation(123);
+    }
+    catch (Exception ex)
+    {
+        //If an exception is thown, discard the audit event
+        scope.Discard();
+    }
+}
+```
+
 ##Event output
 
 You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
