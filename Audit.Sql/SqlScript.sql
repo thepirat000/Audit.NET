@@ -5,6 +5,7 @@ GO
 CREATE TABLE [Event]
 (
 	EventId BIGINT IDENTITY(1,1) NOT NULL,
+	InsertedDate datetimeoffset NOT NULL DEFAULT(GETDATE()),
 	[Data] NVARCHAR(MAX) NOT NULL,
 	CONSTRAINT PK_Event PRIMARY KEY (EventId)
 )
@@ -13,6 +14,7 @@ GO
 CREATE VIEW dbo.[v_Event] WITH SCHEMABINDING
 AS
 SELECT EventId, 
+	InsertedDate,
 	CAST(JSON_VALUE(Data, '$.EventType') AS NVARCHAR(255)) AS [EventType],
 	CAST(JSON_VALUE(Data, '$.ReferenceId') AS NVARCHAR(255)) AS [ReferenceId],
 	JSON_VALUE(Data, '$.Environment.Exception') As [Exception],

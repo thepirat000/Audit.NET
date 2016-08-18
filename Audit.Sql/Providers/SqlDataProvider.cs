@@ -15,6 +15,7 @@ namespace Audit.SqlServer.Providers
     {
         private string _connectionString;
         private string _tableName = "Event";
+        private string _columnName = "Data";
         private bool _shouldTestConnection = true;
 
         public string ConnectionString
@@ -35,12 +36,18 @@ namespace Audit.SqlServer.Providers
             set { _shouldTestConnection = value; }
         }
 
+        public string ColumnName
+        {
+            get { return _columnName; }
+            set { _columnName = value; }
+        }
+
         public override void WriteEvent(AuditEvent auditEvent)
         { 
             var json = auditEvent.ToJson();
             using (var ctx = new Audit.SqlServer.Entities(_connectionString))
             {
-                ctx.Database.ExecuteSqlCommand(string.Format("INSERT INTO [{0}] ([Data]) VALUES (@json)", _tableName), new SqlParameter("@json", json));
+                ctx.Database.ExecuteSqlCommand(string.Format("INSERT INTO [{0}] ([{1}]) VALUES (@json)", _tableName, _columnName), new SqlParameter("@json", json));
             }
         }
 
