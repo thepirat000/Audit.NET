@@ -21,13 +21,18 @@ AuditConfiguration.SetDataProvider(new Audit.SqlServer.Providers.SqlDataProvider
 {
     ConnectionString =
         "data source=localhost;initial catalog=AuditDb;user id=user;password=pass",
-    TableName = "Audit"
+    TableName = "Audit",
+    ColumnName = "Data"
 });
 ```
 
-##Table constraint
+You need to indicate:
 
-The table should have a column named `[Data]` of type `NVARCHAR(MAX)`. The JSON representation of the events will be saved on that column.
+- **ConnectionString**: The SQL Server connection string.
+- **TableName**: The events table name.
+- **ColumnName**: The column name of the event table where the JSON will be stored.
+
+The table should exists and the column type should be `NVARCHAR(MAX)`.
 
 For example:
 ```SQL
