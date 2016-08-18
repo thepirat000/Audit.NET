@@ -31,7 +31,7 @@ using (AuditScope.Create("Order:Update", () => order, orderId))
 
 The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track, and the third is a string that identifies the object to track.
 
-The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields]() provided.
+The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields](#custom-fields-and-comments) provided.
 
 It will generate and store an output (event) for each operation.
 
@@ -131,17 +131,20 @@ The output of the previous example would be:
 }
 ```
 
-##Persistence of events
+##Event output
 
-You decide where to save the events by [configuring]() one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+You decide what to do with the events by configuring one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
-    public override void Save(AuditEvent auditEvent)
+    public override void WriteEvent(AuditEvent auditEvent)
     {
-        // AuditEvent has a ToJson method
-        string json = auditEvent.ToJson();
+        // Here you can provide custom fields for all the scopes
+        auditEvent.CustomFields["OSVersion"] = Environment.OSVersion.VersionString;
+        // AuditEvent provides a ToJson() method
+        string json = auditEvent.ToJson();  
+        // Append the json representation of the event to a text file
         File.AppendAllText("audit.json", json);
     }
 }
