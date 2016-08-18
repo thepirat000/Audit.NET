@@ -28,7 +28,7 @@ AuditConfiguration.SetDataProvider(new Audit.AzureDocumentDB.Providers.AzureDbDa
 
 Provider options:
 
-- **ConnectionString**: The Azure Document DB [connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
+- **ConnectionString**: The Azure Document DB connection string.
 - **Database**: The audit database name.
 - **Collection**: The events collection name.
 
