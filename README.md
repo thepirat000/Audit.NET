@@ -41,12 +41,16 @@ An example of the output in JSON:
 {
   "EventType": "Order:Update",
   "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-  "UserName": "Federico",
-  "MachineName": "HP1234",
-  "DomainName": "MyCompany",
+  "Environment": {
+    "UserName": "Federico",
+    "MachineName": "HP",
+    "DomainName": "HP",
+    "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+    "Exception": null,
+    "Culture": "en-GB"
+  },
   "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
   "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
-  "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
   "Target": {
     "Type": "Order",
     "Old": {
@@ -94,9 +98,14 @@ The output of the previous example would be:
 {
   "EventType": "Order:Update",
   "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-  "UserName": "Federico",
-  "MachineName": "HP1234",
-  "DomainName": "MyCompany",
+  "Environment": {
+    "UserName": "Federico",
+    "MachineName": "HP",
+    "DomainName": "HP",
+    "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+    "Exception": null,
+    "Culture": "en-GB"
+  },
   "Target": {
     "Type": "Order",
     "Old": {
@@ -113,7 +122,6 @@ The output of the previous example would be:
   ],
   "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
   "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
-  "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
   "ItemsCatalog": [
     {
       "Sku": "1002",
