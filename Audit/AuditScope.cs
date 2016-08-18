@@ -141,6 +141,15 @@ namespace Audit.Core
         }
 
         /// <summary>
+        /// Discards this audit scope, so the event will not be written.
+        /// </summary>
+        public void Discard()
+        {
+            // Mark as saved to ignore the saving
+            _saved = true;
+        }
+
+        /// <summary>
         /// Saves the event.
         /// </summary>
         public void Save()
