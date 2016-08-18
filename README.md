@@ -14,7 +14,7 @@ PM> Install-Package Audit.NET
 
 ##Usage
 
-Surround the operation code you want to audit with a `using` block, indicating the object to track.
+> Surround the operation code you want to audit with a `using` block, indicating the object to track.
 
 Suppose you have the following code to cancel an order:
 
