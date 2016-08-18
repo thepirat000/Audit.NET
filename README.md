@@ -136,7 +136,7 @@ The output of the previous example would be:
 You decide where to save the events by [configuring]() one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
-public class NaiveFileDataProvider : AuditDataProvider
+public class MyFileDataProvider : AuditDataProvider
 {
     public override void Save(AuditEvent auditEvent)
     {
@@ -149,14 +149,14 @@ public class NaiveFileDataProvider : AuditDataProvider
 
 ##Configuration
 
-The data provider should be set ____in global asax__________ with the `AuditConfiguration.SetDataProvider` method.
+The data provider should be set prior to the `AuditScope` creation, by calling the `AuditConfiguration.SetDataProvider` method.
 
-For example:
+For example, to set your own:
 ```c#
-AuditConfiguration.SetDataProvider(new NaiveFileDataAccess());
+AuditConfiguration.SetDataProvider(new MyFileDataProvider());
 ```
 
-Another example to use the Event Log provider:
+Example to use the Event Log provider (save the events to the Windows Event Log):
 ```c#
 AuditConfiguration.SetDataProvider(new EventLogDataProvider()
 {
