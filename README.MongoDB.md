@@ -28,7 +28,7 @@ AuditConfiguration.SetDataProvider(new Audit.MongoDB.Providers.MongoDataProvider
 
 Provider options:
 
-- **ConnectionString**: The Mongo DB connection string.
+- **ConnectionString**: The [Mongo DB connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
 - **Database**: The audit database name.
 - **Collection**: The events collection name.
 - **ShouldTestConnection**: Set to true to indicate the connection to Mongo DB should be tested to allow the audited operation.
