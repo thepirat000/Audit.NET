@@ -195,7 +195,7 @@ Store the events as rows in a SQL Table, in JSON format.
 **[Mongo DB](https://github.com/thepirat000/Audit.NET/blob/master/README.MongoDB.md#auditnetmongodb)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-**[Azure Document DB]()**
+**[Azure Document DB](https://github.com/thepirat000/Audit.NET/blob/master/README.DocumentDB.md#auditnetazuredocumentdb)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
 
