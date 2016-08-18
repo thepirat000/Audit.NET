@@ -189,13 +189,13 @@ AuditConfiguration.SetDataProvider(new FileDataProvider()
 
 Apart from the _File_ and _EventLog_ providers, there are other providers included in different packages:
 
-**[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/README.SqlServer.md#auditnetsqlserver)**
+**[Sql Server](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Sql#auditnetsqlserver)**
 Store the events as rows in a SQL Table, in JSON format. 
 
-**[Mongo DB](https://github.com/thepirat000/Audit.NET/blob/master/README.MongoDB.md#auditnetmongodb)**
+**[Mongo DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.MongoDB#auditnetmongodb)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-**[Azure Document DB](https://github.com/thepirat000/Audit.NET/blob/master/README.DocumentDB.md#auditnetazuredocumentdb)**
+**[Azure Document DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
 
