@@ -18,7 +18,7 @@ order.OrderItems = null;
 order = Db.OrderUpdate(order);
 ```
 
-To audit this operation, tracking the order object, you can add the following `using` statement:
+To audit this operation, tracking the _Order_ object, you can add the following `using` statement:
 ```c#
 Order order = Db.GetOrder(orderId);
 using (AuditScope.Create("Order:Update", () => order, orderId))
