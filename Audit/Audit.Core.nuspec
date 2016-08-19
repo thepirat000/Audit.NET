@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Audit.NET</id>
+        <version>$version$</version>
+        <title>Audit.NET</title>
+        <authors>ThePirat</authors>
+        <owners>ThePirat</owners>
+        <projectUrl>https://github.com/thepirat000/Audit.NET</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A small framework to audit executing operations in .NET</description>
+        <summary>Easily generate tracking information about an operation being executed.</summary>
+        <copyright>Copyright ©  2016</copyright>
+        <tags>Audit Trail Log</tags>
+        <dependencies>
+            <dependency id="Newtonsoft.Json" version="9.0.1" />
+        </dependencies>
+    </metadata>
+</package>

@@ -43,7 +43,6 @@ namespace Audit.Core
         protected internal AuditScope(string eventType, Func<T> reference, Func<string> referenceIdGetter,
             int callingMethodStackIndex = 1)
         {
-            TestConnectionDataProvider();
             _referenceIdGetter = referenceIdGetter;
             _newValueGetter = () => reference();
             var callingMethod = new StackFrame(callingMethodStackIndex).GetMethod();
@@ -66,6 +65,8 @@ namespace Audit.Core
                 Comments = new List<string>(),
                 CustomFields = new Dictionary<string, object>()
             };
+            _dataProvider.Initialize(_event);
+            TestConnectionDataProvider();
         }
         #endregion
 

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json.Linq;
 
 namespace Audit.Core
 {
@@ -34,6 +35,15 @@ namespace Audit.Core
         public virtual bool TestConnection()
         {
             return true;
+        }
+
+        /// <summary>
+        /// Initialization method, called when the scope is created
+        /// </summary>
+        /// <param name="auditEvent">The audit event being created.</param>
+        public virtual void Initialize(AuditEvent auditEvent)
+        {
+            return;
         }
     }
 }

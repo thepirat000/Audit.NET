@@ -22,5 +22,10 @@
         /// </summary>
         /// <returns><c>true</c> if connection is sucessfull, <c>false</c> otherwise.</returns>
         bool TestConnection();
+        /// <summary>
+        /// Initialization method, called when the scope is created
+        /// </summary>
+        /// <param name="auditEvent">The audit event being created.</param>
+        void Initialize(AuditEvent auditEvent);
     }
 }

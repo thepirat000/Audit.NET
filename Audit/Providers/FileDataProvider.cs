@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -9,8 +10,8 @@ namespace Audit.Core.Providers
     /// </summary>
     /// <remarks>
     /// Settings:
-    /// - SourcePath: Directory path to store the output files (default is current directory)
-    /// - LogName: Filename prefix (default: "")
+    /// - DirectoryPath: Directory path to store the output files (default is current directory)
+    /// - FilenamePrefix: Filename prefix (default: "")
     /// </remarks>
     public class FileDataProvider : AuditDataProvider
     {

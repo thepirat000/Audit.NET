@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Audit.NET.AzureDocumentDB</id>
+        <version>1.0.0.3</version>
+        <title>Audit.AzureDocumentDB</title>
+        <authors>ThePirat</authors>
+        <owners>ThePirat</owners>
+        <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Azure Document DB provider for Audit.NET library</description>
+        <summary>Azure Document DB provider for Audit.NET library</summary>
+        <copyright>Copyright ©  2016</copyright>
+        <tags>Audit Trail Log Azure DocumentDB</tags>
+        <dependencies>
+            <dependency id="Audit.NET" version="1.0.0.3" />
+            <dependency id="Microsoft.Azure.DocumentDB" version="1.9.2" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="lib\net45\Audit.NET.AzureDocumentDB.dll" target="lib\net45\Audit.NET.AzureDocumentDB.dll" />
+    </files>
+</package>
