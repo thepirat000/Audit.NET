@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Audit.NET.MongoDB</id>
-        <version>1.0.0.3</version>
+        <version>$version$</version>
         <title>Audit.MongoDB</title>
         <authors>ThePirat</authors>
         <owners>ThePirat</owners>
@@ -12,12 +12,5 @@
         <summary>Mongo DB provider for Audit.NET library</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log MongoDB</tags>
-        <dependencies>
-            <dependency id="Audit.NET" version="1.0.0.3" />
-            <dependency id="mongocsharpdriver" version="2.2.4" />
-        </dependencies>
     </metadata>
-    <files>
-        <file src="lib\net45\Audit.NET.MongoDB.dll" target="lib\net45\Audit.NET.MongoDB.dll" />
-    </files>
 </package>
