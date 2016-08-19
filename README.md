@@ -179,7 +179,7 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-Yu can also override the `Initialize` method to set up event properties at the time the audit scope is created:
+You can also override the `Initialize` method to set up event properties at the time the audit scope is created:
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
