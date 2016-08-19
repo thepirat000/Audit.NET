@@ -179,6 +179,20 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
+Yu can also override the `Initialize` method to set up event properties at the time the audit scope is created:
+```c#
+public class MyFileDataProvider : AuditDataProvider
+{
+    //...
+    public override void Initialize(AuditEvent auditEvent)
+    {
+        // Here you can provide custom fields for all the scopes, this is executed when the scope is created
+        auditEvent.CustomFields["StackTrace"] = Environment.StackTrace;
+    }
+}
+```
+
+
 ##Configuration
 
 Call the static `AuditConfiguration.SetDataProvider` method to set the data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
