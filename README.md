@@ -204,8 +204,8 @@ public class MyFileDataProvider : AuditDataProvider
 ##Event Creation Policy
 
 The data providers can be configured to persist the event in different ways:
-- **Insert on End:**
-The audit event is saved when the scope is disposed. (**default**)
+- **Insert on End: (**default**)**
+The audit event is saved when the scope is disposed. 
 
 - **Insert on Start, Replace on End:**
 The event (on its initial state) is saved when the scope is created, and then the complete event information is updated when the scope is disposed. 
