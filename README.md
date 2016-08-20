@@ -150,7 +150,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
     try
     {
         //some operation
-        Critical.Operation(123);
+        Critical.Operation();
     }
     catch (Exception ex)
     {
@@ -167,31 +167,39 @@ You decide what to do with the events by [configuring](#configuration) one of th
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
-    public override void WriteEvent(AuditEvent auditEvent)
+    public override object InsertEvent(AuditEvent auditEvent)
     {
-        // Here you can provide custom fields for all the scopes
-        auditEvent.CustomFields["OSVersion"] = Environment.OSVersion.VersionString;
         // AuditEvent provides a ToJson() method
-        string json = auditEvent.ToJson();  
+        string json = auditEvent.ToJson();
         // Append the json representation of the event to a text file
         File.AppendAllText("audit.json", json);
+        return null;
     }
 }
 ```
 
-You can also override the `Initialize` method to set up event properties at the time the audit scope is created:
+You can also override the `Init` and `End` methods, in order to provide different behavior or set up event properties at the time the scope is created or disposed, for example:
+
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
-    //...
-    public override void Initialize(AuditEvent auditEvent)
+    public override void Init(AuditEvent auditEvent)
     {
-        // Here you can provide custom fields for all the scopes, this is executed when the scope is created
-        auditEvent.CustomFields["StackTrace"] = Environment.StackTrace;
+        // Add a custom field for all the scopes
+        auditEvent.CustomFields["FreeMemory_Before"] = new ComputerInfo().AvailablePhysicalMemory;
+        // Don't forget to call the base method.
+        base.Init(auditEvent);
     }
+
+    public override void End(AuditEvent auditEvent)
+    {
+        auditEvent.CustomFields["FreeMemory_After"] = new ComputerInfo().AvailablePhysicalMemory;
+        base.End(auditEvent);
+    }
+
+    //...
 }
 ```
-
 
 ##Configuration
 
