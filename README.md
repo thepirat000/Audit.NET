@@ -138,7 +138,7 @@ The output of the previous example would be:
 }
 ```
 
-###Discard option
+##Discard option
 
 The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain conditions.
 
@@ -150,7 +150,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
     try
     {
         //some operation
-        Critical.Operation(123);
+        Critical.Operation();
     }
     catch (Exception ex)
     {
@@ -167,31 +167,53 @@ You decide what to do with the events by [configuring](#configuration) one of th
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
-    public override void WriteEvent(AuditEvent auditEvent)
+    public override object InsertEvent(AuditEvent auditEvent)
     {
-        // Here you can provide custom fields for all the scopes
-        auditEvent.CustomFields["OSVersion"] = Environment.OSVersion.VersionString;
         // AuditEvent provides a ToJson() method
-        string json = auditEvent.ToJson();  
+        string json = auditEvent.ToJson();
         // Append the json representation of the event to a text file
         File.AppendAllText("audit.json", json);
+        return null;
     }
 }
 ```
 
-You can also override the `Initialize` method to set up event properties at the time the audit scope is created:
+You can also override the `Init` and `End` methods, in order to provide different behavior or set up event properties at the time the scope is created or disposed, for example:
+
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
-    //...
-    public override void Initialize(AuditEvent auditEvent)
+    public override void Init(AuditEvent auditEvent)
     {
-        // Here you can provide custom fields for all the scopes, this is executed when the scope is created
-        auditEvent.CustomFields["StackTrace"] = Environment.StackTrace;
+        // Add a custom field for all the scopes
+        auditEvent.CustomFields["FreeMemory_Before"] = new ComputerInfo().AvailablePhysicalMemory;
+        // Don't forget to call the base method.
+        base.Init(auditEvent);
     }
+
+    public override void End(AuditEvent auditEvent)
+    {
+        auditEvent.CustomFields["FreeMemory_After"] = new ComputerInfo().AvailablePhysicalMemory;
+        base.End(auditEvent);
+    }
+
+    //...
 }
 ```
 
+##Event Creation Policy
+
+The data providers can be configured to persist the event in different ways:
+- **Insert on End:** (**default**)
+The audit event is saved when the scope is disposed. 
+
+- **Insert on Start, Replace on End:**
+The event (on its initial state) is saved when the scope is created, and then the complete event information is updated when the scope is disposed. 
+
+- **Insert on Start, Insert on End:**
+Two versions of the event are saved, the initial when the scope is created, and the final when the scope is disposed.
+
+To configure the creation policy, set the `CreationPolicy` property of the data provider (see next section).
 
 ##Configuration
 
@@ -202,6 +224,16 @@ For example, to set your own provider:
 AuditConfiguration.SetDataProvider(new MyFileDataProvider());
 ```
 
+Initialization example to use the File Log provider (save the events to files):
+```c#
+AuditConfiguration.SetDataProvider(new FileDataProvider()
+{
+    FilenamePrefix = "Event_",
+    DirectoryPath = @"C:\AuditLogs\1",
+    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
+});
+```
+
 Initialization example to use the Event Log provider (save the events to the Windows Event Log):
 ```c#
 AuditConfiguration.SetDataProvider(new EventLogDataProvider()
@@ -209,15 +241,6 @@ AuditConfiguration.SetDataProvider(new EventLogDataProvider()
     SourcePath = "My Audited Application",
     LogName = "Application",
     MachineName = "."
-});
-```
-
-Initialization example to use the File Log provider (save the events to files):
-```c#
-AuditConfiguration.SetDataProvider(new FileDataProvider()
-{
-    FilenamePrefix = "Event_",
-    DirectoryPath = @"C:\AuditLogs\1"
 });
 ```
 
