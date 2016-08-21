@@ -22,16 +22,19 @@ AuditConfiguration.SetDataProvider(new Audit.MongoDB.Providers.MongoDataProvider
     ConnectionString = "mongodb://localhost:27017",
     Database = "Audit",
     Collection = "Event",
-    ShouldTestConnection = true
+    CreationPolicy = EventCreationPolicy.InsertOnEnd
 });
 ```
 
-Provider options:
+###Provider options
 
+Mandatory:
 - **ConnectionString**: The [Mongo DB connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
-- **Database**: The audit database name.
-- **Collection**: The events collection name.
-- **ShouldTestConnection**: Set to true to indicate the connection to Mongo DB should be tested to allow the audited operation.
+- **Database**: The audit Mango Database name.
+- **Collection**: The events Mongo Collection name.
+
+Optional:
+- **CreationPolicy**: The [event creation policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) to use.
 
 An example of the output as seen with [NoSQL Manager for Mongo DB](http://www.mongodbmanager.com/):
 
