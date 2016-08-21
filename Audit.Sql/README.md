@@ -30,7 +30,7 @@ AuditConfiguration.SetDataProvider(new SqlDataProvider()
 });
 ```
 
-###Configuration settings
+###Provider Options
 
 Mandatory:
 - **ConnectionString**: The SQL Server connection string.
