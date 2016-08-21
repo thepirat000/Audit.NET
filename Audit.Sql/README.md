@@ -16,23 +16,33 @@ Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage
 ##Configuration
 Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider. This should be done before any `AuditScope` creation, i.e. during application startup.
 
+For example:
 ```c#
-AuditConfiguration.SetDataProvider(new Audit.SqlServer.Providers.SqlDataProvider()
+AuditConfiguration.SetDataProvider(new SqlDataProvider()
 {
     ConnectionString =
-        "data source=localhost;initial catalog=AuditDb;user id=user;password=pass",
-    TableName = "Audit",
-    ColumnName = "Data"
+        "data source=localhost;initial catalog=Audit;integrated security=true;",
+    TableName = "Event",
+    JsonColumnName = "Data",
+    IdColumnName = "EventId",
+    LastUpdatedDateColumnName = "LastUpdatedDate",
+    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
 });
 ```
 
-You need to indicate:
+###Configuration settings
 
+Mandatory:
 - **ConnectionString**: The SQL Server connection string.
 - **TableName**: The events table name.
-- **ColumnName**: The column name of the event table where the JSON will be stored.
+- **JsonColumnName**: The column name of the event table where the JSON will be stored.
+- **IdColumnName**: The column name of the event identifier (the primary key).
 
-The table should exists and the column type should be `NVARCHAR(MAX)`.
+Optional:
+- **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
+- **CreationPolicy**: The [event creation policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) to use.
+
+The table should exists and the type of the JSON column should be `NVARCHAR(MAX)`.
 
 For example:
 ```SQL
@@ -40,6 +50,7 @@ CREATE TABLE [Event]
 (
 	[EventId] BIGINT IDENTITY(1,1) NOT NULL,
 	[InsertedDate] DATETIME NOT NULL DEFAULT(GETUTCDATE()),
+	[LastUpdatedDate] DATETIME NULL,
 	[Data] NVARCHAR(MAX) NOT NULL,
 	CONSTRAINT PK_Event PRIMARY KEY (EventId)
 )
