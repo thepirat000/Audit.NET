@@ -29,7 +29,7 @@ AuditConfiguration.SetDataProvider(new Audit.AzureDocumentDB.Providers.AzureDbDa
 ###Provider options
 
 Mandatory:
-- **ConnectionString**: The Azure Document DB connection string.
+- **ConnectionString**: The Azure Document DB Connection String.
 - **Database**: The audit database name.
 - **Collection**: The events collection name.
 
