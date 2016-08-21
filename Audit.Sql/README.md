@@ -1,7 +1,7 @@
 # Audit.NET.SqlServer
 Sql Server provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET) (A small framework to audit executing operations in .NET).
 
-Store the events as rows in a SQL Table, in JSON format.
+Store the audit events in a SQL Table, in JSON format.
 
 ##Install
 
