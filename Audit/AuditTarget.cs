@@ -29,7 +29,7 @@ namespace Audit.Core
         /// </summary>
         [JsonProperty("New")]
         [DataMember]
-        public object SerializerNew { get; set; }
+        public object SerializedNew { get; set; }
 
         public AuditTarget()
         {

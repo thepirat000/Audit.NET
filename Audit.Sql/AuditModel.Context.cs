@@ -16,11 +16,10 @@ namespace Audit.SqlServer
     [DbConfigurationType(typeof(DbConfig))]
     public partial class Entities : DbContext
     {
-    
-    	public Entities(string nameOrConnectionString)
+        public Entities(string nameOrConnectionString)
     		: base(nameOrConnectionString)
     	{
-    
+
     	}
     
         public Entities()

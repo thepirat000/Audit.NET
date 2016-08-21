@@ -13,64 +13,41 @@ namespace Audit.Core
         /// The event type is set to the type of T.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
-        /// <param name="reference">The reference object getter.</param>
-        public static AuditScope<T> Create<T>(string eventType, Func<T> reference)
+        /// <param name="target">The reference object getter.</param>
+        public static AuditScope<T> Create<T>(string eventType, Func<T> target)
         {
-            return new AuditScope<T>(eventType, reference, (Func<string>)null, 2);
+            return new AuditScope<T>(eventType, target, null, 2);
         }
 
         /// <summary>
         /// Creates an audit scope from a reference value.
         /// (When using this overload, don't forget to set the ReferenceId property before saving or disposing)
         /// </summary>
-        /// <param name="reference">The reference object getter.</param>
-        public static AuditScope<T> Create<T>(Func<T> reference)
+        /// <param name="target">The reference object getter.</param>
+        public static AuditScope<T> Create<T>(Func<T> target)
         {
-            return new AuditScope<T>(typeof(T).Name, reference, (Func<string>)null, 2);
-        }
-
-        /// <summary>
-        /// Creates an audit scope from a reference value, an event type and a way to get a reference Id.
-        /// Use this overload when the reference id is not available until the scope is saved/disposed.
-        /// </summary>
-        /// <param name="eventType">Type of the event.</param>
-        /// <param name="reference">The reference object getter.</param>
-        /// <param name="referenceIdGetter">The reference id getter.</param>
-        public static AuditScope<T> Create<T>(string eventType, Func<T> reference, Func<string> referenceIdGetter)
-        {
-            return new AuditScope<T>(eventType, reference, referenceIdGetter, 2);
-        }
-
-        /// <summary>
-        /// Creates an audit scope from a reference value, and a way to get a reference Id.
-        /// Use this overload when the reference id is not available until the scope is saved/disposed.
-        /// </summary>
-        /// <param name="reference">The reference object getter.</param>
-        /// <param name="referenceIdGetter">The reference id getter.</param>
-        public static AuditScope<T> Create<T>(Func<T> reference, Func<string> referenceIdGetter)
-        {
-            return new AuditScope<T>(typeof(T).Name, reference, referenceIdGetter, 2);
+            return new AuditScope<T>(typeof(T).Name, target, null, 2);
         }
 
         /// <summary>
         /// Creates an audit scope from a reference value, and a reference Id.
         /// </summary>
-        /// <param name="reference">The reference object getter.</param>
+        /// <param name="target">The reference object getter.</param>
         /// <param name="referenceId">The reference id.</param>
-        public static AuditScope<T> Create<T>(Func<T> reference, string referenceId)
+        public static AuditScope<T> Create<T>(Func<T> target, string referenceId)
         {
-            return new AuditScope<T>(typeof(T).Name, reference, referenceId, 2);
+            return new AuditScope<T>(typeof(T).Name, target, referenceId, 2);
         }
 
         /// <summary>
         /// Creates an audit scope from a reference value, an event type and a reference Id.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
-        /// <param name="reference">The reference object getter.</param>
+        /// <param name="target">The reference object getter.</param>
         /// <param name="referenceId">The reference id.</param>
-        public static AuditScope<T> Create<T>(string eventType, Func<T> reference, string referenceId)
+        public static AuditScope<T> Create<T>(string eventType, Func<T> target, string referenceId)
         {
-            return new AuditScope<T>(eventType, reference, referenceId, 2);
+            return new AuditScope<T>(eventType, target, referenceId, 2);
         }
     }
 }

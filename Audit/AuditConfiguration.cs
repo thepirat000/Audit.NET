@@ -10,7 +10,7 @@ namespace Audit.Core
         /// <summary>
         /// Gets the current data provider.
         /// </summary>
-        public static IAuditDataProvider DataProvider { get; private set; }
+        public static AuditDataProvider DataProvider { get; private set; }
         static AuditConfiguration()
         {
             DataProvider = new FileDataProvider();
@@ -19,7 +19,7 @@ namespace Audit.Core
         /// Sets the data provider to use.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public static void SetDataProvider(IAuditDataProvider dataProvider)
+        public static void SetDataProvider(AuditDataProvider dataProvider)
         {
             DataProvider = dataProvider;
         }

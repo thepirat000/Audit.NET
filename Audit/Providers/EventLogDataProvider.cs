@@ -9,6 +9,7 @@ namespace Audit.Core.Providers
     /// Settings:
     /// - SourcePath: Event Source (default: Application)
     /// - LogName: Log name (default: Application)
+    /// - MachineName: Event Source (default: .)
     /// </remarks>
     public class EventLogDataProvider : AuditDataProvider
     {
@@ -16,25 +17,34 @@ namespace Audit.Core.Providers
         private string _machineName = ".";
         private string _logName = "Application";
 
+        /// <summary>
+        /// The EventLog Log Name
+        /// </summary>
         public string LogName
         {
             get { return _logName; }
             set { _logName = value; }
         }
 
+        /// <summary>
+        /// The EventLog Source Path
+        /// </summary>
         public string SourcePath
         {
             get { return _sourcePath; }
             set { _sourcePath = value; }
         }
 
+        /// <summary>
+        /// The Machine name (use "." to set local machine)
+        /// </summary>
         public string MachineName
         {
             get { return _machineName; }
             set { _machineName = value; }
         }
 
-        public override void WriteEvent(AuditEvent auditEvent)
+        public override object InsertEvent(AuditEvent auditEvent)
         {
             var source = _sourcePath;
             var logName = LogName;
@@ -47,7 +57,12 @@ namespace Audit.Core.Providers
             {
                 eventLog.WriteEntry(json, auditEvent.Environment.Exception == null ? EventLogEntryType.Information : EventLogEntryType.Error);
             }
+            return null;
         }
 
+        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        {
+            InsertEvent(auditEvent);
+        }
     }
 }

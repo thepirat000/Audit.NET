@@ -58,7 +58,7 @@
     <Compile Include="AuditTarget.cs" />
     <Compile Include="Providers\EventLogDataProvider.cs" />
     <Compile Include="Providers\FileDataProvider.cs" />
-    <Compile Include="IAuditDataProvider.cs" />
+    <Compile Include="EventCreationPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

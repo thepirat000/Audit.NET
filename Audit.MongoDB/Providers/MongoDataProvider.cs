@@ -1,3 +1,4 @@
+using System;
 using Audit.Core;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -20,7 +21,6 @@ namespace Audit.MongoDB.Providers
         private string _connectionString = "mongodb://localhost:27017";
         private string _database = "Audit";
         private string _collection = "Event";
-        private bool _shouldTestConnection = true;
 
         static MongoDataProvider()
         {
@@ -45,12 +45,6 @@ namespace Audit.MongoDB.Providers
             set { _collection = value; }
         }
 
-        public bool ShouldTestConnection
-        {
-            get { return _shouldTestConnection; }
-            set { _shouldTestConnection = value; }
-        }
-
         private static void ConfigureBsonMapping()
         {
             var pack = new ConventionPack();
@@ -67,15 +61,25 @@ namespace Audit.MongoDB.Providers
             {
                 cm.AutoMap();
                 cm.MapProperty(x => x.SerializedOld).SetElementName("Old");
-                cm.MapProperty(x => x.SerializerNew).SetElementName("New");
+                cm.MapProperty(x => x.SerializedNew).SetElementName("New");
             });
         }
 
-        public override void WriteEvent(AuditEvent auditEvent)
+        public override object InsertEvent(AuditEvent auditEvent)
         {
             var db = GetDatabase();
-            var col = db.GetCollection<AuditEvent>(_collection);
-            col.InsertOne(auditEvent);
+            var col = db.GetCollection<BsonDocument>(_collection);
+            var doc = auditEvent.ToBsonDocument();
+            col.InsertOne(doc);
+            return (BsonObjectId)doc["_id"];
+        }
+
+        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        {
+            var db = GetDatabase();
+            var col = db.GetCollection<BsonDocument>(_collection);
+            var doc = auditEvent.ToBsonDocument();
+            col.ReplaceOne(d => d["_id"] == (BsonObjectId)eventId, doc);
         }
 
         public override object Serialize<T>(T value)
@@ -96,21 +100,14 @@ namespace Audit.MongoDB.Providers
             return value.ToBsonDocument(typeof(object));
         }
 
-        public override bool TestConnection()
+        private void TestConnection()
         {
-            if (!_shouldTestConnection)
+            var db = GetDatabase();
+            var test = db.RunCommand((Command<BsonDocument>)"{ping:1}");
+            
+            if (test["ok"].ToInt64() != 1)
             {
-                return true;
-            }
-            try
-            {
-                var db = GetDatabase();
-                var test = db.RunCommand((Command<BsonDocument>)"{ping:1}");
-                return test["ok"].ToInt64() == 1;
-            }
-            catch
-            {
-                return false;                
+                throw new Exception("Can't connect to Audit Mongo Database.");
             }
         }
 

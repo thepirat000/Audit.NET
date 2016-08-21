@@ -16,10 +16,10 @@ namespace Audit.Core
         /// <summary>
         /// Creates an audit scope from a reference value, and a reference Id.
         /// </summary>
-        /// <param name="reference">The reference object getter.</param>
+        /// <param name="target">The target object getter.</param>
         /// <param name="referenceId">The reference id.</param>
-        public AuditScope(Func<T> reference, string referenceId)
-            : this(typeof(T).Name, () => reference(), referenceId, 2)
+        public AuditScope(Func<T> target, string referenceId)
+            : this(typeof(T).Name, () => target(), referenceId, 2)
         {
         }
 
@@ -27,27 +27,21 @@ namespace Audit.Core
         /// Creates an audit scope from a reference value, an event type and a reference Id.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
-        /// <param name="reference">The reference object getter.</param>
+        /// <param name="target">The reference object getter.</param>
         /// <param name="referenceId">The reference id.</param>
-        public AuditScope(string eventType, Func<T> reference, string referenceId)
-            : this(eventType, () => reference(), referenceId, 2)
+        public AuditScope(string eventType, Func<T> target, string referenceId)
+            : this(eventType, () => target(), referenceId, 2)
         {
         }
 
-        protected internal AuditScope(string eventType, Func<T> reference, string referenceId,
-            int callingMethodStackIndex = 1)
-            : this(eventType, reference, () => referenceId, ++callingMethodStackIndex)
-        {
-        }
-
-        protected internal AuditScope(string eventType, Func<T> reference, Func<string> referenceIdGetter,
+        protected internal AuditScope(string eventType, Func<T> target, string referenceId,
             int callingMethodStackIndex = 1)
         {
-            _referenceIdGetter = referenceIdGetter;
-            _newValueGetter = () => reference();
+            _newValueGetter = target;
             var callingMethod = new StackFrame(callingMethodStackIndex).GetMethod();
             _event = new AuditEvent()
             {
+                ReferenceId = referenceId,
                 Environment = new AuditEventEnvironment()
                 {
                     UserName = Environment.UserName,
@@ -60,19 +54,18 @@ namespace Audit.Core
                 EventType = eventType,
                 Target = new AuditTarget(typeof(T).Name)
                 {
-                    SerializedOld = _dataProvider.Serialize(reference.Invoke())
+                    SerializedOld = _dataProvider.Serialize(target.Invoke())
                 },
                 Comments = new List<string>(),
                 CustomFields = new Dictionary<string, object>()
             };
-            _dataProvider.Initialize(_event);
-            TestConnectionDataProvider();
+            _dataProvider.Init(_event);
         }
         #endregion
 
         #region Public Properties
         /// <summary>
-        /// Indicates the change type (i.e. CustomerOrder Update)
+        /// Indicates the change type
         /// </summary>
         public string EventType
         {
@@ -81,12 +74,20 @@ namespace Audit.Core
         }
 
         /// <summary>
-        /// Indicates the reference Identifier for the change (i.e. The CustomerOrder Id)
+        /// Indicates the reference Identifier for the change
         /// </summary>
         public string ReferenceId
         {
             get { return _event.ReferenceId; }
             set { _event.ReferenceId = value; }
+        }
+
+        /// <summary>
+        /// Gets the event related to this scope.
+        /// </summary>
+        public AuditEvent Event
+        {
+            get { return _event; }
         }
         #endregion
 
@@ -94,9 +95,8 @@ namespace Audit.Core
         private readonly AuditEvent _event;
         private bool _disposed;
         private bool _saved;
-        private readonly IAuditDataProvider _dataProvider = AuditConfiguration.DataProvider;
+        private readonly AuditDataProvider _dataProvider = AuditConfiguration.DataProvider;
         private readonly Func<T> _newValueGetter;
-        private readonly Func<string> _referenceIdGetter;
         #endregion
 
         #region Public Methods
@@ -163,18 +163,14 @@ namespace Audit.Core
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
             if (this._newValueGetter != null)
             {
-                _event.Target.SerializerNew = _dataProvider.Serialize(this._newValueGetter.Invoke());
-            }
-            if (this.ReferenceId == null)
-            {
-                this.ReferenceId = _referenceIdGetter == null ? null : _referenceIdGetter.Invoke();
+                _event.Target.SerializedNew = _dataProvider.Serialize(this._newValueGetter.Invoke());
             }
             if (_event.Comments.Count == 0)
             {
                 _event.Comments = null;
             }
             _event.EndDate = DateTime.Now;
-            _dataProvider.WriteEvent(_event);
+            _dataProvider.End(_event);
             _saved = true;
         }
         #endregion
@@ -187,14 +183,6 @@ namespace Audit.Core
                 return Marshal.GetExceptionForHR(Marshal.GetExceptionCode());
             }
             return null;
-        }
-
-        private void TestConnectionDataProvider()
-        {
-            if (!_dataProvider.TestConnection())
-            {
-                throw new Exception(string.Format("{0}: Can't connect to Audit Database.", _dataProvider.GetType().Name));
-            }
         }
 
         #endregion

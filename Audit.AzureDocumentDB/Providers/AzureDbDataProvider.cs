@@ -1,5 +1,9 @@
 using System;
+using System.Configuration.Internal;
+using System.IO;
+using System.Text;
 using Audit.Core;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
 namespace Audit.AzureDocumentDB.Providers
@@ -9,10 +13,10 @@ namespace Audit.AzureDocumentDB.Providers
     /// </summary>
     /// <remarks>
     /// Settings:
-    /// - AuditConnectionString: Server url
-    /// - AuditAuthKey: Auth key for the Azure API
-    /// - AuditEventDatabase: Database name
-    /// - AuditEventTable: Collection name
+    /// - ConnectionString: Server url
+    /// - AuthKey: Auth key for the Azure API
+    /// - Database: Database name
+    /// - Collection: Collection name
     /// </remarks>
     public class AzureDbDataProvider : AuditDataProvider
     {
@@ -45,14 +49,28 @@ namespace Audit.AzureDocumentDB.Providers
             set { _collection = value; }
         }
 
-        public override void WriteEvent(AuditEvent auditEvent)
+        public override object InsertEvent(AuditEvent auditEvent)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            client.CreateDocumentAsync(collectionUri, auditEvent).Wait();
+            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent).Result;
+            return doc.Id;
         }
 
-        public override bool TestConnection()
+        public override void ReplaceEvent(object docId, AuditEvent auditEvent)
+        {
+            var client = GetClient();
+            var docUri = UriFactory.CreateDocumentUri(_database, _collection, docId.ToString());
+            Document doc;
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
+            {
+                doc = JsonSerializable.LoadFrom<Document>(ms);
+                doc.Id = docId.ToString();
+            }
+            client.ReplaceDocumentAsync(docUri, doc).Wait();
+        }
+
+        private bool TestConnection()
         {
             try
             {

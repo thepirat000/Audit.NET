@@ -30,7 +30,7 @@ namespace Audit.Core.Providers
             set { _directoryPath = value; }
         }
 
-        public override void WriteEvent(AuditEvent auditEvent)
+        public override object InsertEvent(AuditEvent auditEvent)
         {
             var fileName = _filenamePrefix + DateTime.Now.ToString("yyyyMMddmmssfff") + ".json";
             if (_directoryPath.Length > 0)
@@ -40,7 +40,14 @@ namespace Audit.Core.Providers
             var fullPath = Path.Combine(_directoryPath, fileName);
             var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
             File.WriteAllText(fullPath, json);
+            return fullPath;
         }
 
+        public override void ReplaceEvent(object path, AuditEvent auditEvent)
+        {
+            var fullPath = path.ToString();
+            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            File.WriteAllText(fullPath, json);
+        }
     }
 }
