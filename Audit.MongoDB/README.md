@@ -36,7 +36,7 @@ Mandatory:
 Optional:
 - **CreationPolicy**: The [event creation policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) to use.
 
-###Output sample
+##Output sample
 
 An example of the output as seen with [NoSQL Manager for Mongo DB](http://www.mongodbmanager.com/):
 
