@@ -26,9 +26,12 @@ AuditConfiguration.SetDataProvider(new Audit.AzureDocumentDB.Providers.AzureDbDa
 });
 ```
 
-Provider options:
+###Provider options
 
+Mandatory:
 - **ConnectionString**: The Azure Document DB connection string.
 - **Database**: The audit database name.
 - **Collection**: The events collection name.
 
+Optional:
+- **CreationPolicy**: The [event creation policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) to use.
