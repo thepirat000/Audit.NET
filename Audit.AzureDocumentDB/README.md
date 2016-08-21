@@ -1,5 +1,5 @@
 # Audit.NET.AzureDocumentDB
-**Azure Document DB provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (A small framework to audit executing operations in .NET).
+**Azure Document DB provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)**. (A small framework to audit executing operations in .NET)
 
 Store the audit events in an Azure Document DB collection, in JSON format.
 
