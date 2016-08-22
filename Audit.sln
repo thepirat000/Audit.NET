@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.AzureDocumentDB", "Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.UnitTest", "Audit.UnitTest\Audit.UnitTest.csproj", "{30FA281D-360A-4FBF-B192-B3AA607F2D8E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.Mvc", "Audit.Mvc\Audit.Mvc.csproj", "{30F17D37-993C-4C1A-A7BF-4175E891EAA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{30FA281D-360A-4FBF-B192-B3AA607F2D8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30FA281D-360A-4FBF-B192-B3AA607F2D8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30FA281D-360A-4FBF-B192-B3AA607F2D8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
