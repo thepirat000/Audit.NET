@@ -1,6 +1,8 @@
 #Audit.Mvc
 
-Generate an Audit Trail for MVC actions.
+**MVC Actions Audit for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (A small framework to audit executing operations in .NET).
+
+Generate Audit Trails for MVC actions.
 
 ##Install
 
