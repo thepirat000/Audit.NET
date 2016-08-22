@@ -28,7 +28,7 @@ order = Db.OrderUpdate(order);
 To audit this operation, tracking the _Order_ object, you can add the following `using` statement:
 ```c#
 Order order = Db.GetOrder(orderId);
-using (AuditScope.Create("Order:Update", () => order, orderId))
+using (AuditScope.Create("Order:Update", () => order))
 {
     order.Status = -1;
     order.OrderItems = null;
@@ -36,7 +36,7 @@ using (AuditScope.Create("Order:Update", () => order, orderId))
 }
 ```
 
-The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track, and the third is a string that identifies the object to track.
+The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track.
 
 The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields](#custom-fields-and-comments) provided.
 
@@ -47,7 +47,6 @@ An example of the output in JSON:
 ```javascript
 {
   "EventType": "Order:Update",
-  "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
   "Environment": {
     "UserName": "Federico",
     "MachineName": "HP",
@@ -91,9 +90,9 @@ For example:
 
 ```c#
 Order order = Db.GetOrder(orderId);
-using (var audit = AuditScope.Create("Order:Update", () => order, orderId))
+using (var audit = AuditScope.Create("Order:Update", () => order))
 {
-    audit.SetCustomField("ItemsCatalog", ItemsList);
+    audit.SetCustomField("ReferenceId", orderId);
     order.Status = -1;
     order = Db.OrderUpdate(order);
     audit.Comment("Status Updated to Cancelled");
@@ -128,13 +127,18 @@ The output of the previous example would be:
     "Status Updated to Cancelled"
   ],
   "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
-  "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
-  "ItemsCatalog": [
-    {
-      "Sku": "1002",
-      "Description": "Some product description"
-    }
-  ]
+  "CommitDate": "2016-08-13T21:18:02.5718424-05:00"
+}
+```
+
+You can also set the custom fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. for example:
+
+```c#
+using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+{
+    order.Status = -1;
+    order = Db.OrderUpdate(order);
+    audit.Comment("Status Updated to Cancelled");
 }
 ```
 
