@@ -25,7 +25,7 @@ public class HomeController : Controller
       return View(new SomeViewModel() { Id = 0, Name = test });
     }
 
-    [Audit(IncludeHeaders = true, IncludeModel = true)]
+    [Audit(EventType = "InsertOrderAction", IncludeHeaders = true, IncludeModel = true)]
     [HttpPost]
     public ActionResult InsertOrder(OrderViewModel model)
     {
