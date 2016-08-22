@@ -1,6 +1,6 @@
 #Audit.Mvc
 
-**MVC Actions Audit for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (A small framework to audit executing operations in .NET).
+**MVC Actions Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (A small framework to audit executing operations in .NET).
 
 Generate Audit Trails for MVC actions.
 
