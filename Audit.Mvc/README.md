@@ -41,6 +41,17 @@ The `AuditAttribute` can be configured with the following properties:
 - IncludeModel: Boolean to indicate whether to include the View Model or not.
 - EventType: A string that identifies the event type .
 
+##Output
+
+The Audit.Mvc tool will output the following information:
+
+- Authenticated username
+- Client IP address
+- Form Variables
+- Http Headers
+- Action Parameters
+- Model and Model State Errors
+
 ###Output Sample
 
 ```javascript
