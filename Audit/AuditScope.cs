@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -9,17 +10,15 @@ namespace Audit.Core
     /// Makes a code block auditable.
     /// </summary>
     /// <typeparam name="T">The type of the object to audit</typeparam>
-    public class AuditScope<T> : IDisposable
+    public partial class AuditScope : IDisposable
     {
         #region Constructors
-
         /// <summary>
         /// Creates an audit scope from a reference value, and a reference Id.
         /// </summary>
-        /// <param name="target">The target object getter.</param>
-        /// <param name="referenceId">The reference id.</param>
-        public AuditScope(Func<T> target, string referenceId)
-            : this(typeof(T).Name, () => target(), referenceId, 2)
+        /// <param name="eventType">Type of the event.</param>
+        public AuditScope(string eventType)
+            : this(eventType, null, null, 2)
         {
         }
 
@@ -28,39 +27,55 @@ namespace Audit.Core
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="target">The reference object getter.</param>
-        /// <param name="referenceId">The reference id.</param>
-        public AuditScope(string eventType, Func<T> target, string referenceId)
-            : this(eventType, () => target(), referenceId, 2)
+        public AuditScope(string eventType, Func<object> target)
+            : this(eventType, () => target(), null, 2)
         {
         }
 
-        protected internal AuditScope(string eventType, Func<T> target, string referenceId,
-            int callingMethodStackIndex = 1)
+        /// <summary>
+        /// Creates an audit scope from a reference value, an event type and a reference Id.
+        /// </summary>
+        /// <param name="eventType">Type of the event.</param>
+        /// <param name="target">The reference object getter.</param>
+        /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
+        public AuditScope(string eventType, Func<object> target, object extraFields)
+            : this(eventType, () => target(), extraFields, 2)
         {
-            _newValueGetter = target;
+        }
+
+        protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, int callingMethodStackIndex = 1)
+        {
+            _targetGetter = target;
             var callingMethod = new StackFrame(callingMethodStackIndex).GetMethod();
             _event = new AuditEvent()
             {
-                ReferenceId = referenceId,
                 Environment = new AuditEventEnvironment()
                 {
                     UserName = Environment.UserName,
                     MachineName = Environment.MachineName,
                     DomainName = Environment.UserDomainName,
                     CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()",
+                    AssemblyName = callingMethod.DeclaringType?.Assembly.FullName,
                     Culture = System.Globalization.CultureInfo.CurrentCulture.ToString()
                 },
                 StartDate = DateTime.Now,
                 EventType = eventType,
-                Target = new AuditTarget(typeof(T).Name)
-                {
-                    SerializedOld = _dataProvider.Serialize(target.Invoke())
-                },
                 Comments = new List<string>(),
                 CustomFields = new Dictionary<string, object>()
             };
+            if (target != null)
+            {
+                var targetValue = target.Invoke();
+                _event.Target = new AuditTarget
+                {
+                    SerializedOld = _dataProvider.Serialize(targetValue),
+                    Type = targetValue?.GetType().Name ?? "Object"
+                };
+            }
+            ProcessExtraFields(extraFields);
             _dataProvider.Init(_event);
         }
+
         #endregion
 
         #region Public Properties
@@ -71,15 +86,6 @@ namespace Audit.Core
         {
             get { return _event.EventType; }
             set { _event.EventType = value; }
-        }
-
-        /// <summary>
-        /// Indicates the reference Identifier for the change
-        /// </summary>
-        public string ReferenceId
-        {
-            get { return _event.ReferenceId; }
-            set { _event.ReferenceId = value; }
         }
 
         /// <summary>
@@ -96,7 +102,7 @@ namespace Audit.Core
         private bool _disposed;
         private bool _saved;
         private readonly AuditDataProvider _dataProvider = AuditConfiguration.DataProvider;
-        private readonly Func<T> _newValueGetter;
+        private readonly Func<object> _targetGetter;
         #endregion
 
         #region Public Methods
@@ -161,9 +167,9 @@ namespace Audit.Core
             }
             var exception = GetCurrentException();
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
-            if (this._newValueGetter != null)
+            if (_targetGetter != null)
             {
-                _event.Target.SerializedNew = _dataProvider.Serialize(this._newValueGetter.Invoke());
+                _event.Target.SerializedNew = _dataProvider.Serialize(_targetGetter.Invoke());
             }
             if (_event.Comments.Count == 0)
             {
@@ -185,6 +191,17 @@ namespace Audit.Core
             return null;
         }
 
+        private void ProcessExtraFields(object extraFields)
+        {
+            if (extraFields == null)
+            {
+                return;
+            }
+            foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(extraFields))
+            {
+                SetCustomField(prop.Name, prop.GetValue(extraFields));
+            }
+        }
         #endregion
     }
 }

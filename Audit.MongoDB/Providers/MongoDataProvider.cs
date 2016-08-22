@@ -12,9 +12,9 @@ namespace Audit.MongoDB.Providers
     /// </summary>
     /// <remarks>
     /// Settings:
-    /// - AuditConnectionString: Mongo connection string
-    /// - AuditEventDatabase: Database name
-    /// - AuditEventTable: Collection name
+    /// - ConnectionString: Mongo connection string
+    /// - Database: Database name
+    /// - Collection: Collection name
     /// </remarks>
     public class MongoDataProvider : AuditDataProvider
     {

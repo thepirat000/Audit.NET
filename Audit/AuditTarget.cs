@@ -30,14 +30,5 @@ namespace Audit.Core
         [JsonProperty("New")]
         [DataMember]
         public object SerializedNew { get; set; }
-
-        public AuditTarget()
-        {
-        }
-
-        public AuditTarget(string type)
-        {
-            Type = type;
-        }
     }
 }

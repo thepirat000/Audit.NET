@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Audit.AzureDocumentDB.Providers;
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;
+using Microsoft.VisualBasic.Devices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Audit.UnitTest
@@ -63,7 +65,7 @@ namespace Audit.UnitTest
             public struct TestStruct
             {
                 public int Id { get; set; }
-                public IntegrationTests.CustomerOrder Order { get; set; }
+                public CustomerOrder Order { get; set; }
             }
 
             public void TestUpdate()
@@ -73,28 +75,26 @@ namespace Audit.UnitTest
                 var eventType = "Order:Update";
 
                 //struct
-                using (
-                    var a = AuditScope.Create(eventType, () => new IntegrationTests.AuditTests.TestStruct() {Id = 123, Order = order},
-                        order.OrderId))
+                using (var a = AuditScope.Create(eventType, () => new TestStruct() { Id = 123, Order = order },
+                       new { ReferenceId = order.OrderId }))
                 {
                     a.SetCustomField("TestGuid", Guid.NewGuid());
-                    order = DbOrderUpdateStatus(order, IntegrationTests.OrderStatus.Submitted);
+                    order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
                 order = DbCreateOrder();
 
                 //audit multiple 
-                using (
-                    AuditScope.Create(eventType, () => new {OrderStatus = order.Status, Items = order.OrderItems},
-                        order.OrderId))
+                using (AuditScope.Create(eventType, () => new { OrderStatus = order.Status, Items = order.OrderItems },
+                    new { ReferenceId = order.OrderId }))
                 {
-                    order = DbOrderUpdateStatus(order, IntegrationTests.OrderStatus.Submitted);
+                    order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
                 order = DbCreateOrder();
 
 
-                using (var audit = AuditScope.Create("Order:Update", () => order.Status, order.OrderId))
+                using (var audit = AuditScope.Create("Order:Update", () => order.Status, new { ReferenceId = order.OrderId }))
                 {
                     audit.SetCustomField("Reason", reasonText);
                     audit.SetCustomField("ItemsBefore", order.OrderItems);
@@ -108,7 +108,7 @@ namespace Audit.UnitTest
 
                 order = DbCreateOrder();
 
-                using (var audit = new AuditScope<IntegrationTests.CustomerOrder>(eventType, () => order, order.OrderId))
+                using (var audit = new AuditScope(eventType, () => order, new { ReferenceId = order.OrderId }))
                 {
                     audit.SetCustomField("Reason", "reason");
                     ExecuteStoredProcedure(order, IntegrationTests.OrderStatus.Submitted);
@@ -121,11 +121,11 @@ namespace Audit.UnitTest
 
             public void TestInsert()
             {
-                IntegrationTests.CustomerOrder order = null;
+                CustomerOrder order = null;
                 using (var audit = AuditScope.Create("Order:Create", () => order))
                 {
                     order = DbCreateOrder();
-                    audit.ReferenceId = order.OrderId;
+                    audit.SetCustomField("ReferenceId", order.OrderId);
                 }
             }
 
@@ -133,7 +133,7 @@ namespace Audit.UnitTest
             {
                 IntegrationTests.CustomerOrder order = DbCreateOrder();
 
-                using (var audit = AuditScope.Create("Order:Delete", () => order, order.OrderId))
+                using (var audit = AuditScope.Create("Order:Delete", () => order, new { ReferenceId = order.OrderId }))
                 {
                     DbDeteleOrder(order.OrderId);
                     order = null;
@@ -155,7 +155,8 @@ namespace Audit.UnitTest
                 AuditConfiguration.SetDataProvider(new FileDataProvider()
                 {
                     FilenamePrefix = "Event_",
-                    DirectoryPath = @"c:\temp\1"
+                    DirectoryPath = @"c:\temp\1",
+                    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
                 });
             }
 
@@ -163,10 +164,11 @@ namespace Audit.UnitTest
             {
                 AuditConfiguration.SetDataProvider(new AzureDbDataProvider()
                 {
-                    ConnectionString = "https://localhost:443/",
-                    AuthKey = "xxxxxxxxxx==",
+                    ConnectionString = "https://thepirat.documents.azure.com:443/",
+                    AuthKey = "xxxxxxxx",
                     Database = "Audit",
-                    Collection = "Event"
+                    Collection = "Event",
+                    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
                 });
             }
 
@@ -175,8 +177,12 @@ namespace Audit.UnitTest
                 AuditConfiguration.SetDataProvider(new SqlDataProvider()
                 {
                     ConnectionString =
-                        "data source=localhost;initial catalog=db;user id=user;password=pass",
-                    TableName = "Audit"
+                        "data source=localhost;initial catalog=Audit;integrated security=true;",
+                    TableName = "Event",
+                    JsonColumnName = "Data",
+                    IdColumnName = "EventId",
+                    LastUpdatedDateColumnName = "LastUpdatedDate",
+                    CreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd
                 });
             }
 
@@ -184,9 +190,10 @@ namespace Audit.UnitTest
             {
                 AuditConfiguration.SetDataProvider(new MongoDataProvider()
                 {
-                    ConnectionString = "mongodb://server",
+                    ConnectionString = "mongodb://localhost:27017",
                     Database = "Audit",
-                    Collection = "Event"
+                    Collection = "Event",
+                    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
                 });
             }
 
@@ -204,7 +211,6 @@ namespace Audit.UnitTest
                 {
                     OrderId = Guid.NewGuid().ToString(),
                     CustomerId = "customer 123 some 'quotes' to test's. double ''. some double \"quotes\" \"",
-                    DistributorId = "STAFF",
                     Status = IntegrationTests.OrderStatus.Created,
                     OrderItems = new List<IntegrationTests.CustomerOrderItem>()
                     {
@@ -232,7 +238,6 @@ namespace Audit.UnitTest
             public string OrderId { get; set; }
             public IntegrationTests.OrderStatus Status { get; set; }
             public string CustomerId { get; set; }
-            public string DistributorId { get; set; }
             public IEnumerable<IntegrationTests.CustomerOrderItem> OrderItems { get; set; }
         }
 

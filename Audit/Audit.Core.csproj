@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AuditDataProvider.cs" />
     <Compile Include="AuditEvent.cs" />
+    <Compile Include="AuditEventEnvironment.cs" />
     <Compile Include="AuditScope.cs" />
     <Compile Include="AuditScope.Factory.cs" />
     <Compile Include="AuditConfiguration.cs" />

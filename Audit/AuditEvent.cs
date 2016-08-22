@@ -5,54 +5,10 @@ using Newtonsoft.Json;
 
 namespace Audit.Core
 {
-    [Serializable]
-    [DataContract]
-    public class AuditEventEnvironment
-    {
-        /// <summary>
-        /// Gets or sets the name of the user responsible for the change.
-        /// </summary>
-        [DataMember]
-        public string UserName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the machine.
-        /// </summary>
-        [DataMember]
-        public string MachineName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the domain.
-        /// </summary>
-        [DataMember]
-        public string DomainName { get; set; }
-
-        /// <summary>
-        /// The name of the method that has the audited code
-        /// </summary>
-        [JsonProperty("CallingMethodName")]
-        [DataMember]
-        public string CallingMethodName { get; set; }
-
-        /// <summary>
-        /// The exception information (if any)
-        /// </summary>
-        [JsonProperty("Exception")]
-        [DataMember]
-        public string Exception { get; set; }
-
-        /// <summary>
-        /// The locale name
-        /// </summary>
-        [JsonProperty("Culture")]
-        [DataMember]
-        public string Culture { get; set; }
-    }
-
     /// <summary>
-        /// Represents the output of the audit process
-        /// </summary>
-        [Serializable]
+    /// Represents the output of the audit process
+    /// </summary>
+    [Serializable]
     [DataContract]
     public class AuditEvent
     {
@@ -69,13 +25,6 @@ namespace Audit.Core
         [JsonProperty(Order = -999)]
         [DataMember]
         public string EventType { get; set; }
-
-        /// <summary>
-        /// Indicates the reference Identifier for the change (i.e. The CustomerOrder Id)
-        /// </summary>
-        [JsonProperty(Order = -999)]
-        [DataMember]
-        public string ReferenceId { get; set; }
 
         /// <summary>
         /// The extension data. 

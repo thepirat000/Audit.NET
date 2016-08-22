@@ -5,49 +5,27 @@ namespace Audit.Core
     /// <summary>
     /// A factory of scopes.
     /// </summary>
-    public static class AuditScope
+    public partial class AuditScope
     {
         /// <summary>
-        /// Creates an audit scope from a reference value and and event type.
-        /// When using this overload, don't forget to set the ReferenceId property before disposing.
-        /// The event type is set to the type of T.
+        /// Creates an audit scope from a reference value, and an event type.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="target">The reference object getter.</param>
-        public static AuditScope<T> Create<T>(string eventType, Func<T> target)
+        public static AuditScope Create(string eventType, Func<object> target)
         {
-            return new AuditScope<T>(eventType, target, null, 2);
+            return new AuditScope(eventType, target, null, 2);
         }
 
         /// <summary>
-        /// Creates an audit scope from a reference value.
-        /// (When using this overload, don't forget to set the ReferenceId property before saving or disposing)
-        /// </summary>
-        /// <param name="target">The reference object getter.</param>
-        public static AuditScope<T> Create<T>(Func<T> target)
-        {
-            return new AuditScope<T>(typeof(T).Name, target, null, 2);
-        }
-
-        /// <summary>
-        /// Creates an audit scope from a reference value, and a reference Id.
-        /// </summary>
-        /// <param name="target">The reference object getter.</param>
-        /// <param name="referenceId">The reference id.</param>
-        public static AuditScope<T> Create<T>(Func<T> target, string referenceId)
-        {
-            return new AuditScope<T>(typeof(T).Name, target, referenceId, 2);
-        }
-
-        /// <summary>
-        /// Creates an audit scope from a reference value, an event type and a reference Id.
+        /// Creates an audit scope from a reference value, and an event type.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="target">The reference object getter.</param>
-        /// <param name="referenceId">The reference id.</param>
-        public static AuditScope<T> Create<T>(string eventType, Func<T> target, string referenceId)
+        /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
+        public static AuditScope Create(string eventType, Func<object> target, object extraFields)
         {
-            return new AuditScope<T>(eventType, target, referenceId, 2);
+            return new AuditScope(eventType, target, extraFields, 2);
         }
     }
 }
