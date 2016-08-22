@@ -261,6 +261,9 @@ Store the events in a Mongo DB Collection, in BSON format.
 **[Azure Document DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
+##Extensions
+**[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Mvc#auditmvc)**
+Decorate MVC Actions to generate Audit Trails. 
 
 
 
