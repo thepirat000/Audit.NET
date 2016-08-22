@@ -34,7 +34,7 @@ public class HomeController : Controller
 }
 ```
 
-###Configuration
+##Configuration
 
 The `AuditAttribute` can be configured with the following properties:
 - IncludeHeaders: Boolean to indicate whether to include the Http Request Headers or not.
