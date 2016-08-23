@@ -3,7 +3,7 @@ An extensible framework to audit executing operations in .NET.
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
-With Audit.NET you can easily generate tracking information about an operation being executed.
+With Audit.NET you can generate tracking information about operations being executed. It will automatically log environmental information such as the caller user id, machine name, method name, exceptions, including the execution time and duration, exposing an extensible mechanism in which you can provide extra information or implement your persistence mechanism for the audit logs.
 
 ##Install
 
