@@ -8,20 +8,33 @@ namespace Audit.Core
     public static class AuditConfiguration
     {
         /// <summary>
-        /// Gets the current data provider.
+        /// Gets or Sets the Default creation policy.
+        /// </summary>
+        public static EventCreationPolicy CreationPolicy { get; private set; } 
+        /// <summary>
+        /// Gets the Default data provider.
         /// </summary>
         public static AuditDataProvider DataProvider { get; private set; }
         static AuditConfiguration()
         {
             DataProvider = new FileDataProvider();
+            CreationPolicy = EventCreationPolicy.InsertOnEnd;
         }
         /// <summary>
-        /// Sets the data provider to use.
+        /// Sets the default data provider to use.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         public static void SetDataProvider(AuditDataProvider dataProvider)
         {
             DataProvider = dataProvider;
+        }
+        /// <summary>
+        /// Sets the default creation policy.
+        /// </summary>
+        /// <param name="creationPolicy">The event creation policy to use.</param>
+        public static void SetCreationPolicy(EventCreationPolicy creationPolicy)
+        {
+            CreationPolicy = creationPolicy;
         }
     }
 }

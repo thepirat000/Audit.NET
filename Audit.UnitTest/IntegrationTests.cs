@@ -156,8 +156,8 @@ namespace Audit.UnitTest
                 {
                     FilenamePrefix = "Event_",
                     DirectoryPath = @"c:\temp\1",
-                    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
                 });
+                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
             public void SetAzureSettings()
@@ -167,9 +167,9 @@ namespace Audit.UnitTest
                     ConnectionString = "https://thepirat.documents.azure.com:443/",
                     AuthKey = "xxxxxxxx",
                     Database = "Audit",
-                    Collection = "Event",
-                    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
+                    Collection = "Event"
                 });
+                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
             public void SetSqlSettings()
@@ -181,9 +181,9 @@ namespace Audit.UnitTest
                     TableName = "Event",
                     JsonColumnName = "Data",
                     IdColumnName = "EventId",
-                    LastUpdatedDateColumnName = "LastUpdatedDate",
-                    CreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd
+                    LastUpdatedDateColumnName = "LastUpdatedDate"
                 });
+                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
             public void SetMongoSettings()
@@ -192,9 +192,9 @@ namespace Audit.UnitTest
                 {
                     ConnectionString = "mongodb://localhost:27017",
                     Database = "Audit",
-                    Collection = "Event",
-                    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
+                    Collection = "Event"
                 });
+                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)

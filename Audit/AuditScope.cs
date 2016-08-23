@@ -14,37 +14,20 @@ namespace Audit.Core
     {
         #region Constructors
         /// <summary>
-        /// Creates an audit scope from a reference value, and a reference Id.
-        /// </summary>
-        /// <param name="eventType">Type of the event.</param>
-        public AuditScope(string eventType)
-            : this(eventType, null, null, 2)
-        {
-        }
-
-        /// <summary>
         /// Creates an audit scope from a reference value, an event type and a reference Id.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
-        /// <param name="target">The reference object getter.</param>
-        public AuditScope(string eventType, Func<object> target)
-            : this(eventType, () => target(), null, 2)
-        {
-        }
-
-        /// <summary>
-        /// Creates an audit scope from a reference value, an event type and a reference Id.
-        /// </summary>
-        /// <param name="eventType">Type of the event.</param>
-        /// <param name="target">The reference object getter.</param>
+        /// <param name="target">The target object getter.</param>
         /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
-        public AuditScope(string eventType, Func<object> target, object extraFields)
-            : this(eventType, () => target(), extraFields, 2)
+        /// <param name="creationPolicy">The event creation policy to use.</param>
+        /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
+        protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
+            AuditDataProvider dataProvider = null, 
+            EventCreationPolicy? creationPolicy = null)
         {
-        }
-
-        protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, int callingMethodStackIndex = 1)
-        {
+            int callingMethodStackIndex = 2;
+            _creationPolicy = creationPolicy ?? AuditConfiguration.CreationPolicy;
+            _dataProvider = dataProvider ?? AuditConfiguration.DataProvider;
             _targetGetter = target;
             var callingMethod = new StackFrame(callingMethodStackIndex).GetMethod();
             _event = new AuditEvent()
@@ -73,9 +56,12 @@ namespace Audit.Core
                 };
             }
             ProcessExtraFields(extraFields);
-            _dataProvider.Init(_event);
+            // Process the event insertion (if applies)
+            if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            {
+                _event.EventId = _dataProvider.InsertEvent(_event);
+            }
         }
-
         #endregion
 
         #region Public Properties
@@ -98,10 +84,11 @@ namespace Audit.Core
         #endregion
 
         #region Private fields
+        private EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
         private bool _disposed;
-        private bool _saved;
-        private readonly AuditDataProvider _dataProvider = AuditConfiguration.DataProvider;
+        private bool _ended;
+        private readonly AuditDataProvider _dataProvider;
         private readonly Func<object> _targetGetter;
         #endregion
 
@@ -111,7 +98,7 @@ namespace Audit.Core
         /// </summary>
         public void Comment(string text)
         {
-            _event.Comments.Add(text); 
+            Comment(text, new object[0]); 
         }
 
         /// <summary>
@@ -119,6 +106,10 @@ namespace Audit.Core
         /// </summary>
         public void Comment(string format, params object[] args)
         {
+            if (_event.Comments == null)
+            {
+                _event.Comments = new List<string>();
+            }
             _event.Comments.Add(string.Format(format, args));
         }
 
@@ -144,7 +135,7 @@ namespace Audit.Core
                 return;
             }
             _disposed = true;
-            Save();
+            End();
         }
 
         /// <summary>
@@ -153,31 +144,67 @@ namespace Audit.Core
         public void Discard()
         {
             // Mark as saved to ignore the saving
-            _saved = true;
+            _ended = true;
         }
 
         /// <summary>
         /// Saves the event.
         /// </summary>
-        public void Save()
+        private void End()
         {
-            if (_saved)
+            if (_ended)
             {
                 return;
             }
+            EndEvent();
+            // process event creation/replacement
+            if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            {
+                _event.EventId = _dataProvider.InsertEvent(_event);
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
+            {
+                _dataProvider.ReplaceEvent(_event.EventId, _event);
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            {
+                _event.EventId = _dataProvider.InsertEvent(_event);
+            }
+            _ended = true;
+        }
+
+        // Update event info prior to save
+        private void EndEvent()
+        {
             var exception = GetCurrentException();
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
+            _event.EndDate = DateTime.Now;
             if (_targetGetter != null)
             {
                 _event.Target.SerializedNew = _dataProvider.Serialize(_targetGetter.Invoke());
             }
-            if (_event.Comments.Count == 0)
+            if (_event.Comments != null && _event.Comments.Count == 0)
             {
                 _event.Comments = null;
             }
-            _event.EndDate = DateTime.Now;
-            _dataProvider.End(_event);
-            _saved = true;
+        }
+
+        /// <summary>
+        /// Manually Saves (insert/replace) the Event.
+        /// Use this method when the Data Provider's CreationPolicy is set to Manual.
+        /// </summary>
+        public void Save()
+        {
+            if (_creationPolicy != EventCreationPolicy.Manual)
+            {
+                return;
+            }
+            if (_ended)
+            {
+                return;
+            }
+            EndEvent();
+            ForceReplaceOrInsertEvent(_event);
         }
         #endregion
 
@@ -200,6 +227,18 @@ namespace Audit.Core
             foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(extraFields))
             {
                 SetCustomField(prop.Name, prop.GetValue(extraFields));
+            }
+        }
+
+        private void ForceReplaceOrInsertEvent(AuditEvent auditEvent)
+        {
+            if (auditEvent.EventId != null)
+            {
+                _dataProvider.ReplaceEvent(auditEvent.EventId, auditEvent);
+            }
+            else
+            {
+                auditEvent.EventId = _dataProvider.InsertEvent(auditEvent);
             }
         }
         #endregion

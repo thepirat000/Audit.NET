@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Web.Mvc;
@@ -42,9 +43,9 @@ namespace Audit.Mvc
                 ControllerName = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName,
                 ActionParameters = filterContext.ActionParameters.ToDictionary(k => k.Key, v => v.Value)
             };
+            var eventType = EventType ?? $"{auditAction.ControllerName}/{auditAction.ActionName} ({auditAction.HttpMethod})";
             // Create the audit scope
-            var auditScope = new AuditScope(EventType ?? $"{auditAction.ControllerName}/{auditAction.ActionName} ({auditAction.HttpMethod})");
-            auditScope.SetCustomField("Action", auditAction);
+            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction }, EventCreationPolicy.Manual);
             filterContext.HttpContext.Items[AuditActionKey] = auditAction;
             filterContext.HttpContext.Items[AuditScopeKey] = auditScope;
             base.OnActionExecuting(filterContext);
@@ -61,16 +62,38 @@ namespace Audit.Mvc
                 auditAction.RedirectLocation = filterContext.HttpContext.Response.RedirectLocation;
                 auditAction.ResponseStatus = filterContext.HttpContext.Response.Status;
                 auditAction.ResponseStatusCode = filterContext.HttpContext.Response.StatusCode;
+                auditAction.Exception = GetExceptionInfo(filterContext.Exception);
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
             {
-                // Replace the Action field
+                // Replace the Action field and save
+                auditScope.SetCustomField("Action", auditAction);
+                auditScope.Save();
+            }
+            base.OnActionExecuted(filterContext);
+        }
+
+        public override void OnResultExecuted(ResultExecutedContext filterContext)
+        {
+            var auditAction = filterContext.HttpContext.Items[AuditActionKey] as AuditAction;
+            if (auditAction != null)
+            {
+                var viewResult = filterContext.Result as ViewResult;
+                var razorView = viewResult?.View as RazorView;
+                auditAction.ViewName = viewResult?.ViewName;
+                auditAction.ViewPath = razorView?.ViewPath;
+                auditAction.Exception = GetExceptionInfo(filterContext.Exception);
+            }
+            var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
+            if (auditScope != null)
+            {
+                // Replace the Action field and save
                 auditScope.SetCustomField("Action", auditAction);
                 auditScope.Save();
                 auditScope.Dispose();
             }
-            base.OnActionExecuted(filterContext);
+            base.OnResultExecuted(filterContext);
         }
 
         private static IDictionary<string, string> ToDictionary(NameValueCollection col)
@@ -94,6 +117,21 @@ namespace Audit.Mvc
                 }
             }
             return dict.Count > 0 ? dict : null;
+        }
+
+        private static string GetExceptionInfo(Exception exception)
+        {
+            if (exception == null)
+            {
+                return null;
+            }
+            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
+            Exception inner = exception;
+            while ((inner = inner.InnerException) != null)
+            {
+                exceptionInfo += " -> " + inner.Message;
+            }
+            return exceptionInfo;
         }
     }
 }

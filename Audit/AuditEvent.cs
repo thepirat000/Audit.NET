@@ -13,6 +13,11 @@ namespace Audit.Core
     public class AuditEvent
     {
         /// <summary>
+        /// Internally stores the EventId (set after inserting an event)
+        /// </summary>
+        [JsonIgnore]
+        public object EventId { get; internal set; }
+        /// <summary>
         /// The enviroment information
         /// </summary>
         [JsonProperty]
@@ -37,14 +42,14 @@ namespace Audit.Core
         /// <summary>
         /// The tracked target.
         /// </summary>
-        [JsonProperty("Target")]
+        [JsonProperty("Target", NullValueHandling = NullValueHandling.Ignore)]
         [DataMember]
         public AuditTarget Target { get; set; }
 
         /// <summary>
         /// Comments.
         /// </summary>
-        [JsonProperty("Comments")]
+        [JsonProperty("Comments", NullValueHandling = NullValueHandling.Ignore)]
         [DataMember]
         public List<string> Comments { get; set; }
 

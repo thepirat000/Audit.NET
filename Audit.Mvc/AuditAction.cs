@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Audit.Mvc
 {
+    [Serializable]
     public class AuditAction
     {
         [JsonProperty(Order = 0)]
@@ -11,6 +13,10 @@ namespace Audit.Mvc
         public string ControllerName { get; set; }
         [JsonProperty(Order = 10)]
         public string ActionName { get; set; }
+        [JsonProperty(Order = 12, NullValueHandling = NullValueHandling.Ignore)]
+        public string ViewName { get; set; }
+        [JsonProperty(Order = 12, NullValueHandling = NullValueHandling.Ignore)]
+        public string ViewPath { get; set; }
         [JsonProperty(Order = 15)]
         public IDictionary<string, string> FormVariables { get; set; }
         [JsonProperty(Order = 20)]
@@ -35,6 +41,7 @@ namespace Audit.Mvc
         public IDictionary<string, string> ModelStateErrors { get; set; }
         [JsonProperty(Order = 70)]
         public string RedirectLocation { get; set; }
-
+        [JsonProperty(Order = 999, NullValueHandling = NullValueHandling.Ignore)]
+        public string Exception { get; set; }
     }
 }
