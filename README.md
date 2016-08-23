@@ -166,7 +166,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
 
 ##Event output configuration
 
-You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File, EventLog, MongoDB, SQL, DocumentDB), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
 public class MyFileDataProvider : AuditDataProvider
