@@ -21,15 +21,15 @@ For example:
 public class HomeController : Controller
 {
     [Audit]
-    public ActionResult Index(string test)
+    public ActionResult Index(int id, string name)
     {
       //...
-      return View(new SomeViewModel() { Id = 0, Name = test });
+      return View(new SomeViewModel() { Id = id, Name = name });
     }
 
     [Audit(EventType = "InsertOrderAction", IncludeHeaders = true, IncludeModel = true)]
     [HttpPost]
-    public ActionResult InsertOrder(OrderViewModel model)
+    public ActionResult Post(SomeViewModel model)
     {
       //...
     }
@@ -54,9 +54,11 @@ The Audit.Mvc tool will output the following information:
 - Form Variables
 - Http Headers
 - Action Parameters
-- Model and Model State Errors
+- View Model 
+- Model State Errors
+- Exceptions
 
-###Output Sample
+###Output Sample for Get operation
 
 ```javascript
 {
@@ -65,34 +67,89 @@ The Audit.Mvc tool will output the following information:
     "UserName": "Federico",
     "MachineName": "HP",
     "DomainName": "HP",
-    "CallingMethodName": "TestMvc.AuditAttribute.OnActionExecuting()",
-    "AssemblyName": "TestMvc, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "CallingMethodName": "Audit.Mvc.AuditAttribute.OnActionExecuting()",
+    "AssemblyName": "Audit.Mvc, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null",
     "Exception": null,
     "Culture": "en-GB"
   },
-  "StartDate": "2016-08-22T11:28:01.2901086-05:00",
-  "EndDate": "2016-08-22T11:28:01.4634822-05:00",
+  "StartDate": "2016-08-22T18:31:48.1450924-05:00",
+  "EndDate": "2016-08-22T18:31:51.1334012-05:00",
   "Action": {
     "HttpMethod": "GET",
     "ControllerName": "Home",
     "ActionName": "Index",
+    "ViewName": "Index",
+    "ViewPath": "~/Views/Home/Index.cshtml",
     "FormVariables": {},
     "ActionParameters": {
-      "test": null
+      "id": 1234567,
+      "name": "test",
     },
     "UserName": "federico@mycompany.com",
     "RequestUrl": "/",
-    "IpAddress": "::1",
+    "IpAddress": "127.0.0.1",
     "ResponseStatus": "200 OK",
     "ResponseStatusCode": 200,
-    "Model": {
-      "Id": 0,
-      "Name": "this is a test"
-    },
     "ModelStateValid": true,
     "RedirectLocation": null
   }
 }
 ```
 
+###Output Sample for Post operation
+```javascript
+{
+  "EventType": "InsertOrderAction",
+  "Environment": {
+    "UserName": "Federico",
+    "MachineName": "HP",
+    "DomainName": "HP",
+    "CallingMethodName": "Audit.Mvc.AuditAttribute.OnActionExecuting()",
+    "AssemblyName": "Audit.Mvc, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null",
+    "Exception": null,
+    "Culture": "en-GB"
+  },
+  "StartDate": "2016-08-22T18:31:55.5720036-05:00",
+  "EndDate": "2016-08-22T18:31:55.5805128-05:00",
+  "Action": {
+    "HttpMethod": "POST",
+    "ControllerName": "Home",
+    "ActionName": "TestPost",
+    "FormVariables": {
+      "id": "1234567",
+      "name": "test"
+    },
+    "ActionParameters": {
+      "model": {
+        "id": 1234567,
+        "name": "test"
+      }
+    },
+    "UserName": "federicoc@herbalife.com",
+    "RequestUrl": "/Home/TestPost",
+    "IpAddress": "::1",
+    "ResponseStatus": "200 OK",
+    "ResponseStatusCode": 200,
+    "Headers": {
+      "Cache-Control": "max-age=0",
+      "Connection": "keep-alive",
+      "Content-Length": "24",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "es-419,es;q=0.8",
+      "Host": "localhost:37341",
+      "Referer": "http://localhost:37341/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
+      "Origin": "http://localhost:37341",
+      "Upgrade-Insecure-Requests": "1"
+    },
+    "ModelStateValid": false,
+    "ModelStateErrors": {
+      "Id": "The field Id must be between 0 and 9999."
+    },
+    "RedirectLocation": null
+  }
+}
+```
 
