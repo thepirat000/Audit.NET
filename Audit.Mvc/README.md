@@ -63,102 +63,91 @@ With this information, you can not just know who did the operation, but also mea
 
 ###Output Sample for Get operation
 
-> HTTP GET Home/Index?id=1234567&name=test
+> `HomeController.Index` (GET) with params: id=1234567&name=test
 
 ```javascript
 {
-  "EventType": "Home/Index (GET)",
-  "Environment": {
-    "UserName": "Federico",
-    "MachineName": "HP",
-    "DomainName": "HP",
-    "CallingMethodName": "Audit.Mvc.AuditAttribute.OnActionExecuting()",
-    "AssemblyName": "Audit.Mvc, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null",
-    "Exception": null,
-    "Culture": "en-GB"
-  },
-  "StartDate": "2016-08-22T18:31:48.1450924-05:00",
-  "EndDate": "2016-08-22T18:31:51.1334012-05:00",
-  "Action": {
-    "HttpMethod": "GET",
-    "ControllerName": "Home",
-    "ActionName": "Index",
-    "ViewName": "Index",
-    "ViewPath": "~/Views/Home/Index.cshtml",
-    "FormVariables": {},
-    "ActionParameters": {
-      "id": 1234567,
-      "name": "test",
+    "EventType": "Home/Index (GET)",
+    "Environment": {
+        ...
     },
-    "UserName": "federico@mycompany.com",
-    "RequestUrl": "/",
-    "IpAddress": "127.0.0.1",
-    "ResponseStatus": "200 OK",
-    "ResponseStatusCode": 200,
-    "ModelStateValid": true,
-    "RedirectLocation": null
-  }
+    "StartDate": "2016-08-22T18:31:14.6550924-05:00",
+    "EndDate": "2016-08-22T18:31:23.1834012-05:00",
+    "Duration": 8529,
+    "Action": {
+        "HttpMethod": "GET",
+        "ControllerName": "Home",
+        "ActionName": "Index",
+        "ViewName": "Index",
+        "ViewPath": "~/Views/Home/Index.cshtml",
+        "FormVariables": {},
+        "ActionParameters": {
+            "id": 1234567,
+            "name": "test",
+        },
+        "UserName": "federico@mycompany.com",
+        "RequestUrl": "/",
+        "IpAddress": "127.0.0.1",
+        "ResponseStatus": "200 OK",
+        "ResponseStatusCode": 200,
+        "ModelStateValid": true,
+        "RedirectLocation": null
+    }
 }
 ```
 
 ###Output Sample for Post operation
 
-> HTTP POST Home/TestPost
-> BODY: id=1234567&name=test
+> `HomeController.TestPost` (POST) with body: id=1234567&name=test
 
 ```javascript
 {
-  "EventType": "InsertOrderAction",
-  "Environment": {
-    "UserName": "Federico",
-    "MachineName": "HP",
-    "DomainName": "HP",
-    "CallingMethodName": "Audit.Mvc.AuditAttribute.OnActionExecuting()",
-    "AssemblyName": "Audit.Mvc, Version=2.1.0.0, Culture=neutral, PublicKeyToken=null",
-    "Exception": null,
-    "Culture": "en-GB"
-  },
-  "StartDate": "2016-08-22T18:31:55.5720036-05:00",
-  "EndDate": "2016-08-22T18:31:55.5805128-05:00",
-  "Action": {
-    "HttpMethod": "POST",
-    "ControllerName": "Home",
-    "ActionName": "TestPost",
-    "FormVariables": {
-      "id": "1234567",
-      "name": "test"
+    "EventType": "InsertOrderAction",
+    "Environment": {
+        ...
     },
-    "ActionParameters": {
-      "model": {
-        "id": 1234567,
-        "name": "test"
-      }
-    },
-    "UserName": "federico@mycompany.com",
-    "RequestUrl": "/Home/TestPost",
-    "IpAddress": "::1",
-    "ResponseStatus": "200 OK",
-    "ResponseStatusCode": 200,
-    "Headers": {
-      "Cache-Control": "max-age=0",
-      "Connection": "keep-alive",
-      "Content-Length": "24",
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-      "Accept-Encoding": "gzip, deflate",
-      "Accept-Language": "es-419,es;q=0.8",
-      "Host": "localhost:37341",
-      "Referer": "http://localhost:37341/",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
-      "Origin": "http://localhost:37341",
-      "Upgrade-Insecure-Requests": "1"
-    },
-    "ModelStateValid": false,
-    "ModelStateErrors": {
-      "Id": "The field Id must be between 0 and 9999."
-    },
-    "RedirectLocation": null
-  }
+    "StartDate": "2016-08-22T18:31:00.0020036-05:00",
+    "EndDate": "2016-08-22T18:31:15.1705128-05:00",
+    "Duration": 15000,
+    "Action": {
+        "HttpMethod": "POST",
+        "ControllerName": "Home",
+        "ActionName": "TestPost",
+        "FormVariables": {
+            "id": "1234567",
+            "name": "test"
+        },
+        "ActionParameters": {
+            "model": {
+                "id": 1234567,
+                "name": "test"
+            }
+        },
+        "UserName": "federico@mycompany.com",
+        "RequestUrl": "/Home/TestPost",
+        "IpAddress": "::1",
+        "ResponseStatus": "200 OK",
+        "ResponseStatusCode": 200,
+        "Headers": {
+            "Cache-Control": "max-age=0",
+            "Connection": "keep-alive",
+            "Content-Length": "24",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "es-419,es;q=0.8",
+            "Host": "localhost:37341",
+            "Referer": "http://localhost:37341/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743",
+            "Origin": "http://localhost:37341",
+            "Upgrade-Insecure-Requests": "1"
+        },
+        "ModelStateValid": false,
+        "ModelStateErrors": {
+            "Id": "The field Id must be between 0 and 9999."
+        },
+        "RedirectLocation": null
+    }
 }
 ```
 
