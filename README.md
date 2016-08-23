@@ -1,5 +1,5 @@
 # Audit.NET
-A extensible framework to audit executing operations in .NET.
+An extensible framework to audit executing operations in .NET.
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
