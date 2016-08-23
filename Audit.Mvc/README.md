@@ -4,7 +4,7 @@
 
 Generate Audit Trails for MVC actions.
 
-Audit.Mvc provides an infrastructure to log interactions with MVC applications. It can record action methods calls with caller info and arguments.
+Audit.Mvc provides the infrastructure to log interactions with MVC applications. It can record action methods calls with caller info and arguments.
 
 ##Install
 
