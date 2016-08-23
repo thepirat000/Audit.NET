@@ -125,7 +125,7 @@ The Audit.Mvc tool will output the following information:
         "name": "test"
       }
     },
-    "UserName": "federicoc@herbalife.com",
+    "UserName": "federico@mycompany.com",
     "RequestUrl": "/Home/TestPost",
     "IpAddress": "::1",
     "ResponseStatus": "200 OK",
