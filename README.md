@@ -164,9 +164,9 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
 }
 ```
 
-##Event output
+##Event output configuration
 
-You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File or EventLog), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File, EventLog, MongoDB, SQL, DocumentDB), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
 public class MyFileDataProvider : AuditDataProvider
@@ -182,29 +182,6 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-You can also override the `Init` and `End` methods, in order to provide different behavior or set up event properties at the time the scope is created or disposed, for example:
-
-```c#
-public class MyFileDataProvider : AuditDataProvider
-{
-    public override void Init(AuditEvent auditEvent)
-    {
-        // Add a custom field for all the scopes
-        auditEvent.CustomFields["FreeMemory_Before"] = new ComputerInfo().AvailablePhysicalMemory;
-        // Don't forget to call the base method.
-        base.Init(auditEvent);
-    }
-
-    public override void End(AuditEvent auditEvent)
-    {
-        auditEvent.CustomFields["FreeMemory_After"] = new ComputerInfo().AvailablePhysicalMemory;
-        base.End(auditEvent);
-    }
-
-    //...
-}
-```
-
 ##Event Creation Policy
 
 The data providers can be configured to persist the event in different ways:
@@ -217,15 +194,36 @@ The event (on its initial state) is saved when the scope is created, and then th
 - **Insert on Start, Insert on End:**
 Two versions of the event are saved, the initial when the scope is created, and the final when the scope is disposed.
 
-To configure the creation policy, set the `CreationPolicy` property of the data provider (see next section).
+- **Manual:**
+The event saving (insert/replace) should be explicitly invoked by calling the `AuditScope.Save()` method.
+
+You can set the Creation Policy per-scope, for example to explicitly set the Creation Policy to Manual:
+```c#
+using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolicy.Manual))
+{
+    //...
+    scope.Save();
+}
+```
+
+If you don't provide a Creation Policy, the Default Policy Configured will be used (see next section).
 
 ##Configuration
 
-Call the static `AuditConfiguration.SetDataProvider` method to set the data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
+###Data provider
+Call the static `AuditConfiguration.SetDataProvider` method to set the default data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set your own provider:
 ```c#
 AuditConfiguration.SetDataProvider(new MyFileDataProvider());
+```
+
+###Creation Policy
+Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should should be set prior to the `AuditScope` creation, i.e. during application startup.
+
+For example, to set the default creation policy to Manual:
+```c#
+AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
 ```
 
 Initialization example to use the File Log provider (save the events to files):
@@ -233,9 +231,9 @@ Initialization example to use the File Log provider (save the events to files):
 AuditConfiguration.SetDataProvider(new FileDataProvider()
 {
     FilenamePrefix = "Event_",
-    DirectoryPath = @"C:\AuditLogs\1",
-    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
+    DirectoryPath = @"C:\AuditLogs\1"
 });
+AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 ```
 
 Initialization example to use the Event Log provider (save the events to the Windows Event Log):
@@ -246,6 +244,7 @@ AuditConfiguration.SetDataProvider(new EventLogDataProvider()
     LogName = "Application",
     MachineName = "."
 });
+AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
 ##More providers
@@ -261,6 +260,10 @@ Store the events in a Mongo DB Collection, in BSON format.
 **[Azure Document DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
+##Extensions
+
+**[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Mvc#auditmvc)**
+Decorate MVC Actions to generate Audit Trails. 
 
 
 
