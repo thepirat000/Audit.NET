@@ -29,7 +29,7 @@ public class HomeController : Controller
 
     [Audit(EventType = "InsertOrderAction", IncludeHeaders = true, IncludeModel = true)]
     [HttpPost]
-    public ActionResult Post(SomeViewModel model)
+    public ActionResult TestPost(SomeViewModel model)
     {
       //...
     }
@@ -59,6 +59,8 @@ The Audit.Mvc tool will output the following information:
 - Exceptions
 
 ###Output Sample for Get operation
+
+> HTTP GET Home/Index?id=1234567&name=test
 
 ```javascript
 {
@@ -97,6 +99,10 @@ The Audit.Mvc tool will output the following information:
 ```
 
 ###Output Sample for Post operation
+
+> HTTP POST Home/TestPost
+> BODY: id=1234567&name=test
+
 ```javascript
 {
   "EventType": "InsertOrderAction",
