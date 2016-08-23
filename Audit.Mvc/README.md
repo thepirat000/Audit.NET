@@ -4,6 +4,8 @@
 
 Generate Audit Trails for MVC actions.
 
+Audit.Mvc provides an infrastructure to log interactions with MVC applications. It can record action methods calls with caller info and arguments.
+
 ##Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.Mvc/)**
@@ -47,16 +49,17 @@ To configure the output persistence mechanism please see [Event Output Configura
 
 ##Output
 
-The Audit.Mvc tool will output the following information:
+Audit.Mvc output includes:
 
+- Execution time and duration
 - Authenticated username
 - Client IP address
-- Form Variables
+- Form Variables, Action Parameters
 - Http Headers
-- Action Parameters
-- View Model 
-- Model State Errors
+- View Model, View Model State Errors
 - Exceptions
+
+With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your application.
 
 ###Output Sample for Get operation
 
