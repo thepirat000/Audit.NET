@@ -13,7 +13,7 @@ PM> Install-Package Audit.Mvc
 
 ##Usage
 
-Add an `AuditAttribute` to the MVC Controller Actions you want to audit.
+Decorate with an `AuditAttribute` the MVC Actions you want to audit.
 
 For example:
 
