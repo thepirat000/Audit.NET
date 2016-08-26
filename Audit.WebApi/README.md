@@ -28,7 +28,8 @@ public class UsersController : ApiController
       //...
     }
 
-    [AuditApi(EventTypeName = "GetUser", IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+    [AuditApi(EventTypeName = "GetUser", 
+        IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
     public IHttpActionResult Get(string id)
     {
      //...
