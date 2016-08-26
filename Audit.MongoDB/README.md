@@ -1,5 +1,5 @@
 # Audit.NET.MongoDB
-**Mongo DB provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (A small framework to audit executing operations in .NET).
+**Mongo DB provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (An extensible framework to audit executing operations in .NET).
 
 Store the audit events in a Mongo DB Collection, in BSON format.
 

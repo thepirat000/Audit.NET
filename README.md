@@ -1,9 +1,9 @@
 # Audit.NET
-A small framework to audit executing operations in .NET.
+An extensible framework to audit executing operations in .NET.
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
-With Audit.NET you can easily generate tracking information about an operation being executed.
+With Audit.NET you can generate tracking information about operations being executed. It will automatically log environmental information such as the caller user id, machine name, method name, exceptions, including the execution time and duration, exposing an extensible mechanism in which you can provide extra information or implement your persistence mechanism for the audit logs.
 
 ##Install
 
@@ -46,35 +46,34 @@ An example of the output in JSON:
 
 ```javascript
 {
-  "EventType": "Order:Update",
-  "Environment": {
-    "UserName": "Federico",
-    "MachineName": "HP",
-    "DomainName": "HP",
-    "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
-    "Exception": null,
-    "Culture": "en-GB"
-  },
-  "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
-  "CommitDate": "2016-08-13T21:18:02.5718424-05:00",
-  "Target": {
-    "Type": "Order",
-    "Old": {
-      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": 2,
-      "OrderItems": [
-        {
-          "Sku": "1002",
-          "Quantity": 3.0
-        }
-      ]    
-    },
-    "New": {
-      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": -1,
-      "OrderItems": null
-    }
-  }
+	"EventType": "Order:Update",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+		"Exception": null,
+		"Culture": "en-GB"
+	},
+	"StartDate": "2016-08-23T11:33:14.653191-05:00",
+	"EndDate": "2016-08-23T11:33:23.1820786-05:00",
+	"Duration": 8529,
+	"Target": {
+		"Type": "Order",
+		"Old": {
+			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+			"Status": 2,
+			"OrderItems": [{
+				"Sku": "1002",
+				"Quantity": 3.0
+			}]
+		},
+		"New": {
+			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+			"Status": -1,
+			"OrderItems": null
+		}
+	}
 }
 ```
 
@@ -102,32 +101,33 @@ The output of the previous example would be:
 
 ```javascript
 {
-  "EventType": "Order:Update",
-  "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-  "Environment": {
-    "UserName": "Federico",
-    "MachineName": "HP",
-    "DomainName": "HP",
-    "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
-    "Exception": null,
-    "Culture": "en-GB"
-  },
-  "Target": {
-    "Type": "Order",
-    "Old": {
-      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": 2,
-    },
-    "New": {
-      "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-      "Status": -1,
-    }
-  },
-  "Comments": [
-    "Status Updated to Cancelled"
-  ],
-  "CreatedDate": "2016-08-13T21:18:02.5708415-05:00",
-  "CommitDate": "2016-08-13T21:18:02.5718424-05:00"
+	"EventType": "Order:Update",
+	"ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+		"Exception": null,
+		"Culture": "en-GB"
+	},
+	"Target": {
+		"Type": "Order",
+		"Old": {
+			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+			"Status": 2,
+			
+		},
+		"New": {
+			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+			"Status": -1,
+			
+		}
+	},
+	"Comments": ["Status Updated to Cancelled"],
+	"StartDate": "2016-08-23T11:34:44.656101-05:00",
+	"EndDate": "2016-08-23T11:34:55.1810821-05:00",
+	"Duration": 8531
 }
 ```
 
