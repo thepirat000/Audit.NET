@@ -28,8 +28,7 @@ public class UsersController : ApiController
       //...
     }
 
-    [AuditApi(EventTypeName = "{controller}/{action} ({verb})", 
-        IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+    [AuditApi(EventTypeName = "GetUser", IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
     public IHttpActionResult Get(string id)
     {
      //...
@@ -37,7 +36,23 @@ public class UsersController : ApiController
 }
 ```
 
-You can also decorate the controller class with the `AuditApiAttribute` so it will apply to all the actions.
+You can also decorate the controller class with the `AuditApiAttribute` so it will apply to all the actions, for example:
+```c#
+[AuditApi(EventTypeName = "{action}/{controller}", IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+public class UsersController : ApiController
+{
+    public IEnumerable<ApplicationUser> Get()
+    {
+      //...
+    }
+
+    public IHttpActionResult Get(string id)
+    {
+     //...
+    }
+}
+```
+
 
 ##Configuration
 
