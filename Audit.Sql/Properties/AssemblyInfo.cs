@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Audit.SqlServer")]
-[assembly: AssemblyDescription("Sql Server DB provider for Audit.NET library")]
+[assembly: AssemblyDescription("Store Audit.NET Trail Logs into a SQL Server database")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ThePirat")]
 [assembly: AssemblyProduct("Audit.SqlServer")]

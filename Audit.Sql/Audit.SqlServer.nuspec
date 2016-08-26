@@ -8,7 +8,7 @@
         <owners>ThePirat</owners>
         <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.Sql#auditnetsqlserver</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Sql Server DB provider for Audit.NET library</description>
+        <description>Store Audit.NET Trail Logs into a SQL Server database</description>
         <summary>Sql Server DB provider for Audit.NET library</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log SqlServer</tags>

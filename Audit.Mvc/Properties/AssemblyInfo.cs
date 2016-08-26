@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Audit.Mvc")]
-[assembly: AssemblyDescription("MVC extensions for Audit.NET library")]
+[assembly: AssemblyDescription("Generate detailed Audit Logs for MVC Controller actions.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ThePirat")]
 [assembly: AssemblyProduct("Audit.Mvc")]

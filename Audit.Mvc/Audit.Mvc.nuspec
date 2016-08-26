@@ -8,8 +8,8 @@
         <owners>ThePirat</owners>
         <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.Mvc#auditmvc</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>MVC Actions Audit Extension for Audit.NET library</description>
-        <summary>Generate Audit Trails for MVC controller actions.</summary>
+        <description>Generate detailed Audit Logs for MVC Controller actions.</description>
+        <summary>Generate detailed Audit Logs for MVC Controller actions.</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log Mvc ActionFilter</tags>
     </metadata>

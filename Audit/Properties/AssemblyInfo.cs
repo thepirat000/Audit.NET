@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Audit.NET")]
-[assembly: AssemblyDescription("A small framework to audit executing operations in .NET")]
+[assembly: AssemblyDescription("An extensible framework to generate detailed audit logs for executing operations in .NET")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ThePirat")]
 [assembly: AssemblyProduct("Audit.NET")]

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Audit.WebApi")]
-[assembly: AssemblyDescription("Web Api extensions for Audit.NET library")]
+[assembly: AssemblyDescription("Generate detailed Audit Logs for Web API Controller calls.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ThePirat")]
 [assembly: AssemblyProduct("Audit.WebApi")]

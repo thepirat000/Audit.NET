@@ -8,7 +8,7 @@
         <owners>ThePirat</owners>
         <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.MongoDB#auditnetmongodb</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Mongo DB provider for Audit.NET library</description>
+        <description>Store Audit.NET Trail Logs into a MongoDB database</description>
         <summary>Mongo DB provider for Audit.NET library</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log MongoDB</tags>
