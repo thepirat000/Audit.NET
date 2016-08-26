@@ -4,7 +4,7 @@
 
 Generate Audit Trails for Web API calls.
 
-Audit.WebApi provides the infrastructure to log interactions with ASP.NET Web API calls. It can record action method calls with caller info and arguments.
+Audit.WebApi provides the infrastructure to log interactions with ASP.NET Web API Controllers. It can record action method calls with caller info and arguments.
 
 ##Install
 
@@ -15,7 +15,7 @@ PM> Install-Package Audit.WebApi
 
 ##Usage
 
-Decorate with an `AuditApiAttribute` the Web Api method you want to audit. 
+Decorate with an `AuditApiAttribute` the Web Api methods you want to audit. 
 
 For example:
 
@@ -28,7 +28,8 @@ public class UsersController : ApiController
       //...
     }
 
-    [AuditApi(EventTypeName = "{controller}/{action} ({verb})", IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+    [AuditApi(EventTypeName = "{controller}/{action} ({verb})", 
+        IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
     public IHttpActionResult Get(string id)
     {
      //...
