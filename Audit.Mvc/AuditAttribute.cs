@@ -21,9 +21,13 @@ namespace Audit.Mvc
         /// </summary>
         public bool IncludeHeaders { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating the event type
+        /// Gets or sets a value indicating the event type name
+        /// Can contain the following placeholders:
+        /// - {controller}: replaced with the controller name.
+        /// - {action}: replaced with the action method name.
+        /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </summary>
-        public string EventType { get; set; }
+        public string EventTypeName { get; set; }
 
         private const string AuditActionKey = "__private_AuditAction__";
         private const string AuditScopeKey = "__private_AuditScope__";
@@ -43,7 +47,9 @@ namespace Audit.Mvc
                 ControllerName = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName,
                 ActionParameters = filterContext.ActionParameters.ToDictionary(k => k.Key, v => v.Value)
             };
-            var eventType = EventType ?? $"{auditAction.ControllerName}/{auditAction.ActionName} ({auditAction.HttpMethod})";
+            var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
+                .Replace("{controller}", auditAction.ControllerName)
+                .Replace("{action}", auditAction.ActionName);
             // Create the audit scope
             var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction }, EventCreationPolicy.Manual);
             filterContext.HttpContext.Items[AuditActionKey] = auditAction;

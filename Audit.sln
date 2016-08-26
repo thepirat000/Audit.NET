@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.UnitTest", "Audit.Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.Mvc", "Audit.Mvc\Audit.Mvc.csproj", "{30F17D37-993C-4C1A-A7BF-4175E891EAA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.WebApi", "Audit.WebApi\Audit.WebApi.csproj", "{8503624C-5E50-4D03-9BAF-0A9139B4CED9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30F17D37-993C-4C1A-A7BF-4175E891EAA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8503624C-5E50-4D03-9BAF-0A9139B4CED9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8503624C-5E50-4D03-9BAF-0A9139B4CED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8503624C-5E50-4D03-9BAF-0A9139B4CED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8503624C-5E50-4D03-9BAF-0A9139B4CED9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

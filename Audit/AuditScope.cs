@@ -81,6 +81,11 @@ namespace Audit.Core
         {
             get { return _event; }
         }
+
+        public AuditDataProvider DataProvider
+        {
+            get { return _dataProvider; }
+        }
         #endregion
 
         #region Private fields
@@ -179,6 +184,7 @@ namespace Audit.Core
             var exception = GetCurrentException();
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
             _event.EndDate = DateTime.Now;
+            _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
             if (_targetGetter != null)
             {
                 _event.Target.SerializedNew = _dataProvider.Serialize(_targetGetter.Invoke());

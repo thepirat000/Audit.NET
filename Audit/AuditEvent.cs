@@ -65,7 +65,14 @@ namespace Audit.Core
         /// </summary>
         [JsonProperty("EndDate")]
         [DataMember]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        ///<summary>
+        /// The duration of the operation in milliseconds.
+        /// </summary>
+        [JsonProperty]
+        [DataMember]
+        public int Duration { get; set; }
 
         private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
 

@@ -8,7 +8,7 @@
         <owners>ThePirat</owners>
         <projectUrl>https://github.com/thepirat000/Audit.NET</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>A small framework to audit executing operations in .NET</description>
+        <description>An extensible framework to audit executing operations in .NET</description>
         <summary>Easily generate tracking information about an operation being executed.</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log</tags>

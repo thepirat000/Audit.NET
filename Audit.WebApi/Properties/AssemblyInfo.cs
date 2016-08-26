@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Audit.NET")]
-[assembly: AssemblyDescription("A small framework to audit executing operations in .NET")]
+[assembly: AssemblyTitle("Audit.WebApi")]
+[assembly: AssemblyDescription("Web Api extensions for Audit.NET library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ThePirat")]
-[assembly: AssemblyProduct("Audit.NET")]
+[assembly: AssemblyProduct("Audit.WebApi")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ab4fb487-fede-4c8f-abd8-16eec5826136")]
+[assembly: Guid("8503624c-fede-4d03-9baf-0a9139b4ced9")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,4 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.4.0.0")]
 [assembly: AssemblyFileVersion("2.4.0.0")]
-[assembly: InternalsVisibleTo("Audit.UnitTest")]
