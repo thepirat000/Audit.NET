@@ -14,3 +14,10 @@ PM> Install-Package Audit.WebApi
 ```
 
 ##Usage
+
+Decorate with an `AuditApiAttribute` the Web Api methods/controllers you want to audit.
+
+For example:
+
+```c#
+```
