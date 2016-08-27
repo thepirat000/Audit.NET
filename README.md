@@ -263,7 +263,9 @@ Store the events in an Azure Document DB Collection, in JSON format.
 ##Extensions
 
 **[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Mvc#auditmvc)**
-Decorate MVC Actions to generate Audit Trails. 
+Decorate ASP.NET MVC Actions and Controllers to generate detailes Audit Logs. 
 
+**[Audit Web API Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.WebApi#auditwebapi)**
+Decorate ASP.NET Web API Methods and Controllers to generate detailed Audit Logs. 
 
 
