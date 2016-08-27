@@ -61,8 +61,28 @@ Audit.Mvc output includes:
 - Http Headers
 - View Model, View Model State Errors
 - Exceptions
+- Comments and Custom Fields 
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your application.
+
+##Customization
+You can access the Audit Scope from the controller action by calling the Controller extension method `GetCurrentAuditScope()`. For example:
+```c#
+public class HomeController : Controller
+{
+    [Audit]
+    public ActionResult Index(int id, string name)
+    {
+       //...
+       var auditScope = this.GetCurrentAuditScope();
+       auditScope.Comment("New comment from controller");
+       auditScope.SetCustomField("TestField", Guid.NewGuid());
+       //...
+    }
+}
+```
+
+See Audit.NET [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
 ###Output Sample for Get operation
 
