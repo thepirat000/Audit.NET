@@ -66,7 +66,10 @@ Audit.Mvc output includes:
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your application.
 
 ##Customization
-You can access the Audit Scope from the controller action by calling the Controller extension method `GetCurrentAuditScope()`. For example:
+
+You can access the Audit Scope from the controller action by calling the Controller extension method `GetCurrentAuditScope()`. 
+
+For example:
 ```c#
 public class HomeController : Controller
 {
@@ -82,7 +85,7 @@ public class HomeController : Controller
 }
 ```
 
-See Audit.NET [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
+See Audit.NET documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
 ###Output Sample for Get operation
 
