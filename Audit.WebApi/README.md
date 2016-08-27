@@ -81,8 +81,31 @@ Audit.WebApi output includes:
 - Model State
 - Exception details
 - Response Status and Body
+- Comments and Custom Fields provided
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your API.
+
+##Customization
+
+You can access the Audit Scope from the API controller action by calling the ApiController extension method `GetCurrentAuditScope()`. 
+
+For example:
+```c#
+[AuditApi]
+public class UsersController : ApiController
+{
+    public IHttpActionResult Get(string id)
+    {
+       //...
+       var auditScope = this.GetCurrentAuditScope();
+       auditScope.Comment("New comment from controller");
+       auditScope.SetCustomField("TestField", Guid.NewGuid());
+       //...
+    }
+}
+```
+
+See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
 ###Output Sample
 
