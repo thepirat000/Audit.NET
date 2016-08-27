@@ -41,9 +41,12 @@ public class HomeController : Controller
 ##Configuration
 
 The `AuditAttribute` can be configured with the following properties:
+- **EventType**: A string that identifies the event type. Can contain the following placeholders: 
+ - {controller}: replaced with the controller name.
+ - {action}: replaced with the action method name.
+ - {verb}: replaced with the HTTP verb used (GET, POST, etc).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not.
 - **IncludeModel**: Boolean to indicate whether to include the View Model or not.
-- **EventType**: A string that identifies the event type .
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
 
