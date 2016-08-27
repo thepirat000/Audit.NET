@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using Audit.Core;
 
@@ -138,6 +139,11 @@ namespace Audit.Mvc
                 exceptionInfo += " -> " + inner.Message;
             }
             return exceptionInfo;
+        }
+
+        internal static AuditScope GetCurrentScope(HttpContextBase httpContext)
+        {
+            return httpContext?.Items[AuditScopeKey] as AuditScope;
         }
     }
 }

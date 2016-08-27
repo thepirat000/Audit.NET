@@ -39,7 +39,7 @@ namespace Audit.WebApi
 
         private const string AuditApiActionKey = "__private_AuditApiAction__";
         private const string AuditApiScopeKey = "__private_AuditApiScope__";
-
+        
         /// <summary>
         /// Occurs before the action method is invoked.
         /// </summary>
@@ -55,7 +55,7 @@ namespace Audit.WebApi
                 IpAddress = GetClientIp(request),
                 RequestUrl = request.RequestUri.AbsoluteUri,
                 HttpMethod = actionContext.Request.Method.Method,
-                FormVariables = ToDictionary(httpContext.Request.Form), //TODO CHECK THIS!
+                FormVariables = ToDictionary(httpContext.Request.Form), 
                 Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor.ActionName,
                 ControllerName = actionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
@@ -169,6 +169,12 @@ namespace Audit.WebApi
                 context = obj as HttpContextWrapper;
             }
             return context ?? new HttpContextWrapper(HttpContext.Current);
+        }
+
+        internal static AuditScope GetCurrentScope(HttpRequestMessage request)
+        {
+            var httpContext = GetHttpContext(request);
+            return httpContext?.Items[AuditApiScopeKey] as AuditScope;
         }
     }
 }

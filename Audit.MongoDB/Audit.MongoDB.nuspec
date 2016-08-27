@@ -9,7 +9,7 @@
         <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.MongoDB#auditnetmongodb</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Store Audit.NET Trail Logs into a MongoDB database</description>
-        <summary>Mongo DB provider for Audit.NET library</summary>
+        <summary>MongoDB provider for Audit.NET library. Store Audit Logs into MongoDB.</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log MongoDB</tags>
     </metadata>

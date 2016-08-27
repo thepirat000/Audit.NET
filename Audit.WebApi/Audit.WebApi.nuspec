@@ -9,7 +9,7 @@
         <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.WebApi#auditwebapi</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Generate detailed Audit Logs for Web API Controller calls.</description>
-        <summary>Generate detailed Audit Logs for Web API Controller calls.</summary>
+        <summary>Generate detailed Audit Logs for ASP.NET Web API Controller calls.</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log WebApi</tags>
     </metadata>

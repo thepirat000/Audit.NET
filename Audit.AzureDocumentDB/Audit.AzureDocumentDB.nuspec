@@ -9,7 +9,7 @@
         <projectUrl>https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Store Audit.NET Trail Logs into an Azure Document DB database</description>
-        <summary>Azure Document DB provider for Audit.NET library</summary>
+        <summary>Document DB provider for Audit.NET library. Store Audit Logs into Azure Document DB.</summary>
         <copyright>Copyright ©  2016</copyright>
         <tags>Audit Trail Log Azure DocumentDB</tags>
     </metadata>
