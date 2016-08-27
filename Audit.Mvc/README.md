@@ -61,7 +61,7 @@ Audit.Mvc output includes:
 - Http Headers
 - View Model, View Model State Errors
 - Exceptions
-- Comments and Custom Fields 
+- Comments and Custom Fields provided
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your application.
 
