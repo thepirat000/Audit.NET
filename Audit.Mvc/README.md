@@ -85,7 +85,7 @@ public class HomeController : Controller
 }
 ```
 
-See Audit.NET documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
+See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
 ###Output Sample for Get operation
 
