@@ -108,7 +108,7 @@ namespace Audit.Mvc
             IDictionary<string, string> dict = new Dictionary<string, string>();
             foreach (var k in col.AllKeys)
             {
-                dict.Add(k, col[k]);
+                dict.Add(k.Replace(".","_"), col[k]);
             }
             return dict;
         }
