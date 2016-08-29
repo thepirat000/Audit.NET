@@ -13,13 +13,13 @@ namespace Audit.SqlServer
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    [DbConfigurationType(typeof(DbConfig))]
     public partial class Entities : DbContext
     {
-        public Entities(string nameOrConnectionString)
+    
+    	public Entities(string nameOrConnectionString)
     		: base(nameOrConnectionString)
     	{
-
+    
     	}
     
         public Entities()

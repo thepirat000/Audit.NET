@@ -53,7 +53,6 @@ using System.Linq;
 }
 #>
 
-[DbConfigurationType(typeof(DbConfig))]
 <#=Accessibility.ForType(container)#> partial class <#=code.Escape(container)#> : DbContext
 {
 
