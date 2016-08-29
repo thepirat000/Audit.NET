@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Audit.Core;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -49,19 +50,20 @@ namespace Audit.MongoDB.Providers
         {
             var pack = new ConventionPack();
             pack.Add(new IgnoreIfNullConvention(true));
-            ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof (AuditEvent));
-
-            BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
-            {
-                cm.AutoMap();
-                cm.MapExtraElementsMember(c => c.CustomFields);
-            });
+            ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof(AuditEvent));
 
             BsonClassMap.RegisterClassMap<AuditTarget>(cm =>
             {
                 cm.AutoMap();
                 cm.MapProperty(x => x.SerializedOld).SetElementName("Old");
                 cm.MapProperty(x => x.SerializedNew).SetElementName("New");
+            });
+
+            BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
+            {
+               cm.AutoMap();
+               cm.UnmapProperty(c => c.EventId);
+               cm.MapExtraElementsField(c => c.CustomFields);
             });
         }
 
@@ -70,6 +72,7 @@ namespace Audit.MongoDB.Providers
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(_collection);
             var doc = auditEvent.ToBsonDocument();
+            FixDocumentElementNames(doc);
             col.InsertOne(doc);
             return (BsonObjectId)doc["_id"];
         }
@@ -79,7 +82,52 @@ namespace Audit.MongoDB.Providers
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(_collection);
             var doc = auditEvent.ToBsonDocument();
+            FixDocumentElementNames(doc);
             col.ReplaceOne(d => d["_id"] == (BsonObjectId)eventId, doc);
+        }
+
+        /// <summary>
+        /// Fixes the document Element Names (avoid using dots '.' and starting with '$').
+        /// </summary>
+        /// <param name="document">The document to fix.</param>
+        private void FixDocumentElementNames(BsonDocument document)
+        {
+            var toRename = new List<Tuple<string, BsonValue, string>>();
+            foreach (var elem in document)
+            {
+                if (elem.Name.Contains(".") || elem.Name.StartsWith("$"))
+                {
+                    var value = elem.Value;
+                    var name = elem.Name.Replace('.', '_');
+                    if (name.StartsWith("$"))
+                    {
+                        name = "_" + name.Substring(1);
+                    }
+                    toRename.Add(new Tuple<string, BsonValue, string>(elem.Name, value, name));
+                }
+                if (elem.Value != null)
+                {
+                    if (elem.Value.IsBsonDocument)
+                    {
+                        FixDocumentElementNames(elem.Value as BsonDocument);
+                    }
+                    else if (elem.Value.IsBsonArray)
+                    {
+                        foreach (var sub in (elem.Value as BsonArray))
+                        {
+                            if (sub.IsBsonDocument)
+                            {
+                                FixDocumentElementNames(sub as BsonDocument);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var x in toRename)
+            {
+                document.Remove(x.Item1);
+                document.Add(new BsonElement(x.Item3, x.Item2));
+            }
         }
 
         public override object Serialize<T>(T value)
