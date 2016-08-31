@@ -5,7 +5,7 @@
   "authors": [ "Federico Colombo" ],
   "description": "Generate detailed Audit Logs for Web API Controller calls.e",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.WebApi",
     "owners": [ "ThePirat" ],
     "summary": "Generate detailed Audit Logs for ASP.NET Web API Controller calls.",
     "tags": [ "Audit", "Trail", "Log", "WebApi" ],

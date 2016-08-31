@@ -5,7 +5,7 @@
   "authors": [ "Federico Colombo" ],
   "description": "Store Audit.NET Trail Logs into an Azure Document DB database",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB",
     "owners": [ "ThePirat" ],
     "summary": "Document DB provider for Audit.NET library. Store Audit Logs into Azure Document DB.",
     "tags": [ "Audit", "Trail", "Log", "Azure", "DocumentDB" ],

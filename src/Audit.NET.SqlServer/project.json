@@ -5,7 +5,7 @@
   "authors": [ "Federico Colombo" ],
   "description": "Store Audit.NET Trail Logs into a SQL Server database",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer",
     "owners": [ "ThePirat" ],
     "summary": "SQL Server provider for Audit.NET library. Store Audit Logs into a SQL Server database.",
     "tags": [ "Audit", "Trail", "Log", "SQL", "SqlServer" ],

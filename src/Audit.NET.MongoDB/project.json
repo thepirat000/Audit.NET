@@ -1,28 +1,29 @@
 {
   "title": "Audit.MongoDB",
-  "version": "3.0.0-*",
+  "version": "3.0.1-*",
   "copyright": "Copyright ©  2016",
   "authors": [ "Federico Colombo" ],
   "description": "Store Audit.NET Trail Logs into a MongoDB database",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB",
     "owners": [ "ThePirat" ],
     "summary": "MongoDB provider for Audit.NET library. Store Audit Logs into MongoDB.",
     "tags": [ "Audit", "Trail", "Log", "MongoDB" ],
     "requireLicenseAcceptance": false
   },
   "dependencies": {
-    "Audit.NET": { "target": "project" },
-    "mongocsharpdriver": "2.3.0-rc1"
+    "Audit.NET": { "target": "project" }
   },
   "frameworks": {
     "netstandard1.5": {
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.0",
+        "mongocsharpdriver": "2.3.0-rc1"
       }
     },
     "net45": {
       "dependencies": {
+        "mongocsharpdriver": "2.2.4"
       }
     }
   },
