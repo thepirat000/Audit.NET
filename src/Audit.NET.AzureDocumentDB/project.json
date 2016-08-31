@@ -1,0 +1,27 @@
+{
+  "title": "Audit.AzureDocumentDB",
+  "version": "3.0.0-*",
+  "copyright": "Copyright ©  2016",
+  "authors": [ "Federico Colombo" ],
+  "description": "Store Audit.NET Trail Logs into an Azure Document DB database",
+  "packOptions": {
+    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "owners": [ "ThePirat" ],
+    "summary": "Document DB provider for Audit.NET library. Store Audit Logs into Azure Document DB.",
+    "tags": [ "Audit", "Trail", "Log", "Azure", "DocumentDB" ],
+    "requireLicenseAcceptance": false
+  },
+  "dependencies": {
+    "Audit.NET": { "target": "project" }
+  },
+  "frameworks": {
+    "net45": {
+      "dependencies": {
+        "Microsoft.Azure.DocumentDB": "1.9.4"
+      }
+    }
+  },
+  "buildOptions": {
+    "xmlDoc": true
+  }
+}

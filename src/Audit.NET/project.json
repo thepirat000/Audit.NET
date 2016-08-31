@@ -1,0 +1,37 @@
+{
+  "title": "Audit.NET",
+  "version": "3.0.0-*",
+  "copyright": "Copyright ©  2016",
+  "authors": [ "Federico Colombo" ],
+  "description": "An extensible framework to generate detailed audit logs for executing operations in .NET",
+  "packOptions": {
+    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "owners": [ "ThePirat" ],
+    "summary": "Easily generate tracking information about an operation being executed.",
+    "tags": [ "Audit", "Trail", "Log" ],
+    "requireLicenseAcceptance": false,
+    "files": [
+      "tools/Init.ps1"
+    ]
+  },
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1"
+  },
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0"
+      }
+    },
+    "net45": {
+      "dependencies": {
+      }
+    }
+  },
+  "configurations": {
+  },
+  "buildOptions": {
+    "define": [],
+    "xmlDoc": true
+  }
+}

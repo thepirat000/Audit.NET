@@ -1,0 +1,38 @@
+{
+  "title": "Audit.WebApi",
+  "version": "3.0.0-*",
+  "copyright": "Copyright ©  2016",
+  "authors": [ "Federico Colombo" ],
+  "description": "Generate detailed Audit Logs for Web API Controller calls.e",
+  "packOptions": {
+    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "owners": [ "ThePirat" ],
+    "summary": "Generate detailed Audit Logs for ASP.NET Web API Controller calls.",
+    "tags": [ "Audit", "Trail", "Log", "WebApi" ],
+    "requireLicenseAcceptance": false
+  },
+  "dependencies": {
+    "Audit.NET": { "target": "project" }
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "Microsoft.AspNetCore.Mvc": "1.0.0",
+        "Microsoft.AspNetCore.Identity": "1.0.0",
+        "Microsoft.Extensions.PlatformAbstractions": "1.0.0"
+      }
+    },
+    "net45": {
+      "dependencies": {
+        "Microsoft.AspNet.WebApi.Core": "5.2.3"
+      },
+      "frameworkAssemblies": {
+        "System.Web": "4.0.0.0"
+      }
+    }
+  },
+  "buildOptions": {
+    "xmlDoc": true
+  }
+}
