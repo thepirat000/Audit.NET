@@ -1,5 +1,5 @@
 # Audit.NET
-An extensible framework to audit executing operations in .NET including support for NetCore 1.0 / NetStandard 1.3.
+An extensible framework to audit executing operations in .NET including support for .NET 4.5 / NetCore 1.0 / NetStandard 1.3.
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
