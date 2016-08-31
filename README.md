@@ -251,21 +251,21 @@ AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
 Apart from the _File_ and _EventLog_ providers, there are other providers included in different packages:
 
-**[Sql Server](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Sql#auditnetsqlserver)**
+**[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format. 
 
-**[Mongo DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.MongoDB#auditnetmongodb)**
+**[Mongo DB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-**[Azure Document DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb)**
+**[Azure Document DB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
 ##Extensions
 
-**[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Mvc#auditmvc)**
+**[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
 Decorate ASP.NET MVC Actions and Controllers to generate detailed Audit Logs. 
 
-**[Audit Web API Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.WebApi#auditwebapi)**
+**[Audit Web API Actions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
 Decorate ASP.NET Web API Methods and Controllers to generate detailed Audit Logs. 
 
 
