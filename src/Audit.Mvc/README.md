@@ -2,7 +2,7 @@
 
 **MVC Actions Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (An extensible framework to audit executing operations in .NET).
 
-Generate Audit Trails for MVC actions.
+Generate Audit Trails for MVC actions. Supporting AspNetCore Mvc.
 
 Audit.Mvc provides the infrastructure to log interactions with MVC applications. It can record action methods calls with caller info and arguments.
 

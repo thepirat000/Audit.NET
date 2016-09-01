@@ -1,5 +1,5 @@
 # Audit.NET
-An extensible framework to audit executing operations in .NET including support for .NET 4.5 / NetCore 1.0 / NetStandard 1.3.
+An extensible framework to audit executing operations in .NET including support for .NET 4.5 / NetCore 1.0 (NetStandard 1.3).
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
@@ -14,7 +14,7 @@ PM> Install-Package Audit.NET
 
 ##Usage
 
-Surround the operation code you want to audit with a `using` block, indicating the object to track.
+Surround the operation code you want to audit with a `using` block that creates an `AuditScope` indicating the object to track.
 
 Suppose you have the following code to cancel an order:
 
@@ -38,9 +38,11 @@ using (AuditScope.Create("Order:Update", () => order))
 
 The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track.
 
-The library will gather contextual information about the user and the machine, as well as the tracked object's state before and after the operation, and optionally [Comments and Custom Fields](#custom-fields-and-comments) provided.
-
-It will generate and store an output (event) for each operation.
+The library will generate an output (`AuditEvent`) for each operation, including:
+- Tracked object's state before and after the operation.
+- Execution time and duration.
+- Enviroment information such as user, machine, domain, locale, etc.
+- [Comments and Custom Fields](#custom-fields-and-comments) provided
 
 An example of the output in JSON:
 
@@ -83,7 +85,7 @@ The `AuditScope` object provides two methods to extend the event output.
 
 With `SetCustomField()` you can store any object state as a custom field. (The object is serialized upon this method, so further changes to the object are not reflected on the field value).
 
-With `Comment()` you can add textual comments to the scope.
+With `Comment()` you can add textual comments to the event.
 
 For example:
 
@@ -131,7 +133,7 @@ The output of the previous example would be:
 }
 ```
 
-You can also set the custom fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. for example:
+You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
 
 ```c#
 using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
@@ -171,13 +173,22 @@ You decide what to do with the events by [configuring](#configuration) one of th
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
+    // Insert a new event and return its ID
     public override object InsertEvent(AuditEvent auditEvent)
     {
         // AuditEvent provides a ToJson() method
         string json = auditEvent.ToJson();
-        // Append the json representation of the event to a text file
-        File.AppendAllText("audit.json", json);
-        return null;
+        // Write the json representation of the event to a randomly named file
+        var fileName = Guid.NewGuid().ToString() + ".json";
+        File.WriteAllText(fileName, json);
+        return fileName;
+    }
+    // Update an existing event given the ID and the event
+    public override void UpdateEvent(object eventId, AuditEvent auditEvent)
+    {
+        // Override an existing event
+        var fileName = eventId.ToString();
+        File.WriteAllText(fileName, auditEvent.ToJson());
     }
 }
 ```
@@ -213,7 +224,7 @@ If you don't provide a Creation Policy, the Default Policy Configured will be us
 ###Data provider
 Call the static `AuditConfiguration.SetDataProvider` method to set the default data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
 
-For example, to set your own provider:
+For example, to set your own provider as the default data provider:
 ```c#
 AuditConfiguration.SetDataProvider(new MyFileDataProvider());
 ```
@@ -226,7 +237,7 @@ For example, to set the default creation policy to Manual:
 AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
 ```
 
-Initialization example to use the File Log provider (save the events to files):
+Initialization example to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
 ```c#
 AuditConfiguration.SetDataProvider(new FileDataProvider()
 {
@@ -236,7 +247,7 @@ AuditConfiguration.SetDataProvider(new FileDataProvider()
 AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 ```
 
-Initialization example to use the Event Log provider (save the events to the Windows Event Log):
+Initialization example to use the Event Log provider with an InsertOnEnd Creation Policy:
 ```c#
 AuditConfiguration.SetDataProvider(new EventLogDataProvider()
 {
@@ -251,21 +262,21 @@ AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
 Apart from the _File_ and _EventLog_ providers, there are other providers included in different packages:
 
-**[Sql Server](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Sql#auditnetsqlserver)**
+**[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format. 
 
-**[Mongo DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.MongoDB#auditnetmongodb)**
+**[Mongo DB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-**[Azure Document DB](https://github.com/thepirat000/Audit.NET/tree/master/Audit.AzureDocumentDB#auditnetazuredocumentdb)**
+**[Azure Document DB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
 ##Extensions
 
-**[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.Mvc#auditmvc)**
-Decorate ASP.NET MVC Actions and Controllers to generate detailed Audit Logs. 
+**[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
+Decorate ASP.NET MVC Actions and Controllers to generate detailed Audit Logs. Includes support for ASP.NET Core MVC. 
 
-**[Audit Web API Actions](https://github.com/thepirat000/Audit.NET/tree/master/Audit.WebApi#auditwebapi)**
-Decorate ASP.NET Web API Methods and Controllers to generate detailed Audit Logs. 
+**[Audit Web API Actions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
+Decorate ASP.NET Web API Methods and Controllers to generate detailed Audit Logs. Includes support for ASP.NET Core MVC. 
 
 
