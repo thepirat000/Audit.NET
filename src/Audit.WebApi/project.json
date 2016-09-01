@@ -3,7 +3,7 @@
   "version": "3.1.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
-  "description": "Generate detailed Audit Logs for Web API Controller calls.e",
+  "description": "Generate detailed Audit Logs for Web API Controller calls.",
   "packOptions": {
     "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.WebApi",
     "owners": [ "ThePirat" ],
