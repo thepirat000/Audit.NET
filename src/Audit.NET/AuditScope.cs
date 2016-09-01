@@ -66,7 +66,7 @@ namespace Audit.Core
             // Process the event insertion (if applies)
             if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
-                _event.EventId = _dataProvider.InsertEvent(_event);
+                _eventId = _dataProvider.InsertEvent(_event);
             }
         }
 #endregion
@@ -89,15 +89,30 @@ namespace Audit.Core
             get { return _event; }
         }
 
+        /// <summary>
+        /// Gets the data provider for this AuditScope instance.
+        /// </summary>
         public AuditDataProvider DataProvider
         {
             get { return _dataProvider; }
         }
-#endregion
 
-#region Private fields
+        /// <summary>
+        /// Gets the current event ID, or NULL if not yet created.
+        /// </summary>
+        public object EventId
+        {
+            get
+            {
+                return _eventId;
+            }
+        }
+        #endregion
+
+        #region Private fields
         private EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
+        private object _eventId;
         private bool _disposed;
         private bool _ended;
         private readonly AuditDataProvider _dataProvider;
@@ -172,15 +187,15 @@ namespace Audit.Core
             // process event creation/replacement
             if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
             {
-                _event.EventId = _dataProvider.InsertEvent(_event);
+                _eventId = _dataProvider.InsertEvent(_event);
             }
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
             {
-                _dataProvider.ReplaceEvent(_event.EventId, _event);
+                _dataProvider.ReplaceEvent(_eventId, _event);
             }
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
-                _event.EventId = _dataProvider.InsertEvent(_event);
+                _eventId = _dataProvider.InsertEvent(_event);
             }
             _ended = true;
         }
@@ -247,13 +262,13 @@ namespace Audit.Core
 
         private void ForceReplaceOrInsertEvent(AuditEvent auditEvent)
         {
-            if (auditEvent.EventId != null)
+            if (_eventId != null)
             {
-                _dataProvider.ReplaceEvent(auditEvent.EventId, auditEvent);
+                _dataProvider.ReplaceEvent(_eventId, auditEvent);
             }
             else
             {
-                auditEvent.EventId = _dataProvider.InsertEvent(auditEvent);
+                _eventId = _dataProvider.InsertEvent(auditEvent);
             }
         }
 #endregion

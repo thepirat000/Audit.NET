@@ -62,7 +62,6 @@ namespace Audit.MongoDB.Providers
             BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
             {
                cm.AutoMap();
-               cm.UnmapProperty(c => c.EventId);
                cm.MapExtraElementsField(c => c.CustomFields);
             });
         }

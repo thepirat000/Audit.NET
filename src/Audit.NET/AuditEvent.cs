@@ -11,11 +11,6 @@ namespace Audit.Core
     public class AuditEvent
     {
         /// <summary>
-        /// Internally stores the EventId (set after inserting an event)
-        /// </summary>
-        [JsonIgnore]
-        public object EventId { get; internal set; }
-        /// <summary>
         /// The enviroment information
         /// </summary>
         [JsonProperty]

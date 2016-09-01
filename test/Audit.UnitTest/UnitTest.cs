@@ -139,9 +139,9 @@ namespace Audit.UnitTest
             scope1.Save();
             var scope2 = AuditScope.Create("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, EventCreationPolicy.Manual);
             scope2.Save();
-            Assert.NotNull(scope1.Event.EventId);
-            Assert.NotNull(scope2.Event.EventId);
-            Assert.NotEqual(scope1.Event.EventId, scope2.Event.EventId);
+            Assert.NotNull(scope1.EventId);
+            Assert.NotNull(scope2.EventId);
+            Assert.NotEqual(scope1.EventId, scope2.EventId);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
