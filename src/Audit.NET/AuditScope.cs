@@ -63,10 +63,12 @@ namespace Audit.Core
                 };
             }
             ProcessExtraFields(extraFields);
+            // Execute custom on-saving actions
+            AuditConfiguration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
             // Process the event insertion (if applies)
             if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
-                _eventId = _dataProvider.InsertEvent(_event);
+                SaveEvent();
             }
         }
 #endregion
@@ -185,17 +187,13 @@ namespace Audit.Core
             }
             EndEvent();
             // process event creation/replacement
-            if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            if (_creationPolicy == EventCreationPolicy.InsertOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
-                _eventId = _dataProvider.InsertEvent(_event);
+                SaveEvent(true);
             }
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
             {
-                _dataProvider.ReplaceEvent(_eventId, _event);
-            }
-            else if (_creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
-            {
-                _eventId = _dataProvider.InsertEvent(_event);
+                SaveEvent();
             }
             _ended = true;
         }
@@ -215,7 +213,7 @@ namespace Audit.Core
                 return;
             }
             EndEvent();
-            ForceReplaceOrInsertEvent(_event);
+            SaveEvent();
         }
 #endregion
 
@@ -231,10 +229,6 @@ namespace Audit.Core
             if (_targetGetter != null)
             {
                 _event.Target.SerializedNew = _dataProvider.Serialize(_targetGetter.Invoke());
-            }
-            if (_event.Comments != null && _event.Comments.Count == 0)
-            {
-                _event.Comments = null;
             }
         }
 
@@ -260,17 +254,24 @@ namespace Audit.Core
             }
         }
 
-        private void ForceReplaceOrInsertEvent(AuditEvent auditEvent)
+        private void SaveEvent(bool forceInsert = false)
         {
-            if (_eventId != null)
+            if (_ended)
             {
-                _dataProvider.ReplaceEvent(_eventId, auditEvent);
+                return; 
+            }
+            AuditConfiguration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
+            if (_eventId != null && !forceInsert)
+            {
+                _dataProvider.ReplaceEvent(_eventId, _event);
             }
             else
             {
-                _eventId = _dataProvider.InsertEvent(auditEvent);
+                _eventId = _dataProvider.InsertEvent(_event);
             }
         }
-#endregion
+
+        #endregion
+
     }
 }

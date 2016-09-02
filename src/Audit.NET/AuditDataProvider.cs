@@ -6,22 +6,11 @@ namespace Audit.Core
     /// <summary>
     /// Base class for the persistence classes.
     /// </summary>
-    public abstract class AuditDataProvider 
+    public abstract class AuditDataProvider
     {
         /// <summary>
-        /// Saves the specified audit event.
-        /// Triggered when the scope is saved.
-        /// Override this method to replace the specified audit event on the data source.
-        /// </summary>
-        /// <param name="auditEvent">The audit event.</param>
-        /// <param name="eventId">The event id being replaced.</param>
-        public virtual void ReplaceEvent(object eventId, AuditEvent auditEvent)
-        {
-        }
-
-        /// <summary>
         /// Override this method to provide a different serialization method for the values that need to be serialized before saving.
-        /// (old target value & custom fields)
+        /// (old target value and custom fields)
         /// </summary>
         public virtual object Serialize<T>(T value)
         {
@@ -37,5 +26,17 @@ namespace Audit.Core
         /// </summary>
         /// <param name="auditEvent">The audit event being inserted.</param>
         public abstract object InsertEvent(AuditEvent auditEvent);
+
+        /// <summary>
+        /// Saves the specified audit event.
+        /// Triggered when the scope is saved.
+        /// Override this method to replace the specified audit event on the data source.
+        /// </summary>
+        /// <param name="auditEvent">The audit event.</param>
+        /// <param name="eventId">The event id being replaced.</param>
+        public virtual void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        {
+        }
     }
 }
+

@@ -9,6 +9,92 @@ namespace Audit.UnitTest
     public class UnitTest
     {
         [Fact]
+        public void Test_CustomAction_OnCreating()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            
+            var eventType = "event type 1";
+            var target = "test";
+            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            {
+                scope.SetCustomField("custom field", "test");
+                if (scope.EventType == eventType)
+                {
+                    scope.Discard();
+                }
+            });
+            AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+            {
+                Assert.True(false, "This should not be executed");
+            });
+
+            AuditEvent ev;
+            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
+            {
+                ev = scope.Event;
+            }
+            AuditConfiguration.ResetCustomActions();
+            Assert.True(ev.CustomFields.ContainsKey("custom field"));
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+        }
+
+        [Fact]
+        public void Test_CustomAction_OnSaving()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            //provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent e) => e.Comments);
+            var eventType = "event type 1";
+            var target = "test";
+            var comment = "comment test";
+            AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+            {
+                scope.Comment(comment);
+            });
+            AuditEvent ev;
+            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            {
+                ev = scope.Event;
+                scope.Save();
+            }
+            AuditConfiguration.ResetCustomActions();
+            Assert.True(ev.Comments.Contains(comment));
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+        }
+
+        [Fact]
+        public void Test_CustomAction_OnCreating_Double()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            var eventType = "event type 1";
+            var target = "test";
+            var key1 = "key1";
+            var key2 = "key2";
+            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            {
+                scope.SetCustomField(key1, "test");
+            });
+            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            {
+                scope.Event.CustomFields.Remove(key1);
+                scope.SetCustomField(key2, "test");
+            });
+            AuditEvent ev;
+            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            {
+                ev = scope.Event;
+            }
+            AuditConfiguration.ResetCustomActions();
+            Assert.False(ev.CustomFields.ContainsKey(key1));
+            Assert.True(ev.CustomFields.ContainsKey(key2));
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+        }
+
+        [Fact]
         public void TestSave()
         {
             var provider = new Mock<AuditDataProvider>();
@@ -72,6 +158,7 @@ namespace Audit.UnitTest
         public void Test_EventCreationPolicy_InsertOnStartReplaceOnEnd()
         {
             var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             AuditConfiguration.SetDataProvider(provider.Object);
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd))
             {
@@ -85,6 +172,7 @@ namespace Audit.UnitTest
         public void Test_EventCreationPolicy_InsertOnStartInsertOnEnd()
         {
             var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             AuditConfiguration.SetDataProvider(provider.Object);
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd))
             {
