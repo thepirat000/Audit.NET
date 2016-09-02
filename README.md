@@ -296,7 +296,7 @@ AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
 ##More providers
 
-Apart from the _File_ and _EventLog_ providers, there are other providers included in different packages:
+Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
 **[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format. 
@@ -309,10 +309,11 @@ Store the events in an Azure Document DB Collection, in JSON format.
 
 ##Extensions
 
+The following packages are extensions to log interactions with MVC / WebApi applications. 
+
 **[Audit MVC Actions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
-Decorate ASP.NET MVC Actions and Controllers to generate detailed Audit Logs. Includes support for ASP.NET Core MVC. 
+Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. (Includes support for ASP.NET CORE MVC)
 
 **[Audit Web API Actions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
-Decorate ASP.NET Web API Methods and Controllers to generate detailed Audit Logs. Includes support for ASP.NET Core MVC. 
-
+Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. (Includes support for ASP.NET CORE MVC)
 
