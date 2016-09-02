@@ -166,14 +166,13 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
 }
 ```
 
-##Event output configuration
+##Event output
 
-You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File, EventLog, MongoDB, SQL, DocumentDB), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File, EventLog, [MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb), [SQL](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver), [DocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb)), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
-    // Insert a new event and return its ID
     public override object InsertEvent(AuditEvent auditEvent)
     {
         // AuditEvent provides a ToJson() method
@@ -192,6 +191,8 @@ public class MyFileDataProvider : AuditDataProvider
     }
 }
 ```
+
+The `InsertEvent` method should return a unique ID for the event. The `UpdateEvent` method should update the event given its event ID.
 
 ##Event Creation Policy
 
@@ -235,6 +236,35 @@ Call the static `AuditConfiguration.SetCreationPolicy` method to set the default
 For example, to set the default creation policy to Manual:
 ```c#
 AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
+```
+
+###Custom Actions
+
+You can configure Custom Actions that are executed globally for all the Audit Scopes in your application. This allows to change the behavior and data intercepting the scopes after they are created or before they are saved.
+
+Call the static `AuditConfiguration.AddCustomAction` method to attach a custom action. 
+
+For example, to globally discard the events under centain condition:
+```c#
+AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+{
+    if (DateTime.Now.Hour == 22)
+    {
+        scope.Discard();
+    }
+});
+```
+
+Or to add custom fields / comments globally to all scopes:
+```c#
+AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+{
+    if (scope.Event.Environment.Exception != null)
+    {
+        scope.SetCustomField("HasException", true);
+    }
+    scope.Comment("Saved at " + DateTime.Now);
+});
 ```
 
 Initialization example to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
