@@ -255,15 +255,17 @@ AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 });
 ```
 
-Or to add custom fields globally to all scopes:
+Or to add custom fields / comments globally to all scopes:
 ```c#
 AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
 {
-    scope.SetCustomField("ApplicationId", "MyApplication");
+    if (scope.Event.Environment.Exception != null)
+    {
+        scope.SetCustomField("HasException", true);
+    }
+    scope.Comment("Saved at " + DateTime.Now);
 });
 ```
-
-
 
 Initialization example to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
 ```c#
