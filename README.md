@@ -312,8 +312,8 @@ Store the events in an Azure Document DB Collection, in JSON format.
 The following packages are extensions to log interactions with MVC / WebApi applications. 
 
 **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
-Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. (Includes support for ASP.NET CORE MVC)
+Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. (Includes support for ASP.NET Core MVC)
 
 **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
-Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. (Includes support for ASP.NET CORE MVC)
+Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. (Includes support for ASP.NET Core MVC)
 
