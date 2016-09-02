@@ -267,7 +267,9 @@ AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
 });
 ```
 
-Initialization example to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
+##Configuration examples
+
+Initialization to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
 ```c#
 AuditConfiguration.SetDataProvider(new FileDataProvider()
 {
@@ -277,7 +279,7 @@ AuditConfiguration.SetDataProvider(new FileDataProvider()
 AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 ```
 
-Initialization example to use the Event Log provider with an InsertOnEnd Creation Policy:
+Initialization to use the Event Log provider with an InsertOnEnd Creation Policy:
 ```c#
 AuditConfiguration.SetDataProvider(new EventLogDataProvider()
 {
