@@ -267,6 +267,10 @@ AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
 });
 ```
 
+The `ActionType` indicates when the action should be performed. The allowed values are:
+- OnScopeCreated: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
+- OnEventSaving: When an Audit Scope's Event is about to be saved. 
+
 ##Configuration examples
 
 Initialization to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
