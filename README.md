@@ -281,14 +281,20 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 
 ##Configuration examples
 
-Initialization to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
+Initialization to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy, and a global custom field to indicate an application ID:
 ```c#
 AuditConfiguration.SetDataProvider(new FileDataProvider()
 {
     FilenamePrefix = "Event_",
     DirectoryPath = @"C:\AuditLogs\1"
 });
+
 AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope => 
+{ 
+    scope.SetCustomField("ApplicationId", "MyApplication"); 
+});
 ```
 
 Initialization to use the Event Log provider with an InsertOnEnd Creation Policy:
