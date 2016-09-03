@@ -269,7 +269,7 @@ AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
 {
     if (scope.Event.Environment.Exception != null)
     {
-        scope.SetCustomField("HasException", true);
+        scope.SetCustomField("Oops", true);
     }
     scope.Comment("Saved at " + DateTime.Now);
 });
