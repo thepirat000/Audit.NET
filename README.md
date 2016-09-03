@@ -36,7 +36,7 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track. This object is passed as an `Action<object>` to allow the library to inspect the object at the beggining and at the end of the scope.
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track. This object is passed as an `Action<object>` to allow the library to inspect the value at the beggining and at the end of the scope.
 
 It is not mandatory to use a `using` block, but it simplifies the syntax allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
