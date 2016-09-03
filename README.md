@@ -256,7 +256,7 @@ For example, to globally discard the events under centain condition:
 ```c#
 AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
-    if (DateTime.Now.Hour == 22)
+    if (DateTime.Now.Hour == 17) // Tea time
     {
         scope.Discard();
     }
