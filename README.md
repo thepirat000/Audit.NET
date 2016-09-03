@@ -281,7 +281,7 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 
 ##Configuration examples
 
-Initialization to use the **File Log provider** with an **InsertOnStart-ReplaceOnEnd Creation Policy**, and a **global ApplicationId Custom Field**:
+Initialization to use the File Log [Provider](#data-provider) with an InsertOnStart-ReplaceOnEnd [Creation Policy](#creation-policy), and a global ApplicationId [Custom Field](#custom-fields-and-comments):
 ```c#
 AuditConfiguration.SetDataProvider(new FileDataProvider()
 {
