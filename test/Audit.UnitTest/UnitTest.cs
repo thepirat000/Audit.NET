@@ -9,6 +9,22 @@ namespace Audit.UnitTest
     public class UnitTest
     {
         [Fact]
+        public void Test_StartAndSave()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+
+            var eventType = "event type";
+            var target = "test";
+            AuditScope.CreateAndSave(eventType, new { ExtraField = "extra value" });
+
+            AuditScope.CreateAndSave(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+
+        }
+
+        [Fact]
         public void Test_CustomAction_OnCreating()
         {
             var provider = new Mock<AuditDataProvider>();

@@ -22,9 +22,11 @@ namespace Audit.Core
         /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
         /// <param name="creationPolicy">The event creation policy to use.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
+        /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
         protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
             AuditDataProvider dataProvider = null, 
-            EventCreationPolicy? creationPolicy = null)
+            EventCreationPolicy? creationPolicy = null,
+            bool isCreateAndSave = false)
         {
             _creationPolicy = creationPolicy ?? AuditConfiguration.CreationPolicy;
             _dataProvider = dataProvider ?? AuditConfiguration.DataProvider;
@@ -65,8 +67,15 @@ namespace Audit.Core
             ProcessExtraFields(extraFields);
             // Execute custom on-saving actions
             AuditConfiguration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
+
             // Process the event insertion (if applies)
-            if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            if (isCreateAndSave)
+            {
+                EndEvent();
+                SaveEvent();
+                _ended = true;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
                 SaveEvent();
             }

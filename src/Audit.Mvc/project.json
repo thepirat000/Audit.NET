@@ -1,6 +1,6 @@
-﻿{
+{
   "title": "Audit.Mvc",
-  "version": "3.1.0-*",
+  "version": "3.2.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Generate detailed Audit Logs for MVC Controller actions.",
