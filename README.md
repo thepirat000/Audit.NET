@@ -1,5 +1,5 @@
 # Audit.NET
-An extensible framework to audit executing operations in .NET including support for .NET 4.5 / NetCore 1.0 (NetStandard 1.3).
+An extensible framework to audit executing operations in .NET including support for .NET Framework 4.5 and NetCore 1.0 (NetStandard 1.3).
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
@@ -36,7 +36,14 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track.
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track. This object is passed as an `Action<object>` to allow the library to inspect the value at the beggining and at the end of the scope.
+
+It is not mandatory to use a `using` block, but it simplifies the syntax allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
+
+If you are not tracking an specific object change, you can use the `CreateAndSave` shortcut method that creates and saves an event immediately. For example:
+```c#
+AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
+```
 
 The library will generate an output (`AuditEvent`) for each operation, including:
 - Tracked object's state before and after the operation.
@@ -183,7 +190,7 @@ public class MyFileDataProvider : AuditDataProvider
         return fileName;
     }
     // Update an existing event given the ID and the event
-    public override void UpdateEvent(object eventId, AuditEvent auditEvent)
+    public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
         // Override an existing event
         var fileName = eventId.ToString();
@@ -192,7 +199,8 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-The `InsertEvent` method should return a unique ID for the event. The `UpdateEvent` method should update the event given its event ID.
+The `InsertEvent` method should return a unique ID for the event. 
+The `ReplaceEvent` method should update an event given its ID, this method is only called when the [Creation Policy](#event-creation-policy) is set to **Manual** or **InsertOnStartReplaceOnEnd**.
 
 ##Event Creation Policy
 
@@ -231,7 +239,7 @@ AuditConfiguration.SetDataProvider(new MyFileDataProvider());
 ```
 
 ###Creation Policy
-Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should should be set prior to the `AuditScope` creation, i.e. during application startup.
+Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should be set prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set the default creation policy to Manual:
 ```c#
@@ -240,7 +248,7 @@ AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
 
 ###Custom Actions
 
-You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data intercepting the scopes after they are created or before they are saved.
+You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
 
 Call the static `AuditConfiguration.AddCustomAction` method to attach a custom action. 
 
@@ -248,7 +256,7 @@ For example, to globally discard the events under centain condition:
 ```c#
 AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
-    if (DateTime.Now.Hour == 22)
+    if (DateTime.Now.Hour == 17) // Tea time
     {
         scope.Discard();
     }
@@ -261,7 +269,7 @@ AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
 {
     if (scope.Event.Environment.Exception != null)
     {
-        scope.SetCustomField("HasException", true);
+        scope.SetCustomField("Oops", true);
     }
     scope.Comment("Saved at " + DateTime.Now);
 });
@@ -273,14 +281,20 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 
 ##Configuration examples
 
-Initialization to use the File Log provider with an InsertOnStart-ReplaceOnEnd Creation Policy:
+Initialization to use the File Log [Provider](#data-provider) with an InsertOnStart-ReplaceOnEnd [Creation Policy](#creation-policy), and a global ApplicationId [Custom Field](#custom-fields-and-comments):
 ```c#
 AuditConfiguration.SetDataProvider(new FileDataProvider()
 {
     FilenamePrefix = "Event_",
     DirectoryPath = @"C:\AuditLogs\1"
 });
+
 AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope => 
+{ 
+    scope.SetCustomField("ApplicationId", "MyApplication"); 
+});
 ```
 
 Initialization to use the Event Log provider with an InsertOnEnd Creation Policy:
