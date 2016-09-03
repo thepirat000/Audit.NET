@@ -239,7 +239,7 @@ AuditConfiguration.SetDataProvider(new MyFileDataProvider());
 ```
 
 ###Creation Policy
-Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should should be set prior to the `AuditScope` creation, i.e. during application startup.
+Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should be set prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set the default creation policy to Manual:
 ```c#
