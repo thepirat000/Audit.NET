@@ -38,6 +38,13 @@ using (AuditScope.Create("Order:Update", () => order))
 
 The first parameter of the `Create` method is an event type name. The second is the delegate to obtain the object to track.
 
+It is not mandatory to use a `using` block, but it simplifies the syntax allowing to detect if an exception has been thrown. The object to track is passed as an Action to allow the library to inspect the object at the beggining and at the end of the scope.
+
+If you are not tracking an specific object change, you can use the `CreateAndSave` shortcut method, that saves the event immediately. For example:
+```c#
+AuditScope.CreateAndSave(eventType, new { ExtraField = "extra value" });
+```
+
 The library will generate an output (`AuditEvent`) for each operation, including:
 - Tracked object's state before and after the operation.
 - Execution time and duration.
