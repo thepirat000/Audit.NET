@@ -248,7 +248,7 @@ AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
 
 ###Custom Actions
 
-You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data intercepting the scopes after they are created or before they are saved.
+You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
 
 Call the static `AuditConfiguration.AddCustomAction` method to attach a custom action. 
 
