@@ -190,7 +190,7 @@ public class MyFileDataProvider : AuditDataProvider
         return fileName;
     }
     // Update an existing event given the ID and the event
-    public override void UpdateEvent(object eventId, AuditEvent auditEvent)
+    public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
         // Override an existing event
         var fileName = eventId.ToString();
@@ -199,7 +199,8 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-The `InsertEvent` method should return a unique ID for the event. The `UpdateEvent` method should update the event given its event ID.
+The `InsertEvent` method should return a unique ID for the event. 
+The `ReplaceEvent` method should update an event given its ID, this method is only called when the [Creation Policy](#event-creation-policy) is set to **Manual** or **InsertOnStartReplaceOnEnd**.
 
 ##Event Creation Policy
 
