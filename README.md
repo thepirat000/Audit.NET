@@ -308,8 +308,8 @@ Or by using the fluent API:
 ```c#
 AuditConfiguration.Setup()
     .UsingFileLogProvider(config => config
-        .Directory(@"C:\AuditLogs\1")
-        .FilenamePrefix("Event_"))
+        .FilenamePrefix("Event_")
+        .Directory(@"C:\AuditLogs\1"))
     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
     .WithAction(x => x.OnScopeCreated(scope => scope.SetCustomField("ApplicationId", "MyApplication")));
 ```
