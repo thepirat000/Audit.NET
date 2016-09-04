@@ -14,7 +14,7 @@ PM> Install-Package Audit.NET.SqlServer
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
 
 ##Configuration
-Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider. This should be done before any `AuditScope` creation, i.e. during application startup.
+Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider, or call the `UseSqlServer` on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
 For example:
 ```c#
@@ -23,11 +23,21 @@ AuditConfiguration.SetDataProvider(new SqlDataProvider()
     ConnectionString =
         "data source=localhost;initial catalog=Audit;integrated security=true;",
     TableName = "Event",
-    JsonColumnName = "Data",
     IdColumnName = "EventId",
-    LastUpdatedDateColumnName = "LastUpdatedDate",
-    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
+    JsonColumnName = "Data",
+    LastUpdatedDateColumnName = "LastUpdatedDate"
 });
+```
+
+Or by using the fluent API:
+```c#
+AuditConfiguration.Setup()
+    .UseSqlServer(config => config
+        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+        .TableName("Event")
+        .IdColumnName("EventId")
+        .JsonColumnName("Data")
+        .LastUpdatedColumnName("LastUpdatedDate"));
 ```
 
 ###Provider Options
