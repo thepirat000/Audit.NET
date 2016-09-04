@@ -9,6 +9,39 @@ namespace Audit.UnitTest
     public class UnitTest
     {
         [Fact]
+        public void Test_FluentConfig_FileLog()
+        {
+            int x = 0;
+            AuditConfiguration.Setup()
+                .UseFileLogProvider(config => config.Directory(@"C:\").FilenamePrefix("prefix"))
+                .WithCreationPolicy(EventCreationPolicy.Manual)
+                .WithAction(action => action.OnScopeCreated(s => x++));
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+            Assert.Equal(typeof(FileDataProvider), AuditConfiguration.DataProvider.GetType());
+            Assert.Equal("prefix", (AuditConfiguration.DataProvider as FileDataProvider).FilenamePrefix);
+            Assert.Equal(@"C:\", (AuditConfiguration.DataProvider as FileDataProvider).DirectoryPath);
+            Assert.Equal(EventCreationPolicy.Manual, AuditConfiguration.CreationPolicy);
+            Assert.True(AuditConfiguration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
+            Assert.Equal(1, x);
+        }
+#if NET451
+        [Fact]
+        public void Test_FluentConfig_EventLog()
+        {
+            AuditConfiguration.Setup()
+                .UseEventLogProvider(config => config.LogName("LogName").SourcePath("SourcePath").MachineName("MachineName"))
+                .WithCreationPolicy(EventCreationPolicy.Manual);
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+            Assert.Equal(typeof(EventLogDataProvider), AuditConfiguration.DataProvider.GetType());
+            Assert.Equal("LogName", (AuditConfiguration.DataProvider as EventLogDataProvider).LogName);
+            Assert.Equal("SourcePath", (AuditConfiguration.DataProvider as EventLogDataProvider).SourcePath);
+            Assert.Equal("MachineName", (AuditConfiguration.DataProvider as EventLogDataProvider).MachineName);
+            Assert.Equal(EventCreationPolicy.Manual, AuditConfiguration.CreationPolicy);
+        }
+#endif
+        [Fact]
         public void Test_StartAndSave()
         {
             var provider = new Mock<AuditDataProvider>();

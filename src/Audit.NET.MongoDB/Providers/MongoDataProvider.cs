@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Audit.Core;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Audit.Core;
 
 namespace Audit.MongoDB.Providers
 {

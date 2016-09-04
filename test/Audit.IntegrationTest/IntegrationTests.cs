@@ -173,59 +173,55 @@ namespace Audit.IntegrationTest
 #if NET451
             public void SetEventLogSettings()
             {
-                AuditConfiguration.SetDataProvider(new EventLogDataProvider()
-                {
-                    SourcePath = "Application",
-                    LogName = "Application",
-                    MachineName = "."
-                });
+                AuditConfiguration.Setup()
+                    .UseEventLogProvider(config => config
+                        .LogName("Application")
+                        .SourcePath("TestApplication")
+                        .MachineName("."))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
             }
 
             public void SetAzureSettings()
             {
-                AuditConfiguration.SetDataProvider(new AzureDbDataProvider()
-                {
-                    ConnectionString = "https://thepirat.documents.azure.com:443/",
-                    AuthKey = "xx==",
-                    Database = "Audit",
-                    Collection = "Event"
-                });
-                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+                AuditConfiguration.Setup()
+                    .UseAzureDocumentDB(config => config
+                        .ConnectionString("https://thepirat.documents.azure.com:443/")
+                        .AuthKey("xxxxxxxxxxxxxxxxxxxxxxx=="))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
             }
 #endif
             public void SetFileSettings()
             {
-                AuditConfiguration.SetDataProvider(new FileDataProvider()
-                {
-                    FilenamePrefix = "Event_",
-                    DirectoryPath = @"c:\temp\1",
-                });
-                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+                AuditConfiguration.Setup()
+                    .UseFileLogProvider(config => config.Directory(@"c:\temp\1").FilenamePrefix("Event_"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
             }
 
             public void SetSqlSettings()
             {
-                AuditConfiguration.SetDataProvider(new SqlDataProvider()
-                {
-                    ConnectionString =
-                        "data source=localhost;initial catalog=Audit;integrated security=true;",
-                    TableName = "Event",
-                    JsonColumnName = "Data",
-                    IdColumnName = "EventId",
-                    LastUpdatedDateColumnName = "LastUpdatedDate"
-                });
-                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+                AuditConfiguration.Setup()
+                    .UseSqlServer(config => config
+                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+                        .TableName("Event")
+                        .IdColumnName("EventId")
+                        .JsonColumnName("Data")
+                        .LastUpdatedColumnName("LastUpdatedDate"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
             }
 
             public void SetMongoSettings()
             {
-                AuditConfiguration.SetDataProvider(new MongoDataProvider()
-                {
-                    ConnectionString = "mongodb://localhost:27017",
-                    Database = "Audit",
-                    Collection = "Event"
-                });
-                AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+                AuditConfiguration.Setup()
+                    .UseMongoDB(config => config
+                        .ConnectionString("mongodb://localhost:27017")
+                        .Database("Audit")
+                        .Collection("Event"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
             }
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)

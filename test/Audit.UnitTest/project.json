@@ -3,7 +3,6 @@
   "testRunner": "xunit",
   "dependencies": {
     "Audit.NET": { "target": "project" },
-    "Audit.NET.SqlServer": { "target": "project" },
     "Moq": "4.6.38-alpha"
   },
   "commands": {

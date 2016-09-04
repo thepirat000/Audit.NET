@@ -1,6 +1,6 @@
 {
   "title": "Audit.WebApi",
-  "version": "3.2.0-*",
+  "version": "3.3.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Generate detailed Audit Logs for Web API Controller calls.",

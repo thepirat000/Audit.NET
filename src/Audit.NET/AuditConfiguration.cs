@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Audit.Core.Configuration;
 using Audit.Core.Providers;
 
 namespace Audit.Core
@@ -10,16 +10,23 @@ namespace Audit.Core
     /// </summary>
     public static class AuditConfiguration
     {
-        private static Dictionary<ActionType, List<Action<AuditScope>>> _auditScopeActions;
-
         /// <summary>
-        /// Gets or Sets the Default creation policy.
+        /// Configure Audit by using Fluent Configuration API.
+        /// </summary>
+        public static IConfigurator Setup()
+        {
+            return new Configurator();
+        }
+        /// <summary>
+        /// Gets the Default creation policy.
         /// </summary>
         public static EventCreationPolicy CreationPolicy { get; private set; } 
         /// <summary>
         /// Gets the Default data provider.
         /// </summary>
         public static AuditDataProvider DataProvider { get; private set; }
+
+        internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
 
         static AuditConfiguration()
         {
@@ -50,22 +57,25 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddCustomAction(ActionType when, Action<AuditScope> action)
         {
-            _auditScopeActions[when].Add(action);
+            AuditScopeActions[when].Add(action);
         }
         /// <summary>
         /// Resets the audit scope handlers. Removes all the attached actions for the Audit Scopes.
         /// </summary>
         public static void ResetCustomActions()
         {
-            _auditScopeActions = new Dictionary<ActionType, List<Action<AuditScope>>>()
+            AuditScopeActions = new Dictionary<ActionType, List<Action<AuditScope>>>()
             {
                 {ActionType.OnScopeCreated, new List<Action<AuditScope>>()},
                 {ActionType.OnEventSaving, new List<Action<AuditScope>>()},
             };
         }
+        /// <summary>
+        /// Invokes the scope custom actions.
+        /// </summary>
         internal static void InvokeScopeCustomActions(ActionType type, AuditScope auditScope)
         {
-            foreach (var action in _auditScopeActions[type])
+            foreach (var action in AuditScopeActions[type])
             {
                 action.Invoke(auditScope);
             }
