@@ -14,7 +14,7 @@ PM> Install-Package Audit.NET.SqlServer
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
 
 ##Configuration
-Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider, or call the `UseSqlServer` on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
+Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider, or call the `UseSqlServer` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
 For example:
 ```c#
@@ -29,7 +29,7 @@ AuditConfiguration.SetDataProvider(new SqlDataProvider()
 });
 ```
 
-Or by using the fluent API:
+Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
 ```c#
 AuditConfiguration.Setup()
     .UseSqlServer(config => config
