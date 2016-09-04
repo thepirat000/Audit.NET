@@ -158,7 +158,7 @@ The `AuditScope` object has a `Discard()` method to allow the user to discard an
 For example, if you want to avoid saving the audit event if an exception is thrown:
 
 ```c#
-using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
+using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 {
     try
     {
