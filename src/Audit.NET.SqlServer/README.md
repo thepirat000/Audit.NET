@@ -50,11 +50,12 @@ Mandatory:
 
 Optional:
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
-- **CreationPolicy**: The [event creation policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) to use.
 
 ##Table constraints
 
-The table should exists and the type of the JSON column should be `NVARCHAR(MAX)`.
+- The table should exists. 
+- The table should have a single ID column (Unique or Primary key).
+- The type of the ID column should be convertible to `NVARCHAR`.
 
 For example:
 ```SQL
