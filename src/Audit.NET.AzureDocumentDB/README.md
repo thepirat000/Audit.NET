@@ -16,6 +16,7 @@ Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage
 ##Configuration
 Call the static `AuditConfiguration.SetDataProvider` method to set the Document DB data provider, or use the `UseAzureDocumentDB` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
+For example:
 ```c#
 AuditConfiguration.SetDataProvider(new Audit.AzureDocumentDB.Providers.AzureDbDataProvider()
 {
