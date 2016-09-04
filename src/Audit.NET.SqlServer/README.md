@@ -14,7 +14,7 @@ PM> Install-Package Audit.NET.SqlServer
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
 
 ##Configuration
-Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider. This should be done before any `AuditScope` creation, i.e. during application startup.
+Call the static `AuditConfiguration.SetDataProvider` method to set the Sql Server data provider, or call the `UseSqlServer` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
 For example:
 ```c#
@@ -23,11 +23,21 @@ AuditConfiguration.SetDataProvider(new SqlDataProvider()
     ConnectionString =
         "data source=localhost;initial catalog=Audit;integrated security=true;",
     TableName = "Event",
-    JsonColumnName = "Data",
     IdColumnName = "EventId",
-    LastUpdatedDateColumnName = "LastUpdatedDate",
-    CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd
+    JsonColumnName = "Data",
+    LastUpdatedDateColumnName = "LastUpdatedDate"
 });
+```
+
+Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
+```c#
+AuditConfiguration.Setup()
+    .UseSqlServer(config => config
+        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+        .TableName("Event")
+        .IdColumnName("EventId")
+        .JsonColumnName("Data")
+        .LastUpdatedColumnName("LastUpdatedDate"));
 ```
 
 ###Provider Options
@@ -40,11 +50,12 @@ Mandatory:
 
 Optional:
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
-- **CreationPolicy**: The [event creation policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) to use.
 
 ##Table constraints
 
-The table should exists and the type of the JSON column should be `NVARCHAR(MAX)`.
+- The table should exists. 
+- The table should have a single ID column (Unique or Primary key).
+- The type of the ID column should be convertible to `NVARCHAR`.
 
 For example:
 ```SQL
