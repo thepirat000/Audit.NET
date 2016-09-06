@@ -46,10 +46,36 @@ You can change the default behavior by decorating your DbContext with the `Audit
 
 For example:
 ```c#
-[AuditDbContext(Mode = AuditOptionMode.OptIn, IncludeEntityObjects = false, AuditEventType = "{database}_{context}" )]
+[AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false, AuditEventType = "{database}_{context}" )]
 public class MyEntitites : Audit.EntityFramework.AuditDbContext
 {
 ...
 ```
 
-You can also change the settings by changing the  
+You can also change the settings by accessing the properties with the same name as in the attribute. For example:
+```c#
+public class MyEntitites : Audit.EntityFramework.AuditDbContext
+{
+    public MyEntitites()
+    {
+        AuditEventType = "{database}_{context}";
+        Mode = AuditOptionMode.OptOut;
+        IncludeEntityObjects = false;
+    }
+}
+```
+
+##Output
+Audit.EntityFramework output includes:
+- Affected Database and Table names
+- Affected column data including primary key, original and new values
+- Model validation results
+- Exception details
+- Entity object graphs (optional with `IncludeEntityObjects` configuration)
+- Execution time and duration
+- Enviroment information such as user, machine, domain, locale, etc.
+
+With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your database.
+
+
+
