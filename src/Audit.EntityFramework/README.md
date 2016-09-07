@@ -80,5 +80,43 @@ With this information, you can not just know who did the operation, but also mea
 
 ##Output samples
 
-This is an example of the output for an operation
+This is an example of the output for a single Insert operation:
+```javascript
+{
+	"EventType": "Blogs_MyContext",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.UnitTest.AuditTests.TestEF()",
+		"Exception": null,
+		"Culture": "en-GB"
+	},
+	"StartDate": "2016-09-06T21:11:57.7562152-05:00",
+	"EndDate": "2016-09-06T21:11:58.1039904-05:00",
+	"Duration": 348,
+	"EntityFrameworkEvent": {
+		"Database": "Blogs",
+		"TransactionId": "620ad14e-ec3b-4eac-a8fe-cfe5e8f76e5d_1",
+		"Entries": [{
+			"EntityType": "Posts",
+			"Action": "Add",
+			"PrimaryKey": {
+				"Id": 73
+			},
+			"Entity": {
+				"Id": 73,
+				"Title": "some title",
+				"DateCreated": "2016-09-06T21:11:28.0257409-05:00",
+				"Content": "some content",
+				"BlogId": 1,
+				"Blog": null
+			},
+			"Valid": true
+		}],
+		"Result": 1,
+		"Success": true
+	}
+}
+```
 
