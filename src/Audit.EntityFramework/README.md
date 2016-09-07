@@ -89,7 +89,7 @@ This is an example of the output for a failed insert operation:
 		"MachineName": "HP",
 		"DomainName": "HP",
 		"CallingMethodName": "Audit.UnitTest.AuditTests.TestEF()",
-		"Exception": null,
+		"Exception": "Exception: Exception from HRESULT: 0xE0434352",
 		"Culture": "en-GB"
 	},
 	"StartDate": "2016-09-06T21:11:57.7562152-05:00",
