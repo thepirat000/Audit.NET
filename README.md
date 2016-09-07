@@ -332,7 +332,7 @@ AuditConfiguration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-##More providers
+##Storage providers
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
