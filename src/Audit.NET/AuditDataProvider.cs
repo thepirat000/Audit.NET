@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Audit.Core
 {
@@ -8,6 +9,8 @@ namespace Audit.Core
     /// </summary>
     public abstract class AuditDataProvider
     {
+        private static JsonSerializer _defaultSerializer = JsonSerializer.Create(new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
         /// <summary>
         /// Override this method to provide a different serialization method for the values that need to be serialized before saving.
         /// (old target value and custom fields)
@@ -18,7 +21,7 @@ namespace Audit.Core
             {
                 return null;
             }
-            return JToken.FromObject(value);
+            return JToken.FromObject(value, _defaultSerializer);
         }
 
         /// <summary>
