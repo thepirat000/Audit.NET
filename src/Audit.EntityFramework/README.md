@@ -72,7 +72,7 @@ The library intercepts the calls to `SaveChanges` / `SaveChangesAsync` methods o
 
 ##Output
 Audit.EntityFramework output includes:
-- Affected SQL Database and Table names
+- Affected SQL database and table names
 - Affected column data including primary key, original and new values
 - Model validation results
 - Exception details
