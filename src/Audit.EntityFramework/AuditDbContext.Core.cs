@@ -118,11 +118,13 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
+            var clientConnectionId = GetClientConnectionId(context.Database.GetDbConnection());
             var efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
                 Database = context.Database.GetDbConnection()?.Database,
-                TransactionId = GetCurrentTransactionId(context)
+                ConnectionId = clientConnectionId,
+                TransactionId = GetCurrentTransactionId(context, clientConnectionId)
             };
             foreach (var entry in modifiedEntries)
             {
@@ -148,7 +150,8 @@ namespace Audit.EntityFramework
         /// Tries to get the current transaction identifier.
         /// </summary>
         /// <param name="context">The db context.</param>
-        private static string GetCurrentTransactionId(DbContext context)
+        /// <param name="clientConnectionId">The client ConnectionId.</param>
+        private static string GetCurrentTransactionId(DbContext context, string clientConnectionId)
         {
             var dbtxmgr = context.GetInfrastructure().GetService<IDbContextTransactionManager>();
             var relcon = dbtxmgr as IRelationalConnection;
@@ -158,7 +161,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-            return GetTransactionId(tx, context.Database.GetDbConnection());
+            return GetTransactionId(tx, clientConnectionId);
         }
     }
 }

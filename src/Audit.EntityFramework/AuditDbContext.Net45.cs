@@ -125,7 +125,8 @@ namespace Audit.EntityFramework
         /// Tries to get the current transaction identifier.
         /// </summary>
         /// <param name="context">The db context.</param>
-        private static string GetCurrentTransactionId(DbContext context)
+        /// <param name="clientConnectionId">The client ConnectionId.</param>
+        private static string GetCurrentTransactionId(DbContext context, string clientConnectionId)
         {
             var curr = context.Database.CurrentTransaction;
             if (curr == null)
@@ -134,7 +135,7 @@ namespace Audit.EntityFramework
             }
             // Get the transaction id
             var underlyingTran = curr.UnderlyingTransaction;
-            return GetTransactionId(underlyingTran, context.Database.Connection);
+            return GetTransactionId(underlyingTran, clientConnectionId);
         }
 
         /// <summary>
@@ -150,11 +151,13 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
+            var clientConnectionId = GetClientConnectionId(context.Database.Connection);
             var efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
                 Database = context.Database.Connection.Database,
-                TransactionId = GetCurrentTransactionId(context)
+                ConnectionId = clientConnectionId,
+                TransactionId = GetCurrentTransactionId(context, clientConnectionId)
             };
             foreach (var entry in modifiedEntries)
             {

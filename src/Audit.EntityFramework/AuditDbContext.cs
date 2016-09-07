@@ -67,6 +67,8 @@ namespace Audit.EntityFramework
         private static readonly Dictionary<Type, bool?> EntitiesIncludedCache = new Dictionary<Type, bool?>();
         // AuditDbContext Attribute cache
         private static AuditDbContextAttribute _auditAttribute;
+
+        private Dictionary<string, object> _extraFields;
 #endregion
 
 #region Private methods
@@ -179,6 +181,13 @@ namespace Audit.EntityFramework
             var typeName = GetType().Name;
             var eventType = AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
             var scope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual);
+            if (_extraFields != null)
+            {
+                foreach(var field in _extraFields)
+                {
+                    scope.SetCustomField(field.Key, field.Value);
+                }
+            }
             return scope;
         }
 
@@ -198,21 +207,47 @@ namespace Audit.EntityFramework
                 .ToList();
         }
 
-        private static string GetTransactionId(DbTransaction transaction, DbConnection connection)
+        /// <summary>
+        /// Gets a unique ID for the current SQL transaction.
+        /// </summary>
+        /// <param name="transaction">The transaction.</param>
+        /// <param name="clientConnectionId">The client connection identifier.</param>
+        /// <returns>System.String.</returns>
+        private static string GetTransactionId(DbTransaction transaction, string clientConnectionId)
         {
-            // Get the transaction id
             var propIntTran = transaction.GetType().GetProperty("InternalTransaction", BindingFlags.NonPublic | BindingFlags.Instance);
             object intTran = propIntTran?.GetValue(transaction);
             var propTranId = intTran?.GetType().GetProperty("TransactionId", BindingFlags.NonPublic | BindingFlags.Instance);
             var tranId = (int)(long)propTranId?.GetValue(intTran);
+            return string.Format("{0}_{1}", clientConnectionId, tranId);
+        }
+
+        private static string GetClientConnectionId(DbConnection connection)
+        {
             // Get the connection id
             var sqlConnection = connection as SqlConnection;
             var connId = sqlConnection?.ClientConnectionId.ToString();
-            return string.Format("{0}_{1}", connId, tranId);
+            return connId;
         }
         #endregion
 
-#region Public methods
+        #region Public methods
+
+        /// <summary>
+        /// Adds a custom field to the audit scope.
+        /// The value will be serialized when SaveChanges takes place.
+        /// </summary>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="value">The value.</param>
+        public void AddAuditCustomField(string fieldName, object value)
+        {
+            if (_extraFields == null)
+            {
+                _extraFields = new Dictionary<string, object>();
+            }
+            _extraFields.Add(fieldName, value);
+        }
+
         /// <summary>
         /// Saves the changes synchronously.
         /// </summary>

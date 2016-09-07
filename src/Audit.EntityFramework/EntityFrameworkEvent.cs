@@ -7,6 +7,8 @@ namespace Audit.EntityFramework
     {
         [JsonProperty(Order = 1)]
         public string Database { get; set; }
+        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)]
+        public string ConnectionId { get; set; }
         [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)]
         public string TransactionId { get; set; }
         [JsonProperty(Order = 10)]
