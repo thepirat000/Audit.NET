@@ -79,7 +79,7 @@ Audit.EntityFramework output includes:
 - Transaction identifier (to group logs that are part of the same SQL transaction)
 - Entity object graphs (optional with `IncludeEntityObjects` configuration)
 - Execution time and duration
-- Enviroment information such as user, machine, domain, locale, etc.
+- Environment information such as user, machine, domain, locale, etc.
 
 With this information, you can measure performance, observe exceptions thrown or get statistics about usage of your database.
 
