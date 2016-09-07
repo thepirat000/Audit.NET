@@ -356,5 +356,5 @@ Generate detailed audit logs by decorating MVC Actions and Controllers with an a
 Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
 **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
-Generate detailed CRUD operations audit logs by inheriting from a provided `DbContext`.  Includes support for Entity Framework 6 and EF Core.
+Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF Core.
 
