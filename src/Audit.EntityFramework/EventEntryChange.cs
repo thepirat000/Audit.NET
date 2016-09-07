@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Audit.EntityFramework
 {
-    public class EntityFrameworkEventEntryChange
+    public class EventEntryChange
     {
         [JsonProperty(Order = 10)]
         public string ColumnName { get; set; }

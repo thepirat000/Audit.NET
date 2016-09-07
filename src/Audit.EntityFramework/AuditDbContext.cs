@@ -99,9 +99,9 @@ namespace Audit.EntityFramework
             switch (state)
             {
                 case EntityState.Added:
-                    return "Add";
+                    return "Insert";
                 case EntityState.Modified:
-                    return "Modify";
+                    return "Update";
                 case EntityState.Deleted:
                     return "Delete";
                 default:

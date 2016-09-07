@@ -56,7 +56,7 @@ namespace Audit.IntegrationTest
             {
                 ctx.Posts.Add(new Post() { BlogId = 1, Content = "other content", DateCreated = DateTime.Now, Title = "other title" });
                 var efEvent = AuditDbContext.CreateAuditEvent(ctx, true, AuditOptionMode.OptOut);
-                Assert.True(efEvent.Entries.Any(e => e.Action == "Add" && (e.Entity as Post)?.Title == "other title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "other title"));
             }
         }
 
@@ -125,11 +125,11 @@ SET IDENTITY_INSERT Posts OFF
 
                 Assert.Equal(4, result);
                 Assert.Equal("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
-                Assert.True(efEvent.Entries.Any(e => e.Action == "Add" && (e.Entity as Post)?.Title == "title"));
-                Assert.True(efEvent.Entries.Any(e => e.Action == "Add" && e.Changes.Any(ch => ch.NewValue.Equals("title") && ch.ColumnName == "Title") && (e.Entity as Post)?.Title == "title"));
-                Assert.True(efEvent.Entries.Any(e => e.Action == "Modify" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && (e.Entity as Post)?.Id == 5));
-                Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && e.Changes.Any(ch => ch.OriginalValue.Equals(5) && ch.ColumnName == "Id") && (e.Entity as Post)?.Id == 5));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && e.ColumnValues["Id"].Equals(5) && (e.Entity as Post)?.Id == 5));
 
                 provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
 

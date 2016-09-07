@@ -35,37 +35,44 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="context">The db context.</param>
         /// <param name="entry">The entry.</param>
-        private static List<EntityFrameworkEventEntryChange> GetChanges(DbContext context, EntityEntry entry)
+        private static List<EventEntryChange> GetChanges(DbContext context, EntityEntry entry)
         {
-            var result = new List<EntityFrameworkEventEntryChange>();
+            var result = new List<EventEntryChange>();
             var props = context.Model.FindEntityType(entry.Entity.GetType()).GetProperties();
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
-                if (entry.State == EntityState.Modified)
+                if (propEntry.IsModified)
                 {
-                    if (propEntry.IsModified)
-                    {
-                        result.Add(new EntityFrameworkEventEntryChange()
-                        {
-                            ColumnName = GetColumnName(prop),
-                            NewValue = propEntry.CurrentValue,
-                            OriginalValue = propEntry.OriginalValue
-                        });
-                    }
-                }
-                else
-                {
-                    result.Add(new EntityFrameworkEventEntryChange()
+                    result.Add(new EventEntryChange()
                     {
                         ColumnName = GetColumnName(prop),
-                        NewValue = entry.State == EntityState.Deleted ? null : propEntry.CurrentValue,
-                        OriginalValue = entry.State == EntityState.Added ? null : propEntry.OriginalValue
+                        NewValue = propEntry.CurrentValue,
+                        OriginalValue = propEntry.OriginalValue
                     });
                 }
             }
             return result;
         }
+
+        /// <summary>
+        /// Gets the column values for an insert/delete operation.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="entry">The entity entry.</param>
+        private static Dictionary<string, object> GetColumnValues(DbContext context, EntityEntry entry)
+        {
+            var result = new Dictionary<string, object>();
+            var props = context.Model.FindEntityType(entry.Entity.GetType()).GetProperties();
+            foreach (var prop in props)
+            {
+                PropertyEntry propEntry = entry.Property(prop.Name);
+                var value = (entry.State == EntityState.Added) ? propEntry.CurrentValue : propEntry.OriginalValue;
+                result.Add(prop.Name, value);
+            }
+            return result;
+        }
+
         /// <summary>
         /// Gets the name of the column.
         /// </summary>
@@ -113,7 +120,7 @@ namespace Audit.EntityFramework
             }
             var efEvent = new EntityFrameworkEvent()
             {
-                Entries = new List<EntityFrameworkEventEntry>(),
+                Entries = new List<EventEntry>(),
                 Database = context.Database.GetDbConnection()?.Database,
                 TransactionId = GetCurrentTransactionId(context)
             };
@@ -122,15 +129,16 @@ namespace Audit.EntityFramework
                 var entity = entry.Entity;
                 var validationResults = GetValidationResults(entity);
                 var entityType = context.Model.FindEntityType(entry.Entity.GetType());
-                efEvent.Entries.Add(new EntityFrameworkEventEntry()
+                efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults == null,
                     ValidationResults = validationResults?.Select(x => x.ErrorMessage).ToList(),
                     Entity = includeEntities ? entity : null,
                     Action = GetStateName(entry.State),
-                    Changes = GetChanges(context, entry),
+                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
+                    ColumnValues = entry.State != EntityState.Modified ? GetColumnValues(context, entry) : null,
                     PrimaryKey = GetPrimaryKey(entityType, entity),
-                    EntityType = GetEntityName(entityType)
+                    Table = GetEntityName(entityType)
                 });
             }
             return efEvent;

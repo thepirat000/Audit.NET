@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Audit.EntityFramework
 {
-    public class EntityFrameworkEventEntry
+    public class EventEntry
     {
         [JsonProperty(Order = 10)]
-        public string EntityType { get; set; }
+        public string Table { get; set; }
         [JsonProperty(Order = 25)]
         public IDictionary<string, object> PrimaryKey { get; set; }
         [JsonProperty(Order = 20)]
@@ -14,7 +14,9 @@ namespace Audit.EntityFramework
         [JsonProperty(Order = 30, NullValueHandling = NullValueHandling.Ignore)]
         public object Entity { get; set; }
         [JsonProperty(Order = 40, NullValueHandling = NullValueHandling.Ignore)]
-        public List<EntityFrameworkEventEntryChange> Changes { get; set; }
+        public List<EventEntryChange> Changes { get; set; }
+        [JsonProperty(Order = 45, NullValueHandling = NullValueHandling.Ignore)]
+        public IDictionary<string, object> ColumnValues { get; set; }
         [JsonProperty(Order = 50)]
         public bool Valid { get; set; }
         [JsonProperty(Order = 60, NullValueHandling = NullValueHandling.Ignore)]

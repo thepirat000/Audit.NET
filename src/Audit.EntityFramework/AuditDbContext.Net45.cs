@@ -64,42 +64,47 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="context">The db context.</param>
         /// <param name="entry">The entry.</param>
-        private static List<EntityFrameworkEventEntryChange> GetChanges(DbContext context, DbEntityEntry entry)
+        private static List<EventEntryChange> GetChanges(DbContext context, DbEntityEntry entry)
         {
-            var result = new List<EntityFrameworkEventEntryChange>();
-            var propertyNames = entry.State != EntityState.Deleted ? entry.CurrentValues.PropertyNames : entry.OriginalValues.PropertyNames;
-            foreach (var propName in propertyNames)
+            var result = new List<EventEntryChange>();
+            foreach (var propName in entry.CurrentValues.PropertyNames)
             {
-                if (entry.State == EntityState.Modified)
+                var current = entry.CurrentValues[propName];
+                var original = entry.OriginalValues[propName];
+                if (current == null && original == null)
                 {
-                    var current = entry.CurrentValues[propName];
-                    var original = entry.OriginalValues[propName];
-                    if (current == null && original == null)
-                    {
-                        continue;
-                    }
-                    if (original == null || !original.Equals(current))
-                    {
-                        result.Add(new EntityFrameworkEventEntryChange()
-                        {
-                            ColumnName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), entry.Property(propName).Name, context),
-                            NewValue = current,
-                            OriginalValue = original
-                        });
-                    }
+                    continue;
                 }
-                else
+                if (original == null || !original.Equals(current))
                 {
-                    result.Add(new EntityFrameworkEventEntryChange()
+                    result.Add(new EventEntryChange()
                     {
                         ColumnName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), entry.Property(propName).Name, context),
-                        NewValue = entry.State == EntityState.Deleted ? null : entry.CurrentValues[propName],
-                        OriginalValue = entry.State == EntityState.Added ? null : entry.OriginalValues[propName]
+                        NewValue = current,
+                        OriginalValue = original
                     });
                 }
             }
             return result;
         }
+
+        /// <summary>
+        /// Gets the column values for an insert/delete operation.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="entry">The entity entry.</param>
+        private static Dictionary<string, object> GetColumnValues(DbContext context, DbEntityEntry entry)
+        {
+            var result = new Dictionary<string, object>();
+            var propertyNames = entry.State != EntityState.Deleted ? entry.CurrentValues.PropertyNames : entry.OriginalValues.PropertyNames;
+            foreach (var propName in propertyNames)
+            {
+                var value = (entry.State == EntityState.Added) ? entry.CurrentValues[propName] : entry.OriginalValues[propName];
+                result.Add(propName, value);
+            }
+            return result;
+        }
+
         /// <summary>
         /// Gets the name of the table/entity.
         /// </summary>
@@ -147,7 +152,7 @@ namespace Audit.EntityFramework
             }
             var efEvent = new EntityFrameworkEvent()
             {
-                Entries = new List<EntityFrameworkEventEntry>(),
+                Entries = new List<EventEntry>(),
                 Database = context.Database.Connection.Database,
                 TransactionId = GetCurrentTransactionId(context)
             };
@@ -155,15 +160,16 @@ namespace Audit.EntityFramework
             {
                 var entity = entry.Entity;
                 var validationResults = entry.GetValidationResult();
-                efEvent.Entries.Add(new EntityFrameworkEventEntry()
+                efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults.IsValid,
                     ValidationResults = validationResults.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
                     Entity = includeEntities ? entity : null,
                     Action = GetStateName(entry.State),
-                    Changes = GetChanges(context, entry),
+                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
+                    ColumnValues = entry.State != EntityState.Modified ? GetColumnValues(context, entry) : null,
                     PrimaryKey = GetPrimaryKey(context, entry),
-                    EntityType = GetEntityName(context, entity)
+                    Table = GetEntityName(context, entity)
                 });
             }
             return efEvent;
