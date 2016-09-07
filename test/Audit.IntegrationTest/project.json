@@ -24,7 +24,8 @@
         "xunit": "2.2.0-beta2-build3300",
         "Audit.NET": { "target": "project" },
         "Audit.NET.MongoDB": { "target": "project" },
-        "Audit.NET.SqlServer": { "target": "project" }
+        "Audit.NET.SqlServer": { "target": "project" },
+        "Audit.EntityFramework": { "target": "project" }
       }
     },
     "net451": {
@@ -34,9 +35,13 @@
         "Audit.NET": { "target": "project" },
         "Audit.NET.MongoDB": { "target": "project" },
         "Audit.NET.SqlServer": { "target": "project" },
-        "Audit.NET.AzureDocumentDB": { "target": "project" }
+        "Audit.NET.AzureDocumentDB": { "target": "project" },
+        "Audit.EntityFramework": { "target": "project" },
+        "EntityFramework": "6.1.3"
       }
+
     }
+
 
 
   }

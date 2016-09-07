@@ -1,14 +1,14 @@
 {
-  "title": "Audit.SqlServer",
+  "title": "Audit.EntityFramework",
   "version": "3.4.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
-  "description": "Store Audit.NET Trail Logs into a SQL Server database",
+  "description": "Generate Audit Trails from EntityFramework context changes",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.EntityFramework",
     "owners": [ "ThePirat" ],
-    "summary": "SQL Server provider for Audit.NET library. Store Audit Logs into a SQL Server database.",
-    "tags": [ "Audit", "Trail", "Log", "SQL", "SqlServer" ],
+    "summary": "Generate detailed Audit Logs from EntityFramework CRUD operations.",
+    "tags": [ "Audit", "Trail", "Log", "EntityFramework" ],
     "requireLicenseAcceptance": false
   },
   "tools": {
@@ -37,7 +37,8 @@
     },
     "net45": {
       "frameworkAssemblies": {
-        "System.Data": "4.0.0.0"
+        "System.Data": "4.0.0.0",
+        "System.Transactions": "4.0.0.0"
       },
       "dependencies": {
         "EntityFramework": "6.1.3"
