@@ -40,7 +40,7 @@ You can change the default behavior by decorating your DbContext with the `Audit
  - _Opt-Out_: All the entities are tracked by default, except those decorated with the `AuditIgnore` attribute. (Default)
  - _Opt-In_: No entity is tracked by default, except those decorated with the `AuditInclude` attribute.
 - **IncludeEntityObjects**: To indicate if the output should contain the modified entities objects. (Default is false)
-- **AuditEventType**: To indicate the event type to use on the audit event. (Default is the context name). Can contain the following placeholder: 
+- **AuditEventType**: To indicate the event type to use on the audit event. (Default is the context name). Can contain the following placeholders: 
   - {context}: replaced with the Db Context type name.
   - {database}: replaced with the database name.
 
