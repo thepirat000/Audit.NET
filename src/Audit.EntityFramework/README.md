@@ -71,11 +71,14 @@ Audit.EntityFramework output includes:
 - Affected column data including primary key, original and new values
 - Model validation results
 - Exception details
+- Transaction information
 - Entity object graphs (optional with `IncludeEntityObjects` configuration)
 - Execution time and duration
 - Enviroment information such as user, machine, domain, locale, etc.
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your database.
 
+##Output samples
 
+This is an example of the output for an operation
 
