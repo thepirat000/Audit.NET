@@ -84,7 +84,7 @@ Audit.EntityFramework output includes:
 With this information, you can measure performance, observe exceptions thrown or get statistics about usage of your database.
 
 ##Customization
-You can add extra field to the events by calling the method `AddAuditCustomField` on the `DbContext`. For example:
+You can add extra information to the events by calling the method `AddAuditCustomField` on the `DbContext`. For example:
 
 ```c#
 using(var context = new MyEntitites())
