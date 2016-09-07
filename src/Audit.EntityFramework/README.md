@@ -80,7 +80,7 @@ With this information, you can not just know who did the operation, but also mea
 
 ##Output samples
 
-This is an example of the output for a single Insert operation:
+This is an example of the output for a failed insert operation:
 ```javascript
 {
 	"EventType": "Blogs_MyContext",
@@ -98,20 +98,7 @@ This is an example of the output for a single Insert operation:
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
 		"Entries": [{
-			"EntityType": "Blogs",
-			"Action": "Update",
-			"PrimaryKey": {
-				"Id": 1
-			},
-			"Changes": [{
-				"ColumnName": "BloggerName",
-				"OriginalValue": "federico",
-				"NewValue": "Federico Colombo"
-			}],
-			"Valid": true
-		},
-		{
-			"EntityType": "Posts",
+			"Table": "Posts",
 			"Action": "Insert",
 			"PrimaryKey": {
 				"Id": -2147482647
@@ -125,7 +112,7 @@ This is an example of the output for a single Insert operation:
 			},
 			"Valid": false,
 			"ValidationResults": ["The field Title must be a string or array type with a maximum length of '20'."]
-		},
+		}],
 		"Result": 0,
 		"Success": false,
 		"ErrorMessage": "(DbUpdateException) An error occurred while updating the entries. See the inner exception for details. -> String or binary data would be truncated."
