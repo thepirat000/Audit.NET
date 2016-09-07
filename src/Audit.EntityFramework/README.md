@@ -44,6 +44,8 @@ You can change the default behavior by decorating your DbContext with the `Audit
   - {context}: replaced with the Db Context type name.
   - {database}: replaced with the database name.
 
+To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
+
 For example:
 ```c#
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false, AuditEventType = "{database}_{context}" )]
@@ -65,6 +67,9 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
+#How it works
+The library intercepts the calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` to generate detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+
 ##Output
 Audit.EntityFramework output includes:
 - Affected SQL Database and Table names
@@ -78,8 +83,21 @@ Audit.EntityFramework output includes:
 
 With this information, you can measure performance, observe exceptions thrown or get statistics about usage of your database.
 
-##Output samples
+##Customization
+You can add extra field to the events by calling the method `AddAuditCustomField` on the `DbContext`. For example:
 
+```c#
+using(var context = new MyEntitites())
+{
+	...
+	context.AddAuditCustomField("UserName", userName);
+	...
+	context.SaveChanges();
+	
+}
+```
+
+##Output samples
 This is an example of the output for a failed insert operation:
 ```javascript
 {
