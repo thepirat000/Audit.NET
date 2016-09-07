@@ -83,7 +83,7 @@ With this information, you can measure performance, observe exceptions thrown or
 This is an example of the output for a failed insert operation:
 ```javascript
 {
-	"EventType": "Blogs_MyContext",
+	"EventType": "Blogs_MyEntitites",
 	"Environment": {
 		"UserName": "Federico",
 		"MachineName": "HP",
