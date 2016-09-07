@@ -97,25 +97,38 @@ This is an example of the output for a single Insert operation:
 	"Duration": 348,
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
-		"TransactionId": "620ad14e-ec3b-4eac-a8fe-cfe5e8f76e5d_1",
 		"Entries": [{
-			"EntityType": "Posts",
-			"Action": "Add",
+			"EntityType": "Blogs",
+			"Action": "Update",
 			"PrimaryKey": {
-				"Id": 73
+				"Id": 1
 			},
-			"Entity": {
-				"Id": 73,
-				"Title": "some title",
-				"DateCreated": "2016-09-06T21:11:28.0257409-05:00",
-				"Content": "some content",
-				"BlogId": 1,
-				"Blog": null
-			},
+			"Changes": [{
+				"ColumnName": "BloggerName",
+				"OriginalValue": "federico",
+				"NewValue": "Federico Colombo"
+			}],
 			"Valid": true
-		}],
-		"Result": 1,
-		"Success": true
+		},
+		{
+			"EntityType": "Posts",
+			"Action": "Insert",
+			"PrimaryKey": {
+				"Id": -2147482647
+			},
+			"ColumnValues": {
+				"Id": -2147482647,
+				"BlogId": 1,
+				"Content": "content",
+				"DateCreated": "2016-09-07T01:05:51.1972469-05:00",
+				"Title": "title VERY LONG_________________"
+			},
+			"Valid": false,
+			"ValidationResults": ["The field Title must be a string or array type with a maximum length of '20'."]
+		},
+		"Result": 0,
+		"Success": false,
+		"ErrorMessage": "(DbUpdateException) An error occurred while updating the entries. See the inner exception for details. -> String or binary data would be truncated."
 	}
 }
 ```
