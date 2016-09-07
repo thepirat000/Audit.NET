@@ -17,7 +17,7 @@ PM> Install-Package Audit.EntityFramework
 Change your EF Context class to inherits from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. For example if you have a context like this:
 
 ```c#
-public class MyEntitites : DbContext
+public class MyEntities : DbContext
 {
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -26,7 +26,7 @@ public class MyEntitites : DbContext
 
 to enable the audit log, you should change it to this:
 ```c#
-public class MyEntitites : Audit.EntityFramework.AuditDbContext
+public class MyEntities : Audit.EntityFramework.AuditDbContext
 {
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -54,9 +54,9 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 
 You can also change the settings by accessing the properties with the same name as in the attribute. For example:
 ```c#
-public class MyEntitites : Audit.EntityFramework.AuditDbContext
+public class MyEntities : Audit.EntityFramework.AuditDbContext
 {
-    public MyEntitites()
+    public MyEntities()
     {
         AuditEventType = "{database}_{context}";
         Mode = AuditOptionMode.OptOut;
@@ -83,7 +83,7 @@ With this information, you can measure performance, observe exceptions thrown or
 This is an example of the output for a failed insert operation:
 ```javascript
 {
-	"EventType": "Blogs_MyEntitites",
+	"EventType": "Blogs_MyEntities",
 	"Environment": {
 		"UserName": "Federico",
 		"MachineName": "HP",
