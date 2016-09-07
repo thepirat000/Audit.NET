@@ -1,6 +1,6 @@
 {
   "title": "Audit.MongoDB",
-  "version": "3.5.0-*",
+  "version": "3.6.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Store Audit.NET Trail Logs into a MongoDB database",
