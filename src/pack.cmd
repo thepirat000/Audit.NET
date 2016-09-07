@@ -12,6 +12,6 @@ dotnet pack "Audit.WebApi/"
 dotnet pack "Audit.NET.AzureDocumentDB/"
 dotnet pack "Audit.NET.MongoDB/"
 dotnet pack "Audit.NET.SqlServer/"
-dotnet pack "Audit.entityframework/"
+dotnet pack "Audit.EntityFramework/"
 dotnet pack "Audit.NET/"
 
