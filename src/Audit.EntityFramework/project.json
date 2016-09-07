@@ -1,6 +1,6 @@
 {
   "title": "Audit.EntityFramework",
-  "version": "3.6.0-*",
+  "version": "3.6.1-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Generate Audit Logs from EntityFramework context changes",

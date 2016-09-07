@@ -24,7 +24,7 @@ namespace Audit.EntityFramework
     /// </summary>
     public abstract partial class AuditDbContext : DbContext
     {
-#region Contructors
+        #region Contructors
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>
@@ -34,7 +34,7 @@ namespace Audit.EntityFramework
         }
         #endregion
 
-#region Properties
+        #region Properties
         /// <summary>
         /// To indicate the event type to use on the audit event. (Default is the context name). 
         /// Can contain the following placeholders: 
@@ -55,23 +55,28 @@ namespace Audit.EntityFramework
         protected virtual bool IncludeEntityObjects { get; set; }
 
         /// <summary>
-        /// To indicate the audit operation mode. (Default if OptOut). 
+        /// To indicate the audit operation mode. (Default is OptOut). 
         ///  - OptOut: All the entities are tracked by default, except those decorated with the AuditIgnore attribute. 
         ///  - OptIn: No entity is tracked by default, except those decorated with the AuditInclude attribute.
         /// </summary>
         protected virtual AuditOptionMode Mode { get; set; }
-#endregion
 
-#region Private fields
+        /// <summary>
+        /// To indicate the Audit Data Provider to use. (Default is NULL to use the configured default data provider). 
+        /// </summary>
+        protected virtual AuditDataProvider AuditDataProvider { get; set; }
+        #endregion
+
+        #region Private fields
         // Entities Include/Ignore attributes cache
         private static readonly Dictionary<Type, bool?> EntitiesIncludedCache = new Dictionary<Type, bool?>();
         // AuditDbContext Attribute cache
         private static AuditDbContextAttribute _auditAttribute;
-
+        // User defined fields that will be stored as Custom Fields on the audit event
         private Dictionary<string, object> _extraFields;
-#endregion
+        #endregion
 
-#region Private methods
+        #region Private methods
         private void SetConfig()
         {
             if (_auditAttribute == null)
@@ -180,7 +185,7 @@ namespace Audit.EntityFramework
         {
             var typeName = GetType().Name;
             var eventType = AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
-            var scope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual);
+            var scope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual, AuditDataProvider);
             if (_extraFields != null)
             {
                 foreach(var field in _extraFields)
@@ -266,9 +271,6 @@ namespace Audit.EntityFramework
             try
             {
                 efEvent.Result = base.SaveChanges();
-                efEvent.Success = true;
-                SaveScope(scope, efEvent);
-                return efEvent.Result;
             }
             catch (Exception ex)
             {
@@ -277,6 +279,9 @@ namespace Audit.EntityFramework
                 SaveScope(scope, efEvent);
                 throw;
             }
+            efEvent.Success = true;
+            SaveScope(scope, efEvent);
+            return efEvent.Result;
         }
 
         /// <summary>
@@ -298,9 +303,6 @@ namespace Audit.EntityFramework
             try
             {
                 efEvent.Result = await base.SaveChangesAsync(cancellationToken);
-                efEvent.Success = true;
-                SaveScope(scope, efEvent);
-                return efEvent.Result;
             }
             catch (Exception ex)
             {
@@ -309,7 +311,10 @@ namespace Audit.EntityFramework
                 SaveScope(scope, efEvent);
                 throw;
             }
+            efEvent.Success = true;
+            SaveScope(scope, efEvent);
+            return efEvent.Result;
         }
-#endregion
+        #endregion
     }
 }
