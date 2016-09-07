@@ -139,3 +139,54 @@ This is an example of the output for a failed insert operation:
 }
 ```
 
+Output example for an update+delete operation:
+```javascript
+{
+	"EventType": "Blogs_MyEntities",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.UnitTest.AuditTests.TestEF()",
+		"Exception": null,
+		"Culture": "en-GB"
+	},
+	"StartDate": "2016-09-07T11:36:16.2643822-05:00",
+	"EndDate": "2016-09-07T11:36:20.410577-05:00",
+	"Duration": 4146,
+	"EntityFrameworkEvent": {
+		"Database": "Blogs",
+		"ConnectionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef",
+		"Entries": [{
+			"Table": "Blogs",
+			"Action": "Update",
+			"PrimaryKey": {
+				"Id": 1
+			},
+			"Changes": [{
+				"ColumnName": "BloggerName",
+				"OriginalValue": "fede",
+				"NewValue": "Federico"
+			}],
+			"Valid": true
+		},
+		{
+			"Table": "Posts",
+			"Action": "Delete",
+			"PrimaryKey": {
+				"Id": 5
+			},
+			"ColumnValues": {
+				"Id": 5,
+				"BlogId": 2,
+				"Content": "this is an example",
+				"DateCreated": "2016-09-07T11:36:10.973",
+				"Title": "my post 5"
+			},
+			"Valid": true
+		}],
+		"Result": 2,
+		"Success": true
+	}
+}
+```
