@@ -67,11 +67,11 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 
 ##Output
 Audit.EntityFramework output includes:
-- Affected Database and Table names
+- Affected SQL Database and Table names
 - Affected column data including primary key, original and new values
 - Model validation results
 - Exception details
-- Transaction information
+- Transaction identifier (to group logs that are part of the same SQL transaction)
 - Entity object graphs (optional with `IncludeEntityObjects` configuration)
 - Execution time and duration
 - Enviroment information such as user, machine, domain, locale, etc.
@@ -97,6 +97,7 @@ This is an example of the output for a failed insert operation:
 	"Duration": 348,
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
+		"TransactionId": "593e082d-b6b5-440b-a048-ba223b247e9f_1",
 		"Entries": [{
 			"Table": "Posts",
 			"Action": "Insert",
