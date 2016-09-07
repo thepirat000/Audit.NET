@@ -158,7 +158,7 @@ The `AuditScope` object has a `Discard()` method to allow the user to discard an
 For example, if you want to avoid saving the audit event if an exception is thrown:
 
 ```c#
-using (var scope = AuditScope.Create("SomeEvent", () => someTarget, "SomeId"))
+using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 {
     try
     {
@@ -284,7 +284,7 @@ Alternatively to the methods mentioned before (SetDataProvider, SetCreationPolic
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
 ```c#
 AuditConfiguration.Setup()
-    .UsingFileLogProvider()
+    .UseFileLogProvider()
     .WithCreationPolicy(EventCreationPolicy.Manual);
 ```
 
@@ -307,7 +307,7 @@ AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 Or by using the fluent API:
 ```c#
 AuditConfiguration.Setup()
-    .UsingFileLogProvider(config => config
+    .UseFileLogProvider(config => config
         .FilenamePrefix("Event_")
         .Directory(@"C:\AuditLogs\1"))
     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
@@ -326,7 +326,7 @@ AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
 Or by using the fluent API:
 ```c#
 AuditConfiguration.Setup()
-    .UsingEventLogProvider(config => config
+    .UseEventLogProvider(config => config
         .SourcePath("My Audited Application")
         .LogName("Application"))
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
