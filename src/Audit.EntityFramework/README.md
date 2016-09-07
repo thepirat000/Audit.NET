@@ -76,7 +76,7 @@ Audit.EntityFramework output includes:
 - Execution time and duration
 - Enviroment information such as user, machine, domain, locale, etc.
 
-With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your database.
+With this information, you can measure performance, observe exceptions thrown or get statistics about usage of your database.
 
 ##Output samples
 
