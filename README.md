@@ -90,18 +90,18 @@ An example of the output in JSON:
 
 The following tables describe the fields in the generated output:
 
-####**AuditEvent**
+###AuditEvent object
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **EventType** | string | User-defined string to group the events |
-| **Environment** | [**EnvironmentObject**](#environmentobject) | Contains information about the execution environment |
+| **Environment** | [**Environment**](#environment-object) | Contains information about the execution environment |
 | **StartDate** | DateTime | The date and time when the event has started |
 | **EndDate** | DateTime | The date and time when the event has ended |
 | **Duration** | integer | The duration of the event in milliseconds |
-| **Target** | [**TargetObject**](#targetobject) | User-defined tracked object |
+| **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
 
-####**EnvironmentObject**
+###Environment object
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **UserName** | string | The current logged user name |
@@ -111,7 +111,7 @@ The following tables describe the fields in the generated output:
 | **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
 | **Culture** | string | The current culture identifier |
 
-####**TargetObject**
+###Target object
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Type** | string | The tracked object type name |
