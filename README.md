@@ -86,6 +86,36 @@ An example of the output in JSON:
 }
 ```
 
+#Output details
+
+##AuditEvent 
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **EventType** | string | User defined string to group the events |
+| **Enviroment** | [**EnviromentObject**](#environmentobject) | Contains information about the execution environment |
+| **StartDate** | DateTime | The date and time when the event has started |
+| **EndDate** | DateTime | The date and time when the event has ended |
+| **Duration** | integer | The duration in milliseconds |
+| **Target** | [**TargetObject**](#targetobject) | User defined tracked object |
+| **Comments** | Array of strings | User defined comments |
+
+##EnvironmentObject
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **UserName** | string | The current logged user name |
+| **MachineName** | string | The current machine name |
+| **DomainName** | string | The user domain |
+| **CallingMethodName** | string | The calling method signature information |
+| **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
+| **Culture** | string | The current culture identifier |
+
+##TargetObject
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Type** | string | The tracked object type name |
+| **Old** | Object | The value of the tracked object at the beginning of the event |
+| **New** | Object | The value of the tracked object at the end of the event |
+
 ##Custom Fields and Comments
 
 The `AuditScope` object provides two methods to extend the event output.
