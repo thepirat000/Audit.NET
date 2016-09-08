@@ -4,7 +4,7 @@
 
 Automatically generates Audit Trails for EntityFramework's CRUD operations. **Supporting EF 6 and EF Core**.
 
-Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record operations in the database with detailed information.
+Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about CRUD operations in your database.
 
 ##Install
 
@@ -34,7 +34,7 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 ```
 
 ##Configuration
-You can change the default behavior by decorating your DbContext with the `AuditDbContext` attribute, indicating the setting values:
+Change the default behavior by decorating your DbContext with the `AuditDbContext` attribute, indicating the setting values:
 
 - **Mode**: To indicate the audit operation mode
  - _Opt-Out_: All the entities are tracked by default, except those decorated with the `AuditIgnore` attribute. (Default)
@@ -54,7 +54,7 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 ...
 ```
 
-You can also change the settings by accessing the properties with the same name as in the attribute. For example:
+You can also change the settings by accessing the properties on the `DbContext` with the same name as in the attribute. For example:
 ```c#
 public class MyEntities : Audit.EntityFramework.AuditDbContext
 {
@@ -67,7 +67,7 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
-To exclude specific entities from the audit (OptOut), you can decorate the entity class with the `AuditIgnore` attribute, for example:
+To exclude specific entities from the audit (OptOut Mode), you can decorate the entity classes with the `AuditIgnore` attribute, for example:
 ```c#
 [AuditIgnore]
 public class Blog
@@ -77,7 +77,7 @@ public class Blog
 }
 ```
 
-Instead, to include specific entities from the audit (OptIn), you can use the `AuditInclude` attribute:
+Instead, to include specific entities to the audit (OptIn Mode), you can use the `AuditInclude` attribute:
 ```c#
 [AuditInclude]
 public class Post
@@ -88,7 +88,7 @@ public class Post
 ```
 
 ##How it works
-The library intercepts the calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ##Output
 Audit.EntityFramework output includes:
@@ -116,6 +116,8 @@ using(var context = new MyEntitites())
 	
 }
 ```
+
+Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions).
 
 ##Output samples
 This is an example of the output for a failed insert operation:
