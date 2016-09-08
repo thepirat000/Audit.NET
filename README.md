@@ -88,6 +88,8 @@ An example of the output in JSON:
 
 #Output details
 
+The following tables describe the fields in the generated output:
+
 ##AuditEvent 
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
