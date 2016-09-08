@@ -78,7 +78,7 @@ The following table describes the Audit.Mvc output fields:
 | ViewName | string | The view name (if any) |
 | ViewPath | string | View physical path (if any) |
 | FormVariables | Object | Form-data input variables passed to the action |
-| ActionParameters | Object | Action parameters |
+| ActionParameters | Object | The action parameters passed |
 | UserName | string | Username on the HttpContext Identity |
 | RequestUrl | string | URL of the request |
 | IpAddress | string | Client IP address |
