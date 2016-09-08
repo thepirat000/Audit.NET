@@ -54,7 +54,6 @@ public class UsersController : ApiController
 }
 ```
 
-
 ##Configuration
 
 The `AuditApiAttribute` can be configured with the following properties:
@@ -84,6 +83,30 @@ Audit.WebApi output includes:
 - Comments and Custom Fields provided
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your API.
+
+##Output details
+
+The following table describes the Audit.WebApi output fields:
+
+###Action
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **HttpMethod** | string | HTTP method (GET, POST, etc) |
+| **ControllerName** | string | The controller name |
+| **ActionName** | string | The action name |
+| **FormVariables** | Object | Form-data input variables passed to the action |
+| **ActionParameters** | Object | The action parameters passed |
+| **UserName** | string | Username on the HttpContext Identity |
+| **RequestUrl** | string | URL of the request |
+| **IpAddress** | string | Client IP address |
+| **ResponseStatusCode** | integer | HTTP response status code |
+| **ResponseStatus** | string | Response status description |
+| **ResponseBodyType** | string | The reported response body type |
+| **ResponseBody** | string | The response body (optional) |
+| **Headers** | Object | HTTP Headers (optional) |
+| **ModelStateValid** | boolean | Boolean to indicate if the model is valid |
+| **ModelStateErrors** | string | Error description when the model is invalid |
+| **Exception** | string | The exception thrown details (if any) |
 
 ##Customization
 
