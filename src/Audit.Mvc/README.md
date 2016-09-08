@@ -72,24 +72,24 @@ The following table describes the Audit.Mvc output fields:
 ###Action
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
-| HttpMethod | string | HTTP method (GET, POST, etc) |
-| ControllerName | string | The controller name |
-| ActionName | string | The action name |
-| ViewName | string | The view name (if any) |
-| ViewPath | string | View physical path (if any) |
-| FormVariables | Object | Form-data input variables passed to the action |
-| ActionParameters | Object | The action parameters passed |
-| UserName | string | Username on the HttpContext Identity |
-| RequestUrl | string | URL of the request |
-| IpAddress | string | Client IP address |
-| ResponseStatusCode | integer | HTTP response status code |
-| ResponseStatus | string | Response status description |
-| Headers | Object | HTTP Headers (optional) |
-| Model | Object | The model object returned by the controller (if any) (optional) |
-| ModelStateValid | boolean | Boolean to indicate if the model is valid |
-| ModelStateErrors | string | Error description when the model is invalid |
-| RedirectLocation | string | The redirect location (if any) |
-| Exception | string | The exception thrown details (if any) |
+| **HttpMethod** | string | HTTP method (GET, POST, etc) |
+| **ControllerName** | string | The controller name |
+| **ActionName** | string | The action name |
+| **ViewName** | string | The view name (if any) |
+| **ViewPath** | string | View physical path (if any) |
+| **FormVariables** | Object | Form-data input variables passed to the action |
+| **ActionParameters** | Object | The action parameters passed |
+| **UserName** | string | Username on the HttpContext Identity |
+| **RequestUrl** | string | URL of the request |
+| **IpAddress** | string | Client IP address |
+| **ResponseStatusCode** | integer | HTTP response status code |
+| **ResponseStatus** | string | Response status description |
+| **Headers** | Object | HTTP Headers (optional) |
+| **Model** | Object | The model object returned by the controller (if any) (optional) |
+| **ModelStateValid** | boolean | Boolean to indicate if the model is valid |
+| **ModelStateErrors** | string | Error description when the model is invalid |
+| **RedirectLocation** | string | The redirect location (if any) |
+| **Exception** | string | The exception thrown details (if any) |
 ##Customization
 
 You can access the Audit Scope from the controller action by calling the Controller extension method `GetCurrentAuditScope()`. 
