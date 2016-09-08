@@ -332,7 +332,7 @@ AuditConfiguration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-##Storage providers
+#Storage providers
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
@@ -345,7 +345,7 @@ Store the events in a Mongo DB Collection, in BSON format.
 **[Azure DocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
-##Extensions
+#Extensions
 
 The following packages are extensions to log interactions with different systems such as MVC, WebApi and Entity Framework. 
 
