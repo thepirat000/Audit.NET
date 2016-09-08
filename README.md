@@ -88,7 +88,7 @@ An example of the output in JSON:
 
 #Output details
 
-The following tables describe the output fields:
+The following tables describes the output fields:
 
 ###AuditEvent object
 | Field Name | Type | Description | 
