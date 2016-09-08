@@ -67,7 +67,7 @@ With this information, you can not just know who did the operation, but also mea
 
 ##Output details
 
-The following tables describes the Audit.Mvc output fields:
+The following table describes the Audit.Mvc output fields:
 
 ###AuditAction object
 | Field Name | Type | Description | 
