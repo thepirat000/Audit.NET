@@ -67,8 +67,28 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
+To exclude specific entities from the audit (OptOut), you can decorate the entity class with the `AuditIgnore` attribute, for example:
+```c#
+[AuditIgnore]
+public class Blog
+{
+    public int Id { get; set; }
+    ...
+}
+```
+
+Instead, to include specific entities from the audit (OptIn), you can use the `AuditInclude` attribute:
+```c#
+[AuditInclude]
+public class Post
+{
+    public int Id { get; set; }
+    ...
+}
+```
+
 ##How it works
-The library intercepts the calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` to generate detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+The library intercepts the calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ##Output
 Audit.EntityFramework output includes:
