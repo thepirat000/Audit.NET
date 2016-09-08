@@ -90,6 +90,7 @@ The following table describes the Audit.Mvc output fields:
 | **ModelStateErrors** | string | Error description when the model is invalid |
 | **RedirectLocation** | string | The redirect location (if any) |
 | **Exception** | string | The exception thrown details (if any) |
+
 ##Customization
 
 You can access the Audit Scope from the controller action by calling the Controller extension method `GetCurrentAuditScope()`. 
