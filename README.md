@@ -90,7 +90,7 @@ An example of the output in JSON:
 
 The following tables describe the fields in the generated output:
 
-###AuditEvent 
+####**AuditEvent**
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **EventType** | string | User-defined string to group the events |
@@ -101,7 +101,7 @@ The following tables describe the fields in the generated output:
 | **Target** | [**TargetObject**](#targetobject) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
 
-###EnvironmentObject
+####**EnvironmentObject**
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **UserName** | string | The current logged user name |
@@ -111,7 +111,7 @@ The following tables describe the fields in the generated output:
 | **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
 | **Culture** | string | The current culture identifier |
 
-###TargetObject
+####**TargetObject**
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Type** | string | The tracked object type name |
