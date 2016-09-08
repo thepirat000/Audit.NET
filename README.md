@@ -1,4 +1,4 @@
-# Audit.NET
+a# Audit.NET
 An extensible framework to audit executing operations in .NET including support for .NET Framework 4.5 and NetCore 1.0 (NetStandard 1.3).
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
@@ -263,29 +263,29 @@ If you don't provide a Creation Policy, the Default Policy Configured will be us
 ##Configuration
 
 ###Data provider
-Call the static `AuditConfiguration.SetDataProvider` method to set the default data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
+To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set your own provider as the default data provider:
 ```c#
-AuditConfiguration.SetDataProvider(new MyFileDataProvider());
+Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 ```
 
 ###Creation Policy
-Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should be set prior to the `AuditScope` creation, i.e. during application startup.
+To change the default creation policy, set the static property `SetCreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set the default creation policy to Manual:
 ```c#
-AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
+Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
 ```
 
 ###Custom Actions
 You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
 
-Call the static `AuditConfiguration.AddCustomAction` method to attach a custom action. 
+Call the static `AddCustomAction()` method on `Audit.Core.Configuration` class to attach a custom action. 
 
 For example, to globally discard the events under centain condition:
 ```c#
-AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
     if (DateTime.Now.Hour == 17) // Tea time
     {
@@ -296,7 +296,7 @@ AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 
 Or to add custom fields / comments globally to all scopes:
 ```c#
-AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
 {
     if (scope.Event.Environment.Exception != null)
     {
@@ -311,11 +311,11 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 
 ##Configuration Fluent API
-Alternatively to the methods mentioned before (SetDataProvider, SetCreationPolicy and AddCustomAction),  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `AuditConfiguration.Setup()`.
+Alternatively to the properties/methods mentioned before,  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the easiest way to configure the library.
 
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseFileLogProvider()
     .WithCreationPolicy(EventCreationPolicy.Manual);
 ```
@@ -323,22 +323,22 @@ AuditConfiguration.Setup()
 ##Configuration examples
 **Initialization to use the File Log [Provider](#data-provider) with an InsertOnStart-ReplaceOnEnd [Creation Policy](#creation-policy), and a global ApplicationId [Custom Field](#custom-fields-and-comments)**:
 ```c#
-AuditConfiguration.SetDataProvider(new FileDataProvider()
+Audit.Core.Configuration.DataProvider = new FileDataProvider()
 {
     FilenamePrefix = "Event_",
     DirectoryPath = @"C:\AuditLogs\1"
-});
+};
 
-AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
 
-AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope => 
+Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope => 
 { 
     scope.SetCustomField("ApplicationId", "MyApplication"); 
 });
 ```
 Or by using the fluent API:
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseFileLogProvider(config => config
         .FilenamePrefix("Event_")
         .Directory(@"C:\AuditLogs\1"))
@@ -348,16 +348,16 @@ AuditConfiguration.Setup()
 
 **Initialization to use the Event Log provider with an InsertOnEnd Creation Policy**:
 ```c#
-AuditConfiguration.SetDataProvider(new EventLogDataProvider()
+Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
 {
     SourcePath = "My Audited Application",
     LogName = "Application"
-});
-AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
+};
+Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 ```
 Or by using the fluent API:
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
         .SourcePath("My Audited Application")
         .LogName("Application"))
