@@ -34,7 +34,8 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 ```
 
 ##Configuration
-Change the default behavior by decorating your DbContext with the `AuditDbContext` attribute, indicating the setting values:
+
+The following settings can be configured per DbContext or globally:
 
 - **Mode**: To indicate the audit operation mode
  - _Opt-Out_: All the entities are tracked by default, except those decorated with the `AuditIgnore` attribute. (Default)
@@ -44,9 +45,9 @@ Change the default behavior by decorating your DbContext with the `AuditDbContex
   - {context}: replaced with the Db Context type name.
   - {database}: replaced with the database name.
 
-To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
 
-For example:
+Change the settings by decorating your DbContext with the `AuditDbContext` attribute, for example:
+
 ```c#
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false, AuditEventType = "{database}_{context}" )]
 public class MyEntitites : Audit.EntityFramework.AuditDbContext
@@ -54,20 +55,7 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 ...
 ```
 
-You can also change the settings by accessing the properties on the `DbContext` with the same name as in the attribute. For example:
-```c#
-public class MyEntities : Audit.EntityFramework.AuditDbContext
-{
-    public MyEntities()
-    {
-        AuditEventType = "{database}_{context}";
-        Mode = AuditOptionMode.OptOut;
-        IncludeEntityObjects = false;
-    }
-}
-```
-
-To exclude specific entities from the audit (OptOut Mode), you can decorate the entity classes with the `AuditIgnore` attribute, for example:
+To exclude specific entities from the audit (OptOut Mode), you can decorate your entity classes with the `AuditIgnore` attribute, for example:
 ```c#
 [AuditIgnore]
 public class Blog
@@ -86,6 +74,41 @@ public class Post
     ...
 }
 ```
+
+You can also change the settings of your DbContext by accessing the properties with the same name as in the attribute. For example:
+```c#
+public class MyEntities : Audit.EntityFramework.AuditDbContext
+{
+    public MyEntities()
+    {
+        AuditEventType = "{database}_{context}";
+        Mode = AuditOptionMode.OptOut;
+        IncludeEntityObjects = false;
+    }
+}
+```
+
+You can also configure settings by using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
+
+For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding the entities `PostHistory` and `BlogHistory` from the audit:
+```c#
+Audit.EntityFramework.Configuration.Setup()
+    .ForContext<MyEntities>(config => config
+        .IncludeEntityObjects()
+        .AuditEventType("{context}:{database}"))
+    .UseOptOut()
+        .Ignore<PostHistory>()
+        .Ignore<BlogHistory>;
+```
+
+In summary, you have three ways to configure the audit for the contexts:
+- By accessing the properties on the `AuditDbContext` base class.
+- By decorating your context classes with `AuditDbContext` attribute and your entity classes with `AuditIgnore`/`AuditInclude` attributes.
+- By using the fluent API provided by the method `Audit.EntityFramework.Configuration.Setup()`
+
+All three can be used at the same time, and the precedence order is the order exposed in the above list.
+
+To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
 
 ##How it works
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
