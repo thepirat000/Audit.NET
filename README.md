@@ -97,7 +97,7 @@ The following tables describe the fields in the generated output:
 | **Environment** | [**EnvironmentObject**](#environmentobject) | Contains information about the execution environment |
 | **StartDate** | DateTime | The date and time when the event has started |
 | **EndDate** | DateTime | The date and time when the event has ended |
-| **Duration** | integer | The duration in milliseconds |
+| **Duration** | integer | The duration of the event in milliseconds |
 | **Target** | [**TargetObject**](#targetobject) | User defined tracked object |
 | **Comments** | Array of strings | User defined comments |
 
