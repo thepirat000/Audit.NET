@@ -137,7 +137,7 @@ This is an example of the output for a failed insert operation:
 	"Duration": 348,
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
-		"TransactionId": "593e082d-b6b5-440b-a048-ba223b247e9f_1",
+		"ConnectionId": "593e082d-b6b5-440b-a048-ba223b247e9f",
 		"Entries": [{
 			"Table": "Posts",
 			"Action": "Insert",
@@ -161,7 +161,7 @@ This is an example of the output for a failed insert operation:
 }
 ```
 
-Output example for an update+delete operation:
+Output example for a successful update+delete operation within a transaction:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
@@ -179,6 +179,7 @@ Output example for an update+delete operation:
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
 		"ConnectionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef",
+		"TransactionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef_1",
 		"Entries": [{
 			"Table": "Blogs",
 			"Action": "Update",
