@@ -126,6 +126,41 @@ Audit.EntityFramework output includes:
 
 With this information, you can measure performance, observe exceptions thrown or get statistics about usage of your database.
 
+##Output details
+
+The following table describes the Audit.EntityFramework output fields:
+
+###EntityFrameworkEvent
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Database** | string | Name of the database affected |
+| **ConnectionId** | Guid | Unique client connection ID (only available when the connection is open at the beginning of the event) |
+| **TransactionId** | string | Unique identifier for the DB transaction used on the audited operation (if any). To group events that are part of the same transaction. |
+| **Entries** | Array of [EventEntry](#evententry) | Array with information about the entities affected by the audited operation |
+| **Result** | integer | Result of the SaveChanges call. Is the number of objects affected by the operation. |
+| **Success** | boolean | Boolean to indicate if the operation was successful |
+| **ErrorMessage** | string | The exception thrown details (if any) |
+
+###EventEntry
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Table** | string | Name of the affected table |
+| **Action** | string | Action type (Insert, Update or Delete) |
+| **PrimaryKey** | Object | Object with the affected entity's primary key value(s) |
+| **ColumnValues** | Object | Object with the affected entity's column values  |
+| **Changes** | Array of [ChangeObject](#changeobject) | An array containing the modified columns with the original and new values (only available for Update operations) |
+| **Entity** | Object | The object representation of the .NET entity affected (optional) |
+| **Valid** | boolean | Bolean indicating if the entity passes the validations |
+| **ValidationResults** | Array of string | The validation messages when the entity validation fails |
+
+###ChangeObject
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **ColumnName** | string | The column name that was updated |
+| **OriginalValue** | string | The original value before the update |
+| **NewValue** | string | The new value after the update |
+
+
 ##Customization
 You can add extra information to the events by calling the method `AddAuditCustomField` on the `DbContext`. For example:
 
