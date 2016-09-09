@@ -6,8 +6,10 @@ using System.Threading;
 using System.Reflection;
 using Audit.Core;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using Audit.EntityFramework.ConfigurationApi;
 #if NETCOREAPP1_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -71,7 +73,7 @@ namespace Audit.EntityFramework
         // Entities Include/Ignore attributes cache
         private static readonly Dictionary<Type, bool?> EntitiesIncludedCache = new Dictionary<Type, bool?>();
         // AuditDbContext Attribute cache
-        private static AuditDbContextAttribute _auditAttribute;
+        private static Dictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new Dictionary<Type, AuditDbContextAttribute>();
         // User defined fields that will be stored as Custom Fields on the audit event
         private Dictionary<string, object> _extraFields;
         #endregion
@@ -79,13 +81,18 @@ namespace Audit.EntityFramework
         #region Private methods
         private void SetConfig()
         {
-            if (_auditAttribute == null)
+            var type = GetType();
+            if (!_auditAttributeCache.ContainsKey(type))
             {
-                _auditAttribute = GetType().GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute ?? new AuditDbContextAttribute();
+                _auditAttributeCache[type] = GetType().GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute;
             }
-            Mode = _auditAttribute.Mode;
-            IncludeEntityObjects = _auditAttribute.IncludeEntityObjects;
-            AuditEventType = _auditAttribute.AuditEventType;
+            var attrConfig = _auditAttributeCache[type]?.InternalConfig;
+            var localConfig = Audit.EntityFramework.Configuration.GetConfigForType(GetType());
+            var globalConfig = Audit.EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
+
+            Mode = attrConfig?.Mode ?? localConfig?.Mode ?? globalConfig?.Mode ?? AuditOptionMode.OptOut;
+            IncludeEntityObjects = attrConfig?.IncludeEntityObjects ?? localConfig?.IncludeEntityObjects ?? globalConfig?.IncludeEntityObjects ?? false;
+            AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
         }
         /// <summary>
         /// Gets the validation results, return NULL if there are no validation errors.
@@ -145,9 +152,9 @@ namespace Audit.EntityFramework
 
         // Determines whether to include the entity on the audit log or not
 #if NETCOREAPP1_0
-        private static bool IncludeEntity(EntityEntry entry, AuditOptionMode mode)
+        private bool IncludeEntity(EntityEntry entry, AuditOptionMode mode)
 #elif NET45
-        private static  bool IncludeEntity(DbEntityEntry entry, AuditOptionMode mode)
+        private bool IncludeEntity(DbEntityEntry entry, AuditOptionMode mode)
 #endif
         {
             var type = entry.Entity.GetType();
@@ -156,18 +163,23 @@ namespace Audit.EntityFramework
                 var includeAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIncludeAttribute));
                 if (includeAttr != null)
                 {
-                    EntitiesIncludedCache[type] = true; // Type Included
+                    EntitiesIncludedCache[type] = true; // Type Included by IncludeAttribute
                 }
                 else
                 {
                     var ignoreAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute));
                     if (ignoreAttr != null)
                     {
-                        EntitiesIncludedCache[type] = false; // Type Ignored
+                        EntitiesIncludedCache[type] = false; // Type Ignored by IgnoreAttribute
                     }
                     else
                     {
-                        EntitiesIncludedCache[type] = null; // No attribute specified
+                        // No attribute specified, check the global config
+                        var localConfig = EntityFramework.Configuration.GetConfigForType(GetType());
+                        var globalConfig = EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
+                        var ignored = localConfig?.IgnoredTypes.Contains(type) ?? globalConfig?.IgnoredTypes.Contains(type) ?? false;
+                        var included = localConfig?.IncludedTypes.Contains(type) ?? globalConfig?.IncludedTypes.Contains(type) ?? false;
+                        EntitiesIncludedCache[type] = included ? true : ignored ? (bool?)false : null; 
                     }
                 }
             }
@@ -200,12 +212,12 @@ namespace Audit.EntityFramework
         /// Gets the modified entries to process.
         /// </summary>
 #if NETCOREAPP1_0
-        private static List<EntityEntry> GetModifiedEntries(DbContext context, AuditOptionMode mode)
+        private List<EntityEntry> GetModifiedEntries(AuditOptionMode mode)
 #elif NET45
-        private static List<DbEntityEntry> GetModifiedEntries(DbContext context, AuditOptionMode mode)
+        private List<DbEntityEntry> GetModifiedEntries(AuditOptionMode mode)
 #endif
         {
-            return context.ChangeTracker.Entries()
+            return ChangeTracker.Entries()
                 .Where(x => x.State != EntityState.Unchanged
                          && x.State != EntityState.Detached
                          && IncludeEntity(x, mode))
@@ -227,16 +239,16 @@ namespace Audit.EntityFramework
             return string.Format("{0}_{1}", clientConnectionId, tranId);
         }
 
-        private static string GetClientConnectionId(DbConnection connection)
+        private string GetClientConnectionId(DbConnection connection)
         {
-            // Get the connection id
+            // Get the connection id (returns NULL if the connection is not open)
             var sqlConnection = connection as SqlConnection;
-            var connId = sqlConnection?.ClientConnectionId.ToString();
-            return connId;
+            var connId = sqlConnection?.ClientConnectionId;
+            return connId.HasValue && !connId.Equals(Guid.Empty) ? connId.Value.ToString() : null;
         }
-        #endregion
+#endregion
 
-        #region Public methods
+#region Public methods
 
         /// <summary>
         /// Adds a custom field to the audit scope.
@@ -262,7 +274,7 @@ namespace Audit.EntityFramework
             {
                 return base.SaveChanges();
             }
-            var efEvent = CreateAuditEvent(this, IncludeEntityObjects, Mode);
+            var efEvent = CreateAuditEvent(IncludeEntityObjects, Mode);
             if (efEvent == null)
             {
                 return base.SaveChanges();
@@ -294,7 +306,7 @@ namespace Audit.EntityFramework
             {
                 return await base.SaveChangesAsync(cancellationToken);
             }
-            var efEvent = CreateAuditEvent(this, IncludeEntityObjects, Mode);
+            var efEvent = CreateAuditEvent(IncludeEntityObjects, Mode);
             if (efEvent == null)
             {
                 return await base.SaveChangesAsync(cancellationToken);
@@ -315,6 +327,6 @@ namespace Audit.EntityFramework
             SaveScope(scope, efEvent);
             return efEvent.Result;
         }
-        #endregion
+#endregion
     }
 }

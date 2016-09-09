@@ -1,6 +1,6 @@
 using System;
 using Audit.SqlServer.Providers;
-using Audit.Core.Configuration;
+using Audit.Core.ConfigurationApi;
 using Audit.SqlServer.Configuration;
 
 namespace Audit.Core
@@ -18,14 +18,14 @@ namespace Audit.Core
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, string connectionString,
             string tableName = "Event", string idColumnName = "Id", string jsonColumnName = "Data", string lastUpdatedDateColumnName = null)
         {
-            AuditConfiguration.SetDataProvider(new SqlDataProvider()
+            Configuration.DataProvider = new SqlDataProvider()
             {
                 ConnectionString = connectionString,
                 TableName = tableName,
                 IdColumnName = idColumnName,
                 JsonColumnName = jsonColumnName,
                 LastUpdatedDateColumnName = lastUpdatedDateColumnName
-            });
+            };
             return new CreationPolicyConfigurator();
         }
         /// <summary>

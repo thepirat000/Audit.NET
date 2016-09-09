@@ -24,7 +24,7 @@ namespace Audit.IntegrationTest
             });
             provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
 
-            AuditConfiguration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
 
             using (var ctx = new MyAuditedVerboseContext())
@@ -50,17 +50,6 @@ namespace Audit.IntegrationTest
         }
 
         [Fact]
-        public void Test_EF_Direct()
-        {
-            using (var ctx = new OtherContextFromDbContext())
-            {
-                ctx.Posts.Add(new Post() { BlogId = 1, Content = "other content", DateCreated = DateTime.Now, Title = "other title" });
-                var efEvent = AuditDbContext.CreateAuditEvent(ctx, true, AuditOptionMode.OptOut);
-                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "other title"));
-            }
-        }
-
-        [Fact]
         public void Test_EF_SaveChangesSync()
         {
             Test_EF_Actions(ctx => ctx.SaveChanges());
@@ -83,7 +72,7 @@ namespace Audit.IntegrationTest
             });
             provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
 
-            AuditConfiguration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
 
             Database.SetInitializer<MyAuditedVerboseContext>(new CreateDatabaseIfNotExists<MyAuditedVerboseContext>());

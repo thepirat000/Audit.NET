@@ -1,6 +1,6 @@
 using System;
 
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     /// <summary>
     /// Provides a configuration for Audit mechanism.

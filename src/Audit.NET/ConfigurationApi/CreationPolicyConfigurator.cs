@@ -1,10 +1,10 @@
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     public class CreationPolicyConfigurator : ICreationPolicyConfigurator
     {
         public IActionConfigurator WithCreationPolicy(EventCreationPolicy creationPolicy)
         {
-            AuditConfiguration.SetCreationPolicy(creationPolicy);
+            Configuration.CreationPolicy = creationPolicy;
             return new ActionConfigurator();
         }
     }

@@ -48,7 +48,7 @@ namespace Audit.WebApi.UnitTest
             };
             
             var dataProvider = new Mock<AuditDataProvider>();
-            AuditConfiguration.SetDataProvider(dataProvider.Object);
+            Audit.Core.Configuration.DataProvider = dataProvider.Object;
 
             var filter = new AuditApiAttribute()
             {

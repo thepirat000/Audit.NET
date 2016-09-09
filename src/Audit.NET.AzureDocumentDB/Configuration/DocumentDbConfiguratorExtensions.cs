@@ -1,6 +1,6 @@
 ﻿using Audit.AzureDocumentDB.Providers;
 using Audit.Core;
-using Audit.Core.Configuration;
+using Audit.Core.ConfigurationApi;
 using System;
 using Audit.AzureDocumentDB.Configuration;
 
@@ -17,13 +17,13 @@ namespace Audit.Core
         public static ICreationPolicyConfigurator UseAzureDocumentDB(this IConfigurator configurator, string connectionString,
             string authKey = null, string database = "Audit", string collection = "Event")
         {
-            AuditConfiguration.SetDataProvider(new AzureDbDataProvider()
+            Configuration.DataProvider = new AzureDbDataProvider()
             {
                 ConnectionString = connectionString,
                 AuthKey = authKey,
                 Collection = collection,
                 Database = database
-            });
+            };
             return new CreationPolicyConfigurator();
         }
         /// <summary>

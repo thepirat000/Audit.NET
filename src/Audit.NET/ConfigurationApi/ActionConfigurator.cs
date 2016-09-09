@@ -1,6 +1,6 @@
 using System;
 
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     public class ActionConfigurator : IActionConfigurator
     {
@@ -12,7 +12,7 @@ namespace Audit.Core.Configuration
         }
         public IActionConfigurator ResetActions()
         {
-            AuditConfiguration.ResetCustomActions();
+            Configuration.ResetCustomActions();
             return this;
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Audit.Core.Configuration
+﻿namespace Audit.Core.ConfigurationApi
 {
     public class FileLogProviderConfigurator : IFileLogProviderConfigurator
     {

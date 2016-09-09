@@ -1,7 +1,7 @@
 using System;
 using Audit.Core.Providers;
 
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     public class Configurator : IConfigurator
     {
@@ -13,18 +13,18 @@ namespace Audit.Core.Configuration
         }
         public ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider)
         {
-            AuditConfiguration.SetDataProvider(provider);
+            Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
 #if NET45
         public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".")
         {
-            AuditConfiguration.SetDataProvider(new EventLogDataProvider()
+            Configuration.DataProvider = new EventLogDataProvider()
             {
                 LogName = logName,
                 SourcePath = sourcePath,
                 MachineName = machineName
-            });
+            };
             return new CreationPolicyConfigurator();
         }
         public ICreationPolicyConfigurator UseEventLogProvider(Action<IEventLogProviderConfigurator> config)
@@ -36,11 +36,11 @@ namespace Audit.Core.Configuration
 #endif
         public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "")
         {
-            AuditConfiguration.SetDataProvider(new FileDataProvider()
+            Configuration.DataProvider = new FileDataProvider()
             {
                 DirectoryPath = directoryPath,
                 FilenamePrefix = filenamePrefix
-            });
+            };
             return new CreationPolicyConfigurator();
         }
     }

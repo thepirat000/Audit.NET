@@ -28,8 +28,8 @@ namespace Audit.Core
             EventCreationPolicy? creationPolicy = null,
             bool isCreateAndSave = false)
         {
-            _creationPolicy = creationPolicy ?? AuditConfiguration.CreationPolicy;
-            _dataProvider = dataProvider ?? AuditConfiguration.DataProvider;
+            _creationPolicy = creationPolicy ?? Configuration.CreationPolicy;
+            _dataProvider = dataProvider ?? Configuration.DataProvider;
             _targetGetter = target;
             var environment = new AuditEventEnvironment()
             {
@@ -66,7 +66,7 @@ namespace Audit.Core
             }
             ProcessExtraFields(extraFields);
             // Execute custom on-saving actions
-            AuditConfiguration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
+            Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
 
             // Process the event insertion (if applies)
             if (isCreateAndSave)
@@ -269,7 +269,7 @@ namespace Audit.Core
             {
                 return; 
             }
-            AuditConfiguration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
+            Configuration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
             if (_eventId != null && !forceInsert)
             {
                 _dataProvider.ReplaceEvent(_eventId, _event);

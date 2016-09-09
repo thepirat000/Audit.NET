@@ -3,6 +3,7 @@
   "testRunner": "xunit",
   "dependencies": {
     "Audit.NET": { "target": "project" },
+    "Audit.EntityFramework": { "target": "project" },
     "Moq": "4.6.38-alpha"
   },
   "commands": {

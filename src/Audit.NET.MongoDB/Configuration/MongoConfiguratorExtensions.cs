@@ -1,5 +1,5 @@
 ﻿using System;
-using Audit.Core.Configuration;
+using Audit.Core.ConfigurationApi;
 using Audit.MongoDB.Providers;
 using Audit.MongoDB.Configuration;
 
@@ -16,12 +16,12 @@ namespace Audit.Core
         public static ICreationPolicyConfigurator UseMongoDB(this IConfigurator configurator, string connectionString = "mongodb://localhost:27017",
             string database = "Audit", string collection = "Event")
         {
-            AuditConfiguration.SetDataProvider(new MongoDataProvider()
+            Configuration.DataProvider = new MongoDataProvider()
             {
                 ConnectionString = connectionString,
                 Collection = collection,
                 Database = database
-            });
+            };
             return new CreationPolicyConfigurator();
         }
         /// <summary>

@@ -59,7 +59,6 @@ namespace Audit.IntegrationTest
             public void TestMongo()
             {
                 SetMongoSettings();
-
                 TestUpdate();
                 TestInsert();
                 TestDelete();
@@ -78,8 +77,7 @@ namespace Audit.IntegrationTest
                 var eventType = "Order:Update";
                 var ev = (AuditEvent)null;
                 //struct
-                using (var a = AuditScope.Create(eventType, () => new TestStruct() { Id = 123, Order = order },
-                       new { ReferenceId = order.OrderId }))
+                using (var a = AuditScope.Create(eventType, () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = a.Event;
                     a.SetCustomField("$TestGuid", Guid.NewGuid());
@@ -97,19 +95,18 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
                 
-                Assert.Equal(AuditConfiguration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
                 //audit multiple 
-                using (var a = AuditScope.Create(eventType, () => new { OrderStatus = order.Status, Items = order.OrderItems },
-                    new { ReferenceId = order.OrderId }))
-                {
-                    ev = a.Event;
+                using (var a = AuditScope.Create(eventType, () => new { OrderStatus = order.Status, Items = order.OrderItems }, new { ReferenceId = order.OrderId }))
+                { 
+                   ev = a.Event;
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
-                Assert.Equal(AuditConfiguration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -126,7 +123,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Another Comment");
                 }
 
-                Assert.Equal(AuditConfiguration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -139,7 +136,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Status Updated to Submitted");
                 }
 
-                Assert.Equal(AuditConfiguration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
             }
 
             public void TestInsert()
@@ -153,7 +150,7 @@ namespace Audit.IntegrationTest
                     audit.SetCustomField("ReferenceId", order.OrderId);
                 }
 
-                Assert.Equal(AuditConfiguration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
             }
 
             public void TestDelete()
@@ -167,13 +164,13 @@ namespace Audit.IntegrationTest
                     DbDeteleOrder(order.OrderId);
                     order = null;
                 }
-                Assert.Equal(AuditConfiguration.DataProvider.Serialize(orderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(Configuration.DataProvider.Serialize(orderId), ev.CustomFields["ReferenceId"]);
             }
 
 #if NET451
             public void SetEventLogSettings()
             {
-                AuditConfiguration.Setup()
+                Audit.Core.Configuration.Setup()
                     .UseEventLogProvider(config => config
                         .LogName("Application")
                         .SourcePath("TestApplication")
@@ -184,17 +181,17 @@ namespace Audit.IntegrationTest
 
             public void SetAzureSettings()
             {
-                AuditConfiguration.Setup()
+                Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
                         .ConnectionString("https://thepirat.documents.azure.com:443/")
-                        .AuthKey("xxxxxxxxxxxxxxxxxxxxxxx=="))
+                        .AuthKey("xxxxxx=="))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
 #endif
             public void SetFileSettings()
             {
-                AuditConfiguration.Setup()
+                Audit.Core.Configuration.Setup()
                     .UseFileLogProvider(config => config.Directory(@"c:\temp\1").FilenamePrefix("Event_"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
@@ -202,7 +199,7 @@ namespace Audit.IntegrationTest
 
             public void SetSqlSettings()
             {
-                AuditConfiguration.Setup()
+                Audit.Core.Configuration.Setup()
                     .UseSqlServer(config => config
                         .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
                         .TableName("Event")
@@ -215,7 +212,7 @@ namespace Audit.IntegrationTest
 
             public void SetMongoSettings()
             {
-                AuditConfiguration.Setup()
+                Audit.Core.Configuration.Setup()
                     .UseMongoDB(config => config
                         .ConnectionString("mongodb://localhost:27017")
                         .Database("Audit")

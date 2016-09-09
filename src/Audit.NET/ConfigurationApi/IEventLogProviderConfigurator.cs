@@ -1,4 +1,4 @@
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     /// <summary>
     /// Provides a configuration for the EventLogDataProvider

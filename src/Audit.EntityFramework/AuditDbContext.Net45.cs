@@ -62,9 +62,8 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the entities changes for an entry entity.
         /// </summary>
-        /// <param name="context">The db context.</param>
         /// <param name="entry">The entry.</param>
-        private static List<EventEntryChange> GetChanges(DbContext context, DbEntityEntry entry)
+        private List<EventEntryChange> GetChanges(DbEntityEntry entry)
         {
             var result = new List<EventEntryChange>();
             foreach (var propName in entry.CurrentValues.PropertyNames)
@@ -79,7 +78,7 @@ namespace Audit.EntityFramework
                 {
                     result.Add(new EventEntryChange()
                     {
-                        ColumnName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), entry.Property(propName).Name, context),
+                        ColumnName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), entry.Property(propName).Name, this),
                         NewValue = current,
                         OriginalValue = original
                     });
@@ -91,9 +90,8 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the column values for an insert/delete operation.
         /// </summary>
-        /// <param name="context">The context.</param>
         /// <param name="entry">The entity entry.</param>
-        private static Dictionary<string, object> GetColumnValues(DbContext context, DbEntityEntry entry)
+        private Dictionary<string, object> GetColumnValues(DbEntityEntry entry)
         {
             var result = new Dictionary<string, object>();
             var propertyNames = entry.State != EntityState.Deleted ? entry.CurrentValues.PropertyNames : entry.OriginalValues.PropertyNames;
@@ -108,27 +106,26 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the name of the table/entity.
         /// </summary>
-        private static string GetEntityName(DbContext context, object entity)
+        private string GetEntityName(object entity)
         {
             var entityType = entity.GetType();
-            return EntityKeyHelper.Instance.GetTableName(entityType, context) ?? entityType.Name;
+            return EntityKeyHelper.Instance.GetTableName(entityType, this) ?? entityType.Name;
         }
         /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetPrimaryKey(DbContext context, DbEntityEntry entry)
+        private Dictionary<string, object> GetPrimaryKey(DbEntityEntry entry)
         {
-            return EntityKeyHelper.Instance.GetPrimaryKeyValues(entry.Entity, context);
+            return EntityKeyHelper.Instance.GetPrimaryKeyValues(entry.Entity, this);
         }
 
         /// <summary>
         /// Tries to get the current transaction identifier.
         /// </summary>
-        /// <param name="context">The db context.</param>
         /// <param name="clientConnectionId">The client ConnectionId.</param>
-        private static string GetCurrentTransactionId(DbContext context, string clientConnectionId)
+        private string GetCurrentTransactionId(string clientConnectionId)
         {
-            var curr = context.Database.CurrentTransaction;
+            var curr = Database.CurrentTransaction;
             if (curr == null)
             {
                 return null;
@@ -142,22 +139,21 @@ namespace Audit.EntityFramework
         /// Creates the Audit Event.
         /// </summary>
         /// <param name="includeEntities">To indicate if it must incluide the serialized entities.</param>
-        /// <param name="context">The DbContext.</param>
         /// <param name="mode">The option mode to include/exclude entities from Audit.</param>
-        public static EntityFrameworkEvent CreateAuditEvent(DbContext context, bool includeEntities, AuditOptionMode mode)
+        public EntityFrameworkEvent CreateAuditEvent(bool includeEntities, AuditOptionMode mode)
         {
-            var modifiedEntries = GetModifiedEntries(context, mode);
+            var modifiedEntries = GetModifiedEntries(mode);
             if (modifiedEntries.Count == 0)
             {
                 return null;
             }
-            var clientConnectionId = GetClientConnectionId(context.Database.Connection);
+            var clientConnectionId = GetClientConnectionId(Database.Connection);
             var efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
-                Database = context.Database.Connection.Database,
+                Database = Database.Connection.Database,
                 ConnectionId = clientConnectionId,
-                TransactionId = GetCurrentTransactionId(context, clientConnectionId)
+                TransactionId = GetCurrentTransactionId(clientConnectionId)
             };
             foreach (var entry in modifiedEntries)
             {
@@ -169,10 +165,10 @@ namespace Audit.EntityFramework
                     ValidationResults = validationResults.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
                     Entity = includeEntities ? entity : null,
                     Action = GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
-                    ColumnValues = entry.State != EntityState.Modified ? GetColumnValues(context, entry) : null,
-                    PrimaryKey = GetPrimaryKey(context, entry),
-                    Table = GetEntityName(context, entity)
+                    Changes = entry.State == EntityState.Modified ? GetChanges(entry) : null,
+                    ColumnValues = GetColumnValues(entry),
+                    PrimaryKey = GetPrimaryKey(entry),
+                    Table = GetEntityName(entity)
                 });
             }
             return efEvent;

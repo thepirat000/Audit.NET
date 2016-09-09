@@ -1,6 +1,6 @@
 {
   "title": "Audit.SqlServer",
-  "version": "3.6.0-*",
+  "version": "4.0.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Store Audit.NET Trail Logs into a SQL Server database",

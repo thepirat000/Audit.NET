@@ -1,17 +1,17 @@
 using System;
 
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     public class ActionEventSelector : IActionEventSelector
     {
         public void OnEventSaving(Action<AuditScope> action)
         {
-            AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, action);
+            Configuration.AddCustomAction(ActionType.OnEventSaving, action);
         }
 
         public void OnScopeCreated(Action<AuditScope> action)
         {
-            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, action);
+            Configuration.AddCustomAction(ActionType.OnScopeCreated, action);
         }
     }
 }

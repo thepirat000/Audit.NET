@@ -1,6 +1,6 @@
 using System;
 
-namespace Audit.Core.Configuration
+namespace Audit.Core.ConfigurationApi
 {
     public interface IActionEventSelector
     {

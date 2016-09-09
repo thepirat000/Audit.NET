@@ -3,42 +3,64 @@ using System;
 using Xunit;
 using Moq;
 using Audit.Core.Providers;
+using Audit.EntityFramework;
 
 namespace Audit.UnitTest
 {
     public class UnitTest
     {
         [Fact]
+        public void Test_EntityFramework_Config_Precedence()
+        {
+            EntityFramework.Configuration.Setup()
+                .ForContext<MyContext>(x => x.AuditEventType("ForContext"))
+                .UseOptIn();
+            EntityFramework.Configuration.Setup()
+                .ForAnyContext(x => x.AuditEventType("ForAnyContext").IncludeEntityObjects(true))
+                .UseOptOut();
+
+            var ctx = new MyContext();
+            var ctx2 = new AnotherContext();
+
+            Assert.Equal("FromAttr", ctx.AuditEventType);
+            Assert.Equal(true, ctx.IncludeEntityObjects);
+            Assert.Equal(AuditOptionMode.OptIn, ctx.Mode);
+
+            Assert.Equal("ForAnyContext", ctx2.AuditEventType);
+            Assert.Equal(AuditOptionMode.OptOut, ctx2.Mode);
+        }
+
+        [Fact]
         public void Test_FluentConfig_FileLog()
         {
             int x = 0;
-            AuditConfiguration.Setup()
+            Core.Configuration.Setup()
                 .UseFileLogProvider(config => config.Directory(@"C:\").FilenamePrefix("prefix"))
                 .WithCreationPolicy(EventCreationPolicy.Manual)
                 .WithAction(action => action.OnScopeCreated(s => x++));
             var scope = AuditScope.Create("test", null);
             scope.Dispose();
-            Assert.Equal(typeof(FileDataProvider), AuditConfiguration.DataProvider.GetType());
-            Assert.Equal("prefix", (AuditConfiguration.DataProvider as FileDataProvider).FilenamePrefix);
-            Assert.Equal(@"C:\", (AuditConfiguration.DataProvider as FileDataProvider).DirectoryPath);
-            Assert.Equal(EventCreationPolicy.Manual, AuditConfiguration.CreationPolicy);
-            Assert.True(AuditConfiguration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
+            Assert.Equal(typeof(FileDataProvider), Core.Configuration.DataProvider.GetType());
+            Assert.Equal("prefix", (Core.Configuration.DataProvider as FileDataProvider).FilenamePrefix);
+            Assert.Equal(@"C:\", (Core.Configuration.DataProvider as FileDataProvider).DirectoryPath);
+            Assert.Equal(EventCreationPolicy.Manual, Core.Configuration.CreationPolicy);
+            Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
             Assert.Equal(1, x);
         }
 #if NET451
         [Fact]
         public void Test_FluentConfig_EventLog()
         {
-            AuditConfiguration.Setup()
+            Core.Configuration.Setup()
                 .UseEventLogProvider(config => config.LogName("LogName").SourcePath("SourcePath").MachineName("MachineName"))
                 .WithCreationPolicy(EventCreationPolicy.Manual);
             var scope = AuditScope.Create("test", null);
             scope.Dispose();
-            Assert.Equal(typeof(EventLogDataProvider), AuditConfiguration.DataProvider.GetType());
-            Assert.Equal("LogName", (AuditConfiguration.DataProvider as EventLogDataProvider).LogName);
-            Assert.Equal("SourcePath", (AuditConfiguration.DataProvider as EventLogDataProvider).SourcePath);
-            Assert.Equal("MachineName", (AuditConfiguration.DataProvider as EventLogDataProvider).MachineName);
-            Assert.Equal(EventCreationPolicy.Manual, AuditConfiguration.CreationPolicy);
+            Assert.Equal(typeof(EventLogDataProvider), Core.Configuration.DataProvider.GetType());
+            Assert.Equal("LogName", (Core.Configuration.DataProvider as EventLogDataProvider).LogName);
+            Assert.Equal("SourcePath", (Core.Configuration.DataProvider as EventLogDataProvider).SourcePath);
+            Assert.Equal("MachineName", (Core.Configuration.DataProvider as EventLogDataProvider).MachineName);
+            Assert.Equal(EventCreationPolicy.Manual, Core.Configuration.CreationPolicy);
         }
 #endif
         [Fact]
@@ -65,7 +87,7 @@ namespace Audit.UnitTest
             
             var eventType = "event type 1";
             var target = "test";
-            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
             {
                 scope.SetCustomField("custom field", "test");
                 if (scope.EventType == eventType)
@@ -73,7 +95,7 @@ namespace Audit.UnitTest
                     scope.Discard();
                 }
             });
-            AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+            Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
             {
                 Assert.True(false, "This should not be executed");
             });
@@ -83,7 +105,7 @@ namespace Audit.UnitTest
             {
                 ev = scope.Event;
             }
-            AuditConfiguration.ResetCustomActions();
+            Core.Configuration.ResetCustomActions();
             Assert.True(ev.CustomFields.ContainsKey("custom field"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
@@ -98,7 +120,7 @@ namespace Audit.UnitTest
             var eventType = "event type 1";
             var target = "test";
             var comment = "comment test";
-            AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+            Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
             {
                 scope.Comment(comment);
             });
@@ -108,7 +130,7 @@ namespace Audit.UnitTest
                 ev = scope.Event;
                 scope.Save();
             }
-            AuditConfiguration.ResetCustomActions();
+            Core.Configuration.ResetCustomActions();
             Assert.True(ev.Comments.Contains(comment));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
         }
@@ -122,11 +144,11 @@ namespace Audit.UnitTest
             var target = "test";
             var key1 = "key1";
             var key2 = "key2";
-            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
             {
                 scope.SetCustomField(key1, "test");
             });
-            AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
             {
                 scope.Event.CustomFields.Remove(key1);
                 scope.SetCustomField(key2, "test");
@@ -136,7 +158,7 @@ namespace Audit.UnitTest
             {
                 ev = scope.Event;
             }
-            AuditConfiguration.ResetCustomActions();
+            Core.Configuration.ResetCustomActions();
             Assert.False(ev.CustomFields.ContainsKey(key1));
             Assert.True(ev.CustomFields.ContainsKey(key2));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
@@ -148,7 +170,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
@@ -171,7 +193,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
@@ -193,7 +215,7 @@ namespace Audit.UnitTest
         public void Test_EventCreationPolicy_InsertOnEnd()
         {
             var provider = new Mock<AuditDataProvider>();
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd))
             {
                 scope.Comment("test");
@@ -208,7 +230,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd))
             {
                 scope.Comment("test");
@@ -222,7 +244,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd))
             {
                 scope.Comment("test");
@@ -236,7 +258,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.Manual))
             {
                 scope.Comment("test");
@@ -257,7 +279,7 @@ namespace Audit.UnitTest
         [Fact]
         public void Test_ExtraFields()
         {
-            AuditConfiguration.SetDataProvider(new FileDataProvider());
+            Core.Configuration.DataProvider = new FileDataProvider();
             var scope = AuditScope.Create("SomeEvent", null, new { @class = "class value", DATA = 123 }, EventCreationPolicy.Manual);
             scope.Comment("test");
             var ev = scope.Event;
@@ -271,7 +293,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
-            AuditConfiguration.SetDataProvider(provider.Object);
+            Core.Configuration.DataProvider = provider.Object;
             var scope1 = AuditScope.Create("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, EventCreationPolicy.Manual);
             scope1.Save();
             var scope2 = AuditScope.Create("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, EventCreationPolicy.Manual);
@@ -282,5 +304,18 @@ namespace Audit.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
+        [AuditDbContext(AuditEventType = "FromAttr")]
+        public class MyContext : AuditDbContext
+        {
+            public string AuditEventType { get { return base.AuditEventType; } }
+            public bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
+            public AuditOptionMode Mode { get { return base.Mode; } }
+        }
+        public class AnotherContext : AuditDbContext
+        {
+            public string AuditEventType { get { return base.AuditEventType; } }
+            public bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
+            public AuditOptionMode Mode { get { return base.Mode; } }
+        }
     }
 }
