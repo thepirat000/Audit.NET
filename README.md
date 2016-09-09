@@ -1,4 +1,4 @@
-a# Audit.NET
+# Audit.NET
 An extensible framework to audit executing operations in .NET including support for .NET Framework 4.5 and NetCore 1.0 (NetStandard 1.3).
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
@@ -311,7 +311,7 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 
 ##Configuration Fluent API
-Alternatively to the properties/methods mentioned before,  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the easiest way to configure the library.
+Alternatively to the properties/methods mentioned before,  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
 ```c#
