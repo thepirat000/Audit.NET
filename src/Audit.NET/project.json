@@ -1,6 +1,6 @@
 {
   "title": "Audit.NET",
-  "version": "4.0.0-*",
+  "version": "4.0.1-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "An extensible framework to generate detailed audit logs for executing operations in .NET",
