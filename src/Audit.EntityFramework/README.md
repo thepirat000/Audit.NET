@@ -134,10 +134,10 @@ The following table describes the Audit.EntityFramework output fields:
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Database** | string | Name of the database affected |
-| **ConnectionId** | Guid | Unique client connection ID |
-| **TransactionId** | string | Unique ID for the DB transaction for the audited operation. Group events that are part of the same transaction. The ID is formed by the connection id plus a transaction id |
+| **ConnectionId** | Guid | Unique client connection ID (only available when the connection is open at the beginning of the event) |
+| **TransactionId** | string | Unique identifier for the DB transaction used on the audited operation (if any). To group events that are part of the same transaction. |
 | **Entries** | Array of [EventEntry](#evententry) | Array with information about the entities affected by the audited operation |
-| **Result** | integer | Result of the SaveChanges call. The number of objects in an Added, Modified, or Deleted state when SaveChanges was called. |
+| **Result** | integer | Result of the SaveChanges call. The number of objects affected by the SaveChanges. |
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
 
