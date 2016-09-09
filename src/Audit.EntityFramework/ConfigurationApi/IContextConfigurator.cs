@@ -1,6 +1,6 @@
 using System;
 
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     /// <summary>
     /// Provides a global configuration for Audit.EntityFramework

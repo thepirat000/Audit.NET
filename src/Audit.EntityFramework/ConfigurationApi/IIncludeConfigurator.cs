@@ -1,6 +1,6 @@
 using System;
 
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     /// <summary>
     /// Configurates the OptIn mode

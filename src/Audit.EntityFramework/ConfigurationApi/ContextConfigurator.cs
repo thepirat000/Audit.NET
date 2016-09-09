@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ContextConfigurator : IContextConfigurator
     {

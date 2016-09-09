@@ -1,4 +1,4 @@
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ContextSettingsConfigurator<T> : IContextSettingsConfigurator<T>
         where T : AuditDbContext

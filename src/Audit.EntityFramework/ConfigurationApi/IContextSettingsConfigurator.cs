@@ -1,4 +1,4 @@
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     /// <summary>
     /// The settings configuration for an AuditDbContext

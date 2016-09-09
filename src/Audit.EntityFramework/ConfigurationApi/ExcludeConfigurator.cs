@@ -1,6 +1,6 @@
 using System;
 
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ExcludeConfigurator<T> : IExcludeConfigurator<T>
         where T : AuditDbContext

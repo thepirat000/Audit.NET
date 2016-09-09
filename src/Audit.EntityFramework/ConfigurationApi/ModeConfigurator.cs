@@ -1,4 +1,4 @@
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ModeConfigurator<T> : IModeConfigurator<T> where T : AuditDbContext
     {

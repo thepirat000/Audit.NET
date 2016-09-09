@@ -1,4 +1,4 @@
-namespace Audit.EntityFramework
+namespace Audit.EntityFramework.ConfigurationApi
 {
     /// <summary>
     /// Configures the context operation mode (OptIn / OptOut)
