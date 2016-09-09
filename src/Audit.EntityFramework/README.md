@@ -2,9 +2,9 @@
 
 **EntityFramework (EF) Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
 
-Automatically generates Audit Trails for EntityFramework's CRUD operations. **Supporting EF 6 and EF Core**.
+Automatically generates Audit Logs for EntityFramework's CRUD operations. **Supporting EF 6 and EF Core**.
 
-Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record operations in the database with detailed information.
+Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about CRUD operations in your database.
 
 ##Install
 
@@ -34,19 +34,20 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 ```
 
 ##Configuration
-You can change the default behavior by decorating your DbContext with the `AuditDbContext` attribute, indicating the setting values:
+
+The following settings can be configured per DbContext or globally:
 
 - **Mode**: To indicate the audit operation mode
- - _Opt-Out_: All the entities are tracked by default, except those decorated with the `AuditIgnore` attribute. (Default)
- - _Opt-In_: No entity is tracked by default, except those decorated with the `AuditInclude` attribute.
+ - _Opt-Out_: All the entities are tracked by default, except those explicitly ignored. (Default)
+ - _Opt-In_: No entity is tracked by default, except those explicitly included.
 - **IncludeEntityObjects**: To indicate if the output should contain the complete entity object graphs. (Default is false)
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the context name). Can contain the following placeholders: 
   - {context}: replaced with the Db Context type name.
   - {database}: replaced with the database name.
 
-To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
 
-For example:
+Change the settings by decorating your DbContext with the `AuditDbContext` attribute, for example:
+
 ```c#
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false, AuditEventType = "{database}_{context}" )]
 public class MyEntitites : Audit.EntityFramework.AuditDbContext
@@ -54,7 +55,27 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 ...
 ```
 
-You can also change the settings by accessing the properties with the same name as in the attribute. For example:
+To exclude specific entities from the audit (OptOut Mode), you can decorate your entity classes with the `AuditIgnore` attribute, for example:
+```c#
+[AuditIgnore]
+public class Blog
+{
+    public int Id { get; set; }
+    ...
+}
+```
+
+Instead, to include specific entities to the audit (OptIn Mode), you can use the `AuditInclude` attribute:
+```c#
+[AuditInclude]
+public class Post
+{
+    public int Id { get; set; }
+    ...
+}
+```
+
+You can also change the settings of your DbContext by accessing the properties with the same name as in the attribute. For example:
 ```c#
 public class MyEntities : Audit.EntityFramework.AuditDbContext
 {
@@ -67,8 +88,30 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
+You can also configure settings by using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
+
+For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding the entities `PostHistory` and `BlogHistory` from the audit:
+```c#
+Audit.EntityFramework.Configuration.Setup()
+    .ForContext<MyEntities>(config => config
+        .IncludeEntityObjects()
+        .AuditEventType("{context}:{database}"))
+    .UseOptOut()
+        .Ignore<PostHistory>()
+        .Ignore<BlogHistory>;
+```
+
+In summary, you have three ways to configure the audit for the contexts:
+- By accessing the properties on the `AuditDbContext` base class.
+- By decorating your context classes with `AuditDbContext` attribute and your entity classes with `AuditIgnore`/`AuditInclude` attributes.
+- By using the fluent API provided by the method `Audit.EntityFramework.Configuration.Setup()`
+
+All three can be used at the same time, and the precedence order is the order exposed in the above list.
+
+To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
+
 ##How it works
-The library intercepts the calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` to generate detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ##Output
 Audit.EntityFramework output includes:
@@ -97,6 +140,8 @@ using(var context = new MyEntitites())
 }
 ```
 
+Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions).
+
 ##Output samples
 This is an example of the output for a failed insert operation:
 ```javascript
@@ -115,7 +160,7 @@ This is an example of the output for a failed insert operation:
 	"Duration": 348,
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
-		"TransactionId": "593e082d-b6b5-440b-a048-ba223b247e9f_1",
+		"ConnectionId": "593e082d-b6b5-440b-a048-ba223b247e9f",
 		"Entries": [{
 			"Table": "Posts",
 			"Action": "Insert",
@@ -139,7 +184,7 @@ This is an example of the output for a failed insert operation:
 }
 ```
 
-Output example for an update+delete operation:
+Output example for a successful update+delete operation within a transaction:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
@@ -157,6 +202,7 @@ Output example for an update+delete operation:
 	"EntityFrameworkEvent": {
 		"Database": "Blogs",
 		"ConnectionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef",
+		"TransactionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef_1",
 		"Entries": [{
 			"Table": "Blogs",
 			"Action": "Update",

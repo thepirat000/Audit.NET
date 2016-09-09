@@ -86,6 +86,38 @@ An example of the output in JSON:
 }
 ```
 
+#Output details
+
+The following tables describes the output fields:
+
+###AuditEvent object
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **EventType** | string | User-defined string to group the events |
+| **Environment** | [**Environment**](#environment-object) | Contains information about the execution environment |
+| **StartDate** | DateTime | The date and time when the event has started |
+| **EndDate** | DateTime | The date and time when the event has ended |
+| **Duration** | integer | The duration of the event in milliseconds |
+| **Target** | [**Target**](#target-object) | User-defined tracked object |
+| **Comments** | Array of strings | User-defined comments |
+
+###Environment object
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **UserName** | string | The current logged user name |
+| **MachineName** | string | The current machine name |
+| **DomainName** | string | The user domain |
+| **CallingMethodName** | string | The calling method signature information |
+| **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
+| **Culture** | string | The current culture identifier |
+
+###Target object
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Type** | string | The tracked object type name |
+| **Old** | Object | The value of the tracked object at the beginning of the event |
+| **New** | Object | The value of the tracked object at the end of the event |
+
 ##Custom Fields and Comments
 
 The `AuditScope` object provides two methods to extend the event output.
@@ -231,29 +263,29 @@ If you don't provide a Creation Policy, the Default Policy Configured will be us
 ##Configuration
 
 ###Data provider
-Call the static `AuditConfiguration.SetDataProvider` method to set the default data provider. The data provider should be set prior to the `AuditScope` creation, i.e. during application startup.
+To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set your own provider as the default data provider:
 ```c#
-AuditConfiguration.SetDataProvider(new MyFileDataProvider());
+Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 ```
 
 ###Creation Policy
-Call the static `AuditConfiguration.SetCreationPolicy` method to set the default creation policy. This should be set prior to the `AuditScope` creation, i.e. during application startup.
+To change the default creation policy, set the static property `SetCreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set the default creation policy to Manual:
 ```c#
-AuditConfiguration.SetCreationPolicy(EventCreationPolicy.Manual);
+Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
 ```
 
 ###Custom Actions
 You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
 
-Call the static `AuditConfiguration.AddCustomAction` method to attach a custom action. 
+Call the static `AddCustomAction()` method on `Audit.Core.Configuration` class to attach a custom action. 
 
 For example, to globally discard the events under centain condition:
 ```c#
-AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
     if (DateTime.Now.Hour == 17) // Tea time
     {
@@ -264,7 +296,7 @@ AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 
 Or to add custom fields / comments globally to all scopes:
 ```c#
-AuditConfiguration.AddCustomAction(ActionType.OnEventSaving, scope =>
+Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
 {
     if (scope.Event.Environment.Exception != null)
     {
@@ -279,11 +311,11 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 
 ##Configuration Fluent API
-Alternatively to the methods mentioned before (SetDataProvider, SetCreationPolicy and AddCustomAction),  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `AuditConfiguration.Setup()`.
+Alternatively to the properties/methods mentioned before,  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseFileLogProvider()
     .WithCreationPolicy(EventCreationPolicy.Manual);
 ```
@@ -291,22 +323,22 @@ AuditConfiguration.Setup()
 ##Configuration examples
 **Initialization to use the File Log [Provider](#data-provider) with an InsertOnStart-ReplaceOnEnd [Creation Policy](#creation-policy), and a global ApplicationId [Custom Field](#custom-fields-and-comments)**:
 ```c#
-AuditConfiguration.SetDataProvider(new FileDataProvider()
+Audit.Core.Configuration.DataProvider = new FileDataProvider()
 {
     FilenamePrefix = "Event_",
     DirectoryPath = @"C:\AuditLogs\1"
-});
+};
 
-AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
 
-AuditConfiguration.AddCustomAction(ActionType.OnScopeCreated, scope => 
+Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope => 
 { 
     scope.SetCustomField("ApplicationId", "MyApplication"); 
 });
 ```
 Or by using the fluent API:
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseFileLogProvider(config => config
         .FilenamePrefix("Event_")
         .Directory(@"C:\AuditLogs\1"))
@@ -316,45 +348,45 @@ AuditConfiguration.Setup()
 
 **Initialization to use the Event Log provider with an InsertOnEnd Creation Policy**:
 ```c#
-AuditConfiguration.SetDataProvider(new EventLogDataProvider()
+Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
 {
     SourcePath = "My Audited Application",
     LogName = "Application"
-});
-AuditConfiguration.SetCreationPolicy(EventCreationPolicy.InsertOnEnd);
+};
+Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 ```
 Or by using the fluent API:
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
         .SourcePath("My Audited Application")
         .LogName("Application"))
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-##Storage providers
+#Storage providers
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
-**[Sql Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
+###**[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format. 
 
-**[MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
+###**[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-**[Azure DocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
+###**[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
-##Extensions
+#Extensions
 
-The following packages are extensions to log interactions with different systems such as MVC, WebApi and Entity Framework. 
+The following packages are extensions to log interactions with different systems such as MVC, WebApi and Entity Framework: 
 
-**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
+###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
 Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
-**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
+###**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
 Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
-**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
+###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
 Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF Core.
 
