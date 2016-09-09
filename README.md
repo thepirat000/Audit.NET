@@ -90,7 +90,7 @@ An example of the output in JSON:
 
 The following tables describes the output fields:
 
-###AuditEvent object
+###[AuditEvent object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **EventType** | string | User-defined string to group the events |
@@ -101,7 +101,7 @@ The following tables describes the output fields:
 | **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
 
-###Environment object
+###[Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **UserName** | string | The current logged user name |
@@ -111,7 +111,7 @@ The following tables describes the output fields:
 | **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
 | **Culture** | string | The current culture identifier |
 
-###Target object
+###[Target object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditTarget.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Type** | string | The tracked object type name |
