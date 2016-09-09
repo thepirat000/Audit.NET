@@ -130,7 +130,7 @@ With this information, you can measure performance, observe exceptions thrown or
 
 The following table describes the Audit.EntityFramework output fields:
 
-###EntityFrameworkEvent
+###[EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Database** | string | Name of the database affected |
@@ -141,7 +141,7 @@ The following table describes the Audit.EntityFramework output fields:
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
 
-###EventEntry
+###[EventEntry](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntry.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Table** | string | Name of the affected table |
@@ -153,7 +153,7 @@ The following table describes the Audit.EntityFramework output fields:
 | **Valid** | boolean | Bolean indicating if the entity passes the validations |
 | **ValidationResults** | Array of string | The validation messages when the entity validation fails |
 
-###ChangeObject
+###[ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **ColumnName** | string | The column name that was updated |
