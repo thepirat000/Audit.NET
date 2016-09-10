@@ -321,7 +321,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 ##Configuration examples
-Use the file log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
+- Use the file log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
 ```c#
 Audit.Core.Configuration.DataProvider = new FileDataProvider()
 {
@@ -346,7 +346,7 @@ Audit.Core.Configuration.Setup()
     .WithAction(x => x.OnScopeCreated(scope => scope.SetCustomField("ApplicationId", "MyApplication")));
 ```
 
-Initialization to use the event log provider with an InsertOnEnd creation policy:
+- Initialization to use the event log provider with an InsertOnEnd creation policy:
 ```c#
 Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
 {
