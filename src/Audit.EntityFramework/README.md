@@ -128,7 +128,7 @@ With this information, you can measure performance, observe exceptions thrown or
 
 ##Output details
 
-The following table describes the Audit.EntityFramework output fields:
+The following tables describes the Audit.EntityFramework output fields:
 
 - ###[EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
 | Field Name | Type | Description | 
