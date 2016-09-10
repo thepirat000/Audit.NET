@@ -69,7 +69,7 @@ With this information, you can not just know who did the operation, but also mea
 
 The following table describes the Audit.Mvc output fields:
 
-###[Action](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/AuditAction.cs)
+###[AuditAction](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/AuditAction.cs) object
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **HttpMethod** | string | HTTP method (GET, POST, etc) |
