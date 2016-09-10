@@ -122,9 +122,9 @@ The following tables describes the output fields:
 
 The `AuditScope` object provides two methods to extend the event output.
 
-With `SetCustomField()` you can store any object state as a custom field. (The object is serialized upon this method, so further changes to the object are not reflected on the field value).
+- With `SetCustomField()` you can store any object state as a custom field. (The object is serialized upon this method, so further changes to the object are not reflected on the field value).
 
-With `Comment()` you can add textual comments to the event.
+- With `Comment()` you can add textual comments to the event.
 
 For example:
 
