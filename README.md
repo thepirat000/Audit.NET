@@ -95,28 +95,28 @@ The following tables describes the output fields:
 | ------------ | ---------------- |  -------------- |
 | **EventType** | string | User-defined string to group the events |
 | **Environment** | [**Environment**](#environment-object) | Contains information about the execution environment |
-| **StartDate** | DateTime | The date and time when the event has started |
-| **EndDate** | DateTime | The date and time when the event has ended |
-| **Duration** | integer | The duration of the event in milliseconds |
+| **StartDate** | DateTime | Date and time when the event has started |
+| **EndDate** | DateTime | Date and time when the event has ended |
+| **Duration** | integer | Duration of the event in milliseconds |
 | **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
 
 - ###[Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
-| **UserName** | string | The current logged user name |
-| **MachineName** | string | The current machine name |
-| **DomainName** | string | The user domain |
-| **CallingMethodName** | string | The calling method signature information |
+| **UserName** | string | Current logged user name |
+| **MachineName** | string | Executing machine name |
+| **DomainName** | string | Current user domain |
+| **CallingMethodName** | string | Calling method signature information |
 | **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
-| **Culture** | string | The current culture identifier |
+| **Culture** | string | Current culture identifier |
 
 - ###[Target object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditTarget.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
-| **Type** | string | The tracked object type name |
-| **Old** | Object | The value of the tracked object at the beginning of the event |
-| **New** | Object | The value of the tracked object at the end of the event |
+| **Type** | string | Tracked object type name |
+| **Old** | Object | Value of the tracked object at the beginning of the event |
+| **New** | Object | Value of the tracked object at the end of the event |
 
 ##Custom Fields and Comments
 
