@@ -130,7 +130,7 @@ With this information, you can measure performance, observe exceptions thrown or
 
 The following table describes the Audit.EntityFramework output fields:
 
-###[EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
+- ###[EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Database** | string | Name of the database affected |
@@ -141,7 +141,7 @@ The following table describes the Audit.EntityFramework output fields:
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
 
-###[EventEntry](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntry.cs)
+- ###[EventEntry](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntry.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Table** | string | Name of the affected table |
@@ -153,7 +153,7 @@ The following table describes the Audit.EntityFramework output fields:
 | **Valid** | boolean | Bolean indicating if the entity passes the validations |
 | **ValidationResults** | Array of string | The validation messages when the entity validation fails |
 
-###[ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
+- ###[ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **ColumnName** | string | The column name that was updated |
@@ -178,7 +178,7 @@ using(var context = new MyEntitites())
 Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions).
 
 ##Output samples
-This is an example of the output for a failed insert operation:
+- Output sample for a failed insert operation:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
@@ -219,7 +219,7 @@ This is an example of the output for a failed insert operation:
 }
 ```
 
-Output example for a successful update+delete operation within a transaction:
+- Output sample for a successful update+delete operation within a transaction:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
