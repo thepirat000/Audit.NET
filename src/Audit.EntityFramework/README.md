@@ -100,7 +100,7 @@ Audit.EntityFramework.Configuration.Setup()
         .AuditEventType("{context}:{database}"))
     .UseOptOut()
         .Ignore<PostHistory>()
-        .Ignore<BlogHistory>;
+        .Ignore<BlogHistory>();
 ```
 
 In summary, you have three ways to configure the audit for the contexts:
