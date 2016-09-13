@@ -1,4 +1,4 @@
-namespace Audit.MongoDB.Configuration
+namespace Audit.MongoDB.ConfigurationApi
 {
     /// <summary>
     /// Provides a configuration for the Mongo DB data provider

@@ -1,4 +1,4 @@
-namespace Audit.MongoDB.Configuration
+namespace Audit.MongoDB.ConfigurationApi
 {
     public class MongoProviderConfigurator : IMongoProviderConfigurator
     {

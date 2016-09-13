@@ -94,6 +94,7 @@ namespace Audit.EntityFramework
             IncludeEntityObjects = attrConfig?.IncludeEntityObjects ?? localConfig?.IncludeEntityObjects ?? globalConfig?.IncludeEntityObjects ?? false;
             AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
         }
+
         /// <summary>
         /// Gets the validation results, return NULL if there are no validation errors.
         /// </summary>
@@ -197,7 +198,7 @@ namespace Audit.EntityFramework
         {
             var typeName = GetType().Name;
             var eventType = AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
-            var scope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual, AuditDataProvider);
+            var scope = AuditScope.Create(eventType, null, new { EntityFrameworkEvent = efEvent }, EventCreationPolicy.Manual, AuditDataProvider);
             if (_extraFields != null)
             {
                 foreach(var field in _extraFields)

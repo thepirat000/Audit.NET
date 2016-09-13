@@ -27,7 +27,13 @@ namespace Audit.IntegrationTest
             provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(provider.Object);
+                .UseCustomProvider(provider.Object)
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(x => x.OnScopeCreated(sc =>
+                {
+                    var wcfEvent = sc.Event.GetEntityFrameworkEvent();
+                    Assert.Equal("Blogs", wcfEvent.Database);
+                }));
 
             using (var ctx = new MyAuditedVerboseContext())
             {
@@ -40,6 +46,7 @@ namespace Audit.IntegrationTest
                     transaction.Rollback();
                 }
                 ctx.Posts.Add(new Post() { BlogId = 1, Content = "other content 3", DateCreated = DateTime.Now, Title = "other title 3" });
+                
                 ctx.SaveChanges();
             }
             var ev1 = (auditEvents[0].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);

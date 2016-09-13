@@ -55,10 +55,10 @@ namespace Audit.Mvc.UnitTest
                 EventTypeName = "TestEvent"
             };
             var actionExecutingContext = new ActionExecutingContext(controllerContext, actionDescriptor.Object, new Dictionary<string, object> { { "test1", "value1" } } );
-            
-            //.Properties.Add("MS_HttpContext", httpContext.Object);
-            
             filter.OnActionExecuting(actionExecutingContext);
+
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
             var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
             filter.OnActionExecuted(actionExecutedContext);
@@ -67,6 +67,8 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             Assert.Equal("header-value", action.Headers["test-header"]);
             Assert.Equal("get", action.ActionName);

@@ -52,7 +52,6 @@ namespace Audit.Core
                 Environment = environment,
                 StartDate = DateTime.Now,
                 EventType = eventType,
-                Comments = new List<string>(),
                 CustomFields = new Dictionary<string, object>()
             };
             if (target != null)
@@ -152,15 +151,15 @@ namespace Audit.Core
         }
 
         /// <summary>
-        /// Add a custom field to the event.
+        /// Adds a custom field to the event
         /// </summary>
-        public void SetCustomField<TC>(string fieldName, TC value)
+        /// <typeparam name="TC">The type of the value.</typeparam>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="value">The value object.</param>
+        /// <param name="serialize">if set to <c>true</c> the field is serialized immediately.</param>
+        public void SetCustomField<TC>(string fieldName, TC value, bool serialize = false)
         {
-            if (value == null)
-            {
-                return;
-            }
-            _event.CustomFields[fieldName] = _dataProvider.Serialize(value);
+            _event.CustomFields[fieldName] = serialize ? _dataProvider.Serialize(value) : value;
         }
 
         /// <summary>

@@ -10,7 +10,9 @@ namespace Audit.EntityFramework
         /// <param name="auditEvent">The audit event.</param>
         public static EntityFrameworkEvent GetEntityFrameworkEvent(this AuditEvent auditEvent)
         {
-            return auditEvent.CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent;
+            return auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent")
+                ? auditEvent.CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent
+                : null;
         }
     }
 }

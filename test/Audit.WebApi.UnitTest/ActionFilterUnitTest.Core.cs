@@ -61,6 +61,9 @@ namespace Audit.WebApi.UnitTest
             var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
             filter.OnActionExecuting(actionExecutingContext);
 
+            var scopeFromController = AuditApiAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
+
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
             filter.OnActionExecuted(actionExecutedContext);
@@ -69,6 +72,8 @@ namespace Audit.WebApi.UnitTest
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             Assert.Equal("http://200.10.10.20:1010/api/values", action.RequestUrl);
             Assert.Equal("application/json", action.Headers["content-type"]);

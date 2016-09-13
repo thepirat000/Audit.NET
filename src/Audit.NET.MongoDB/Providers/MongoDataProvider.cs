@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Audit.Core;
+using System.Linq;
 
 namespace Audit.MongoDB.Providers
 {
@@ -70,6 +71,7 @@ namespace Audit.MongoDB.Providers
         {
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(_collection);
+            SerializeExtraFields(auditEvent);
             var doc = auditEvent.ToBsonDocument();
             FixDocumentElementNames(doc);
             col.InsertOne(doc);
@@ -80,9 +82,18 @@ namespace Audit.MongoDB.Providers
         {
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(_collection);
+            SerializeExtraFields(auditEvent);
             var doc = auditEvent.ToBsonDocument();
             FixDocumentElementNames(doc);
             col.ReplaceOne(d => d["_id"] == (BsonObjectId)eventId, doc);
+        }
+
+        private void SerializeExtraFields(AuditEvent auditEvent)
+        {
+            foreach(var k in auditEvent.CustomFields.Keys.ToList())
+            {
+                auditEvent.CustomFields[k] = Serialize(auditEvent.CustomFields[k]);
+            }
         }
 
         /// <summary>
@@ -131,6 +142,15 @@ namespace Audit.MongoDB.Providers
 
         public override object Serialize<T>(T value)
         {
+            if (value == null)
+            {
+                return null;
+            }
+            // if is a serialized document already, return that.
+            if (value is BsonDocument)
+            {
+                return value;
+            }
             // if can be converted to bsonvalue, return the value
             try
             {

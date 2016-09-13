@@ -69,6 +69,9 @@ namespace Audit.WebApi.UnitTest
             
             filter.OnActionExecuting(actionExecutingContext);
 
+            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
+            var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
+
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
             actionExecutedContext.Response = new System.Net.Http.HttpResponseMessage()
             {
@@ -80,6 +83,8 @@ namespace Audit.WebApi.UnitTest
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             Assert.Equal("header-value", action.Headers["test-header"]);
             Assert.Equal("get", action.ActionName);

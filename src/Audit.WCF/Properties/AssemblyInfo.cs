@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Audit.WebApi")]
+[assembly: AssemblyProduct("Audit.WCF")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,6 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5d3052ca-00e0-4fcf-9de0-bd8cbfdae5da")]
-
-[assembly: InternalsVisibleTo("Audit.WebApi.UnitTest")]
+[assembly: Guid("6a20e5d4-1e8c-4155-9aa3-d9346a6fac93")]

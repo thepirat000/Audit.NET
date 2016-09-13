@@ -61,6 +61,9 @@ namespace Audit.Mvc.UnitTest
             var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
             filter.OnActionExecuting(actionExecutingContext);
 
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
             filter.OnActionExecuted(actionExecutedContext);
@@ -70,6 +73,8 @@ namespace Audit.Mvc.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
             Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);
             Assert.Equal("home", action.ControllerName);
             Assert.Equal("value1", action.ActionParameters["test1"]);

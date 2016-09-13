@@ -7,6 +7,7 @@ using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;
 using Xunit;
 using Newtonsoft.Json.Linq;
+using Audit.MongoDB.ConfigurationApi;
 #if NET451
 using Audit.AzureDocumentDB.Providers;
 #endif
@@ -95,7 +96,7 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
                 
-                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -106,7 +107,7 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
-                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -123,7 +124,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Another Comment");
                 }
 
-                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -136,7 +137,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Status Updated to Submitted");
                 }
 
-                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
             }
 
             public void TestInsert()
@@ -150,7 +151,7 @@ namespace Audit.IntegrationTest
                     audit.SetCustomField("ReferenceId", order.OrderId);
                 }
 
-                Assert.Equal(Configuration.DataProvider.Serialize(order.OrderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
             }
 
             public void TestDelete()
@@ -164,7 +165,7 @@ namespace Audit.IntegrationTest
                     DbDeteleOrder(order.OrderId);
                     order = null;
                 }
-                Assert.Equal(Configuration.DataProvider.Serialize(orderId), ev.CustomFields["ReferenceId"]);
+                Assert.Equal(orderId, ev.CustomFields["ReferenceId"]);
             }
 
 #if NET451
@@ -184,7 +185,7 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
                         .ConnectionString("https://thepirat.documents.azure.com:443/")
-                        .AuthKey("xxxxxx=="))
+                        .AuthKey("xxxxx=="))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
@@ -279,3 +280,4 @@ namespace Audit.IntegrationTest
         }
     }
 }
+

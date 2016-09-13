@@ -25,7 +25,13 @@ namespace Audit.IntegrationTest
             provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(provider.Object);
+                .UseCustomProvider(provider.Object)
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(x => x.OnScopeCreated(sc =>
+                {
+                    var wcfEvent = sc.Event.GetEntityFrameworkEvent();
+                    Assert.Equal("Blogs", wcfEvent.Database);
+                }));
 
             using (var ctx = new MyAuditedVerboseContext())
             {
