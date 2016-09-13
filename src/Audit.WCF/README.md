@@ -15,7 +15,7 @@ PM> Install-Package Audit.Wcf
 
 ##Usage
 
-Decorate your WCF service class or methods with `Audit.WCF.AuditBehavior` attribute.
+Decorate your WCF service class or methods with the `Audit.WCF.AuditBehavior` attribute.
 
 For example:
 
