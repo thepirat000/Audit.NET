@@ -2,9 +2,9 @@
 
 **WCF Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 
-Generate Audit Logs for Windows Communication Foundation (WCF) calls.
+Generate Audit Logs for Windows Communication Foundation (WCF) service calls.
 
-Audit.Wcf provides the infrastructure to log interactions with WCF Services. It can record service method calls with caller info and arguments.
+Audit.Wcf provides the server-side infrastructure to log interactions with WCF Services. It can record service method calls with caller info and arguments.
 
 ##Install
 
@@ -15,7 +15,7 @@ PM> Install-Package Audit.Wcf
 
 ##Usage
 
-Decorate your WCF service class or methods with `AuditBehaviorAttribute`.
+Decorate your WCF service class or methods with `AuditBehavior` attribute.
 
 For example:
 
@@ -42,7 +42,7 @@ public class OrderService : IOrderService
 }
 ```
 
-If you can't change the service code, you can also enable the audit by adding the `AuditBehavior` extension to your service host configuration file.
+If you can't (or do not want) to change the service code, you can also enable the audit mechanism by adding the `AuditBehavior` extension to your service host configuration file.
 
 For example:
 
@@ -74,7 +74,6 @@ The `AuditBehavior` attribute or extension can be configured with the following 
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
  - {contract}: Replaced with the contract name (service interface name)
  - {operation}: Replaces with the operation name (service method name)
- 
 
 To globally configure the output persistence mechanism, use the `Audit.Core.Configuration` class. For more details please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
@@ -84,7 +83,9 @@ Audit.Core.Configuration.Setup()
 	.UseFileLogProvider(config => config.Directory(@"C:\Logs"));
 ```
 
-If you want to configure an AuditDataProvider per service instance, you can add a public instance property to your service class and make it return the provider you want, for example:
+This should be done prior to the AuditScope creation, i.e. during application startup.
+
+If you want to configure an Audit Data Provider per service instance, you can add a public instance property named `AuditDataProvider` to your service class and make it return the provider you want, for example:
 ```c#
 [AuditBehavior]
 public class OrderService : IOrderService
@@ -237,5 +238,3 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 	}
 }
 ```
-
-
