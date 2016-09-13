@@ -4,7 +4,7 @@
 
 Generate Audit Logs for Windows Communication Foundation (WCF) service calls.
 
-Audit.Wcf provides the server-side infrastructure to log interactions with WCF Services. It can record service method calls with caller info and arguments.
+Audit.Wcf provides the server-side infrastructure to log interactions with WCF services. It can record service method calls with caller info and arguments.
 
 ##Install
 
