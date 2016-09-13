@@ -34,7 +34,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Mvc", "src\Audit.Mvc\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.EntityFramework", "src\Audit.EntityFramework\Audit.EntityFramework.xproj", "{0E1077B5-0166-46AE-BD6D-7CCEA001D1A3}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.WCF", "src\Audit.WCF\Audit.WCF.xproj", "{6A20E5D4-1E8C-4155-9AA3-D9346A6FAC93}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Wcf", "src\Audit.WCF\Audit.Wcf.xproj", "{6A20E5D4-1E8C-4155-9AA3-D9346A6FAC93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

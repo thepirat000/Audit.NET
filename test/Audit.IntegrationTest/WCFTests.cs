@@ -17,7 +17,7 @@ namespace Audit.IntegrationTest
     public class WCFTests
     {
         [Fact]
-        public void WCFTest__AuditScope()
+        public void WCFTest_AuditScope()
         {
             WCFTest_Concurrency_AuditScope(1, 1);
         }

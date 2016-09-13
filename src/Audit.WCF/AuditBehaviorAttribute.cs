@@ -48,6 +48,10 @@ namespace Audit.WCF
                 {
                     continue;
                 }
+                if (operation.Behaviors.Any(b => b is AuditBehaviorAttribute))
+                {
+                    continue;
+                }
                 operation.Behaviors.Add(new AuditBehaviorAttribute(EventType));
             }
         }
