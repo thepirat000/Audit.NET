@@ -377,6 +377,9 @@ Store the events in a Mongo DB Collection, in BSON format.
 - ###**[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
+![Storage providers](http://i.imgur.com/1MUCvFI.jpg)
+
+
 #Extensions
 
 The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
