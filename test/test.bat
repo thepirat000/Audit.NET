@@ -1,5 +1,5 @@
 @echo off
-"c:\Program Files\MongoDB\Server\3.2\bin\mongod.exe"
+start "" /D c:\ "c:\Program Files\MongoDB\Server\3.2\bin\mongod.exe"
 net start mssqlserver
 
 
@@ -23,6 +23,4 @@ cd ..
 
 cd Audit.WebApi.UnitTest
 dotnet test
-echo continue...
-pause > nul
 cd ..
