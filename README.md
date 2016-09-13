@@ -389,7 +389,7 @@ Apart from the _File_ and _EventLog_ event storage, there are other providers in
 ![Storage providers](http://i.imgur.com/1MUCvFI.jpg)
 
 - ###**[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
-Store the events as rows in a SQL Table, in JSON format.### 
+Store the events as rows in a SQL Table, in JSON format.
 
 - ###**[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
 Store the events in a Mongo DB Collection, in BSON format.
