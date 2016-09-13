@@ -20,7 +20,7 @@ Decorate your WCF service class or methods with `AuditBehaviorAttribute`.
 For example:
 
 ```c#
-[AuditBehavior]
+[AuditBehavior(EventType = "{contract}.{operation}")]
 public class OrderService : IOrderService
 {
   public GetOrderResponse GetOrder(GetOrderRequest request)
@@ -42,7 +42,8 @@ public class OrderService : IOrderService
 }
 ```
 
-If you can't change the service code, you can enable the audit by setting the `AuditBehavior` extension to your service host config file.
+If you can't change the service code, you can also enable the audit by adding the `AuditBehavior` extension to your service host configuration file.
+
 For example:
 
 ```xml
@@ -76,7 +77,13 @@ The `AuditBehavior` attribute or extension can be configured with the following 
  
 ?? pending: property AuditDataProvider ??
  
-To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
+To configure the output persistence mechanism, use the `Audit.Core.Configuration` class. For more details please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
+
+For example:
+```c#
+Audit.Core.Configuration.Setup()
+	.UseFileLogProvider(config => config.Directory(@"C:\Logs"));
+```
 
 ##Output
 
@@ -96,6 +103,51 @@ With this information, you can not just know who did the operation, but also mea
 ##Output details
 
 The following table describes the Audit.Wcf output fields:
+
+- ###[AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs) 
+
+Describes an audited WCF event
+
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| ContractName | string | Name of the contract (service interface) |
+| OperationName | string | Name of the operation (service method) |
+| InstanceQualifiedName | string | Assembly qualified type name of the service instance |
+| MethodSignature | string | Signature of the audited method |
+| Action | string | Action absolute address |
+| ReplyAction | string |Reply action absolute address |
+| IdentityName | string | Name of the current identity (username) |
+| ClientAddress | string | Client address (IP) |
+| HostAddress | string | Serice host address |
+| Success | boolean | Indicates if the operation completed succesfully |
+| Fault | [AuditWcfEventFault](#AuditWcfEventFault) | Fault details when the operation fails |
+| Result | Object | The result object value |
+| InputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Input parameters object values |
+| OutputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Output parameters object values |
+
+- ###[AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)
+
+Describes a WCF fault/exception
+
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| FaultType | string | Fault type (Exception / Fault) |
+| Exception | string | Exception details |
+| FaultCode | string | The fault code |
+| FaultAction | string | The fault action name |
+| FaultReason | string | The fault reason |
+| FaultDetails | [AuditWcfEventElement](#AuditWcfEventElement) | The detail object related to the fault |
+
+###[AuditWcfEventElement](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventElement.cs)
+
+Describes an element/object related to the WCF audit event.
+
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| Type | string | The object type name |
+| Value | Object | The object value |
+
+
 
 
 
