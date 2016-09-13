@@ -364,6 +364,23 @@ Audit.Core.Configuration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
+#Extensions
+
+The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
+
+![Audit.NET Extensions](http://i.imgur.com/O6zhqJV.jpg)
+
+- ###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
+Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. Includes support for ASP.NET Core MVC.
+
+- ###**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
+Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. Includes support for ASP.NET Core MVC.
+
+- ###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
+Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
+
+- ###**[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
+Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior. 
 #Storage providers
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
@@ -378,20 +395,4 @@ Store the events in a Mongo DB Collection, in BSON format.
 
 - ###**[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
-
-#Extensions
-
-The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
-
-- ###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
-Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. Includes support for ASP.NET Core MVC.
-
-- ###**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
-Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. Includes support for ASP.NET Core MVC.
-
-- ###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
-Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
-
-- ###**[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
-Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior. 
 
