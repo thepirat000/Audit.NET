@@ -215,6 +215,12 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 		"ReplyAction": "http://tempuri.org/IOrderService/GetOrderResponse",
 		"ClientAddress": "::1",
 		"HostAddress": "http://localhost:8733/Design_Time_Addresses/WCF_IIS/OrderService/",
+		"InputParameters": [{
+			"Type": "GetOrderRequest",
+			"Value": {
+				"OrderId": 123
+			}
+		}],
 		"Success": true,
 		"Result": {
 			"Type": "GetOrderResponse",
@@ -228,12 +234,6 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 				}
 			}
 		},
-		"InputParameters": [{
-			"Type": "GetOrderRequest",
-			"Value": {
-				"OrderId": 123
-			}
-		}],
 		"OutputParameters": []
 	}
 }
