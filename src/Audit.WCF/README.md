@@ -2,7 +2,7 @@
 
 **WCF Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 
-Generate Audit Logs for Wincows Communication Foundation (WCF) calls.
+Generate Audit Logs for Windows Communication Foundation (WCF) calls.
 
 Audit.Wcf provides the infrastructure to log interactions with WCF Services. It can record service method calls with caller info and arguments.
 
