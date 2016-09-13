@@ -236,7 +236,7 @@ The `ReplaceEvent` method should update an event given its ID, this method is on
 
 ##Event Creation Policy
 
-The data providers can be configured to persist the event in different ways:
+The audit scope can be configured to persist the event in different ways:
 - **Insert on End:** (**default**)
 The audit event is saved when the scope is disposed. 
 
@@ -258,7 +258,7 @@ using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolic
 }
 ```
 
-If you don't provide a Creation Policy, the Default Policy Configured will be used (see next section).
+If you don't provide a Creation Policy, the default Creation Policy configured will be used (see next section).
 
 ##Configuration
 
