@@ -75,15 +75,34 @@ The `AuditBehavior` attribute or extension can be configured with the following 
  - {contract}: Replaced with the contract name (service interface name)
  - {operation}: Replaces with the operation name (service method name)
  
-?? pending: property AuditDataProvider ??
- 
-To configure the output persistence mechanism, use the `Audit.Core.Configuration` class. For more details please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
+
+To globally configure the output persistence mechanism, use the `Audit.Core.Configuration` class. For more details please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
 For example:
 ```c#
 Audit.Core.Configuration.Setup()
 	.UseFileLogProvider(config => config.Directory(@"C:\Logs"));
 ```
+
+If you want to configure an AuditDataProvider per service instance, you can add a public instance property to your service class and make it return the provider you want, for example:
+```c#
+[AuditBehavior]
+public class OrderService : IOrderService
+{
+    public AuditDataProvider AuditDataProvider
+    {
+        get
+        {
+            return new Audit.Core.Providers.FileDataProvider()
+            {
+                DirectoryPath = @"C:\Logs"
+            };
+        }
+    }
+}
+```
+
+The library will automatically detect the property and use the given data provider for that service instance.
 
 ##Output
 
@@ -147,6 +166,76 @@ Describes an element/object related to the WCF audit event.
 | Type | string | The object type name |
 | Value | Object | The object value |
 
+##Customization
 
+You can access the Audit Scope for customization from the WCF audited methods by getting the static property value `Audit.WCF.AuditBehavior.CurrentAuditScope`. 
+
+For example:
+```c#
+using Audit.WCF;
+
+[AuditBehavior]
+public class OrderService : IOrderService
+{
+    public GetOrderResponse GetOrder(GetOrderRequest request)
+    {
+        AuditBehavior.CurrentAuditScope.Comment("some comment");
+        AuditBehavior.CurrentAuditScope.SetCustomField("User", MySession.CurrentUser);
+        ...
+    }
+}
+```
+
+See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
+
+###Output Sample
+
+```javascript
+{
+	"EventType": "IOrderService.GetOrder",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.WCF.AuditOperationInvoker.Invoke()",
+		"AssemblyName": "Audit.WCF, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null",
+		"Exception": null,
+		"Culture": "en-GB"
+	},
+	"StartDate": "2016-09-13T01:31:58.6843094-05:00",
+	"EndDate": "2016-09-13T01:31:58.6858324-05:00",
+	"Duration": 2,
+	"WcfEvent": {
+		"ContractName": "IOrderService",
+		"OperationName": "GetOrder",
+		"InstanceQualifiedName": "WCF_IIS.OrderService, WCF_IIS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+		"MethodSignature": "WCF_IIS.GetOrderResponse GetOrder(WCF_IIS.GetOrderRequest)",
+		"Action": "http://tempuri.org/IOrderService/GetOrder",
+		"ReplyAction": "http://tempuri.org/IOrderService/GetOrderResponse",
+		"ClientAddress": "::1",
+		"HostAddress": "http://localhost:8733/Design_Time_Addresses/WCF_IIS/OrderService/",
+		"Success": true,
+		"Result": {
+			"Type": "GetOrderResponse",
+			"Value": {
+				"Success": true,
+				"Errors": null,
+				"Order": {
+					"OrderId": 123,
+					"CustomerName": "customer",
+					"Total": 10.0
+				}
+			}
+		},
+		"InputParameters": [{
+			"Type": "GetOrderRequest",
+			"Value": {
+				"OrderId": 123
+			}
+		}],
+		"OutputParameters": []
+	}
+}
+```
 
 
