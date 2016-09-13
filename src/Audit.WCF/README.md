@@ -169,7 +169,7 @@ Describes an element/object related to the WCF audit event.
 
 ##Customization
 
-You can access the Audit Scope for customization from the WCF audited methods by getting the static property value `Audit.WCF.AuditBehavior.CurrentAuditScope`. 
+You can access the `AuditScope` object for customization from the audited methods, by the static property `Audit.WCF.AuditBehavior.CurrentAuditScope`. 
 
 For example:
 ```c#
