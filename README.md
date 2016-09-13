@@ -390,6 +390,6 @@ Generate detailed audit logs by decorating Web API Methods and Controllers with 
 - ###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
 Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 
-- ###**[Audit.Mvc](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MVC/README.md)**
-Generate detailed server-side audit logs for WCF service calls, by configuring a provided Behavior. 
+- ###**[Audit.Wcf](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
+Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided Behavior. 
 
