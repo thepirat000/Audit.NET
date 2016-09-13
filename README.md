@@ -379,7 +379,7 @@ Store the events in an Azure Document DB Collection, in JSON format.
 
 #Extensions
 
-The following packages are extensions to log interactions with different systems such as MVC, WebApi and Entity Framework: 
+The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
 
 - ###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
 Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. Includes support for ASP.NET Core MVC.
@@ -389,4 +389,7 @@ Generate detailed audit logs by decorating Web API Methods and Controllers with 
 
 - ###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
 Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
+
+- ###**[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
+Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior. 
 
