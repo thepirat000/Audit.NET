@@ -90,41 +90,41 @@ An example of the output in JSON:
 
 The following tables describes the output fields:
 
-###AuditEvent object
+- ###[AuditEvent object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **EventType** | string | User-defined string to group the events |
 | **Environment** | [**Environment**](#environment-object) | Contains information about the execution environment |
-| **StartDate** | DateTime | The date and time when the event has started |
-| **EndDate** | DateTime | The date and time when the event has ended |
-| **Duration** | integer | The duration of the event in milliseconds |
+| **StartDate** | DateTime | Date and time when the event has started |
+| **EndDate** | DateTime | Date and time when the event has ended |
+| **Duration** | integer | Duration of the event in milliseconds |
 | **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
 
-###Environment object
+- ###[Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
-| **UserName** | string | The current logged user name |
-| **MachineName** | string | The current machine name |
-| **DomainName** | string | The user domain |
-| **CallingMethodName** | string | The calling method signature information |
+| **UserName** | string | Current logged user name |
+| **MachineName** | string | Executing machine name |
+| **DomainName** | string | Current user domain |
+| **CallingMethodName** | string | Calling method signature information |
 | **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
-| **Culture** | string | The current culture identifier |
+| **Culture** | string | Current culture identifier |
 
-###Target object
+- ###[Target object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditTarget.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
-| **Type** | string | The tracked object type name |
-| **Old** | Object | The value of the tracked object at the beginning of the event |
-| **New** | Object | The value of the tracked object at the end of the event |
+| **Type** | string | Tracked object type name |
+| **Old** | Object | Value of the tracked object at the beginning of the event |
+| **New** | Object | Value of the tracked object at the end of the event |
 
 ##Custom Fields and Comments
 
 The `AuditScope` object provides two methods to extend the event output.
 
-With `SetCustomField()` you can store any object state as a custom field. (The object is serialized upon this method, so further changes to the object are not reflected on the field value).
+- With `SetCustomField()` you can store any object state as a custom field. (The object is serialized upon this method, so further changes to the object are not reflected on the field value).
 
-With `Comment()` you can add textual comments to the event.
+- With `Comment()` you can add textual comments to the event.
 
 For example:
 
@@ -143,7 +143,7 @@ The output of the previous example would be:
 ```javascript
 {
 	"EventType": "Order:Update",
-	"ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+	"ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",           // <-- Custom Field
 	"Environment": {
 		"UserName": "Federico",
 		"MachineName": "HP",
@@ -165,7 +165,7 @@ The output of the previous example would be:
 			
 		}
 	},
-	"Comments": ["Status Updated to Cancelled"],
+	"Comments": ["Status Updated to Cancelled"],                     // <-- Comments
 	"StartDate": "2016-08-23T11:34:44.656101-05:00",
 	"EndDate": "2016-08-23T11:34:55.1810821-05:00",
 	"Duration": 8531
@@ -321,7 +321,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 ##Configuration examples
-**Initialization to use the File Log [Provider](#data-provider) with an InsertOnStart-ReplaceOnEnd [Creation Policy](#creation-policy), and a global ApplicationId [Custom Field](#custom-fields-and-comments)**:
+- Use the file log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
 ```c#
 Audit.Core.Configuration.DataProvider = new FileDataProvider()
 {
@@ -346,7 +346,7 @@ Audit.Core.Configuration.Setup()
     .WithAction(x => x.OnScopeCreated(scope => scope.SetCustomField("ApplicationId", "MyApplication")));
 ```
 
-**Initialization to use the Event Log provider with an InsertOnEnd Creation Policy**:
+- Initialization to use the event log provider with an InsertOnEnd creation policy:
 ```c#
 Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
 {
@@ -368,25 +368,25 @@ Audit.Core.Configuration.Setup()
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
-###**[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
+- ###**[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format. 
 
-###**[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
+- ###**[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-###**[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
+- ###**[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 
 #Extensions
 
 The following packages are extensions to log interactions with different systems such as MVC, WebApi and Entity Framework: 
 
-###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
+- ###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
 Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
-###**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
+- ###**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
 Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
-###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
-Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF Core.
+- ###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
+Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 

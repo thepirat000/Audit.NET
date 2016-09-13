@@ -66,7 +66,7 @@ The `AuditApiAttribute` can be configured with the following properties:
 - **IncludeModelState**: Boolean to indicate whether to include the Model State info or not.
 
  
-To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
+To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
 ##Output
 
@@ -88,7 +88,7 @@ With this information, you can not just know who did the operation, but also mea
 
 The following table describes the Audit.WebApi output fields:
 
-###Action
+###[Action](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/AuditApiAction.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **HttpMethod** | string | HTTP method (GET, POST, etc) |

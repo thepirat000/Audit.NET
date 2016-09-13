@@ -14,22 +14,22 @@ PM> Install-Package Audit.NET.AzureDocumentDB
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
 
 ##Configuration
-Call the static `AuditConfiguration.SetDataProvider` method to set the Document DB data provider, or use the `UseAzureDocumentDB` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
+Set the static `Audit.Core.Configuration.DataProvider` property to set the Document DB data provider, or use the `UseAzureDocumentDB` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
 For example:
 ```c#
-AuditConfiguration.SetDataProvider(new Audit.AzureDocumentDB.Providers.AzureDbDataProvider()
+Audit.Core.Configuration.DataProvider = new Audit.AzureDocumentDB.Providers.AzureDbDataProvider()
 {
     ConnectionString = "https://mycompany.documents.azure.com:443/",
     AuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==",
     Database = "Audit",
     Collection = "Event"
-});
+};
 ```
 
 Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
 ```c#
-AuditConfiguration.Setup()
+Audit.Core.Configuration.Setup()
     .UseAzureDocumentDB(config => config
         .ConnectionString("https://mycompany.documents.azure.com:443/")
         .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")

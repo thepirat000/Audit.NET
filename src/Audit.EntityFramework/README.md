@@ -2,7 +2,7 @@
 
 **EntityFramework (EF) Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
 
-Automatically generates Audit Logs for EntityFramework's CRUD operations. **Supporting EF 6 and EF Core**.
+Automatically generates Audit Logs for EntityFramework's CRUD operations. **Supporting EF 6 and EF 7 (EF Core)**.
 
 Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about CRUD operations in your database.
 
@@ -14,7 +14,9 @@ PM> Install-Package Audit.EntityFramework
 ```
 
 ##Usage
-Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. For example if you have a context like this:
+Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
+
+For example if you have a context like this:
 
 ```c#
 public class MyEntities : DbContext
@@ -98,7 +100,7 @@ Audit.EntityFramework.Configuration.Setup()
         .AuditEventType("{context}:{database}"))
     .UseOptOut()
         .Ignore<PostHistory>()
-        .Ignore<BlogHistory>;
+        .Ignore<BlogHistory>();
 ```
 
 In summary, you have three ways to configure the audit for the contexts:
@@ -108,7 +110,7 @@ In summary, you have three ways to configure the audit for the contexts:
 
 All three can be used at the same time, and the precedence order is the order exposed in the above list.
 
-To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output-configuration).
+To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
 ##How it works
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
@@ -128,9 +130,9 @@ With this information, you can measure performance, observe exceptions thrown or
 
 ##Output details
 
-The following table describes the Audit.EntityFramework output fields:
+The following tables describes the Audit.EntityFramework output fields:
 
-###EntityFrameworkEvent
+- ###[EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Database** | string | Name of the database affected |
@@ -141,7 +143,7 @@ The following table describes the Audit.EntityFramework output fields:
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
 
-###EventEntry
+- ###[EventEntry](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntry.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Table** | string | Name of the affected table |
@@ -153,7 +155,7 @@ The following table describes the Audit.EntityFramework output fields:
 | **Valid** | boolean | Bolean indicating if the entity passes the validations |
 | **ValidationResults** | Array of string | The validation messages when the entity validation fails |
 
-###ChangeObject
+- ###[ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **ColumnName** | string | The column name that was updated |
@@ -178,7 +180,7 @@ using(var context = new MyEntitites())
 Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions).
 
 ##Output samples
-This is an example of the output for a failed insert operation:
+- Output sample for a failed insert operation:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
@@ -219,7 +221,7 @@ This is an example of the output for a failed insert operation:
 }
 ```
 
-Output example for a successful update+delete operation within a transaction:
+- Output sample for a successful update+delete operation within a transaction:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
