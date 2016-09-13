@@ -104,7 +104,7 @@ With this information, you can not just know who did the operation, but also mea
 
 The following table describes the Audit.Wcf output fields:
 
-- ###[AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs) 
+####[AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs) 
 
 Describes an audited WCF event
 
@@ -125,7 +125,7 @@ Describes an audited WCF event
 | InputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Input parameters object values |
 | OutputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Output parameters object values |
 
-- ###[AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)
+###[AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)
 
 Describes a WCF fault/exception
 
@@ -148,10 +148,5 @@ Describes an element/object related to the WCF audit event.
 | Value | Object | The object value |
 
 
-
-
-
-
------ HERE ------------
 
 
