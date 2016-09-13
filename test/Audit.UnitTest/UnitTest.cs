@@ -191,6 +191,10 @@ namespace Audit.UnitTest
         [Fact]
         public void TestDiscard()
         {
+            
+            
+                
+
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;

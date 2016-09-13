@@ -10,8 +10,8 @@ namespace Audit.WCF
         /// <param name="auditEvent">The audit event.</param>
         public static AuditWcfEvent GetWcfAuditAction(this AuditEvent auditEvent)
         {
-            return auditEvent.CustomFields.ContainsKey(Configuration.CustomFieldName) 
-                ? auditEvent.CustomFields[Configuration.CustomFieldName] as AuditWcfEvent
+            return auditEvent.CustomFields.ContainsKey(AuditBehavior.CustomFieldName) 
+                ? auditEvent.CustomFields[AuditBehavior.CustomFieldName] as AuditWcfEvent
                 : null;
         }
     }

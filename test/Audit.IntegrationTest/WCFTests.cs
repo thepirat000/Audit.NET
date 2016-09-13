@@ -45,7 +45,6 @@ namespace Audit.IntegrationTest
                 return Guid.NewGuid();
             });
 
-
             Audit.Core.Configuration.Setup()
                     .UseCustomProvider(provider.Object);
 
@@ -143,11 +142,11 @@ namespace Audit.IntegrationTest
         public GetOrderResponse GetOrder(GetOrderRequest request)
         {
             var rnd = new Random();
-            var ctx1 = Audit.WCF.Configuration.CurrentAuditScope;
+            var ctx1 = Audit.WCF.AuditBehavior.CurrentAuditScope;
             Thread.Sleep(rnd.Next(2, 100));
             ctx1.SetCustomField("Test-Field-1", request.OrderId);
             Thread.Sleep(rnd.Next(2, 100));
-            var ctx2 = Audit.WCF.Configuration.CurrentAuditScope;
+            var ctx2 = Audit.WCF.AuditBehavior.CurrentAuditScope;
             ctx2.SetCustomField("Test-Field-2", request.OrderId);
 
             return new GetOrderResponse()

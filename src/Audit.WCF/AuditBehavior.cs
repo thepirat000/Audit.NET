@@ -1,3 +1,4 @@
+using Audit.Core;
 using System;
 using System.Configuration;
 using System.ServiceModel.Configuration;
@@ -5,10 +6,38 @@ using System.ServiceModel.Configuration;
 namespace Audit.WCF
 {
     /// <summary>
-    /// AuditBehavior element for web.config behavior configuration.
+    /// AuditBehavior element for Audit.Wcf behavior configuration.
     /// </summary>
     public class AuditBehavior : BehaviorExtensionElement
     {
+        private const string WcfContextScopeKey = "AuditScope";
+        internal const string CustomFieldName = "WcfEvent";
+
+        /// <summary>
+        /// Gets the current audit scope for the running thread.
+        /// Get this property from an audited WCF method to get the current audit scope.
+        /// </summary>
+        public static AuditScope CurrentAuditScope
+        {
+            get
+            {
+                object auditScope;
+                WcfOperationContext.Current.Items.TryGetValue(WcfContextScopeKey, out auditScope);
+                return auditScope as AuditScope;
+            }
+            internal set
+            {
+                if (value == null)
+                {
+                    WcfOperationContext.Current.Items.Remove(WcfContextScopeKey);
+                }
+                else
+                {
+                    WcfOperationContext.Current.Items[WcfContextScopeKey] = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the event type.
         /// Can contain the following placeholders:

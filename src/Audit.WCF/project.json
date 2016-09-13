@@ -1,5 +1,5 @@
 {
-  "title": "Audit.WCF",
+  "title": "Audit.Wcf",
   "copyright": "Copyright 2016",
   "description": "Generate detailed Audit Logs for WCF service calls.",
   "version": "4.1.0-*",

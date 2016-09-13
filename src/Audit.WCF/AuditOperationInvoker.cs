@@ -59,22 +59,22 @@ namespace Audit.WCF
             var eventType = _eventType.Replace("{contract}", auditWcfEvent.ContractName).Replace("{operation}", auditWcfEvent.OperationName);
             var auditScope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual, GetAuditDataProvider(instance));
             // Set the initial WcfEvent data
-            auditScope.SetCustomField(Configuration.CustomFieldName, auditWcfEvent);
+            auditScope.SetCustomField(AuditBehavior.CustomFieldName, auditWcfEvent);
             // Store a reference to this audit scope on a thread static field
-            Configuration.CurrentAuditScope = auditScope;
+            AuditBehavior.CurrentAuditScope = auditScope;
             try
             {
                 result = _baseInvoker.Invoke(instance, inputs, out outputs);
             }
             catch (Exception ex)
             {
-                Configuration.CurrentAuditScope = null;
+                AuditBehavior.CurrentAuditScope = null;
                 auditWcfEvent.Fault = GetWcfFaultData(ex);
                 auditWcfEvent.Success = false;
                 SaveAuditScope(auditScope, auditWcfEvent);
                 throw;
             }
-            Configuration.CurrentAuditScope = null;
+            AuditBehavior.CurrentAuditScope = null;
             auditWcfEvent.OutputParameters = GetEventElements(outputs);
             auditWcfEvent.Result = new AuditWcfEventElement(result);
             SaveAuditScope(auditScope, auditWcfEvent);
@@ -144,7 +144,7 @@ namespace Audit.WCF
 
         private void SaveAuditScope(AuditScope auditScope, AuditWcfEvent auditWcfEvent)
         {
-            auditScope.SetCustomField(Configuration.CustomFieldName, auditWcfEvent);
+            auditScope.SetCustomField(AuditBehavior.CustomFieldName, auditWcfEvent);
             auditScope.Save();
         }
 
