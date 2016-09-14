@@ -27,13 +27,13 @@ namespace Audit.WCF
         [JsonProperty(Order = 90)]
         public string HostAddress { get; set; }
         [JsonProperty(Order = 100)]
-        public bool Success { get; set; }
-        [JsonProperty(Order = 110, NullValueHandling = NullValueHandling.Ignore)]
-        public AuditWcfEventFault Fault { get; set; }
-        [JsonProperty(Order = 120)]
-        public AuditWcfEventElement Result { get; set; }
-        [JsonProperty(Order = 130)]
         public List<AuditWcfEventElement> InputParameters { get; set; }
+        [JsonProperty(Order = 110)]
+        public bool Success { get; set; }
+        [JsonProperty(Order = 120, NullValueHandling = NullValueHandling.Ignore)]
+        public AuditWcfEventFault Fault { get; set; }
+        [JsonProperty(Order = 130)]
+        public AuditWcfEventElement Result { get; set; }
         [JsonProperty(Order = 140, NullValueHandling = NullValueHandling.Ignore)]
         public List<AuditWcfEventElement> OutputParameters { get; set; }
     }
