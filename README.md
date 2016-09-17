@@ -40,11 +40,12 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track. This object is passed as an `Action<object>` to allow the library to inspect the value at the beggining and at the end of the scope.
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track. This object is passed as an `Action<object>` to allow the library to inspect the value at the beggining and at the end of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 It is not mandatory to use a `using` block, but it simplifies the syntax allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
-If you are not tracking an specific object change, you can use the `CreateAndSave` shortcut method that creates and saves an event immediately. For example:
+If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
+For example:
 ```c#
 AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
 ```
@@ -126,7 +127,7 @@ The following tables describes the output fields:
 
 The `AuditScope` object provides two methods to extend the event output.
 
-- With `SetCustomField()` you can store any object state as a custom field.
+- With `SetCustomField()` you can store any object as a custom field.
 
 - With `Comment()` you can add textual comments to the event.
 
@@ -189,9 +190,9 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 
 ##Discard option
 
-The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain conditions.
+The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain condition.
 
-For example, if you want to avoid saving the audit event if an exception is thrown:
+For example, if you want to avoid saving the audit event when an exception is thrown:
 
 ```c#
 using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
@@ -315,7 +316,7 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 
 ## Configuration Fluent API
-Alternatively to the properties/methods mentioned before,  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
+Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
 ```c#
