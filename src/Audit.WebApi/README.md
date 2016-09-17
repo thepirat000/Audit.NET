@@ -15,7 +15,7 @@ PM> Install-Package Audit.WebApi
 
 ## Usage
 
-Decorate with an `AuditApiAttribute` the Web Api methods you want to audit. 
+Decorate with `AuditApi` attribute the Web Api methods/controllers you want to audit. 
 
 For example:
 
@@ -37,9 +37,9 @@ public class UsersController : ApiController
 }
 ```
 
-You can also decorate the controller class with the `AuditApiAttribute` so it will apply to all the actions, for example:
+You can also decorate the controller class with the `AuditApi` attribute so it will apply to all the actions, for example:
 ```c#
-[AuditApi(EventTypeName = "{action}/{controller}", IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+[AuditApi(EventTypeName = "{controller}/{action} ({verb})", IncludeResponseBody = true, IncludeModelState = true)]
 public class UsersController : ApiController
 {
     public IEnumerable<ApplicationUser> Get()
@@ -56,11 +56,11 @@ public class UsersController : ApiController
 
 ## Configuration
 
-The `AuditApiAttribute` can be configured with the following properties:
+The `AuditApi` attribute can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
- - {controller}: replaced with the controller name.
- - {action}: replaced with the action method name.
- - {verb}: replaced with the HTTP verb used (GET, POST, etc).
+  - \{controller}: replaced with the controller name.
+  - \{action}: replaced with the action method name.
+  - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not.
 - **IncludeResponseBody**: Boolean to indicate whether to include response body or not.
 - **IncludeModelState**: Boolean to indicate whether to include the Model State info or not.
@@ -110,7 +110,7 @@ The following table describes the Audit.WebApi output fields:
 
 ## Customization
 
-You can access the Audit Scope from the API controller action by calling the ApiController extension method `GetCurrentAuditScope()`. 
+You can access the Audit Scope from the API controller action by calling the ApiController extension method `GetCurrentAuditScope()`.
 
 For example:
 ```c#
