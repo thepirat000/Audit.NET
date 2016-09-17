@@ -5,14 +5,18 @@ Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence
 
 With Audit.NET you can generate tracking information about operations being executed. It will automatically log environmental information such as the caller user id, machine name, method name, exceptions, including the execution time and duration, exposing an extensible mechanism in which you can provide extra information or implement your persistence mechanism for the audit logs.
 
-##Install
+Extensions to log to a File, Event Log, SQL, MongoDB and DocumentDB are provided. 
+And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
+See [Extensions](#extensions) section for more information.
+
+## Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.NET/)**
 ```
 PM> Install-Package Audit.NET
 ```
 
-##Usage
+## Usage
 
 Surround the operation code you want to audit with a `using` block that creates an `AuditScope` indicating the object to track.
 
@@ -86,11 +90,11 @@ An example of the output in JSON:
 }
 ```
 
-#Output details
+## Output details
 
 The following tables describes the output fields:
 
-- ###[AuditEvent object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEvent.cs)
+- ### [AuditEvent object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **EventType** | string | User-defined string to group the events |
@@ -101,7 +105,7 @@ The following tables describes the output fields:
 | **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
 
-- ###[Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
+- ### [Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **UserName** | string | Current logged user name |
@@ -111,14 +115,14 @@ The following tables describes the output fields:
 | **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown) |
 | **Culture** | string | Current culture identifier |
 
-- ###[Target object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditTarget.cs)
+- ### [Target object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditTarget.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Type** | string | Tracked object type name |
 | **Old** | Object | Value of the tracked object at the beginning of the event |
 | **New** | Object | Value of the tracked object at the end of the event |
 
-##Custom Fields and Comments
+## Custom Fields and Comments
 
 The `AuditScope` object provides two methods to extend the event output.
 
@@ -205,7 +209,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 }
 ```
 
-##Event output
+## Event output
 
 You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File, EventLog, [MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb), [SQL](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver), [DocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb)), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
@@ -217,7 +221,7 @@ public class MyFileDataProvider : AuditDataProvider
         // AuditEvent provides a ToJson() method
         string json = auditEvent.ToJson();
         // Write the json representation of the event to a randomly named file
-        var fileName = Guid.NewGuid().ToString() + ".json";
+        var fileName = "Log" + Guid.NewGuid().ToString() + ".json";
         File.WriteAllText(fileName, json);
         return fileName;
     }
@@ -234,7 +238,7 @@ public class MyFileDataProvider : AuditDataProvider
 The `InsertEvent` method should return a unique ID for the event. 
 The `ReplaceEvent` method should update an event given its ID, this method is only called when the [Creation Policy](#event-creation-policy) is set to **Manual** or **InsertOnStartReplaceOnEnd**.
 
-##Event Creation Policy
+## Event Creation Policy
 
 The audit scope can be configured to persist the event in different ways:
 - **Insert on End:** (**default**)
@@ -260,9 +264,9 @@ using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolic
 
 If you don't provide a Creation Policy, the default Creation Policy configured will be used (see next section).
 
-##Configuration
+## Configuration
 
-###Data provider
+### Data provider
 To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set your own provider as the default data provider:
@@ -270,7 +274,7 @@ For example, to set your own provider as the default data provider:
 Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 ```
 
-###Creation Policy
+### Creation Policy
 To change the default creation policy, set the static property `SetCreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
 
 For example, to set the default creation policy to Manual:
@@ -278,7 +282,7 @@ For example, to set the default creation policy to Manual:
 Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
 ```
 
-###Custom Actions
+### Custom Actions
 You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
 
 Call the static `AddCustomAction()` method on `Audit.Core.Configuration` class to attach a custom action. 
@@ -310,7 +314,7 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnScopeCreated`: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 
-##Configuration Fluent API
+## Configuration Fluent API
 Alternatively to the properties/methods mentioned before,  you can also configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
@@ -320,7 +324,7 @@ Audit.Core.Configuration.Setup()
     .WithCreationPolicy(EventCreationPolicy.Manual);
 ```
 
-##Configuration examples
+## Configuration examples
 - Use the file log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
 ```c#
 Audit.Core.Configuration.DataProvider = new FileDataProvider()
@@ -364,36 +368,38 @@ Audit.Core.Configuration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-#Extensions
+-----------
+
+# Extensions
 
 The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
 
 ![Audit.NET Extensions](http://i.imgur.com/O6zhqJV.jpg)
 
-- ###**[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
+- ### **[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
 Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior.
 
-- ###**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
+- ### **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
 Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 
-- ###**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
+- ### **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
 Generate detailed audit logs by decorating Web API Methods and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
-- ###**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
+- ### **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
 Generate detailed audit logs by decorating MVC Actions and Controllers with an attribute. Includes support for ASP.NET Core MVC.
 
-#Storage providers
+# Storage providers
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
 ![Storage providers](http://i.imgur.com/1MUCvFI.jpg)
 
-- ###**[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
+- ### **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format.
 
-- ###**[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
+- ### **[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)**
 Store the events in a Mongo DB Collection, in BSON format.
 
-- ###**[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
+- ### **[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
 

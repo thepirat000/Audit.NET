@@ -11,7 +11,7 @@
     "tags": [ "Audit", "Trail", "Log" ],
     "requireLicenseAcceptance": false,
     "files": [
-      "tools/Init.ps1"
+      "tools/Install.ps1"
     ]
   },
   "dependencies": {
