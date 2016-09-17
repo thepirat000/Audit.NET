@@ -263,7 +263,7 @@ using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolic
 }
 ```
 
-If you don't provide a Creation Policy, the default Creation Policy configured will be used (see next section).
+> If you don't provide a Creation Policy, the default Creation Policy configured will be used (see next section).
 
 ## Configuration
 
