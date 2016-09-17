@@ -72,8 +72,8 @@ For example:
 
 The `AuditBehavior` attribute or extension can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
- - {contract}: Replaced with the contract name (service interface name)
- - {operation}: Replaces with the operation name (service method name)
+  - \{contract}: Replaced with the contract name (service interface name)
+  - \{operation}: Replaces with the operation name (service method name)
 
 To globally configure the output persistence mechanism, use the `Audit.Core.Configuration` class. For more details please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 

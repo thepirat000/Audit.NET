@@ -110,7 +110,7 @@ The following table describes the Audit.WebApi output fields:
 
 ## Customization
 
-You can access the Audit Scope from the API controller action by calling the ApiController extension method `GetCurrentAuditScope()`.
+You can access the Audit Scope object for customization from the API controller action by calling the ApiController extension method `GetCurrentAuditScope()`.
 
 For example:
 ```c#

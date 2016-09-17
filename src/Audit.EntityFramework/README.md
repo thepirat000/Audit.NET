@@ -40,12 +40,12 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 The following settings can be configured per DbContext or globally:
 
 - **Mode**: To indicate the audit operation mode
- - _Opt-Out_: All the entities are tracked by default, except those explicitly ignored. (Default)
- - _Opt-In_: No entity is tracked by default, except those explicitly included.
+  - _Opt-Out_: All the entities are tracked by default, except those explicitly ignored. (Default)
+  - _Opt-In_: No entity is tracked by default, except those explicitly included.
 - **IncludeEntityObjects**: To indicate if the output should contain the complete entity object graphs. (Default is false)
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the context name). Can contain the following placeholders: 
-  - {context}: replaced with the Db Context type name.
-  - {database}: replaced with the database name.
+   - \{context}: replaced with the Db Context type name.
+   - \{database}: replaced with the database name.
 
 
 Change the settings by decorating your DbContext with the `AuditDbContext` attribute, for example:
