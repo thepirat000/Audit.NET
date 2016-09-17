@@ -1,4 +1,4 @@
-#Audit.WebApi
+# Audit.WebApi
 
 **ASP.NET Web API Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (An extensible framework to audit executing operations in .NET).
 
@@ -6,14 +6,14 @@ Generate Audit Trails for Web API calls.
 
 Audit.WebApi provides the infrastructure to log interactions with ASP.NET Web API Controllers. It can record action method calls with caller info and arguments.
 
-##Install
+## Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.WebApi/)**
 ```
 PM> Install-Package Audit.WebApi
 ```
 
-##Usage
+## Usage
 
 Decorate with an `AuditApiAttribute` the Web Api methods you want to audit. 
 
@@ -54,7 +54,7 @@ public class UsersController : ApiController
 }
 ```
 
-##Configuration
+## Configuration
 
 The `AuditApiAttribute` can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
@@ -68,7 +68,7 @@ The `AuditApiAttribute` can be configured with the following properties:
  
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
-##Output
+## Output
 
 Audit.WebApi output includes:
 
@@ -84,7 +84,7 @@ Audit.WebApi output includes:
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your API.
 
-##Output details
+## Output details
 
 The following table describes the Audit.WebApi output fields:
 
@@ -108,7 +108,7 @@ The following table describes the Audit.WebApi output fields:
 | **ModelStateErrors** | string | Error description when the model is invalid |
 | **Exception** | string | The exception thrown details (if any) |
 
-##Customization
+## Customization
 
 You can access the Audit Scope from the API controller action by calling the ApiController extension method `GetCurrentAuditScope()`. 
 
@@ -130,7 +130,7 @@ public class UsersController : ApiController
 
 See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
-###Output Sample
+### Output Sample
 
 ```javascript
 {

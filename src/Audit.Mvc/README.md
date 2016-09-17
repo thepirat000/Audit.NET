@@ -1,4 +1,4 @@
-#Audit.Mvc
+# Audit.Mvc
 
 **MVC Actions Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (An extensible framework to audit executing operations in .NET).
 
@@ -6,14 +6,14 @@ Generate Audit Trails for MVC actions. Supporting AspNetCore Mvc.
 
 Audit.Mvc provides the infrastructure to log interactions with MVC applications. It can record action methods calls with caller info and arguments.
 
-##Install
+## Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.Mvc/)**
 ```
 PM> Install-Package Audit.Mvc
 ```
 
-##Usage
+## Usage
 
 Decorate with an `AuditAttribute` the MVC Actions/Controllers you want to audit.
 
@@ -38,7 +38,7 @@ public class HomeController : Controller
 }
 ```
 
-##Configuration
+## Configuration
 
 The `AuditAttribute` can be configured with the following properties:
 - **EventType**: A string that identifies the event type. Can contain the following placeholders: 
@@ -50,7 +50,7 @@ The `AuditAttribute` can be configured with the following properties:
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
-##Output
+## Output
 
 Audit.Mvc output includes:
 
@@ -65,11 +65,11 @@ Audit.Mvc output includes:
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your application.
 
-##Output details
+## Output details
 
 The following table describes the Audit.Mvc output fields:
 
-- **[AuditAction object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/AuditAction.cs)**
+- ### [AuditAction object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/AuditAction.cs)
 
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
@@ -92,7 +92,7 @@ The following table describes the Audit.Mvc output fields:
 | **RedirectLocation** | string | The redirect location (if any) |
 | **Exception** | string | The exception thrown details (if any) |
 
-##Customization
+## Customization
 
 You can access the Audit Scope from the controller action by calling the Controller extension method `GetCurrentAuditScope()`. 
 
@@ -114,7 +114,7 @@ public class HomeController : Controller
 
 See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
-###Output Sample for Get operation
+### Output Sample for Get operation
 
 > `HomeController.Index` (GET) with params: id=1234567&name=test
 
@@ -149,7 +149,7 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 }
 ```
 
-###Output Sample for Post operation
+### Output Sample for Post operation
 
 > `HomeController.TestPost` (POST) with body: id=1234567&name=test
 

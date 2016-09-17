@@ -3,17 +3,17 @@
 
 Store the audit events in a Mongo DB Collection, in BSON format.
 
-##Install
+## Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.NET.MongoDB/)**
 ```
 PM> Install-Package Audit.NET.MongoDB
 ```
 
-##Usage
+## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
 
-##Configuration
+## Configuration
 Set the static `Audit.Core.Configuration.DataProvider` property to set the Mongo DB data provider, or call the `UseMongoDB` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
 For example:
@@ -35,14 +35,14 @@ Audit.Core.Configuration.Setup()
         .Collection("Event"));
 ```
 
-###Provider options
+### Provider options
 
 Mandatory:
 - **ConnectionString**: The [Mongo DB connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
 - **Database**: The audit Mango Database name.
 - **Collection**: The events Mongo Collection name.
 
-##Output sample
+## Output sample
 
 An example of the output as seen with [NoSQL Manager for Mongo DB](http://www.mongodbmanager.com/):
 

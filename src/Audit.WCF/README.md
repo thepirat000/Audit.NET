@@ -1,4 +1,4 @@
-#Audit.WCF
+# Audit.WCF
 
 **WCF Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 
@@ -6,14 +6,14 @@ Generate Audit Logs for Windows Communication Foundation (WCF) service calls.
 
 Audit.Wcf provides the server-side infrastructure to log interactions with WCF services. It can record service method calls with caller info and arguments.
 
-##Install
+## Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.Wcf/)**
 ```
 PM> Install-Package Audit.Wcf
 ```
 
-##Usage
+## Usage
 
 Decorate your WCF service class or methods with the `Audit.WCF.AuditBehavior` attribute.
 
@@ -68,7 +68,7 @@ For example:
 </configuration>
 ```
 
-##Configuration
+## Configuration
 
 The `AuditBehavior` attribute or extension can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
@@ -105,7 +105,7 @@ public class OrderService : IOrderService
 
 The library will automatically detect the property and use the given data provider for that service instance.
 
-##Output
+## Output
 
 Audit.Wcf output includes:
 
@@ -120,7 +120,7 @@ Audit.Wcf output includes:
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your WCF service.
 
-##Output details
+## Output details
 
 The following table describes the Audit.Wcf output fields:
 
@@ -167,7 +167,7 @@ Describes an element/object related to the WCF audit event.
 | Type | string | The object type name |
 | Value | Object | The object value |
 
-##Customization
+## Customization
 
 You can access the `AuditScope` object for customization from the audited methods, by the static property `Audit.WCF.AuditBehavior.CurrentAuditScope`. 
 
@@ -189,7 +189,7 @@ public class OrderService : IOrderService
 
 See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [Custom Field and Comments](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) for more information.
 
-###Output Sample
+### Output Sample
 
 ```javascript
 {

@@ -3,14 +3,14 @@
 
 Store the audit events in a SQL Table, in JSON format.
 
-##Install
+## Install
 
 **[NuGet Package](https://www.nuget.org/packages/Audit.NET.SqlServer/)**
 ```
 PM> Install-Package Audit.NET.SqlServer
 ```
 
-##Usage
+## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
 
 ##Configuration
@@ -40,7 +40,7 @@ Audit.Core.Configuration.Setup()
         .LastUpdatedColumnName("LastUpdatedDate"));
 ```
 
-###Provider Options
+### Provider Options
 
 Mandatory:
 - **ConnectionString**: The SQL Server connection string.
@@ -51,7 +51,7 @@ Mandatory:
 Optional:
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
 
-##Table constraints
+## Table constraints
 
 - The table should exists. 
 - The table should have a single ID column (Unique or Primary key).
