@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Audit.Core
@@ -23,6 +24,7 @@ namespace Audit.Core
         /// <param name="creationPolicy">The event creation policy to use.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
             AuditDataProvider dataProvider = null, 
             EventCreationPolicy? creationPolicy = null,
@@ -46,6 +48,9 @@ namespace Audit.Core
                 ? callingMethod.DeclaringType.FullName + "."
                 : "") + callingMethod.Name + "()";
             environment.AssemblyName = callingMethod.DeclaringType?.Assembly.FullName;
+#elif NETSTANDARD1_3
+            environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
+            environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
 #endif
             _event = new AuditEvent()
             {
@@ -119,7 +124,7 @@ namespace Audit.Core
         }
         #endregion
 
-        #region Private fields
+#region Private fields
         private EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
         private object _eventId;
@@ -280,6 +285,5 @@ namespace Audit.Core
         }
 
         #endregion
-
     }
 }

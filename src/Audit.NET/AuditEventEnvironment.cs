@@ -36,6 +36,7 @@ namespace Audit.Core
         /// <summary>
         /// The exception information (if any)
         /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Exception { get; set; }
 
         /// <summary>

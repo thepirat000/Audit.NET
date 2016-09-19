@@ -1,6 +1,6 @@
 {
   "title": "Audit.NET",
-  "version": "4.1.0-*",
+  "version": "4.2.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Generate tracking information about an operation being executed.",
