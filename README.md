@@ -253,7 +253,7 @@ The event (on its initial state) is saved when the scope is created, and then th
 Two versions of the event are saved, the initial when the scope is created, and the final when the scope is disposed.
 
 - **Manual:**
-The event saving (insert/replace) should be explicitly invoked by calling the `AuditScope.Save()` method.
+The event saving (insert/replace) should be explicitly invoked by calling the `Save()` method on the `AuditScope`.
 
 You can set the Creation Policy per-scope, for example to explicitly set the Creation Policy to Manual:
 ```c#
