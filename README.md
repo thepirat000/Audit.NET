@@ -42,7 +42,7 @@ using (AuditScope.Create("Order:Update", () => order))
 
 > It is not mandatory to use a `using` block, but it simplifies the syntax allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as an `Action<object>` to allow the library inspect the value at the beggining and at the end of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the end of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
@@ -278,7 +278,7 @@ Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 
 ### Creation Policy
 To change the default creation policy, set the static property `SetCreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
-
+ 
 For example, to set the default creation policy to Manual:
 ```c#
 Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
