@@ -18,7 +18,9 @@ Set the static `Audit.Core.Configuration.DataProvider` property to set the Mongo
 
 For example:
 ```c#
-Audit.Core.Configuration.DataProvider = new Audit.MongoDB.Providers.MongoDataProvider()
+using Audit.MongoDB.Providers;
+//...
+Audit.Core.Configuration.DataProvider = new MongoDataProvider()
 {
     ConnectionString = "mongodb://localhost:27017",
     Database = "Audit",
