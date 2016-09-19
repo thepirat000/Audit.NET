@@ -41,7 +41,7 @@ Audit.Core.Configuration.Setup()
 
 Mandatory:
 - **ConnectionString**: The [Mongo DB connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
-- **Database**: The audit Mango Database name.
+- **Database**: The audit Mongo Database name.
 - **Collection**: The events Mongo Collection name.
 
 ## Output sample
