@@ -394,7 +394,7 @@ Generate detailed audit logs by decorating MVC Actions and Controllers with an a
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
-![Storage providers](http://i.imgur.com/1MUCvFI.jpg)
+![Storage providers](http://i.imgur.com/hOnJyvM.png)
 
 - ### **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format.
@@ -404,4 +404,7 @@ Store the events in a Mongo DB Collection, in BSON format.
 
 - ### **[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)**
 Store the events in an Azure Document DB Collection, in JSON format.
+
+- ### **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)**
+Store the events in an Azure Blob Storage container, in JSON format.
 
