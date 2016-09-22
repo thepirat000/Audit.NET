@@ -28,8 +28,6 @@ Audit.Core.Configuration.DataProvider = new Audit.MongoDB.Providers.MongoDataPro
 
 Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
 ```c#
-using Audit.MongoDB.ConfigurationApi;
-//...
 Audit.Core.Configuration.Setup()
     .UseMongoDB(config => config
         .ConnectionString("mongodb://localhost:27017")
