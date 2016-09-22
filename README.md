@@ -370,19 +370,6 @@ Audit.Core.Configuration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-- Initialization to use the file log provider with a custom _directory path_ depending on the event date, and a custom _file prefix_ depending on the username:
-```c#
-Audit.Core.Configuration.Setup()
-    .UseFileLogProvider()
-    .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
-    .WithAction(x => x.OnScopeCreated(scope =>
-    {
-        var fdp = scope.DataProvider as Audit.Core.Providers.FileDataProvider;
-        fdp.DirectoryPath = string.Format(@"C:\AuditLogs\{0:yyyy-MM-dd}", scope.Event.StartDate);
-        fdp.FilenamePrefix = scope.Event.Environment.UserName + "_";
-    }));
-```
-
 -----------
 
 # Extensions
