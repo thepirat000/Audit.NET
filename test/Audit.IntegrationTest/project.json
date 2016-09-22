@@ -25,6 +25,7 @@
         "Audit.NET": { "target": "project" },
         "Audit.NET.MongoDB": { "target": "project" },
         "Audit.NET.SqlServer": { "target": "project" },
+        "Audit.NET.AzureStorage": { "target": "project" },
         "Audit.EntityFramework": { "target": "project" }
       }
     },
@@ -33,6 +34,7 @@
         "Audit.NET": { "target": "project" },
         "Audit.NET.MongoDB": { "target": "project" },
         "Audit.NET.SqlServer": { "target": "project" },
+        "Audit.NET.AzureStorage": { "target": "project" },
         "Audit.NET.AzureDocumentDB": { "target": "project" },
         "Audit.EntityFramework": { "target": "project" },
         "Audit.WCF": { "target": "project" },

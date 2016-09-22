@@ -17,34 +17,56 @@ namespace Audit.MongoDB.Providers
     /// - ConnectionString: Mongo connection string
     /// - Database: Database name
     /// - Collection: Collection name
+    /// - IgnoreElementNames: indicate whether the element names should be validated and fixed or not
     /// </remarks>
     public class MongoDataProvider : AuditDataProvider
     {
         private string _connectionString = "mongodb://localhost:27017";
         private string _database = "Audit";
         private string _collection = "Event";
+        private bool _ignoreElementNames = false;
 
         static MongoDataProvider()
         {
             ConfigureBsonMapping();
         }
 
+        /// <summary>
+        /// Gets or sets the MongoDB connection string.
+        /// </summary>
         public string ConnectionString
         {
             get { return _connectionString; }
             set { _connectionString = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the MongoDB Database name.
+        /// </summary>
         public string Database
         {
             get { return _database; }
             set { _database = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the MongoDB collection name.
+        /// </summary>
         public string Collection
         {
             get { return _collection; }
             set { _collection = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value to indicate whether the element names should be validated/fixed or not.
+        /// If <c>true</c> the element names are not validated, use this when you know the element names will not contain invalid characters.
+        /// If <c>false</c> (default) the element names are validated and fixed to avoid containing invalid characters.
+        /// </summary>
+        public bool IgnoreElementNames
+        {
+            get { return _ignoreElementNames; }
+            set { _ignoreElementNames = value; }
         }
 
         private static void ConfigureBsonMapping()
@@ -73,7 +95,10 @@ namespace Audit.MongoDB.Providers
             var col = db.GetCollection<BsonDocument>(_collection);
             SerializeExtraFields(auditEvent);
             var doc = auditEvent.ToBsonDocument();
-            FixDocumentElementNames(doc);
+            if (!_ignoreElementNames)
+            {
+                FixDocumentElementNames(doc);
+            }
             col.InsertOne(doc);
             return (BsonObjectId)doc["_id"];
         }
@@ -84,7 +109,10 @@ namespace Audit.MongoDB.Providers
             var col = db.GetCollection<BsonDocument>(_collection);
             SerializeExtraFields(auditEvent);
             var doc = auditEvent.ToBsonDocument();
-            FixDocumentElementNames(doc);
+            if (!_ignoreElementNames)
+            {
+                FixDocumentElementNames(doc);
+            }
             col.ReplaceOne(d => d["_id"] == (BsonObjectId)eventId, doc);
         }
 

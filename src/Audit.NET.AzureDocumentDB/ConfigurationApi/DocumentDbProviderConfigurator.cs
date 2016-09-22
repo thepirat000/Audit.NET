@@ -1,4 +1,4 @@
-namespace Audit.AzureDocumentDB.Configuration
+namespace Audit.AzureDocumentDB.ConfigurationApi
 {
     public class DocumentDbProviderConfigurator : IDocumentDbProviderConfigurator
     {

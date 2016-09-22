@@ -8,8 +8,10 @@ using Audit.SqlServer.Providers;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using Audit.MongoDB.ConfigurationApi;
+using Audit.AzureTableStorage.ConfigurationApi;
 #if NET451
 using Audit.AzureDocumentDB.Providers;
+using Audit.AzureDocumentDB.ConfigurationApi;
 #endif
 
 namespace Audit.IntegrationTest
@@ -42,6 +44,15 @@ namespace Audit.IntegrationTest
             public void TestFile()
             {
                 SetFileSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Fact]
+            public void TestAzureBlob()
+            {
+                SetAzureBlobSettings();
                 TestUpdate();
                 TestInsert();
                 TestDelete();
@@ -193,9 +204,18 @@ namespace Audit.IntegrationTest
             public void SetFileSettings()
             {
                 Audit.Core.Configuration.Setup()
-                    .UseFileLogProvider(config => config.Directory(@"c:\temp\1").FilenamePrefix("Event_"))
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
+                    .UseFileLogProvider(fl => fl.FilenamePrefix("Test").Directory(@"C:\temp\1"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+            }
+
+            public void SetAzureBlobSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseAzureBlobStorage(config => config
+                        .ConnectionString("DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=KcPvvF2rRAXigVvDnImAMbU1vLevot6dvA9cmF5FK93RAheds9lqy4KTxOLIpTwKUYZ3uM4LozF+/mVWRofXUg==")
+                        .ContainerName("event")
+                        .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
             public void SetSqlSettings()

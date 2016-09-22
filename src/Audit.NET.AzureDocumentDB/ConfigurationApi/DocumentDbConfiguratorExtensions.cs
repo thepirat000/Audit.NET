@@ -1,8 +1,7 @@
-﻿using Audit.AzureDocumentDB.Providers;
-using Audit.Core;
+﻿using Audit.AzureDocumentDB.ConfigurationApi;
+using Audit.AzureDocumentDB.Providers;
 using Audit.Core.ConfigurationApi;
 using System;
-using Audit.AzureDocumentDB.Configuration;
 
 namespace Audit.Core
 {

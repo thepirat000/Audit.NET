@@ -1,9 +1,9 @@
 ﻿using System;
 using Audit.MongoDB.Providers;
 using Audit.Core.ConfigurationApi;
-using Audit.Core;
+using Audit.MongoDB.ConfigurationApi;
 
-namespace Audit.MongoDB.ConfigurationApi
+namespace Audit.Core
 {
     public static class MongoConfiguratorExtensions
     {
