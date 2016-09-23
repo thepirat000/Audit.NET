@@ -360,16 +360,7 @@ Audit.Core.Configuration.Setup()
         .FilenameBuilder(auditEvent => $"{auditEvent.Environment.UserName}_{DateTime.Now.Ticks}.json"));
 ```
 
-- Event log provider with an InsertOnEnd creation policy:
-```c#
-Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
-{
-    SourcePath = "My Audited Application",
-    LogName = "Application"
-};
-Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
-```
-Or by using the fluent API:
+- Event log provider with an InsertOnEnd creation policy (fluent API):
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
