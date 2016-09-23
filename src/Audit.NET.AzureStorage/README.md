@@ -21,7 +21,7 @@ For example:
 Audit.Core.Configuration.DataProvider = new AzureBlobDataProvider()
 {
     ConnectionString = "DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key",
-    ContainerName = "events",
+    ContainerName = "event",
     BlobNameBuilder = ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"
 };
 ```
@@ -31,7 +31,7 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 Audit.Core.Configuration.Setup()
     .UseAzureBlobStorage(config => config
         .ConnectionString("DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key")
-        .ContainerName("events")
+        .ContainerName("event")
         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"));
 ```
 
@@ -40,6 +40,14 @@ Audit.Core.Configuration.Setup()
 Mandatory:
 - **ConnectionString**: The Azure Storage connection string.
 - **ContainerName**: The container name to use (see the naming restrictions [here](https://azure.microsoft.com/en-us/documentation/articles/storage-dotnet-how-to-use-blobs/)).
-- **BlobNameBuilder**: A function that takes an Audit Event and returns a unique blob name for the event. The resulting name can include path information (slash separated sub-folders).
+
+Optional:
+- **BlobNameBuilder**: A function that takes an Audit Event and returns a unique blob name for the event. The resulting name can include path information (slash separated sub-folders). By default, a random Guid is used as the blob name.
+
+## Output sample
+
+An example of the output as seen with [Microsoft Azure Storage Explorer](http://storageexplorer.com/):
+
+![AzureStorage sample 1](http://i.imgur.com/XLKluLn.jpg)
 
 
