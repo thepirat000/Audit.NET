@@ -17,7 +17,8 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         /// <param name="directoryPath">Specifies the directory where to store the audit log files.</param>
         /// <param name="filenamePrefix">Specifies the filename prefix to use in the audit log files.</param>
-        ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = null, string filenamePrefix = null);
+        ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = null, string filenamePrefix = null, Func<AuditEvent, string> directoryPathBuilder = null,
+            Func<AuditEvent, string> filenameBuilder = null);
 #if NET45
         /// <summary>
         /// Store the events in the windows Event Log.

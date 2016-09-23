@@ -196,7 +196,7 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
                         .ConnectionString("https://thepirat.documents.azure.com:443/")
-                        .AuthKey("xxxxx=="))
+                        .AuthKey("xxxxxxx=="))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
@@ -204,7 +204,9 @@ namespace Audit.IntegrationTest
             public void SetFileSettings()
             {
                 Audit.Core.Configuration.Setup()
-                    .UseFileLogProvider(fl => fl.FilenamePrefix("Test").Directory(@"C:\temp\1"))
+                    .UseFileLogProvider(fl => fl
+                        .FilenameBuilder(_ => $"{_.Environment.UserName}_{DateTime.Now.Ticks}.json")
+                        .DirectoryBuilder(_ => $@"C:\Temp\Logs\{DateTime.Now:yyyy-MM-dd}"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
@@ -212,7 +214,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureBlobStorage(config => config
-                        .ConnectionString("DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=KcPvvF2rRAXigVvDnImAMbU1vLevot6dvA9cmF5FK93RAheds9lqy4KTxOLIpTwKUYZ3uM4LozF+/mVWRofXUg==")
+                        .ConnectionString("xxxxxxxxxx")
                         .ContainerName("event")
                         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);

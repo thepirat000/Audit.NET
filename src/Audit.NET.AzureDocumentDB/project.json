@@ -1,6 +1,6 @@
 {
   "title": "Audit.AzureDocumentDB",
-  "version": "4.3.0-*",
+  "version": "4.4.0-*",
   "copyright": "Copyright 2016",
   "authors": [ "Federico Colombo" ],
   "description": "Store Audit.NET Trail Logs into an Azure Document DB database",

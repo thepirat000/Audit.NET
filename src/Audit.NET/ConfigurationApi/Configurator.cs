@@ -9,7 +9,7 @@ namespace Audit.Core.ConfigurationApi
         {
             var fileLogConfig = new FileLogProviderConfigurator();
             config.Invoke(fileLogConfig);
-            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix);
+            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix, fileLogConfig._directoryPathBuilder, fileLogConfig._filenameBuilder);
         }
         public ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider)
         {
@@ -34,12 +34,15 @@ namespace Audit.Core.ConfigurationApi
             return UseEventLogProvider(eventLogConfig._logName, eventLogConfig._sourcePath, eventLogConfig._machineName);
         }
 #endif
-        public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "")
+        public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "", 
+            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null)
         {
             Configuration.DataProvider = new FileDataProvider()
             {
                 DirectoryPath = directoryPath,
-                FilenamePrefix = filenamePrefix
+                FilenamePrefix = filenamePrefix,
+                DirectoryPathBuilder = directoryPathBuilder,
+                FilenameBuilder = filenameBuilder
             };
             return new CreationPolicyConfigurator();
         }

@@ -48,7 +48,7 @@ namespace Audit.IntegrationTest
             Audit.Core.Configuration.Setup()
                     .UseCustomProvider(provider.Object);
 
-            var basePipeAddress = new Uri(@"http://localhost/test/");
+            var basePipeAddress = new Uri(@"http://localhost:14285/test/");
             using (var host = new ServiceHost(typeof(OrderService), basePipeAddress))
             {
                 var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
