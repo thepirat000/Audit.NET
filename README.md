@@ -327,7 +327,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 ## Configuration examples
-- Use the file log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
+- File log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
 ```c#
 Audit.Core.Configuration.DataProvider = new FileDataProvider()
 {
@@ -352,15 +352,15 @@ Audit.Core.Configuration.Setup()
     .WithAction(x => x.OnScopeCreated(scope => scope.SetCustomField("ApplicationId", "MyApplication")));
 ```
 
-- Initialization to use the file log provider with dynamic directory path and filename (fluent API):
+- File log provider with dynamic directory path and filename (fluent API):
 ```c#
 Audit.Core.Configuration.Setup()
     .UseFileLogProvider(config => config
-        .DirectoryBuilder(_ => $@"C:\Temp\Logs\{DateTime.Now:yyyy-MM-dd}")
+        .DirectoryBuilder(_ => $@"C:\Logs\{DateTime.Now:yyyy-MM-dd}")
         .FilenameBuilder(auditEvent => $"{auditEvent.Environment.UserName}_{DateTime.Now.Ticks}.json"));
 ```
 
-- Initialization to use the event log provider with an InsertOnEnd creation policy:
+- Event log provider with an InsertOnEnd creation policy:
 ```c#
 Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
 {
