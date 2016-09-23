@@ -5,7 +5,7 @@ Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence
 
 With Audit.NET you can generate tracking information about operations being executed. It will automatically log environmental information such as the caller user id, machine name, method name, exceptions, including the execution time and duration, exposing an extensible mechanism in which you can provide extra information or implement your persistence mechanism for the audit logs.
 
-Extensions to log to a File, Event Log, SQL, MongoDB and DocumentDB are provided. 
+Extensions to log to a File, Event Log, SQL, MongoDB, AzureBlob and DocumentDB are provided. 
 And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
 See [Extensions](#extensions) section for more information.
 
@@ -213,7 +213,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 
 ## Event output
 
-You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (such as File, EventLog, [MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb), [SQL](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver), [DocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb)), or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (File, EventLog, [MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb), [SQL](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver), [DocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb), [AzureBlobStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage)) or by injecting your own persistence mechanism, creating a class that inherits from `AuditDataProvider`, for example:
 
 ```c#
 public class MyFileDataProvider : AuditDataProvider
@@ -327,7 +327,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 ## Configuration examples
-- Use the file log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
+- File log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
 ```c#
 Audit.Core.Configuration.DataProvider = new FileDataProvider()
 {
@@ -352,16 +352,15 @@ Audit.Core.Configuration.Setup()
     .WithAction(x => x.OnScopeCreated(scope => scope.SetCustomField("ApplicationId", "MyApplication")));
 ```
 
-- Initialization to use the event log provider with an InsertOnEnd creation policy:
+- File log provider with dynamic directory path and filename (fluent API):
 ```c#
-Audit.Core.Configuration.DataProvider = new EventLogDataProvider()
-{
-    SourcePath = "My Audited Application",
-    LogName = "Application"
-};
-Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+Audit.Core.Configuration.Setup()
+    .UseFileLogProvider(config => config
+        .DirectoryBuilder(_ => $@"C:\Logs\{DateTime.Now:yyyy-MM-dd}")
+        .FilenameBuilder(auditEvent => $"{auditEvent.Environment.UserName}_{DateTime.Now.Ticks}.json"));
 ```
-Or by using the fluent API:
+
+- Event log provider with an InsertOnEnd creation policy (fluent API):
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
