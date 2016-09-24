@@ -26,7 +26,7 @@ public class MyEntities : DbContext
 }
 ```
 
-to enable the audit log, you should change it to this:
+to enable the audit log, you should change it to inherit from `AuditDbContext`:
 ```c#
 public class MyEntities : Audit.EntityFramework.AuditDbContext
 {
