@@ -16,7 +16,7 @@ PM> Install-Package Audit.EntityFramework
 ## Usage
 Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
 
-For example if you have a context like this:
+For example, if you have a context like this:
 
 ```c#
 public class MyEntities : DbContext
