@@ -221,7 +221,7 @@ Another way to customize the output is by using global custom actions, please se
 }
 ```
 
-- Output sample for a successful update+delete operation within a transaction:
+- Output sample for a successful multiple operation (update+delete) within a transaction:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
