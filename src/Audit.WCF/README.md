@@ -116,7 +116,7 @@ Audit.Wcf output includes:
 - Method parameters (in and out)
 - Response object
 - Faults and Exceptions details
-- Comments and Custom Fields provided
+- [Comments and Custom Fields](#custom-fields-and-comments) provided
 
 With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your WCF service.
 
