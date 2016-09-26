@@ -9,7 +9,8 @@
     "owners": [ "ThePirat" ],
     "summary": "Document DB provider for Audit.NET library. Store Audit Logs into Azure Document DB.",
     "tags": [ "Audit", "Trail", "Log", "Azure", "DocumentDB" ],
-    "requireLicenseAcceptance": false
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/yeBZZiP.png"
   },
   "dependencies": {
     "Audit.NET": { "target": "project" }

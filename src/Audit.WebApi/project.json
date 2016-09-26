@@ -9,7 +9,8 @@
     "owners": [ "ThePirat" ],
     "summary": "Generate detailed Audit Logs for ASP.NET Web API Controller calls.",
     "tags": [ "Audit", "Trail", "Log", "WebApi" ],
-    "requireLicenseAcceptance": false
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/GkqLSk8.png"
   },
   "dependencies": {
     "Audit.NET": { "target": "project" }

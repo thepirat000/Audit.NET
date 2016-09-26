@@ -9,7 +9,8 @@
     "owners": [ "ThePirat" ],
     "summary": "Azure Blob Storage provider for Audit.NET library. Store Audit Logs into an Azure Blob container.",
     "tags": [ "Audit", "Trail", "Log", "Azure", "Blob", "BlobStorage" ],
-    "requireLicenseAcceptance": false
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/ouaw5CX.png"
   },
   "dependencies": {
     "Audit.NET": { "target": "project" },

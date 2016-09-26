@@ -9,7 +9,8 @@
     "owners": [ "ThePirat" ],
     "summary": "Generate detailed Audit Logs for EntityFramework CRUD operations.",
     "tags": [ "Audit", "Trail", "Log", "EntityFramework" ],
-    "requireLicenseAcceptance": false
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/T3NcXaZ.png"
   },
   "tools": {
     "Microsoft.EntityFrameworkCore.Tools": {

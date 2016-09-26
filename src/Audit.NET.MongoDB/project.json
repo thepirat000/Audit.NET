@@ -9,7 +9,8 @@
     "owners": [ "ThePirat" ],
     "summary": "MongoDB provider for Audit.NET library. Store Audit Logs into MongoDB.",
     "tags": [ "Audit", "Trail", "Log", "MongoDB" ],
-    "requireLicenseAcceptance": false
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/1nMVLQo.png"
   },
   "dependencies": {
     "Audit.NET": { "target": "project" }

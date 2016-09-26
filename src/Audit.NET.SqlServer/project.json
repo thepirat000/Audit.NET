@@ -9,7 +9,8 @@
     "owners": [ "ThePirat" ],
     "summary": "SQL Server provider for Audit.NET library. Store Audit Logs into a SQL Server database.",
     "tags": [ "Audit", "Trail", "Log", "SQL", "SqlServer" ],
-    "requireLicenseAcceptance": false
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/lmzs1gw.png"
   },
   "tools": {
     "Microsoft.EntityFrameworkCore.Tools": {

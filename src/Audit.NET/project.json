@@ -12,7 +12,8 @@
     "requireLicenseAcceptance": false,
     "files": [
       "tools/Install.ps1"
-    ]
+    ],
+    "iconUrl": "http://i.imgur.com/jQhfBSo.png"
   },
   "dependencies": {
     "Newtonsoft.Json": "9.0.1"
