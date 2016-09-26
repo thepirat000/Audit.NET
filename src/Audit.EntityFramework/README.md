@@ -16,7 +16,7 @@ PM> Install-Package Audit.EntityFramework
 ## Usage
 Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
 
-For example if you have a context like this:
+For example, if you have a context like this:
 
 ```c#
 public class MyEntities : DbContext
@@ -26,7 +26,7 @@ public class MyEntities : DbContext
 }
 ```
 
-to enable the audit log, you should change it to this:
+to enable the audit log, you should change it to inherit from `AuditDbContext`:
 ```c#
 public class MyEntities : Audit.EntityFramework.AuditDbContext
 {
@@ -221,7 +221,7 @@ Another way to customize the output is by using global custom actions, please se
 }
 ```
 
-- Output sample for a successful update+delete operation within a transaction:
+- Output sample for a successful multiple operation (update+delete) within a transaction:
 ```javascript
 {
 	"EventType": "Blogs_MyEntities",
