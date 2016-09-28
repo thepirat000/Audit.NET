@@ -377,6 +377,9 @@ The following packages are extensions to log interactions with different systems
 
 ![Audit.NET Extensions](http://i.imgur.com/O6zhqJV.jpg)
 
+- ### **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)**
+Generate detailed audit logs for any class without changing its code by using a proxy.
+
 - ### **[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)**
 Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior.
 
