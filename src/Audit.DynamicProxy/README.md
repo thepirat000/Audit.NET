@@ -16,7 +16,7 @@ PM> Install-Package Audit.DynamicProxy
 
 ## Usage
 
-To enable the audit log for an instance, create a proxy for the class by calling the `AuditProxy.Create<>()` method.
+To enable the audit log for an instance of a class, create a proxy for the class by calling the `AuditProxy.Create<>()` method.
 
 This will return a proxied _audit-enabled_ instance of the class that you should use in order to generate logs.
 
@@ -77,7 +77,7 @@ This is the method signature:
 `T AuditProxy.Create<T>(T instance, InterceptionSettings settings = null)`
 
 Give special attention to the generic type argument `T`, it can be:
-- **An interface**: Will generate an _interface proxy_ to log all the interface member calls.
+- **An interface**: Will generate an _interface proxy_ to log all the interface member calls. (Recommended)
 - **A class type**: Will generate a _class proxy_ to log virtual member calls. Non-virtual methods or fields can't be automatically audited. 
 
 The `instance` argument is an instance of the object to be audited.
@@ -93,7 +93,7 @@ The class `InterceptionSettings` provides access to the following settings:
   - \{method}: Replaced by the method name
 - **IgnoreProperties**: A boolean indicating whether the audit should ignore the property getters and setters.
  If _true_, the property accesses will not be logged. Default is _false_
- - **IgnoreEvents**: A boolean indicating whether the audit should ignore the event attach and detach operations.
+- **IgnoreEvents**: A boolean indicating whether the audit should ignore the event attach and detach operations.
  If _true_, the event accesses will not be logged. Default is _false_
 - **MethodFilter**: A function that takes a `MethodInfo` and returns a boolean indicating whether the method should be taken into account for the logging. Use this setting to have fine grained control over the methods that should be audited. By default all methods are included.
 - **AuditDataProvider**: Allows to set a specific audit data provider for this instance. By default the globally configured data provider is used. See [Audit.NET configuration](https://github.com/thepirat000/Audit.NET#data-provider) section for more information.
