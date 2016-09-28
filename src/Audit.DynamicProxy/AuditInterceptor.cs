@@ -4,6 +4,7 @@ using Audit.Core;
 using Castle.DynamicProxy;
 using System.Reflection;
 using System.Linq;
+using Audit.Core.Extensions;
 
 namespace Audit.DynamicProxy
 {
@@ -40,7 +41,7 @@ namespace Audit.DynamicProxy
             }
             catch (Exception ex)
             {
-                intEvent.Exception = GetExceptionInfo(ex);
+                intEvent.Exception = ex.GetExceptionInfo();
                 scope.Save();
                 AuditProxy.CurrentScope = null;
                 throw;
@@ -126,24 +127,6 @@ namespace Audit.DynamicProxy
                 i++;
             }
             return result.Count == 0 ? null : result;
-        }
-
-        /// <summary>
-        /// Gets the exception info for an exception
-        /// </summary>
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
     }
 }

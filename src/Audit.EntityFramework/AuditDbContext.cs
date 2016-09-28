@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Audit.EntityFramework.ConfigurationApi;
+using Audit.Core.Extensions;
 #if NETCOREAPP1_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -131,24 +132,6 @@ namespace Audit.EntityFramework
         {
             scope.SetCustomField("EntityFrameworkEvent", @event);
             scope.Save();
-        }
-
-        /// <summary>
-        /// Gets the exception info for an exception
-        /// </summary>
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
 
         // Determines whether to include the entity on the audit log or not
@@ -288,7 +271,7 @@ namespace Audit.EntityFramework
             catch (Exception ex)
             {
                 efEvent.Success = false;
-                efEvent.ErrorMessage = GetExceptionInfo(ex);
+                efEvent.ErrorMessage = ex.GetExceptionInfo();
                 SaveScope(scope, efEvent);
                 throw;
             }
@@ -320,7 +303,7 @@ namespace Audit.EntityFramework
             catch (Exception ex)
             {
                 efEvent.Success = false;
-                efEvent.ErrorMessage = GetExceptionInfo(ex);
+                efEvent.ErrorMessage = ex.GetExceptionInfo();
                 SaveScope(scope, efEvent);
                 throw;
             }

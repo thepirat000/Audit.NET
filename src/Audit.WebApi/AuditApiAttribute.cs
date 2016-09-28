@@ -1,5 +1,6 @@
 ﻿#if NET45
 using Audit.Core;
+using Audit.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -80,7 +81,7 @@ namespace Audit.WebApi
             var auditScope = httpContext.Items[AuditApiScopeKey] as AuditScope;
             if (auditAction != null && auditScope != null)
             {
-                auditAction.Exception = GetExceptionInfo(actionExecutedContext.Exception);
+                auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
                 auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(actionExecutedContext.ActionContext.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? actionExecutedContext.ActionContext.ModelState?.IsValid : null;
                 auditAction.ResponseBodyType = actionExecutedContext.Response.Content?.GetType().Name;
@@ -150,21 +151,6 @@ namespace Audit.WebApi
         private string GetClientIp(HttpRequestMessage request)
         {
             return GetHttpContext(request).Request.UserHostAddress;
-        }
-
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
 
         private static HttpContextBase GetHttpContext(HttpRequestMessage request)

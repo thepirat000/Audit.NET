@@ -7,6 +7,7 @@ using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 using Audit.Core;
 using System.Threading;
+using Audit.Core.Extensions;
 
 namespace Audit.WCF
 {
@@ -121,7 +122,7 @@ namespace Audit.WCF
         private AuditWcfEventFault GetWcfFaultData(Exception ex)
         {
             var result = new AuditWcfEventFault();
-            result.Exception = GetExceptionInfo(ex);
+            result.Exception = ex.GetExceptionInfo();
             if (ex is FaultException)
             {
                 result.FaultType = "Fault";
@@ -160,24 +161,6 @@ namespace Audit.WCF
                 result.Add(new AuditWcfEventElement(objects[i]));
             }
             return result;
-        }
-
-        /// <summary>
-        /// Gets the exception info for an exception
-        /// </summary>
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
 
         public IAsyncResult InvokeBegin(object instance, object[] inputs, AsyncCallback callback, object state)

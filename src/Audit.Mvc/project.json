@@ -1,19 +1,31 @@
 {
   "title": "Audit.Mvc",
-  "version": "4.5.0-*",
+  "version": "4.5.1-*",
   "copyright": "Copyright 2016",
-  "authors": [ "Federico Colombo" ],
+  "authors": [
+    "Federico Colombo"
+  ],
   "description": "Generate detailed Audit Logs for MVC Controller actions.",
   "packOptions": {
     "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.Mvc",
-    "owners": [ "ThePirat" ],
+    "owners": [
+      "ThePirat"
+    ],
     "summary": "Generate detailed Audit Logs for ASP.NET MVC Controller actions.",
-    "tags": [ "Audit", "Trail", "Log", "MVC", "ActionFilter" ],
+    "tags": [
+      "Audit",
+      "Trail",
+      "Log",
+      "MVC",
+      "ActionFilter"
+    ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/5YjHlfd.png"
   },
   "dependencies": {
-    "Audit.NET": { "target": "project" }
+    "Audit.NET": {
+      "target": "project"
+    }
   },
   "frameworks": {
     "netstandard1.6": {

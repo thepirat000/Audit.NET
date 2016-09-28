@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Audit.Core;
+using Audit.Core.Extensions;
 
 namespace Audit.Mvc
 {
@@ -70,7 +71,7 @@ namespace Audit.Mvc
                 auditAction.RedirectLocation = filterContext.HttpContext.Response.RedirectLocation;
                 auditAction.ResponseStatus = filterContext.HttpContext.Response.Status;
                 auditAction.ResponseStatusCode = filterContext.HttpContext.Response.StatusCode;
-                auditAction.Exception = GetExceptionInfo(filterContext.Exception);
+                auditAction.Exception = filterContext.Exception.GetExceptionInfo();
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
@@ -91,7 +92,7 @@ namespace Audit.Mvc
                 var razorView = viewResult?.View as RazorView;
                 auditAction.ViewName = viewResult?.ViewName;
                 auditAction.ViewPath = razorView?.ViewPath;
-                auditAction.Exception = GetExceptionInfo(filterContext.Exception);
+                auditAction.Exception = filterContext.Exception.GetExceptionInfo();
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
@@ -133,21 +134,6 @@ namespace Audit.Mvc
                 }
             }
             return dict.Count > 0 ? dict : null;
-        }
-
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
 
         internal static AuditScope GetCurrentScope(HttpContextBase httpContext)

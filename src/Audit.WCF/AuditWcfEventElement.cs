@@ -1,3 +1,4 @@
+using Audit.Core.Extensions;
 using Newtonsoft.Json;
 
 namespace Audit.WCF
@@ -14,7 +15,7 @@ namespace Audit.WCF
 
         public AuditWcfEventElement(object value)
         {
-            Type = value?.GetType().Name;
+            Type = value?.GetType().GetFullTypeName();
             Value = value;
         }
     }

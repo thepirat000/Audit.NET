@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Audit.Core.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -65,7 +66,7 @@ namespace Audit.Core
                 _event.Target = new AuditTarget
                 {
                     SerializedOld = _dataProvider.Serialize(targetValue),
-                    Type = targetValue?.GetType().Name ?? "Object"
+                    Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
                 };
             }
             ProcessExtraFields(extraFields);

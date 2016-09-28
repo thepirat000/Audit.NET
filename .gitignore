@@ -263,3 +263,5 @@ __pycache__/
 /AuditFw.pptx
 
 Docs/
+/src/Newtonsoft.Json.dll
+/src/UpgradeVersion.exe

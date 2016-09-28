@@ -2,18 +2,29 @@
   "title": "Audit.Wcf",
   "copyright": "Copyright 2016",
   "description": "Generate detailed Audit Logs for WCF service calls.",
-  "version": "4.5.0-*",
-  "authors": [ "Federico Colombo" ],
+  "version": "4.5.1-*",
+  "authors": [
+    "Federico Colombo"
+  ],
   "packOptions": {
     "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.WCF",
-    "owners": [ "ThePirat" ],
+    "owners": [
+      "ThePirat"
+    ],
     "summary": "Generate server-side Audit Logs for WCF service calls.",
-    "tags": [ "Audit", "Trail", "Log", "WCF" ],
+    "tags": [
+      "Audit",
+      "Trail",
+      "Log",
+      "WCF"
+    ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/Sl1hHBz.png"
   },
   "dependencies": {
-    "Audit.NET": { "target": "project" }
+    "Audit.NET": {
+      "target": "project"
+    }
   },
   "frameworks": {
     "net45": {

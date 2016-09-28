@@ -1,14 +1,23 @@
 {
   "title": "Audit.EntityFramework",
-  "version": "4.5.0-*",
+  "version": "4.5.1-*",
   "copyright": "Copyright 2016",
-  "authors": [ "Federico Colombo" ],
+  "authors": [
+    "Federico Colombo"
+  ],
   "description": "Generate Audit Logs from EntityFramework context changes",
   "packOptions": {
     "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.EntityFramework",
-    "owners": [ "ThePirat" ],
+    "owners": [
+      "ThePirat"
+    ],
     "summary": "Generate detailed Audit Logs for EntityFramework CRUD operations.",
-    "tags": [ "Audit", "Trail", "Log", "EntityFramework" ],
+    "tags": [
+      "Audit",
+      "Trail",
+      "Log",
+      "EntityFramework"
+    ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/T3NcXaZ.png"
   },
@@ -22,7 +31,9 @@
     }
   },
   "dependencies": {
-    "Audit.NET": { "target": "project" }
+    "Audit.NET": {
+      "target": "project"
+    }
   },
   "frameworks": {
     "netcoreapp1.0": {

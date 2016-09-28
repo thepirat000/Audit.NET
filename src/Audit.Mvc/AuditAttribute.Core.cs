@@ -9,6 +9,7 @@ using Audit.Core;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Audit.Core.Extensions;
 
 namespace Audit.Mvc
 {
@@ -78,7 +79,7 @@ namespace Audit.Mvc
                 auditAction.RedirectLocation = httpContext.Response.Headers?["Location"];
                 auditAction.ResponseStatus = httpContext.Response.StatusCode.ToString();
                 auditAction.ResponseStatusCode = httpContext.Response.StatusCode;
-                auditAction.Exception = GetExceptionInfo(filterContext.Exception);
+                auditAction.Exception = filterContext.Exception.GetExceptionInfo();
             }
             var auditScope = httpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
@@ -98,7 +99,7 @@ namespace Audit.Mvc
             {
                 var viewResult = filterContext.Result as ViewResult;
                 auditAction.ViewName = viewResult?.ViewName ?? auditAction.ActionName;
-                auditAction.Exception = GetExceptionInfo(filterContext.Exception);
+                auditAction.Exception = filterContext.Exception.GetExceptionInfo();
             }
             var auditScope = httpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
@@ -136,21 +137,6 @@ namespace Audit.Mvc
                 }
             }
             return dict.Count > 0 ? dict : null;
-        }
-
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
 
         internal static AuditScope GetCurrentScope(HttpContext httpContext)

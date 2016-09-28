@@ -9,6 +9,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Audit.Core.Extensions;
 
 namespace Audit.WebApi
 {
@@ -78,7 +79,7 @@ namespace Audit.WebApi
             var auditScope = httpContext.Items[AuditApiScopeKey] as AuditScope;
             if (auditAction != null && auditScope != null)
             {
-                auditAction.Exception = GetExceptionInfo(context.Exception);
+                auditAction.Exception = context.Exception.GetExceptionInfo();
                 auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(context.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? context.ModelState?.IsValid : null;
                 auditAction.ResponseBodyType = context.Result?.GetType().Name;
@@ -142,21 +143,6 @@ namespace Audit.WebApi
                 }
             }
             return dict.Count > 0 ? dict : null;
-        }
-
-        private static string GetExceptionInfo(Exception exception)
-        {
-            if (exception == null)
-            {
-                return null;
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
         }
 
         internal static AuditScope GetCurrentScope(HttpContext httpContext)

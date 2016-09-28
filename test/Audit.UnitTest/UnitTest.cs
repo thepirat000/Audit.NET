@@ -4,11 +4,21 @@ using Xunit;
 using Moq;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
+using System.Collections.Generic;
+using Audit.Core.Extensions;
 
 namespace Audit.UnitTest
 {
     public class UnitTest
     {
+        [Fact]
+        public void Test_TypeExtension()
+        {
+            var s = new List<Dictionary<HashSet<string>, KeyValuePair<int, decimal>>>();
+            var fullname = s.GetType().GetFullTypeName();
+            Assert.Equal("List<Dictionary<HashSet<String>,KeyValuePair<Int32,Decimal>>>", fullname);
+        }
+
         [Fact]
         public void Test_EntityFramework_Config_Precedence()
         {
