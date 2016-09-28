@@ -154,6 +154,103 @@ With this information you can know who did the operation, and also measure perfo
 
 ## Output Details
 
+The following table describes the Audit.DynamicProxy output fields:
+
+- <h3>[AuditInterceptEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptEvent.cs)</h3>
+
+Describes an operation call event
+
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| ClassName  | string | Name of class where the operation is defined |
+| MethodName | string | Name of the audited method |
+| InstanceQualifiedName  | string | Full qualified name of the class |
+| MethodSignature   | string | The complete method signature |
+| PropertyName | string | Name of the property modified (if any) |
+| EventName | string | Name of the event modified (if any) |
+| Arguments  | [argument](#AuditInterceptArgument) array | The operation arguments (input and output parameters) |
+| Success | boolean | Indicates if the operation completed succesfully |
+| Exception | string | The exception details when an exception is thrown |
+| Result | [argument](#AuditInterceptArgument) object | The result of the operation |
+
+- <h3>[AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)</h3>
+
+Describes an operation call event
+
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| Name  | string | The argument name |
+| Type | string | The argument type |
+| Value | object | The input argument value |
+| OutputValue | object | The output argument value (Only for ref or out parameters) |
+
 ## Output Samples
+
+- Successful method call:
+```javascript
+{
+	"EventType": "MyRepository.InsertUser",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.DynamicProxy.AuditInterceptor.Intercept()",
+		"AssemblyName": "Audit.DynamicProxy, Version=4.5.0.0, Culture=neutral, PublicKeyToken=null",
+		"Culture": "en-GB"
+	},
+	"StartDate": "2016-09-28T09:53:17.7555677-05:00",
+	"EndDate": "2016-09-28T09:53:99.7565477-05:00",
+	"Duration": 82,
+	"InterceptEvent": {
+		"ClassName": "MyRepository",
+		"MethodName": "InsertUser",
+		"InstanceQualifiedName": "Audit.DynamicProxy.UnitTest.MyRepository, Audit.DynamicProxy.UnitTest, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null",
+		"MethodSignature": "Void InsertUser(System.String)",
+		"Arguments": [{
+			"Name": "userName",
+			"Type": "String",
+			"Value": "thepirat000"
+		}],
+		"Success": true,
+		"Result": {
+			"Type": "Void",
+			"Value": null
+		}
+	}
+}
+```
+
+- Exception on method call:
+```javascript
+{
+	"EventType": "MyRepository.InsertUser",
+	"Environment": {
+		"UserName": "Federico",
+		"MachineName": "HP",
+		"DomainName": "HP",
+		"CallingMethodName": "Audit.DynamicProxy.AuditInterceptor.Intercept()",
+		"AssemblyName": "Audit.DynamicProxy, Version=4.5.0.0, Culture=neutral, PublicKeyToken=null",
+		"Exception": "COMException: Exception from HRESULT: 0xE0434352",
+		"Culture": "en-GB"
+	},
+	"StartDate": "2016-09-28T09:56:32.8875018-05:00",
+	"EndDate": "2016-09-28T09:58:32.8880027-05:00",
+	"Duration": 3,
+	"InterceptEvent": {
+		"ClassName": "MyRepository",
+		"MethodName": "InsertUser",
+		"InstanceQualifiedName": "Audit.DynamicProxy.UnitTest.MyRepository, Audit.DynamicProxy.UnitTest, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null",
+		"MethodSignature": "Void InsertUser(System.String)",
+		"Arguments": [{
+			"Name": "userName",
+			"Type": "String",
+			"Value": null
+		}],
+		"Success": false,
+		"Exception": "(ArgumentNullException) userName cannot be NULL\r\nParameter name: userName",
+		"Result": null
+	}
+}
+```
 
 
