@@ -168,10 +168,10 @@ Describes an operation call event
 | MethodSignature   | string | The complete method signature |
 | PropertyName | string | Name of the property modified (if any) |
 | EventName | string | Name of the event modified (if any) |
-| Arguments  | [argument](#AuditInterceptArgument) array | The operation arguments (input and output parameters) |
+| Arguments  | [argument](#auditinterceptargument) array | The operation arguments (input and output parameters) |
 | Success | boolean | Indicates if the operation completed succesfully |
 | Exception | string | The exception details when an exception is thrown |
-| Result | [argument](#AuditInterceptArgument) object | The result of the operation |
+| Result | [argument](#auditinterceptargument) object | The result of the operation |
 
 - <h3>[AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)</h3>
 
