@@ -23,4 +23,10 @@ cd ..
 
 cd Audit.WebApi.UnitTest
 dotnet test
+echo continue...
+pause > nul
+cd ..
+
+cd Audit.DynamicProxy.UnitTest
+dotnet test
 cd ..

@@ -1,6 +1,6 @@
 ﻿# Audit.DynamicProxy
 
-**WCF Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
+**Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 
 Generate Audit Logs by intercepting operations on any class.
 
