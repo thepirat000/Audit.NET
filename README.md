@@ -375,7 +375,7 @@ Audit.Core.Configuration.Setup()
 
 The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
 
-![Audit.NET Extensions](http://i.imgur.com/O6zhqJV.jpg)
+![Audit.NET Extensions](http://i.imgur.com/YaRlP1q.png)
 
 - ### **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)**
 Generate detailed audit logs for any class without changing its code by using a proxy.
@@ -396,7 +396,7 @@ Generate detailed audit logs by decorating MVC Actions and Controllers with an a
 
 Apart from the _File_ and _EventLog_ event storage, there are other providers included in different packages:
 
-![Storage providers](http://i.imgur.com/hOnJyvM.png)
+![Storage providers](http://i.imgur.com/auj1lH6.png)
 
 - ### **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format.
