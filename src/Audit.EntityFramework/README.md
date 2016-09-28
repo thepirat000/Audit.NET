@@ -116,7 +116,11 @@ To configure the output persistence mechanism please see [Event Output Configura
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ## Output
+
 Audit.EntityFramework output includes:
+
+- Execution time and duration
+- Environment information such as user, machine, domain and locale.
 - Affected SQL database and table names
 - Affected column data including primary key, original and new values
 - Model validation results
@@ -124,7 +128,6 @@ Audit.EntityFramework output includes:
 - Transaction identifier (to group logs that are part of the same SQL transaction)
 - Entity object graphs (optional with `IncludeEntityObjects` configuration)
 - Execution time and duration
-- Environment information such as user, machine, domain, locale, etc.
 
 With this information, you can measure performance, observe exceptions thrown or get statistics about usage of your database.
 

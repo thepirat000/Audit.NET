@@ -7,6 +7,7 @@ del "audit.net.sqlserver\bin\debug\*.nupkg"
 del "audit.entityframework\bin\debug\*.nupkg"
 del "audit.WCF\bin\debug\*.nupkg"
 del "audit.net.azurestorage\bin\debug\*.nupkg"
+del "audit.dynamicproxy\bin\debug\*.nupkg"
 
 dotnet pack "Audit.NET/"
 dotnet pack "Audit.Mvc/"
@@ -18,4 +19,5 @@ dotnet pack "Audit.EntityFramework/"
 dotnet pack "Audit.NET/"
 dotnet pack "Audit.Wcf/"
 dotnet pack "Audit.NET.AzureStorage/"
+dotnet pack "Audit.DynamicProxy/"
 

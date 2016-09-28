@@ -110,6 +110,7 @@ The library will automatically detect the property and use the given data provid
 Audit.Wcf output includes:
 
 - Execution time and duration
+- Environment information such as user, machine, domain and locale.
 - Authenticated username (identity name)
 - Client IP address
 - Contract and Operation details

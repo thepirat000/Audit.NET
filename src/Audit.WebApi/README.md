@@ -73,6 +73,7 @@ To configure the output persistence mechanism please see [Event Output Configura
 Audit.WebApi output includes:
 
 - Execution time and duration
+- Environment information such as user, machine, domain and locale.
 - Authenticated username
 - Client IP address
 - Form Variables, Action Arguments

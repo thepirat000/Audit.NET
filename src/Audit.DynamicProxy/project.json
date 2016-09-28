@@ -1,0 +1,36 @@
+﻿{
+  "title": "Audit.DynamicProxy",
+  "version": "4.5.0-*",
+  "copyright": "Copyright 2016",
+  "authors": [ "Federico Colombo" ],
+  "description": "Generate Audit Logs by intercepting operations on any class without changing its code.",
+  "packOptions": {
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.DynamicProxy",
+    "owners": [ "ThePirat" ],
+    "summary": "Generate Audit Logs on any class without changing its code.",
+    "tags": [ "Audit", "Trail", "Log", "Proxy", "Castle", "DynamicProxy" ],
+    "requireLicenseAcceptance": false,
+    "iconUrl": "http://i.imgur.com/hVMM5WF.png"
+  },
+  "dependencies": {
+    "Audit.NET": { "target": "project"},
+    "Castle.Core": "4.0.0-beta001",
+    "Newtonsoft.Json": "9.0.1"
+  },
+  "frameworks": {
+    "netstandard1.5": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.Reflection": "4.1.0"
+      }
+    },
+    "net45": {
+      "dependencies": {
+        "System.Reflection": "4.0.0"
+      }
+    }
+  },
+  "buildOptions": {
+    "xmlDoc": true
+  }
+}

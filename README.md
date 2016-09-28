@@ -54,7 +54,7 @@ AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
 The library will generate an output (`AuditEvent`) for each operation, including:
 - Tracked object's state before and after the operation.
 - Execution time and duration.
-- Enviroment information such as user, machine, domain, locale, etc.
+- Environment information such as user, machine, domain, locale, etc.
 - [Comments and Custom Fields](#custom-fields-and-comments) provided
 
 An example of the output in JSON:
