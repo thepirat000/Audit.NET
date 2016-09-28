@@ -175,7 +175,7 @@ Describes an operation call event
 
 - <h3>[AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)</h3>
 
-Describes an operation call event
+Describes an operation argument
 
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
