@@ -5,6 +5,14 @@ namespace Audit.Core.ConfigurationApi
 {
     public class Configurator : IConfigurator
     {
+        public ICreationPolicyConfigurator UseDynamicProvider(Action<IDynamicDataProviderConfigurator> config)
+        {
+            var dataProvider = new DynamicDataProvider();
+            var dynamicConfig = new DynamicDataProviderConfigurator(dataProvider);
+            config.Invoke(dynamicConfig);
+            Configuration.DataProvider = dataProvider;
+            return new CreationPolicyConfigurator();
+        }
         public ICreationPolicyConfigurator UseFileLogProvider(Action<IFileLogProviderConfigurator> config)
         {
             var fileLogConfig = new FileLogProviderConfigurator();

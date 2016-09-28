@@ -27,7 +27,7 @@ namespace Audit.Core.ConfigurationApi
         IFileLogProviderConfigurator FilenamePrefix(string filenamePrefix);
 
         /// <summary>
-        /// Filenames the filename builder to get the filename to store the audit log for an event.
+        /// Specifies the filename builder to get the filename to store the audit log for an event.
         /// </summary>
         /// <param name="filenameBuilder">The filename builder. A function that returns the file name to store the output for an event.</param>
         /// <returns>IFileLogProviderConfigurator.</returns>

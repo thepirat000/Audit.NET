@@ -6,11 +6,34 @@ using Audit.Core.Providers;
 using Audit.EntityFramework;
 using System.Collections.Generic;
 using Audit.Core.Extensions;
+using System.Diagnostics;
 
 namespace Audit.UnitTest
 {
     public class UnitTest
     {
+        [Fact]
+        public void Test_DynamicDataProvider()
+        {
+            int onInsertCount = 0, onReplaceCount = 0, onInsertOrReplaceCount = 0;
+            Core.Configuration.Setup()
+                .UseDynamicProvider(config => config
+                    .OnInsert(ev => onInsertCount++)
+                    .OnReplace((obj, ev) => onReplaceCount++)
+                    .OnInsertAndReplace(ev => onInsertOrReplaceCount++));
+
+            var scope = AuditScope.Create("et1", null, EventCreationPolicy.Manual);
+            scope.Save();
+            scope.SetCustomField("field", "value");
+            Assert.Equal(1, onInsertCount);
+            Assert.Equal(0, onReplaceCount);
+            Assert.Equal(1, onInsertOrReplaceCount);
+            scope.Save();
+            Assert.Equal(1, onInsertCount);
+            Assert.Equal(1, onReplaceCount);
+            Assert.Equal(2, onInsertOrReplaceCount);
+        }
+
         [Fact]
         public void Test_TypeExtension()
         {
