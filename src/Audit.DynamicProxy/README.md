@@ -1,6 +1,6 @@
 ﻿# Audit.DynamicProxy
 
-**Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
+**Dynamic Proxy Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 
 Generate Audit Logs by intercepting operations on any class.
 
@@ -20,9 +20,9 @@ PM> Install-Package Audit.DynamicProxy
 
 To enable the audit log for an instance of a class, create a proxy for the class by calling the `AuditProxy.Create<>()` method.
 
-This will return a proxied _audit-enabled_ instance of the class that you should use in order to generate logs.
+This will return a proxied _audit-enabled_ instance of the class that you should use instead of the real instance, in order to generate logs.
 
-Suppose you have a `MyRepository` class that you want to audit, for example:
+Suppose you have a `MyRepository` instance that you want to audit in a `MyDataAccess` class, for example:
 ```c#
 public class MyDataAccess
 {
@@ -52,7 +52,7 @@ public class MyDataAccess
 }
 ```
 
-Or you can optionally intercept the assignation, for example to optionally audit when no debugger is attached:
+You can intercept _conditionally_, for example to avoid auditing when a debugger is attached:
 ```c#
 public class MyDataAccess
 {
@@ -88,7 +88,7 @@ The `settings` argument allows you to change the default settings. See [settings
 
 ## Settings
 
-The class `InterceptionSettings` provides access to the following settings:
+The `InterceptionSettings` class include the following settings:
 
 - **EventType**: A string that identifies the event type. Default is "\{class}.\{method}". Can contain the following placeholders: 
   - \{class}: Replaced by the class name
@@ -100,9 +100,9 @@ The class `InterceptionSettings` provides access to the following settings:
 - **MethodFilter**: A function that takes a `MethodInfo` and returns a boolean indicating whether the method should be taken into account for the logging. Use this setting to have fine grained control over the methods that should be audited. By default all methods are included.
 - **AuditDataProvider**: Allows to set a specific audit data provider for this instance. By default the globally configured data provider is used. See [Audit.NET configuration](https://github.com/thepirat000/Audit.NET#data-provider) section for more information.
 
-## AuditIgnore attribute
+## AuditIgnore Attribute
 
-You can ignore specific members from the audit, by decorating them with the `AuditIgnore` attribute. For example:
+You can bypass specific members from the audit, by decorating them with the `AuditIgnore` attribute. For example:
 
 ```c#
 public class MyRepository : IMyRepository
@@ -119,8 +119,8 @@ public class MyRepository : IMyRepository
 
 You can access the current audit scope from an audited member by getting the static `AuditProxy.CurrentScope` property. 
 
-> This property returns the scope for the **current running thread** and should be accessed from the same thread as the executing audited operation.
-Calling this property from a different thread will return NULL or an unexpected value.
+> The static property `AuditProxy.CurrentScope` returns the scope for the **current running thread** and should be accessed from the same thread as the executing audited operation.
+Calling this from a different thread will lead to an unexpected result.
 
 For example:
 ```c#
@@ -130,13 +130,12 @@ public class MyRepository : IMyRepository
     {
         var auditScope = AuditProxy.CurrentScope;   // Get the current scope
         auditScope.SetCustomField("TestField", Guid.NewGuid()); // Set a custom field
-        
-        //... add the user ...
-        
         if (pleaseDoNotLog)
         {
             auditScope.Discard(); // Discard the event
         }
+        
+        //... existing code to insert user ...
     }
 }
 ``` 
@@ -188,7 +187,7 @@ Describes an operation argument
 
 ## Output Samples
 
-- Successful method call:
+#### Successful method call:
 ```javascript
 {
 	"EventType": "MyRepository.InsertUser",
@@ -222,7 +221,7 @@ Describes an operation argument
 }
 ```
 
-- Exception on method call:
+#### Failed method call:
 ```javascript
 {
 	"EventType": "MyRepository.InsertUser",
