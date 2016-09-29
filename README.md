@@ -1,5 +1,3 @@
-![logo](http://i.imgur.com/oeogzj9.png)
-
 # Audit.NET
 An extensible framework to audit executing operations in .NET including support for .NET Framework 4.5 and NetCore 1.0 (NetStandard 1.3).
 
