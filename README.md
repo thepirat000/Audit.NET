@@ -1,6 +1,6 @@
 # Audit.NET
 
-[![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
+[![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)     ![fede](https://img.shields.io/twitter/follow/thepirat000.svg?style=social&label=Follow)
 
 An extensible framework to audit executing operations in .NET including support for .NET Framework 4.5 and NetCore 1.0 (NetStandard 1.3).
 
