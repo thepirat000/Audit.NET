@@ -215,10 +215,16 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 }
 ```
 
-## Event output
+## Event output (data providers)
 
-You decide what to do with the events by [configuring](#configuration) one of the mechanisms provided (File, EventLog, [MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb), [SQL](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver), [DocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb), [AzureBlobStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage)) or by injecting your own mechanism, creating a class that inherits from `AuditDataProvider`, for example:
+A _data provider_ lets you define what to do with the audit logs (events).
 
+You can inject your own mechanism by creating a class that inherits from `AuditDataProvider`, overriding the following methods:
+
+- `InsertEvent`: should return a unique ID for the event. 
+- `ReplaceEvent`: should update an event given its ID, this method is only called for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
+
+For example:
 ```c#
 public class MyFileDataProvider : AuditDataProvider
 {
@@ -241,8 +247,20 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-The `InsertEvent` method should return a unique ID for the event. 
-The `ReplaceEvent` method should update an event given its ID, this method is only called when the [Creation Policy](#event-creation-policy) is set to **Manual** or **InsertOnStartReplaceOnEnd**.
+
+#### Data providers included
+
+The Data Providers included are summarized in the following table:
+
+| Data Provider | Package | Description | 
+| ------------ | ---------------- |  -------------- |
+| FileDataProvider | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configuring the directory and path. |
+| EventLogDataProvider | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Write the audit logs to the Windows EventLog. |
+| DynamicDataProvider | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Lets you dynamically define and change the behavior at run-time. Define the _Insert_ and a _Replace_ actions with lambda expressions. |
+| SqlDataProvider | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. |
+| MongoDataProvider | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. |
+| AzureDbDataProvider | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. |
+| AzureBlobDataProvider | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format.
 
 ## Event Creation Policy
 
@@ -331,22 +349,16 @@ Audit.Core.Configuration.Setup()
 ```
 
 ## Configuration examples
-- File log provider with an InsertOnStart-ReplaceOnEnd [creation policy](#creation-policy), and a global _ApplicationId_ [Custom Field](#custom-fields-and-comments):
+
+##### File log provider with dynamic directory path and filename (fluent API):
 ```c#
-Audit.Core.Configuration.DataProvider = new FileDataProvider()
-{
-    FilenamePrefix = "Event_",
-    DirectoryPath = @"C:\AuditLogs\1"
-};
-
-Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
-
-Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope => 
-{ 
-    scope.SetCustomField("ApplicationId", "MyApplication"); 
-});
+Audit.Core.Configuration.Setup()
+    .UseFileLogProvider(config => config
+        .DirectoryBuilder(_ => $@"C:\Logs\{DateTime.Now:yyyy-MM-dd}")
+        .FilenameBuilder(auditEvent => $"{auditEvent.Environment.UserName}_{DateTime.Now.Ticks}.json"));
 ```
-Or by using the fluent API:
+
+##### File log provider with an InsertOnStart-ReplaceOnEnd creation policy, and a global custom field set in a custom action:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseFileLogProvider(config => config
@@ -356,15 +368,8 @@ Audit.Core.Configuration.Setup()
     .WithAction(x => x.OnScopeCreated(scope => scope.SetCustomField("ApplicationId", "MyApplication")));
 ```
 
-- File log provider with dynamic directory path and filename (fluent API):
-```c#
-Audit.Core.Configuration.Setup()
-    .UseFileLogProvider(config => config
-        .DirectoryBuilder(_ => $@"C:\Logs\{DateTime.Now:yyyy-MM-dd}")
-        .FilenameBuilder(auditEvent => $"{auditEvent.Environment.UserName}_{DateTime.Now.Ticks}.json"));
-```
 
-- Event log provider with an InsertOnEnd creation policy (fluent API):
+##### Event log provider with an InsertOnEnd creation policy (fluent API):
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
@@ -372,6 +377,15 @@ Audit.Core.Configuration.Setup()
         .LogName("Application"))
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
+
+##### Dynamic provider to log to the console (fluent API):
+```c#
+Audit.Core.Configuration.Setup()
+    .UseDynamicProvider(config => config
+        .OnInsert(ev => Console.WriteLine("{0}: {1}->{2}", ev.StartDate, ev.Environment.UserName, ev.EventType)));
+
+```
+
 
 -----------
 

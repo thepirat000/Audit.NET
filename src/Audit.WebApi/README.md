@@ -1,6 +1,6 @@
 # Audit.WebApi
 
-**ASP.NET Web API Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (An extensible framework to audit executing operations in .NET).
+**ASP.NET Web API Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
 Generate Audit Trails for Web API calls.
 
