@@ -14,11 +14,11 @@ See [Extensions](#extensions) section for more information.
 
 ## Install (NuGet)
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
-
 ```
 PM> Install-Package Audit.NET
 ```
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
 ## Usage
 
