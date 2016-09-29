@@ -9,11 +9,10 @@ Extensions to log to Files, Event Log, SQL, MongoDB, AzureBlob and DocumentDB ar
 And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
 See [Extensions](#extensions) section for more information.
 
-## Install
+## Install [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
 **NuGet Package** 
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 ```
 PM> Install-Package Audit.NET
 ```
