@@ -8,11 +8,13 @@ Audit.EntityFramework provides the infrastructure to log interactions with the E
 
 ## Install
 
-**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
+**NuGet Package** 
 
 ```
 PM> Install-Package Audit.EntityFramework
 ```
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
 
 ## Usage
 Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 

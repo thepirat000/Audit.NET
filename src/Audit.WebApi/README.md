@@ -8,11 +8,13 @@ Audit.WebApi provides the infrastructure to log interactions with ASP.NET Web AP
 
 ## Install
 
-**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.WebApi.svg?style=flat)](https://www.nuget.org/packages/Audit.WebApi/)
+**NuGet Package** 
 
 ```
 PM> Install-Package Audit.WebApi
 ```
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.WebApi.svg?style=flat)](https://www.nuget.org/packages/Audit.WebApi/)
 
 ## Usage
 

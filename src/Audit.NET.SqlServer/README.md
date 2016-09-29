@@ -5,11 +5,13 @@ Store the audit events in a SQL Table, in JSON format.
 
 ## Install
 
-**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.SqlServer.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.SqlServer/)
+**NuGet Package** 
 
 ```
 PM> Install-Package Audit.NET.SqlServer
 ```
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.SqlServer.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.SqlServer/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)

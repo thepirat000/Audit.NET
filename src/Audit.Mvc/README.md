@@ -8,11 +8,13 @@ Audit.Mvc provides the infrastructure to log interactions with MVC applications.
 
 ## Install
 
-**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.Mvc.svg?style=flat)](https://www.nuget.org/packages/Audit.Mvc/)
+**NuGet Package** 
 
 ```
 PM> Install-Package Audit.Mvc
 ```
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.Mvc.svg?style=flat)](https://www.nuget.org/packages/Audit.Mvc/)
 
 ## Usage
 
