@@ -11,7 +11,9 @@ See [Extensions](#extensions) section for more information.
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.NET/)**
+**NuGet Package** 
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 ```
 PM> Install-Package Audit.NET
 ```
@@ -396,7 +398,7 @@ Generate detailed audit logs for any class without changing its code by using a 
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
-![Storage providers](http://i.imgur.com/auj1lH6.png)
+[![Storage providers](http://i.imgur.com/auj1lH6.png)]()
 
 - ### **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format.
