@@ -11,7 +11,7 @@ See [Extensions](#extensions) section for more information.
 
 ## Install 
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
+**Nuget package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
 ```
 PM> Install-Package Audit.NET
