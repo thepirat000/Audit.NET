@@ -9,7 +9,7 @@ It relies on [Castle DynamicProxy](http://www.castleproject.org/projects/dynamic
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.DynamicProxy/)**
+**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.DynamicProxy.svg?style=flat)](https://www.nuget.org/packages/Audit.DynamicProxy/)
 ```
 PM> Install-Package Audit.DynamicProxy
 ```
