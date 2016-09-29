@@ -8,7 +8,8 @@ Audit.Wcf provides the server-side infrastructure to log interactions with WCF s
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.Wcf/)**
+**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.Wcf.svg?style=flat)](https://www.nuget.org/packages/Audit.Wcf/)
+
 ```
 PM> Install-Package Audit.Wcf
 ```

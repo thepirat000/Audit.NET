@@ -5,7 +5,8 @@ Store the audit events in a Mongo DB Collection, in BSON format.
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.NET.MongoDB/)**
+**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.MongoDB.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.MongoDB/)
+
 ```
 PM> Install-Package Audit.NET.MongoDB
 ```

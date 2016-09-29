@@ -39,6 +39,7 @@
   "configurations": {},
   "buildOptions": {
     "define": [],
-    "xmlDoc": true
+    "xmlDoc": true,
+    "nowarn": [ "1591" ]
   }
 }

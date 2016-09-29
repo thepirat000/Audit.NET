@@ -35,6 +35,7 @@
     }
   },
   "buildOptions": {
-    "xmlDoc": true
+    "xmlDoc": true,
+    "nowarn": [ "1591" ]
   }
 }

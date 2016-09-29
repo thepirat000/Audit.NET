@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "3.0.0-*",
   "testRunner": "xunit",
   "dependencies": {
@@ -45,5 +45,8 @@
         "System.ServiceModel": "4.0.0.0"
       }
     }
+  },
+  "buildOptions": {
+    "nowarn": [ "1591" ]
   }
 }

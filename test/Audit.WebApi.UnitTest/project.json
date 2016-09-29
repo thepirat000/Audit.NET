@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "3.0.0-*",
   "testRunner": "xunit",
   "dependencies": {
@@ -31,7 +31,8 @@
         "System.Runtime": "4.0.10"
       }
     }
-
-
+  },
+  "buildOptions": {
+    "nowarn": [ "1591" ]
   }
 }

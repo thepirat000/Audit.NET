@@ -5,7 +5,8 @@ Store the audit events in an Azure Blob Storage container, in JSON format.
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.NET.AzureStorage/)**
+**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureStorage.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureStorage/)
+
 ```
 PM> Install-Package Audit.NET.AzureStorage
 ```

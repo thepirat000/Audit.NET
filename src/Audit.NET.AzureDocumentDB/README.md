@@ -5,7 +5,8 @@ Store the audit events in an Azure Document DB collection, in JSON format.
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.NET.AzureDocumentDB/)**
+**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureDocumentDB.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureDocumentDB/)
+
 ```
 PM> Install-Package Audit.NET.AzureDocumentDB
 ```

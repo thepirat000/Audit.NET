@@ -8,7 +8,8 @@ Audit.EntityFramework provides the infrastructure to log interactions with the E
 
 ## Install
 
-**[NuGet Package](https://www.nuget.org/packages/Audit.EntityFramework/)**
+**NuGet Package** [![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
+
 ```
 PM> Install-Package Audit.EntityFramework
 ```
