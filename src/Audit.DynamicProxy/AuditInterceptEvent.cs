@@ -29,6 +29,16 @@ namespace Audit.DynamicProxy
         [JsonProperty(Order = 10)]
         public string MethodName { get; set; }
         /// <summary>
+        /// A boolean indicating whether this method is async
+        /// </summary>
+        [JsonProperty(Order = 15)]
+        public bool IsAsync { get; set; }
+        /// <summary>
+        /// A string indicating the Task final status
+        /// </summary>
+        [JsonProperty(Order = 17, NullValueHandling = NullValueHandling.Ignore)]
+        public string AsyncStatus { get; set; }
+        /// <summary>
         /// The class instance qualified name
         /// </summary>
         [JsonProperty(Order = 20)]

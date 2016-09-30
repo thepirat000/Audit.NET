@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Audit.Core.Extensions
 {
@@ -19,6 +17,11 @@ namespace Audit.Core.Extensions
             if (exception == null)
             {
                 return null;
+            }
+            if (exception is AggregateException)
+            {
+                var aggEx = exception as AggregateException;
+                return string.Join(" | ", aggEx.InnerExceptions?.Select(ex => GetExceptionInfo(ex)));
             }
             string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
             Exception inner = exception;

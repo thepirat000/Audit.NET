@@ -13,6 +13,11 @@ namespace Audit.DynamicProxy
     public class AuditInterceptArgument
     {
         /// <summary>
+        /// The argument index.
+        /// </summary>
+        [JsonProperty(Order = 1, NullValueHandling = NullValueHandling.Ignore)]
+        public int? Index { get; set; }
+        /// <summary>
         /// The argument name.
         /// </summary>
         [JsonProperty(Order = 10, NullValueHandling = NullValueHandling.Ignore)]
@@ -33,17 +38,12 @@ namespace Audit.DynamicProxy
         [JsonProperty(Order = 40, NullValueHandling = NullValueHandling.Ignore)]
         public object OutputValue { get; set; }
 
-        public AuditInterceptArgument(object value)
-        {
-            Type = value?.GetType().GetFullTypeName();
-            Value = value;
-        }
-
-        public AuditInterceptArgument(string name, Type type, object value)
+        public AuditInterceptArgument(string name, Type type, object value, int index)
         {
             Name = name;
             Type = type.GetFullTypeName();
             Value = value;
+            Index = index;
         }
 
         public AuditInterceptArgument(Type type, object value)

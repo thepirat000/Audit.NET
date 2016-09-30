@@ -2,7 +2,7 @@
   "title": "Audit.Wcf",
   "copyright": "Copyright 2016",
   "description": "Generate detailed Audit Logs for WCF service calls.",
-  "version": "4.5.2-*",
+  "version": "4.5.3-*",
   "authors": [
     "Federico Colombo"
   ],
@@ -36,6 +36,8 @@
   },
   "buildOptions": {
     "xmlDoc": true,
-    "nowarn": [ "1591" ]
+    "nowarn": [
+      "1591"
+    ]
   }
 }

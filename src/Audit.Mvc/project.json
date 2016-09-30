@@ -1,6 +1,6 @@
 {
   "title": "Audit.Mvc",
-  "version": "4.5.2-*",
+  "version": "4.5.3-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -45,6 +45,8 @@
   },
   "buildOptions": {
     "xmlDoc": true,
-    "nowarn": [ "1591" ]
+    "nowarn": [
+      "1591"
+    ]
   }
 }
