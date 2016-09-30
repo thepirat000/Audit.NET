@@ -274,7 +274,7 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-To set the provider to use, you can assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
+To indicate the data provider to use, assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 ```
