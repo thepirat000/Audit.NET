@@ -274,7 +274,7 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-You set the provider to use globally, assign the property `Configuration.DataProvider`, for example:
+You set the provider to use globally, assign the property `Configuration.DataProvider`, (see [Configuration section](#configuration) for more information) for example:
 ```c#
 Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 ```
