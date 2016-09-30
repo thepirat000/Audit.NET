@@ -2,7 +2,7 @@
 
 **Dynamic Proxy Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 
-Generate Audit Logs by intercepting operations on any class.
+Generate Audit Logs by intercepting operations on _virtually_ any class.
 
 Audit.DynamicProxy provides the infrastructure to create audit logs for a class without changing its code.
 It relies on [Castle DynamicProxy](http://www.castleproject.org/projects/dynamicproxy/) library to intercept and record the operation calls (methods and properties) including caller info and arguments.
