@@ -279,7 +279,7 @@ To indicate the data provider to use, assign the `DataProvider` property on the 
 Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
 ```
 
-Or by using the fluent API:
+Or using the fluent API:
 ```c#
 Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyFileDataProvider());
@@ -295,7 +295,7 @@ dataProvider.AttachOnInsert(ev => Console.Write(ev.ToJson()));
 Audit.Core.Configuration.DataProvider = dataProvider;
 ```
 
-Or by using the fluent API:
+Or using the fluent API:
  
 ```c#
 Audit.Core.Configuration.Setup()
