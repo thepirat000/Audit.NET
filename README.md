@@ -279,15 +279,15 @@ public class MyFileDataProvider : AuditDataProvider
 
 The Data Providers included are summarized in the following table:
 
-| Data Provider | Package | Description | 
-| ------------ | ---------------- |  -------------- |
-| [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configuring the directory and path. |
-| [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Write the audit logs to the Windows EventLog. |
-| [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Lets you dynamically define and change the behavior at run-time. Define the _Insert_ and a _Replace_ actions with lambda expressions. |
-| [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. |
-| [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. |
-| [AzureDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/Providers/AzureDbDataProvider.cs) | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. |
-| [AzureBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureBlobDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format.
+| Data Provider | Package | Description | Configuration API |
+| ------------ | ---------------- |  -------------- | ------------------ |
+| [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configuring the directory and path. | `.UseFileLogProvider()` |
+| [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Write the audit logs to the Windows EventLog. | `.UseEventLogProvider()` |
+| [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Lets you dynamically define and change the behavior at run-time. Define the _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()` |
+| [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()` |
+| [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()` |
+| [AzureDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/Providers/AzureDbDataProvider.cs) | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. | `.UseAzureBlobStorage()` |
+| [AzureBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureBlobDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureDocumentDB()` |
 
 ## Event Creation Policy
 
