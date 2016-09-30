@@ -22,9 +22,9 @@ PM> Install-Package Audit.NET
 
 ## Usage
 
-Surround the operation code you want to audit with a `using` block that creates an `AuditScope` indicating the object to track (target).
-
-Suppose you have the following code to cancel an order:
+Create an Audit Scope by calling the static `AuditScope.Create` method.
+ 
+Suppose you have the following code to cancel an order that you want to audit:
 
 ```c#
 Order order = Db.GetOrder(orderId);
@@ -33,7 +33,9 @@ order.OrderItems = null;
 order = Db.OrderUpdate(order);
 ```
 
-To audit this operation, tracking the _Order_ object, you can add the following `using` statement:
+
+To audit this operation, you can surround the code with a `using` block that creates an `AuditScope`, indicating a target object to track:
+
 ```c#
 Order order = Db.GetOrder(orderId);
 using (AuditScope.Create("Order:Update", () => order))
@@ -44,7 +46,32 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-> It is not mandatory to use a `using` block, but it simplifies the syntax allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
+> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single code block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
+
+You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single operation:
+```c#
+public class SomethingThatStartsAndEnds
+{
+    private AuditScope auditScope;
+
+    public int Status { get; set; }
+
+    public void Start()
+    {
+        Status = 0;
+        // Create the scope
+        auditScope = AuditScope.Create("MyEvent", () => Status);
+    }
+
+    public void End()
+    {
+        Status = 1;
+        // Dispose the scope (will save the event)
+        auditScope.Dispose();  
+    }
+}
+```
+
 
 The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the end of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
