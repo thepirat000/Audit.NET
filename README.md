@@ -274,7 +274,18 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-You can also define the mechanism at run time by using the `DynamicDataProvider` provider.
+You set the provider to use globally, assign the property `Configuration.DataProvider`, for example:
+```c#
+Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
+```
+
+Or by using the fluent API:
+```c#
+Audit.Core.Configuration.Setup()
+	.UseCustomProvider(new MyFileDataProvider());
+```
+
+As an anternative, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
 
 For example:
 ```c#
@@ -283,7 +294,8 @@ var dataProvider = new DynamicDataProvider();
 dataProvider.AttachOnInsert(ev => Console.Write(ev.ToJson()));
 Audit.Core.Configuration.DataProvider = dataProvider;
 ```
- Or by using the fluent API:
+
+Or by using the fluent API:
  
 ```c#
 Audit.Core.Configuration.Setup()
