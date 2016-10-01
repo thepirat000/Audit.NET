@@ -202,7 +202,7 @@ Audit.Core.Configuration.Setup()
 	    
 	        // Commit the transaction
 	        var ctx = auditEvent.GetEntityFrameworkEvent().DbContext;
-                ctx.Database.CurrentTransaction.Commit();
+            ctx.Database.CurrentTransaction.Commit();
         }))
         .WithCreationPolicy(EventCreationPolicy.Manual)
         .WithAction(action => action.OnScopeCreated(scope =>
