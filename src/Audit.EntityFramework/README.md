@@ -207,7 +207,7 @@ Audit.Core.Configuration.Setup()
         .WithCreationPolicy(EventCreationPolicy.Manual)
         .WithAction(action => action.OnScopeCreated(scope =>
         {
-	    // Create a transaction when a scope is created
+	        // Create a transaction when a scope is created
             var ctx = scope.Event.GetEntityFrameworkEvent().DbContext;
             ctx.Database.BeginTransaction();
         }));
