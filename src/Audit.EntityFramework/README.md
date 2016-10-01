@@ -183,7 +183,32 @@ using(var context = new MyEntitites())
 }
 ```
 
-Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions).
+Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions) for more information.
+
+### Audit in a transaction
+
+To generate **transactional** audit logs, so when the audit logging fails, the audited operation is rolled back, you can use a [custom action](https://github.com/thepirat000/Audit.NET#custom-actions) to begin a transaction that will be commited by a custom [audit data provider](https://github.com/thepirat000/Audit.NET#data-providers).
+
+For example:
+```c#
+Audit.Core.Configuration.Setup()
+    .UseDynamicProvider(p => p
+        .OnInsert(auditEvent =>
+        {
+	    // ... your logic to store the audit event ...
+	    
+	    // Commit the transaction
+	    var ctx = auditEvent.GetEntityFrameworkEvent().DbContext;
+            ctx.Database.CurrentTransaction.Commit();
+        }))
+        .WithCreationPolicy(EventCreationPolicy.Manual)
+        .WithAction(action => action.OnScopeCreated(scope =>
+        {
+	    // Create a transaction when a scope is created
+            var ctx = scope.Event.GetEntityFrameworkEvent().DbContext;
+            ctx.Database.BeginTransaction();
+        }));
+```
 
 ## Output samples
 - Output sample for a failed insert operation:
