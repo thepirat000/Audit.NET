@@ -195,7 +195,7 @@ To generate **transactional** audit logs, so when the audit logging fails, the a
 For example:
 ```c#
 Audit.Core.Configuration.Setup()
-    .UseDynamicProvider(p => p
+    .UseDynamicProvider(config => config
         .OnInsert(auditEvent =>
         {
 	    // ... your logic to store the audit event ...
