@@ -198,11 +198,11 @@ Audit.Core.Configuration.Setup()
     .UseDynamicProvider(config => config
         .OnInsert(auditEvent =>
         {
-	    // ... your logic to store the audit event ...
+	        // ... your logic to store the audit event ...
 	    
-	    // Commit the transaction
-	    var ctx = auditEvent.GetEntityFrameworkEvent().DbContext;
-            ctx.Database.CurrentTransaction.Commit();
+	        // Commit the transaction
+	        var ctx = auditEvent.GetEntityFrameworkEvent().DbContext;
+                ctx.Database.CurrentTransaction.Commit();
         }))
         .WithCreationPolicy(EventCreationPolicy.Manual)
         .WithAction(action => action.OnScopeCreated(scope =>
