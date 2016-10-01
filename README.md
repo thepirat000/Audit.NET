@@ -22,14 +22,14 @@ PM> Install-Package Audit.NET
 
 ##Contents
 
-- [Usage](https://github.com/thepirat000/Audit.NET/blob/master/README.md#usage)
-- [Output Details](https://github.com/thepirat000/Audit.NET/blob/master/README.md#output-details)
-- [Custom Fields and Comments](https://github.com/thepirat000/Audit.NET/blob/master/README.md#custom-fields-and-comments)
-- [Discard option](https://github.com/thepirat000/Audit.NET/blob/master/README.md#discard-option)
-- [Data providers](https://github.com/thepirat000/Audit.NET#event-output-data-providers)
-- [Event Creation Policy](https://github.com/thepirat000/Audit.NET#event-creation-policy)
-- [Configuration](https://github.com/thepirat000/Audit.NET#configuration)
-- [Extensions](https://github.com/thepirat000/Audit.NET#extensions)
+- [Usage](#usage)
+- [Output Details](#output-details)
+- [Custom Fields and Comments](#custom-fields-and-comments)
+- [Discard option](#discard-option)
+- [Data providers](#event-output-data-providers)
+- [Event Creation Policy](#event-creation-policy)
+- [Configuration](#configuration)
+- [Extensions](#extensions)
 
 
 ## Usage
