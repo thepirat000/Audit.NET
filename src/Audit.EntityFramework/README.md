@@ -170,6 +170,9 @@ The following tables describes the Audit.EntityFramework output fields:
 
 
 ## Customization
+
+### Custom fields
+
 You can add extra information to the events by calling the method `AddAuditCustomField` on the `DbContext`. For example:
 
 ```c#
