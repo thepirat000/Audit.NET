@@ -58,9 +58,9 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single code block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
+> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
-You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single operation:
+You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single event:
 ```c#
 public class SomethingThatStartsAndEnds
 {
@@ -84,9 +84,7 @@ public class SomethingThatStartsAndEnds
 }
 ```
 
-
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the end of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
-
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
 For example:
@@ -98,7 +96,7 @@ The library will generate an output (`AuditEvent`) for each operation, including
 - Tracked object's state before and after the operation.
 - Execution time and duration.
 - Environment information such as user, machine, domain, locale, etc.
-- [Comments and Custom Fields](#custom-fields-and-comments) provided
+- [Comments and Custom Fields](#custom-fields-and-comments) provided.
 
 An example of the output in JSON:
 
@@ -149,6 +147,8 @@ The following tables describes the output fields:
 | **Duration** | integer | Duration of the event in milliseconds |
 | **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
+| **CustomFields** | Dictionary | User-defined custom fields |
+
 
 - ### [Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 | Field Name | Type | Description | 
