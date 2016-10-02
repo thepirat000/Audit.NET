@@ -131,6 +131,7 @@ namespace Audit.EntityFramework
         private void SaveScope(AuditScope scope, EntityFrameworkEvent @event)
         {
             scope.SetCustomField("EntityFrameworkEvent", @event);
+            OnScopeSaving(scope);
             scope.Save();
         }
 
@@ -189,6 +190,7 @@ namespace Audit.EntityFramework
                     scope.SetCustomField(field.Key, field.Value);
                 }
             }
+            OnScopeCreated(scope);
             return scope;
         }
 
@@ -230,9 +232,26 @@ namespace Audit.EntityFramework
             var connId = sqlConnection?.ClientConnectionId;
             return connId.HasValue && !connId.Equals(Guid.Empty) ? connId.Value.ToString() : null;
         }
-#endregion
 
-#region Public methods
+        /// <summary>
+        /// Called after the audit scope is created.
+        /// Override to specify custom logic.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        protected virtual void OnScopeCreated(AuditScope auditScope)
+        {
+        }
+        /// <summary>
+        /// Called after the EF operation execution and before the AuditScope saving.
+        /// Override to specify custom logic.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        protected virtual void OnScopeSaving(AuditScope auditScope)
+        {
+        }
+        #endregion
+
+        #region Public methods
 
         /// <summary>
         /// Adds a custom field to the audit scope.

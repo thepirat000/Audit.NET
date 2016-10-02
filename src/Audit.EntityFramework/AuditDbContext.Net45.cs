@@ -140,7 +140,7 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="includeEntities">To indicate if it must incluide the serialized entities.</param>
         /// <param name="mode">The option mode to include/exclude entities from Audit.</param>
-        public EntityFrameworkEvent CreateAuditEvent(bool includeEntities, AuditOptionMode mode)
+        private EntityFrameworkEvent CreateAuditEvent(bool includeEntities, AuditOptionMode mode)
         {
             var modifiedEntries = GetModifiedEntries(mode);
             if (modifiedEntries.Count == 0)

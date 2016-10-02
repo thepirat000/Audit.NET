@@ -3,6 +3,9 @@ using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -12,6 +15,7 @@ using Xunit;
 
 namespace Audit.IntegrationTest
 {
+    [Collection("EF")]
     public class EntityFrameworkTests_Core
     {
         [Fact]
@@ -56,6 +60,8 @@ namespace Audit.IntegrationTest
             Assert.NotNull(ev2.TransactionId);
             Assert.Null(ev3.TransactionId);
             Assert.Equal(ev1.TransactionId, ev2.TransactionId);
+
+            Audit.Core.Configuration.ResetCustomActions();
         }
 
         [Fact]
@@ -88,6 +94,8 @@ namespace Audit.IntegrationTest
             {
                 ctx.Database.EnsureCreated();
                 ctx.Database.ExecuteSqlCommand(@"
+delete from AuditPosts
+delete from AuditBlogs
 delete from Posts
 delete from Blogs
 SET IDENTITY_INSERT Blogs ON 
@@ -186,6 +194,52 @@ SET IDENTITY_INSERT Posts OFF
 
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<AuditPost> AuditPosts { get; set; }
+        public DbSet<AuditBlog> AuditBlogs { get; set; }
+    }
+
+    public class MyTransactionalContext : MyBaseContext
+    {
+        protected override void OnScopeCreated(AuditScope auditScope)
+        {
+            Database.BeginTransaction();
+        }
+        protected override void OnScopeSaved(AuditScope auditScope)
+        {
+            if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
+                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"] == "ROLLBACK")
+            {
+                GetCurrentTran().Rollback();
+            }
+            else
+            {
+                GetCurrentTran().Commit();
+            }
+        }
+
+        private IDbContextTransaction GetCurrentTran()
+        {
+            var dbtxmgr = this.GetInfrastructure().GetService<IDbContextTransactionManager>();
+            var relcon = dbtxmgr as IRelationalConnection;
+            return relcon.CurrentTransaction;
+        }
+    }
+
+    [AuditIgnore]
+    public class AuditBlog
+    {
+        public int Id { get; set; }
+        public int BlogId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Changes { get; set; }
+    }
+    [AuditIgnore]
+    public class AuditPost
+    {
+        public int Id { get; set; }
+        public int PostId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Changes { get; set; }
     }
 
     public class Blog

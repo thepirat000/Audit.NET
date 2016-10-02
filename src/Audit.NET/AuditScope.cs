@@ -70,7 +70,7 @@ namespace Audit.Core
                 };
             }
             ProcessExtraFields(extraFields);
-            // Execute custom on-saving actions
+            // Execute custom on scope created actions
             Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
 
             // Process the event insertion (if applies)
@@ -274,6 +274,7 @@ namespace Audit.Core
             {
                 return; 
             }
+            // Execute custom on event saving actions
             Configuration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
             if (_eventId != null && !forceInsert)
             {

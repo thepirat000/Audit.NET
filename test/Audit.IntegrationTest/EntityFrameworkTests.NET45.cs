@@ -1,5 +1,6 @@
 ﻿#if NET451
 using Audit.Core;
+using Audit.Core.Providers;
 using Audit.EntityFramework;
 using Moq;
 using System;
@@ -10,6 +11,7 @@ using Xunit;
 
 namespace Audit.IntegrationTest
 {
+    [Collection("EF")]
     public class EntityFrameworkTests_Net45
     {
         [Fact]
@@ -53,6 +55,8 @@ namespace Audit.IntegrationTest
             Assert.NotNull(ev2.TransactionId);
             Assert.Null(ev3.TransactionId);
             Assert.Equal(ev1.TransactionId, ev2.TransactionId);
+
+            Audit.Core.Configuration.ResetCustomActions();
         }
 
         [Fact]
@@ -168,10 +172,50 @@ SET IDENTITY_INSERT Posts OFF
 
         public MyBaseContext()
             : base("data source=localhost;initial catalog=Blogs;integrated security=true;")
-        { }
+        {
+        }
 
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<AuditPost> AuditPosts { get; set; }
+        public DbSet<AuditBlog> AuditBlogs { get; set; }
+    }
+
+    public class MyTransactionalContext : MyBaseContext
+    {
+        protected override void OnScopeCreated(AuditScope auditScope)
+        {
+            Database.BeginTransaction();
+        }
+        protected override void OnScopeSaved(AuditScope auditScope)
+        {
+            if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
+                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"] == "ROLLBACK")
+            {
+                Database.CurrentTransaction.Rollback();
+            }
+            else
+            {
+                Database.CurrentTransaction.Commit();
+            }
+        }
+    }
+
+        [AuditIgnore]
+    public class AuditBlog
+    {
+        public int Id { get; set; }
+        public int BlogId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Changes { get; set; }
+    }
+    [AuditIgnore]
+    public class AuditPost
+    {
+        public int Id { get; set; }
+        public int PostId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Changes { get; set; }
     }
 
     public class Blog

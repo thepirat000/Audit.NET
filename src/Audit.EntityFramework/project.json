@@ -1,6 +1,6 @@
 {
   "title": "Audit.EntityFramework",
-  "version": "4.5.3-*",
+  "version": "4.5.4-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -43,7 +43,7 @@
       ],
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "Microsoft.EntityFrameworkCore": "1.0.0",
+        "Microsoft.EntityFrameworkCore": "1.0.1",
         "Microsoft.EntityFrameworkCore.SqlServer.Design": "1.0.0"
       }
     },
