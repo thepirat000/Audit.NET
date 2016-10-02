@@ -121,7 +121,6 @@ To configure the output persistence mechanism please see [Event Output Configura
 The `AuditDbContext` has the following virtual methods that can be overriden to provide your custom logic:
 - **OnScopeCreated**: Called before the EF operation execution and after the `AuditScope` creation.
 - **OnScopeSaving**: Called after the EF operation execution and before the `AuditScope` saving.
-- **OnScopeSaved**: Called after `AuditScope` saving.
 
 This is useful to, for example, save the audit logs in the same transaction as the CRUD operation being audited, so when the audit logging fails the audited operation is rolled back.
 
@@ -139,7 +138,7 @@ public class MyDbContext : AuditDbContext
 		Database.BeginTransaction();
 	}
 
-	protected override void OnScopeSaved(AuditScope auditScope)
+	protected override void OnScopeSaving(AuditScope auditScope)
 	{
 		try	
 		{
@@ -156,7 +155,7 @@ public class MyDbContext : AuditDbContext
 }
 ```
 
-> Note that in the example above, since the event saving is done on the `OnScopeSaved` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this is done specifying an empty dynamic provider.
+> Note that in the example above, since the event saving is done on the `OnScopeSaving` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this can be done specifying an empty dynamic provider.
 
 ## How it works
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
