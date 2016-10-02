@@ -128,24 +128,24 @@ This is useful to, for example, save the audit logs in the same transaction as t
 ```c#
 public class MyDbContext : AuditDbContext
 {
-    protected override void OnScopeCreated(AuditScope auditScope)
-    {
-        Database.BeginTransaction();
-    }
+	protected override void OnScopeCreated(AuditScope auditScope)
+	{
+		Database.BeginTransaction();
+	}
 
-    protected override void OnScopeSaved(AuditScope auditScope)
-    {
-    	try	
+	protected override void OnScopeSaved(AuditScope auditScope)
 	{
-            // ... custom audit log saving/handling ...
+		try	
+		{
+			// ... custom audit log saving/handling ...
+		}
+		catch
+		{
+			Database.CurrentTransaction.Rollback();
+			throw;
+		}
+		Database.CurrentTransaction.Commit();
 	}
-	catch
-	{
-	    Database.CurrentTransaction.Rollback();
-	    throw;
-	}
-	Database.CurrentTransaction.Commit();
-    }
 }
 ```
 
