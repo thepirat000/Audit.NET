@@ -20,9 +20,7 @@ PM> Install-Package Audit.DynamicProxy
 
 To enable the audit log for an instance of a class, create a proxy for the class by calling the `AuditProxy.Create<>()` method.
 
-This will return a proxied _audit-enabled_ instance of the class that you should use instead of the real instance. Each operation on the proxy (access to a property or method call) will generate an Audit Event. 
-
-
+This will return a proxied _audit-enabled_ instance that you should use instead of the real instance. Each operation on the proxy (access to a property or method call) will generate an Audit Event. 
 
 Suppose you have a `MyRepository` instance that you want to audit, like this:
 ```c#
