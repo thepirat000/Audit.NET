@@ -256,7 +256,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 
 ## Data providers
 
-A _data provider_ lets you define what to do with the audit logs.
+A _data provider_ contains the logic to handle the audit event output, where you define what to do with the audit logs.
 
 You can inject your own mechanism by creating a class that inherits from `AuditDataProvider`, overriding the following methods:
 
