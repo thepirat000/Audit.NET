@@ -258,7 +258,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 
 A _data provider_ contains the logic to handle the audit event output, where you define what to do with the audit logs.
 
-You can inject your own mechanism by creating a class that inherits from `AuditDataProvider`, overriding the following methods:
+You can use one of the [data providers included](#data-providers-included) or inject your own mechanism by creating a class that inherits from `AuditDataProvider`, overriding the following methods:
 
 - `InsertEvent`: should return a unique ID for the event. 
 - `ReplaceEvent`: should update an event given its ID, this method is only called for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
