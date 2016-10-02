@@ -143,7 +143,7 @@ public class MyDbContext : AuditDbContext
 	{
 		try	
 		{
-			// ... custom audit log saving/handling ...
+			// ... custom log saving ...
 		}
 		catch
 		{
