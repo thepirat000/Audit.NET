@@ -319,7 +319,7 @@ Audit.Core.Configuration.Setup()
 
 The Data Providers included are summarized in the following table:
 
-| Data Provider | Package | Description | Configuration API |
+| Data Provider | Package | Description | [Configuration API](#configuration-fluent-api) |
 | ------------ | ---------------- |  -------------- | ------------------ |
 | [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configure the directory and path. | `.UseFileLogProvider()` |
 | [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Write the audit logs to the Windows EventLog. | `.UseEventLogProvider()` |
