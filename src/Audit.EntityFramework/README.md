@@ -147,7 +147,7 @@ public class MyDbContext : AuditDbContext
 		}
 		catch
 		{
-			Database.CurrentTransaction.Rollback();
+			Database.CurrentTransaction.Rollback(); // not really necessary, if exception is thrown, transaction will never get commited
 			throw;
 		}
 		Database.CurrentTransaction.Commit();
