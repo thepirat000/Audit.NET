@@ -97,7 +97,7 @@ The `InterceptionSettings` class include the following settings:
 - **IgnoreEvents**: A boolean indicating whether the audit should ignore the event attach and detach operations.
  If _true_, the event accesses will not be logged. Default is _false_
 - **MethodFilter**: A function that takes a `MethodInfo` and returns a boolean indicating whether the method should be taken into account for the logging. Use this setting to have fine grained control over the methods that should be audited. By default all methods are included.
-- **AuditDataProvider**: Allows to set a specific audit data provider for this instance. By default the globally configured data provider is used. See [Audit.NET configuration](https://github.com/thepirat000/Audit.NET#data-provider) section for more information.
+- **AuditDataProvider**: Allows to set a specific audit data provider for this instance. By default the globally configured data provider is used. See [Audit.NET Data Providers](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers) section for more information.
 
 ## AuditIgnore Attribute
 
