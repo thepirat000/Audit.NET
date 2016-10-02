@@ -40,6 +40,7 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 
 ## Configuration
 
+### Settings
 The following settings can be configured per DbContext or globally:
 
 - **Mode**: To indicate the audit operation mode
@@ -115,6 +116,47 @@ All three can be used at the same time, and the precedence order is the order ex
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
+### Overrides
+
+The `AuditDbContext` has the following virtual methods that can be overriden to provide your custom logic:
+- **OnScopeCreated**: Called before the EF operation execution and after the `AuditScope` creation.
+- **OnScopeSaving**: Called after the EF operation execution and before the `AuditScope` saving.
+
+This is useful to, for example, save the audit logs in the same transaction as the CRUD operation being audited, so when the audit logging fails the audited operation is rolled back.
+
+```c#
+public class MyDbContext : AuditDbContext
+{
+	public MyDbContext()
+	{
+		// Set an empty DynamicDataProvider to avoid saving on the data provider
+		AuditDataProvider = new DynamicDataProvider();
+	}
+	
+	protected override void OnScopeCreated(AuditScope auditScope)
+	{
+		Database.BeginTransaction();
+	}
+
+	protected override void OnScopeSaving(AuditScope auditScope)
+	{
+		try	
+		{
+			// ... custom log saving ...
+		}
+		catch
+		{
+			// Rollback call is not mandatory. If exception thrown, the transaction won't get commited
+			Database.CurrentTransaction.Rollback(); 
+			throw;
+		}
+		Database.CurrentTransaction.Commit();
+	}
+}
+```
+
+> Note that in the example above, since the event saving is done on the `OnScopeSaving` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this can be done specifying an empty dynamic provider.
+
 ## How it works
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
@@ -170,6 +212,9 @@ The following tables describes the Audit.EntityFramework output fields:
 
 
 ## Customization
+
+### Custom fields
+
 You can add extra information to the events by calling the method `AddAuditCustomField` on the `DbContext`. For example:
 
 ```c#
@@ -183,7 +228,7 @@ using(var context = new MyEntitites())
 }
 ```
 
-Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions).
+Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions) for more information.
 
 ## Output samples
 - Output sample for a failed insert operation:

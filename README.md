@@ -20,6 +20,18 @@ PM> Install-Package Audit.NET
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
+##Contents
+
+- [Usage](#usage)
+- [Output Details](#output-details)
+- [Custom Fields and Comments](#custom-fields-and-comments)
+- [Discard option](#discard-option)
+- [Data providers](#event-output-data-providers)
+- [Event Creation Policy](#event-creation-policy)
+- [Configuration](#configuration)
+- [Extensions](#extensions)
+
+
 ## Usage
 
 Create an Audit Scope by calling the static `AuditScope.Create` method.
@@ -46,9 +58,9 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single code block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
+> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
-You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single operation:
+You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single event:
 ```c#
 public class SomethingThatStartsAndEnds
 {
@@ -72,9 +84,7 @@ public class SomethingThatStartsAndEnds
 }
 ```
 
-
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the end of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
-
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
 For example:
@@ -86,7 +96,7 @@ The library will generate an output (`AuditEvent`) for each operation, including
 - Tracked object's state before and after the operation.
 - Execution time and duration.
 - Environment information such as user, machine, domain, locale, etc.
-- [Comments and Custom Fields](#custom-fields-and-comments) provided
+- [Comments and Custom Fields](#custom-fields-and-comments) provided.
 
 An example of the output in JSON:
 
@@ -137,6 +147,8 @@ The following tables describes the output fields:
 | **Duration** | integer | Duration of the event in milliseconds |
 | **Target** | [**Target**](#target-object) | User-defined tracked object |
 | **Comments** | Array of strings | User-defined comments |
+| **CustomFields** | Dictionary | User-defined custom fields |
+
 
 - ### [Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 | Field Name | Type | Description | 
@@ -242,9 +254,9 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 }
 ```
 
-## Event output (data providers)
+## Data providers
 
-A _data provider_ lets you define what to do with the audit logs (events).
+A _data provider_ lets you define what to do with the audit logs.
 
 You can inject your own mechanism by creating a class that inherits from `AuditDataProvider`, overriding the following methods:
 
@@ -274,6 +286,34 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
+To indicate the data provider to use, assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
+```c#
+Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
+```
+
+Or using the fluent API:
+```c#
+Audit.Core.Configuration.Setup()
+	.UseCustomProvider(new MyFileDataProvider());
+```
+
+As an anternative, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
+
+For example:
+```c#
+var dataProvider = new DynamicDataProvider();
+// Attach an action for insert
+dataProvider.AttachOnInsert(ev => Console.Write(ev.ToJson()));
+Audit.Core.Configuration.DataProvider = dataProvider;
+```
+
+Or using the fluent API:
+ 
+```c#
+Audit.Core.Configuration.Setup()
+	.UseDynamicProvider(config => config
+		.OnInsert(ev => Console.Write(ev.ToJson())));
+```
 
 #### Data providers included
 
@@ -281,9 +321,9 @@ The Data Providers included are summarized in the following table:
 
 | Data Provider | Package | Description | Configuration API |
 | ------------ | ---------------- |  -------------- | ------------------ |
-| [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configuring the directory and path. | `.UseFileLogProvider()` |
+| [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configure the directory and path. | `.UseFileLogProvider()` |
 | [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Write the audit logs to the Windows EventLog. | `.UseEventLogProvider()` |
-| [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Lets you dynamically define and change the behavior at run-time. Define the _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()` |
+| [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Dynamically change the behavior at run-time. Define _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()` |
 | [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()` |
 | [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()` |
 | [AzureDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/Providers/AzureDbDataProvider.cs) | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. | `.UseAzureBlobStorage()` |
