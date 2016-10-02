@@ -128,6 +128,12 @@ This is useful to, for example, save the audit logs in the same transaction as t
 ```c#
 public class MyDbContext : AuditDbContext
 {
+	public MyDbContext()
+	{
+		// Set an empty DynamicDataProvider to avoid saving on the data provider
+		this.AuditDataProvider = new DynamicDataProvider();
+	}
+	
 	protected override void OnScopeCreated(AuditScope auditScope)
 	{
 		Database.BeginTransaction();
@@ -149,9 +155,10 @@ public class MyDbContext : AuditDbContext
 }
 ```
 
-In the example above, since the event saving is done on the `OnScopeSaved` method, you need to bypass the [Data Provider]() and one way is to specify an empty dynamic provider:
+> Note that in the example above, since the event saving is done on the `OnScopeSaved` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this is done specifying an empty dynamic provider.
 
 ```c#
+this.AuditDataProvider = new DynamicDataProvider();
     Audit.Core.Configuration.Setup()
         .UseDynamicProvider(_ => { });
 ```
