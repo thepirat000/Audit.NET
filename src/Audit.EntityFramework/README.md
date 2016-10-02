@@ -158,12 +158,6 @@ public class MyDbContext : AuditDbContext
 
 > Note that in the example above, since the event saving is done on the `OnScopeSaved` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this is done specifying an empty dynamic provider.
 
-```c#
-this.AuditDataProvider = new DynamicDataProvider();
-    Audit.Core.Configuration.Setup()
-        .UseDynamicProvider(_ => { });
-```
-
 ## How it works
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
