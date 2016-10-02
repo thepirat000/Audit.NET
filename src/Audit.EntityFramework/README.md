@@ -131,7 +131,7 @@ public class MyDbContext : AuditDbContext
 	public MyDbContext()
 	{
 		// Set an empty DynamicDataProvider to avoid saving on the data provider
-		this.AuditDataProvider = new DynamicDataProvider();
+		AuditDataProvider = new DynamicDataProvider();
 	}
 	
 	protected override void OnScopeCreated(AuditScope auditScope)
