@@ -7,11 +7,15 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.SetMode<T>(AuditOptionMode.OptIn);
             return new IncludeConfigurator<T>();
         }
-
         public IExcludeConfigurator<T> UseOptOut()
         {
             Configuration.SetMode<T>(AuditOptionMode.OptOut);
             return new ExcludeConfigurator<T>();
+        }
+        public IModeConfigurator<T> Reset()
+        {
+            Configuration.Reset<T>();
+            return this;
         }
     }
 }

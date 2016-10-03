@@ -19,5 +19,10 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="entityType">The entity type to include.</param>
         IncludeConfigurator<T> Include(Type entityType);
+        /// <summary>
+        /// Specifies the function that determines whether an entity is included or not.
+        /// </summary>
+        /// <param name="predicate">A function to test each entity type for a condition.</param>
+        IncludeConfigurator<T> IncludeAny(Func<Type, bool> predicate);
     }
 }

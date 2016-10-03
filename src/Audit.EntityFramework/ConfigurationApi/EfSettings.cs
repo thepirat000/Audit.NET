@@ -15,5 +15,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         public AuditOptionMode? Mode { get; set; }
         public HashSet<Type> IncludedTypes { get; set; }
         public HashSet<Type> IgnoredTypes { get; set; }
+        public Func<Type, bool> IgnoredTypesFilter { get; set; }
+        public Func<Type, bool> IncludedTypesFilter { get; set; }
     }
 }

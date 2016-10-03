@@ -43,7 +43,6 @@ namespace Audit.DynamicProxy.UnitTest
         string GetSomePropValue();
 
         Task AsyncMethodAsync(string parameter);
-
         Task<string> AsyncMethodAsyncWithCancellation(CancellationToken cancellationToken);
 
         Task<string> AsyncFunctionAsync(string parameter);
@@ -137,7 +136,8 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var scopeBefore = AuditProxy.CurrentScope;
             System.Diagnostics.Trace.WriteLine("AsyncFunctionAsync - Before await.");
-            await Task.Delay(int.Parse(parameter));
+            await Task.Delay(int.Parse(parameter)/2);
+            await Task.Delay(int.Parse(parameter)/2);
             System.Diagnostics.Trace.WriteLine("AsyncFunctionAsync - After await.");
             var scopeAfter = AuditProxy.CurrentScope;
             return "ok";

@@ -19,5 +19,10 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="entityType">The entity type to ignore.</param>
         IExcludeConfigurator<T> Ignore(Type entityType);
+        /// <summary>
+        /// Specifies the function that determines whether an entity is exluded or not.
+        /// </summary>
+        /// <param name="predicate">A function to test each entity type for a condition.</param>
+        IExcludeConfigurator<T> IgnoreAny(Func<Type, bool> predicate);
     }
 }

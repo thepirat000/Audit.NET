@@ -49,6 +49,24 @@ namespace Audit.EntityFramework
             EnsureConfigFor<TContext>().IgnoredTypes.Add(entityType);
         }
 
+        internal static void IgnoredEntitiesFilter<TContext>(Func<Type, bool> predicate)
+            where TContext : AuditDbContext
+        {
+            EnsureConfigFor<TContext>().IgnoredTypesFilter = predicate;
+        }
+
+        internal static void IncludedEntitiesFilter<TContext>(Func<Type, bool> predicate)
+            where TContext : AuditDbContext
+        {
+            EnsureConfigFor<TContext>().IncludedTypesFilter = predicate;
+        }
+
+        internal static void Reset<T>()
+            where T : AuditDbContext
+        {
+            _currentConfig.Remove(typeof(T));
+        }
+
         internal static EfSettings EnsureConfigFor<T>()
             where T : AuditDbContext
         {

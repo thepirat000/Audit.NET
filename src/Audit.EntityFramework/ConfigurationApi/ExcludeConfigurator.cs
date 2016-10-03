@@ -16,5 +16,12 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.IgnoreEntity<T>(typeof(TEntity));
             return this;
         }
+
+        public IExcludeConfigurator<T> IgnoreAny(Func<Type, bool> predicate)
+        {
+            Configuration.IgnoredEntitiesFilter<T>(predicate);
+            return this;
+        }
+
     }
 }

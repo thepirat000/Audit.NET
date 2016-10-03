@@ -16,5 +16,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// No entity is tracked by default, except those explicitly included.
         /// </summary>
         IIncludeConfigurator<T> UseOptIn();
+        /// <summary>
+        /// Resets the previous configuration for this type.
+        /// </summary>
+        IModeConfigurator<T> Reset();
     }
 }

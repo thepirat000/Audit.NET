@@ -38,24 +38,31 @@ namespace Audit.IntegrationTest
                     var wcfEvent = sc.Event.GetEntityFrameworkEvent();
                     Assert.Equal("Blogs", wcfEvent.Database);
                 }));
-
+            int blogId;
+            using (var ctx = new MyAuditedVerboseContext())
+            {
+                var blog = new Blog() { BloggerName = "fede", Title = "test" };
+                ctx.Blogs.Add(blog);
+                ctx.SaveChanges();
+                blogId = blog.Id;
+            }
             using (var ctx = new MyAuditedVerboseContext())
             {
                 using (var transaction = ctx.Database.BeginTransaction())
                 {
-                    ctx.Posts.Add(new Post() { BlogId = 1, Content = "other content 1", DateCreated = DateTime.Now, Title = "other title 1" });
+                    ctx.Posts.Add(new Post() { BlogId = blogId, Content = "other content 1", DateCreated = DateTime.Now, Title = "other title 1" });
                     ctx.SaveChanges();
-                    ctx.Posts.Add(new Post() { BlogId = 1, Content = "other content 2", DateCreated = DateTime.Now, Title = "other title 2" });
+                    ctx.Posts.Add(new Post() { BlogId = blogId, Content = "other content 2", DateCreated = DateTime.Now, Title = "other title 2" });
                     ctx.SaveChanges();
                     transaction.Rollback();
                 }
-                ctx.Posts.Add(new Post() { BlogId = 1, Content = "other content 3", DateCreated = DateTime.Now, Title = "other title 3" });
+                ctx.Posts.Add(new Post() { BlogId = blogId, Content = "other content 3", DateCreated = DateTime.Now, Title = "other title 3" });
                 
                 ctx.SaveChanges();
             }
-            var ev1 = (auditEvents[0].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
-            var ev2 = (auditEvents[1].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
-            var ev3 = (auditEvents[2].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
+            var ev1 = (auditEvents[1].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
+            var ev2 = (auditEvents[2].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
+            var ev3 = (auditEvents[3].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
             Assert.NotNull(ev1.TransactionId);
             Assert.NotNull(ev2.TransactionId);
             Assert.Null(ev3.TransactionId);
@@ -207,7 +214,7 @@ SET IDENTITY_INSERT Posts OFF
         protected override void OnScopeSaving(AuditScope auditScope)
         {
             if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
-                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"] == "ROLLBACK")
+                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].ToString() == "ROLLBACK")
             {
                 GetCurrentTran().Rollback();
             }

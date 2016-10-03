@@ -15,5 +15,10 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.IncludeEntity<T>(typeof(TEntity));
             return this;
         }
+        public IncludeConfigurator<T> IncludeAny(Func<Type, bool> predicate)
+        {
+            Configuration.IncludedEntitiesFilter<T>(predicate);
+            return this;
+        }
     }
 }

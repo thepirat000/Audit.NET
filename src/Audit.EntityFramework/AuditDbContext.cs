@@ -72,7 +72,7 @@ namespace Audit.EntityFramework
 
         #region Private fields
         // Entities Include/Ignore attributes cache
-        private static readonly Dictionary<Type, bool?> EntitiesIncludedCache = new Dictionary<Type, bool?>();
+        private static readonly Dictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new Dictionary<Type, bool?>();
         // AuditDbContext Attribute cache
         private static Dictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new Dictionary<Type, AuditDbContextAttribute>();
         // User defined fields that will be stored as Custom Fields on the audit event
@@ -143,36 +143,79 @@ namespace Audit.EntityFramework
 #endif
         {
             var type = entry.Entity.GetType();
-            if (!EntitiesIncludedCache.ContainsKey(type))
+            bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false=ignored null=unknown
+            if (result == null)
+            {
+                // No static attributes, check the filters
+                var localConfig = EntityFramework.Configuration.GetConfigForType(GetType());
+                var globalConfig = EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
+                var included = EvalIncludeFilter(type, localConfig, globalConfig);
+                var ignored = EvalIgnoreFilter(type, localConfig, globalConfig);
+                result = included ? true : ignored ? false : (bool?)null;
+            }
+            if (mode == AuditOptionMode.OptIn)
+            {
+                // Include only explicitly included entities
+                return result.GetValueOrDefault();
+            }
+            // Include all, except the explicitly ignored entities
+            return result == null || result.Value;
+        }
+
+        private bool? EnsureEntitiesIncludeIgnoreAttrCache(Type type)
+        {
+            if (!EntitiesIncludeIgnoreAttrCache.ContainsKey(type))
             {
                 var includeAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIncludeAttribute));
                 if (includeAttr != null)
                 {
-                    EntitiesIncludedCache[type] = true; // Type Included by IncludeAttribute
+                    EntitiesIncludeIgnoreAttrCache[type] = true; // Type Included by IncludeAttribute
+                }
+                else if (type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute)) != null)
+                {
+                    EntitiesIncludeIgnoreAttrCache[type] = false; // Type Ignored by IgnoreAttribute
                 }
                 else
                 {
-                    var ignoreAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute));
-                    if (ignoreAttr != null)
-                    {
-                        EntitiesIncludedCache[type] = false; // Type Ignored by IgnoreAttribute
-                    }
-                    else
-                    {
-                        // No attribute specified, check the global config
-                        var localConfig = EntityFramework.Configuration.GetConfigForType(GetType());
-                        var globalConfig = EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
-                        var ignored = localConfig?.IgnoredTypes.Contains(type) ?? globalConfig?.IgnoredTypes.Contains(type) ?? false;
-                        var included = localConfig?.IncludedTypes.Contains(type) ?? globalConfig?.IncludedTypes.Contains(type) ?? false;
-                        EntitiesIncludedCache[type] = included ? true : ignored ? (bool?)false : null; 
-                    }
+                    EntitiesIncludeIgnoreAttrCache[type] = null; // No attribute
                 }
             }
-            if (mode == AuditOptionMode.OptIn)
+            return EntitiesIncludeIgnoreAttrCache[type];
+        }
+        /// <summary>
+        /// Gets the include value for a given entity type.
+        /// </summary>
+        private bool EvalIncludeFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
+        {
+            var includedExplicit = localConfig?.IncludedTypes.Contains(type) ?? globalConfig?.IncludedTypes.Contains(type) ?? false;
+            if (includedExplicit)
             {
-                return EntitiesIncludedCache[type] != null && EntitiesIncludedCache[type].Value;
+                return true;
             }
-            return EntitiesIncludedCache[type] == null || EntitiesIncludedCache[type].Value;
+            var includedFilter = localConfig?.IncludedTypesFilter ?? globalConfig?.IncludedTypesFilter;
+            if (includedFilter != null)
+            {
+                return includedFilter.Invoke(type);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the exclude value for a given entity type.
+        /// </summary>
+        private bool EvalIgnoreFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
+        {
+            var ignoredExplicit = localConfig?.IgnoredTypes.Contains(type) ?? globalConfig?.IgnoredTypes.Contains(type) ?? false;
+            if (ignoredExplicit)
+            {
+                return true;
+            }
+            var ignoredFilter = localConfig?.IgnoredTypesFilter ?? globalConfig?.IgnoredTypesFilter;
+            if (ignoredFilter != null)
+            {
+                return ignoredFilter.Invoke(type);
+            }
+            return false;
         }
 
         /// <summary>
