@@ -38,6 +38,9 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
+## How it works
+The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+
 ## Configuration
 
 ### Settings
@@ -113,6 +116,8 @@ In summary, you have three ways to configure the audit for the contexts:
 
 All three can be used at the same time, and the precedence order is the order exposed in the above list.
 
+### Event Output 
+
 To configure the output persistence mechanism please see [Configuration](https://github.com/thepirat000/Audit.NET#configuration) and [Data Providers](https://github.com/thepirat000/Audit.NET#data-providers) sections.
 
 ### Overrides
@@ -155,9 +160,6 @@ public class MyDbContext : AuditDbContext
 ```
 
 > Note that in the example above, since we want the event saving to be done on the `OnScopeSaving` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this can be done specifying an empty dynamic provider.
-
-## How it works
-The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ## Output
 
