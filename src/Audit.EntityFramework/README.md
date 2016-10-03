@@ -113,7 +113,7 @@ In summary, you have three ways to configure the audit for the contexts:
 
 All three can be used at the same time, and the precedence order is the order exposed in the above list.
 
-For more information about the output persistence mechanism please see [Data Providers](https://github.com/thepirat000/Audit.NET#data-providers) section.
+To configure the output persistence mechanism please see [Configuration](https://github.com/thepirat000/Audit.NET#configuration) and [Data Providers](https://github.com/thepirat000/Audit.NET#data-providers) sections.
 
 ### Overrides
 
