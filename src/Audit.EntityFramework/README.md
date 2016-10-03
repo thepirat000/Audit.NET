@@ -39,7 +39,9 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 ```
 
 ## How it works
-The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs.
+
+Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ## Configuration
 
