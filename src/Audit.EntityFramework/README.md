@@ -101,7 +101,7 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 
 You can also configure settings by using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
-For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding the entities `PostHistory` and `BlogHistory` from the audit:
+For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding from the audit the entities whose name ends with `History`:
 ```c#
 Audit.EntityFramework.Configuration.Setup()
     .ForContext<MyEntities>(config => config
