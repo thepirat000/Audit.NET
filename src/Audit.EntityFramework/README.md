@@ -38,6 +38,11 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
+## How it works
+The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs.
+
+Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+
 ## Configuration
 
 ### Settings
@@ -96,15 +101,14 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 
 You can also configure settings by using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
-For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding the entities `PostHistory` and `BlogHistory` from the audit:
+For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding from the audit the entities whose name ends with `History`:
 ```c#
 Audit.EntityFramework.Configuration.Setup()
     .ForContext<MyEntities>(config => config
         .IncludeEntityObjects()
         .AuditEventType("{context}:{database}"))
     .UseOptOut()
-        .Ignore<PostHistory>()
-        .Ignore<BlogHistory>();
+        .IgnoreAny(t => t.Name.EndsWith("History"));
 ```
 
 In summary, you have three ways to configure the audit for the contexts:
@@ -114,7 +118,9 @@ In summary, you have three ways to configure the audit for the contexts:
 
 All three can be used at the same time, and the precedence order is the order exposed in the above list.
 
-To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
+### Event Output 
+
+To configure the output persistence mechanism please see [Configuration](https://github.com/thepirat000/Audit.NET#configuration) and [Data Providers](https://github.com/thepirat000/Audit.NET#data-providers) sections.
 
 ### Overrides
 
@@ -156,9 +162,6 @@ public class MyDbContext : AuditDbContext
 ```
 
 > Note that in the example above, since we want the event saving to be done on the `OnScopeSaving` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this can be done specifying an empty dynamic provider.
-
-## How it works
-The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs. Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
 
 ## Output
 
