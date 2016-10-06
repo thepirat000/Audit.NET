@@ -15,8 +15,11 @@ namespace Audit.Core
         /// <param name="idColumnName">The primary key column name.</param>
         /// <param name="jsonColumnName">The column name where to store the json data.</param>
         /// <param name="lastUpdatedDateColumnName">The column name where to store the last updated date.</param>
+        /// <param name="lastUpdatedDateColumnName">The column name where to store the last updated date.</param>
+        /// <param name="schema">The schema name to use when storing the events.</param>
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, string connectionString,
-            string tableName = "Event", string idColumnName = "Id", string jsonColumnName = "Data", string lastUpdatedDateColumnName = null)
+            string tableName = "Event", string idColumnName = "Id", string jsonColumnName = "Data", string lastUpdatedDateColumnName = null,
+            string schema = null)
         {
             Configuration.DataProvider = new SqlDataProvider()
             {
@@ -24,7 +27,8 @@ namespace Audit.Core
                 TableName = tableName,
                 IdColumnName = idColumnName,
                 JsonColumnName = jsonColumnName,
-                LastUpdatedDateColumnName = lastUpdatedDateColumnName
+                LastUpdatedDateColumnName = lastUpdatedDateColumnName,
+                Schema = schema
             };
             return new CreationPolicyConfigurator();
         }
@@ -37,7 +41,7 @@ namespace Audit.Core
             var sqlDbConfig = new SqlServerProviderConfigurator();
             config.Invoke(sqlDbConfig);
             return UseSqlServer(configurator, sqlDbConfig._connectionString, sqlDbConfig._tableName, 
-                sqlDbConfig._idColumnName, sqlDbConfig._jsonColumnName, sqlDbConfig._lastUpdatedColumnName);
+                sqlDbConfig._idColumnName, sqlDbConfig._jsonColumnName, sqlDbConfig._lastUpdatedColumnName, sqlDbConfig._schema);
         }
     }
 }

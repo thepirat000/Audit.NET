@@ -30,5 +30,10 @@
         /// </summary>
         /// <param name="lastUpdatedColumnName">The last udpated date column name, or NULL to ignore.</param>
         ISqlServerProviderConfigurator LastUpdatedColumnName(string lastUpdatedColumnName);
+        /// <summary>
+        /// Specifies the SQL schema where to store the events
+        /// </summary>
+        /// <param name="schema">The Schema name.</param>
+        ISqlServerProviderConfigurator Schema(string schema);
     }
 }

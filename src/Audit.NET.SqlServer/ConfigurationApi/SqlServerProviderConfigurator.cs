@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace Audit.SqlServer.Configuration
     public class SqlServerProviderConfigurator : ISqlServerProviderConfigurator
     {
         internal string _connectionString = "data source=localhost;initial catalog=Audit;integrated security=true;";
+        internal string _schema = null;
         internal string _tableName = "Event";
         internal string _idColumnName = "Id";
         internal string _jsonColumnName = "Data";
@@ -42,5 +44,10 @@ namespace Audit.SqlServer.Configuration
             return this;
         }
 
+        public ISqlServerProviderConfigurator Schema(string schema)
+        {
+            _schema = schema;
+            return this;
+        }
     }
 }
