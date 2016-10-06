@@ -25,6 +25,7 @@ Audit.Core.Configuration.DataProvider = new SqlDataProvider()
 {
     ConnectionString =
         "data source=localhost;initial catalog=Audit;integrated security=true;",
+    Schema = "dbo",
     TableName = "Event",
     IdColumnName = "EventId",
     JsonColumnName = "Data",
@@ -37,6 +38,7 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 Audit.Core.Configuration.Setup()
     .UseSqlServer(config => config
         .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+	.Schema("dbo")
         .TableName("Event")
         .IdColumnName("EventId")
         .JsonColumnName("Data")
@@ -52,6 +54,7 @@ Mandatory:
 - **IdColumnName**: The column name of the event identifier (the primary key).
 
 Optional:
+- **Schema**: The SQL schema to use.
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
 
 ## Table constraints
