@@ -38,7 +38,7 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 Audit.Core.Configuration.Setup()
     .UseSqlServer(config => config
         .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
-	.Schema("dbo")
+	    .Schema("dbo")
         .TableName("Event")
         .IdColumnName("EventId")
         .JsonColumnName("Data")
