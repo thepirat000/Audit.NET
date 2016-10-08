@@ -36,7 +36,7 @@ PM> Install-Package Audit.NET
 
 Create an Audit Scope by calling the static `AuditScope.Create` method.
  
-Suppose you have the following code to cancel an order that you want to audit:
+Suppose you have the following code to _cancel an order_ that you want to audit:
 
 ```c#
 Order order = Db.GetOrder(orderId);
@@ -62,11 +62,15 @@ using (AuditScope.Create("Order:Update", () => order))
 
 The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
+### Simple logging
+
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
 For example:
 ```c#
 AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
 ```
+
+### Manual Saving
 
 You can control the creation and saving logic, by creating a _manual_ `AuditScope`. For example to log a pair of `Start`/`End` method calls as a single event:
 
