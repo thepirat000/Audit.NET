@@ -286,7 +286,7 @@ public class MyFileDataProvider : AuditDataProvider
         File.WriteAllText(fileName, json);
         return fileName;
     }
-    // Update an existing event given the ID and the event
+    // Replaces an existing event given the ID and the event
     public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
         // Override an existing event
