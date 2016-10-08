@@ -60,30 +60,6 @@ using (AuditScope.Create("Order:Update", () => order))
 
 > It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
-You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single event:
-```c#
-public class SomethingThatStartsAndEnds
-{
-    private AuditScope auditScope;
-
-    public int Status { get; set; }
-
-    public void Start()
-    {
-        // Create a manual scope
-        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
-    }
-
-    public void End()
-    {
-        // Save the event
-        auditScope.Save();  
-        // Call dispose to avoid further saving
-        auditScope.Dispose();
-    }
-}
-```
-
 The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
@@ -130,6 +106,30 @@ An example of the output in JSON:
 			"OrderItems": null
 		}
 	}
+}
+```
+
+You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single event:
+```c#
+public class SomethingThatStartsAndEnds
+{
+    private AuditScope auditScope;
+
+    public int Status { get; set; }
+
+    public void Start()
+    {
+        // Create a manual scope
+        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
+    }
+
+    public void End()
+    {
+        // Save the event
+        auditScope.Save();  
+        // Call dispose to avoid further saving
+        auditScope.Dispose();
+    }
 }
 ```
 
