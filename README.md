@@ -76,9 +76,10 @@ public class SomethingThatStartsAndEnds
 
     public void End()
     {
-        Status = 1;
         // Save the event
         auditScope.Save();  
+        // Call dispose to avoid further saving
+	auditScope.Dispose();
     }
 }
 ```
