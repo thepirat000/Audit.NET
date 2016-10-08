@@ -183,7 +183,7 @@ Describes an operation call event
 | ------------ | ---------------- |  -------------- |
 | ClassName  | string | Name of class where the operation is defined |
 | MethodName | string | Name of the audited method |
-| IsAsync | boolean | A boolean indicating whether this method is async |
+| IsAsync | boolean | A boolean indicating whether the audited method is async |
 | AsyncStatus | string | If the method is async, this will contain the final [Task status](https://msdn.microsoft.com/en-us/library/system.threading.tasks.taskstatus(v=vs.110).aspx) (`Canceled`, `Faulted`, `RanToCompletion`) |
 | InstanceQualifiedName  | string | Full qualified name of the class |
 | MethodSignature   | string | The complete method signature |
