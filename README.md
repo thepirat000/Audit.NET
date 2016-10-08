@@ -68,6 +68,31 @@ For example:
 AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
 ```
 
+You can control the creation and saving logic, by creating a _manual_ `AuditScope`. For example to log a pair of `Start`/`End` method calls as a single event:
+
+```c#
+public class SomethingThatStartsAndEnds
+{
+    private AuditScope auditScope;
+
+    public int Status { get; set; }
+
+    public void Start()
+    {
+        // Create a manual scope
+        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
+    }
+
+    public void End()
+    {
+        // Save the event
+        auditScope.Save();  
+        // Call dispose to avoid further saving
+        auditScope.Dispose();
+    }
+}
+```
+
 The library will generate an output (`AuditEvent`) for each operation, including:
 - Tracked object's state before and after the operation.
 - Execution time and duration.
@@ -106,30 +131,6 @@ An example of the output in JSON:
 			"OrderItems": null
 		}
 	}
-}
-```
-
-You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single event:
-```c#
-public class SomethingThatStartsAndEnds
-{
-    private AuditScope auditScope;
-
-    public int Status { get; set; }
-
-    public void Start()
-    {
-        // Create a manual scope
-        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
-    }
-
-    public void End()
-    {
-        // Save the event
-        auditScope.Save();  
-        // Call dispose to avoid further saving
-        auditScope.Dispose();
-    }
 }
 ```
 
