@@ -93,6 +93,8 @@ public class SomethingThatStartsAndEnds
 }
 ```
 
+For more information about the `EventCreationPolicy` please see [Event Creation Policy](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-creation-policy) section.
+
 The library will generate an output (`AuditEvent`) for each operation, including:
 - Tracked object's state before and after the operation.
 - Execution time and duration.
