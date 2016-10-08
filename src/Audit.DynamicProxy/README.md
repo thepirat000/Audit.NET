@@ -143,12 +143,14 @@ public class MyRepository : IMyRepository
     {
         var auditScope = AuditProxy.CurrentScope;   // Get the current scope
         auditScope.SetCustomField("TestField", Guid.NewGuid()); // Set a custom field
+        
+        //... existing code to insert user ...
+
         if (pleaseDoNotLog)
         {
             auditScope.Discard(); // Discard the event
         }
-        
-        //... existing code to insert user ...
+
         return await _repository.InsertUserAsync(userName);
     }
 }
