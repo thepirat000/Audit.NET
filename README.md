@@ -71,15 +71,15 @@ public class SomethingThatStartsAndEnds
     public void Start()
     {
         Status = 0;
-        // Create the scope
-        auditScope = AuditScope.Create("MyEvent", () => Status);
+        // Create a manual scope
+        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
     }
 
     public void End()
     {
         Status = 1;
-        // Dispose the scope (will save the event)
-        auditScope.Dispose();  
+        // Save the event
+        auditScope.Save();  
     }
 }
 ```
