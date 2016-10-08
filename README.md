@@ -91,8 +91,8 @@ public class SomethingThatStartsAndEnds
     {
         // Save the event
         auditScope.Save();  
-        // Call dispose to avoid further saving
-        auditScope.Dispose();
+        // Discard to avoid further saving
+        auditScope.Discard();
     }
 }
 ```
