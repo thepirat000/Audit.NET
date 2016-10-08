@@ -70,7 +70,6 @@ public class SomethingThatStartsAndEnds
 
     public void Start()
     {
-        Status = 0;
         // Create a manual scope
         auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
     }
