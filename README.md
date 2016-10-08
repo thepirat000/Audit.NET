@@ -196,7 +196,19 @@ using (var audit = AuditScope.Create("Order:Update", () => order))
     audit.Comment("Status Updated to Cancelled");
 }
 ```
-The output of the previous example would be:
+
+You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
+
+```c#
+using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+{
+    order.Status = -1;
+    order = Db.OrderUpdate(order);
+    audit.Comment("Status Updated to Cancelled");
+}
+```
+
+The output of the previous examples would be:
 
 ```javascript
 {
@@ -227,17 +239,6 @@ The output of the previous example would be:
 	"StartDate": "2016-08-23T11:34:44.656101-05:00",
 	"EndDate": "2016-08-23T11:34:55.1810821-05:00",
 	"Duration": 8531
-}
-```
-
-You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
-
-```c#
-using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
-{
-    order.Status = -1;
-    order = Db.OrderUpdate(order);
-    audit.Comment("Status Updated to Cancelled");
 }
 ```
 
