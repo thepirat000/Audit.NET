@@ -295,7 +295,9 @@ public class MyCustomDataProvider : AuditDataProvider
 }
 ```
 
-You can set a default data provider assigning the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
+You can set a default data provider assigning the `DataProvider` property on the global `Configuration` object. 
+
+For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
@@ -305,6 +307,8 @@ Or using the fluent API:
 Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
 ```
+
+See [Configuration section](#configuration) for more information.
 
 You can also set the data provider per-scope, by using an appropriate overload of the `AuditScope.Create` method, for example:
 ```c#
