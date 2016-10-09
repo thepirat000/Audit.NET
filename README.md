@@ -312,7 +312,7 @@ See [Configuration section](#configuration) for more information.
 
 You can also set the data provider per-scope, by using an appropriate overload of the `AuditScope.Create` method, for example:
 ```c#
-var audit = AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
+AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
 ```
 
 As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
