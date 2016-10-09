@@ -346,15 +346,15 @@ The Data Providers included are summarized in the following table:
 
 ## Event Creation Policy
 
-The audit scope can be configured to persist the event in different ways:
+The audit scope can be configured to call its data provider in different ways:
 - **Insert on End:** (**default**)
-The audit event is saved when the scope is disposed. 
+The audit event is inserted when the scope is disposed. 
 
 - **Insert on Start, Replace on End:**
-The event (on its initial state) is saved when the scope is created, and then the complete event information is updated when the scope is disposed. 
+The event (on its initial state) is inserted when the scope is created, and then the complete event information is replaced when the scope is disposed. 
 
 - **Insert on Start, Insert on End:**
-Two versions of the event are saved, the initial when the scope is created, and the final when the scope is disposed.
+Two versions of the event are inserted, the initial when the scope is created, and the final when the scope is disposed.
 
 - **Manual:**
 The event saving (insert/replace) should be explicitly invoked by calling the `Save()` method on the `AuditScope`.
