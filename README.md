@@ -296,7 +296,7 @@ public class MyCustomDataProvider : AuditDataProvider
 }
 ```
 
-To indicate the data provider to use, assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
+To indicate the data provider to use, you can assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
@@ -307,7 +307,12 @@ Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
 ```
 
-As an anternative, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
+You can also set the data provider per-scope, by using an appropriate overload of the `AuditScope.Create` method, for example:
+```c#
+var audit = AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
+```
+
+As an anternative to creating a class, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
 
 For example:
 ```c#
