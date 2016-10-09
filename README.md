@@ -23,14 +23,13 @@ PM> Install-Package Audit.NET
 ##Contents
 
 - [Usage](#usage)
-- [Output Details](#output-details)
+- [Output](#output)
 - [Custom Fields and Comments](#custom-fields-and-comments)
 - [Discard option](#discard-option)
-- [Data providers](#event-output-data-providers)
+- [Data providers](#data-providers)
 - [Event Creation Policy](#event-creation-policy)
 - [Configuration](#configuration)
 - [Extensions](#extensions)
-
 
 ## Usage
 
