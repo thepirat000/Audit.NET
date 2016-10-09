@@ -275,7 +275,7 @@ You can use one of the [data providers included](#data-providers-included) or in
 
 For example:
 ```c#
-public class MyFileDataProvider : AuditDataProvider
+public class MyCustomDataProvider : AuditDataProvider
 {
     public override object InsertEvent(AuditEvent auditEvent)
     {
@@ -298,13 +298,13 @@ public class MyFileDataProvider : AuditDataProvider
 
 To indicate the data provider to use, assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
 ```c#
-Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
+Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
 Or using the fluent API:
 ```c#
 Audit.Core.Configuration.Setup()
-	.UseCustomProvider(new MyFileDataProvider());
+	.UseCustomProvider(new MyCustomDataProvider());
 ```
 
 As an anternative, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
@@ -372,7 +372,7 @@ To change the default data provider, set the static property `DataProvider` on `
 
 For example, to set your own provider as the default data provider:
 ```c#
-Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
+Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
 ### Creation Policy
