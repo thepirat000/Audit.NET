@@ -432,7 +432,7 @@ Audit.Core.Configuration.Setup()
 
 ## Configuration examples
 
-##### File log provider with dynamic directory path and filename (fluent API):
+##### File log provider with dynamic directory path and filename:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseFileLogProvider(config => config
@@ -451,7 +451,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 
-##### Event log provider with an InsertOnEnd creation policy (fluent API):
+##### Event log provider with an InsertOnEnd creation policy:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
@@ -460,7 +460,7 @@ Audit.Core.Configuration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-##### Dynamic provider to log to the console (fluent API):
+##### Dynamic provider to log to the console:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseDynamicProvider(config => config
