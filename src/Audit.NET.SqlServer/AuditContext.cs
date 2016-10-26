@@ -3,10 +3,10 @@
 #if NET45
     using System.Data.Entity;
 
-    public class AuditDbContext : DbContext
+    internal class AuditContext : DbContext
     {
 
-        public AuditDbContext(string connectionString)
+        public AuditContext(string connectionString)
             : base(connectionString)
         {
         }
@@ -15,18 +15,18 @@
     using System.ComponentModel.DataAnnotations;
     using Microsoft.EntityFrameworkCore;
     
-    public class DynamicIdModel
+    internal class DynamicIdModel
     {
         [Key]
         public string Id { get; set; }
 
     }
 
-    public class AuditDbContext : DbContext
+    internal class AuditContext : DbContext
     {
         public DbSet<DynamicIdModel> FakeIdSet { get; set; }
         public string _connectionString;
-        public AuditDbContext(string connectionString)
+        public AuditContext(string connectionString)
         {
             _connectionString = connectionString;
         }

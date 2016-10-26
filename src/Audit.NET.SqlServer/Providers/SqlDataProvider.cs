@@ -84,7 +84,7 @@ namespace Audit.SqlServer.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var json = new SqlParameter("json", auditEvent.ToJson());
-            using (var ctx = new AuditDbContext(_connectionString))
+            using (var ctx = new AuditContext(_connectionString))
             {
                 var cmdText = string.Format("INSERT INTO {0} ([{1}]) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES (@json)", FullTableName, _jsonColumnName, _idColumnName);
 #if NET45
@@ -100,7 +100,7 @@ namespace Audit.SqlServer.Providers
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var json = auditEvent.ToJson();
-            using (var ctx = new AuditDbContext(_connectionString))
+            using (var ctx = new AuditContext(_connectionString))
             {
                 var ludScript = _lastUpdatedDateColumnName != null ? string.Format(", [{0}] = GETUTCDATE()", _lastUpdatedDateColumnName) : string.Empty;
                 var cmdText = string.Format("UPDATE {0} SET [{1}] = @json{2} WHERE [{3}] = @eventId",
