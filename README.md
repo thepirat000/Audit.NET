@@ -6,9 +6,9 @@ An extensible framework to audit executing operations in .NET including support 
 
 Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
-With Audit.NET you can generate tracking information about operations being executed. It will automatically log environmental information such as the caller user id, machine name, method name, exceptions, including the execution time and duration, exposing an extensible mechanism in which you can provide extra information or implement your output mechanism for the audit logs.
+With Audit.NET you can generate tracking information about operations being executed. It will log environmental information such as the caller user id, machine name, method name, exceptions, including execution time and duration, and exposing an extensible mechanism in which you can provide extra information or implement your output mechanism for the audit logs.
 
-Extensions to log to Files, Event Log, SQL, MongoDB, AzureBlob and DocumentDB are provided. 
+Extensions to log to json Files, Event Log, SQL, MongoDB, AzureBlob and DocumentDB are provided. 
 And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
 See [Extensions](#extensions) section for more information.
 
@@ -23,20 +23,19 @@ PM> Install-Package Audit.NET
 ##Contents
 
 - [Usage](#usage)
-- [Output Details](#output-details)
+- [Output](#output)
 - [Custom Fields and Comments](#custom-fields-and-comments)
 - [Discard option](#discard-option)
-- [Data providers](#event-output-data-providers)
+- [Data providers](#data-providers)
 - [Event Creation Policy](#event-creation-policy)
 - [Configuration](#configuration)
 - [Extensions](#extensions)
-
 
 ## Usage
 
 Create an Audit Scope by calling the static `AuditScope.Create` method.
  
-Suppose you have the following code to cancel an order that you want to audit:
+Suppose you have the following code to _cancel an order_ that you want to audit:
 
 ```c#
 Order order = Db.GetOrder(orderId);
@@ -60,7 +59,20 @@ using (AuditScope.Create("Order:Update", () => order))
 
 > It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
 
-You can create an `AuditScope` and reuse it on different methods, for example to log a pair of `Start`/`End` methods calls as a single event:
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
+
+### Simple logging
+
+If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
+For example:
+```c#
+AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
+```
+
+### Manual Saving
+
+You can control the creation and saving logic, by creating a _manual_ `AuditScope`. For example to log a pair of `Start`/`End` method calls as a single event:
+
 ```c#
 public class SomethingThatStartsAndEnds
 {
@@ -70,27 +82,23 @@ public class SomethingThatStartsAndEnds
 
     public void Start()
     {
-        Status = 0;
-        // Create the scope
-        auditScope = AuditScope.Create("MyEvent", () => Status);
+        // Create a manual scope
+        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
     }
 
     public void End()
     {
-        Status = 1;
-        // Dispose the scope (will save the event)
-        auditScope.Dispose();  
+        // Save the event
+        auditScope.Save();  
+        // Discard to avoid further saving
+        auditScope.Discard();
     }
 }
 ```
 
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
+For more information about the `EventCreationPolicy` please see [Event Creation Policy](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-creation-policy) section.
 
-If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
-For example:
-```c#
-AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
-```
+## Output
 
 The library will generate an output (`AuditEvent`) for each operation, including:
 - Tracked object's state before and after the operation.
@@ -187,7 +195,19 @@ using (var audit = AuditScope.Create("Order:Update", () => order))
     audit.Comment("Status Updated to Cancelled");
 }
 ```
-The output of the previous example would be:
+
+You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
+
+```c#
+using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+{
+    order.Status = -1;
+    order = Db.OrderUpdate(order);
+    audit.Comment("Status Updated to Cancelled");
+}
+```
+
+The output of the previous examples would be:
 
 ```javascript
 {
@@ -218,17 +238,6 @@ The output of the previous example would be:
 	"StartDate": "2016-08-23T11:34:44.656101-05:00",
 	"EndDate": "2016-08-23T11:34:55.1810821-05:00",
 	"Duration": 8531
-}
-```
-
-You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
-
-```c#
-using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
-{
-    order.Status = -1;
-    order = Db.OrderUpdate(order);
-    audit.Comment("Status Updated to Cancelled");
 }
 ```
 
@@ -265,7 +274,7 @@ You can use one of the [data providers included](#data-providers-included) or in
 
 For example:
 ```c#
-public class MyFileDataProvider : AuditDataProvider
+public class MyCustomDataProvider : AuditDataProvider
 {
     public override object InsertEvent(AuditEvent auditEvent)
     {
@@ -276,7 +285,7 @@ public class MyFileDataProvider : AuditDataProvider
         File.WriteAllText(fileName, json);
         return fileName;
     }
-    // Update an existing event given the ID and the event
+    // Replaces an existing event given the ID and the event
     public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
         // Override an existing event
@@ -286,20 +295,26 @@ public class MyFileDataProvider : AuditDataProvider
 }
 ```
 
-To indicate the data provider to use, assign the `DataProvider` property on the global `Configuration` object. See [Configuration section](#configuration) for more information. For example:
+You can set a default data provider assigning the `DataProvider` property on the global `Configuration` object. For example:
 ```c#
-Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
+Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
 Or using the fluent API:
 ```c#
 Audit.Core.Configuration.Setup()
-	.UseCustomProvider(new MyFileDataProvider());
+	.UseCustomProvider(new MyCustomDataProvider());
 ```
 
-As an anternative, you can define the mechanism at run time by using the `DynamicDataProvider` provider.
+See [Configuration section](#configuration) for more information.
 
-For example:
+You can also set the data provider per-scope, by using an appropriate overload of the `AuditScope.Create` method. For example:
+```c#
+AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
+```
+
+As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` provider. For example:
+
 ```c#
 var dataProvider = new DynamicDataProvider();
 // Attach an action for insert
@@ -307,7 +322,7 @@ dataProvider.AttachOnInsert(ev => Console.Write(ev.ToJson()));
 Audit.Core.Configuration.DataProvider = dataProvider;
 ```
 
-Or using the fluent API:
+Or by using the fluent API:
  
 ```c#
 Audit.Core.Configuration.Setup()
@@ -326,20 +341,20 @@ The Data Providers included are summarized in the following table:
 | [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Dynamically change the behavior at run-time. Define _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()` |
 | [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()` |
 | [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()` |
-| [AzureDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/Providers/AzureDbDataProvider.cs) | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. | `.UseAzureBlobStorage()` |
-| [AzureBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureBlobDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureDocumentDB()` |
+| [AzureDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/Providers/AzureDbDataProvider.cs) | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. | `.UseAzureDocumentDB()` |
+| [AzureBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureBlobDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureBlobStorage()` |
 
 ## Event Creation Policy
 
-The audit scope can be configured to persist the event in different ways:
+The audit scope can be configured to call its data provider in different ways:
 - **Insert on End:** (**default**)
-The audit event is saved when the scope is disposed. 
+The audit event is inserted when the scope is disposed. 
 
 - **Insert on Start, Replace on End:**
-The event (on its initial state) is saved when the scope is created, and then the complete event information is updated when the scope is disposed. 
+The event (on its initial state) is inserted when the scope is created, and then the complete event information is replaced when the scope is disposed. 
 
 - **Insert on Start, Insert on End:**
-Two versions of the event are saved, the initial when the scope is created, and the final when the scope is disposed.
+Two versions of the event are inserted, the initial when the scope is created, and the final when the scope is disposed.
 
 - **Manual:**
 The event saving (insert/replace) should be explicitly invoked by calling the `Save()` method on the `AuditScope`.
@@ -362,7 +377,7 @@ To change the default data provider, set the static property `DataProvider` on `
 
 For example, to set your own provider as the default data provider:
 ```c#
-Audit.Core.Configuration.DataProvider = new MyFileDataProvider();
+Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
 ### Creation Policy
@@ -417,7 +432,7 @@ Audit.Core.Configuration.Setup()
 
 ## Configuration examples
 
-##### File log provider with dynamic directory path and filename (fluent API):
+##### File log provider with dynamic directory path and filename:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseFileLogProvider(config => config
@@ -436,7 +451,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 
-##### Event log provider with an InsertOnEnd creation policy (fluent API):
+##### Event log provider with an InsertOnEnd creation policy:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEventLogProvider(config => config
@@ -445,7 +460,7 @@ Audit.Core.Configuration.Setup()
     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 ```
 
-##### Dynamic provider to log to the console (fluent API):
+##### Dynamic provider to log to the console:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseDynamicProvider(config => config
@@ -469,7 +484,7 @@ Generate detailed server-side audit logs for Windows Communication Foundation (W
 Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 
 - ### **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
-Generate detailed audit logs by decorating Web API Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.
+Generate detailed audit logs by decorating Web API Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core.
 
 - ### **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)**
 Generate detailed audit logs by decorating MVC Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.

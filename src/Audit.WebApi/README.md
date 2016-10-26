@@ -57,6 +57,15 @@ public class UsersController : ApiController
 }
 ```
 
+To apply the audit filter to all the controllers, you can add the `AuditApiAttribute` as a global filter, for example:
+
+```c#
+public static void Register(HttpConfiguration config)
+{
+    config.Filters.Add(new AuditApiAttribute());
+}
+```
+
 ## Configuration
 
 The `AuditApi` attribute can be configured with the following properties:
