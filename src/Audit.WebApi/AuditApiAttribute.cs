@@ -84,7 +84,7 @@ namespace Audit.WebApi
                 auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
                 auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(actionExecutedContext.ActionContext.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? actionExecutedContext.ActionContext.ModelState?.IsValid : null;
-                auditAction.ResponseBodyType = actionExecutedContext.Response.Content?.GetType().Name;
+                auditAction.ResponseBodyType = actionExecutedContext.Response?.Content.GetType().Name;
                 if (actionExecutedContext.Response != null)
                 {
                     auditAction.ResponseStatus = actionExecutedContext.Response.ReasonPhrase;
@@ -94,7 +94,7 @@ namespace Audit.WebApi
                         var objContent = actionExecutedContext.Response.Content as ObjectContent;
                         auditAction.ResponseBody = objContent != null
                             ? new { Type = objContent.ObjectType.Name, Value = objContent.Value }
-                            : (object)actionExecutedContext.Response.Content?.ReadAsStringAsync().Result;
+                            : (object)actionExecutedContext.Response.Content.ReadAsStringAsync().Result;
                     }
                 }
                 // Replace the Action field and save
