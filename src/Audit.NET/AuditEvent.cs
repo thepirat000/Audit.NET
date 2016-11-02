@@ -59,7 +59,11 @@ namespace Audit.Core
         [JsonProperty]
         public int Duration { get; set; }
 
-        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
 
         /// <summary>
         /// Converts the event to its JSON representation using JSON.NET.

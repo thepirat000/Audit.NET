@@ -233,32 +233,38 @@ SET IDENTITY_INSERT Posts OFF
     }
 
     [AuditIgnore]
-    public class AuditBlog
+    public class AuditBlog : BaseEntity
     {
-        public int Id { get; set; }
+        public override int Id { get; set; }
         public int BlogId { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Changes { get; set; }
     }
     [AuditIgnore]
-    public class AuditPost
+    public class AuditPost : BaseEntity
     {
-        public int Id { get; set; }
+        public override int Id { get; set; }
         public int PostId { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Changes { get; set; }
     }
 
-    public class Blog
+    public abstract class BaseEntity
     {
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
+
+    }
+
+    public class Blog : BaseEntity
+    {
+        public override int Id { get; set; }
         public string Title { get; set; }
         public string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
     }
-    public class Post
+    public class Post : BaseEntity
     {
-        public int Id { get; set; }
+        public override int Id { get; set; }
         [MaxLength(20)]
         public string Title { get; set; }
         public DateTime DateCreated { get; set; }

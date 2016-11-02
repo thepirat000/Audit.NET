@@ -29,4 +29,10 @@ cd ..
 
 cd Audit.DynamicProxy.UnitTest
 dotnet test
+echo continue...
+pause > nul
+cd ..
+
+cd Audit.EntityFramework.Edmx.UnitTest
+dotnet test
 cd ..

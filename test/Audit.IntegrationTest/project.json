@@ -3,9 +3,14 @@
   "testRunner": "xunit",
   "dependencies": {
     "Moq": "4.6.38-alpha",
-    "xunit": "2.2.0-beta2-build3300",
+    "xunit": "2.2.0-beta3-build3402",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "System.Runtime": "4.1.0"
+    "System.Runtime": "4.1.0",
+    "Audit.NET": { "target": "project" },
+    "Audit.NET.MongoDB": { "target": "project" },
+    "Audit.NET.SqlServer": { "target": "project" },
+    "Audit.NET.AzureStorage": { "target": "project" },
+    "Audit.EntityFramework": { "target": "project" }
   },
   "commands": {
     "test": "xunit.runner.visualstudio"
@@ -21,24 +26,14 @@
           "type": "platform",
           "version": "1.0.0"
         },
-        "Microsoft.NETCore.Platforms": "1.0.1",
-        "Audit.NET": { "target": "project" },
-        "Audit.NET.MongoDB": { "target": "project" },
-        "Audit.NET.SqlServer": { "target": "project" },
-        "Audit.NET.AzureStorage": { "target": "project" },
-        "Audit.EntityFramework": { "target": "project" }
+        "Microsoft.NETCore.Platforms": "1.0.1"
       }
     },
     "net451": {
       "dependencies": {
-        "Audit.NET": { "target": "project" },
-        "Audit.NET.MongoDB": { "target": "project" },
-        "Audit.NET.SqlServer": { "target": "project" },
-        "Audit.NET.AzureStorage": { "target": "project" },
+        "EntityFramework": "6.1.3",
         "Audit.NET.AzureDocumentDB": { "target": "project" },
-        "Audit.EntityFramework": { "target": "project" },
-        "Audit.WCF": { "target": "project" },
-        "EntityFramework": "6.1.3"
+        "Audit.WCF": { "target": "project" }
       },
       "frameworkAssemblies": {
         "System.Runtime.Serialization": "4.0.0.0",

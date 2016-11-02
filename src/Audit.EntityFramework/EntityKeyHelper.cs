@@ -90,12 +90,7 @@ public sealed class EntityKeyHelper
 
     private Type GetBaseEntityType(Type type)
     {
-        //retreive the base type
-        while (type.BaseType != typeof(object))
-        {
-            type = type.BaseType;
-        }
-        return type;
+        return ObjectContext.GetObjectType(type);
     }
     #endregion
 
