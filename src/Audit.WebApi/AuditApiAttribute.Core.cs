@@ -83,7 +83,7 @@ namespace Audit.WebApi
                 auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(context.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? context.ModelState?.IsValid : null;
                 auditAction.ResponseBodyType = context.Result?.GetType().Name;
-                if (context.HttpContext.Response != null)
+                if (context.HttpContext.Response != null && context.Result != null)
                 {
                     auditAction.ResponseStatus = context.HttpContext.Response.StatusCode.ToString();
                     auditAction.ResponseStatusCode = context.HttpContext.Response.StatusCode;
@@ -105,8 +105,12 @@ namespace Audit.WebApi
                                 auditAction.ResponseBody = string.Format("Result type: {0}", context.Result.GetType().Name);
                                 break;
                         }
-
                     }
+                }
+                else
+                {
+                    auditAction.ResponseStatusCode = 500;
+                    auditAction.ResponseStatus = "Internal Server Error";
                 }
                 // Replace the Action field and save
                 auditScope.SetCustomField("Action", auditAction);

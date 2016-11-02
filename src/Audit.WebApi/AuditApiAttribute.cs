@@ -97,6 +97,11 @@ namespace Audit.WebApi
                             : (object)actionExecutedContext.Response.Content?.ReadAsStringAsync().Result;
                     }
                 }
+                else
+                {
+                    auditAction.ResponseStatusCode = 500;
+                    auditAction.ResponseStatus = "Internal Server Error";
+                }
                 // Replace the Action field and save
                 auditScope.SetCustomField("Action", auditAction);
                 auditScope.Save();
