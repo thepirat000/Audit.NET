@@ -380,6 +380,8 @@ For example, to set your own provider as the default data provider:
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
+> If you don't specify a Data Provider, a default `FileDataProvider` will be used to write the events as .json files into the current working directory.
+
 ### Creation Policy
 To change the default creation policy, set the static property `SetCreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
  
@@ -387,6 +389,8 @@ For example, to set the default creation policy to Manual:
 ```c#
 Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
 ```
+
+> If you don't specify a Creation Policy, the default `Insert on End` will be used.
 
 ### Custom Actions
 You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
