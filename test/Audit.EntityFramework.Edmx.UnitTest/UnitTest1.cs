@@ -8,6 +8,48 @@ namespace Audit.EntityFramework.Edmx.UnitTest
 {
     public class UnitTest1
     {
+
+        [Fact]
+        public void Test_Delete_Ignored()
+        {
+            bool neverTrue = false;
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+                {
+                    neverTrue = true;
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(x => x.OnScopeCreated(sc =>
+                {
+                    var efEvent = sc.Event.GetEntityFrameworkEvent();
+                }));
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsEntities>(config => config
+                    .IncludeEntityObjects(false)
+                    .AuditEventType("{context}:{database}"))
+                .UseOptOut()
+                .IgnoreAny(x =>
+                {
+                    Assert.Equal("Post", x.Name);
+                    return x.Name == "Post";
+                });
+
+            using (var ctx = new BlogsEntities())
+            {
+                var post = new Post()
+                {
+                    DateCreated = DateTime.Now,
+                    Content = "test-content-x",
+                    BlogId = 1
+                };
+                ctx.Posts.Add(post);
+                ctx.SaveChanges();
+            }
+
+            Assert.False(neverTrue);
+        }
+
         [Fact]
         public void TestMethod1()
         {

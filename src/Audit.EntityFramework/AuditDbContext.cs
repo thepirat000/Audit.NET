@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 #elif NET45
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Core.Objects;
 #endif
 
 namespace Audit.EntityFramework
@@ -143,6 +144,9 @@ namespace Audit.EntityFramework
 #endif
         {
             var type = entry.Entity.GetType();
+#if NET45
+            type = ObjectContext.GetObjectType(type);
+#endif
             bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false=ignored null=unknown
             if (result == null)
             {
