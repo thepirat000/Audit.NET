@@ -65,22 +65,17 @@ namespace Audit.EntityFramework
         /// <param name="entry">The entry.</param>
         private List<EventEntryChange> GetChanges(DbEntityEntry entry)
         {
+            
             var result = new List<EventEntryChange>();
             foreach (var propName in entry.CurrentValues.PropertyNames)
             {
-                var current = entry.CurrentValues[propName];
-                var original = entry.OriginalValues[propName];
-                if (current == null && original == null)
-                {
-                    continue;
-                }
-                if (original == null || !original.Equals(current))
+                if (entry.Property(propName).IsModified)
                 {
                     result.Add(new EventEntryChange()
                     {
                         ColumnName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), entry.Property(propName).Name, this),
-                        NewValue = current,
-                        OriginalValue = original
+                        NewValue = entry.CurrentValues[propName],
+                        OriginalValue = entry.OriginalValues[propName]
                     });
                 }
             }

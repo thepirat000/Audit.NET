@@ -15,6 +15,31 @@ namespace Audit.IntegrationTest
     public class EntityFrameworkTests_Net45
     {
         [Fact]
+        public void Test_EF_Attach()
+        {
+            EntityFrameworkEvent efEvent = null;
+            Audit.Core.Configuration.Setup().UseDynamicProvider(x => x
+                .OnInsertAndReplace(ev => {
+                    efEvent = ev.GetEntityFrameworkEvent();
+                }));
+            using (var ctx = new MyAuditedVerboseContext())
+            {
+                var blog = new Blog()
+                {
+                    Id = 1,
+                    BloggerName = "def-22"
+                };
+                blog.Title = "Changed-" + Guid.NewGuid();
+                ctx.Blogs.Attach(blog);
+                ctx.Entry(blog).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+            Assert.Equal(1, efEvent.Entries.Count);
+            Assert.Equal("Update", efEvent.Entries[0].Action);
+            Assert.True(efEvent.Entries[0].Changes.Any(ch => ch.ColumnName == "Title"));
+        }
+
+        [Fact]
         public void Test_EF_Transaction()
         {
             var provider = new Mock<AuditDataProvider>();

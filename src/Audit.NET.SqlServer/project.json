@@ -1,6 +1,6 @@
 {
   "title": "Audit.SqlServer",
-  "version": "4.6.0-*",
+  "version": "4.6.1-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
