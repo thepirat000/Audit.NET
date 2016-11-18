@@ -65,7 +65,7 @@ namespace Audit.WebApi
                 .Replace("{controller}", auditAction.ControllerName)
                 .Replace("{action}", auditAction.ActionName);
             // Create the audit scope
-            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction }, EventCreationPolicy.Manual);
+            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction });
             httpContext.Items[AuditApiActionKey] = auditAction;
             httpContext.Items[AuditApiScopeKey] = auditScope;
         }

@@ -214,14 +214,10 @@ namespace Audit.Core
 
         /// <summary>
         /// Manually Saves (insert/replace) the Event.
-        /// Use this method when the Data Provider's CreationPolicy is set to Manual.
+        /// Use this method to save (insert/replace) the event when CreationPolicy is set to Manual.
         /// </summary>
         public void Save()
         {
-            if (_creationPolicy != EventCreationPolicy.Manual)
-            {
-                return;
-            }
             if (_ended)
             {
                 return;

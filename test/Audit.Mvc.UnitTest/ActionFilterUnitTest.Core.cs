@@ -18,7 +18,7 @@ namespace Audit.Mvc.UnitTest
     public class ActionFilterUnitTest
     {
         [Fact]
-        public void Test_AuditActionFilter_Core()
+        public void Test_AuditActionFilter_Core_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequest>();
@@ -49,7 +49,9 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
             var filter = new AuditAttribute()
             {
@@ -73,6 +75,152 @@ namespace Audit.Mvc.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
+            Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);
+            Assert.Equal("home", action.ControllerName);
+            Assert.Equal("value1", action.ActionParameters["test1"]);
+            Assert.Equal(200, action.ResponseStatusCode);
+        }
+
+        [Fact]
+        public void Test_AuditActionFilter_Core_InsertOnStartReplaceOnEnd()
+        {
+            // Mock out the context to run the action filter.
+            var request = new Mock<HttpRequest>();
+            request.SetupGet(r => r.Scheme).Returns("http");
+            request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
+            request.SetupGet(r => r.Path).Returns("/home/index");
+            var httpResponse = new Mock<HttpResponse>();
+            httpResponse.SetupGet(c => c.StatusCode).Returns(200);
+            var itemsDict = new Dictionary<object, object>();
+            var httpContext = new Mock<HttpContext>();
+            httpContext.SetupGet(c => c.Request).Returns(request.Object);
+            httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
+            httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var actionContext = new ActionContext()
+            {
+                HttpContext = httpContext.Object,
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
+                {
+                    ActionName = "index",
+                    ControllerName = "home"
+                }
+            };
+            var args = new Dictionary<string, object>()
+            {
+                {"test1", "value1" }
+            };
+            var filters = new List<IFilterMetadata>();
+            var controller = new Mock<Controller>();
+            var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            var filter = new AuditAttribute()
+            {
+                IncludeHeaders = true,
+                IncludeModel = true,
+                EventTypeName = "TestEvent"
+            };
+
+            var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
+            filter.OnActionExecuting(actionExecutingContext);
+
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+
+            Assert.Equal("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
+            Assert.Null(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+
+
+            var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
+            actionExecutedContext.Result = new ObjectResult("this is the result");
+            filter.OnActionExecuted(actionExecutedContext);
+
+            var action = itemsDict["__private_AuditAction__"] as AuditAction;
+            var scope = itemsDict["__private_AuditScope__"] as AuditScope;
+
+            //Assert
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            Assert.NotNull(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
+            Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);
+            Assert.Equal("home", action.ControllerName);
+            Assert.Equal("value1", action.ActionParameters["test1"]);
+            Assert.Equal(200, action.ResponseStatusCode);
+        }
+
+
+        [Fact]
+        public void Test_AuditActionFilter_Core_Manual()
+        {
+            // Mock out the context to run the action filter.
+            var request = new Mock<HttpRequest>();
+            request.SetupGet(r => r.Scheme).Returns("http");
+            request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
+            request.SetupGet(r => r.Path).Returns("/home/index");
+            var httpResponse = new Mock<HttpResponse>();
+            httpResponse.SetupGet(c => c.StatusCode).Returns(200);
+            var itemsDict = new Dictionary<object, object>();
+            var httpContext = new Mock<HttpContext>();
+            httpContext.SetupGet(c => c.Request).Returns(request.Object);
+            httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
+            httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var actionContext = new ActionContext()
+            {
+                HttpContext = httpContext.Object,
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
+                {
+                    ActionName = "index",
+                    ControllerName = "home"
+                }
+            };
+            var args = new Dictionary<string, object>()
+            {
+                {"test1", "value1" }
+            };
+            var filters = new List<IFilterMetadata>();
+            var controller = new Mock<Controller>();
+            var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
+            var filter = new AuditAttribute()
+            {
+                IncludeHeaders = true,
+                IncludeModel = true,
+                EventTypeName = "TestEvent"
+            };
+
+            var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
+            filter.OnActionExecuting(actionExecutingContext);
+
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+
+            Assert.Equal("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
+            Assert.Null(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+
+
+            var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
+            actionExecutedContext.Result = new ObjectResult("this is the result");
+            filter.OnActionExecuted(actionExecutedContext);
+
+            var action = itemsDict["__private_AuditAction__"] as AuditAction;
+            var scope = itemsDict["__private_AuditScope__"] as AuditScope;
+
+            //Assert
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            Assert.NotNull(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+
             Assert.Equal(action, actionFromController);
             Assert.Equal(scope, scopeFromController);
             Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);

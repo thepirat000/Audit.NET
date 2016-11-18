@@ -15,7 +15,7 @@ namespace Audit.Mvc.UnitTest
     public class ActionFilterUnitTest
     {
         [Fact]
-        public void Test_AuditActionFilter()
+        public void Test_AuditActionFilter_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
@@ -46,7 +46,9 @@ namespace Audit.Mvc.UnitTest
             };
             
             var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
             var filter = new AuditAttribute()
             {
@@ -67,6 +69,138 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            Assert.Equal("header-value", action.Headers["test-header"]);
+            Assert.Equal("get", action.ActionName);
+            Assert.Equal("value1", action.ActionParameters["test1"]);
+        }
+
+        [Fact]
+        public void Test_AuditActionFilter_Manual()
+        {
+            // Mock out the context to run the action filter.
+            var request = new Mock<HttpRequestBase>();
+            var nvc = new NameValueCollection();
+            //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
+            request.Setup(c => c.ContentType).Returns("application/json");
+            request.Setup(c => c.Headers).Returns(() => nvc);
+
+            var httpResponse = new Mock<HttpResponseBase>();
+
+            httpResponse.Setup(c => c.StatusCode).Returns(200);
+            var itemsDict = new Dictionary<object, object>();
+            var httpContext = new Mock<HttpContextBase>();
+            httpContext.SetupGet(c => c.Request).Returns(request.Object);
+            httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
+            httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var controllerContext = new ControllerContext()
+            {
+                HttpContext = httpContext.Object
+            };
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+            var actionDescriptor = new Mock<ActionDescriptor>();
+            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+
+            var args = new Dictionary<string, object>()
+            {
+                {"test1", "value1" }
+            };
+
+            var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
+
+            var filter = new AuditAttribute()
+            {
+                IncludeHeaders = true,
+                IncludeModel = true,
+                EventTypeName = "TestEvent"
+            };
+            var actionExecutingContext = new ActionExecutingContext(controllerContext, actionDescriptor.Object, new Dictionary<string, object> { { "test1", "value1" } });
+            filter.OnActionExecuting(actionExecutingContext);
+
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+
+            var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
+            filter.OnActionExecuted(actionExecutedContext);
+
+            var action = itemsDict["__private_AuditAction__"] as AuditAction;
+            var scope = itemsDict["__private_AuditScope__"] as AuditScope;
+
+            //Assert
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            Assert.Equal(action, actionFromController);
+            Assert.Equal(scope, scopeFromController);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            Assert.Equal("header-value", action.Headers["test-header"]);
+            Assert.Equal("get", action.ActionName);
+            Assert.Equal("value1", action.ActionParameters["test1"]);
+        }
+
+        [Fact]
+        public void Test_AuditActionFilter_InsertOnStartReplaceOnEnd()
+        {
+            // Mock out the context to run the action filter.
+            var request = new Mock<HttpRequestBase>();
+            var nvc = new NameValueCollection();
+            //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
+            request.Setup(c => c.ContentType).Returns("application/json");
+            request.Setup(c => c.Headers).Returns(() => nvc);
+
+            var httpResponse = new Mock<HttpResponseBase>();
+
+            httpResponse.Setup(c => c.StatusCode).Returns(200);
+            var itemsDict = new Dictionary<object, object>();
+            var httpContext = new Mock<HttpContextBase>();
+            httpContext.SetupGet(c => c.Request).Returns(request.Object);
+            httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
+            httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var controllerContext = new ControllerContext()
+            {
+                HttpContext = httpContext.Object
+            };
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+            var actionDescriptor = new Mock<ActionDescriptor>();
+            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+
+            var args = new Dictionary<string, object>()
+            {
+                {"test1", "value1" }
+            };
+
+            var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+
+            var filter = new AuditAttribute()
+            {
+                IncludeHeaders = true,
+                IncludeModel = true,
+                EventTypeName = "TestEvent"
+            };
+            var actionExecutingContext = new ActionExecutingContext(controllerContext, actionDescriptor.Object, new Dictionary<string, object> { { "test1", "value1" } });
+            filter.OnActionExecuting(actionExecutingContext);
+
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+
+            var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
+            filter.OnActionExecuted(actionExecutedContext);
+
+            var action = itemsDict["__private_AuditAction__"] as AuditAction;
+            var scope = itemsDict["__private_AuditScope__"] as AuditScope;
+
+            //Assert
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.Equal(action, actionFromController);
             Assert.Equal(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);

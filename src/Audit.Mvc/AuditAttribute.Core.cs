@@ -60,7 +60,7 @@ namespace Audit.Mvc
                 .Replace("{controller}", auditAction.ControllerName)
                 .Replace("{action}", auditAction.ActionName);
             // Create the audit scope
-            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction }, EventCreationPolicy.Manual);
+            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction });
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
             base.OnActionExecuting(filterContext);

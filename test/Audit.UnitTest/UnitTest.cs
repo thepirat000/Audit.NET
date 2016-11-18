@@ -213,12 +213,12 @@ namespace Audit.UnitTest
                 scope.Comment("test");
                 scope.SetCustomField<string>("custom", "value");
                 target = "final";
-                scope.Save(); // this should do nothing because of the creation policy
-                provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+                scope.Save(); // this should do nothing because of the creation policy (this no more true since v4.6.2)
+                provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             }
             Assert.Equal(eventType, ev.EventType);
             Assert.True(ev.Comments.Contains("test"));
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -252,10 +252,10 @@ namespace Audit.UnitTest
             using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd))
             {
                 scope.Comment("test");
-                scope.Save(); // this should do nothing because of the creation policy
+                scope.Save(); // this should do nothing because of the creation policy (this is no more true, since v 4.6.2)
             }
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
         [Fact]
