@@ -11,7 +11,7 @@ namespace Audit.AzureTableStorage.Providers
         private CloudBlobContainer _container;
         private string _connectionString;
         private Func<AuditEvent, string> _blobNameBuilder = null;
-        private string _containerName = string.Empty;
+        private Func<AuditEvent, string> _containerNameBuilder = null;
 
         /// <summary>
         /// Gets or sets a function that returns a unique name for the blob (can contain folders).
@@ -23,12 +23,12 @@ namespace Audit.AzureTableStorage.Providers
         }
 
         /// <summary>
-        /// Gets or sets the Azure Storage container name
+        /// Gets or sets a function that returns a container name for the event.
         /// </summary>
-        public string ContainerName
+        public Func<AuditEvent, string> ContainerNameBuilder
         {
-            get { return _containerName; }
-            set { _containerName = value; }
+            get { return _containerNameBuilder; }
+            set { _containerNameBuilder = value; }
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Audit.AzureTableStorage.Providers
 
         private void Upload(string name, AuditEvent auditEvent)
         {
-            EnsureContainer();
+            EnsureContainer(auditEvent);
             var blob = _container.GetBlockBlobReference(name);
             var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
             blob.UploadTextAsync(json).Wait();
@@ -70,13 +70,23 @@ namespace Audit.AzureTableStorage.Providers
             return string.Format("{0}.json", Guid.NewGuid());
         }
 
-        private void EnsureContainer()
+        private string GetContainerName(AuditEvent auditEvent)
+        {
+            if (_containerNameBuilder != null)
+            {
+                return _containerNameBuilder.Invoke(auditEvent);
+            }
+            return "event";
+        }
+
+        private void EnsureContainer(AuditEvent auditEvent)
         {
             if (_container == null)
             {
+                var containerName = GetContainerName(auditEvent);
                 var storageAccount = CloudStorageAccount.Parse(_connectionString);
                 var blobClient = storageAccount.CreateCloudBlobClient();
-                var container = blobClient.GetContainerReference(_containerName);
+                var container = blobClient.GetContainerReference(containerName);
                 container.CreateIfNotExistsAsync().Wait();
                 _container = container;
             }
