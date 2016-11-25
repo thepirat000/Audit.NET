@@ -7,17 +7,23 @@ namespace Audit.AzureTableStorage.ConfigurationApi
     {
         internal Func<AuditEvent, string> _blobNameBuilder = null;
         internal Func<AuditEvent, string> _containerNameBuilder = null;
-        internal string _connectionString = null;
+        internal Func<AuditEvent, string> _connectionStringBuilder = null;
 
         public IAzureBlobProviderConfigurator ConnectionString(string connectionString)
         {
-            _connectionString = connectionString;
+            _connectionStringBuilder = ev => connectionString;
             return this;
         }
 
         public IAzureBlobProviderConfigurator ContainerName(string containerName)
         {
             _containerNameBuilder = ev => containerName;
+            return this;
+        }
+
+        public IAzureBlobProviderConfigurator ConnectionStringBuilder(Func<AuditEvent, string> connectionStringBuilder)
+        {
+            _connectionStringBuilder = connectionStringBuilder;
             return this;
         }
 

@@ -3,13 +3,15 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Audit.AzureTableStorage.Providers
 {
     public class AzureBlobDataProvider : AuditDataProvider
     {
-        private CloudBlobContainer _container;
-        private string _connectionString;
+        private static IDictionary<string, CloudBlobContainer> _containerCache = new Dictionary<string, CloudBlobContainer>();
+        private Func<AuditEvent, string> _connectionStringBuilder = null;
         private Func<AuditEvent, string> _blobNameBuilder = null;
         private Func<AuditEvent, string> _containerNameBuilder = null;
 
@@ -34,12 +36,13 @@ namespace Audit.AzureTableStorage.Providers
         /// <summary>
         /// Gets or sets the Azure Storage connection string
         /// </summary>
-        public string ConnectionString
+        public Func<AuditEvent, string> ConnectionStringBuilder
         {
-            get { return _connectionString; }
-            set { _connectionString = value; }
+            get { return _connectionStringBuilder; }
+            set { _connectionStringBuilder = value; }
         }
 
+        #region Overrides
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var name = GetBlobName(auditEvent);
@@ -52,11 +55,13 @@ namespace Audit.AzureTableStorage.Providers
             var name = eventId as string;
             Upload(name, auditEvent);
         }
+        #endregion
 
+        #region Private Methods
         private void Upload(string name, AuditEvent auditEvent)
         {
-            EnsureContainer(auditEvent);
-            var blob = _container.GetBlockBlobReference(name);
+            var container = EnsureContainer(auditEvent);
+            var blob = container.GetBlockBlobReference(name);
             var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
             blob.UploadTextAsync(json).Wait();
         }
@@ -79,17 +84,28 @@ namespace Audit.AzureTableStorage.Providers
             return "event";
         }
 
-        private void EnsureContainer(AuditEvent auditEvent)
+        private string GetConnectionString(AuditEvent auditEvent)
         {
-            if (_container == null)
-            {
-                var containerName = GetContainerName(auditEvent);
-                var storageAccount = CloudStorageAccount.Parse(_connectionString);
-                var blobClient = storageAccount.CreateCloudBlobClient();
-                var container = blobClient.GetContainerReference(containerName);
-                container.CreateIfNotExistsAsync().Wait();
-                _container = container;
-            }
+            return _connectionStringBuilder?.Invoke(auditEvent);
         }
+
+        internal CloudBlobContainer EnsureContainer(AuditEvent auditEvent)
+        {
+            CloudBlobContainer result;
+            var containerName = GetContainerName(auditEvent);
+            var cnnString = GetConnectionString(auditEvent);
+            var cacheKey = cnnString + "|" + containerName;
+            if (_containerCache.TryGetValue(cacheKey, out result))
+            {
+                return result;
+            }
+            var storageAccount = CloudStorageAccount.Parse(cnnString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference(containerName);
+            container.CreateIfNotExistsAsync().Wait();
+            _containerCache[cacheKey] = container;
+            return container;
+        }
+        #endregion
     }
 }

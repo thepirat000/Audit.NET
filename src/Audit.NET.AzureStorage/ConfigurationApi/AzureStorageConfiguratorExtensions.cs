@@ -27,9 +27,20 @@ namespace Audit.Core
         public static ICreationPolicyConfigurator UseAzureBlobStorage(this IConfigurator configurator, string connectionString = null,
             Func<AuditEvent, string> containerNameBuilder = null, Func<AuditEvent, string> blobNameBuilder = null)
         {
+            return UseAzureBlobStorage(configurator, ev => connectionString, containerNameBuilder, blobNameBuilder);
+        }
+        /// <summary>
+        /// Store the events in an Azure Blob Storage.
+        /// </summary>
+        /// <param name="connectionStringBuilder">A builder that returns a connection string for an event.</param>
+        /// <param name="containerNameBuilder">A builder that returns a container name for an event.</param>
+        /// <param name="blobNameBuilder">A builder that returns a unique name for the blob (can contain folders).</param>
+        public static ICreationPolicyConfigurator UseAzureBlobStorage(this IConfigurator configurator, Func<AuditEvent, string> connectionStringBuilder = null,
+            Func<AuditEvent, string> containerNameBuilder = null, Func<AuditEvent, string> blobNameBuilder = null)
+        {
             Configuration.DataProvider = new AzureBlobDataProvider()
             {
-                ConnectionString = connectionString,
+                ConnectionStringBuilder = connectionStringBuilder,
                 ContainerNameBuilder = containerNameBuilder,
                 BlobNameBuilder = blobNameBuilder
             };
@@ -43,7 +54,7 @@ namespace Audit.Core
         {
             var blobConfig = new AzureBlobProviderConfigurator();
             config.Invoke(blobConfig);
-            return UseAzureBlobStorage(configurator, blobConfig._connectionString, blobConfig._containerNameBuilder, blobConfig._blobNameBuilder);
+            return UseAzureBlobStorage(configurator, blobConfig._connectionStringBuilder, blobConfig._containerNameBuilder, blobConfig._blobNameBuilder);
         }
     }
 }

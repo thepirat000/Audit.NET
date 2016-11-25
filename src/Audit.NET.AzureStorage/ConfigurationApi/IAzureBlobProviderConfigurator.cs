@@ -19,6 +19,11 @@ namespace Audit.AzureTableStorage.ConfigurationApi
         /// <param name="containerName">The container name (must be lower case).</param>
         IAzureBlobProviderConfigurator ContainerName(string containerName);
         /// <summary>
+        /// Specifies a function that returns the connection string for an event
+        /// </summary>
+        /// <param name="connectionStringBuilder">A function that returns the connection string for an event.</param>
+        IAzureBlobProviderConfigurator ConnectionStringBuilder(Func<AuditEvent, string> connectionStringBuilder);
+        /// <summary>
         /// Specifies a function that returns the unique blob name for an event (can contain folders)
         /// </summary>
         /// <param name="blobNameBuilder">A function that returns the unique blob name for an event (can contain folders).</param>
