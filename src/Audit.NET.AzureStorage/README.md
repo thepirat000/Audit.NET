@@ -23,7 +23,7 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new AzureBlobDataProvider()
 {
-    ConnectionString = "DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key",
+    ConnectionStringBuilder = ev => "DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key",
     ContainerNameBuilder = ev => "event",
     BlobNameBuilder = ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"
 };
@@ -34,7 +34,7 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 Audit.Core.Configuration.Setup()
     .UseAzureBlobStorage(config => config
         .ConnectionString("DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key")
-        .ContainerNameBuilder(ev => "event")
+        .ContainerName("event")
         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"));
 ```
 
