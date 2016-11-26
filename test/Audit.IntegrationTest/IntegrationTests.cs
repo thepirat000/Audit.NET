@@ -9,6 +9,10 @@ using Xunit;
 using Newtonsoft.Json.Linq;
 using Audit.MongoDB.ConfigurationApi;
 using Audit.AzureTableStorage.ConfigurationApi;
+using System.Threading.Tasks;
+using Audit.AzureTableStorage.Providers;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 #if NET451
 using Audit.AzureDocumentDB.Providers;
 using Audit.AzureDocumentDB.ConfigurationApi;
@@ -18,6 +22,10 @@ namespace Audit.IntegrationTest
 {
     public class IntegrationTests
     {
+        private const string AzureBlobCnnString = "xxxxx";
+        private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
+        private const string AzureDocDbAuthKey = "xxxxx";
+
         public class AuditTests
         {
 #if NET451
@@ -56,6 +64,49 @@ namespace Audit.IntegrationTest
                 TestUpdate();
                 TestInsert();
                 TestDelete();
+            }
+
+            [Fact]
+            public void TestStressAzureBlob()
+            {
+                Audit.Core.Configuration.Setup()
+                   .UseAzureBlobStorage(config => config
+                       .ConnectionString(AzureBlobCnnString)
+                       .ContainerNameBuilder(ev => ev.EventType)
+                       .BlobNameBuilder(ev => $"{ev.EventType}_{Guid.NewGuid()}.json"))
+                   .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+                var rnd = new Random();
+                
+                //Parallel random insert into event1, event2 and event3 containers
+                Parallel.ForEach(Enumerable.Range(1, 100), i =>
+                {
+                    var eventType =  "event" + rnd.Next(1, 4); //1..3
+                    var x = "start";
+                    using (var s = AuditScope.Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd))
+                    {
+                        x = "end";
+                    }
+                });
+
+                // Assert events are on correct container 
+                var storageAccount = CloudStorageAccount.Parse(AzureBlobCnnString);
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                for (int i = 1; i <= 3; i++)
+                {
+                    var eventId = "event" + i;
+                    BlobContinuationToken continuationToken = null;
+                    BlobResultSegment resultSegment = null;
+                    do
+                    {
+                        resultSegment = blobClient.ListBlobsSegmentedAsync(eventId + "/", continuationToken).Result;
+                        foreach (CloudBlockBlob blob in resultSegment.Results)
+                        {
+                            Assert.True(blob.Name.StartsWith(eventId + "_"));
+                        }
+                        continuationToken = resultSegment.ContinuationToken;
+                    } while (continuationToken != null);
+                }
             }
 
             [Fact]
@@ -195,8 +246,8 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
-                        .ConnectionString("https://thepirat.documents.azure.com:443/")
-                        .AuthKey("xxxxxxx=="))
+                        .ConnectionString(AzureDocDbUrl)
+                        .AuthKey(AzureDocDbAuthKey))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
@@ -214,8 +265,9 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureBlobStorage(config => config
-                        .ConnectionString("xxxxxxxxxx")
-                        .ContainerName("event")
+                        .ConnectionString(AzureBlobCnnString)
+                        //.ContainerName("event")
+                        .ContainerNameBuilder(ev => $"events{ev.StartDate:yyyyMMdd}")
                         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
@@ -302,4 +354,3 @@ namespace Audit.IntegrationTest
         }
     }
 }
-
