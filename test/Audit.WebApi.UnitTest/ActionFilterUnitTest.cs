@@ -2,19 +2,19 @@
 using Moq;
 using System.Collections.Generic;
 using System.Web;
-using Xunit;
 using Audit.Core;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using System.Net;
 using System.Net.Http;
 using System;
+using NUnit.Framework;
 
 namespace Audit.WebApi.UnitTest
 {
     public class ActionFilterUnitTest
     {
-        [Fact]
+        [Test]
         public void Test_AuditApiActionFilter_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
@@ -88,15 +88,15 @@ namespace Audit.WebApi.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal("header-value", action.Headers["test-header"]);
-            Assert.Equal("get", action.ActionName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual("header-value", action.Headers["test-header"]);
+            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
 
-        [Fact]
+        [Test]
         public void Test_AuditApiActionFilter_Manual()
         {
             // Mock out the context to run the action filter.
@@ -170,15 +170,15 @@ namespace Audit.WebApi.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal("header-value", action.Headers["test-header"]);
-            Assert.Equal("get", action.ActionName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual("header-value", action.Headers["test-header"]);
+            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
 
-        [Fact]
+        [Test]
         public void Test_AuditApiActionFilter_InsertOnStartReplaceOnEnd()
         {
             // Mock out the context to run the action filter.
@@ -252,12 +252,12 @@ namespace Audit.WebApi.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal("header-value", action.Headers["test-header"]);
-            Assert.Equal("get", action.ActionName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual("header-value", action.Headers["test-header"]);
+            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
     }
 }

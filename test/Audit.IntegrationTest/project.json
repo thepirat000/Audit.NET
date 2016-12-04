@@ -1,10 +1,10 @@
 {
   "version": "3.0.0-*",
-  "testRunner": "xunit",
+  "testRunner": "nunit",
   "dependencies": {
     "Moq": "4.6.38-alpha",
-    "xunit": "2.2.0-beta3-build3402",
-    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "NUnit": "3.4.1",
+    "dotnet-test-nunit": "3.4.0-beta-3",
     "System.Runtime": "4.1.0",
     "Audit.NET": { "target": "project" },
     "Audit.NET.MongoDB": { "target": "project" },
@@ -14,7 +14,6 @@
     "WindowsAzure.Storage": "7.2.1"
   },
   "commands": {
-    "test": "xunit.runner.visualstudio"
   },
   "frameworks": {
     "netcoreapp1.0": {

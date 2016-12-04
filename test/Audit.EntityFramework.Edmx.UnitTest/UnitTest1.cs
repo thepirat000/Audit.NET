@@ -1,15 +1,22 @@
 ﻿using Audit.Core;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
 
 namespace Audit.EntityFramework.Edmx.UnitTest
 {
+    [TestFixture]
     public class UnitTest1
     {
+        [SetUp]
+        public void SetUp()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsEntities>().Reset();
+        }
 
-        [Fact]
+        [Test]
         public void Test_Delete_Ignored()
         {
             bool neverTrue = false;
@@ -31,7 +38,7 @@ namespace Audit.EntityFramework.Edmx.UnitTest
                 .UseOptOut()
                 .IgnoreAny(x =>
                 {
-                    Assert.Equal("Post", x.Name);
+                    Assert.AreEqual("Post", x.Name);
                     return x.Name == "Post";
                 });
 
@@ -50,7 +57,7 @@ namespace Audit.EntityFramework.Edmx.UnitTest
             Assert.False(neverTrue);
         }
 
-        [Fact]
+        [Test]
         public void TestMethod1()
         {
             var guid = Guid.NewGuid().ToString();
@@ -81,16 +88,16 @@ namespace Audit.EntityFramework.Edmx.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.Equal(2, evs.Count);
+            Assert.AreEqual(2, evs.Count);
 
-            Assert.Equal("Posts", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
-            Assert.Equal("Posts", evs[1].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual("Posts", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual("Posts", evs[1].GetEntityFrameworkEvent().Entries[0].Table);
 
             var p1 = evs[0].GetEntityFrameworkEvent().Entries[0].Entity as Post;
             var p2 = evs[1].GetEntityFrameworkEvent().Entries[0].Entity as Post;
 
-            Assert.Equal("test-content", p1.Content);
-            Assert.Equal(guid, p2.Content);
+            Assert.AreEqual("test-content", p1.Content);
+            Assert.AreEqual(guid, p2.Content);
         }
     }
 }

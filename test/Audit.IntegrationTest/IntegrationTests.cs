@@ -5,7 +5,6 @@ using Audit.Core;
 using Audit.Core.Providers;
 using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;
-using Xunit;
 using Newtonsoft.Json.Linq;
 using Audit.MongoDB.ConfigurationApi;
 using Audit.AzureTableStorage.ConfigurationApi;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using Audit.AzureTableStorage.Providers;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using NUnit.Framework;
 #if NET451
 using Audit.AzureDocumentDB.Providers;
 using Audit.AzureDocumentDB.ConfigurationApi;
@@ -20,16 +20,17 @@ using Audit.AzureDocumentDB.ConfigurationApi;
 
 namespace Audit.IntegrationTest
 {
+    [TestFixture]
     public class IntegrationTests
     {
-        private const string AzureBlobCnnString = "xxxxx";
+        private const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=xxxxxxxxxxxxxx";
         private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "xxxxx";
+        private const string AzureDocDbAuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxx==";
 
         public class AuditTests
         {
 #if NET451
-            [Fact]
+            [Test]
             public void TestEventLog()
             {
                 SetEventLogSettings();
@@ -38,7 +39,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-            [Fact]
+            [Test]
             public void TestAzure()
             {
                 SetAzureSettings();
@@ -48,7 +49,7 @@ namespace Audit.IntegrationTest
             }
 #endif
 
-            [Fact]
+            [Test]
             public void TestFile()
             {
                 SetFileSettings();
@@ -57,7 +58,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-            [Fact]
+            [Test]
             public void TestAzureBlob()
             {
                 SetAzureBlobSettings();
@@ -66,7 +67,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-            [Fact]
+            [Test]
             public void TestStressAzureBlob()
             {
                 Audit.Core.Configuration.Setup()
@@ -109,7 +110,7 @@ namespace Audit.IntegrationTest
                 }
             }
 
-            [Fact]
+            [Test]
             public void TestSql()
             {
                 SetSqlSettings();
@@ -118,7 +119,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-            [Fact]
+            [Test]
             public void TestMongo()
             {
                 SetMongoSettings();
@@ -158,7 +159,7 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
                 
-                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -169,7 +170,7 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
-                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -186,7 +187,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Another Comment");
                 }
 
-                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
@@ -199,7 +200,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Status Updated to Submitted");
                 }
 
-                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
             }
 
             public void TestInsert()
@@ -213,7 +214,7 @@ namespace Audit.IntegrationTest
                     audit.SetCustomField("ReferenceId", order.OrderId);
                 }
 
-                Assert.Equal(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
             }
 
             public void TestDelete()
@@ -227,7 +228,7 @@ namespace Audit.IntegrationTest
                     DbDeteleOrder(order.OrderId);
                     order = null;
                 }
-                Assert.Equal(orderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
             }
 
 #if NET451

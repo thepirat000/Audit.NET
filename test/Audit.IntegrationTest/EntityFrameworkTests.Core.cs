@@ -7,18 +7,18 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Xunit;
 
 namespace Audit.IntegrationTest
 {
-    [Collection("EF")]
+    [TestFixture(Category ="EF")]
     public class EntityFrameworkTests_Core
     {
-        [Fact]
+        [Test]
         public void Test_EF_Attach()
         {
             EntityFrameworkEvent efEvent = null;
@@ -38,12 +38,12 @@ namespace Audit.IntegrationTest
                 ctx.Entry(blog).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
-            Assert.Equal(1, efEvent.Entries.Count);
-            Assert.Equal("Update", efEvent.Entries[0].Action);
+            Assert.AreEqual(1, efEvent.Entries.Count);
+            Assert.AreEqual("Update", efEvent.Entries[0].Action);
             Assert.True(efEvent.Entries[0].Changes.Any(ch => ch.ColumnName == "Title"));
         }
 
-        [Fact]
+        [Test]
         public void Test_EF_Transaction()
         {
             var provider = new Mock<AuditDataProvider>();
@@ -61,7 +61,7 @@ namespace Audit.IntegrationTest
                 .WithAction(x => x.OnScopeCreated(sc =>
                 {
                     var wcfEvent = sc.Event.GetEntityFrameworkEvent();
-                    Assert.Equal("Blogs", wcfEvent.Database);
+                    Assert.AreEqual("Blogs", wcfEvent.Database);
                 }));
             int blogId;
             using (var ctx = new MyAuditedVerboseContext())
@@ -91,18 +91,18 @@ namespace Audit.IntegrationTest
             Assert.NotNull(ev1.TransactionId);
             Assert.NotNull(ev2.TransactionId);
             Assert.Null(ev3.TransactionId);
-            Assert.Equal(ev1.TransactionId, ev2.TransactionId);
+            Assert.AreEqual(ev1.TransactionId, ev2.TransactionId);
 
             Audit.Core.Configuration.ResetCustomActions();
         }
 
-        [Fact]
+        [Test]
         public void Test_EF_SaveChangesSync()
         {
             Test_EF_Actions(ctx => ctx.SaveChanges());
         }
 
-        [Fact]
+        [Test]
         public void Test_EF_SaveChangesAsync()
         {
             Test_EF_Actions(ctx => ctx.SaveChangesAsync().Result);
@@ -159,8 +159,8 @@ SET IDENTITY_INSERT Posts OFF
 
                 var efEvent = auditEvent.CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent;
 
-                Assert.Equal(4, result);
-                Assert.Equal("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
+                Assert.AreEqual(4, result);
+                Assert.AreEqual("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));

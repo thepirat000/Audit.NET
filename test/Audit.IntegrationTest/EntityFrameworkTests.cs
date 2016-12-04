@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using NUnit.Framework;
 #if NETCOREAPP1_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -16,14 +17,13 @@ using Microsoft.Extensions.DependencyInjection;
 #else
 using System.Data.Entity;
 #endif
-using Xunit;
 
 namespace Audit.IntegrationTest
 {
-    [Collection("EF")]
+    [TestFixture(Category ="EF")]
     public class EntityFrameworkTests
     {
-        [Fact]
+        [Test]
         public void Test_EF_IncludeIgnoreFilters()
         {
             var logs = new List<AuditEvent>();
@@ -58,9 +58,9 @@ namespace Audit.IntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.Equal(1, logs.Count);
-            Assert.Equal(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
-            Assert.Equal("Posts", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual(1, logs.Count);
+            Assert.AreEqual(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.AreEqual("Posts", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
 
             logs.Clear();
 
@@ -89,13 +89,13 @@ namespace Audit.IntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.Equal(1, logs.Count);
-            Assert.Equal(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
-            Assert.Equal("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual(1, logs.Count);
+            Assert.AreEqual(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.AreEqual("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
         }
 
 
-        [Fact]
+        [Test]
         public void Test_EF_SaveOnSameContext_Transaction()
         {
             var b1Title = Guid.NewGuid().ToString().Substring(1, 10);
@@ -157,7 +157,7 @@ namespace Audit.IntegrationTest
                 Assert.Null(b);
             }
 
-            Assert.Equal(3, logs.Count);
+            Assert.AreEqual(3, logs.Count);
         }
 
 #if NETCOREAPP1_0

@@ -10,22 +10,26 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
 
 namespace Audit.IntegrationTest
 {
     public class WCFTests
     {
-        [Fact]
+        [Test]
         public void WCFTest_AuditScope()
         {
             WCFTest_Concurrency_AuditScope(1, 1);
         }
 
-        [Theory(),
-        InlineData(1, 1),
-        InlineData(5, 10),
-        InlineData(5, 25)]
+        [Test]
+        public void WCFTest_Concurrency_AuditScope()
+        {
+            WCFTest_Concurrency_AuditScope(1, 1);
+            WCFTest_Concurrency_AuditScope(5, 10);
+            WCFTest_Concurrency_AuditScope(5, 25);
+        }
+
         public void WCFTest_Concurrency_AuditScope(int threads, int callsPerThread)
         {
             var provider = new Mock<AuditDataProvider>();
@@ -37,11 +41,11 @@ namespace Audit.IntegrationTest
                 var request = wcfEvent.InputParameters[0].Value as GetOrderRequest;
                 var result = wcfEvent.Result.Value as GetOrderResponse;
                 Assert.NotNull(request.OrderId);
-                Assert.Equal(request.OrderId, ev.CustomFields["Test-Field-1"]);
+                Assert.AreEqual(request.OrderId, ev.CustomFields["Test-Field-1"]);
                 Assert.False(bag.Contains(request.OrderId));
                 bag.Add(request.OrderId);
-                Assert.Equal(ev.CustomFields["Test-Field-1"], ev.CustomFields["Test-Field-2"]);
-                Assert.Equal(request.OrderId, result.Order.OrderId);
+                Assert.AreEqual(ev.CustomFields["Test-Field-1"], ev.CustomFields["Test-Field-2"]);
+                Assert.AreEqual(request.OrderId, result.Order.OrderId);
                 return Guid.NewGuid();
             });
 
@@ -59,8 +63,8 @@ namespace Audit.IntegrationTest
                 host.Close();
             }
             Console.WriteLine("Times: {0}.", threads * callsPerThread);
-            Assert.Equal(bag.Distinct().Count(), bag.Count);
-            Assert.Equal(threads * callsPerThread, bag.Count);
+            Assert.AreEqual(bag.Distinct().Count(), bag.Count);
+            Assert.AreEqual(threads * callsPerThread, bag.Count);
         }
 
         private static BasicHttpBinding CreateBinding()

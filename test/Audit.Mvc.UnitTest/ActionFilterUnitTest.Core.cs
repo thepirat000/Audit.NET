@@ -7,17 +7,18 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace Audit.Mvc.UnitTest
 {
+    [TestFixture]
     public class ActionFilterUnitTest
     {
-        [Fact]
+        [Test]
         public void Test_AuditActionFilter_Core_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
@@ -76,15 +77,15 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
-            Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.Equal("home", action.ControllerName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
-            Assert.Equal(200, action.ResponseStatusCode);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
+            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
+            Assert.AreEqual("home", action.ControllerName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual(200, action.ResponseStatusCode);
         }
 
-        [Fact]
+        [Test]
         public void Test_AuditActionFilter_Core_InsertOnStartReplaceOnEnd()
         {
             // Mock out the context to run the action filter.
@@ -132,7 +133,7 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
-            Assert.Equal("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
+            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
             Assert.Null(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
 
 
@@ -148,16 +149,16 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.NotNull(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
 
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
-            Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.Equal("home", action.ControllerName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
-            Assert.Equal(200, action.ResponseStatusCode);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
+            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
+            Assert.AreEqual("home", action.ControllerName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual(200, action.ResponseStatusCode);
         }
 
 
-        [Fact]
+        [Test]
         public void Test_AuditActionFilter_Core_Manual()
         {
             // Mock out the context to run the action filter.
@@ -205,7 +206,7 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
-            Assert.Equal("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
+            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
             Assert.Null(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
 
 
@@ -221,12 +222,12 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             Assert.NotNull(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
 
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
-            Assert.Equal("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.Equal("home", action.ControllerName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
-            Assert.Equal(200, action.ResponseStatusCode);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
+            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
+            Assert.AreEqual("home", action.ControllerName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual(200, action.ResponseStatusCode);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿#if NETCOREAPP1_0
 using System.Collections.Generic;
-using Xunit;
 using Moq;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -10,12 +9,13 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Audit.Core;
 using System;
+using NUnit.Framework;
 
 namespace Audit.WebApi.UnitTest
 {
     public class ActionFilterUnitTest
     {
-        [Fact]
+        [Test]
         public void Test_AuditApiActionFilter_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
@@ -77,17 +77,17 @@ namespace Audit.WebApi.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal("http://200.10.10.20:1010/api/values", action.RequestUrl);
-            Assert.Equal("application/json", action.Headers["content-type"]);
-            Assert.Equal("values", action.ControllerName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
-            Assert.Equal("this is the result", action.ResponseBody);
+            Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
+            Assert.AreEqual("application/json", action.Headers["content-type"]);
+            Assert.AreEqual("values", action.ControllerName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual("this is the result", action.ResponseBody);
         }
 
-        [Fact]
+        [Test]
         public void Test_AuditApiActionFilter_Manual()
         {
             // Mock out the context to run the action filter.
@@ -149,17 +149,17 @@ namespace Audit.WebApi.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal("http://200.10.10.20:1010/api/values", action.RequestUrl);
-            Assert.Equal("application/json", action.Headers["content-type"]);
-            Assert.Equal("values", action.ControllerName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
-            Assert.Equal("this is the result", action.ResponseBody);
+            Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
+            Assert.AreEqual("application/json", action.Headers["content-type"]);
+            Assert.AreEqual("values", action.ControllerName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual("this is the result", action.ResponseBody);
         }
 
-        [Fact]
+        [Test]
         public void Test_AuditApiActionFilter_InsertOnStartReplaceOnEnd()
         {
             // Mock out the context to run the action filter.
@@ -221,14 +221,14 @@ namespace Audit.WebApi.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal(action, actionFromController);
-            Assert.Equal(scope, scopeFromController);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            Assert.Equal("http://200.10.10.20:1010/api/values", action.RequestUrl);
-            Assert.Equal("application/json", action.Headers["content-type"]);
-            Assert.Equal("values", action.ControllerName);
-            Assert.Equal("value1", action.ActionParameters["test1"]);
-            Assert.Equal("this is the result", action.ResponseBody);
+            Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
+            Assert.AreEqual("application/json", action.Headers["content-type"]);
+            Assert.AreEqual("values", action.ControllerName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual("this is the result", action.ResponseBody);
         }
     }
 }

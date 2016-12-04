@@ -1,15 +1,14 @@
 {
   "version": "3.0.0-*",
-  "testRunner": "xunit",
+  "testRunner": "nunit",
   "dependencies": {
     "Audit.NET": { "target": "project" },
     "Audit.WebApi": { "target": "project" },
-    "xunit": "2.2.0-beta2-build3300",
-    "Moq": "4.6.38-alpha",
-    "dotnet-test-xunit": "2.2.0-preview2-build1029"
+    "NUnit": "3.4.1",
+    "dotnet-test-nunit": "3.4.0-beta-3",
+    "Moq": "4.6.38-alpha"
   },
   "commands": {
-    "test": "xunit.runner.visualstudio"
   },
   "frameworks": {
     "netcoreapp1.0": {
