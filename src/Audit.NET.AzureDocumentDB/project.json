@@ -1,6 +1,6 @@
 {
   "title": "Audit.AzureDocumentDB",
-  "version": "4.6.4-*",
+  "version": "4.6.5-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -31,6 +31,11 @@
     "net45": {
       "dependencies": {
         "Microsoft.Azure.DocumentDB": "1.9.4"
+      }
+    },
+    "netstandard1.6": {
+      "dependencies": {
+        "Microsoft.Azure.DocumentDB.Core": "0.1.0-preview"
       }
     }
   },

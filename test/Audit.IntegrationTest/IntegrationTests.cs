@@ -13,19 +13,17 @@ using Audit.AzureTableStorage.Providers;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
-#if NET451
 using Audit.AzureDocumentDB.Providers;
 using Audit.AzureDocumentDB.ConfigurationApi;
-#endif
 
 namespace Audit.IntegrationTest
 {
     [TestFixture]
     public class IntegrationTests
     {
-        private const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=xxxxxxxxxxxxxx";
+        private const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=xxxxxxxxxxxxxxxxxxxxxxxx==";
         private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxx==";
+        private const string AzureDocDbAuthKey = "xxxxxxxxxxxxxxxxx==";
 
         public class AuditTests
         {
@@ -38,6 +36,7 @@ namespace Audit.IntegrationTest
                 TestInsert();
                 TestDelete();
             }
+#endif
 
             [Test]
             public void TestAzure()
@@ -47,7 +46,6 @@ namespace Audit.IntegrationTest
                 TestInsert();
                 TestDelete();
             }
-#endif
 
             [Test]
             public void TestFile()
@@ -242,6 +240,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
+#endif
 
             public void SetAzureSettings()
             {
@@ -252,7 +251,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#endif
+
             public void SetFileSettings()
             {
                 Audit.Core.Configuration.Setup()
