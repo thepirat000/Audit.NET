@@ -33,7 +33,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Intercept an asynchronous operation that returns a Task.
         /// </summary>
-        private static async Task InterceptAsync(Task task, IInvocation invocation, AuditInterceptEvent intEvent, AuditScope scope)
+        private static async Task InterceptAsync(Task task, IInvocation invocation, InterceptEvent intEvent, AuditScope scope)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Intercept an asynchronous operation that returns a Task Of[T].
         /// </summary>
-        private static async Task<T> InterceptAsync<T>(Task<T> task, IInvocation invocation, AuditInterceptEvent intEvent, AuditScope scope)
+        private static async Task<T> InterceptAsync<T>(Task<T> task, IInvocation invocation, InterceptEvent intEvent, AuditScope scope)
         {
             T result;
             try
@@ -69,7 +69,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Ends the event for asynchronous interceptions.
         /// </summary>
-        private static void EndAsyncAuditInterceptEvent(Task task, IInvocation invocation, AuditInterceptEvent intEvent, AuditScope scope, object result)
+        private static void EndAsyncAuditInterceptEvent(Task task, IInvocation invocation, InterceptEvent intEvent, AuditScope scope, object result)
         {
             intEvent.AsyncStatus = task.Status.ToString();
             if (task.Status == TaskStatus.Faulted)
@@ -89,7 +89,7 @@ namespace Audit.DynamicProxy
         /// <param name="invocation">The invocation.</param>
         /// <param name="intEvent">The int event.</param>
         /// <param name="returnValue">The return value.</param>
-        private static void SuccessAuditInterceptEvent(IInvocation invocation, AuditInterceptEvent intEvent, object returnValue)
+        private static void SuccessAuditInterceptEvent(IInvocation invocation, InterceptEvent intEvent, object returnValue)
         {
             var method = invocation.MethodInvocationTarget;
             intEvent.Success = true;
@@ -121,7 +121,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Creates the audit intercept event. Returns NULL if the event should be bypassed
         /// </summary>
-        private AuditInterceptEvent CreateAuditInterceptEvent(IInvocation invocation)
+        private InterceptEvent CreateAuditInterceptEvent(IInvocation invocation)
         {
             var method = invocation.MethodInvocationTarget;
             if (method == null)
@@ -155,7 +155,7 @@ namespace Audit.DynamicProxy
                     return null;
                 }
             }
-            var intEvent = new AuditInterceptEvent()
+            var intEvent = new InterceptEvent()
             {
                 ClassName = invocation.TargetType.Name,
                 InstanceQualifiedName = invocation.TargetType.AssemblyQualifiedName,
@@ -204,10 +204,13 @@ namespace Audit.DynamicProxy
             }
             var method = invocation.MethodInvocationTarget;
             var eventType = Settings.EventType?.Replace("{class}", intEvent.ClassName).Replace("{method}", intEvent.MethodName);
-            var scope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual, Settings.AuditDataProvider);
             var isAsync = method.GetCustomAttribute(typeof(AsyncStateMachineAttribute)) != null;
             intEvent.IsAsync = isAsync;
-            scope.SetCustomField("InterceptEvent", intEvent);
+            var auditEventIntercept = new AuditEventIntercept()
+            {
+                InterceptEvent = intEvent
+            };
+            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, Settings.AuditDataProvider, auditEventIntercept);
             AuditProxy.CurrentScope = scope;
             // Call the intercepted method (sync part)
             try

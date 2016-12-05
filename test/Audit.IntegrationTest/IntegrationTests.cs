@@ -18,13 +18,13 @@ using Audit.AzureDocumentDB.ConfigurationApi;
 
 namespace Audit.IntegrationTest
 {
-    [TestFixture]
     public class IntegrationTests
     {
-        private const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=xxxxxxxxxxxxxxxxxxxxxxxx==";
+        private const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=xxxxxxxxxxxxxxxxxxx==";
         private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "xxxxxxxxxxxxxxxxx==";
+        private const string AzureDocDbAuthKey = "xxxxxxxxxx==";
 
+        [TestFixture]
         public class AuditTests
         {
 #if NET451

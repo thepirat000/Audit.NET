@@ -25,11 +25,13 @@ namespace Audit.Core
         /// <param name="creationPolicy">The event creation policy to use.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
+        /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
         protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
             AuditDataProvider dataProvider = null, 
             EventCreationPolicy? creationPolicy = null,
-            bool isCreateAndSave = false)
+            bool isCreateAndSave = false,
+            AuditEvent auditEvent = null)
         {
             _creationPolicy = creationPolicy ?? Configuration.CreationPolicy;
             _dataProvider = dataProvider ?? Configuration.DataProvider;
@@ -53,13 +55,12 @@ namespace Audit.Core
             environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
             environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
 #endif
-            _event = new AuditEvent()
-            {
-                Environment = environment,
-                StartDate = DateTime.Now,
-                EventType = eventType,
-                CustomFields = new Dictionary<string, object>()
-            };
+            _event = auditEvent ?? new AuditEvent();
+            _event.Environment = environment;
+            _event.StartDate = DateTime.Now;
+            _event.EventType = eventType;
+            _event.CustomFields = new Dictionary<string, object>();
+
             if (target != null)
             {
                 var targetValue = target.Invoke();

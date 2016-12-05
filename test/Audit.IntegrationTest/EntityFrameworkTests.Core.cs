@@ -85,9 +85,9 @@ namespace Audit.IntegrationTest
                 
                 ctx.SaveChanges();
             }
-            var ev1 = (auditEvents[1].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
-            var ev2 = (auditEvents[2].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
-            var ev3 = (auditEvents[3].CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent);
+            var ev1 = (auditEvents[1] as AuditEventEntityFramework).EntityFrameworkEvent;
+            var ev2 = (auditEvents[2] as AuditEventEntityFramework).EntityFrameworkEvent;
+            var ev3 = (auditEvents[3] as AuditEventEntityFramework).EntityFrameworkEvent;
             Assert.NotNull(ev1.TransactionId);
             Assert.NotNull(ev2.TransactionId);
             Assert.Null(ev3.TransactionId);
@@ -157,7 +157,8 @@ SET IDENTITY_INSERT Posts OFF
 
                 int result = saveChangesMethod.Invoke(ctx);
 
-                var efEvent = auditEvent.CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent;
+                Assert.IsFalse(auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent"));
+                var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
 
                 Assert.AreEqual(4, result);
                 Assert.AreEqual("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);

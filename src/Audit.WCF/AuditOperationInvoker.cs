@@ -58,9 +58,11 @@ namespace Audit.WCF
             var auditWcfEvent = CreateWcfAuditEvent(instance, inputs);
             // Create the audit scope
             var eventType = _eventType.Replace("{contract}", auditWcfEvent.ContractName).Replace("{operation}", auditWcfEvent.OperationName);
-            var auditScope = AuditScope.Create(eventType, null, EventCreationPolicy.Manual, GetAuditDataProvider(instance));
-            // Set the initial WcfEvent data
-            auditScope.SetCustomField(AuditBehavior.CustomFieldName, auditWcfEvent);
+            var auditEventWcf = new AuditEventWcfAction()
+            {
+                WcfEvent = auditWcfEvent
+            };
+            var auditScope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, GetAuditDataProvider(instance), auditEventWcf);
             // Store a reference to this audit scope on a thread static field
             AuditBehavior.CurrentAuditScope = auditScope;
             try
@@ -84,13 +86,13 @@ namespace Audit.WCF
         #endregion
 
         #region Private Methods
-        private AuditWcfEvent CreateWcfAuditEvent(object instance, object[] inputs)
+        private WcfEvent CreateWcfAuditEvent(object instance, object[] inputs)
         {
             var securityContext = ServiceSecurityContext.Current;
             var operationContext = OperationContext.Current;
             var imProps = OperationContext.Current.IncomingMessageProperties;
             var endpoint = imProps.ContainsKey(RemoteEndpointMessageProperty.Name) ? imProps[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty : null;
-            return new AuditWcfEvent()
+            return new WcfEvent()
             {
                 Action = _operation.Action,
                 ReplyAction = _operation.ReplyAction,
@@ -143,9 +145,9 @@ namespace Audit.WCF
             return result;
         }
 
-        private void SaveAuditScope(AuditScope auditScope, AuditWcfEvent auditWcfEvent)
+        private void SaveAuditScope(AuditScope auditScope, WcfEvent auditWcfEvent)
         {
-            auditScope.SetCustomField(AuditBehavior.CustomFieldName, auditWcfEvent);
+            (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
             auditScope.Save();
         }
 

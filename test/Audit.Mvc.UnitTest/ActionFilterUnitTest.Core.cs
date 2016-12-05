@@ -133,8 +133,8 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
-            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
-            Assert.Null(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ActionParameters["test1"]);
+            Assert.Null(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
 
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
@@ -147,7 +147,7 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
-            Assert.NotNull(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+            Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
@@ -206,8 +206,8 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
-            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.CustomFields["Action"]).ActionParameters["test1"]);
-            Assert.Null(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ActionParameters["test1"]);
+            Assert.Null(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
 
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
@@ -220,7 +220,7 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.NotNull(((AuditAction)scopeFromController.Event.CustomFields["Action"]).ResponseStatus);
+            Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);

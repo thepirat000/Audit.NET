@@ -11,7 +11,6 @@ namespace Audit.WCF
     public class AuditBehavior : BehaviorExtensionElement
     {
         private const string WcfContextScopeKey = "AuditScope";
-        internal const string CustomFieldName = "WcfEvent";
 
         /// <summary>
         /// Gets the current audit scope for the running thread.

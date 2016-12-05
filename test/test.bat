@@ -36,3 +36,7 @@ cd ..
 cd Audit.EntityFramework.Edmx.UnitTest
 dotnet test
 cd ..
+
+
+del TestResult.xml /s
+

@@ -52,7 +52,6 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
-
             var filter = new AuditApiAttribute()
             {
                 IncludeHeaders = true,
@@ -134,7 +133,6 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
-
             var filter = new AuditApiAttribute()
             {
                 IncludeHeaders = true,
@@ -216,7 +214,6 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
-
             var filter = new AuditApiAttribute()
             {
                 IncludeHeaders = true,

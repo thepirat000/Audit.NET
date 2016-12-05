@@ -59,9 +59,10 @@ namespace Audit.Core
         /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
         /// <param name="creationPolicy">The event creation policy to use.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
-        public static AuditScope Create(string eventType, Func<object> target, object extraFields, EventCreationPolicy creationPolicy, AuditDataProvider dataProvider = null)
+        /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
+        public static AuditScope Create(string eventType, Func<object> target, object extraFields, EventCreationPolicy creationPolicy, AuditDataProvider dataProvider = null, AuditEvent auditEvent = null)
         {
-            return new AuditScope(eventType, target, extraFields, dataProvider, creationPolicy);
+            return new AuditScope(eventType, target, extraFields, dataProvider, creationPolicy, false, auditEvent);
         }
 
     }

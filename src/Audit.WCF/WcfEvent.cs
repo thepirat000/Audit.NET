@@ -6,7 +6,7 @@ namespace Audit.WCF
     /// <summary>
     /// The audit event portion with WCF call data
     /// </summary>
-    public class AuditWcfEvent
+    public class WcfEvent
     {
         [JsonProperty(Order = 10)]
         public string ContractName { get; set; }

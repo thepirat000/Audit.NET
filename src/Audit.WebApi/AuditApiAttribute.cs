@@ -65,7 +65,11 @@ namespace Audit.WebApi
                 .Replace("{controller}", auditAction.ControllerName)
                 .Replace("{action}", auditAction.ActionName);
             // Create the audit scope
-            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction });
+            var auditEventAction = new AuditEventWebApi()
+            {
+                Action = auditAction
+            };
+            var auditScope = AuditScope.Create(eventType, null, null, Configuration.CreationPolicy, null, auditEventAction);
             httpContext.Items[AuditApiActionKey] = auditAction;
             httpContext.Items[AuditApiScopeKey] = auditScope;
         }
@@ -103,7 +107,7 @@ namespace Audit.WebApi
                     auditAction.ResponseStatus = "Internal Server Error";
                 }
                 // Replace the Action field and save
-                auditScope.SetCustomField("Action", auditAction);
+                (auditScope.Event as AuditEventWebApi).Action = auditAction;
                 auditScope.Save();
             }
         }

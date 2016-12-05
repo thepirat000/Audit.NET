@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Audit.DynamicProxy
@@ -6,7 +6,7 @@ namespace Audit.DynamicProxy
     /// <summary>
     /// Represents an intercepted operation call
     /// </summary>
-    public class AuditInterceptEvent
+    public class InterceptEvent
     {
         /// <summary>
         /// The class name where the operation is defined.

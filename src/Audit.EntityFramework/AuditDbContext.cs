@@ -131,7 +131,7 @@ namespace Audit.EntityFramework
         /// </summary>
         private void SaveScope(AuditScope scope, EntityFrameworkEvent @event)
         {
-            scope.SetCustomField("EntityFrameworkEvent", @event);
+            (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
             OnScopeSaving(scope);
             scope.Save();
         }
@@ -229,7 +229,9 @@ namespace Audit.EntityFramework
         {
             var typeName = GetType().Name;
             var eventType = AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
-            var scope = AuditScope.Create(eventType, null, new { EntityFrameworkEvent = efEvent }, EventCreationPolicy.Manual, AuditDataProvider);
+            var auditEfEvent = new AuditEventEntityFramework();
+            auditEfEvent.EntityFrameworkEvent = efEvent;
+            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, AuditDataProvider, auditEfEvent);
             if (_extraFields != null)
             {
                 foreach(var field in _extraFields)

@@ -60,7 +60,11 @@ namespace Audit.Mvc
                 .Replace("{controller}", auditAction.ControllerName)
                 .Replace("{action}", auditAction.ActionName);
             // Create the audit scope
-            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction });
+            var auditEventAction = new AuditEventMvcAction()
+            {
+                Action = auditAction
+            };
+            var auditScope = AuditScope.Create(eventType, null, null, Configuration.CreationPolicy, null, auditEventAction);
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
             base.OnActionExecuting(filterContext);
@@ -85,7 +89,7 @@ namespace Audit.Mvc
             if (auditScope != null)
             {
                 // Replace the Action field and save
-                auditScope.SetCustomField("Action", auditAction);
+                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
                 auditScope.Save();
             }
             base.OnActionExecuted(filterContext);
@@ -105,7 +109,7 @@ namespace Audit.Mvc
             if (auditScope != null)
             {
                 // Replace the Action field and save
-                auditScope.SetCustomField("Action", auditAction);
+                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
                 auditScope.Save();
                 auditScope.Dispose();
             }

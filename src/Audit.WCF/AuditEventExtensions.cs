@@ -8,10 +8,15 @@ namespace Audit.WCF
         /// Gets the WCF Event portion of the Audit Event.
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>
-        public static AuditWcfEvent GetWcfAuditAction(this AuditEvent auditEvent)
+        public static WcfEvent GetWcfAuditAction(this AuditEvent auditEvent)
         {
-            return auditEvent.CustomFields.ContainsKey(AuditBehavior.CustomFieldName) 
-                ? auditEvent.CustomFields[AuditBehavior.CustomFieldName] as AuditWcfEvent
+            if (auditEvent is AuditEventWcfAction)
+            {
+                return (auditEvent as AuditEventWcfAction).WcfEvent;
+            }
+            // For backwards compatibility
+            return auditEvent.CustomFields.ContainsKey("WcfEvent") 
+                ? auditEvent.CustomFields["WcfEvent"] as WcfEvent
                 : null;
         }
     }
