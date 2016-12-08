@@ -63,7 +63,7 @@ IQueryable<AuditEvent> query = azureDbDataProvider.QueryEvents()
 	.Take(10);
 ```
 
-You can use the `EnumerateEvents()` method to run SQL-like queries. For example the previous query can be written as:
+Alternatively, you can use the `EnumerateEvents()` method to run SQL-like queries. For example the previous query can be written as:
 
 ```c#
 IEnumerable<AuditEvent> events = azureDbDataProvider.EnumerateEvents(
