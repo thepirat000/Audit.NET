@@ -131,7 +131,7 @@ public sealed class EntityKeyHelper
 
         // Find the storage entity set (table) that the entity is mapped
         var table = mapping
-            .EntityTypeMappings.Single()
+            .EntityTypeMappings.Single(m => m.Fragments.Count > 0)
             .Fragments.Single()
             .StoreEntitySet;
 
@@ -158,7 +158,7 @@ public sealed class EntityKeyHelper
         var mapping = GetMapping(type, context);
         // Find the storage property (column) that the property is mapped
         var columnName = mapping
-            .EntityTypeMappings.Single()
+            .EntityTypeMappings.Single(m => m.Fragments.Count > 0)
             .Fragments.Single()
             .PropertyMappings
             .OfType<ScalarPropertyMapping>()
