@@ -52,7 +52,7 @@ Mandatory:
 
 The Azure Document DB data provider includes support for querying the events collection.
 
-You can use the `QueryEvents()` on `AzureDbDataProvider` class to run LINQ queries against the audit events.
+Use the `QueryEvents()` method on `AzureDbDataProvider` class to run LINQ queries against the audit events.
 
 
 For example, to get the top 10 most time-consuming events for a specific machine:
@@ -63,7 +63,7 @@ IQueryable<AuditEvent> query = azureDbDataProvider.QueryEvents()
 	.Take(10);
 ```
 
-Alternatively, you can use the `EnumerateEvents()` method to run SQL-like queries. For example the previous query can be written as:
+Also you can use the `EnumerateEvents()` method to run SQL-like queries. For example the previous query can be written as:
 
 ```c#
 IEnumerable<AuditEvent> events = azureDbDataProvider.EnumerateEvents(
