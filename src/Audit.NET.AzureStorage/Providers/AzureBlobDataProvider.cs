@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Audit.AzureTableStorage.Providers
 {
@@ -91,9 +92,14 @@ namespace Audit.AzureTableStorage.Providers
 
         internal CloudBlobContainer EnsureContainer(AuditEvent auditEvent)
         {
-            CloudBlobContainer result;
-            var containerName = GetContainerName(auditEvent);
             var cnnString = GetConnectionString(auditEvent);
+            var containerName = GetContainerName(auditEvent);
+            return EnsureContainer(cnnString, containerName);
+        }
+
+        internal CloudBlobContainer EnsureContainer(string cnnString, string containerName)
+        {
+            CloudBlobContainer result;
             var cacheKey = cnnString + "|" + containerName;
             if (_containerCache.TryGetValue(cacheKey, out result))
             {

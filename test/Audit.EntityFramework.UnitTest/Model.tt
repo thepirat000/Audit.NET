@@ -1,22 +1,229 @@
 ﻿<#@ template language="C#" debug="false" hostspecific="true"#>
-<#@ include file="EF6.Utility.CS.ttinclude"#><#@
+<#@ include file="EF6.Utility.CS.ttinclude"#><#@ 
  output extension=".cs"#><#
 
-const string inputFile = @"EdmxTest.edmx";
+const string inputFile = @"Model.edmx";
 var textTransform = DynamicTextTransformation.Create(this);
 var code = new CodeGenerationTools(this);
 var ef = new MetadataTools(this);
 var typeMapper = new TypeMapper(code, ef, textTransform.Errors);
-var loader = new EdmMetadataLoader(textTransform.Host, textTransform.Errors);
-var itemCollection = loader.CreateEdmItemCollection(inputFile);
-var modelNamespace = loader.GetModelNamespace(inputFile);
+var	fileManager = EntityFrameworkTemplateFileManager.Create(this);
+var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Errors).CreateEdmItemCollection(inputFile);
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
 
-var container = itemCollection.OfType<EntityContainer>().FirstOrDefault();
-if (container == null)
+if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
 {
     return string.Empty;
 }
+
+WriteHeader(codeStringGenerator, fileManager);
+
+foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection))
+{
+    fileManager.StartNewFile(entity.Name + ".cs");
+    BeginNamespace(code);
+#>
+<#=codeStringGenerator.UsingDirectives(inHeader: false)#>
+<#=codeStringGenerator.EntityClassOpening(entity)#>
+{
+<#
+    var propertiesWithDefaultValues = typeMapper.GetPropertiesWithDefaultValues(entity);
+    var collectionNavigationProperties = typeMapper.GetCollectionNavigationProperties(entity);
+    var complexProperties = typeMapper.GetComplexProperties(entity);
+
+    if (propertiesWithDefaultValues.Any() || collectionNavigationProperties.Any() || complexProperties.Any())
+    {
+#>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public <#=code.Escape(entity)#>()
+    {
+<#
+        foreach (var edmProperty in propertiesWithDefaultValues)
+        {
+#>
+        this.<#=code.Escape(edmProperty)#> = <#=typeMapper.CreateLiteral(edmProperty.DefaultValue)#>;
+<#
+        }
+
+        foreach (var navigationProperty in collectionNavigationProperties)
+        {
+#>
+        this.<#=code.Escape(navigationProperty)#> = new HashSet<<#=typeMapper.GetTypeName(navigationProperty.ToEndMember.GetEntityType())#>>();
+<#
+        }
+
+        foreach (var complexProperty in complexProperties)
+        {
+#>
+        this.<#=code.Escape(complexProperty)#> = new <#=typeMapper.GetTypeName(complexProperty.TypeUsage)#>();
+<#
+        }
+#>
+    }
+
+<#
+    }
+
+    var simpleProperties = typeMapper.GetSimpleProperties(entity);
+    if (simpleProperties.Any())
+    {
+        foreach (var edmProperty in simpleProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(edmProperty)#>
+<#
+        }
+    }
+
+    if (complexProperties.Any())
+    {
+#>
+
+<#
+        foreach(var complexProperty in complexProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(complexProperty)#>
+<#
+        }
+    }
+
+    var navigationProperties = typeMapper.GetNavigationProperties(entity);
+    if (navigationProperties.Any())
+    {
+#>
+
+<#
+        foreach (var navigationProperty in navigationProperties)
+        {
+            if (navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many)
+            {
+#>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+<#
+            }
+#>
+    <#=codeStringGenerator.NavigationProperty(navigationProperty)#>
+<#
+        }
+    }
+#>
+}
+<#
+    EndNamespace(code);
+}
+
+foreach (var complex in typeMapper.GetItemsToGenerate<ComplexType>(itemCollection))
+{
+    fileManager.StartNewFile(complex.Name + ".cs");
+    BeginNamespace(code);
+#>
+<#=codeStringGenerator.UsingDirectives(inHeader: false, includeCollections: false)#>
+<#=Accessibility.ForType(complex)#> partial class <#=code.Escape(complex)#>
+{
+<#
+    var complexProperties = typeMapper.GetComplexProperties(complex);
+    var propertiesWithDefaultValues = typeMapper.GetPropertiesWithDefaultValues(complex);
+
+    if (propertiesWithDefaultValues.Any() || complexProperties.Any())
+    {
+#>
+    public <#=code.Escape(complex)#>()
+    {
+<#
+        foreach (var edmProperty in propertiesWithDefaultValues)
+        {
+#>
+        this.<#=code.Escape(edmProperty)#> = <#=typeMapper.CreateLiteral(edmProperty.DefaultValue)#>;
+<#
+        }
+
+        foreach (var complexProperty in complexProperties)
+        {
+#>
+        this.<#=code.Escape(complexProperty)#> = new <#=typeMapper.GetTypeName(complexProperty.TypeUsage)#>();
+<#
+        }
+#>
+    }
+
+<#
+    }
+
+    var simpleProperties = typeMapper.GetSimpleProperties(complex);
+    if (simpleProperties.Any())
+    {
+        foreach(var edmProperty in simpleProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(edmProperty)#>
+<#
+        }
+    }
+
+    if (complexProperties.Any())
+    {
+#>
+
+<#
+        foreach(var edmProperty in complexProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(edmProperty)#>
+<#
+        }
+    }
+#>
+}
+<#
+    EndNamespace(code);
+}
+
+foreach (var enumType in typeMapper.GetEnumItemsToGenerate(itemCollection))
+{
+    fileManager.StartNewFile(enumType.Name + ".cs");
+    BeginNamespace(code);
+#>
+<#=codeStringGenerator.UsingDirectives(inHeader: false, includeCollections: false)#>
+<#
+    if (typeMapper.EnumIsFlags(enumType))
+    {
+#>
+[Flags]
+<#
+    }
+#>
+<#=codeStringGenerator.EnumOpening(enumType)#>
+{
+<#
+    var foundOne = false;
+    
+    foreach (MetadataItem member in typeMapper.GetEnumMembers(enumType))
+    {
+        foundOne = true;
+#>
+    <#=code.Escape(typeMapper.GetEnumMemberName(member))#> = <#=typeMapper.GetEnumMemberValue(member)#>,
+<#
+    }
+
+    if (foundOne)
+    {
+        this.GenerationEnvironment.Remove(this.GenerationEnvironment.Length - 3, 1);
+    }
+#>
+}
+<#
+    EndNamespace(code);
+}
+
+fileManager.Process();
+
+#>
+<#+
+
+public void WriteHeader(CodeStringGenerator codeStringGenerator, EntityFrameworkTemplateFileManager fileManager)
+{
+    fileManager.StartHeader();
 #>
 //------------------------------------------------------------------------------
 // <auto-generated>
@@ -26,137 +233,36 @@ if (container == null)
 // <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine3")#>
 // </auto-generated>
 //------------------------------------------------------------------------------
+<#=codeStringGenerator.UsingDirectives(inHeader: true)#>
+<#+
+    fileManager.EndBlock();
+}
 
-<#
-
-var codeNamespace = code.VsNamespaceSuggestion();
-if (!String.IsNullOrEmpty(codeNamespace))
+public void BeginNamespace(CodeGenerationTools code)
 {
+    var codeNamespace = code.VsNamespaceSuggestion();
+    if (!String.IsNullOrEmpty(codeNamespace))
+    {
 #>
 namespace <#=code.EscapeNamespace(codeNamespace)#>
 {
-<#
-    PushIndent("    ");
-}
-
-#>
-using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-<#
-if (container.FunctionImports.Any())
-{
-#>
-using System.Data.Entity.Core.Objects;
-using System.Linq;
-<#
-}
-#>
-
-<#=Accessibility.ForType(container)#> partial class <#=code.Escape(container)#> : DbContext
-{
-    public <#=code.Escape(container)#>()
-        : base("name=<#=container.Name#>")
-    {
-<#
-if (!loader.IsLazyLoadingEnabled(container))
-{
-#>
-        this.Configuration.LazyLoadingEnabled = false;
-<#
-}
-
-foreach (var entitySet in container.BaseEntitySets.OfType<EntitySet>())
-{
-    // Note: the DbSet members are defined below such that the getter and
-    // setter always have the same accessibility as the DbSet definition
-    if (Accessibility.ForReadOnlyProperty(entitySet) != "public")
-    {
-#>
-        <#=codeStringGenerator.DbSetInitializer(entitySet)#>
-<#
-    }
-}
-#>
-    }
-
-    protected override void OnModelCreating(DbModelBuilder modelBuilder)
-    {
-        throw new UnintentionalCodeFirstException();
-    }
-
-<#
-    foreach (var entitySet in container.BaseEntitySets.OfType<EntitySet>())
-    {
-#>
-    <#=codeStringGenerator.DbSet(entitySet)#>
-<#
-    }
-
-    foreach (var edmFunction in container.FunctionImports)
-    {
-        WriteFunctionImport(typeMapper, codeStringGenerator, edmFunction, modelNamespace, includeMergeOption: false);
-    }
-#>
-}
-<#
-
-if (!String.IsNullOrEmpty(codeNamespace))
-{
-    PopIndent();
-#>
-}
-<#
-}
-#>
 <#+
-
-private void WriteFunctionImport(TypeMapper typeMapper, CodeStringGenerator codeStringGenerator, EdmFunction edmFunction, string modelNamespace, bool includeMergeOption)
-{
-    if (typeMapper.IsComposable(edmFunction))
-    {
-#>
-
-    [DbFunction("<#=edmFunction.NamespaceName#>", "<#=edmFunction.Name#>")]
-    <#=codeStringGenerator.ComposableFunctionMethod(edmFunction, modelNamespace)#>
-    {
-<#+
-        codeStringGenerator.WriteFunctionParameters(edmFunction, WriteFunctionParameter);
-#>
-        <#=codeStringGenerator.ComposableCreateQuery(edmFunction, modelNamespace)#>
+        PushIndent("    ");
     }
+}
+
+public void EndNamespace(CodeGenerationTools code)
+{
+    if (!String.IsNullOrEmpty(code.VsNamespaceSuggestion()))
+    {
+        PopIndent();
+#>
+}
 <#+
     }
-    else
-    {
-#>
-
-    <#=codeStringGenerator.FunctionMethod(edmFunction, modelNamespace, includeMergeOption)#>
-    {
-<#+
-        codeStringGenerator.WriteFunctionParameters(edmFunction, WriteFunctionParameter);
-#>
-        <#=codeStringGenerator.ExecuteFunction(edmFunction, modelNamespace, includeMergeOption)#>
-    }
-<#+
-        if (typeMapper.GenerateMergeOptionFunction(edmFunction, includeMergeOption))
-        {
-            WriteFunctionImport(typeMapper, codeStringGenerator, edmFunction, modelNamespace, includeMergeOption: true);
-        }
-    }
 }
 
-public void WriteFunctionParameter(string name, string isNotNull, string notNullInit, string nullInit)
-{
-#>
-        var <#=name#> = <#=isNotNull#> ?
-            <#=notNullInit#> :
-            <#=nullInit#>;
-
-<#+
-}
-
-public const string TemplateId = "CSharp_DbContext_Context_EF6";
+public const string TemplateId = "CSharp_DbContext_Types_EF6";
 
 public class CodeStringGenerator
 {
@@ -314,15 +420,6 @@ public class CodeStringGenerator
             _code.Escape(entitySet));
     }
 
-    public string DbSetInitializer(EntitySet entitySet)
-    {
-        return string.Format(
-            CultureInfo.InvariantCulture,
-            "{0} = Set<{1}>();",
-            _code.Escape(entitySet),
-            _typeMapper.GetTypeName(entitySet.ElementType));
-    }
-
     public string UsingDirectives(bool inHeader, bool includeCollections = true)
     {
         return inHeader == string.IsNullOrEmpty(_code.VsNamespaceSuggestion())
@@ -345,11 +442,6 @@ public class TypeMapper
     private readonly CodeGenerationTools _code;
     private readonly MetadataTools _ef;
 
-    public static string FixNamespaces(string typeName)
-    {
-        return typeName.Replace("System.Data.Spatial.", "System.Data.Entity.Spatial.");
-    }
-
     public TypeMapper(CodeGenerationTools code, MetadataTools ef, System.Collections.IList errors)
     {
         ArgumentNotNull(code, "code");
@@ -359,6 +451,11 @@ public class TypeMapper
         _code = code;
         _ef = ef;
         _errors = errors;
+    }
+
+    public static string FixNamespaces(string typeName)
+    {
+        return typeName.Replace("System.Data.Spatial.", "System.Data.Entity.Spatial.");
     }
 
     public string GetTypeName(TypeUsage typeUsage)

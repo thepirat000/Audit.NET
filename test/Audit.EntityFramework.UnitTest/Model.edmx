@@ -5,24 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
       <Schema Namespace="BlogsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="AuditBlogs">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="BlogId" Type="int" Nullable="false" />
-          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
-          <Property Name="Changes" Type="nvarchar(max)" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AuditPosts">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="PostId" Type="int" Nullable="false" />
-          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
-          <Property Name="Changes" Type="nvarchar(max)" Nullable="false" />
-        </EntityType>
         <EntityType Name="Blogs">
           <Key>
             <PropertyRef Name="Id" />
@@ -53,9 +35,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="Delete_Blog" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Insert_Blog" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Title" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
+        </Function>
+        <Function Name="Update_Blog" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Id" Type="int" Mode="In" />
+          <Parameter Name="Title" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Name" Type="nvarchar(max)" Mode="In" />
+        </Function>
         <EntityContainer Name="BlogsModelStoreContainer">
-          <EntitySet Name="AuditBlogs" EntityType="Self.AuditBlogs" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AuditPosts" EntityType="Self.AuditPosts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Blogs" EntityType="Self.Blogs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Posts" EntityType="Self.Posts" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Post_Blog" Association="Self.FK_Post_Blog">
@@ -68,24 +60,6 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="BlogsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="AuditBlog">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="BlogId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Changes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AuditPost">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PostId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Changes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-        </EntityType>
         <EntityType Name="Blog">
           <Key>
             <PropertyRef Name="Id" />
@@ -119,14 +93,24 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="BlogsEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="AuditBlogs" EntityType="Self.AuditBlog" />
-          <EntitySet Name="AuditPosts" EntityType="Self.AuditPost" />
           <EntitySet Name="Blogs" EntityType="Self.Blog" />
           <EntitySet Name="Posts" EntityType="Self.Post" />
           <AssociationSet Name="FK_Post_Blog" Association="Self.FK_Post_Blog">
             <End Role="Blogs" EntitySet="Blogs" />
             <End Role="Posts" EntitySet="Posts" />
           </AssociationSet>
+          <FunctionImport Name="Delete_Blog">
+            <Parameter Name="Id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Insert_Blog">
+            <Parameter Name="Title" Mode="In" Type="String" />
+            <Parameter Name="Name" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="Update_Blog">
+            <Parameter Name="Id" Mode="In" Type="Int32" />
+            <Parameter Name="Title" Mode="In" Type="String" />
+            <Parameter Name="Name" Mode="In" Type="String" />
+          </FunctionImport>
         </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
@@ -134,26 +118,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="BlogsModelStoreContainer" CdmEntityContainer="BlogsEntities">
-          <EntitySetMapping Name="AuditBlogs">
-            <EntityTypeMapping TypeName="BlogsModel.AuditBlog">
-              <MappingFragment StoreEntitySet="AuditBlogs">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="BlogId" ColumnName="BlogId" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Changes" ColumnName="Changes" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AuditPosts">
-            <EntityTypeMapping TypeName="BlogsModel.AuditPost">
-              <MappingFragment StoreEntitySet="AuditPosts">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="PostId" ColumnName="PostId" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Changes" ColumnName="Changes" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Blogs">
             <EntityTypeMapping TypeName="BlogsModel.Blog">
               <MappingFragment StoreEntitySet="Blogs">
@@ -161,6 +125,22 @@
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="BloggerName" ColumnName="BloggerName" />
               </MappingFragment>
+            </EntityTypeMapping>
+            <EntityTypeMapping TypeName="BlogsModel.Blog">
+              <ModificationFunctionMapping>
+                <InsertFunction FunctionName="BlogsModel.Store.Insert_Blog">
+                  <ScalarProperty Name="BloggerName" ParameterName="Name" />
+                  <ScalarProperty Name="Title" ParameterName="Title" />
+                </InsertFunction>
+                <UpdateFunction FunctionName="BlogsModel.Store.Update_Blog">
+                  <ScalarProperty Name="BloggerName" ParameterName="Name" Version="Current" />
+                  <ScalarProperty Name="Title" ParameterName="Title" Version="Current" />
+                  <ScalarProperty Name="Id" ParameterName="Id" Version="Current" />
+                </UpdateFunction>
+                <DeleteFunction FunctionName="BlogsModel.Store.Delete_Blog">
+                  <ScalarProperty Name="Id" ParameterName="Id" />
+                </DeleteFunction>
+              </ModificationFunctionMapping>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Posts">
@@ -174,6 +154,9 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="Delete_Blog" FunctionName="BlogsModel.Store.Delete_Blog" />
+          <FunctionImportMapping FunctionImportName="Insert_Blog" FunctionName="BlogsModel.Store.Insert_Blog" />
+          <FunctionImportMapping FunctionImportName="Update_Blog" FunctionName="BlogsModel.Store.Update_Blog" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

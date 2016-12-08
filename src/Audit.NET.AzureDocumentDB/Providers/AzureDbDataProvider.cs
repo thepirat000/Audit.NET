@@ -4,6 +4,8 @@ using System.Text;
 using Audit.Core;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Audit.AzureDocumentDB.Providers
 {
@@ -92,5 +94,49 @@ namespace Audit.AzureDocumentDB.Providers
         {
             return UriFactory.CreateDocumentCollectionUri(_database, _collection);
         }
+
+        #region Events Query        
+        /// <summary>
+        /// Returns an IQueryable that enables the creation of queries against the audit events stored on Azure Document DB.
+        /// </summary>
+        public IQueryable<AuditEvent> QueryEvents()
+        {
+            var client = GetClient();
+            var collectionUri = GetCollectionUri();
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri);
+        }
+
+        /// <summary>
+        /// Returns an IQueryable that enables the creation of queries against the audit events stored on Azure Document DB, for the audit event type given.
+        /// </summary>
+        /// <typeparam name="T">The AuditEvent type</typeparam>
+        public IQueryable<T> QueryEvents<T>() where T : AuditEvent
+        {
+            var client = GetClient();
+            var collectionUri = GetCollectionUri();
+            return client.CreateDocumentQuery<T>(collectionUri);
+        }
+
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Azure Document DB SQL expression.
+        /// </summary>
+        /// <param name="sqlExpression">The Azure Document DB SQL expression</param>
+        public IEnumerable<AuditEvent> EnumerateEvents(string sqlExpression)
+        {
+            var client = GetClient();
+            var collectionUri = GetCollectionUri();
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression);
+        }
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Azure Document DB SQL expression and the event type given.
+        /// </summary>
+        /// <typeparam name="T">The AuditEvent type</typeparam>
+        public IEnumerable<T> EnumerateEvents<T>(string sqlExpression) where T : AuditEvent
+        {
+            var client = GetClient();
+            var collectionUri = GetCollectionUri();
+            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression);
+        }
+        #endregion
     }
 }

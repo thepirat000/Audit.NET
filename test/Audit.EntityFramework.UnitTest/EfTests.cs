@@ -3,17 +3,57 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Audit.EntityFramework.Edmx.UnitTest
+namespace Audit.EntityFramework.UnitTest
 {
     [TestFixture]
-    public class UnitTest1
+    public class EfTests
     {
         [SetUp]
         public void SetUp()
         {
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsEntities>().Reset();
+        }
+
+        [Test]
+        public void Test_FunctionMapping()
+        {
+            AuditEventEntityFramework auditEvent = null;
+            Audit.Core.Configuration.Setup()
+               .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+               {
+                   auditEvent = ev as AuditEventEntityFramework;
+               }))
+               .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsEntities>(config => config
+                    .IncludeEntityObjects(false)
+                    .AuditEventType("{context}:{database}"))
+                .Reset()
+                .UseOptOut();
+            var title = Guid.NewGuid().ToString();
+            using (var ctx = new BlogsEntities())
+            {
+                var blog = new Blog()
+                {
+                    Title = title,
+                    BloggerName = "test"
+                };
+                ctx.Blogs.Add(blog);
+                // this will execute via SP
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(1, auditEvent.EntityFrameworkEvent.Entries.Count);
+            Assert.AreEqual("Insert", auditEvent.EntityFrameworkEvent.Entries[0].Action);
+            Assert.AreEqual("Blogs", auditEvent.EntityFrameworkEvent.Entries[0].Table);
+            Assert.AreEqual(title, auditEvent.EntityFrameworkEvent.Entries[0].ColumnValues["Title"]);
+
+
         }
 
         [Test]
@@ -58,7 +98,7 @@ namespace Audit.EntityFramework.Edmx.UnitTest
         }
 
         [Test]
-        public void TestMethod1()
+        public void Test_General()
         {
             var guid = Guid.NewGuid().ToString();
             var evs = new List<AuditEvent>();

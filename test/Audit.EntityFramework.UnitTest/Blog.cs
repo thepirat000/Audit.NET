@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Audit.EntityFramework.Edmx.UnitTest
+namespace Audit.EntityFramework.UnitTest
 {
     using System;
     using System.Collections.Generic;
