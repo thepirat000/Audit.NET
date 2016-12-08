@@ -55,7 +55,7 @@ An example of the output as seen with [NoSQL Manager for Mongo DB](http://www.mo
 
 The Mongo DB data provider includes support for querying the events collection.
 
-You can use the `QueryEvents()` method to run LINQ queries.
+You can use the `QueryEvents()` method on `MongoDataProvider` class to run LINQ queries against the audit events.
 
 For example, to get the top 10 most time-consuming events for a specific machine:
 ```c#
