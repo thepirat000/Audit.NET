@@ -48,3 +48,28 @@ Mandatory:
 - **Database**: The audit database name.
 - **Collection**: The events collection name.
 
+## Query events
+
+The Azure Document DB data provider includes support for querying the events collection.
+
+You can use the `QueryEvents()` method to run LINQ queries.
+
+For example, to get the top 10 most time-consuming events for a specific machine:
+```c#
+IQueryable<AuditEvent> query = azureDbDataProvider.QueryEvents()
+	.Where(ev => ev.Environment.MachineName == "HP")
+	.OrderByDescending(ev => ev.Duration)
+	.Take(10);
+```
+
+You can use the `EnumerateEvents()` method to run SQL-like queries. For example the previous query can be written as:
+
+```c#
+IEnumerable<AuditEvent> events = azureDbDataProvider.EnumerateEvents(
+       @"SELECT TOP 10 * 
+         FROM c 
+         WHERE c.Environment.MachineName = 'HP' 
+         ORDER BY c.Duration DESC");
+```
+
+This [post](https://docs.microsoft.com/en-us/azure/documentdb/documentdb-sql-query) contains information about the SQL query syntax supported by Azure Document DB.
