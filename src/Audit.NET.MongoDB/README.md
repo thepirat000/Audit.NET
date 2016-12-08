@@ -50,3 +50,18 @@ Mandatory:
 An example of the output as seen with [NoSQL Manager for Mongo DB](http://www.mongodbmanager.com/):
 
 ![MongoDB sample](http://i.imgur.com/jyYOypX.png)
+
+## Query events
+
+The Mongo DB data provider includes support for querying the events collection.
+
+You can use the `QueryEvents()` method to run LINQ queries.
+
+For example, to get the top 10 most time-consuming events for a specific machine:
+```c#
+IQueryable<AuditEvent> query = mongoDbDataProvider.QueryEvents()
+	.Where(ev => ev.Environment.MachineName == "HP")
+	.OrderByDescending(ev => ev.Duration)
+	.Take(10);
+```
+
