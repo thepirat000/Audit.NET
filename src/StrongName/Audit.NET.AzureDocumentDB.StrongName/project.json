@@ -1,5 +1,5 @@
-{
-  "title": "Audit.AzureDocumentDB",
+﻿{
+  "title": "Audit.AzureDocumentDB.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
@@ -17,13 +17,14 @@
       "Trail",
       "Log",
       "Azure",
-      "DocumentDB"
+      "DocumentDB",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/yeBZZiP.png"
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     }
   },
@@ -43,6 +44,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.NET.AzureDocumentDB/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.NET.AzureDocumentDB/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.NET.AzureDocumentDB/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

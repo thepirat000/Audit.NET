@@ -1,26 +1,26 @@
-{
-  "title": "Audit.SqlServer",
+﻿{
+  "title": "Audit.EntityFramework.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
   ],
-  "description": "Store Audit.NET Trail Logs into a SQL Server database",
+  "description": "Generate Audit Logs from EntityFramework context changes",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.EntityFramework",
     "owners": [
       "ThePirat"
     ],
-    "summary": "SQL Server provider for Audit.NET library. Store Audit Logs into a SQL Server database.",
+    "summary": "Generate detailed Audit Logs for EntityFramework CRUD operations.",
     "tags": [
       "Audit",
       "Trail",
       "Log",
-      "SQL",
-      "SqlServer"
+      "EntityFramework",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
-    "iconUrl": "http://i.imgur.com/lmzs1gw.png"
+    "iconUrl": "http://i.imgur.com/T3NcXaZ.png"
   },
   "tools": {
     "Microsoft.EntityFrameworkCore.Tools": {
@@ -32,7 +32,7 @@
     }
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     }
   },
@@ -44,7 +44,7 @@
       ],
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "Microsoft.EntityFrameworkCore": "1.0.0",
+        "Microsoft.EntityFrameworkCore": "1.0.1",
         "Microsoft.EntityFrameworkCore.SqlServer.Design": "1.0.0"
       }
     },
@@ -61,6 +61,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.EntityFramework/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.EntityFramework/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.EntityFramework/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

@@ -1,5 +1,5 @@
-{
-  "title": "Audit.Mvc",
+﻿{
+  "title": "Audit.Mvc.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
@@ -17,13 +17,14 @@
       "Trail",
       "Log",
       "MVC",
-      "ActionFilter"
+      "ActionFilter",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/5YjHlfd.png"
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     }
   },
@@ -47,6 +48,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.Mvc/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.Mvc/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.Mvc/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

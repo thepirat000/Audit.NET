@@ -1,5 +1,5 @@
-{
-  "title": "Audit.DynamicProxy",
+﻿{
+  "title": "Audit.DynamicProxy.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
@@ -18,13 +18,14 @@
       "Log",
       "Proxy",
       "Castle",
-      "DynamicProxy"
+      "DynamicProxy",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/hVMM5WF.png"
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     },
     "Castle.Core": "4.0.0-beta001"
@@ -46,6 +47,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.DynamicProxy/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.DynamicProxy/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.DynamicProxy/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

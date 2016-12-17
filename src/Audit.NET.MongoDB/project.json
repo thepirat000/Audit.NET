@@ -1,6 +1,6 @@
 {
   "title": "Audit.MongoDB",
-  "version": "4.7.0-*",
+  "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -30,12 +30,12 @@
     "netstandard1.5": {
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "mongocsharpdriver": "2.3.0-rc1"
+        "MongoDB.Driver": "2.4.0"
       }
     },
     "net45": {
       "dependencies": {
-        "mongocsharpdriver": "2.2.4"
+        "MongoDB.Driver":  "2.4.0"
       }
     }
   },

@@ -1,5 +1,5 @@
-{
-  "title": "Audit.SqlServer",
+﻿{
+  "title": "Audit.SqlServer.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
@@ -17,7 +17,8 @@
       "Trail",
       "Log",
       "SQL",
-      "SqlServer"
+      "SqlServer",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/lmzs1gw.png"
@@ -32,7 +33,7 @@
     }
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     }
   },
@@ -61,6 +62,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.NET.SqlServer/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.NET.SqlServer/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.NET.SqlServer/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

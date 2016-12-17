@@ -1,5 +1,5 @@
-{
-  "title": "Audit.WebApi",
+﻿{
+  "title": "Audit.WebApi.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
@@ -16,13 +16,14 @@
       "Audit",
       "Trail",
       "Log",
-      "WebApi"
+      "WebApi",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/GkqLSk8.png"
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     }
   },
@@ -48,6 +49,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.WebApi/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.WebApi/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.WebApi/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

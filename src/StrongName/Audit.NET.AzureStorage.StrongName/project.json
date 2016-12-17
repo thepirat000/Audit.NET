@@ -1,5 +1,5 @@
-{
-  "title": "Audit.AzureStorage",
+﻿{
+  "title": "Audit.AzureStorage.StrongName",
   "version": "4.8.0-*",
   "copyright": "Copyright 2016",
   "authors": [
@@ -18,13 +18,14 @@
       "Log",
       "Azure",
       "Blob",
-      "BlobStorage"
+      "BlobStorage",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/ouaw5CX.png"
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     },
     "Newtonsoft.Json": "9.0.1",
@@ -49,6 +50,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.NET.AzureStorage/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.NET.AzureStorage/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.NET.AzureStorage/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }

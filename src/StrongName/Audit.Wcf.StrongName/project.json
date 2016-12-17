@@ -1,5 +1,5 @@
-{
-  "title": "Audit.Wcf",
+﻿{
+  "title": "Audit.Wcf.StrongName",
   "copyright": "Copyright 2016",
   "description": "Generate detailed Audit Logs for WCF service calls.",
   "version": "4.8.0-*",
@@ -16,13 +16,14 @@
       "Audit",
       "Trail",
       "Log",
-      "WCF"
+      "WCF",
+      "StrongName"
     ],
     "requireLicenseAcceptance": false,
     "iconUrl": "http://i.imgur.com/Sl1hHBz.png"
   },
   "dependencies": {
-    "Audit.NET": {
+    "Audit.NET.StrongName": {
       "target": "project"
     }
   },
@@ -38,6 +39,21 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ]
+    ],
+    "keyFile": "../Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ],
+    "compile": {
+      "include": [
+        "../../Audit.WCF/**/*.cs"
+      ],
+      "exclude": [
+        "../../Audit.WCF/obj/"
+      ],
+      "excludeFiles": [
+        "../../Audit.WCF/Properties/AssemblyInfo.cs"
+      ]
+    }
   }
 }
