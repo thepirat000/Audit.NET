@@ -59,7 +59,7 @@ You can use the `QueryEvents()` method on `MongoDataProvider` class to run LINQ 
 
 For example, to get the top 10 most time-consuming events for a specific machine:
 ```c#
-IQueryable<AuditEvent> query = mongoDbDataProvider.QueryEvents()
+IQueryable<AuditEvent> query = mongoDataProvider.QueryEvents()
 	.Where(ev => ev.Environment.MachineName == "HP")
 	.OrderByDescending(ev => ev.Duration)
 	.Take(10);
