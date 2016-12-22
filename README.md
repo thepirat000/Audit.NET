@@ -17,6 +17,12 @@ And also extensions to audit different systems such as EntityFramework, MVC, Web
 PM> Install-Package Audit.NET
 ```
 
+If you need Strong-Named use the package Audit.NET.StrongName:
+```
+PM> Install-Package Audit.NET.StrongName
+```
+
+
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
 ##Contents
