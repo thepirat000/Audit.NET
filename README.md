@@ -11,7 +11,9 @@ With Audit.NET you can generate tracking information about operations being exec
 [Extensions](#extensions) to log to json Files, Event Log, SQL, MongoDB, AzureBlob and DocumentDB are provided. 
 And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
 
-## Install [NuGet](https://www.nuget.org/packages/Audit.NET/)
+## [NuGet](https://www.nuget.org/packages/Audit.NET/)
+
+To install the package run the following command on the Package Manager Console:
 
 ```
 PM> Install-Package Audit.NET
