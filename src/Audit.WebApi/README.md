@@ -16,7 +16,7 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.WebApi
 ```
 
-Or for the [Strong-Named](https://www.nuget.org/packages/Audit.Wcf.StrongName/) version:
+Or for the [Strong-Named](https://www.nuget.org/packages/Audit.WebApi.StrongName/) version:
 ```
 PM> Install-Package Audit.WebApi.StrongName
 ```
