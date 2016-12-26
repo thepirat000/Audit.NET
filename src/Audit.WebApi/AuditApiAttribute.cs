@@ -1,13 +1,11 @@
 ﻿#if NET45
 using Audit.Core;
 using Audit.Core.Extensions;
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using System.Web.Http.ModelBinding;
@@ -39,7 +37,7 @@ namespace Audit.WebApi
 
         private const string AuditApiActionKey = "__private_AuditApiAction__";
         private const string AuditApiScopeKey = "__private_AuditApiScope__";
-
+        
         /// <summary>
         /// Occurs before the action method is invoked.
         /// </summary>
@@ -47,15 +45,14 @@ namespace Audit.WebApi
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var request = actionContext.Request;
-            var httpContext = GetHttpContext(request);
-
+            var contextWrapper = new ContextWrapper(request);
             var auditAction = new AuditApiAction
             {
                 UserName = actionContext.RequestContext?.Principal?.Identity?.Name,
-                IpAddress = GetClientIp(request),
+                IpAddress = contextWrapper.GetClientIp(),
                 RequestUrl = request.RequestUri?.AbsoluteUri,
                 HttpMethod = actionContext.Request.Method?.Method,
-                FormVariables = ToDictionary(httpContext.Request?.Form),
+                FormVariables = contextWrapper.GetFormVariables(),
                 Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
@@ -70,8 +67,8 @@ namespace Audit.WebApi
                 Action = auditAction
             };
             var auditScope = AuditScope.Create(eventType, null, null, Configuration.CreationPolicy, null, auditEventAction);
-            httpContext.Items[AuditApiActionKey] = auditAction;
-            httpContext.Items[AuditApiScopeKey] = auditScope;
+            contextWrapper.Set(AuditApiActionKey, auditAction);
+            contextWrapper.Set(AuditApiScopeKey, auditScope);
         }
 
         /// <summary>
@@ -80,9 +77,9 @@ namespace Audit.WebApi
         /// <param name="actionExecutedContext">The action executed context.</param>
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
-            var httpContext = GetHttpContext(actionExecutedContext.Request);
-            var auditAction = httpContext.Items[AuditApiActionKey] as AuditApiAction;
-            var auditScope = httpContext.Items[AuditApiScopeKey] as AuditScope;
+            var contextWrapper = new ContextWrapper(actionExecutedContext.Request);
+            var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiActionKey);
+            var auditScope = contextWrapper.Get<AuditScope>(AuditApiScopeKey);
             if (auditAction != null && auditScope != null)
             {
                 auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
@@ -157,27 +154,10 @@ namespace Audit.WebApi
             return dict.Count > 0 ? dict : null;
         }
 
-        private string GetClientIp(HttpRequestMessage request)
-        {
-            return GetHttpContext(request).Request.UserHostAddress;
-        }
-
-        private static HttpContextBase GetHttpContext(HttpRequestMessage request)
-        {
-            HttpContextBase context = null;
-            if (request?.Properties != null && request.Properties.ContainsKey("MS_HttpContext"))
-            {
-                object obj;
-                request.Properties.TryGetValue("MS_HttpContext", out obj);
-                context = obj as HttpContextBase;
-            }
-            return context ?? new HttpContextWrapper(HttpContext.Current);
-        }
-
         internal static AuditScope GetCurrentScope(HttpRequestMessage request)
         {
-            var httpContext = GetHttpContext(request);
-            return httpContext?.Items[AuditApiScopeKey] as AuditScope;
+            var contextWrapper = new ContextWrapper(request);
+            return contextWrapper.Get<AuditScope>(AuditApiScopeKey);
         }
     }
 }
