@@ -11,10 +11,17 @@ With Audit.NET you can generate tracking information about operations being exec
 [Extensions](#extensions) to log to json Files, Event Log, SQL, MongoDB, AzureBlob and DocumentDB are provided. 
 And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
 
-## Install (NuGet)
+## [NuGet](https://www.nuget.org/packages/Audit.NET/)
+
+To install the package run the following command on the Package Manager Console:
 
 ```
 PM> Install-Package Audit.NET
+```
+
+Or for the [Strong-Named](https://www.nuget.org/packages/Audit.NET.StrongName/) version:
+```
+PM> Install-Package Audit.NET.StrongName
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
@@ -178,9 +185,9 @@ The following tables describes the output fields:
 
 The `AuditScope` object provides two methods to extend the event output.
 
-- With `SetCustomField()` you can store any object as a custom field.
+- Use `SetCustomField()` method to add any object as a custom field of the event.
 
-- With `Comment()` you can add textual comments to the event.
+- Use `Comment()` to add textual comments to the event.
 
 For example:
 
