@@ -18,6 +18,7 @@ namespace Audit.Mvc.UnitTest
     [TestFixture]
     public class ActionFilterUnitTest
     {
+     
         [Test]
         public void Test_AuditActionFilter_Core_InsertOnEnd()
         {
@@ -70,6 +71,9 @@ namespace Audit.Mvc.UnitTest
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
             filter.OnActionExecuted(actionExecutedContext);
+
+            var resultExecute = new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
+            filter.OnResultExecuted(resultExecute);
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
@@ -140,6 +144,9 @@ namespace Audit.Mvc.UnitTest
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
             filter.OnActionExecuted(actionExecutedContext);
+
+            var resultExecute = new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
+            filter.OnResultExecuted(resultExecute);
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
@@ -213,6 +220,9 @@ namespace Audit.Mvc.UnitTest
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
             filter.OnActionExecuted(actionExecutedContext);
+
+            var resultExecute = new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
+            filter.OnResultExecuted(resultExecute);
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;

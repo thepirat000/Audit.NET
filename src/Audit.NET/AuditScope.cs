@@ -124,6 +124,17 @@ namespace Audit.Core
                 return _eventId;
             }
         }
+
+        /// <summary>
+        /// Gets the creation policy for this scope.
+        /// </summary>
+        public EventCreationPolicy EventCreationPolicy
+        {
+            get
+            {
+                return _creationPolicy;
+            }
+        }
         #endregion
 
 #region Private fields

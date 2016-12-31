@@ -2,8 +2,8 @@
   "version": "3.0.0-*",
   "testRunner": "nunit",
   "dependencies": {
-    "Audit.NET.StrongName": { "target": "project" },
-    "Audit.Mvc.StrongName": { "target": "project" },
+    "Audit.NET": { "target": "project" },
+    "Audit.Mvc": { "target": "project" },
     "NUnit": "3.4.1",
     "dotnet-test-nunit": "3.4.0-beta-3",
     "Moq": "4.6.38-alpha"
@@ -32,11 +32,7 @@
     }
   },
   "buildOptions": {
-    "nowarn": [ "1591" ],
-    "keyFile": "../../src/StrongName/Audit.NET.snk",
-    "define": [
-      "STRONG_NAME"
-    ]
+    "nowarn": [ "1591" ]
   }
 
 }

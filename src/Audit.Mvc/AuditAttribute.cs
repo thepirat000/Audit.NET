@@ -72,17 +72,13 @@ namespace Audit.Mvc
                 auditAction.ModelStateErrors = IncludeModel ? GetModelStateErrors(filterContext.Controller?.ViewData.ModelState) : null;
                 auditAction.Model = IncludeModel ? filterContext.Controller?.ViewData.Model : null;
                 auditAction.ModelStateValid = IncludeModel ? filterContext.Controller?.ViewData.ModelState.IsValid : null;
-                auditAction.RedirectLocation = filterContext.HttpContext.Response.RedirectLocation;
-                auditAction.ResponseStatus = filterContext.HttpContext.Response.Status;
-                auditAction.ResponseStatusCode = filterContext.HttpContext.Response.StatusCode;
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
             {
-                // Replace the Action field and save
+                // Replace the Action field
                 (auditScope.Event as AuditEventMvcAction).Action = auditAction;
-                auditScope.Save();
             }
             base.OnActionExecuted(filterContext);
         }
@@ -96,14 +92,20 @@ namespace Audit.Mvc
                 var razorView = viewResult?.View as RazorView;
                 auditAction.ViewName = viewResult?.ViewName;
                 auditAction.ViewPath = razorView?.ViewPath;
+                auditAction.RedirectLocation = filterContext.HttpContext.Response.RedirectLocation;
+                auditAction.ResponseStatus = filterContext.HttpContext.Response.Status;
+                auditAction.ResponseStatusCode = filterContext.HttpContext.Response.StatusCode;
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
             {
-                // Replace the Action field and save
+                // Replace the Action field 
                 (auditScope.Event as AuditEventMvcAction).Action = auditAction;
-                auditScope.Save();
+                if (auditScope.EventCreationPolicy == EventCreationPolicy.Manual)
+                {
+                    auditScope.Save(); // for backwards compatibility
+                }
                 auditScope.Dispose();
             }
             base.OnResultExecuted(filterContext);

@@ -66,6 +66,9 @@ namespace Audit.Mvc.UnitTest
             var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
             filter.OnActionExecuted(actionExecutedContext);
 
+            var resultExecute = new ResultExecutedContext(controllerContext, new RedirectResult("url"), false, null);
+            filter.OnResultExecuted(resultExecute);
+
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
@@ -131,6 +134,9 @@ namespace Audit.Mvc.UnitTest
             var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
             filter.OnActionExecuted(actionExecutedContext);
 
+            var resultExecute = new ResultExecutedContext(controllerContext, new RedirectResult("url"), false, null);
+            filter.OnResultExecuted(resultExecute);
+
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
@@ -195,6 +201,9 @@ namespace Audit.Mvc.UnitTest
 
             var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
             filter.OnActionExecuted(actionExecutedContext);
+
+            var resultExecute = new ResultExecutedContext(controllerContext, new RedirectResult("url"), false, null);
+            filter.OnResultExecuted(resultExecute);
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
