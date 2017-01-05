@@ -26,12 +26,14 @@ namespace Audit.Core
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
         /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
+        /// <param name="skipExtraFrames">Used to indicate how many frames in the stack should be skipped to determine the calling method.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
         protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
             AuditDataProvider dataProvider = null, 
             EventCreationPolicy? creationPolicy = null,
             bool isCreateAndSave = false,
-            AuditEvent auditEvent = null)
+            AuditEvent auditEvent = null,
+            int skipExtraFrames = 0)
         {
             _creationPolicy = creationPolicy ?? Configuration.CreationPolicy;
             _dataProvider = dataProvider ?? Configuration.DataProvider;
@@ -43,7 +45,7 @@ namespace Audit.Core
 #if NET45
             //This will be possible in future NETStandard: 
             //See: https://github.com/dotnet/corefx/issues/1797, https://github.com/dotnet/corefx/issues/1784
-            var callingMethod = new StackFrame(2).GetMethod();
+            var callingMethod = new StackFrame(2 + skipExtraFrames).GetMethod();
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;

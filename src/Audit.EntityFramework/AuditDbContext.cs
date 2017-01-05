@@ -231,7 +231,7 @@ namespace Audit.EntityFramework
             var eventType = AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
             var auditEfEvent = new AuditEventEntityFramework();
             auditEfEvent.EntityFrameworkEvent = efEvent;
-            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, AuditDataProvider, auditEfEvent);
+            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, AuditDataProvider, auditEfEvent, 2);
             if (_extraFields != null)
             {
                 foreach(var field in _extraFields)

@@ -92,6 +92,9 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(1, logs.Count);
             Assert.AreEqual(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
             Assert.AreEqual("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
+#if NET451
+            Assert.IsTrue(logs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+#endif
         }
 
 
@@ -158,6 +161,9 @@ namespace Audit.IntegrationTest
             }
 
             Assert.AreEqual(3, logs.Count);
+#if NET451
+            Assert.IsTrue(logs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+#endif
         }
 
 #if NETCOREAPP1_0

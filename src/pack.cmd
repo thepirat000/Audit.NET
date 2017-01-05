@@ -19,6 +19,28 @@ del "StrongName\audit.WCF.StrongName\bin\debug\*.nupkg"
 del "StrongName\audit.net.azurestorage.StrongName\bin\debug\*.nupkg"
 del "StrongName\audit.dynamicproxy.StrongName\bin\debug\*.nupkg"
 
+copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
+
+dotnet build "Audit.NET/" 
+dotnet build "Audit.Mvc/"
+dotnet build "Audit.WebApi/"
+dotnet build "Audit.NET.AzureDocumentDB/"
+dotnet build "Audit.NET.MongoDB/"
+dotnet build "Audit.NET.SqlServer/"
+dotnet build "Audit.EntityFramework/"
+dotnet build "Audit.Wcf/"
+dotnet build "Audit.NET.AzureStorage/"
+dotnet build "Audit.DynamicProxy/"
+
+dotnet build "StrongName/Audit.NET.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.Mvc.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.WebApi.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.NET.AzureDocumentDB.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.NET.SqlServer.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.EntityFramework.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.Wcf.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.NET.AzureStorage.StrongName/" --no-incremental
+dotnet build "StrongName/Audit.DynamicProxy.StrongName/" --no-incremental
 
 dotnet pack "Audit.NET/"
 dotnet pack "Audit.Mvc/"
@@ -27,7 +49,6 @@ dotnet pack "Audit.NET.AzureDocumentDB/"
 dotnet pack "Audit.NET.MongoDB/"
 dotnet pack "Audit.NET.SqlServer/"
 dotnet pack "Audit.EntityFramework/"
-dotnet pack "Audit.NET/"
 dotnet pack "Audit.Wcf/"
 dotnet pack "Audit.NET.AzureStorage/"
 dotnet pack "Audit.DynamicProxy/"
@@ -38,7 +59,6 @@ dotnet pack "StrongName/Audit.WebApi.StrongName/"
 dotnet pack "StrongName/Audit.NET.AzureDocumentDB.StrongName/"
 dotnet pack "StrongName/Audit.NET.SqlServer.StrongName/"
 dotnet pack "StrongName/Audit.EntityFramework.StrongName/"
-dotnet pack "StrongName/Audit.StrongName/"
 dotnet pack "StrongName/Audit.Wcf.StrongName/"
 dotnet pack "StrongName/Audit.NET.AzureStorage.StrongName/"
 dotnet pack "StrongName/Audit.DynamicProxy.StrongName/"

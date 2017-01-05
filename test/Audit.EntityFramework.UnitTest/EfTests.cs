@@ -52,8 +52,7 @@ namespace Audit.EntityFramework.UnitTest
             Assert.AreEqual("Insert", auditEvent.EntityFrameworkEvent.Entries[0].Action);
             Assert.AreEqual("Blogs", auditEvent.EntityFrameworkEvent.Entries[0].Table);
             Assert.AreEqual(title, auditEvent.EntityFrameworkEvent.Entries[0].ColumnValues["Title"]);
-
-
+            Assert.IsTrue(auditEvent.Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
         }
 
         [Test]
@@ -138,6 +137,7 @@ namespace Audit.EntityFramework.UnitTest
 
             Assert.AreEqual("test-content", p1.Content);
             Assert.AreEqual(guid, p2.Content);
+            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
         }
     }
 }
