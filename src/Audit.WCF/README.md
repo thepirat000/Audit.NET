@@ -209,8 +209,8 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 		"UserName": "Federico",
 		"MachineName": "HP",
 		"DomainName": "HP",
-		"CallingMethodName": "Audit.WCF.AuditOperationInvoker.Invoke()",
-		"AssemblyName": "Audit.WCF, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null",
+		"CallingMethodName": "WCF_IIS.IOrderService.GetData()",
+		"AssemblyName": "WCF_IIS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
 		"Exception": null,
 		"Culture": "en-GB"
 	},
