@@ -1,7 +1,6 @@
 ﻿using Audit.Core.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -19,65 +18,60 @@ namespace Audit.Core
         /// <summary>
         /// Creates an audit scope from a reference value, an event type and a reference Id.
         /// </summary>
-        /// <param name="eventType">Type of the event.</param>
-        /// <param name="target">The target object getter.</param>
-        /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
-        /// <param name="creationPolicy">The event creation policy to use.</param>
-        /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
-        /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
-        /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
-        /// <param name="skipExtraFrames">Used to indicate how many frames in the stack should be skipped to determine the calling method.</param>
+        /// <param name="options">The creation options to use</param>
+        /// 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
-            AuditDataProvider dataProvider = null, 
-            EventCreationPolicy? creationPolicy = null,
-            bool isCreateAndSave = false,
-            AuditEvent auditEvent = null,
-            int skipExtraFrames = 0)
+        protected internal AuditScope(AuditScopeOptions options)
         {
-            _creationPolicy = creationPolicy ?? Configuration.CreationPolicy;
-            _dataProvider = dataProvider ?? Configuration.DataProvider;
-            _targetGetter = target;
+            _creationPolicy = options.CreationPolicy ?? Configuration.CreationPolicy;
+            _dataProvider = options.DataProvider ?? Configuration.DataProvider;
+            _targetGetter = options.TargetGetter;
             var environment = new AuditEventEnvironment()
             {
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
+            MethodBase callingMethod = options.CallingMethod;
 #if NET45
             //This will be possible in future NETStandard: 
             //See: https://github.com/dotnet/corefx/issues/1797, https://github.com/dotnet/corefx/issues/1784
-            var callingMethod = new StackFrame(2 + skipExtraFrames).GetMethod();
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
-            environment.CallingMethodName = (callingMethod.DeclaringType != null
-                ? callingMethod.DeclaringType.FullName + "."
-                : "") + callingMethod.Name + "()";
-            environment.AssemblyName = callingMethod.DeclaringType?.Assembly.FullName;
+            if (callingMethod == null)
+            {
+                callingMethod = new StackFrame(2 + options.SkipExtraFrames).GetMethod();
+            }
 #elif NETSTANDARD1_3
             environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
             environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
 #endif
-            _event = auditEvent ?? new AuditEvent();
+            if (callingMethod != null)
+            {
+                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") 
+                    + callingMethod.Name + "()";
+                environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
+            }
+            _event = options.AuditEvent ?? new AuditEvent();
             _event.Environment = environment;
             _event.StartDate = DateTime.Now;
-            _event.EventType = eventType;
+            _event.EventType = options.EventType;
             _event.CustomFields = new Dictionary<string, object>();
 
-            if (target != null)
+            if (options.TargetGetter != null)
             {
-                var targetValue = target.Invoke();
+                var targetValue = options.TargetGetter.Invoke();
                 _event.Target = new AuditTarget
                 {
                     SerializedOld = _dataProvider.Serialize(targetValue),
                     Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
                 };
             }
-            ProcessExtraFields(extraFields);
+            ProcessExtraFields(options.ExtraFields);
             // Execute custom on scope created actions
             Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
 
             // Process the event insertion (if applies)
-            if (isCreateAndSave)
+            if (options.IsCreateAndSave)
             {
                 EndEvent();
                 SaveEvent();

@@ -62,7 +62,15 @@ namespace Audit.WCF
             {
                 WcfEvent = auditWcfEvent
             };
-            var auditScope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, GetAuditDataProvider(instance), auditEventWcf);
+            // Create the audit scope
+            var auditScope = AuditScope.Create(new AuditScopeOptions()
+            {
+                EventType = eventType,
+                CreationPolicy = EventCreationPolicy.Manual,
+                AuditEvent = auditEventWcf,
+                DataProvider = GetAuditDataProvider(instance),
+                CallingMethod = _operationDescription.SyncMethod
+            });
             // Store a reference to this audit scope on a thread static field
             AuditBehavior.CurrentAuditScope = auditScope;
             try

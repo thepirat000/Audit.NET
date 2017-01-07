@@ -46,6 +46,7 @@ namespace Audit.IntegrationTest
                 bag.Add(request.OrderId);
                 Assert.AreEqual(ev.CustomFields["Test-Field-1"], ev.CustomFields["Test-Field-2"]);
                 Assert.AreEqual(request.OrderId, result.Order.OrderId);
+                Assert.IsTrue(ev.Environment.CallingMethodName.Contains("GetOrder()"));
                 return Guid.NewGuid();
             });
 
@@ -65,6 +66,7 @@ namespace Audit.IntegrationTest
             Console.WriteLine("Times: {0}.", threads * callsPerThread);
             Assert.AreEqual(bag.Distinct().Count(), bag.Count);
             Assert.AreEqual(threads * callsPerThread, bag.Count);
+
         }
 
         private static BasicHttpBinding CreateBinding()

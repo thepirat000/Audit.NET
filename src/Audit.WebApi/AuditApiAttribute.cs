@@ -66,7 +66,13 @@ namespace Audit.WebApi
             {
                 Action = auditAction
             };
-            var auditScope = AuditScope.Create(eventType, null, null, Configuration.CreationPolicy, null, auditEventAction);
+            var options = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                AuditEvent = auditEventAction,
+                CallingMethod = (actionContext.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
+            };
+            var auditScope = AuditScope.Create(options);
             contextWrapper.Set(AuditApiActionKey, auditAction);
             contextWrapper.Set(AuditApiScopeKey, auditScope);
         }

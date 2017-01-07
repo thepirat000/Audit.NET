@@ -64,7 +64,7 @@ namespace Audit.Mvc
             {
                 Action = auditAction
             };
-            var auditScope = AuditScope.Create(eventType, null, null, Configuration.CreationPolicy, null, auditEventAction);
+            var auditScope = AuditScope.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior.MethodInfo });
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
             base.OnActionExecuting(filterContext);

@@ -27,7 +27,7 @@
           "version": "1.0.0"
         },
         "Microsoft.NETCore.Platforms": "1.0.1",
-        "Audit.NET.AzureDocumentDB": { "target": "project" }
+        "Audit.NET.AzureDocumentDB": { "target": "project" },
       }
     },
     "net451": {

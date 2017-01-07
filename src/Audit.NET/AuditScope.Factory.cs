@@ -17,7 +17,7 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static void CreateAndSave(string eventType, object extraFields, AuditDataProvider dataProvider = null)
         {
-            new AuditScope(eventType, null, extraFields, dataProvider, null, true);
+            new AuditScope(new AuditScopeOptions(eventType, null, extraFields, dataProvider, null, true));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static AuditScope Create(string eventType, Func<object> target)
         {
-            return new AuditScope(eventType, target, null, null, null);
+            return new AuditScope(new AuditScopeOptions(eventType, target, null, null, null));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static AuditScope Create(string eventType, Func<object> target, EventCreationPolicy creationPolicy, AuditDataProvider dataProvider = null)
         {
-            return new AuditScope(eventType, target, null, dataProvider, creationPolicy);
+            return new AuditScope(new AuditScopeOptions(eventType, target, null, dataProvider, creationPolicy));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static AuditScope Create(string eventType, Func<object> target, object extraFields)
         {
-            return new AuditScope(eventType, target, extraFields, null, null);
+            return new AuditScope(new AuditScopeOptions(eventType, target, extraFields, null, null));
         }
 
         /// <summary>
@@ -69,8 +69,16 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static AuditScope Create(string eventType, Func<object> target, object extraFields, EventCreationPolicy creationPolicy, AuditDataProvider dataProvider = null, AuditEvent auditEvent = null, int skipExtraFrames = 0)
         {
-            return new AuditScope(eventType, target, extraFields, dataProvider, creationPolicy, false, auditEvent, skipExtraFrames);
+            return new AuditScope(new AuditScopeOptions(eventType, target, extraFields, dataProvider, creationPolicy, false, auditEvent, skipExtraFrames));
         }
 
+        /// <summary>
+        /// Creates an audit scope with the given creation options.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static AuditScope Create(AuditScopeOptions options)
+        {
+            return new AuditScope(options);
+        }
     }
 }
