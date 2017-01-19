@@ -2,7 +2,7 @@
   "title": "Audit.Wcf.StrongName",
   "copyright": "Copyright 2016",
   "description": "Generate detailed Audit Logs for WCF service calls.",
-  "version": "5.0.0-*",
+  "version": "5.1.0-*",
   "authors": [
     "Federico Colombo"
   ],

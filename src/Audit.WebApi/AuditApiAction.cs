@@ -27,7 +27,9 @@ namespace Audit.WebApi
         public int ResponseStatusCode { get; set; }
         [JsonProperty(Order = 41)]
         public string ResponseBodyType { get; set; }
-        [JsonProperty(Order = 42)]
+        [JsonProperty(Order = 42, NullValueHandling = NullValueHandling.Ignore)]
+        public string RequestBody { get; set; }
+        [JsonProperty(Order = 43, NullValueHandling = NullValueHandling.Ignore)]
         public object ResponseBody { get; set; }
         [JsonProperty(Order = 45, NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, string> Headers { get; set; }

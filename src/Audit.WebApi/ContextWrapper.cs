@@ -22,6 +22,11 @@ namespace Audit.WebApi
             _httpContext = GetHttpContext(request);
         }
 
+        public HttpContextBase GetHttpContext()
+        {
+            return _httpContext;
+        }
+
         private HttpContextBase GetHttpContext(HttpRequestMessage request)
         {
             HttpContextBase context = null;
@@ -48,7 +53,7 @@ namespace Audit.WebApi
             IDictionary<string, string> dict = new Dictionary<string, string>();
             foreach (var k in col.AllKeys)
             {
-                dict.Add(k, col[k]);
+                dict[k ?? ""] = col[k];
             }
             return dict;
         }

@@ -3,9 +3,11 @@ using Audit.Core;
 using Audit.Core.Extensions;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using System.Web.Http.ModelBinding;
@@ -23,9 +25,13 @@ namespace Audit.WebApi
         /// </summary>
         public bool IncludeModelState { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether the output should include the Http Response text.
+        /// Gets or sets a value indicating whether the output should include the Http Response body.
         /// </summary>
         public bool IncludeResponseBody { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the output should include the Http request body string.
+        /// </summary>
+        public bool IncludeRequestBody { get; set; }
         /// <summary>
         /// Gets or sets a string indicating the event type to use.
         /// Can contain the following placeholders:
@@ -56,7 +62,8 @@ namespace Audit.WebApi
                 Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = actionContext.ActionArguments
+                ActionParameters = actionContext.ActionArguments,
+                RequestBody = IncludeRequestBody ? GetRequestBody(contextWrapper) : null
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
@@ -113,6 +120,21 @@ namespace Audit.WebApi
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
                 auditScope.Save();
             }
+        }
+
+        private string GetRequestBody(ContextWrapper contextWrapper)
+        {
+            var context = contextWrapper.GetHttpContext();
+            if (context != null)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    context.Request.InputStream.Seek(0, SeekOrigin.Begin);
+                    context.Request.InputStream.CopyTo(stream);
+                    return Encoding.UTF8.GetString(stream.ToArray());
+                }
+            }
+            return null;
         }
 
         private static IDictionary<string, string> ToDictionary(HttpRequestHeaders col)
