@@ -52,6 +52,7 @@ namespace Audit.WebApi
         {
             var request = actionContext.Request;
             var contextWrapper = new ContextWrapper(request);
+
             var auditAction = new AuditApiAction
             {
                 UserName = actionContext.RequestContext?.Principal?.Identity?.Name,
@@ -98,7 +99,6 @@ namespace Audit.WebApi
                 auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
                 auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(actionExecutedContext.ActionContext.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? actionExecutedContext.ActionContext.ModelState?.IsValid : null;
-                auditAction.ResponseBodyType = actionExecutedContext.Response?.Content?.GetType().Name;
                 if (actionExecutedContext.Response != null)
                 {
                     auditAction.ResponseStatus = actionExecutedContext.Response.ReasonPhrase;
@@ -106,9 +106,12 @@ namespace Audit.WebApi
                     if (IncludeResponseBody)
                     {
                         var objContent = actionExecutedContext.Response.Content as ObjectContent;
-                        auditAction.ResponseBody = objContent != null
-                            ? new { Type = objContent.ObjectType.Name, Value = objContent.Value }
-                            : (object)actionExecutedContext.Response.Content?.ReadAsStringAsync().Result;
+                        auditAction.ResponseBody = new BodyContent
+                        {
+                            Type = objContent != null ? objContent.ObjectType.Name : actionExecutedContext.Response.Content?.Headers?.ContentType.ToString(),
+                            Length = actionExecutedContext.Response.Content?.Headers.ContentLength,
+                            Value = objContent != null ? objContent.Value : actionExecutedContext.Response.Content?.ReadAsStringAsync().Result
+                        };
                     }
                 }
                 else
@@ -122,16 +125,22 @@ namespace Audit.WebApi
             }
         }
 
-        private string GetRequestBody(ContextWrapper contextWrapper)
+        private BodyContent GetRequestBody(ContextWrapper contextWrapper)
         {
             var context = contextWrapper.GetHttpContext();
-            if (context != null)
+            if (context?.Request?.InputStream != null)
             {
                 using (var stream = new MemoryStream())
                 {
                     context.Request.InputStream.Seek(0, SeekOrigin.Begin);
                     context.Request.InputStream.CopyTo(stream);
-                    return Encoding.UTF8.GetString(stream.ToArray());
+                    var body = Encoding.UTF8.GetString(stream.ToArray());
+                    return new BodyContent
+                    {
+                        Type = context.Request.ContentType,
+                        Length = context.Request.ContentLength,
+                        Value = body
+                    };
                 }
             }
             return null;

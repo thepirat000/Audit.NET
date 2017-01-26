@@ -57,7 +57,8 @@ namespace Audit.WebApi
                 Headers = IncludeHeaders ? ToDictionary(httpContext.Request.Headers) : null,
                 ActionName = actionDescriptior != null ? actionDescriptior.ActionName : actionContext.ActionDescriptor.DisplayName,
                 ControllerName = actionDescriptior != null ? actionDescriptior.ControllerName : null,
-                ActionParameters = actionContext.ActionArguments
+                ActionParameters = actionContext.ActionArguments,
+                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength }
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
@@ -86,27 +87,28 @@ namespace Audit.WebApi
                 auditAction.Exception = context.Exception.GetExceptionInfo();
                 auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(context.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? context.ModelState?.IsValid : null;
-                auditAction.ResponseBodyType = context.Result?.GetType().Name;
                 if (context.HttpContext.Response != null && context.Result != null)
                 {
                     auditAction.ResponseStatus = context.HttpContext.Response.StatusCode.ToString();
                     auditAction.ResponseStatusCode = context.HttpContext.Response.StatusCode;
                     if (IncludeResponseBody)
                     {
-                        switch(auditAction.ResponseBodyType)
+                        var bodyType = context.Result?.GetType().GetFullTypeName();
+                        auditAction.ResponseBody = new BodyContent() { Type = bodyType };
+                        switch (context.Result?.GetType().Name)
                         {
                             case nameof(ObjectResult):
-                                auditAction.ResponseBody = (context.Result as ObjectResult).Value;
+                                auditAction.ResponseBody.Value = (context.Result as ObjectResult).Value;
                                 break;
                             case nameof(StatusCodeResult):
-                                auditAction.ResponseBody = string.Format("StatusCode ({0})", (context.Result as StatusCodeResult).StatusCode);
+                                auditAction.ResponseBody.Value = string.Format("StatusCode ({0})", (context.Result as StatusCodeResult).StatusCode);
                                 break;
                             case nameof(RedirectResult):
-                                auditAction.ResponseBody = string.Format("Redirect to {0}", (context.Result as RedirectResult).Url);
+                                auditAction.ResponseBody.Value = string.Format("Redirect to {0}", (context.Result as RedirectResult).Url);
                                 break;
                             default:
                                 // TODO: Handle other result types
-                                auditAction.ResponseBody = string.Format("Result type: {0}", context.Result.GetType().Name);
+                                auditAction.ResponseBody.Value = string.Format("Result type: {0}", context.Result.GetType().GetFullTypeName());
                                 break;
                         }
                     }

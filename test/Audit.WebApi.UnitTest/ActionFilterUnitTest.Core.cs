@@ -25,6 +25,8 @@ namespace Audit.WebApi.UnitTest
             request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
             request.SetupGet(r => r.Path).Returns("/api/values");
             request.SetupGet(r => r.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues> { { "content-type", "application/json" } }));
+            request.Setup(c => c.ContentLength).Returns(123);
+
             var httpResponse = new Mock<HttpResponse>();
             httpResponse.SetupGet(c => c.StatusCode).Returns(200);
             var itemsDict = new Dictionary<object, object>();
@@ -84,7 +86,9 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("application/json", action.Headers["content-type"]);
             Assert.AreEqual("values", action.ControllerName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual("this is the result", action.ResponseBody);
+            Assert.AreEqual("this is the result", action.ResponseBody.Value);
+            Assert.AreEqual(123, action.RequestBody.Length);
+            Assert.AreEqual("application/json", action.RequestBody.Type);
         }
 
         [Test]
@@ -156,7 +160,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("application/json", action.Headers["content-type"]);
             Assert.AreEqual("values", action.ControllerName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual("this is the result", action.ResponseBody);
+            Assert.AreEqual("this is the result", action.ResponseBody.Value);
         }
 
         [Test]
@@ -228,7 +232,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("application/json", action.Headers["content-type"]);
             Assert.AreEqual("values", action.ControllerName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual("this is the result", action.ResponseBody);
+            Assert.AreEqual("this is the result", action.ResponseBody.Value);
         }
     }
 }

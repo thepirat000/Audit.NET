@@ -25,12 +25,10 @@ namespace Audit.WebApi
         public string ResponseStatus { get; set; }
         [JsonProperty(Order = 40)]
         public int ResponseStatusCode { get; set; }
-        [JsonProperty(Order = 41)]
-        public string ResponseBodyType { get; set; }
         [JsonProperty(Order = 42, NullValueHandling = NullValueHandling.Ignore)]
-        public string RequestBody { get; set; }
+        public BodyContent RequestBody { get; set; }
         [JsonProperty(Order = 43, NullValueHandling = NullValueHandling.Ignore)]
-        public object ResponseBody { get; set; }
+        public BodyContent ResponseBody { get; set; }
         [JsonProperty(Order = 45, NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, string> Headers { get; set; }
         [JsonProperty(Order = 50, NullValueHandling = NullValueHandling.Ignore)]
@@ -39,6 +37,5 @@ namespace Audit.WebApi
         public IDictionary<string, string> ModelStateErrors { get; set; }
         [JsonProperty(Order = 999, NullValueHandling = NullValueHandling.Ignore)]
         public string Exception { get; set; }
-
     }
 }

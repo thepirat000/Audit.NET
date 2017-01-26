@@ -1,6 +1,6 @@
 {
   "title": "Audit.AzureStorage",
-  "version": "5.1.0-*",
+  "version": "5.2.0-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"

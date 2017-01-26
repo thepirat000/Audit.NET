@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System;
 using NUnit.Framework;
+using System.IO;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -22,6 +23,13 @@ namespace Audit.WebApi.UnitTest
 
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write("{ Id: 'test' }");
+            writer.Flush();
+            stream.Position = 0;
+            request.Setup(c => c.InputStream).Returns(stream);
+            request.Setup(c => c.ContentLength).Returns(123);
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -57,6 +65,7 @@ namespace Audit.WebApi.UnitTest
                 IncludeHeaders = true,
                 IncludeModelState = true,
                 IncludeResponseBody = true,
+                IncludeRequestBody = true,
                 EventTypeName = "TestEvent"
             };
             var actionContext = new HttpActionContext()
@@ -93,6 +102,9 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
+
+            Assert.AreEqual(123, ((dynamic)action.RequestBody).Length);
+            Assert.AreEqual("application/json", ((dynamic)action.RequestBody).Type);
         }
 
         [Test]
