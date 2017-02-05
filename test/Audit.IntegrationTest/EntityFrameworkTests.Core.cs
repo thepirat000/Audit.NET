@@ -18,29 +18,21 @@ namespace Audit.IntegrationTest
     [TestFixture(Category ="EF")]
     public class EntityFrameworkTests_Core
     {
-        [Test]
-        public void Test_EF_Attach()
+        [OneTimeSetUp]
+        public void Init()
         {
-            EntityFrameworkEvent efEvent = null;
-            Audit.Core.Configuration.Setup().UseDynamicProvider(x => x
-                .OnInsertAndReplace(ev => {
-                    efEvent = ev.GetEntityFrameworkEvent();
-                }));
+            var sql = @"drop table posts; drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
+                        create table posts ( Id int identity(1,1) not null primary key, Title nvarchar(max), DateCreated datetime, Content nvarchar(max), BlogId int not null constraint FK_P_B foreign key references Blogs (id) );";
             using (var ctx = new MyAuditedVerboseContext())
             {
-                var blog = new Blog()
-                {
-                    Id = 1,
-                    BloggerName = "def-22"
-                };
-                blog.Title = "Changed-" + Guid.NewGuid();
-                ctx.Attach(blog);
-                ctx.Entry(blog).State = EntityState.Modified;
-                ctx.SaveChanges();
+                ctx.Database.ExecuteSqlCommand(sql);
             }
-            Assert.AreEqual(1, efEvent.Entries.Count);
-            Assert.AreEqual("Update", efEvent.Entries[0].Action);
-            Assert.True(efEvent.Entries[0].Changes.Any(ch => ch.ColumnName == "Title"));
+        }
+
+        [Test]
+        public void Test_EF_SqliteInMemory()
+        {
+
         }
 
         [Test]
@@ -126,8 +118,8 @@ namespace Audit.IntegrationTest
             {
                 ctx.Database.EnsureCreated();
                 ctx.Database.ExecuteSqlCommand(@"
-delete from AuditPosts
-delete from AuditBlogs
+--delete from AuditPosts
+--delete from AuditBlogs
 delete from Posts
 delete from Blogs
 SET IDENTITY_INSERT Blogs ON 

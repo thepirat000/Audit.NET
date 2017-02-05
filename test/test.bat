@@ -1,5 +1,5 @@
 @echo off
-start "" /D c:\ "c:\Program Files\MongoDB\Server\3.2\bin\mongod.exe"
+start "" /D c:\ "c:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 net start mssqlserver
 
 dotnet restore

@@ -115,11 +115,12 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-            var clientConnectionId = GetClientConnectionId(Database.GetDbConnection());
+            var dbConnection = IsRelational() ? Database.GetDbConnection() : null;
+            var clientConnectionId = GetClientConnectionId(dbConnection);
             var efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
-                Database = Database.GetDbConnection()?.Database,
+                Database = dbConnection?.Database,
                 ConnectionId = clientConnectionId,
                 TransactionId = GetCurrentTransactionId(clientConnectionId)
             };
@@ -143,12 +144,23 @@ namespace Audit.EntityFramework
             return efEvent;
         }
 
+        private bool IsRelational()
+        {
+            var provider = (IInfrastructure<IServiceProvider>)Database;
+            var relationalConnection = provider.Instance.GetService<IRelationalConnection>();
+            return relationalConnection != null;
+        }
+
         /// <summary>
         /// Tries to get the current transaction identifier.
         /// </summary>
         /// <param name="clientConnectionId">The client ConnectionId.</param>
         private string GetCurrentTransactionId(string clientConnectionId)
         {
+            if (clientConnectionId == null)
+            {
+                return null;
+            }
             var dbtxmgr = this.GetInfrastructure().GetService<IDbContextTransactionManager>();
             var relcon = dbtxmgr as IRelationalConnection;
             var dbtx = relcon.CurrentTransaction;
