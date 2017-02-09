@@ -96,7 +96,7 @@ namespace Audit.EntityFramework
             {
                 foreach (var pkProp in pkDefinition.Properties)
                 {
-                    var value = entity.GetType().GetProperty(pkProp.Name).GetValue(entity);
+                    var value = entity.GetType().GetTypeInfo().GetProperty(pkProp.Name).GetValue(entity);
                     result.Add(pkProp.Name, value);
                 }
             }

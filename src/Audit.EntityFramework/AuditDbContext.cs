@@ -267,9 +267,9 @@ namespace Audit.EntityFramework
         /// <returns>System.String.</returns>
         private static string GetTransactionId(DbTransaction transaction, string clientConnectionId)
         {
-            var propIntTran = transaction.GetType().GetProperty("InternalTransaction", BindingFlags.NonPublic | BindingFlags.Instance);
+            var propIntTran = transaction.GetType().GetTypeInfo().GetProperty("InternalTransaction", BindingFlags.NonPublic | BindingFlags.Instance);
             object intTran = propIntTran?.GetValue(transaction);
-            var propTranId = intTran?.GetType().GetProperty("TransactionId", BindingFlags.NonPublic | BindingFlags.Instance);
+            var propTranId = intTran?.GetType().GetTypeInfo().GetProperty("TransactionId", BindingFlags.NonPublic | BindingFlags.Instance);
             var tranId = (int)(long)propTranId?.GetValue(intTran);
             return string.Format("{0}_{1}", clientConnectionId, tranId);
         }

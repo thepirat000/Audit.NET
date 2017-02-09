@@ -1,6 +1,6 @@
 {
   "title": "Audit.WebApi",
-  "version": "5.3.0-*",
+  "version": "6.0.0-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -29,7 +29,7 @@
   "frameworks": {
     "netstandard1.6": {
       "dependencies": {
-        "NETStandard.Library": "1.6.0",
+        "NETStandard.Library": "1.6.1",
         "Microsoft.AspNetCore.Mvc": "1.0.0",
         "Microsoft.AspNetCore.Identity": "1.0.0",
         "Microsoft.Extensions.PlatformAbstractions": "1.0.0"

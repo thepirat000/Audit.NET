@@ -1,6 +1,6 @@
 {
   "title": "Audit.NET.StrongName",
-  "version": "5.3.0-*",
+  "version": "6.0.0-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -30,7 +30,7 @@
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.1"
       }
     },
     "net45": {
