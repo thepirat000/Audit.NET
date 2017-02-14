@@ -3,7 +3,7 @@ using System;
 namespace Audit.EntityFramework.ConfigurationApi
 {
     public class IncludeConfigurator<T> : IIncludeConfigurator<T>
-        where T : AuditDbContext
+        where T : IAuditDbContext
     {
         public IncludeConfigurator<T> Include(Type entityType)
         {

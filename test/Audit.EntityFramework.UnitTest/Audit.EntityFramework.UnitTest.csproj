@@ -50,6 +50,14 @@
       <HintPath>..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit3TestAdapter.3.4.1\lib\Mono.Cecil.dll</HintPath>
       <Private>True</Private>
@@ -98,6 +106,9 @@
     <Compile Include="Blog.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Event.cs">
+      <DependentUpon>ModelIdentity.tt</DependentUpon>
+    </Compile>
     <Compile Include="Model.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -113,10 +124,25 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.edmx</DependentUpon>
     </Compile>
+    <Compile Include="ModelIdentity.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelIdentity.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelIdentity.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelIdentity.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelIdentity.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelIdentity.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="EfTests.cs" />
     <Compile Include="Post.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="EfTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +153,13 @@
     </EntityDeploy>
     <None Include="Model.edmx.diagram">
       <DependentUpon>Model.edmx</DependentUpon>
+    </None>
+    <EntityDeploy Include="ModelIdentity.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ModelIdentity.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="ModelIdentity.edmx.diagram">
+      <DependentUpon>ModelIdentity.edmx</DependentUpon>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -142,6 +175,16 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>Model.edmx</DependentUpon>
       <LastGenOutput>Model.cs</LastGenOutput>
+    </Content>
+    <Content Include="ModelIdentity.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ModelIdentity.edmx</DependentUpon>
+      <LastGenOutput>ModelIdentity.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="ModelIdentity.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ModelIdentity.edmx</DependentUpon>
+      <LastGenOutput>ModelIdentity.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

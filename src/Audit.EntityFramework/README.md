@@ -46,6 +46,9 @@ public class MyEntities : Audit.EntityFramework.AuditDbContext
 }
 ```
 
+> If you're using [IdentityDbContext](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx) instead of DbContext, 
+you should inherit from class `AuditIdentityDbContext`.
+
 ## How it works
 The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs.
 

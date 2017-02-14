@@ -11,7 +11,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// Provides a configuration for a specific AuditDbContext (has precedence over ForAnyContext)
         /// </summary>
         /// <param name="config">The context configuration</param>
-        IModeConfigurator<T> ForContext<T>(Action<IContextSettingsConfigurator<T>> config = null) where T : AuditDbContext;
+        IModeConfigurator<T> ForContext<T>(Action<IContextSettingsConfigurator<T>> config = null) where T : IAuditDbContext;
         /// <summary>
         /// Provides a configuration for all the AuditDbContext
         /// </summary>

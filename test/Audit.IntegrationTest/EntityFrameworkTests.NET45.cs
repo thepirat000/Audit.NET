@@ -172,7 +172,7 @@ SET IDENTITY_INSERT Posts OFF
     //[AuditDbContext(IncludeEntityObjects = false, Mode = AuditOptionMode.OptOut)]
     public class MyUnauditedContext : MyBaseContext
     {
-        protected override bool AuditDisabled
+        public override bool AuditDisabled
         {
             get { return true; }
             set { }
@@ -193,7 +193,7 @@ SET IDENTITY_INSERT Posts OFF
 
     public class MyBaseContext : AuditDbContext
     {
-        protected override bool AuditDisabled { get; set; }
+        public override bool AuditDisabled { get; set; }
 
         public MyBaseContext()
             : base("data source=localhost;initial catalog=Blogs;integrated security=true;")
@@ -208,11 +208,11 @@ SET IDENTITY_INSERT Posts OFF
 
     public class MyTransactionalContext : MyBaseContext
     {
-        protected override void OnScopeCreated(AuditScope auditScope)
+        public override void OnScopeCreated(AuditScope auditScope)
         {
             Database.BeginTransaction();
         }
-        protected override void OnScopeSaving(AuditScope auditScope)
+        public override void OnScopeSaving(AuditScope auditScope)
         {
             if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
                 && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"] == "ROLLBACK")

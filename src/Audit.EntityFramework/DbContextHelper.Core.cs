@@ -7,37 +7,22 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Audit.EntityFramework
 {
-    /// <summary>
-    /// The base DbContext class for Audit.
-    /// NET CORE
-    /// </summary>
-    public abstract partial class AuditDbContext
+    public partial class DbContextHelper
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
-        /// </summary>
-        /// <param name="options">The options.</param>
-        protected AuditDbContext(DbContextOptions options) : base(options)
-        {
-            SetConfig();
-        }
-
         /// <summary>
         /// Gets the entities changes for this entry.
         /// </summary>
+        /// <param name="dbContext">The database context.</param>
         /// <param name="entry">The entry.</param>
-        private List<EventEntryChange> GetChanges(EntityEntry entry)
+        private List<EventEntryChange> GetChanges(DbContext dbContext, EntityEntry entry)
         {
             var result = new List<EventEntryChange>();
-            var props = Model.FindEntityType(entry.Entity.GetType()).GetProperties();
+            var props = dbContext.Model.FindEntityType(entry.Entity.GetType()).GetProperties();
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
@@ -55,13 +40,21 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Gets the name of the column.
+        /// </summary>
+        private static string GetColumnName(IProperty prop)
+        {
+            return prop.SqlServer().ColumnName ?? prop.Name;
+        }
+
+        /// <summary>
         /// Gets the column values for an insert/delete operation.
         /// </summary>
         /// <param name="entry">The entity entry.</param>
-        private Dictionary<string, object> GetColumnValues(EntityEntry entry)
+        private Dictionary<string, object> GetColumnValues(DbContext dbContext, EntityEntry entry)
         {
             var result = new Dictionary<string, object>();
-            var props = Model.FindEntityType(entry.Entity.GetType()).GetProperties();
+            var props = dbContext.Model.FindEntityType(entry.Entity.GetType()).GetProperties();
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
@@ -72,19 +65,13 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
-        /// Gets the name of the column.
-        /// </summary>
-        private static string GetColumnName(IProperty prop)
-        {
-            return prop.SqlServer().ColumnName ?? prop.Name;
-        }
-        /// <summary>
         /// Gets the name of the entity.
         /// </summary>
         private static string GetEntityName(IEntityType entityType)
         {
             return entityType.SqlServer().TableName ?? entityType.Name;
         }
+
         /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
@@ -106,37 +93,36 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Creates the Audit Event.
         /// </summary>
-        /// <param name="includeEntities">To indicate if it must incluide the serialized entities.</param>
-        /// <param name="mode">The option mode to include/exclude entities from Audit.</param>
-        private EntityFrameworkEvent CreateAuditEvent(bool includeEntities, AuditOptionMode mode)
+        public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
         {
-            var modifiedEntries = GetModifiedEntries(mode);
+            var dbContext = context.DbContext;
+            var modifiedEntries = GetModifiedEntries(context);
             if (modifiedEntries.Count == 0)
             {
                 return null;
             }
-            var dbConnection = IsRelational() ? Database.GetDbConnection() : null;
+            var dbConnection = IsRelational(dbContext) ? dbContext.Database.GetDbConnection() : null;
             var clientConnectionId = GetClientConnectionId(dbConnection);
             var efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
                 Database = dbConnection?.Database,
                 ConnectionId = clientConnectionId,
-                TransactionId = GetCurrentTransactionId(clientConnectionId)
+                TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId)
             };
             foreach (var entry in modifiedEntries)
             {
                 var entity = entry.Entity;
-                var validationResults = GetValidationResults(entity);
-                var entityType = Model.FindEntityType(entry.Entity.GetType());
+                var validationResults = DbContextHelper.GetValidationResults(entity);
+                var entityType = dbContext.Model.FindEntityType(entry.Entity.GetType());
                 efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults == null,
                     ValidationResults = validationResults?.Select(x => x.ErrorMessage).ToList(),
-                    Entity = includeEntities ? entity : null,
-                    Action = GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified ? GetChanges(entry) : null,
-                    ColumnValues = GetColumnValues(entry),
+                    Entity = context.IncludeEntityObjects ? entity : null,
+                    Action = DbContextHelper.GetStateName(entry.State),
+                    Changes = entry.State == EntityState.Modified ? GetChanges(dbContext, entry) : null,
+                    ColumnValues = GetColumnValues(dbContext, entry),
                     PrimaryKey = GetPrimaryKey(entityType, entity),
                     Table = GetEntityName(entityType)
                 });
@@ -144,24 +130,17 @@ namespace Audit.EntityFramework
             return efEvent;
         }
 
-        private bool IsRelational()
-        {
-            var provider = (IInfrastructure<IServiceProvider>)Database;
-            var relationalConnection = provider.Instance.GetService<IRelationalConnection>();
-            return relationalConnection != null;
-        }
-
         /// <summary>
         /// Tries to get the current transaction identifier.
         /// </summary>
         /// <param name="clientConnectionId">The client ConnectionId.</param>
-        private string GetCurrentTransactionId(string clientConnectionId)
+        private string GetCurrentTransactionId(DbContext dbContext, string clientConnectionId)
         {
             if (clientConnectionId == null)
             {
                 return null;
             }
-            var dbtxmgr = this.GetInfrastructure().GetService<IDbContextTransactionManager>();
+            var dbtxmgr = dbContext.GetInfrastructure().GetService<IDbContextTransactionManager>();
             var relcon = dbtxmgr as IRelationalConnection;
             var dbtx = relcon.CurrentTransaction;
             var tx = dbtx?.GetDbTransaction();
@@ -170,6 +149,13 @@ namespace Audit.EntityFramework
                 return null;
             }
             return GetTransactionId(tx, clientConnectionId);
+        }
+
+        private bool IsRelational(DbContext dbContext)
+        {
+            var provider = (IInfrastructure<IServiceProvider>)dbContext.Database;
+            var relationalConnection = provider.Instance.GetService<IRelationalConnection>();
+            return relationalConnection != null;
         }
     }
 }

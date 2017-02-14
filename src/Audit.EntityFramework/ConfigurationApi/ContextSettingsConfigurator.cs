@@ -1,7 +1,7 @@
 namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ContextSettingsConfigurator<T> : IContextSettingsConfigurator<T>
-        where T : AuditDbContext
+        where T : IAuditDbContext
     {
         public IContextSettingsConfigurator<T> AuditEventType(string eventType)
         {

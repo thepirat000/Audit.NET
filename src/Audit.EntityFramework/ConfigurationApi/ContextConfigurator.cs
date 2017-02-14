@@ -13,7 +13,7 @@ namespace Audit.EntityFramework.ConfigurationApi
             }
             return new ModeConfigurator<AuditDbContext>();
         }
-        public IModeConfigurator<T> ForContext<T>(Action<IContextSettingsConfigurator<T>> config = null) where T : AuditDbContext
+        public IModeConfigurator<T> ForContext<T>(Action<IContextSettingsConfigurator<T>> config = null) where T : IAuditDbContext
         {
             if (config != null)
             {

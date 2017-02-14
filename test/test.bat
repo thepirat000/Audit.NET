@@ -4,12 +4,6 @@ net start mssqlserver
 
 dotnet restore
 
-cd Audit.IntegrationTest
-dotnet test
-echo continue...
-pause > nul
-cd ..
-
 cd Audit.Mvc.UnitTest
 dotnet test
 echo continue...
@@ -40,6 +34,13 @@ cd Audit.EntityFramework.UnitTest
 echo continue...
 pause > nul
 cd ..
+
+cd Audit.IntegrationTest
+dotnet test
+echo continue...
+pause > nul
+cd ..
+
 
 del TestResult.xml /s
 

@@ -4,7 +4,7 @@ namespace Audit.EntityFramework.ConfigurationApi
     /// Configures the context operation mode (OptIn / OptOut)
     /// </summary>
     /// <typeparam name="T">The AuditDbContext type</typeparam>
-    public interface IModeConfigurator<T> where T : AuditDbContext
+    public interface IModeConfigurator<T> where T : IAuditDbContext
     {
         /// <summary>
         /// Uses the opt-out mode.

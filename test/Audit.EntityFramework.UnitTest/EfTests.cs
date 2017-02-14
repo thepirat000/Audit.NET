@@ -16,6 +16,8 @@ namespace Audit.EntityFramework.UnitTest
         {
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsEntities>().Reset();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Entities>().Reset();
         }
 
         [Test]
@@ -137,6 +139,53 @@ namespace Audit.EntityFramework.UnitTest
 
             Assert.AreEqual("test-content", p1.Content);
             Assert.AreEqual(guid, p2.Content);
+            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+        }
+
+
+        [Test]
+        public void Test_General_IdentityContext()
+        {
+            System.Data.Entity.Database.SetInitializer(new System.Data.Entity.DropCreateDatabaseIfModelChanges<Entities>());
+
+            var guid = Guid.NewGuid().ToString();
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Entities>(x => x.
+                    IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }));
+            using (var ctx = new Entities())
+            {
+                var ev = new Event()
+                {
+                    EventId = 123,
+                    Data = "test-content",
+                    InsertedDate = DateTime.Now,
+                    LastUpdatedDate = DateTime.Now
+                };
+                ctx.Events.Add(ev);
+                ctx.SaveChanges();
+
+                var evProxy = ctx.Events.First();
+                evProxy.Data = guid;
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(2, evs.Count);
+
+            Assert.AreEqual("Events", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual("Events", evs[1].GetEntityFrameworkEvent().Entries[0].Table);
+
+            var p1 = evs[0].GetEntityFrameworkEvent().Entries[0].Entity as Event;
+            var p2 = evs[1].GetEntityFrameworkEvent().Entries[0].Entity as Event;
+
+            Assert.AreEqual("test-content", p1.Data);
+            Assert.AreEqual(guid, p2.Data);
             Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
         }
     }

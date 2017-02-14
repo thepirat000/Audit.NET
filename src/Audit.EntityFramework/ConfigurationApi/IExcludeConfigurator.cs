@@ -7,7 +7,7 @@ namespace Audit.EntityFramework.ConfigurationApi
     /// </summary>
     /// <typeparam name="T">The AuditDbContext type</typeparam>
     public interface IExcludeConfigurator<T>
-        where T : AuditDbContext
+        where T : IAuditDbContext
     {
         /// <summary>
         /// Ignores the given entity type.

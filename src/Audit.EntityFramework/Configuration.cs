@@ -20,55 +20,55 @@ namespace Audit.EntityFramework
         }
 
         internal static void SetAuditEventType<T>(string eventType)
-            where T : AuditDbContext
+            where T : IAuditDbContext
         {
             EnsureConfigFor<T>().AuditEventType = eventType;
         }
 
         internal static void SetIncludeEntityObjects<T>(bool include)
-            where T : AuditDbContext
+            where T : IAuditDbContext
         {
             EnsureConfigFor<T>().IncludeEntityObjects = include;
         }
 
         internal static void SetMode<T>(AuditOptionMode mode)
-            where T : AuditDbContext
+            where T : IAuditDbContext
         {
             EnsureConfigFor<T>().Mode = mode;
         }
 
         internal static void IncludeEntity<TContext>(Type entityType)
-            where TContext : AuditDbContext
+            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IncludedTypes.Add(entityType);
         }
 
         internal static void IgnoreEntity<TContext>(Type entityType)
-            where TContext : AuditDbContext
+            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IgnoredTypes.Add(entityType);
         }
 
         internal static void IgnoredEntitiesFilter<TContext>(Func<Type, bool> predicate)
-            where TContext : AuditDbContext
+            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IgnoredTypesFilter = predicate;
         }
 
         internal static void IncludedEntitiesFilter<TContext>(Func<Type, bool> predicate)
-            where TContext : AuditDbContext
+            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IncludedTypesFilter = predicate;
         }
 
         internal static void Reset<T>()
-            where T : AuditDbContext
+            where T : IAuditDbContext
         {
             _currentConfig.Remove(typeof(T));
         }
 
         internal static EfSettings EnsureConfigFor<T>()
-            where T : AuditDbContext
+            where T : IAuditDbContext
         {
             var t = typeof(T);
             EfSettings config;
