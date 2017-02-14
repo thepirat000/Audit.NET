@@ -17,7 +17,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace Audit.EntityFramework
 {
@@ -28,6 +27,9 @@ namespace Audit.EntityFramework
         // AuditDbContext Attribute cache
         private static Dictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new Dictionary<Type, AuditDbContextAttribute>();
 
+        /// <summary>
+        /// Sets the configuration values from attribute, local and global
+        /// </summary>
         public void SetConfig(IAuditDbContext context)
         {
             var type = context.GetType();
@@ -179,7 +181,7 @@ namespace Audit.EntityFramework
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
             var auditEfEvent = new AuditEventEntityFramework();
             auditEfEvent.EntityFrameworkEvent = efEvent;
-            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 2);
+            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 3);
             if (context.ExtraFields != null)
             {
                 foreach (var field in context.ExtraFields)
@@ -230,6 +232,9 @@ namespace Audit.EntityFramework
             return connId.HasValue && !connId.Equals(Guid.Empty) ? connId.Value.ToString() : null;
         }
 
+        /// <summary>
+        /// Saves the changes asynchronously.
+        /// </summary>
         public async Task<int> SaveChangesAsync(IAuditDbContext context, Func<Task<int>> baseSaveChanges)
         {
             var dbContext = context.DbContext;
@@ -259,6 +264,9 @@ namespace Audit.EntityFramework
             return efEvent.Result;
         }
 
+        /// <summary>
+        /// Saves the changes synchronously.
+        /// </summary>
         public int SaveChanges(IAuditDbContext context, Func<int> baseSaveChanges)
         {
             if (context.AuditDisabled)
@@ -287,6 +295,4 @@ namespace Audit.EntityFramework
             return efEvent.Result;
         }
     }
-
-
 }
