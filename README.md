@@ -213,6 +213,15 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 }
 ```
 
+You can also access the Custom Fields directly from `Event.CustomFields` property of the scope. For example:
+```c#
+using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+{
+    audit.Event.CustomField["ReferenceId"] = orderId;
+}
+```
+
+
 The output of the previous examples would be:
 
 ```javascript
