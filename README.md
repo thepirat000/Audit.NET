@@ -345,7 +345,7 @@ You can also set the data provider per-scope, by using an appropriate overload o
 AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
 ```
 
-As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` provider. For example:
+As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` class. For example:
 
 ```c#
 var dataProvider = new DynamicDataProvider();
