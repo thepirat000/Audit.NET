@@ -517,7 +517,7 @@ The following packages are extensions to log interactions with different systems
 Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior.
 
 - ### **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
-Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
+Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 
 - ### **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
 Generate detailed audit logs by decorating Web API Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core.
