@@ -237,6 +237,7 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 }
 ```
 
+> Custom fields are not limited to single properties, you can store any object as well, by default they will be JSON serialized.
 
 The output of the previous examples would be:
 
