@@ -67,6 +67,22 @@ using (AuditScope.Create("Order:Update", () => order))
 
 The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
+There is also a unified overload of the `Create` method that accepts an instance of [`AuditScopeOptions`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeOptions.cs). Use this class to configure any of the available options for the scope:
+
+```c#
+var options = new AuditScopeOptions()
+{
+	EventType = "MyEvent",
+	CreationPolicy = EventCreationPolicy.Manual,
+	ExtraFields = new { Action = this.Action },
+	AuditEvent = new MyCustomAuditEvent()
+};
+using (var scope = AuditScope.Create(options))
+{
+	// ...
+}
+```
+
 ### Simple logging
 
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
