@@ -233,7 +233,7 @@ You can also access the Custom Fields directly from `Event.CustomFields` propert
 ```c#
 using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
 {
-    audit.Event.CustomField["ReferenceId"] = orderId;
+    audit.Event.CustomFields["ReferenceId"] = orderId;
 }
 ```
 
