@@ -1,6 +1,6 @@
 {
   "title": "Audit.EntityFramework.StrongName",
-  "version": "6.1.0-*",
+  "version": "6.2.0-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"

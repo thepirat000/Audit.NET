@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Audit.Core.Providers;
 using Audit.Core.ConfigurationApi;
+using System.Linq;
 
 namespace Audit.Core
 {
@@ -43,7 +44,10 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddCustomAction(ActionType when, Action<AuditScope> action)
         {
-            AuditScopeActions[when].Add(action);
+            lock (AuditScopeActions)
+            {
+                AuditScopeActions[when].Add(action);
+            }
         }
         /// <summary>
         /// Resets the audit scope handlers. Removes all the attached actions for the Audit Scopes.
@@ -61,7 +65,12 @@ namespace Audit.Core
         /// </summary>
         internal static void InvokeScopeCustomActions(ActionType type, AuditScope auditScope)
         {
-            foreach (var action in AuditScopeActions[type])
+            var actions = Enumerable.Empty<Action<AuditScope>>();
+            lock (AuditScopeActions)
+            {
+                actions = AuditScopeActions[type].ToList();
+            }
+            foreach (var action in actions)
             {
                 action.Invoke(auditScope);
             }

@@ -7,11 +7,56 @@ using System.Collections.Generic;
 using Audit.Core.Extensions;
 using System.Diagnostics;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace Audit.UnitTest
 {
     public class UnitTest
     {
+        [Test]
+        public void Test_ScopeActionsStress()
+        {
+            int counter = 0;
+            int counter2 = 0;
+            int counter3 = 0;
+            int MAX = 200;
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    System.Threading.Interlocked.Increment(ref counter);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(_ => _.OnEventSaving(ev =>
+                {
+                    System.Threading.Interlocked.Increment(ref counter2);
+                }))
+                .WithAction(_ => _.OnScopeCreated(ev =>
+                {
+                    System.Threading.Interlocked.Increment(ref counter3);
+                }));
+
+            var tasks = new List<Task>();
+            for (int i = 0; i < MAX; i++)
+            {
+                tasks.Add(Task.Factory.StartNew(() =>
+                {
+                    AuditScope.CreateAndSave("LoginSuccess", new { username = "federico", id = i });
+                    Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, ev =>
+                    {
+                        //do nothing, just bother
+                        var d = ev.Event.Duration * 1234567;
+                    });
+                    AuditScope.CreateAndSave("LoginFailed", new { username = "adriano", id = i * -1 });
+                }));
+            }
+            Task.WaitAll(tasks.ToArray());
+            Assert.AreEqual(MAX * 2, counter);
+            Assert.AreEqual(MAX * 2, counter2);
+            Assert.AreEqual(MAX * 2, counter3);
+        }
+
+
+
         [Test]
         public void Test_DynamicDataProvider()
         {
