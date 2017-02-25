@@ -67,6 +67,22 @@ using (AuditScope.Create("Order:Update", () => order))
 
 The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
+There is also a unified overload of the `Create` method that accepts an instance of [`AuditScopeOptions`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeOptions.cs). Use this class to configure any of the available options for the scope:
+
+```c#
+var options = new AuditScopeOptions()
+{
+	EventType = "MyEvent",
+	CreationPolicy = EventCreationPolicy.Manual,
+	ExtraFields = new { Action = this.Action },
+	AuditEvent = new MyCustomAuditEvent()
+};
+using (var scope = AuditScope.Create(options))
+{
+	// ...
+}
+```
+
 ### Simple logging
 
 If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
@@ -213,6 +229,16 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 }
 ```
 
+You can also access the Custom Fields directly from `Event.CustomFields` property of the scope. For example:
+```c#
+using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+{
+    audit.Event.CustomFields["ReferenceId"] = orderId;
+}
+```
+
+> Custom fields are not limited to single properties, you can store any object as well, by default they will be JSON serialized.
+
 The output of the previous examples would be:
 
 ```javascript
@@ -319,7 +345,7 @@ You can also set the data provider per-scope, by using an appropriate overload o
 AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
 ```
 
-As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` provider. For example:
+As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` class. For example:
 
 ```c#
 var dataProvider = new DynamicDataProvider();
@@ -491,7 +517,7 @@ The following packages are extensions to log interactions with different systems
 Generate detailed server-side audit logs for Windows Communication Foundation (WCF) service calls, by configuring a provided behavior.
 
 - ### **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)**
-Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext`.  Includes support for EF 6 and EF 7 (EF Core).
+Generate detailed audit logs for CRUD operations on Entity Framework, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 
 - ### **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)**
 Generate detailed audit logs by decorating Web API Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core.
