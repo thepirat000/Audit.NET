@@ -13,9 +13,9 @@ namespace Audit.SqlServer.Providers
     /// <remarks>
     /// Settings:
     /// - ConnectionString: SQL connection string
-    /// - TableName: Table name
-    /// - JsonColumnName: Column name where the JSON will be stored
-    /// - IdColumnName: Column name with the primary key
+    /// - TableName: Table name (default is 'Event')
+    /// - JsonColumnName: Column name where the JSON will be stored (default is 'Data')
+    /// - IdColumnName: Column name with the primary key (default is 'EventId')
     /// - LastUpdatedDateColumnName: datetime column to update when replacing events (NULL to ignore)
     /// </remarks>
     public class SqlDataProvider : AuditDataProvider
@@ -23,7 +23,7 @@ namespace Audit.SqlServer.Providers
         private string _connectionString;
         private string _schema = null;
         private string _tableName = "Event";
-        private string _idColumnName = "Id";
+        private string _idColumnName = "EventId";
         private string _jsonColumnName = "Data";
         private string _lastUpdatedDateColumnName = null;
 
