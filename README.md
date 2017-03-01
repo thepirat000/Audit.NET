@@ -13,13 +13,13 @@ And also extensions to audit different systems such as EntityFramework, MVC, Web
 
 ## [NuGet](https://www.nuget.org/packages/Audit.NET/)
 
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
+
 To install the package run the following command on the Package Manager Console:
 
 ```
 PM> Install-Package Audit.NET
 ```
-
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
 ##Contents
 
