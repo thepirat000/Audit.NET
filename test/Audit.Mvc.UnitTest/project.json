@@ -32,7 +32,11 @@
     }
   },
   "buildOptions": {
-    "nowarn": [ "1591" ]
+    "nowarn": [ "1591" ],
+    "keyFile": "../../src/StrongName/Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
+    ]
   }
 
 }

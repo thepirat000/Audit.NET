@@ -12,11 +12,6 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET.AzureDocumentDB
 ```
 
-Or for the [Strong-Named](https://www.nuget.org/packages/Audit.NET.AzureDocumentDB.StrongName/) version:
-```
-PM> Install-Package Audit.NET.AzureDocumentDB.StrongName
-```
-
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureDocumentDB.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureDocumentDB/)
 
 ## Usage

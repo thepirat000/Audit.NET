@@ -12,11 +12,6 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET.SqlServer
 ```
 
-Or for the [Strong-Named](https://www.nuget.org/packages/Audit.NET.SqlServer.StrongName/) version:
-```
-PM> Install-Package Audit.NET.SqlServer.StrongName
-```
-
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.SqlServer.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.SqlServer/)
 
 ## Usage

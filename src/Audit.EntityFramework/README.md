@@ -16,12 +16,6 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.EntityFramework
 ```
 
-Or for the [Strong-Named](https://www.nuget.org/packages/Audit.EntityFramework.StrongName/) version:
-```
-PM> Install-Package Audit.EntityFramework.StrongName
-```
-
-
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
 
 ## Usage

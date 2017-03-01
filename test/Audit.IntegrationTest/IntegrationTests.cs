@@ -27,7 +27,29 @@ namespace Audit.IntegrationTest
         [TestFixture]
         public class AuditTests
         {
+
 #if NET451
+            [Test]
+            public void Test_StrongName_PublicToken()
+            {
+                var expected = "571d6b80b242c87e";
+                ValidateToken(typeof(Audit.Core.AuditEvent), expected);
+                ValidateToken(typeof(Audit.AzureDocumentDB.Providers.AzureDbDataProvider), expected);
+                ValidateToken(typeof(Audit.DynamicProxy.AuditProxy), expected);
+                ValidateToken(typeof(Audit.EntityFramework.AuditDbContext), expected);
+                ValidateToken(typeof(Audit.Mvc.AuditAttribute), expected);
+                ValidateToken(typeof(Audit.SqlServer.Providers.SqlDataProvider), expected);
+                ValidateToken(typeof(Audit.WCF.AuditBehaviorAttribute), expected);
+                ValidateToken(typeof(Audit.WebApi.AuditApiAttribute), expected);
+            }
+            private void ValidateToken(Type type, string expectedToken)
+            {
+                var tokenBytes = type.Assembly.GetName().GetPublicKeyToken();
+                string pkt = String.Concat(tokenBytes.Select(i => i.ToString("x2")));
+                Assert.AreEqual(expectedToken, pkt);
+            }
+
+
             [Test]
             public void TestEventLog()
             {
@@ -39,6 +61,7 @@ namespace Audit.IntegrationTest
 #endif
 
             [Test]
+            [Category("AzureDocDb")]
             public void TestAzure()
             {
                 SetAzureSettings();
@@ -57,6 +80,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("AzureBlob")]
             public void TestAzureBlob()
             {
                 SetAzureBlobSettings();
@@ -109,6 +133,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("SQL")]
             public void TestSql()
             {
                 SetSqlSettings();
@@ -118,6 +143,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("Mongo")]
             public void TestMongo()
             {
                 SetMongoSettings();

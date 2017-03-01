@@ -12,11 +12,6 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET.AzureStorage
 ```
 
-Or for the [Strong-Named](https://www.nuget.org/packages/Audit.NET.AzureStorage.StrongName/) version:
-```
-PM> Install-Package Audit.NET.AzureStorage.StrongName
-```
-
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureStorage.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureStorage/)
 
 ## Usage

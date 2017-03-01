@@ -11,6 +11,9 @@
     "Audit.NET.SqlServer": { "target": "project" },
     "Audit.NET.AzureStorage": { "target": "project" },
     "Audit.EntityFramework": { "target": "project" },
+    "Audit.DynamicProxy": { "target": "project" },
+    "Audit.Mvc": { "target": "project" },
+    "Audit.WebApi": { "target": "project" },
     "WindowsAzure.Storage": "7.2.1"
   },
   "commands": {
