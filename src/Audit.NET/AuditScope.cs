@@ -11,7 +11,6 @@ namespace Audit.Core
     /// <summary>
     /// Makes a code block auditable.
     /// </summary>
-    /// <typeparam name="T">The type of the object to audit</typeparam>
     public partial class AuditScope : IDisposable
     {
         #region Constructors

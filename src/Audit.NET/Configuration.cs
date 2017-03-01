@@ -22,6 +22,8 @@ namespace Audit.Core
 
         internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
 
+        internal static object Locker = new object();
+
         static Configuration()
         {
             DataProvider = new FileDataProvider();
@@ -44,7 +46,7 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddCustomAction(ActionType when, Action<AuditScope> action)
         {
-            lock (AuditScopeActions)
+            lock (Locker)
             {
                 AuditScopeActions[when].Add(action);
             }
@@ -54,19 +56,22 @@ namespace Audit.Core
         /// </summary>
         public static void ResetCustomActions()
         {
-            AuditScopeActions = new Dictionary<ActionType, List<Action<AuditScope>>>()
+            lock (Locker)
             {
-                {ActionType.OnScopeCreated, new List<Action<AuditScope>>()},
-                {ActionType.OnEventSaving, new List<Action<AuditScope>>()},
-            };
+                AuditScopeActions = new Dictionary<ActionType, List<Action<AuditScope>>>()
+                {
+                    {ActionType.OnScopeCreated, new List<Action<AuditScope>>()},
+                    {ActionType.OnEventSaving, new List<Action<AuditScope>>()},
+                };
+            }
         }
         /// <summary>
         /// Invokes the scope custom actions.
         /// </summary>
         internal static void InvokeScopeCustomActions(ActionType type, AuditScope auditScope)
         {
-            var actions = Enumerable.Empty<Action<AuditScope>>();
-            lock (AuditScopeActions)
+            List<Action<AuditScope>> actions;
+            lock (Locker)
             {
                 actions = AuditScopeActions[type].ToList();
             }
