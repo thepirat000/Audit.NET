@@ -19,11 +19,6 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET
 ```
 
-Or for the [Strong-Named](https://www.nuget.org/packages/Audit.NET.StrongName/) version:
-```
-PM> Install-Package Audit.NET.StrongName
-```
-
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
 
 ##Contents
