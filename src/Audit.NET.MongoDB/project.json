@@ -1,6 +1,6 @@
 {
   "title": "Audit.MongoDB",
-  "version": "7.0.0-*",
+  "version": "7.0.1-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -30,12 +30,12 @@
     "netstandard1.5": {
       "dependencies": {
         "NETStandard.Library": "1.6.1",
-        "MongoDB.Driver": "2.4.0"
+        "MongoDB.Driver": "2.4.2"
       }
     },
     "net45": {
       "dependencies": {
-        "MongoDB.Driver": "2.4.0"
+        "MongoDB.Driver": "2.4.2"
       }
     }
   },
@@ -43,6 +43,10 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
+    ],
+    "keyFile": "../StrongName/Audit.NET.snk",
+    "define": [
+      "STRONG_NAME"
     ]
   }
 }
