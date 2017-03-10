@@ -34,7 +34,7 @@ public class UsersController : ApiController
     }
 
     [AuditApi(EventTypeName = "GetUser", 
-        IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+        IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
     public IHttpActionResult Get(string id)
     {
      //...
@@ -44,7 +44,7 @@ public class UsersController : ApiController
 
 You can also decorate the controller class with the `AuditApi` attribute so it will apply to all the actions, for example:
 ```c#
-[AuditApi(EventTypeName = "{controller}/{action} ({verb})", IncludeResponseBody = true, IncludeModelState = true)]
+[AuditApi(EventTypeName = "{controller}/{action} ({verb})", IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
 public class UsersController : ApiController
 {
     public IEnumerable<ApplicationUser> Get()
@@ -116,12 +116,19 @@ The following table describes the Audit.WebApi output fields:
 | **IpAddress** | string | Client IP address |
 | **ResponseStatusCode** | integer | HTTP response status code |
 | **ResponseStatus** | string | Response status description |
-| **ResponseBodyType** | string | The reported response body type |
-| **ResponseBody** | string | The response body (optional) |
+| **RequestBody** | [BodyContent](#bodycontent) | The request body (optional) |
+| **ResponseBody** | [BodyContent](#bodycontent) | The response body (optional) |
 | **Headers** | Object | HTTP Headers (optional) |
 | **ModelStateValid** | boolean | Boolean to indicate if the model is valid |
 | **ModelStateErrors** | string | Error description when the model is invalid |
 | **Exception** | string | The exception thrown details (if any) |
+
+### [BodyContent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/BodyContent.cs)
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Type** | string | The body type reported |
+| **Length** | long? | The length of the body if reported |
+| **Value** | Object | The body content |
 
 ## Customization
 
@@ -148,65 +155,56 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 ### Output Sample
 
 ```javascript
-{
-	"EventType": "Users/Get (GET)",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.WebApi.AuditApiAttribute.OnActionExecuting()",
-		"AssemblyName": "Audit.WebApi, Version=2.4.0.0, Culture=neutral, PublicKeyToken=null",
-		"Exception": null,
-		"Culture": "en-GB"
-	},
-	"StartDate": "2016-08-26T15:35:24.5396857-05:00",
-	"EndDate": "2016-08-26T15:35:25.6622619-05:00",
-	"Duration": 1123,
-	"Action": {
-		"HttpMethod": "GET",
-		"ControllerName": "Users",
-		"ActionName": "Get",
-		"ActionParameters": {
-			"id": "federico@mycompnay.com"
-		},
-		"UserName": "",
-		"RequestUrl": "http://localhost:37341/api/Users/federico@mycompany.com/",
-		"IpAddress": "127.0.0.1",
-		"ResponseStatus": "OK",
-		"ResponseStatusCode": 200,
-		"ResponseBody": {
-			"Type": "ApplicationUser",
-			"Value": {
-				"Roles": [],
-				"Email": "federicoc@herbalife.com",
-				"PasswordHash": "AEkE/D4JxB1bscotMjgtYZMmnsAA2KCsfRXAUQ226/hi39lhrfRi9PIJEqWlqjBdPg==",
-				"PhoneNumber": null,
-				"LockoutEnabled": true,
-				"Id": "bc6828e4-6230-421e-8c55-fd80286998cd",
-				"UserName": "federico@mycompany.com"
-			}
-		},
-		"Headers": {
-			"Connection": "Keep-Alive",
-			"Accept": "text/html, application/xhtml+xml, image/jxr, */*",
-			"Accept-Encoding": "gzip, deflate",
-			"Accept-Language": "en-GB",
-			"Host": "localhost:37341",
-			"User-Agent": "Mozilla/5.0, (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0), like, Gecko"
-		},		
-		"ModelStateValid": true
-	}
+{  
+   "EventType":"POST Values/Post",
+   "Environment":{  
+      "UserName":"Federico",
+      "MachineName":"HP",
+      "DomainName":"HP",
+      "CallingMethodName":"WebApiTest.Controllers.ValuesController.Post()",
+      "AssemblyName":"WebApiTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "Culture":"en-US"
+   },
+   "StartDate":"2017-03-09T18:03:05.5287603-06:00",
+   "EndDate":"2017-03-09T18:03:05.5307604-06:00",
+   "Duration":2,
+   "Action":{  
+      "HttpMethod":"POST",
+      "ControllerName":"Values",
+      "ActionName":"Post",
+      "ActionParameters":{  
+         "value":{  
+            "Id":100,
+            "Text":"Test"
+         }
+      },
+      "FormVariables":{  
+      },
+      "RequestUrl":"http://localhost:65080/api/values",
+      "IpAddress":"127.0.0.1",
+      "ResponseStatus":"OK",
+      "ResponseStatusCode":200,
+      "RequestBody":{  
+         "Type":"application/json",
+         "Length":27,
+         "Value":"{ Id: 100, Text: \"Test\" }"
+      },
+      "ResponseBody":{  
+         "Type":"SomeObject",
+         "Value":{  
+            "Id":1795824380,
+            "Text":"Test"
+         }
+      },
+      "Headers": {
+        "Connection": "Keep-Alive",
+        "Accept": "text/html, application/xhtml+xml, image/jxr, */*",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "en-GB",
+        "Host": "localhost:37341",
+        "User-Agent": "Mozilla/5.0, (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0), like, Gecko"
+      }
+   }
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
 
