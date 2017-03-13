@@ -42,10 +42,10 @@ namespace Audit.Mvc
             {
                 UserName = (request.IsAuthenticated) ? filterContext.HttpContext.User?.Identity.Name : "Anonymous",
                 IpAddress = request.ServerVariables?["HTTP_X_FORWARDED_FOR"] ?? request.UserHostAddress,
-                RequestUrl = request.RawUrl,
+                RequestUrl = request.Unvalidated.RawUrl,
                 HttpMethod = request.HttpMethod,
-                FormVariables = ToDictionary(request.Form),
-                Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
+                FormVariables = ToDictionary(request.Unvalidated.Form),
+                Headers = IncludeHeaders ? ToDictionary(request.Unvalidated.Headers) : null,
                 ActionName = filterContext.ActionDescriptor?.ActionName,
                 ControllerName = filterContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
                 ActionParameters = filterContext.ActionParameters?.ToDictionary(k => k.Key, v => v.Value)

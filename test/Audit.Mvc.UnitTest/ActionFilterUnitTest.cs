@@ -23,7 +23,8 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
-            request.Setup(c => c.Headers).Returns(() => nvc);
+            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -37,7 +38,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
             var actionDescriptor = new Mock<ActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
@@ -91,7 +92,8 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
-            request.Setup(c => c.Headers).Returns(() => nvc);
+            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -105,7 +107,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
             var actionDescriptor = new Mock<ActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
@@ -159,7 +161,8 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
-            request.Setup(c => c.Headers).Returns(() => nvc);
+            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -173,7 +176,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
             var actionDescriptor = new Mock<ActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
