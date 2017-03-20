@@ -113,7 +113,8 @@ namespace Audit.MongoDB.Providers
             {
                 FixDocumentElementNames(doc);
             }
-            col.ReplaceOne(d => d["_id"] == (BsonObjectId)eventId, doc);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            col.ReplaceOne(filter, doc);
         }
 
         private void SerializeExtraFields(AuditEvent auditEvent)

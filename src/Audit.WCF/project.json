@@ -2,7 +2,7 @@
   "title": "Audit.Wcf",
   "copyright": "Copyright 2016",
   "description": "Generate detailed Audit Logs for WCF service calls.",
-  "version": "7.0.2-*",
+  "version": "7.0.3-*",
   "authors": [
     "Federico Colombo"
   ],
@@ -22,6 +22,7 @@
     "iconUrl": "http://i.imgur.com/Sl1hHBz.png"
   },
   "dependencies": {
+    "Newtonsoft.Json": "9.0.1",
     "Audit.NET": {
       "target": "project"
     }

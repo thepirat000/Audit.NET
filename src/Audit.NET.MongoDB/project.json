@@ -1,6 +1,6 @@
 {
   "title": "Audit.MongoDB",
-  "version": "7.0.2-*",
+  "version": "7.0.3-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -43,10 +43,6 @@
     "xmlDoc": true,
     "nowarn": [
       "1591"
-    ],
-    "keyFile": "../StrongName/Audit.NET.snk",
-    "define": [
-      "STRONG_NAME"
     ]
   }
 }

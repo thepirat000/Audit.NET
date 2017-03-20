@@ -1,4 +1,5 @@
 ﻿using Audit.Core;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -103,6 +104,7 @@ namespace Audit.EntityFramework.UnitTest
         {
             var guid = Guid.NewGuid().ToString();
             var evs = new List<AuditEvent>();
+            var entities = new List<Post>();
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsEntities>(x => x.
                     IncludeEntityObjects(true));
@@ -110,6 +112,9 @@ namespace Audit.EntityFramework.UnitTest
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
+                        var p = ev.GetEntityFrameworkEvent().Entries[0].Entity as Post;
+                        p = JsonConvert.DeserializeObject<Post>(JsonConvert.SerializeObject(p, new JsonSerializerSettings() {  ReferenceLoopHandling = ReferenceLoopHandling.Ignore } ));
+                        entities.Add(p);
                         evs.Add(ev);
                     }));
             using (var ctx = new BlogsEntities())
@@ -134,8 +139,10 @@ namespace Audit.EntityFramework.UnitTest
             Assert.AreEqual("Posts", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
             Assert.AreEqual("Posts", evs[1].GetEntityFrameworkEvent().Entries[0].Table);
 
-            var p1 = evs[0].GetEntityFrameworkEvent().Entries[0].Entity as Post;
-            var p2 = evs[1].GetEntityFrameworkEvent().Entries[0].Entity as Post;
+            Assert.AreEqual(2, entities.Count);
+
+            var p1 = entities[0];
+            var p2 = entities[1];
 
             Assert.AreEqual("test-content", p1.Content);
             Assert.AreEqual(guid, p2.Content);
