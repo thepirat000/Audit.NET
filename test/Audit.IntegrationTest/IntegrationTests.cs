@@ -152,6 +152,16 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
+            [Test]
+            [Category("MySql")]
+            public void TestMySql()
+            {
+                SetMySqlSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
             public struct TestStruct
             {
                 public int Id { get; set; }
@@ -321,6 +331,20 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
+
+            public void SetMySqlSettings()
+            { 
+                Audit.Core.Configuration.Setup()
+                    .UseMySql(config => config
+                        .ConnectionString("Server=localhost; Database=events; Uid=admin; Pwd=admin;")
+                        .TableName("event")
+                        .IdColumnName("id")
+                        .JsonColumnName("data"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+            }
+
+
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)
             {

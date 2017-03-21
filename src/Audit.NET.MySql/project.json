@@ -1,42 +1,42 @@
 {
-  "title": "Audit.NET",
+  "title": "Audit.MySql",
   "version": "7.0.4-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
   ],
-  "description": "Generate tracking information about an operation being executed.",
+  "description": "Store Audit.NET Trail Logs into a MySQL database",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MySql",
     "owners": [
       "ThePirat"
     ],
-    "summary": "Extensible framework to generate detailed audit logs for executing operations in .NET",
+    "summary": "MySQL Server provider for Audit.NET library. Store Audit Logs into a MySQL database.",
     "tags": [
       "Audit",
       "Trail",
-      "Log"
+      "Log",
+      "MySQL"
     ],
     "requireLicenseAcceptance": false,
-    "files": [
-      "tools/Install.ps1"
-    ],
-    "iconUrl": "http://i.imgur.com/jQhfBSo.png"
+    "iconUrl": "http://i.imgur.com/NHRBp86.png"
   },
   "dependencies": {
-    "Newtonsoft.Json": "9.0.1"
+    "Audit.NET": {
+      "target": "project"
+    },
+    "MySql.Data": "7.0.6-IR31"
   },
   "frameworks": {
-    "netstandard1.3": {
+    "netcoreapp1.0": {
       "dependencies": {
         "NETStandard.Library": "1.6.1"
       }
     },
-    "net45": {
+    "net451": {
       "dependencies": {}
     }
   },
-  "configurations": {},
   "buildOptions": {
     "xmlDoc": true,
     "nowarn": [

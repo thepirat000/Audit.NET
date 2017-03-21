@@ -10,6 +10,7 @@
     "Audit.NET.MongoDB": { "target": "project" },
     "Audit.NET.SqlServer": { "target": "project" },
     "Audit.NET.AzureStorage": { "target": "project" },
+    "Audit.NET.MySql": { "target": "project" },
     "Audit.EntityFramework": { "target": "project" },
     "Audit.DynamicProxy": { "target": "project" },
     "Audit.Mvc": { "target": "project" },
