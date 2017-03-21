@@ -1,5 +1,6 @@
 @echo off
 start "" /D c:\ "d:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
+net start mysql57
 net start mssqlserver
 
 dotnet restore
@@ -44,3 +45,6 @@ cd ..
 
 del TestResult.xml /s
 
+net stop mssqlserver
+net stop mysql57
+taskkill /f /im mongod.exe
