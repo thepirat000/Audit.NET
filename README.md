@@ -268,7 +268,7 @@ The output of the previous examples would be:
 }
 ```
 
-##Discard option
+## Discard option
 
 The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain condition.
 
