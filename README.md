@@ -21,7 +21,7 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET
 ```
 
-##Contents
+## Contents
 
 - [Usage](#usage)
 - [Output](#output)
