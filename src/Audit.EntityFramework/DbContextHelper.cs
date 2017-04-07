@@ -17,6 +17,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace Audit.EntityFramework
 {
@@ -25,7 +26,7 @@ namespace Audit.EntityFramework
         // Entities Include/Ignore attributes cache
         private static readonly Dictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new Dictionary<Type, bool?>();
         // AuditDbContext Attribute cache
-        private static Dictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new Dictionary<Type, AuditDbContextAttribute>();
+        private static ConcurrentDictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
 
         /// <summary>
         /// Sets the configuration values from attribute, local and global

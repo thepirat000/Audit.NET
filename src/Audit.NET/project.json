@@ -1,6 +1,6 @@
 {
   "title": "Audit.NET",
-  "version": "7.0.5-*",
+  "version": "7.0.6-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -33,6 +33,9 @@
       }
     },
     "net45": {
+      "dependencies": {}
+    },
+    "net40": {
       "dependencies": {}
     }
   },

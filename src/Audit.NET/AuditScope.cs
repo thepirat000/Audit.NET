@@ -30,7 +30,7 @@ namespace Audit.Core
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
             MethodBase callingMethod = options.CallingMethod;
-#if NET45
+#if NET45 || NET40
             //This will be possible in future NETStandard: 
             //See: https://github.com/dotnet/corefx/issues/1797, https://github.com/dotnet/corefx/issues/1784
             environment.UserName = Environment.UserName;
@@ -48,7 +48,11 @@ namespace Audit.Core
             {
                 environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") 
                     + callingMethod.Name + "()";
+#if NET40
+                environment.AssemblyName = callingMethod.DeclaringType?.Assembly.FullName;
+#else
                 environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
+#endif
             }
             _event = options.AuditEvent ?? new AuditEvent();
             _event.Environment = environment;
@@ -130,7 +134,7 @@ namespace Audit.Core
                 return _creationPolicy;
             }
         }
-        #endregion
+#endregion
 
 #region Private fields
         private EventCreationPolicy _creationPolicy;
@@ -264,10 +268,15 @@ namespace Audit.Core
             {
                 return;
             }
-            
-            foreach (var prop in extraFields.GetType().GetRuntimeProperties())
+            var props =
+#if NET40
+                extraFields.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+#else
+                extraFields.GetType().GetRuntimeProperties();
+#endif
+            foreach (var prop in props)
             {
-                SetCustomField(prop.Name, prop.GetValue(extraFields));
+                SetCustomField(prop.Name, prop.GetValue(extraFields, null));
             }
         }
 
@@ -289,6 +298,6 @@ namespace Audit.Core
             }
         }
 
-        #endregion
+#endregion
     }
 }

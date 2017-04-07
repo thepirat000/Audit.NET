@@ -24,7 +24,7 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
-#if NET45
+#if NET45 || NET40
         public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".")
         {
             Configuration.DataProvider = new EventLogDataProvider()

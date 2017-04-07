@@ -1,6 +1,6 @@
 {
   "title": "Audit.Mvc",
-  "version": "7.0.5-*",
+  "version": "7.0.6-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -37,6 +37,14 @@
     "net45": {
       "dependencies": {
         "Microsoft.AspNet.Mvc": "5.2.3"
+      },
+      "frameworkAssemblies": {
+        "System.Web": "4.0.0.0"
+      }
+    },
+    "net40": {
+      "dependencies": {
+        "Microsoft.AspNet.Mvc": "4.0.30506.0"
       },
       "frameworkAssemblies": {
         "System.Web": "4.0.0.0"

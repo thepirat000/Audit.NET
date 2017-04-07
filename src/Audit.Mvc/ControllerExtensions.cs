@@ -14,7 +14,7 @@ namespace Audit.Mvc
         {
             return AuditAttribute.GetCurrentScope(controller.HttpContext);
         }
-#elif NET45
+#elif NET45 || NET40
         public static AuditScope GetCurrentAuditScope(this System.Web.Mvc.Controller controller)
         {
             return AuditAttribute.GetCurrentScope(controller.HttpContext);

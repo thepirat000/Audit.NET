@@ -20,13 +20,21 @@ namespace Audit.Core.Extensions
             {
                 return null;
             }
-            if (!type.GetTypeInfo().IsGenericType)
+#if NET40
+            var typeInfo = type;
+            var genericTypes = type.GetGenericArguments();
+#else
+            var typeInfo = type.GetTypeInfo();
+            var genericTypes = type.GenericTypeArguments;
+#endif
+            if (!typeInfo.IsGenericType)
             {
                 return type.Name;
             }
             var sb = new StringBuilder();
             sb.Append(type.Name.Substring(0, type.Name.LastIndexOf("`")));
-            sb.Append(type.GenericTypeArguments.Aggregate("<",
+
+            sb.Append(genericTypes.Aggregate("<",
                 delegate (string aggregate, Type t)
                 {
                     return aggregate + (aggregate == "<" ? "" : ",") + GetFullTypeName(t);
