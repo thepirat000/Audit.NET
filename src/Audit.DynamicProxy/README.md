@@ -178,7 +178,7 @@ With this information you can know who did the operation, and also measure perfo
 
 The following table describes the Audit.DynamicProxy output fields:
 
-- <h3>[AuditInterceptEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptEvent.cs)</h3>
+### [AuditInterceptEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptEvent.cs)
 
 Describes an operation call event
 
@@ -197,7 +197,7 @@ Describes an operation call event
 | Exception | string | The exception details when an exception is thrown |
 | Result | [argument](#auditinterceptargument) object | The result of the operation |
 
-- <h3>[AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)</h3>
+### [AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)
 
 Describes an operation argument
 
