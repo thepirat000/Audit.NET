@@ -10,6 +10,7 @@ using System.Net.Http;
 using System;
 using NUnit.Framework;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -76,6 +77,13 @@ namespace Audit.WebApi.UnitTest
             };
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
+            var self = new TestClass() { Id = 1 };
+            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
+            Console.WriteLine(JsonConvert.SerializeObject(self, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             
             filter.OnActionExecuting(actionExecutingContext);
@@ -267,6 +275,16 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
+        }
+    }
+
+    public class TestClass
+    {
+        public int Id { get; set; }
+        public TestClass Self { get; set; }
+        public TestClass()
+        {
+            Self = this;
         }
     }
 }

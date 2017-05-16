@@ -36,7 +36,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Audit.EntityFramework">
+    <Reference Include="Audit.EntityFramework, Version=7.0.6.0, Culture=neutral, PublicKeyToken=571d6b80b242c87e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\src\Audit.EntityFramework\bin\Debug\net45\Audit.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Audit.NET">
