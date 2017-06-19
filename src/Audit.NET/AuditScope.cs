@@ -288,6 +288,10 @@ namespace Audit.Core
             }
             // Execute custom on event saving actions
             Configuration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
+            if (_ended)
+            {
+                return;
+            }
             if (_eventId != null && !forceInsert)
             {
                 _dataProvider.ReplaceEvent(_eventId, _event);

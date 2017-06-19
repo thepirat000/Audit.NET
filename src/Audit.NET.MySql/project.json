@@ -1,6 +1,6 @@
 {
   "title": "Audit.MySql",
-  "version": "7.0.7-*",
+  "version": "7.0.8-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -25,7 +25,7 @@
     "Audit.NET": {
       "target": "project"
     },
-    "MySql.Data": "7.0.6-IR31"
+    "MySql.Data": "7.0.7-m61"
   },
   "frameworks": {
     "netcoreapp1.0": {

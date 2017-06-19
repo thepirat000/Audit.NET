@@ -14,7 +14,8 @@ namespace Audit.EntityFramework.UnitTest
     using System.Data.Entity.Infrastructure;
     using System.Data.Entity.Core.Objects;
     using System.Linq;
-    
+    using Core;
+
     public partial class BlogsEntities : AuditDbContext
     {
         public BlogsEntities()

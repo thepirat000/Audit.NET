@@ -214,6 +214,28 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_CustomAction_OnSaving_Discard()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            var eventType = "event type 1";
+            var target = "test";
+            var comment = "comment test";
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
+            {
+                scope.Discard();
+            });
+            AuditEvent ev;
+            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            {
+                ev = scope.Event;
+                scope.Save();
+            }
+            Core.Configuration.ResetCustomActions();
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+        }
+
+        [Test]
         public void Test_CustomAction_OnCreating_Double()
         {
             var provider = new Mock<AuditDataProvider>();
