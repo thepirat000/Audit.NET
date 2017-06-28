@@ -24,7 +24,7 @@ namespace Audit.EntityFramework
     public partial class DbContextHelper
     {
         // Entities Include/Ignore attributes cache
-        private static readonly Dictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new Dictionary<Type, bool?>();
+        private static readonly ConcurrentDictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new ConcurrentDictionary<Type, bool?>();
         // AuditDbContext Attribute cache
         private static ConcurrentDictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
 
