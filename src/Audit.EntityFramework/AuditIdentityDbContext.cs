@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audit.Core;
 using System.Threading;
-#if NETCOREAPP1_0
+#if NETSTANDARD1_5
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 #elif NET45
@@ -18,7 +18,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-#if NETCOREAPP1_0
+#if NETSTANDARD1_5
     public abstract partial class AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
         : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IAuditDbContext
         where TUser : IdentityUser<TKey, TUserClaim, TUserRole, TUserLogin>
@@ -48,7 +48,7 @@ namespace Audit.EntityFramework
         {
             _helper.SetConfig(this);
         }
-#if NETCOREAPP1_0
+#if NETSTANDARD1_5
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>

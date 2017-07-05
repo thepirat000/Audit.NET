@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP1_0
+﻿#if NETSTANDARD1_5
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 #elif NET45
