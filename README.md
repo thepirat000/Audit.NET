@@ -8,8 +8,8 @@ Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence
 
 With Audit.NET you can generate tracking information about operations being executed. It will log environmental information such as the caller user id, machine name, method name, exceptions, including execution time and duration, and exposing an extensible mechanism in which you can provide extra information or implement your output mechanism for the audit logs.
 
-[Extensions](#extensions) to log to json Files, Event Log, SQL, MySQL, MongoDB, AzureBlob and DocumentDB are provided. 
-And also extensions to audit different systems such as EntityFramework, MVC, WebAPI and WCF.
+[Extensions](#extensions) to log to json Files, Event Log, [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), [MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md), [AzureBlob](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md) and [DocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md) are provided. 
+And also extensions to audit different systems such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), [WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md) and [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md).
 
 ## [NuGet](https://www.nuget.org/packages/Audit.NET/)
 
