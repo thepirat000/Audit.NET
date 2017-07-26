@@ -1,4 +1,4 @@
-﻿#if NET451
+﻿#if NET45
 using Audit.Core;
 using Moq;
 using NUnit.Framework;

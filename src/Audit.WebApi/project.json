@@ -1,6 +1,6 @@
 {
   "title": "Audit.WebApi",
-  "version": "7.1.0-*",
+  "version": "7.1.1-*",
   "copyright": "Copyright 2016",
   "authors": [
     "Federico Colombo"
@@ -33,6 +33,11 @@
         "Microsoft.AspNetCore.Mvc": "1.0.0",
         "Microsoft.AspNetCore.Identity": "1.0.0",
         "Microsoft.Extensions.PlatformAbstractions": "1.0.0"
+      }
+    },
+    "net451": {
+      "dependencies": {
+        "Microsoft.AspNetCore.Mvc": "1.1.3"
       }
     },
     "net45": {

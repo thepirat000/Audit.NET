@@ -5,7 +5,6 @@
     "Audit.NET": { "target": "project" },
     "Audit.WebApi": { "target": "project" },
     "NUnit": "3.4.1",
-    "dotnet-test-nunit": "3.4.0-beta-3",
     "Moq": "4.6.38-alpha"
   },
   "commands": {
@@ -22,12 +21,21 @@
           "type": "platform",
           "version": "1.0.0"
         },
-        "Microsoft.NETCore.Platforms": "1.1.0"
+        "Microsoft.NETCore.Platforms": "1.1.0",
+        "dotnet-test-nunit": "3.4.0-beta-3"
       }
     },
     "net451": {
       "dependencies": {
-        "System.Runtime": "4.1.0"
+        "System.Runtime": "4.1.0",
+        "dotnet-test-nunit": "3.4.0-beta-3"
+      }
+    },
+    "net45": {
+      "dependencies": {
+        "System.Runtime": "4.0.0.0",
+        "NUnit.Console": "3.7.0",
+        "NUnit.ConsoleRunner": "3.7.0"
       }
     }
   },

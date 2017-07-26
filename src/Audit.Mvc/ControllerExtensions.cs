@@ -9,7 +9,7 @@ namespace Audit.Mvc
         /// </summary>
         /// <param name="controller">The MVC controller.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
-#if NETSTANDARD1_6
+#if NETSTANDARD1_6 || NET451
         public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.Controller controller)
         {
             return AuditAttribute.GetCurrentScope(controller.HttpContext);

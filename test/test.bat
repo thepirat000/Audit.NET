@@ -6,9 +6,20 @@ net start mssqlserver
 dotnet restore
 
 cd Audit.Mvc.UnitTest
-dotnet test
+dotnet build
+dotnet test -f netcoreapp1.0
 echo continue...
 pause > nul
+
+dotnet test -f net451
+echo continue...
+pause > nul
+
+..\..\packages\NUnit.ConsoleRunner.3.4.1\tools\nunit3-console.exe bin\Debug\net45\win7-x64\Audit.Mvc.UnitTest.dll
+echo continue...
+pause > nul
+
+
 cd ..
 
 cd Audit.UnitTest
@@ -18,9 +29,19 @@ pause > nul
 cd ..
 
 cd Audit.WebApi.UnitTest
-dotnet test
+dotnet build
+dotnet test -f netcoreapp1.0
 echo continue...
 pause > nul
+
+dotnet test -f net451
+echo continue...
+pause > nul
+
+..\..\packages\NUnit.ConsoleRunner.3.4.1\tools\nunit3-console.exe bin\Debug\net45\win7-x64\Audit.WebApi.UnitTest.dll
+echo continue...
+pause > nul
+
 cd ..
 
 cd Audit.DynamicProxy.UnitTest

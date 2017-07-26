@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP1_0
+﻿#if NETCOREAPP1_0 || NET451
 using System.Collections.Generic;
 using Moq;
 using Microsoft.AspNetCore.Mvc.Filters;
