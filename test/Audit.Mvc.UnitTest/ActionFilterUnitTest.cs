@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if NET45 || NET40
 using Audit.Core;
 using Moq;
 using NUnit.Framework;
@@ -23,9 +23,11 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
+#if NET40
+            request.Setup(c => c.Headers).Returns(() => nvc);
+#else
             request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
-            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
-
+#endif
             var httpResponse = new Mock<HttpResponseBase>();
 
             httpResponse.Setup(c => c.StatusCode).Returns(200);
@@ -38,7 +40,11 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
+#if NET40
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+#else
             controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+#endif
             var actionDescriptor = new Mock<ActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
@@ -74,11 +80,12 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
+
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
@@ -92,8 +99,11 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
+#if NET40
+            request.Setup(c => c.Headers).Returns(() => nvc);
+#else
             request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
-            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+#endif
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -107,7 +117,11 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
+#if NET40
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+#else
             controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+#endif
             var actionDescriptor = new Mock<ActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
@@ -143,11 +157,11 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
@@ -161,8 +175,11 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
+#if NET40
+            request.Setup(c => c.Headers).Returns(() => nvc);
+#else
             request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
-            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+#endif
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -176,7 +193,11 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
+#if NET40
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
+#else
             controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+#endif
             var actionDescriptor = new Mock<ActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
@@ -212,11 +233,11 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once());
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);

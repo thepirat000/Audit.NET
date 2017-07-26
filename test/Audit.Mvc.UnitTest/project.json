@@ -4,8 +4,7 @@
   "dependencies": {
     "Audit.NET": { "target": "project" },
     "Audit.Mvc": { "target": "project" },
-    "NUnit": "3.6.1",
-    "Moq": "4.6.38-alpha"
+    "NUnit": "3.6.1"
   },
   "commands": {
   },
@@ -22,20 +21,30 @@
           "version": "1.0.0"
         },
         "Microsoft.NETCore.Platforms": "1.1.0",
-        "dotnet-test-nunit": "3.4.0-beta-3"
+        "dotnet-test-nunit": "3.4.0-beta-3",
+        "Moq": "4.6.38-alpha"
       }
     },
     "net451": {
       "dependencies": {
         "System.Runtime": "4.1.0",
-        "dotnet-test-nunit": "3.4.0-beta-3"
+        "dotnet-test-nunit": "3.4.0-beta-3",
+        "Moq": "4.6.38-alpha"
       }
     },
     "net45": {
       "dependencies": {
         "System.Runtime": "4.0.0.0",
         "NUnit.Console": "3.7.0",
-        "NUnit.ConsoleRunner": "3.7.0"
+        "NUnit.ConsoleRunner": "3.7.0",
+        "Moq": "4.6.38-alpha"
+      }
+    },
+    "net40": {
+      "dependencies": {
+        "NUnit.Console": "3.7.0",
+        "NUnit.ConsoleRunner": "3.7.0",
+        "Moq": "4.0.10827"
       }
     }
   },

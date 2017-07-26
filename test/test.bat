@@ -19,6 +19,9 @@ pause > nul
 echo continue...
 pause > nul
 
+..\..\packages\NUnit.ConsoleRunner.3.4.1\tools\nunit3-console.exe bin\Debug\net40\win7-x64\Audit.Mvc.UnitTest.dll
+echo continue...
+pause > nul
 
 cd ..
 
