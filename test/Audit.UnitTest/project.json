@@ -3,6 +3,7 @@
   "testRunner": "nunit",
   "dependencies": {
     "Audit.NET": { "target": "project" },
+    "Audit.NET.Udp": { "target": "project" },
     "Audit.EntityFramework": { "target": "project" },
     "Moq": "4.6.38-alpha",
     "NUnit": "3.4.1",

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Audit.Core;
 using Audit.Core.Providers;
+using Audit.Udp.Providers;
 using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;
 using Newtonsoft.Json.Linq;
@@ -157,6 +158,16 @@ namespace Audit.IntegrationTest
             public void TestMySql()
             {
                 SetMySqlSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("UDP")]
+            public void TestUdp()
+            {
+                SetUdpSettings();
                 TestUpdate();
                 TestInsert();
                 TestDelete();
@@ -344,6 +355,16 @@ namespace Audit.IntegrationTest
                     .ResetActions();
             }
 
+            public void SetUdpSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseUdp(config => config
+                        .RemoteAddress("127.0.0.1")
+                        .RemotePort(12349)
+                        .MulticastMode(MulticastMode.Disabled))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+            }
 
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)

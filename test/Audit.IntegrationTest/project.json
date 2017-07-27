@@ -7,6 +7,7 @@
     "dotnet-test-nunit": "3.4.0-beta-3",
     "System.Runtime": "4.1.0",
     "Audit.NET": { "target": "project" },
+    "Audit.NET.Udp": { "target": "project" },
     "Audit.NET.MongoDB": { "target": "project" },
     "Audit.NET.SqlServer": { "target": "project" },
     "Audit.NET.AzureStorage": { "target": "project" },
