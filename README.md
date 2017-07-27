@@ -528,7 +528,7 @@ Generate detailed audit logs for any class without changing its code by using a 
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
-[![Storage providers](http://i.imgur.com/tvhunnv.png)]()
+[![Storage providers](http://i.imgur.com/wcSIW8d.png)]()
 
 - ### **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)**
 Store the events as rows in a SQL Table, in JSON format.
@@ -544,4 +544,8 @@ Store the events in an Azure Document DB Collection, in JSON format.
 
 - ### **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)**
 Store the events in an Azure Blob Storage container, in JSON format.
+
+- ### **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)**
+Send Audit Logs as UDP datagrams to a network.
+
 
