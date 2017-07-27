@@ -7,7 +7,7 @@
   ],
   "description": "Send Audit.NET Trail Logs as connectionless UDP datagrams to a remote host or a multicast group",
   "packOptions": {
-    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.Udp",
+    "projectUrl": "https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp",
     "owners": [
       "ThePirat"
     ],
