@@ -19,7 +19,7 @@
       "UDP"
     ],
     "requireLicenseAcceptance": false,
-    "iconUrl": ""
+    "iconUrl": "http://i.imgur.com/pMNmmpH.png"
   },
   "dependencies": {
     "Audit.NET": {

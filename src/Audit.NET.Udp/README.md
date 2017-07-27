@@ -1,7 +1,7 @@
 ﻿# Audit.NET.Udp
 **UDP provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
-Sends Audit Logs as UDP datagrams to a remote host or a multicast group.
+Sends Audit Logs as UDP datagrams to a network remote host or a multicast group.
 
 ## Install
 
@@ -24,8 +24,8 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new UdpDataProvider()
 {
-	RemoteAddress = IPAddress.Parse("224.0.0.1"),
-	RemotePort = 3333
+    RemoteAddress = IPAddress.Parse("224.0.0.1"),
+    RemotePort = 3333
 };
 ```
 
@@ -33,15 +33,15 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 ```c#
 Audit.Core.Configuration.Setup()
     .UseUdp(config => config
-		.RemoteAddress("224.0.0.1")
-		.RemotePort(3333));
+        .RemoteAddress("224.0.0.1")
+        .RemotePort(3333));
 ```
 
 ### Provider Options
 
 Mandatory:
-- **RemoteAddress**: The address of the remote host or multicast group to which the underlying UdpClient should send the audit events.
-- **RemotePort**: The port number of the remote host or multicast group to which the underlying UdpClient should send the audit events.
+- **RemoteAddress**: The address of the remote host or multicast group to which the underlying `UdpClient` should send the audit events.
+- **RemotePort**: The port number of the remote host or multicast group to which the underlying `UdpClient` should send the audit events.
 
 Optional:
 - **MulticastMode**: To indicate if the RemoteAddress is a multicast group (default is Auto-Detect).
