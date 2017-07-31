@@ -71,15 +71,17 @@ namespace Audit.UnitTest
             var p = new Udp.Providers.UdpDataProvider();
             p.RemoteAddress = IPAddress.Parse(ip);
             p.RemotePort = port;
+
             var cts = new CancellationTokenSource();
             var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
 
             var tasks = new List<Task>();
             for (int i = 0; i < N; i++)
             {
+                int a = i;
                 tasks.Add(new Task(() =>
                 {
-                    using (var scope = AuditScope.Create("Test_UdpDataProvider_MultiThread_" + i, null, EventCreationPolicy.InsertOnEnd, p))
+                    using (var scope = AuditScope.Create("Test_UdpDataProvider_MultiThread_" + a, null, EventCreationPolicy.InsertOnEnd, p))
                     {
                     }
                 }));
