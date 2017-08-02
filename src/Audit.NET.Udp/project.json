@@ -1,6 +1,6 @@
-﻿{
+{
   "title": "Audit.Udp",
-  "version": "7.1.1-*",
+  "version": "7.1.2-*",
   "copyright": "Copyright 2017",
   "authors": [
     "Federico Colombo"
@@ -37,10 +37,8 @@
       }
     },
     "net45": {
-      "frameworkAssemblies": {
-      },
-      "dependencies": {
-      }
+      "frameworkAssemblies": {},
+      "dependencies": {}
     }
   },
   "buildOptions": {

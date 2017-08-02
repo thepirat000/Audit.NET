@@ -61,6 +61,12 @@ echo continue...
 pause > nul
 cd ..
 
+cd Audit.Redis.UnitTest
+dotnet test
+echo continue...
+pause > nul
+cd ..
+
 cd Audit.IntegrationTest
 dotnet test
 echo continue...
@@ -73,3 +79,4 @@ del TestResult.xml /s
 net stop mssqlserver
 net stop mysql57
 taskkill /f /im mongod.exe
+taskkill /f /im redis-server.exe

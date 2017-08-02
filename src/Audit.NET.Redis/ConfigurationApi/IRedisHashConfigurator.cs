@@ -19,7 +19,7 @@ namespace Audit.Redis.Configuration
         /// <param name="key">The Redis Key</param>
         IRedisHashConfigurator Key(string key);
         /// <summary>
-        /// Specifies the Time To Live for the Redis Key. Default is no TLL.
+        /// Specifies the Time To Live for the Redis Key. Default is no TTL.
         /// </summary>
         /// <param name="timeToLive">The Time to Live</param>
         IRedisHashConfigurator TimeToLive(TimeSpan? timeToLive);

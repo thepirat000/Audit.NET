@@ -19,7 +19,7 @@ namespace Audit.Redis.Providers
         /// <param name="connectionString">The redis connection string. https://stackexchange.github.io/StackExchange.Redis/Configuration
         /// </param>
         /// <param name="keyBuilder">A function that returns the Redis Key to use</param>
-        /// <param name="timeToLive">The Time To Live for the Redis Key. NULL for no TLL.</param>
+        /// <param name="timeToLive">The Time To Live for the Redis Key. NULL for no TTL.</param>
         /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
         /// <param name="fieldBuilder">A function that returns the hash field to use.</param>
         public RedisProviderHash(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
