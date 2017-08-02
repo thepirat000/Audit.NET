@@ -47,7 +47,7 @@ If you need to set different providers/configuration per scope, you can use the 
 
 This data provider allows to store the events in different ways.
 
-#### Redis String
+### Redis String
 
 Store each audit event as a redis string.
 
@@ -67,7 +67,7 @@ Mandatory settings
 Optional settings
 - `TimeToLive` specifies the Time To Live for the Redis Key. Default is no TTL.
 
-#### Redis Hash
+### Redis Hash
 
 Store each audit event as a field in a redis hash.
 
@@ -89,7 +89,7 @@ Mandatory settings:
 Optional settings
 - `TimeToLive` specifies the Time To Live for the Redis Hash. Default is no TTL.
 
-#### Redis List
+### Redis List
 
 Store each audit event as a member in a redis list.
 
@@ -111,7 +111,7 @@ Optional settings:
 - `MaxLength` to indicate the maximum quantity of events that the list will store. Older elements will be deleted. Default is no-limit.
 - `TimeToLive` specifies the Time To Live for the Redis List. Default is no TTL.
 
-#### Redis Sorted Set
+### Redis Sorted Set
 
 Store each audit event as a member in a redis sorted set.
 
@@ -138,7 +138,7 @@ Optional settings:
 Max<0: Maintain only the bottom N scored elements.
 - `TimeToLive` specifies the Time To Live for the Redis Sorted Set. Default is no TTL.
 
-#### Redis PubSub
+### Redis PubSub
 
 Sends the audit events to a redis PubSub channel.
 
