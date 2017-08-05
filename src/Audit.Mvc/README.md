@@ -23,7 +23,7 @@ If your MVC project target a .NET Framework >= 4.5.1, this library will asume yo
 
 To use this library on an old ASP.NET project, you will need to:
 - Make your project target .NET framework <= 4.5
-- *Or* use Audit.MVC version <= 7.1.0
+- *Or* use Audit.Mvc version <= 7.1.0
 - *Or* manually import the packaged assembly that targets the framework 4.5 
 
 Refer to the following [issue](https://github.com/thepirat000/Audit.NET/issues/59) for another workaround.
