@@ -19,7 +19,7 @@ PM> Install-Package Audit.Mvc
 
 # IMPORTANT NOTE
 
-If your MVC project target a .NET Framework >= 4.5.1, this library will asume you are using ASP.NET Core (MVC 6) and not the old generation of ASP.NET (MVC 5).
+If your MVC project targets a .NET Framework >= 4.5.1, this library will asume you are using ASP.NET Core (MVC 6) and not the old generation of ASP.NET (MVC 5).
 
 In order to use this library on an old ASP.NET project, you will need to:
 - Make your project target .NET framework <= 4.5
