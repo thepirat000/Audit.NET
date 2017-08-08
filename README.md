@@ -372,6 +372,7 @@ The Data Providers included are summarized in the following table:
 | [AzureDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/Providers/AzureDbDataProvider.cs) | [Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB#auditnetazuredocumentdb) | Store the events in an **Azure Document DB** collection, in JSON format. | `.UseAzureDocumentDB()` |
 | [AzureBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureBlobDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureBlobStorage()` |
 | [UdpDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/Providers/UdpDataProvider.cs) | [Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md) | Send Audit Logs as UDP datagrams to a network. | `.UseUdp()` |
+| [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes or publish to a PubSub channel. | `.UseRedis()` |
 
 ## Event Creation Policy
 
