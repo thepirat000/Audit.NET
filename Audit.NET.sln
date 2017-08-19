@@ -1,56 +1,55 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E62475E8-0BE1-4464-BBD9-FD06CC546593}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5617401-3C5E-4B37-85B0-F33D41F6BEEE}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A54B4BB6-3439-432B-AFD9-FE62D6528D42}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.UnitTest", "test\Audit.UnitTest\Audit.UnitTest.xproj", "{C5AEF0E4-8866-4169-9DA9-FCA8E558DC8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.UnitTest", "test\Audit.UnitTest\Audit.UnitTest.csproj", "{C5AEF0E4-8866-4169-9DA9-FCA8E558DC8C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.WebApi.UnitTest", "test\Audit.WebApi.UnitTest\Audit.WebApi.UnitTest.xproj", "{8A6C8B84-2C46-4CC2-A291-D606E1656FF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WebApi.UnitTest", "test\Audit.WebApi.UnitTest\Audit.WebApi.UnitTest.csproj", "{8A6C8B84-2C46-4CC2-A291-D606E1656FF7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Mvc.UnitTest", "test\Audit.Mvc.UnitTest\Audit.Mvc.UnitTest.xproj", "{2E268670-CC83-471E-8A44-92756342140B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Mvc.UnitTest", "test\Audit.Mvc.UnitTest\Audit.Mvc.UnitTest.csproj", "{2E268670-CC83-471E-8A44-92756342140B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.IntegrationTest", "test\Audit.IntegrationTest\Audit.IntegrationTest.xproj", "{C413FE80-2F09-46D3-AAEF-02977F6A2C1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.IntegrationTest", "test\Audit.IntegrationTest\Audit.IntegrationTest.csproj", "{C413FE80-2F09-46D3-AAEF-02977F6A2C1C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.NET", "src\Audit.NET\Audit.NET.xproj", "{95370B23-ED59-420A-B22C-722BF38DEF42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET", "src\Audit.NET\Audit.NET.csproj", "{95370B23-ED59-420A-B22C-722BF38DEF42}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.AzureDocumentDB", "src\Audit.NET.AzureDocumentDB\Audit.AzureDocumentDB.xproj", "{AB4F1AC3-E048-450F-9EEA-8A8976827144}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.AzureDocumentDB", "src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj", "{AB4F1AC3-E048-450F-9EEA-8A8976827144}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.MongoDB", "src\Audit.NET.MongoDB\Audit.MongoDB.xproj", "{D3CEDE4E-620B-40A8-9FFF-E083B3CC6D41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.MongoDB", "src\Audit.NET.MongoDB\Audit.NET.MongoDB.csproj", "{D3CEDE4E-620B-40A8-9FFF-E083B3CC6D41}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.SqlServer", "src\Audit.NET.SqlServer\Audit.SqlServer.xproj", "{D6C86273-942B-4BE7-8764-FA4567F19C9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.SqlServer", "src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj", "{D6C86273-942B-4BE7-8764-FA4567F19C9A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.WebApi", "src\Audit.WebApi\Audit.WebApi.xproj", "{5D3052CA-00E0-4FCF-9DE0-BD8CBFDAE5DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WebApi", "src\Audit.WebApi\Audit.WebApi.csproj", "{5D3052CA-00E0-4FCF-9DE0-BD8CBFDAE5DA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Mvc", "src\Audit.Mvc\Audit.Mvc.xproj", "{1F1C8626-C84B-45F6-9E84-F639212CCB2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Mvc", "src\Audit.Mvc\Audit.Mvc.csproj", "{1F1C8626-C84B-45F6-9E84-F639212CCB2A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.EntityFramework", "src\Audit.EntityFramework\Audit.EntityFramework.xproj", "{0E1077B5-0166-46AE-BD6D-7CCEA001D1A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.EntityFramework", "src\Audit.EntityFramework\Audit.EntityFramework.csproj", "{0E1077B5-0166-46AE-BD6D-7CCEA001D1A3}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Wcf", "src\Audit.WCF\Audit.Wcf.xproj", "{6A20E5D4-1E8C-4155-9AA3-D9346A6FAC93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WCF", "src\Audit.WCF\Audit.WCF.csproj", "{6A20E5D4-1E8C-4155-9AA3-D9346A6FAC93}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.AzureStorage", "src\Audit.NET.AzureStorage\Audit.AzureStorage.xproj", "{F878E251-8172-4CF1-9F2F-9DFC348453E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.AzureStorage", "src\Audit.NET.AzureStorage\Audit.NET.AzureStorage.csproj", "{F878E251-8172-4CF1-9F2F-9DFC348453E7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.DynamicProxy", "src\Audit.DynamicProxy\Audit.DynamicProxy.xproj", "{0193EA15-7307-4D7F-A7B1-C9EC00686FA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.DynamicProxy", "src\Audit.DynamicProxy\Audit.DynamicProxy.csproj", "{0193EA15-7307-4D7F-A7B1-C9EC00686FA0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.DynamicProxy.UnitTest", "test\Audit.DynamicProxy.UnitTest\Audit.DynamicProxy.UnitTest.xproj", "{C60DF995-E82A-4137-9779-DBB5B21FFD4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.DynamicProxy.UnitTest", "test\Audit.DynamicProxy.UnitTest\Audit.DynamicProxy.UnitTest.csproj", "{C60DF995-E82A-4137-9779-DBB5B21FFD4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.EntityFramework.UnitTest", "test\Audit.EntityFramework.UnitTest\Audit.EntityFramework.UnitTest.csproj", "{9A581F76-4772-4B46-82F8-C0E187B50AB6}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.MySql", "src\Audit.NET.MySql\Audit.MySql.xproj", "{E66283AC-59E0-4BA7-AC5D-F1DAC08F965D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.MySql", "src\Audit.NET.MySql\Audit.NET.MySql.csproj", "{E66283AC-59E0-4BA7-AC5D-F1DAC08F965D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Udp", "src\Audit.NET.Udp\Audit.Udp.xproj", "{0FFD2976-B8EB-4A65-982C-BE4546502C5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Udp", "src\Audit.NET.Udp\Audit.NET.Udp.csproj", "{0FFD2976-B8EB-4A65-982C-BE4546502C5A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Redis", "src\Audit.NET.Redis\Audit.Redis.xproj", "{A52C51C4-B236-45D5-ADFA-54FD51A3605A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Redis", "src\Audit.NET.Redis\Audit.NET.Redis.csproj", "{A52C51C4-B236-45D5-ADFA-54FD51A3605A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Audit.Redis.UnitTest", "test\Audit.Redis.UnitTest\Audit.Redis.UnitTest.xproj", "{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Redis.UnitTest", "test\Audit.Redis.UnitTest\Audit.Redis.UnitTest.csproj", "{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.TestRunner", "test\Audit.TestRunner\Audit.TestRunner.csproj", "{6DD15EB0-D93A-49FD-9932-E9EB71287685}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -220,6 +219,14 @@ Global
 		{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF}.Release|x64.ActiveCfg = Release|Any CPU
 		{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF}.Release|x64.Build.0 = Release|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Debug|x64.Build.0 = Debug|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Release|x64.ActiveCfg = Release|Any CPU
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -245,5 +252,9 @@ Global
 		{0FFD2976-B8EB-4A65-982C-BE4546502C5A} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{A52C51C4-B236-45D5-ADFA-54FD51A3605A} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
+		{6DD15EB0-D93A-49FD-9932-E9EB71287685} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}
 	EndGlobalSection
 EndGlobal

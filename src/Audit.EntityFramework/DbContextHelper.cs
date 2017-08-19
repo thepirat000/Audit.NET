@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_5
+﻿#if NETSTANDARD1_5 || NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 #elif NET45
@@ -87,7 +87,7 @@ namespace Audit.EntityFramework
         }
 
         // Determines whether to include the entity on the audit log or not
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_0
         private bool IncludeEntity(IAuditDbContext context, EntityEntry entry, AuditOptionMode mode)
 #elif NET45
         private bool IncludeEntity(IAuditDbContext context, DbEntityEntry entry, AuditOptionMode mode)
@@ -197,7 +197,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the modified entries to process.
         /// </summary>
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_0
         public List<EntityEntry> GetModifiedEntries(IAuditDbContext context)
 #elif NET45
         public List<DbEntityEntry> GetModifiedEntries(IAuditDbContext context)

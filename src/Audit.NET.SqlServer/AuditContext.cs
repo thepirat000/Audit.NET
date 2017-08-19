@@ -11,7 +11,7 @@
         {
         }
     }
-#elif NETSTANDARD1_3
+#elif NETSTANDARD1_3 || NETSTANDARD2_0
     using System.ComponentModel.DataAnnotations;
     using Microsoft.EntityFrameworkCore;
     

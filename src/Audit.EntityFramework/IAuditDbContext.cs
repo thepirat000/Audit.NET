@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_5
+﻿#if NETSTANDARD1_5 || NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 #elif NET45

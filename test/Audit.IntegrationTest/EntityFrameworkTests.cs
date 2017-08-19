@@ -4,10 +4,9 @@ using Audit.EntityFramework;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NUnit.Framework;
-#if NETCOREAPP1_0
+#if NETCOREAPP1_0 || NETCOREAPP2_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -166,7 +165,7 @@ namespace Audit.IntegrationTest
 #endif
         }
 
-#if NETCOREAPP1_0
+#if NETCOREAPP1_0 || NETCOREAPP2_0
         private IDbContextTransaction GetCurrentTran(DbContext context)
         {
             var dbtxmgr = context.GetInfrastructure().GetService<IDbContextTransactionManager>();

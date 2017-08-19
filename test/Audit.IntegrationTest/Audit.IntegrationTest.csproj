@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451</TargetFrameworks>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <AssemblyName>Audit.IntegrationTest</AssemblyName>
+    <PackageId>Audit.IntegrationTest</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.0</RuntimeFrameworkVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <DebugType Condition=" '$(TargetFramework)' == 'net451' ">Full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.MongoDB\Audit.NET.MongoDB.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.AzureStorage\Audit.NET.AzureStorage.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.MySql\Audit.NET.MySql.csproj" />
+    <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\src\Audit.DynamicProxy\Audit.DynamicProxy.csproj" />
+    <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
+    <ProjectReference Include="..\..\src\Audit.WebApi\Audit.WebApi.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.Redis\Audit.NET.Redis.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="NUnit" Version="3.6.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+    <PackageReference Include="Moq" Version="4.7.99" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.3.0" />
+    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.5" />
+    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
+    <ProjectReference Include="..\..\src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj" />
+  </ItemGroup>  
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <ProjectReference Include="..\..\src\Audit.WCF\Audit.WCF.csproj" />
+    <PackageReference Include="EntityFramework" Version="6.1.3" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  
+</Project>

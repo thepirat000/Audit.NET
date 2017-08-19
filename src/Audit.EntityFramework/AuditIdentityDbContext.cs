@@ -4,9 +4,13 @@ using System.Threading.Tasks;
 using Audit.Core;
 using System.Threading;
 #if NETSTANDARD1_5
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-#elif NET45
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+#elif NETSTANDARD2_0
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+#else
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Common;
 using System.Data.Entity;
@@ -18,11 +22,16 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_0
     public abstract partial class AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
         : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IAuditDbContext
+#if NETSTANDARD1_5
         where TUser : IdentityUser<TKey, TUserClaim, TUserRole, TUserLogin>
         where TRole : IdentityRole<TKey, TUserRole, TRoleClaim>
+#else
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
+#endif
         where TKey : IEquatable<TKey>
         where TUserClaim : IdentityUserClaim<TKey>
         where TUserRole : IdentityUserRole<TKey>
@@ -48,7 +57,7 @@ namespace Audit.EntityFramework
         {
             _helper.SetConfig(this);
         }
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_0
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>

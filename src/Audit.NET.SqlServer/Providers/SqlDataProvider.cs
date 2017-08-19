@@ -1,7 +1,7 @@
 using System.Linq;
 using Audit.Core;
 using System.Data.SqlClient;
-#if NETSTANDARD1_3
+#if NETSTANDARD1_3 || NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore;
 #endif
 
@@ -90,7 +90,7 @@ namespace Audit.SqlServer.Providers
 #if NET45
                 var result = ctx.Database.SqlQuery<string>(cmdText, json);
                 return result.FirstOrDefault();
-#elif NETSTANDARD1_3
+#elif NETSTANDARD1_3 || NETSTANDARD2_0
                 var result = ctx.FakeIdSet.FromSql(cmdText, json);
                 return result.FirstOrDefault().Id;
 #endif

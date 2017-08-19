@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore;
 #elif NET45
 using System.Data.Common;
@@ -22,7 +22,7 @@ namespace Audit.EntityFramework
     {
         private DbContextHelper _helper = new DbContextHelper();
 
-#if NETSTANDARD1_5
+#if NETSTANDARD1_5 || NETSTANDARD2_0
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>

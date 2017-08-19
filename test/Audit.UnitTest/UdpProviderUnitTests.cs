@@ -25,14 +25,15 @@ namespace Audit.UnitTest
             p.RemotePort = port;
             var cts = new CancellationTokenSource();
             var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
+            Task.Delay(1000).Wait();
             using (var scope = AuditScope.Create("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd, p))
             {
                 Task.Delay(100).Wait();
             }
-            Task.Delay(800).Wait();
+            Task.Delay(2000).Wait();
             stop = true;
             cts.Cancel();
-            Task.Delay(800).Wait();
+            Task.Delay(2000).Wait();
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[0].EventType);
             Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[1].EventType);
@@ -63,7 +64,7 @@ namespace Audit.UnitTest
         [Test]
         [TestCase("225.0.0.1", 2223, true, 10)]
         [TestCase("127.0.0.1", 12367, false, 10)]
-        [TestCase("226.1.2.15", 5566, true, 100)]
+        [TestCase("226.1.2.15", 5566, true, 50)]
         public void Test_UdpDataProvider_MultiThread(string ip, int port, bool multicast, int N)
         {
             stop = false;
@@ -74,6 +75,7 @@ namespace Audit.UnitTest
 
             var cts = new CancellationTokenSource();
             var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
+            Task.Delay(1500).Wait();
 
             var tasks = new List<Task>();
             for (int i = 0; i < N; i++)
@@ -114,6 +116,7 @@ namespace Audit.UnitTest
 
             var cts = new CancellationTokenSource();
             var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
+            Task.Delay(1000).Wait();
 
             var target = Enumerable.Range(1, 10000).Select(_ => (byte)255).ToArray();
             using (var scope = AuditScope.Create("Test_UdpDataProvider_BigPacket", () => target, EventCreationPolicy.InsertOnEnd, p))
