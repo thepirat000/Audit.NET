@@ -18,6 +18,14 @@ PM> Install-Package Audit.EntityFramework
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
 
+## Note 
+
+If you are targeting the full .NET framework but want to use EntityFrameworkCore (EF >= 7), you should install the `Audit.EntityFramework.Core` package instead:
+
+```
+PM> Install-Package Audit.EntityFramework.Core
+```
+
 ## Usage
 Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
 

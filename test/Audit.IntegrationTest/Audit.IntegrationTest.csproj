@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureStorage\Audit.NET.AzureStorage.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.MySql\Audit.NET.MySql.csproj" />
-    <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
     <ProjectReference Include="..\..\src\Audit.DynamicProxy\Audit.DynamicProxy.csproj" />
     <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
     <ProjectReference Include="..\..\src\Audit.WebApi\Audit.WebApi.csproj" />
@@ -38,8 +37,13 @@
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj" />
   </ItemGroup>  
+  
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net451' ">
+    <ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
+  </ItemGroup>  
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
     <ProjectReference Include="..\..\src\Audit.WCF\Audit.WCF.csproj" />
     <PackageReference Include="EntityFramework" Version="6.1.3" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
