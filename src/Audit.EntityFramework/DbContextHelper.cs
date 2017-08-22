@@ -81,9 +81,30 @@ namespace Audit.EntityFramework
         /// </summary>
         public void SaveScope(IAuditDbContext context, AuditScope scope, EntityFrameworkEvent @event)
         {
+            UpdateAuditEvent(@event, context);
             (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             scope.Save();
+        }
+
+        /// <summary>
+        /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
+        /// </summary>
+        public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
+        {
+            foreach (var efEntry in efEvent.Entries)
+            {
+                var entry = efEntry.Entry;
+                var entity = entry.Entity;
+                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entity);
+                foreach(var pk in efEntry.PrimaryKey)
+                {
+                    if (efEntry.ColumnValues.ContainsKey(pk.Key))
+                    {
+                        efEntry.ColumnValues[pk.Key] = pk.Value;
+                    }
+                }
+            }
         }
 
         // Determines whether to include the entity on the audit log or not

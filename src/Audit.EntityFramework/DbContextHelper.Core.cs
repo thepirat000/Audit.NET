@@ -91,6 +91,15 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Gets the primary key values for an entity
+        /// </summary>
+        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, object entity)
+        {
+            var entityType = dbContext.Model.FindEntityType(entity.GetType());
+            return GetPrimaryKey(entityType, entity);
+        }
+
+        /// <summary>
         /// Creates the Audit Event.
         /// </summary>
         public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
@@ -120,11 +129,11 @@ namespace Audit.EntityFramework
                     Valid = validationResults == null,
                     ValidationResults = validationResults?.Select(x => x.ErrorMessage).ToList(),
                     Entity = context.IncludeEntityObjects ? entity : null,
+                    Entry = entry,
                     Action = DbContextHelper.GetStateName(entry.State),
                     Changes = entry.State == EntityState.Modified ? GetChanges(dbContext, entry) : null,
-                    ColumnValues = GetColumnValues(dbContext, entry),
-                    PrimaryKey = GetPrimaryKey(entityType, entity),
-                    Table = GetEntityName(entityType)
+                    Table = GetEntityName(entityType),
+                    ColumnValues = GetColumnValues(dbContext, entry)
                 });
             }
             return efEvent;

@@ -35,7 +35,7 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
-        /// Gets the column values for an insert/delete operation.
+        /// Gets the column values.
         /// </summary>
         /// <param name="entry">The entity entry.</param>
         private Dictionary<string, object> GetColumnValues(DbEntityEntry entry)
@@ -44,7 +44,7 @@ namespace Audit.EntityFramework
             var propertyNames = entry.State != EntityState.Deleted ? entry.CurrentValues.PropertyNames : entry.OriginalValues.PropertyNames;
             foreach (var propName in propertyNames)
             {
-                var value = (entry.State == EntityState.Added) ? entry.CurrentValues[propName] : entry.OriginalValues[propName];
+                var value = (entry.State != EntityState.Deleted) ? entry.CurrentValues[propName] : entry.OriginalValues[propName];
                 result.Add(propName, value);
             }
             return result;
@@ -76,6 +76,14 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Gets the primary key values for an entity
+        /// </summary>
+        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, object entity)
+        {
+            return EntityKeyHelper.Instance.GetPrimaryKeyValues(entity, dbContext);
+        }
+
+        /// <summary>
         /// Creates the Audit Event.
         /// </summary>
         public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
@@ -103,11 +111,11 @@ namespace Audit.EntityFramework
                     Valid = validationResults.IsValid,
                     ValidationResults = validationResults.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
                     Entity = context.IncludeEntityObjects ? entity : null,
+                    Entry = entry,
                     Action = GetStateName(entry.State),
                     Changes = entry.State == EntityState.Modified ? GetChanges(dbContext, entry) : null,
-                    ColumnValues = GetColumnValues(entry),
-                    PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(entry.Entity, dbContext),
-                    Table = GetEntityName(dbContext, entity)
+                    Table = GetEntityName(dbContext, entity),
+                    ColumnValues = GetColumnValues(entry)
                 });
             }
             return efEvent;

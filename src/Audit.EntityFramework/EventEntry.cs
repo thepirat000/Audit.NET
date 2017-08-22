@@ -21,5 +21,12 @@ namespace Audit.EntityFramework
         public bool Valid { get; set; }
         [JsonProperty(Order = 60, NullValueHandling = NullValueHandling.Ignore)]
         public List<string> ValidationResults { get; set; }
+
+        [JsonIgnore]
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+        internal Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry Entry { get; set; }
+#else
+        internal System.Data.Entity.Infrastructure.DbEntityEntry Entry { get; set; }
+#endif
     }
 }

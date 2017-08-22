@@ -34,7 +34,7 @@ namespace Audit.EntityFramework.UnitTest
 
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsEntities>(config => config
-                    .IncludeEntityObjects(false)
+                    .IncludeEntityObjects(true)
                     .AuditEventType("{context}:{database}"))
                 .Reset()
                 .UseOptOut();
@@ -52,6 +52,9 @@ namespace Audit.EntityFramework.UnitTest
             }
 
             Assert.AreEqual(1, auditEvent.EntityFrameworkEvent.Entries.Count);
+            // PK is zero because the insertion via SP
+            Assert.IsTrue((int)(auditEvent.EntityFrameworkEvent.Entries[0].PrimaryKey["Id"]) == 0);
+            Assert.IsTrue((int)(auditEvent.EntityFrameworkEvent.Entries[0].ColumnValues["Id"]) == 0);
             Assert.AreEqual("Insert", auditEvent.EntityFrameworkEvent.Entries[0].Action);
             Assert.AreEqual("Blogs", auditEvent.EntityFrameworkEvent.Entries[0].Table);
             Assert.AreEqual(title, auditEvent.EntityFrameworkEvent.Entries[0].ColumnValues["Title"]);
@@ -121,7 +124,7 @@ namespace Audit.EntityFramework.UnitTest
             {
                 var post = new Post()
                 {
-                    Id = 1,
+                    //Id = 1,
                     DateCreated = DateTime.Now,
                     Content = "test-content",
                     BlogId = 1
@@ -135,6 +138,12 @@ namespace Audit.EntityFramework.UnitTest
             }
 
             Assert.AreEqual(2, evs.Count);
+
+            Assert.IsTrue((int)(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]) > 0);
+            Assert.IsTrue((int)(evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"]) > 0);
+            Assert.AreEqual(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"], evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual("test-content", evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Content"]);
+            Assert.AreEqual(guid, evs[1].GetEntityFrameworkEvent().Entries[0].ColumnValues["Content"]);
 
             Assert.AreEqual("Posts", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
             Assert.AreEqual("Posts", evs[1].GetEntityFrameworkEvent().Entries[0].Table);

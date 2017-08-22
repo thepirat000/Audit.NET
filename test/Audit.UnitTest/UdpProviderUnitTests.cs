@@ -24,7 +24,9 @@ namespace Audit.UnitTest
             p.RemoteAddress = IPAddress.Parse(ip);
             p.RemotePort = port;
             var cts = new CancellationTokenSource();
-            var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
+            var re = new ManualResetEvent(false);
+            var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
+            re.WaitOne();
             Task.Delay(1000).Wait();
             using (var scope = AuditScope.Create("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd, p))
             {
@@ -45,12 +47,13 @@ namespace Audit.UnitTest
         private static object locker = new object();
         private static List<AuditEvent> events = new List<AuditEvent>();
 
-        private void Listen(string ipAddress, int port, bool isMulticast)
+        private void Listen(ManualResetEvent re, string ipAddress, int port, bool isMulticast)
         {
             var dp = new Udp.Providers.UdpDataProvider();
             dp.RemoteAddress = IPAddress.Parse(ipAddress);
             dp.RemotePort = port;
             dp.MulticastMode = isMulticast ? Udp.Providers.MulticastMode.Enabled : Udp.Providers.MulticastMode.Disabled;
+            re.Set();
             while (!stop)
             {
                 var ev = dp.ReceiveAsync().Result;
@@ -72,9 +75,10 @@ namespace Audit.UnitTest
             var p = new Udp.Providers.UdpDataProvider();
             p.RemoteAddress = IPAddress.Parse(ip);
             p.RemotePort = port;
-
             var cts = new CancellationTokenSource();
-            var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
+            var re = new ManualResetEvent(false);
+            var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
+            re.WaitOne();
             Task.Delay(1500).Wait();
 
             var tasks = new List<Task>();
@@ -115,7 +119,9 @@ namespace Audit.UnitTest
             p.RemotePort = port;
 
             var cts = new CancellationTokenSource();
-            var listener = Task.Factory.StartNew(() => { Listen(ip, port, multicast); }, cts.Token);
+            var re = new ManualResetEvent(false);
+            var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
+            re.WaitOne();
             Task.Delay(1000).Wait();
 
             var target = Enumerable.Range(1, 10000).Select(_ => (byte)255).ToArray();
