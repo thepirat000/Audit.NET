@@ -104,6 +104,14 @@ namespace Audit.EntityFramework
                         efEntry.ColumnValues[pk.Key] = pk.Value;
                     }
                 }
+                var fks = GetForeignKeys(context.DbContext, entity);
+                foreach (var fk in fks)
+                {
+                    if (efEntry.ColumnValues.ContainsKey(fk.Key))
+                    {
+                        efEntry.ColumnValues[fk.Key] = fk.Value;
+                    }
+                }
             }
         }
 

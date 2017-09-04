@@ -84,6 +84,14 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Gets the foreign keys values for an entity
+        /// </summary>
+        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, object entity)
+        {
+            return EntityKeyHelper.Instance.GetForeignKeysValues(entity, dbContext);
+        }
+
+        /// <summary>
         /// Creates the Audit Event.
         /// </summary>
         public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)

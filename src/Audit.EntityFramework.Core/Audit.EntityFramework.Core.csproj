@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>8.1.0</VersionPrefix>
+    <VersionPrefix>8.2.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -26,6 +26,12 @@
 
   <ItemGroup>
     <Compile Include="..\Audit.EntityFramework\**\*.cs" Exclude="..\Audit.EntityFramework\obj\**\*.*;..\**\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ConfigurationApi\**" />
+    <EmbeddedResource Remove="ConfigurationApi\**" />
+    <None Remove="ConfigurationApi\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,10 +63,6 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ConfigurationApi\" />
   </ItemGroup>
 
 </Project>

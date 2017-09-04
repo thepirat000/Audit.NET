@@ -23,6 +23,50 @@ namespace Audit.IntegrationTest
     public class EntityFrameworkTests
     {
         [Test]
+        public void Test_EF_PrimaryKeyUpdate()
+        {
+            var logs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(p => p
+                    .OnInsert(ev => { logs.Add(ev); }));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>()
+                    .Reset()
+                    .UseOptOut();
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Blogs.Add(new IntegrationTest.Blog()
+                {
+                    BloggerName = "abc",
+                    Title = "Test_EF_PrimaryKeyUpdate",
+                    Posts = new List<IntegrationTest.Post>()
+                    {
+                        new Post()
+                        {
+                            Title = "post-test",
+                            Content = "post content",
+                            DateCreated = DateTime.Now
+                        }
+                    }
+                });
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(1, logs.Count);
+            Assert.AreEqual("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual("Posts", logs[0].GetEntityFrameworkEvent().Entries[1].Table);
+            Assert.AreEqual((int)logs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"], (int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]);
+            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"] > 0);
+            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"] > 0);
+            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["Id"] > 0);
+            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[1].PrimaryKey["Id"] > 0);
+            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["BlogId"] > 0);
+            Assert.AreEqual((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["BlogId"], (int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]);
+
+        }
+
+        [Test]
         public void Test_EF_IncludeIgnoreFilters()
         {
             var logs = new List<AuditEvent>();

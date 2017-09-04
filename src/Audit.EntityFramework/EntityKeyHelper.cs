@@ -27,6 +27,8 @@ public sealed class EntityKeyHelper
     private static readonly Lazy<EntityKeyHelper> LazyInstance = new Lazy<EntityKeyHelper>(() => new EntityKeyHelper());
     //Type -> KeyNames
     private readonly Dictionary<Type, string[]> _keyNamesCache = new Dictionary<Type, string[]>();
+    //Type -> ForeignKeyNames
+    private readonly Dictionary<Type, string[]> _foreignKeyNamesCache = new Dictionary<Type, string[]>();
     //Type -> TableName
     private readonly Dictionary<Type, string> _tableNamesCache = new Dictionary<Type, string>();
     //Type -> PropertyName -> ColumnName
@@ -53,10 +55,32 @@ public sealed class EntityKeyHelper
         MethodInfo method = typeof(ObjectContext).GetMethod("CreateObjectSet", Type.EmptyTypes)
                                                  .MakeGenericMethod(entityType);
         dynamic objectSet = method.Invoke(objectContext, null);
+
         IEnumerable<dynamic> keyMembers = objectSet.EntitySet.ElementType.KeyMembers;
         string[] keyNames = keyMembers.Select(k => (string)k.Name).ToArray();
 
-        _keyNamesCache.Add(entityType, keyNames);
+        _keyNamesCache[entityType] = keyNames;
+        return keyNames;
+    }
+
+    private string[] GetForeignKeyNames(DbContext context, Type entityType)
+    {
+        entityType = GetBaseEntityType(entityType);
+        string[] keys;
+        if (_foreignKeyNamesCache.TryGetValue(entityType, out keys))
+        {
+            return keys;
+        }
+        ObjectContext objectContext = ((IObjectContextAdapter)context).ObjectContext;
+        //create method CreateObjectSet with the generic parameter of the base-type
+        MethodInfo method = typeof(ObjectContext).GetMethod("CreateObjectSet", Type.EmptyTypes)
+                                                 .MakeGenericMethod(entityType);
+        dynamic objectSet = method.Invoke(objectContext, null);
+
+        var navProps = objectSet.EntitySet.ElementType.NavigationProperties as IEnumerable<NavigationProperty>;
+        string[] keyNames = navProps?.SelectMany(n => n.GetDependentProperties()).Select(fk => fk.Name).ToArray();
+
+        _foreignKeyNamesCache[entityType] = keyNames;
         return keyNames;
     }
 
@@ -109,6 +133,23 @@ public sealed class EntityKeyHelper
         {
             var columnName = GetColumnName(entity.GetType(), keyNames[i], context);
             result.Add(columnName, entityType.GetProperty(keyNames[i]).GetValue(entity, null));
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the foreign keys and values for a given entity in a given db context.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <param name="context">The db context.</param>
+    public Dictionary<string, object> GetForeignKeysValues(object entity, DbContext context)
+    {
+        var result = new Dictionary<string, object>();
+        var entityType = GetBaseEntityType(entity.GetType());
+        var fkNames = GetForeignKeyNames(context, entityType);
+        foreach (var fk in fkNames)
+        {
+            result.Add(fk, entityType.GetProperty(fk).GetValue(entity, null));
         }
         return result;
     }
@@ -170,7 +211,7 @@ public sealed class EntityKeyHelper
         {
             _columnNamesCache[type] = new Dictionary<string, string>(); // Not thread-safe, but not dangerous since at most it will lost some cached values
         }
-        _columnNamesCache[type].Add(propertyName, columnName);
+        _columnNamesCache[type][propertyName] = columnName;
         return columnName;
     }
     #endregion

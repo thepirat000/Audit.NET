@@ -91,6 +91,36 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Gets the foreign key values for an entity
+        /// </summary>
+        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, object entity)
+        {
+            var entityType = dbContext.Model.FindEntityType(entity.GetType());
+            return GetForeignKeys(entityType, entity);
+        }
+
+        /// <summary>
+        /// Gets the foreign key values for an entity
+        /// </summary>
+        private static Dictionary<string, object> GetForeignKeys(IEntityType entityType, object entity)
+        {
+            var result = new Dictionary<string, object>();
+            var foreignKeys = entityType.GetForeignKeys();
+            if (foreignKeys != null)
+            {
+                foreach (var fk in foreignKeys)
+                {
+                    foreach (var prop in fk.Properties)
+                    {
+                        var value = entity.GetType().GetTypeInfo().GetProperty(prop.Name).GetValue(entity);
+                        result.Add(prop.Name, value);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
         private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, object entity)

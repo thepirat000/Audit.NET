@@ -1,5 +1,5 @@
 @echo off
-start "" /D c:\ "c:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
+start "" /D c:\ "d:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 start "" /D c:\redis "c:\redis\redis-server.exe"
 net start mysql57
 net start mssqlserver
