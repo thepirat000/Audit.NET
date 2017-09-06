@@ -27,7 +27,7 @@ Audit.Core.Configuration.Setup()
             .Key(ev => $"{Guid.NewGuid()}")));
 ```
 
-If you need to set different providers/configuration per scope, you can use the `RedisDataProviderHelper` to easily get a new data provider via the fluent API, for example:
+If you need to set different providers/configuration per scope, you can use the `RedisDataProviderHelper` to easily get a new Redis Data Provider via the fluent API, for example:
 ```c#
     var dp = new RedisDataProviderHelper(RedisCnnString)
         .AsString(str => str
