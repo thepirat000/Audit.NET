@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
 {
@@ -21,11 +22,18 @@ namespace Audit.IntegrationTest
         [OneTimeSetUp]
         public void Init()
         {
-            var sql = @"drop table posts; drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
+            var sql1 = @"drop table posts; drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
                         create table posts ( Id int identity(1,1) not null primary key, Title nvarchar(max), DateCreated datetime, Content nvarchar(max), BlogId int not null constraint FK_P_B foreign key references Blogs (id) );";
+            var sql2 = @"drop table child; drop table parent; CREATE TABLE [Parent] (	Id BIGINT IDENTITY(1,1) NOT NULL, [Name] nvarchar(Max) NOT NULL, CONSTRAINT PK_Parent PRIMARY KEY (Id));
+                        CREATE TABLE [Child] ( Id BIGINT IDENTITY(1,1) NOT NULL, [Name] nvarchar(Max) NOT NULL, [Period_Start] datetime NOT NULL, [Period_End] datetime NOT NULL, [ParentId] bigint NOT NULL, CONSTRAINT PK_Child PRIMARY KEY (Id), Constraint FK_Child_Parent Foreign Key ([ParentId]) References Parent(Id));";
             using (var ctx = new MyAuditedVerboseContext())
             {
-                ctx.Database.ExecuteSqlCommand(sql);
+                ctx.Database.ExecuteSqlCommand(sql1);
+            }
+            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true";
+            using (var ctx = new ApplicationDbContext(SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options))
+            {
+                ctx.Database.ExecuteSqlCommand(sql2);
             }
         }
 
@@ -72,6 +80,42 @@ namespace Audit.IntegrationTest
             Assert.IsTrue(ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues.ContainsKey("BlogId"));
             Assert.AreEqual(ev.Entries.Single(e => e.Entity is Blog).PrimaryKey.Single().Value, ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues["BlogId"]);
             Assert.AreEqual("this guy", ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues["BloggerName"]);
+        }
+
+        [Test]
+        public async Task Test_EF_OwnedEntities_WithFK()
+        {
+            var events = new List<EntityFrameworkEvent>();
+            long childId = -1;
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x.OnInsertAndReplace(eve =>
+                {
+                    events.Add(eve.GetEntityFrameworkEvent());
+                }));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForAnyContext(_ => _.IncludeEntityObjects(true));
+            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true";
+            using (var _dbContext = new ApplicationDbContext(SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options))
+            {
+                _dbContext.Database.EnsureCreated();
+                var parent = new Parent { Name = "PARENT 1" };
+                var child = new Child { Name = "CHILD 1", Period = new Period { Start = new DateTime(2017, 1, 1), End = new DateTime(2018, 1, 1) } };
+                parent.Children = new List<Child> { child };
+
+                await _dbContext.Parents.AddAsync(parent);
+                await _dbContext.SaveChangesAsync();
+                childId = child.Id;
+            }
+            var ev = events.FirstOrDefault();
+
+            Assert.AreEqual(1, events.Count);
+            Assert.NotNull(ev);
+            Assert.AreEqual(3, ev.Entries.Count);
+            Assert.IsTrue(childId > 0);
+            Assert.AreEqual(childId, (long)ev.Entries.Single(e => e.Entity is Child).PrimaryKey.Single().Value);
+            Assert.AreEqual(childId, ev.Entries.Single(e => e.Entity is Period).PrimaryKey.Single().Value);
+            Assert.IsTrue(ev.Entries.Single(e => e.Entity is Period).ColumnValues.ContainsKey("ChildId"));
+            Assert.AreEqual(childId, ev.Entries.Single(e => e.Entity is Period).ColumnValues["ChildId"]);
         }
 
 
@@ -122,6 +166,60 @@ namespace Audit.IntegrationTest
             {
                 return SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options;
             }
+        }
+
+        //---
+
+        public class ApplicationDbContext : Audit.EntityFramework.AuditDbContext // DbContext
+        {
+
+            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+                : base(options)
+            {
+            }
+            public ApplicationDbContext(DbContextOptions options)
+                : base(options)
+            {
+            }
+
+            protected override void OnModelCreating(ModelBuilder builder)
+            {
+                base.OnModelCreating(builder);
+
+                builder.Entity<Child>(x =>
+                {
+                    x.OwnsOne(c => c.Period);
+                    x.ToTable("Child");
+                });
+
+                builder.Entity<Parent>(x =>
+                {
+                    x.Property(c => c.Name).IsRequired();
+                    x.HasMany<Child>(c => c.Children);
+                    x.ToTable("Parent");
+                });
+            }
+
+
+            public DbSet<Parent> Parents { get; set; }
+        }
+
+        public class Child
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+            public Period Period { get; set; }
+        }
+        public class Parent
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+            public List<Child> Children { get; set; }
+        }
+        public class Period
+        {
+            public DateTime Start { get; set; }
+            public DateTime End { get; set; }
         }
 
     }

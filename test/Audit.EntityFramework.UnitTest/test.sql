@@ -1,4 +1,26 @@
 ﻿--create database Blogs
+--create database ParentChild
+
+use ParentChild
+
+drop table child; drop table parent;
+
+CREATE TABLE [Parent]
+(
+	Id BIGINT IDENTITY(1,1) NOT NULL,
+	[Name] nvarchar(Max) NOT NULL,
+	CONSTRAINT PK_Parent PRIMARY KEY (Id)
+)
+CREATE TABLE [Child]
+(
+	Id BIGINT IDENTITY(1,1) NOT NULL,
+	[Name] nvarchar(Max) NOT NULL,
+	[Period_Start] datetime NOT NULL,
+	[Period_End] datetime NOT NULL,
+	[ParentId] bigint NOT NULL,
+	CONSTRAINT PK_Child PRIMARY KEY (Id),
+	Constraint FK_Child_Parent Foreign Key ([ParentId]) References Parent(Id)
+)
 
 use Blogs
 

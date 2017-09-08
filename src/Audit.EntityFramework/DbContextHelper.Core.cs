@@ -100,8 +100,7 @@ namespace Audit.EntityFramework
                 {
                     foreach (var prop in fk.Properties)
                     {
-                        var value = entity.GetType().GetTypeInfo().GetProperty(prop.Name).GetValue(entity);
-                        result.Add(prop.Name, value);
+                        result.Add(prop.Name, entry.Property(prop.Name).CurrentValue);
                     }
                 }
             }
