@@ -78,17 +78,17 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, object entity)
+        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, DbEntityEntry entry)
         {
-            return EntityKeyHelper.Instance.GetPrimaryKeyValues(entity, dbContext);
+            return EntityKeyHelper.Instance.GetPrimaryKeyValues(entry.Entity, dbContext);
         }
 
         /// <summary>
         /// Gets the foreign keys values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, object entity)
+        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, DbEntityEntry entry)
         {
-            return EntityKeyHelper.Instance.GetForeignKeysValues(entity, dbContext);
+            return EntityKeyHelper.Instance.GetForeignKeysValues(entry.Entity, dbContext);
         }
 
         /// <summary>

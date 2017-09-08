@@ -22,7 +22,7 @@ namespace Audit.EntityFramework
         private List<EventEntryChange> GetChanges(DbContext dbContext, EntityEntry entry)
         {
             var result = new List<EventEntryChange>();
-            var props = dbContext.Model.FindEntityType(entry.Entity.GetType()).GetProperties();
+            var props = entry.Metadata.GetProperties();
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
@@ -50,11 +50,12 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the column values for an insert/delete operation.
         /// </summary>
+        /// <param name="dbContext">The Db Context.</param>
         /// <param name="entry">The entity entry.</param>
         private Dictionary<string, object> GetColumnValues(DbContext dbContext, EntityEntry entry)
         {
             var result = new Dictionary<string, object>();
-            var props = dbContext.Model.FindEntityType(entry.Entity.GetType()).GetProperties();
+            var props = entry.Metadata.GetProperties();
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
@@ -67,47 +68,34 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the name of the entity.
         /// </summary>
-        private static string GetEntityName(IEntityType entityType)
+        private static string GetEntityName(DbContext dbContext, EntityEntry entry)
         {
-            return entityType.SqlServer().TableName ?? entityType.Name;
-        }
-
-        /// <summary>
-        /// Gets the primary key values for an entity
-        /// </summary>
-        private static Dictionary<string, object> GetPrimaryKey(IEntityType entityType, object entity)
-        {
-            var result = new Dictionary<string, object>();
-            var pkDefinition = entityType.FindPrimaryKey();
-            if (pkDefinition != null)
+#if NETSTANDARD2_0
+            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entity.GetType());
+#else
+            IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
+#endif
+            if (definingType == null)
             {
-                foreach (var pkProp in pkDefinition.Properties)
-                {
-                    var value = entity.GetType().GetTypeInfo().GetProperty(pkProp.Name).GetValue(entity);
-                    result.Add(pkProp.Name, value);
-                }
+                return null;
             }
-            return result;
+            return definingType.SqlServer().TableName ?? definingType.Name;
         }
 
         /// <summary>
         /// Gets the foreign key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, object entity)
-        {
-            var entityType = dbContext.Model.FindEntityType(entity.GetType());
-            return GetForeignKeys(entityType, entity);
-        }
-
-        /// <summary>
-        /// Gets the foreign key values for an entity
-        /// </summary>
-        private static Dictionary<string, object> GetForeignKeys(IEntityType entityType, object entity)
+        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, EntityEntry entry)
         {
             var result = new Dictionary<string, object>();
-            var foreignKeys = entityType.GetForeignKeys();
+            var foreignKeys = entry.Metadata.GetForeignKeys();
             if (foreignKeys != null)
             {
+#if NETSTANDARD2_0
+                //Filter ownership relations as they are not foreign keys
+                foreignKeys = foreignKeys.Where(fk => !fk.IsOwnership);
+#endif
+                object entity = entry.Entity;
                 foreach (var fk in foreignKeys)
                 {
                     foreach (var prop in fk.Properties)
@@ -123,10 +111,14 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, object entity)
+        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, EntityEntry entry)
         {
-            var entityType = dbContext.Model.FindEntityType(entity.GetType());
-            return GetPrimaryKey(entityType, entity);
+            var result = new Dictionary<string, object>();
+            foreach(var prop in entry.Properties.Where(p => p.Metadata.IsPrimaryKey()))
+            {
+                result.Add(prop.Metadata.Name, prop.CurrentValue); 
+            }
+            return result;
         }
 
         /// <summary>
@@ -153,7 +145,6 @@ namespace Audit.EntityFramework
             {
                 var entity = entry.Entity;
                 var validationResults = DbContextHelper.GetValidationResults(entity);
-                var entityType = dbContext.Model.FindEntityType(entry.Entity.GetType());
                 efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults == null,
@@ -162,7 +153,7 @@ namespace Audit.EntityFramework
                     Entry = entry,
                     Action = DbContextHelper.GetStateName(entry.State),
                     Changes = entry.State == EntityState.Modified ? GetChanges(dbContext, entry) : null,
-                    Table = GetEntityName(entityType),
+                    Table = GetEntityName(dbContext, entry),
                     ColumnValues = GetColumnValues(dbContext, entry)
                 });
             }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E62475E8-0BE1-4464-BBD9-FD06CC546593}"
 EndProject
@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Redis", "src\Audi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Redis.UnitTest", "test\Audit.Redis.UnitTest\Audit.Redis.UnitTest.csproj", "{F0CA6B9F-0586-4F2A-B895-09CCB45C6FFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.TestRunner", "test\Audit.TestRunner\Audit.TestRunner.csproj", "{6DD15EB0-D93A-49FD-9932-E9EB71287685}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.TestRunner", "test\Audit.TestRunner\Audit.TestRunner.csproj", "{6DD15EB0-D93A-49FD-9932-E9EB71287685}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.EntityFramework.Core", "src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj", "{6C3586EB-84E7-49BB-A356-1C36E85206BE}"
 EndProject

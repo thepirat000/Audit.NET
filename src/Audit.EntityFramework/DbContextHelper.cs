@@ -95,8 +95,7 @@ namespace Audit.EntityFramework
             foreach (var efEntry in efEvent.Entries)
             {
                 var entry = efEntry.Entry;
-                var entity = entry.Entity;
-                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entity);
+                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
                 foreach(var pk in efEntry.PrimaryKey)
                 {
                     if (efEntry.ColumnValues.ContainsKey(pk.Key))
@@ -104,7 +103,7 @@ namespace Audit.EntityFramework
                         efEntry.ColumnValues[pk.Key] = pk.Value;
                     }
                 }
-                var fks = GetForeignKeys(context.DbContext, entity);
+                var fks = GetForeignKeys(context.DbContext, entry);
                 foreach (var fk in fks)
                 {
                     if (efEntry.ColumnValues.ContainsKey(fk.Key))
