@@ -12,6 +12,7 @@ del "audit.net.azurestorage\bin\debug\*.nupkg"
 del "audit.dynamicproxy\bin\debug\*.nupkg"
 del "audit.net.udp\bin\debug\*.nupkg"
 del "audit.net.redis\bin\debug\*.nupkg"
+del "Audit.NET.PostgreSql\bin\debug\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -29,6 +30,7 @@ dotnet build "Audit.NET.AzureStorage/"
 dotnet build "Audit.DynamicProxy/"
 dotnet build "Audit.NET.Udp/"
 dotnet build "Audit.NET.Redis/"
+dotnet build "Audit.NET.PostgreSql/"
 
 dotnet pack "Audit.NET/"
 dotnet pack "Audit.Mvc/"
@@ -44,3 +46,4 @@ dotnet pack "Audit.NET.AzureStorage/"
 dotnet pack "Audit.DynamicProxy/"
 dotnet pack "Audit.NET.Udp/"
 dotnet pack "Audit.NET.Redis/"
+dotnet pack "Audit.NET.PostgreSql/"

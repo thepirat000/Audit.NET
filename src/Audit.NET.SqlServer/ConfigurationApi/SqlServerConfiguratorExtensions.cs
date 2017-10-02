@@ -10,6 +10,7 @@ namespace Audit.Core
         /// <summary>
         /// Store the events in a Sql Server database.
         /// </summary>
+        /// <param name="configurator">The Audit.NET configurator object.</param>
         /// <param name="connectionString">The Sql Server connection string.</param>
         /// <param name="tableName">The Sql table name to store the events.</param>
         /// <param name="idColumnName">The primary key column name.</param>
@@ -36,6 +37,7 @@ namespace Audit.Core
         /// Store the events in a Sql Server database.
         /// </summary>
         /// <param name="config">The Sql Serevr provider configuration.</param>
+        /// <param name="configurator">The Audit.NET configurator object.</param>
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, Action<ISqlServerProviderConfigurator> config)
         {
             var sqlDbConfig = new SqlServerProviderConfigurator();
