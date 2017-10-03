@@ -1,15 +1,5 @@
 ﻿namespace Audit.PostgreSql.Configuration
 {
-    public enum DataType
-    {
-        /// <summary>JSON data type</summary>
-        JSON = 0,
-        /// <summary>JSONB data type</summary>
-        JSONB = 1,
-        /// <summary>Any valid character string type (text, char, varchar)</summary>
-        String = 2
-    }
-
     /// <summary>
     /// Provides a configuration for the PostgreSQL Server DB data provider
     /// </summary>
@@ -31,7 +21,7 @@
         /// <param name="idColumnName">The id column name.</param>
         IPostgreSqlProviderConfigurator IdColumnName(string idColumnName);
         /// <summary>
-        /// Specifies the column where to store the event data. Default is the column named "data" assuming type JSON.
+        /// Specifies the column name and type where to store the event data. Default is the column named "data" assuming type JSON.
         /// </summary>
         /// <param name="dataColumnName">The data column name.</param>
         /// <param name="dataColumnType">The data column type.</param>

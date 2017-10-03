@@ -1,5 +1,7 @@
 ﻿using Audit.Core;
+using Newtonsoft.Json;
 using Npgsql;
+using System.Collections.Generic;
 
 namespace Audit.PostgreSql.Providers
 {
@@ -128,6 +130,47 @@ namespace Audit.PostgreSql.Providers
             }
         }
 
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Postgre WHERE expression.
+        /// </summary>
+        /// <param name="whereExpression">Any valid PostgreSQL where expression for the events table.
+        /// The query executed will be SELECT * FROM public.eventb WHERE <paramref name="whereExpression"/>;.
+        /// For example: EnumerateEvents("data ? CustomerId") will return the events whose JSON representation includes CustomerId property on its root.
+        /// </param>
+        /// <remarks>
+        /// JSONB data querying: http://schinckel.net/2014/05/25/querying-json-in-postgres/, https://www.postgresql.org/docs/9.5/static/functions-json.html
+        /// </remarks>
+        public IEnumerable<AuditEvent> EnumerateEvents(string whereExpression)
+        {
+            return EnumerateEvents<AuditEvent>(whereExpression);
+        }
 
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Postgre WHERE expression.
+        /// </summary>
+        /// <param name="whereExpression">Any valid PostgreSQL where expression for the events table.
+        /// The query executed will be SELECT * FROM public.eventb WHERE <paramref name="whereExpression"/>;.
+        /// For example: EnumerateEvents("data ? CustomerId") will return the events whose JSON representation includes CustomerId property on its root.
+        /// </param>
+        /// <remarks>
+        /// JSONB data querying: http://schinckel.net/2014/05/25/querying-json-in-postgres/, https://www.postgresql.org/docs/9.5/static/functions-json.html
+        /// </remarks>
+        public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
+        {
+            using (var cnn = new NpgsqlConnection(_connectionString))
+            {
+                cnn.Open();
+                var cmd = cnn.CreateCommand();
+                var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+                var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
+                cmd.CommandText = $@"SELECT ""{_dataColumnName}"" FROM {schema}""{_tableName}"" {where}";
+                var dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    var data = dr.GetFieldValue<string>(0);
+                    yield return JsonConvert.DeserializeObject<T>(data);
+                }
+            }
+        }
     }
 }

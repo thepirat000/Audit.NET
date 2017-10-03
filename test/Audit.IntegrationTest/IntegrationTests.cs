@@ -144,6 +144,16 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("PostgreSQL")]
+            public void PostgreSql()
+            {
+                SetPostgreSqlSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
             [Category("Mongo")]
             public void TestMongo()
             {
@@ -328,6 +338,19 @@ namespace Audit.IntegrationTest
                         .IdColumnName("EventId")
                         .JsonColumnName("Data")
                         .LastUpdatedColumnName("LastUpdatedDate"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+            }
+
+            public void SetPostgreSqlSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UsePostgreSql(config => config
+                        .ConnectionString("Server=127.0.0.1;Port=5432;User Id=fede;Password=fede;Database=postgres;")
+                        .TableName("eventb")
+                        .IdColumnName("id")
+                        .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)
+                        .LastUpdatedColumnName("updated_date"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
