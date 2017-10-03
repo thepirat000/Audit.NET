@@ -21,16 +21,18 @@ namespace Audit.WCF
         private IOperationInvoker _baseInvoker;
         private DispatchOperation _operation;
         private OperationDescription _operationDescription;
+        private EventCreationPolicy? _creationPolicy;
         #endregion
 
         #region Constructors
         public AuditOperationInvoker(IOperationInvoker baseInvoker, DispatchOperation operation, OperationDescription operationDescription,
-            string eventType)
+            string eventType, EventCreationPolicy? creationPolicy)
         {
             _baseInvoker = baseInvoker;
             _operationDescription = operationDescription;
             _operation = operation;
             _eventType = eventType ?? "{operation}";
+            _creationPolicy = creationPolicy;
         }
         #endregion
 
@@ -63,32 +65,34 @@ namespace Audit.WCF
                 WcfEvent = auditWcfEvent
             };
             // Create the audit scope
-            var auditScope = AuditScope.Create(new AuditScopeOptions()
+            using (var auditScope = AuditScope.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
-                CreationPolicy = EventCreationPolicy.Manual,
+                CreationPolicy = _creationPolicy,
                 AuditEvent = auditEventWcf,
                 DataProvider = GetAuditDataProvider(instance),
                 CallingMethod = _operationDescription.SyncMethod
-            });
-            // Store a reference to this audit scope on a thread static field
-            AuditBehavior.CurrentAuditScope = auditScope;
-            try
+            }))
             {
-                result = _baseInvoker.Invoke(instance, inputs, out outputs);
-            }
-            catch (Exception ex)
-            {
+                // Store a reference to this audit scope on a thread static field
+                AuditBehavior.CurrentAuditScope = auditScope;
+                try
+                {
+                    result = _baseInvoker.Invoke(instance, inputs, out outputs);
+                }
+                catch (Exception ex)
+                {
+                    AuditBehavior.CurrentAuditScope = null;
+                    auditWcfEvent.Fault = GetWcfFaultData(ex);
+                    auditWcfEvent.Success = false;
+                    (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                    throw;
+                }
                 AuditBehavior.CurrentAuditScope = null;
-                auditWcfEvent.Fault = GetWcfFaultData(ex);
-                auditWcfEvent.Success = false;
-                SaveAuditScope(auditScope, auditWcfEvent);
-                throw;
+                auditWcfEvent.OutputParameters = GetEventElements(outputs);
+                auditWcfEvent.Result = new AuditWcfEventElement(result);
+                (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
             }
-            AuditBehavior.CurrentAuditScope = null;
-            auditWcfEvent.OutputParameters = GetEventElements(outputs);
-            auditWcfEvent.Result = new AuditWcfEventElement(result);
-            SaveAuditScope(auditScope, auditWcfEvent);
             return result;
         }
         #endregion
@@ -151,12 +155,6 @@ namespace Audit.WCF
                 result.FaultType = "Exception";
             }
             return result;
-        }
-
-        private void SaveAuditScope(AuditScope auditScope, WcfEvent auditWcfEvent)
-        {
-            (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
-            auditScope.Save();
         }
 
         private List<AuditWcfEventElement> GetEventElements(object[] objects)

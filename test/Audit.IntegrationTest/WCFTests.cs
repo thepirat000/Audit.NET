@@ -11,11 +11,153 @@ using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Newtonsoft.Json;
 
 namespace Audit.IntegrationTest
 {
     public class WCFTests
     {
+        [Test]
+        public void WCFTest_CreationPolicy_InsertOnStartReplaceOnEnd()
+        {
+            var inserted = new List<AuditEventWcfAction>();
+            var replaced = new List<AuditEventWcfAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev => 
+                    {
+                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    })
+                    .OnReplace((evId, ev) => 
+                    {
+                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+            var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
+            using (var host = new ServiceHost(typeof(OrderService), basePipeAddress))
+            {
+                var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
+                host.Open();
+                using (var factory = new ChannelFactory<IOrderService>(CreateBinding()))
+                {
+                    var proxy = factory.CreateChannel(serviceEndpoint.Address);
+                    proxy.DoSomething();
+                }
+                host.Close();
+            }
+            Thread.Sleep(100);
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(1, replaced.Count);
+            Assert.IsNull(inserted[0].WcfEvent.Result);
+            Assert.AreEqual(100, replaced[0].WcfEvent.Result.Value);
+        }
+
+        [Test]
+        public void WCFTest_CreationPolicy_InsertOnStartInsertOnEnd()
+        {
+            var inserted = new List<AuditEventWcfAction>();
+            var replaced = new List<AuditEventWcfAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev =>
+                    {
+                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    })
+                    .OnReplace((evId, ev) =>
+                    {
+                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
+            var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
+            using (var host = new ServiceHost(typeof(OrderService), basePipeAddress))
+            {
+                var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
+                host.Open();
+                using (var factory = new ChannelFactory<IOrderService>(CreateBinding()))
+                {
+                    var proxy = factory.CreateChannel(serviceEndpoint.Address);
+                    proxy.DoSomething();
+                }
+                host.Close();
+            }
+            Thread.Sleep(100);
+
+            Assert.AreEqual(2, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.IsNull(inserted[0].WcfEvent.Result);
+            Assert.AreEqual(100, inserted[1].WcfEvent.Result.Value);
+        }
+
+        [Test]
+        public void WCFTest_CreationPolicy_InsertOnEnd()
+        {
+            var inserted = new List<AuditEventWcfAction>();
+            var replaced = new List<AuditEventWcfAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev =>
+                    {
+                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    })
+                    .OnReplace((evId, ev) =>
+                    {
+                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+            var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
+            using (var host = new ServiceHost(typeof(OrderService), basePipeAddress))
+            {
+                var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
+                host.Open();
+                using (var factory = new ChannelFactory<IOrderService>(CreateBinding()))
+                {
+                    var proxy = factory.CreateChannel(serviceEndpoint.Address);
+                    proxy.DoSomething();
+                }
+                host.Close();
+            }
+            Thread.Sleep(100);
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.AreEqual(100, inserted[0].WcfEvent.Result.Value);
+        }
+
+        [Test]
+        public void WCFTest_CreationPolicy_Manual()
+        {
+            var inserted = new List<AuditEventWcfAction>();
+            var replaced = new List<AuditEventWcfAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev =>
+                    {
+                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    })
+                    .OnReplace((evId, ev) =>
+                    {
+                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.Manual);
+            var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
+            using (var host = new ServiceHost(typeof(OrderService), basePipeAddress))
+            {
+                var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
+                host.Open();
+                using (var factory = new ChannelFactory<IOrderService>(CreateBinding()))
+                {
+                    var proxy = factory.CreateChannel(serviceEndpoint.Address);
+                    proxy.DoSomething();
+                }
+                host.Close();
+            }
+            Thread.Sleep(100);
+
+            Assert.AreEqual(0, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+        }
+
         [Test]
         public void WCFTest_AuditScope()
         {
@@ -112,6 +254,8 @@ namespace Audit.IntegrationTest
     {
         [OperationContract]
         GetOrderResponse GetOrder(GetOrderRequest request);
+        [OperationContract]
+        int DoSomething();
     }
 
     [DataContract]
@@ -144,6 +288,13 @@ namespace Audit.IntegrationTest
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class OrderService : IOrderService
     {
+        [AuditBehavior]
+        public int DoSomething()
+        {
+            Thread.Sleep(1100);
+            return 100;
+        }
+
         [AuditBehavior]
         public GetOrderResponse GetOrder(GetOrderRequest request)
         {
