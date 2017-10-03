@@ -15,7 +15,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.NET.PostgreSql</PackageId>
     <PackageTags>Audit;Trail;Log;Postgres;PostgreSQL</PackageTags>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl>https://i.imgur.com/ZxbDxAU.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.PostgreSql</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.0</NetStandardImplicitPackageVersion>

@@ -24,10 +24,10 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new PostgreSqlDataProvider()
 {
-    ConnectionString = "Server=127.0.0.1;Port=5432;User Id=fede;Password=fede;Database=postgres;",
-    DataColumnName = "data",
-    IdColumnName = "id",
+    ConnectionString = "Server=127.0.0.1;Port=5432;User Id=admin;Password=admin;Database=postgres;",
     TableName = "event",
+    IdColumnName = "id",
+    DataColumnName = "data",
     DataType = "JSONB",
     LastUpdatedDateColumnName = "updated_date"
 };
