@@ -13,6 +13,7 @@ PM> Install-Package Audit.NET.PostgreSql
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.PostgreSql.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.PostgreSql/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.PostgreSql.svg)](https://www.nuget.org/packages/Audit.NET.PostgreSql/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
