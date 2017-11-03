@@ -13,6 +13,7 @@ PM> Install-Package Audit.NET.AzureDocumentDB
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureDocumentDB.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureDocumentDB/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.AzureDocumentDB.svg)](https://www.nuget.org/packages/Audit.NET.AzureDocumentDB/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
