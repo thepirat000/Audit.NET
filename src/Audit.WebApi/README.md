@@ -17,6 +17,7 @@ PM> Install-Package Audit.WebApi
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.WebApi.svg?style=flat)](https://www.nuget.org/packages/Audit.WebApi/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.WebApi.svg)](https://www.nuget.org/packages/Audit.WebApi/)
 
 # IMPORTANT NOTE
 
