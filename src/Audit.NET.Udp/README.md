@@ -13,6 +13,7 @@ PM> Install-Package Audit.NET.Udp
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.Udp.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.Udp/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.Udp.svg)](https://www.nuget.org/packages/Audit.NET.Udp/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
