@@ -246,97 +246,105 @@ using(var context = new MyEntitites())
 
 Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions) for more information.
 
-## Output samples
-- Output sample for a failed insert operation:
-```javascript
+## Entity Framework Data Provider
+
+If you plan to store the audit logs in the same database as the audited entities, you can use the `EntityFrameworkDataProvider`. Use this if you plan to store the audit trails 
+for each entity type in a table with similar structure.
+
+For example, you want to audit the `Order` and `OrderItem` entity types into the `Audit_Order` and `Audit_OrderItem` trail tables respectively, 
+and the structure of the `Audit_*` tables mimic the original table plus some fields like the event date, an action and the username.
+
+[IMAGE]
+
+Note the audit trail tables must be mapped on the same model as the audited entities.
+
+### EF Provider configuration
+
+To set the EntityFramework data provider globally, set the static `Audit.Core.Configuration.DataProvider` property to a new `EntityFrameworkDataProvider`:
+
+```c#
+Audit.Core.Configuration.DataProvider = new EntityFrameworkDataProvider()
 {
-	"EventType": "Blogs_MyEntities",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.UnitTest.AuditTests.TestEF()",
-		"Exception": "Exception: Exception from HRESULT: 0xE0434352",
-		"Culture": "en-GB"
-	},
-	"StartDate": "2016-09-06T21:11:57.7562152-05:00",
-	"EndDate": "2016-09-06T21:11:58.1039904-05:00",
-	"Duration": 348,
-	"EntityFrameworkEvent": {
-		"Database": "Blogs",
-		"ConnectionId": "593e082d-b6b5-440b-a048-ba223b247e9f",
-		"Entries": [{
-			"Table": "Posts",
-			"Action": "Insert",
-			"PrimaryKey": {
-				"Id": -2147482647
-			},
-			"ColumnValues": {
-				"Id": -2147482647,
-				"BlogId": 1,
-				"Content": "content",
-				"DateCreated": "2016-09-07T01:05:51.1972469-05:00",
-				"Title": "title VERY LONG_________________"
-			},
-			"Valid": false,
-			"ValidationResults": ["The field Title must be a string or array type with a maximum length of '20'."]
-		}],
-		"Result": 0,
-		"Success": false,
-		"ErrorMessage": "(DbUpdateException) An error occurred while updating the entries. See the inner exception for details. -> String or binary data would be truncated."
-	}
-}
+    AuditTypeMapper = t => t == typeof(Order) ? typeof(Audit_Order) : t == typeof(OrderItem) ? typeof(Audit_OrderItem) : null,
+    AuditEntityAction = (evt, entry, auditEntity) =>
+    {
+        var a = (dynamic)auditEntity;
+        a.AuditDate = DateTime.UtcNow;
+        a.UserName = evt.Environment.UserName;
+        a.AuditAction = entry.Action; // Insert, Update, Delete
+    }
+};
 ```
 
-- Output sample for a successful multiple operation (update+delete) within a transaction:
-```javascript
-{
-	"EventType": "Blogs_MyEntities",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.UnitTest.AuditTests.TestEF()",
-		"Exception": null,
-		"Culture": "en-GB"
-	},
-	"StartDate": "2016-09-07T11:36:16.2643822-05:00",
-	"EndDate": "2016-09-07T11:36:20.410577-05:00",
-	"Duration": 4146,
-	"EntityFrameworkEvent": {
-		"Database": "Blogs",
-		"ConnectionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef",
-		"TransactionId": "d37ddc34-8ecb-4f08-b95b-598807ff3cef_1",
-		"Entries": [{
-			"Table": "Blogs",
-			"Action": "Update",
-			"PrimaryKey": {
-				"Id": 1
-			},
-			"Changes": [{
-				"ColumnName": "BloggerName",
-				"OriginalValue": "fede",
-				"NewValue": "Federico"
-			}],
-			"Valid": true
-		},
-		{
-			"Table": "Posts",
-			"Action": "Delete",
-			"PrimaryKey": {
-				"Id": 5
-			},
-			"ColumnValues": {
-				"Id": 5,
-				"BlogId": 2,
-				"Content": "this is an example",
-				"DateCreated": "2016-09-07T11:36:10.973",
-				"Title": "my post 5"
-			},
-			"Valid": true
-		}],
-		"Result": 2,
-		"Success": true
-	}
-}
+Or use the [fluent API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api) `UseEntityFramework` method:
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(ef => ef
+        .AuditTypeExplicitMapper(m => m
+            .Map<Order, Audit_Order>()
+            .Map<OrderItem, Audit_OrderItem>())
+        .AuditEntityAction<IAudit>((evt, entry, auditEntity) =>
+        {
+            auditEntity.AuditDate = DateTime.UtcNow;
+            auditEntity.UserName = evt.Environment.UserName;
+            auditEntity.AuditAction = entry.Action; // Insert, Update, Delete
+        }));
+```
+
+### EF Provider Options
+
+Mandatory:
+- **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
+- **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties.
+
+Optional:
+- **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is true).
+
+### EF Provider configuration examples
+
+The `UseEntityFramework` method provides several ways to indicate the Type Mapper and the Audit Action.
+
+You can map the audited entity to its audit trail entity by the entity name using the `AuditTypeNameMapper` method, for example to prepend `Audit_` to the entity name. 
+This assumes both entity types are defined on the same assembly and namespace:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(x => x
+        .AuditTypeNameMapper(typeName => "Audit_" + typeName)
+        .AuditEntityAction((ev, ent, auditEntity) =>
+        {
+        // auditEntity is object
+	    ((dynamic)auditEntity).AuditDate = DateTime.UtcNow;
+        }));
+```
+
+If your audit trail entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
+to configure the action to be performed to each audit trail entity before saving:
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(x => x
+        .AuditTypeNameMapper(typeName => "Audit_" + typeName)
+        .AuditEntityAction<IAudit>((ev, ent, auditEntity) =>
+        {
+            // auditEntity is of IAudit type
+            auditEntity.AuditDate = DateTime.UtcNow;
+        }));
+```
+
+Use the explicit mapper to provide granular configuration per audit type:
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(x => x
+        .AuditTypeExplicitMapper(m => m
+            .Map<Order, Audit_Order>((order, auditOrder) => 
+            { 
+                // This action is executed only for Audit_Order entities
+                auditOrder.Status = "Order-" + order.Status; 
+            })
+            .Map<OrderItem, Audit_OrderItem>()
+            .AuditEntityAction<IAudit>((ev, ent, auditEntity) =>
+            {
+                // This common action executes for every audited entity
+                auditEntity.AuditDate = DateTime.UtcNow;
+            })));
 ```

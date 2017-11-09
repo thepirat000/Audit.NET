@@ -1,6 +1,10 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
-
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+using Microsoft.EntityFrameworkCore;
+#elif NET45
+using System.Data.Entity;
+#endif
 namespace Audit.EntityFramework
 {
     public class EntityFrameworkEvent
@@ -19,5 +23,7 @@ namespace Audit.EntityFramework
         public bool Success { get; set; }
         [JsonProperty(Order = 40, NullValueHandling = NullValueHandling.Ignore)]
         public string ErrorMessage { get; set; }
+        [JsonIgnore]
+        internal DbContext DbContext { get; set; }
     }
 }

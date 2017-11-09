@@ -76,7 +76,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs after the action method is invoked.
         /// </summary>
-        /// <param name="actionExecutedContext">The action executed context.</param>
+        /// <param name="context">The action executed context.</param>
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             var httpContext = context.HttpContext;

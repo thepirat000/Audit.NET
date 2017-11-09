@@ -176,6 +176,10 @@ namespace Audit.EntityFramework
             return await SaveChangesAsync(default(CancellationToken));
         }
 #endif
+        internal int SaveChangesBypassAudit()
+        {
+            return base.SaveChanges();
+        }
         #endregion
     }
 }

@@ -108,7 +108,8 @@ namespace Audit.EntityFramework
                 Entries = new List<EventEntry>(),
                 Database = dbContext.Database.Connection.Database,
                 ConnectionId = clientConnectionId,
-                TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId)
+                TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId),
+                DbContext = dbContext
             };
             foreach (var entry in modifiedEntries)
             {

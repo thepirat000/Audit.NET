@@ -2,11 +2,16 @@
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
+using Audit.EntityFramework.Providers;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 
 namespace Audit.IntegrationTest
@@ -14,6 +19,91 @@ namespace Audit.IntegrationTest
     [TestFixture(Category ="EF")]
     public class EntityFrameworkTests_Net45
     {
+        [Test]
+        public void Test_EFDataProvider()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(x => x
+                    .AuditTypeExplicitMapper(_ => _
+                        .Map<Order, OrderAudit>((order, auditOrder) => { auditOrder.Status = "Order-" + order.Status; })
+                        .Map<Orderline, OrderlineAudit>()
+                        .AuditEntityAction<AuditBase>((ev, ent, auditEntity) =>
+                        {
+                            auditEntity.AuditDate = DateTime.UtcNow;
+                            auditEntity.UserName = ev.Environment.UserName;
+                            auditEntity.AuditStatus = ent.Action;
+                        })));
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending",
+                    OrderLines = new Collection<Orderline>()
+                    {
+                        new Orderline() { Product = "p1: " + id, Quantity = 2 },
+                        new Orderline() { Product = "p2: " + id, Quantity = 3 }
+                    }
+                };
+                ctx.Set(typeof(Order)).Add(o);
+                ctx.SaveChanges();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = ctx.Order.Single(a => a.Number.Equals(id));
+                var orderAudit = ctx.OrderAudit.AsNoTracking().SingleOrDefault(a => a.Id.Equals(order.Id));
+                Assert.NotNull(orderAudit);
+                var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
+                Assert.AreEqual(2, orderlineAudits.Count);
+                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
+                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
+                Assert.AreEqual("Insert", orderAudit.AuditStatus);
+                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
+                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
+                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
+                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
+                Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = ctx.Order.Single(a => a.Number.Equals(id));
+                o.Status = "Cancelled";
+                ctx.SaveChanges();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var orderAudits = ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToList();
+                Assert.AreEqual(2, orderAudits.Count);
+                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
+                Assert.AreEqual("Order-Cancelled", orderAudits[0].Status);
+                Assert.AreEqual("Order-Pending", orderAudits[1].Status);
+                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = ctx.Order.Single(a => a.Number.Equals(id));
+                var ol = ctx.Orderline.Single(a => a.OrderId.Equals(order.Id) && a.Product.StartsWith("p1"));
+                ctx.Orderline.Remove(ol);
+                ctx.SaveChanges();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = ctx.Order.Single(a => a.Number.Equals(id));
+                var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).OrderByDescending(a => a.AuditDate).ToList();
+                Assert.AreEqual(3, orderlineAudits.Count);
+                Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
+                Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
+            }
+        }
+
         [Test]
         public void Test_EF_Attach()
         {
@@ -264,6 +354,65 @@ SET IDENTITY_INSERT Posts OFF
         public string Content { get; set; }
         public int BlogId { get; set; }
         public Blog Blog { get; set; }
+    }
+
+    public class Order
+    {
+        public long Id { get; set; }
+        public string Number { get; set; }
+        public string Status { get; set; }
+        public virtual ICollection<Orderline> OrderLines { get; set; }
+    }
+    public class Orderline
+    {
+        public long Id { get; set; }
+        public string Product { get; set; }
+        public int Quantity { get; set; }
+
+        public long OrderId { get; set; }
+        public Order Order { get; set; }
+    }
+    public abstract class AuditBase
+    {
+        [Key, Column(Order = 1)]
+        public DateTime AuditDate { get; set; }
+        public string AuditStatus { get; set; }
+        public string UserName { get; set; }
+    }
+
+    public class OrderAudit : AuditBase
+    {
+        [Key, Column(Order = 0)]
+        public long Id { get; set; }
+        public string Number { get; set; }
+        public string Status { get; set; }
+    }
+    public class OrderlineAudit : AuditBase
+    {
+        [Key, Column(Order = 0)]
+        public long Id { get; set; }
+        public string Product { get; set; }
+        public int Quantity { get; set; }
+        public long OrderId { get; set; }
+    }
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class AuditPerTableContext : AuditDbContext
+    {
+        public AuditPerTableContext()
+            : base("data source=localhost;initial catalog=Audit;integrated security=true;")
+        {
+        }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            Database.SetInitializer<AuditPerTableContext>(null);
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        }
+
+        public DbSet<Order> Order { get; set; }
+        public DbSet<Orderline> Orderline { get; set; }
+        public DbSet<OrderAudit> OrderAudit { get; set; }
+        public DbSet<OrderlineAudit> OrderlineAudit { get; set; }
     }
 }
 #endif
