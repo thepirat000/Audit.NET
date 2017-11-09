@@ -255,7 +255,7 @@ for each entity type in a table with similar structure.
 For example, you want to audit the `Order` and `OrderItem` entity types into the `Audit_Order` and `Audit_OrderItem` trail tables respectively, 
 and the structure of the `Audit_*` tables mimic the original table plus some fields like the event date, an action and the username.
 
-[IMAGE]
+![Audit entities](http://i.imgur.com/QvfXS9H.png)
 
 Note the audit trail tables must be mapped on the same model as the audited entities.
 
