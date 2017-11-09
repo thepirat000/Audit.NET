@@ -16,6 +16,7 @@ PM> Install-Package Audit.Mvc
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.Mvc.svg?style=flat)](https://www.nuget.org/packages/Audit.Mvc/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.Mvc.svg)](https://www.nuget.org/packages/Audit.Mvc/)
 
 # IMPORTANT NOTE
 

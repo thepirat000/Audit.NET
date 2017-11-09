@@ -12,7 +12,8 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET.Redis
 ```
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.SqlServer.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.Redis/)
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.Redis.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.Redis/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.Redis.svg)](https://www.nuget.org/packages/Audit.NET.Redis/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)

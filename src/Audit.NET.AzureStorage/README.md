@@ -13,6 +13,7 @@ PM> Install-Package Audit.NET.AzureStorage
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureStorage.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureStorage/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.AzureStorage.svg)](https://www.nuget.org/packages/Audit.NET.AzureStorage/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)

@@ -18,6 +18,7 @@ PM> Install-Package Audit.DynamicProxy
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.DynamicProxy.svg?style=flat)](https://www.nuget.org/packages/Audit.DynamicProxy/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.DynamicProxy.svg)](https://www.nuget.org/packages/Audit.DynamicProxy/)
 
 ## Usage
 

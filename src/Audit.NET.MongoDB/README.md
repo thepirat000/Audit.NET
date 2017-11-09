@@ -12,6 +12,7 @@ PM> Install-Package Audit.NET.MongoDB
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.MongoDB.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.MongoDB/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.MongoDB.svg)](https://www.nuget.org/packages/Audit.NET.MongoDB/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
