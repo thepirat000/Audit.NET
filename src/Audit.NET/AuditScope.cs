@@ -70,6 +70,7 @@ namespace Audit.Core
                 };
             }
             ProcessExtraFields(options.ExtraFields);
+            _saveMode = SaveMode.InsertOnStart;
             // Execute custom on scope created actions
             Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
 
@@ -83,11 +84,35 @@ namespace Audit.Core
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
                 SaveEvent();
+                if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                {
+                    _saveMode = SaveMode.ReplaceOnEnd;
+                }
+                else
+                {
+                    _saveMode = SaveMode.InsertOnEnd;
+                }
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            {
+                _saveMode = SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.Manual)
+            {
+                _saveMode = SaveMode.Manual;
             }
         }
 #endregion
 
 #region Public Properties
+        /// <summary>
+        /// The current save mode. Useful on custom actions to determine the saving trigger.
+        /// </summary>
+        public SaveMode SaveMode
+        {
+            get { return _saveMode; }
+        }
+
         /// <summary>
         /// Indicates the change type
         /// </summary>
@@ -134,9 +159,10 @@ namespace Audit.Core
                 return _creationPolicy;
             }
         }
-#endregion
+        #endregion
 
-#region Private fields
+        #region Private fields
+        private SaveMode _saveMode;
         private EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
         private object _eventId;

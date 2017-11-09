@@ -14,6 +14,131 @@ namespace Audit.UnitTest
     public class UnitTest
     {
         [Test]
+        public void Test_ScopeSaveMode_CreateAndSave()
+        {
+            var modes = new List<SaveMode>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev => { })
+                    .OnReplace((id, ev) => { }))
+                .WithCreationPolicy(EventCreationPolicy.Manual)
+                .WithAction(a => a
+                    .OnEventSaving(scope => 
+                    {
+                        modes.Add(scope.SaveMode);
+                    }));
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { IsCreateAndSave = true }))
+            {
+                scope.Save();
+            }
+
+            Assert.AreEqual(1, modes.Count);
+            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
+        }
+
+        [Test]
+        public void Test_ScopeSaveMode_InsertOnStartReplaceOnEnd()
+        {
+            var modes = new List<SaveMode>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev => { })
+                    .OnReplace((id, ev) => { }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                .WithAction(a => a
+                    .OnEventSaving(scope =>
+                    {
+                        modes.Add(scope.SaveMode);
+                    }));
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            {
+                scope.Save();
+            }
+
+            Assert.AreEqual(3, modes.Count);
+            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
+            Assert.AreEqual(SaveMode.ReplaceOnEnd, modes[1]);
+            Assert.AreEqual(SaveMode.ReplaceOnEnd, modes[2]);
+        }
+
+        [Test]
+        public void Test_ScopeSaveMode_InsertOnStartInsertOnEnd()
+        {
+            var modes = new List<SaveMode>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev => { })
+                    .OnReplace((id, ev) => { }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd)
+                .WithAction(a => a
+                    .OnEventSaving(scope =>
+                    {
+                        modes.Add(scope.SaveMode);
+                    }));
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            {
+                scope.Save();
+            }
+
+            Assert.AreEqual(3, modes.Count);
+            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
+            Assert.AreEqual(SaveMode.InsertOnEnd, modes[1]);
+            Assert.AreEqual(SaveMode.InsertOnEnd, modes[2]);
+        }
+
+        [Test]
+        public void Test_ScopeSaveMode_InsertOnEnd()
+        {
+            var modes = new List<SaveMode>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev => { })
+                    .OnReplace((id, ev) => { }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(a => a
+                    .OnEventSaving(scope =>
+                    {
+                        modes.Add(scope.SaveMode);
+                    }));
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            {
+                scope.Save();
+            }
+
+            Assert.AreEqual(2, modes.Count);
+            Assert.AreEqual(SaveMode.InsertOnEnd, modes[0]);
+            Assert.AreEqual(SaveMode.InsertOnEnd, modes[1]);
+        }
+
+        [Test]
+        public void Test_ScopeSaveMode_Manual()
+        {
+            var modes = new List<SaveMode>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsert(ev => { })
+                    .OnReplace((id, ev) => { }))
+                .WithCreationPolicy(EventCreationPolicy.Manual)
+                .WithAction(a => a
+                    .OnEventSaving(scope =>
+                    {
+                        modes.Add(scope.SaveMode);
+                    }));
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            {
+                scope.Save();
+            }
+
+            Assert.AreEqual(1, modes.Count);
+            Assert.AreEqual(SaveMode.Manual, modes[0]);
+        }
+
+        [Test]
         public void Test_ScopeActionsStress()
         {
             int counter = 0;
