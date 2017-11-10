@@ -2,6 +2,7 @@
 using Audit.MongoDB.Providers;
 using Audit.Core.ConfigurationApi;
 using Audit.MongoDB.ConfigurationApi;
+using Newtonsoft.Json;
 
 namespace Audit.Core
 {
@@ -13,14 +14,16 @@ namespace Audit.Core
         /// <param name="connectionString">The mongo DB connection string.</param>
         /// <param name="database">The mongo DB database name.</param>
         /// <param name="collection">The mongo DB collection name.</param>
+        /// <param name="jsonSerializerSettings">The custom JsonSerializerSettings.</param>
         public static ICreationPolicyConfigurator UseMongoDB(this IConfigurator configurator, string connectionString = "mongodb://localhost:27017",
-            string database = "Audit", string collection = "Event")
+            string database = "Audit", string collection = "Event", JsonSerializerSettings jsonSerializerSettings = null)
         {
             Configuration.DataProvider = new MongoDataProvider()
             {
                 ConnectionString = connectionString,
                 Collection = collection,
-                Database = database
+                Database = database,
+                JsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }
             };
             return new CreationPolicyConfigurator();
         }
@@ -32,7 +35,7 @@ namespace Audit.Core
         {
             var mongoConfig = new MongoProviderConfigurator();
             config.Invoke(mongoConfig);
-            return UseMongoDB(configurator, mongoConfig._connectionString, mongoConfig._database, mongoConfig._collection);
+            return UseMongoDB(configurator, mongoConfig._connectionString, mongoConfig._database, mongoConfig._collection, mongoConfig._jsonSerializerSettings);
         }
     }
 }

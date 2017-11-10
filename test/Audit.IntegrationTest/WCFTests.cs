@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Newtonsoft.Json;
 
-namespace Audit.IntegrationTest
+namespace Audit.IntegrationTest.Wcf
 {
     public class WCFTests
     {

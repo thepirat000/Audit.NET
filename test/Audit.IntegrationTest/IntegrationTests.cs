@@ -16,6 +16,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
 using Audit.AzureDocumentDB.Providers;
 using Audit.AzureDocumentDB.ConfigurationApi;
+using Newtonsoft.Json;
 
 namespace Audit.IntegrationTest
 {
@@ -210,10 +211,11 @@ namespace Audit.IntegrationTest
                         }
                     });
 
-
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
-                
+
+                Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
+                Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
@@ -361,7 +363,8 @@ namespace Audit.IntegrationTest
                     .UseMongoDB(config => config
                         .ConnectionString("mongodb://localhost:27017")
                         .Database("Audit")
-                        .Collection("Event"))
+                        .Collection("Event")
+                        .CustomSerializerSettings(new JsonSerializerSettings() {  NullValueHandling = NullValueHandling.Ignore, TypeNameHandling = TypeNameHandling.All, ReferenceLoopHandling = ReferenceLoopHandling.Ignore }))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

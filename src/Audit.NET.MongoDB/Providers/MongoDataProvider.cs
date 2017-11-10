@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Audit.Core;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Audit.MongoDB.Providers
 {
@@ -25,6 +26,7 @@ namespace Audit.MongoDB.Providers
         private string _database = "Audit";
         private string _collection = "Event";
         private bool _ignoreElementNames = false;
+        private JsonSerializerSettings _jsonSerializerSettings =  new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
         static MongoDataProvider()
         {
@@ -69,6 +71,15 @@ namespace Audit.MongoDB.Providers
             set { _ignoreElementNames = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the default JsonSerializerSettings.
+        /// </summary>
+        public JsonSerializerSettings JsonSerializerSettings
+        {
+            get { return _jsonSerializerSettings; }
+            set { _jsonSerializerSettings = value; }
+        }
+
         private static void ConfigureBsonMapping()
         {
             var pack = new ConventionPack();
@@ -94,7 +105,7 @@ namespace Audit.MongoDB.Providers
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(_collection);
             SerializeExtraFields(auditEvent);
-            var doc = auditEvent.ToBsonDocument();
+            var doc = ParseBson(auditEvent);
             if (!_ignoreElementNames)
             {
                 FixDocumentElementNames(doc);
@@ -108,7 +119,7 @@ namespace Audit.MongoDB.Providers
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(_collection);
             SerializeExtraFields(auditEvent);
-            var doc = auditEvent.ToBsonDocument();
+            var doc = ParseBson(auditEvent);
             if (!_ignoreElementNames)
             {
                 FixDocumentElementNames(doc);
@@ -123,6 +134,11 @@ namespace Audit.MongoDB.Providers
             {
                 auditEvent.CustomFields[k] = Serialize(auditEvent.CustomFields[k]);
             }
+        }
+
+        private BsonDocument ParseBson(AuditEvent auditEvent)
+        {
+            return BsonDocument.Parse(JsonConvert.SerializeObject(auditEvent, _jsonSerializerSettings));
         }
 
         /// <summary>
@@ -175,25 +191,7 @@ namespace Audit.MongoDB.Providers
             {
                 return null;
             }
-            // if is a serialized document already, return that.
-            if (value is BsonDocument)
-            {
-                return value;
-            }
-            // if can be converted to bsonvalue, return the value
-            try
-            {
-                BsonValue bsonValue;
-                if (BsonTypeMapper.TryMapToBsonValue(value, out bsonValue))
-                {
-                    return value;
-                }
-            }
-            catch
-            {
-                // ignored. TryMapToBsonValue can throw exception (i.e. when the type is an array of objects that cannot be mapped to a bsonvalue)
-            }
-            return value.ToBsonDocument(typeof(object));
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, _jsonSerializerSettings));
         }
 
         private void TestConnection()
