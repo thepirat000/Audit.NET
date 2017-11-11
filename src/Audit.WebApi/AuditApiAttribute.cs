@@ -1,6 +1,7 @@
 ﻿#if NET45
 using Audit.Core;
 using Audit.Core.Extensions;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -33,6 +34,10 @@ namespace Audit.WebApi
         /// </summary>
         public bool IncludeRequestBody { get; set; }
         /// <summary>
+        /// Gets or sets a value indicating whether the action arguments should be pre-serialized to the audit event.
+        /// </summary>
+        public bool SerializeActionParameters { get; set; }
+        /// <summary>
         /// Gets or sets a string indicating the event type to use.
         /// Can contain the following placeholders:
         /// - {controller}: replaced with the controller name.
@@ -63,7 +68,7 @@ namespace Audit.WebApi
                 Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = actionContext.ActionArguments,
+                ActionParameters = GetActionParameters(actionContext.ActionArguments),
                 RequestBody = IncludeRequestBody ? GetRequestBody(contextWrapper) : null
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
@@ -97,7 +102,7 @@ namespace Audit.WebApi
             if (auditAction != null && auditScope != null)
             {
                 auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
-                auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(actionExecutedContext.ActionContext.ModelState) : null;
+                auditAction.ModelStateErrors = IncludeModelState ? AuditApiHelper.GetModelStateErrors(actionExecutedContext.ActionContext.ModelState) : null;
                 auditAction.ModelStateValid = IncludeModelState ? actionExecutedContext.ActionContext.ModelState?.IsValid : null;
                 if (actionExecutedContext.Response != null)
                 {
@@ -146,6 +151,15 @@ namespace Audit.WebApi
             return null;
         }
 
+        private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)
+        {
+            if (SerializeActionParameters)
+            {
+                return AuditApiHelper.SerializeParameters(actionArguments);
+            }
+            return actionArguments;
+        }
+
         private static IDictionary<string, string> ToDictionary(HttpRequestHeaders col)
         {
             if (col == null)
@@ -174,22 +188,6 @@ namespace Audit.WebApi
             return dict;
         }
 
-        private static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)
-        {
-            if (modelState == null)
-            {
-                return null;
-            }
-            var dict = new Dictionary<string, string>();
-            foreach (var state in modelState)
-            {
-                if (state.Value.Errors.Count > 0)
-                {
-                    dict.Add(state.Key, string.Join(", ", state.Value.Errors.Select(e => e.ErrorMessage)));
-                }
-            }
-            return dict.Count > 0 ? dict : null;
-        }
 
         internal static AuditScope GetCurrentScope(HttpRequestMessage request)
         {

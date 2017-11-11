@@ -116,7 +116,8 @@ namespace Audit.Mvc.UnitTest
             };
             var args = new Dictionary<string, object>()
             {
-                {"test1", "value1" }
+                {"test1", "value1" },
+                {"x", new AuditAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
@@ -128,7 +129,8 @@ namespace Audit.Mvc.UnitTest
             {
                 IncludeHeaders = true,
                 IncludeModel = true,
-                EventTypeName = "TestEvent"
+                EventTypeName = "TestEvent",
+                SerializeActionParameters = true
             };
 
             var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
@@ -137,10 +139,11 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
+            (args["x"] as AuditAttribute).EventTypeName = "CHANGED!";
+
             Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ActionParameters["test1"]);
             Assert.Null(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
-
-
+            
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
             filter.OnActionExecuted(actionExecutedContext);
@@ -152,6 +155,7 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
+            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditAttribute).EventTypeName);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);

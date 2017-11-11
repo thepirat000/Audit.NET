@@ -225,10 +225,7 @@ namespace Audit.WebApi.UnitTest
             var actionDescriptor = new Mock<HttpActionDescriptor>();
             actionDescriptor.Setup(c => c.ActionName).Returns("get");
 
-            var args = new Dictionary<string, object>()
-            {
-                {"test1", "value1" }
-            };
+            var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
 
             var dataProvider = new Mock<AuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
@@ -239,7 +236,8 @@ namespace Audit.WebApi.UnitTest
                 IncludeHeaders = true,
                 IncludeModelState = true,
                 IncludeResponseBody = true,
-                EventTypeName = "TestEvent"
+                EventTypeName = "TestEvent",
+                SerializeActionParameters = true
             };
             var actionContext = new HttpActionContext()
             {
@@ -249,12 +247,15 @@ namespace Audit.WebApi.UnitTest
             };
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
+            actionExecutingContext.ActionArguments.Add("x", arg);
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
 
             filter.OnActionExecuting(actionExecutingContext);
 
             var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
+
+            arg.EventTypeName = "CHANGED!";
 
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
             actionExecutedContext.Response = new System.Net.Http.HttpResponseMessage()
@@ -267,6 +268,8 @@ namespace Audit.WebApi.UnitTest
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
+            var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
+            Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.AreEqual(action, actionFromController);

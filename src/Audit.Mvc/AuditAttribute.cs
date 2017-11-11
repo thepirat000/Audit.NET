@@ -31,6 +31,10 @@ namespace Audit.Mvc
         /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </summary>
         public string EventTypeName { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the action arguments should be pre-serialized to the audit event.
+        /// </summary>
+        public bool SerializeActionParameters { get; set; }
 
         private const string AuditActionKey = "__private_AuditAction__";
         private const string AuditScopeKey = "__private_AuditScope__";
@@ -54,7 +58,7 @@ namespace Audit.Mvc
                 HttpMethod = request.HttpMethod,
                 ActionName = filterContext.ActionDescriptor?.ActionName,
                 ControllerName = filterContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = filterContext.ActionParameters?.ToDictionary(k => k.Key, v => v.Value)
+                ActionParameters = GetActionParameters(filterContext.ActionParameters)
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
@@ -81,7 +85,7 @@ namespace Audit.Mvc
             var auditAction = filterContext.HttpContext.Items[AuditActionKey] as AuditAction;
             if (auditAction != null)
             {
-                auditAction.ModelStateErrors = IncludeModel ? GetModelStateErrors(filterContext.Controller?.ViewData.ModelState) : null;
+                auditAction.ModelStateErrors = IncludeModel ? AuditHelper.GetModelStateErrors(filterContext.Controller?.ViewData.ModelState) : null;
                 auditAction.Model = IncludeModel ? filterContext.Controller?.ViewData.Model : null;
                 auditAction.ModelStateValid = IncludeModel ? filterContext.Controller?.ViewData.ModelState.IsValid : null;
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
@@ -123,6 +127,15 @@ namespace Audit.Mvc
             base.OnResultExecuted(filterContext);
         }
 
+        private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)
+        {
+            if (SerializeActionParameters)
+            {
+                return AuditHelper.SerializeParameters(actionArguments);
+            }
+            return actionArguments.ToDictionary(k => k.Key, v => v.Value);
+        }
+
         private static IDictionary<string, string> ToDictionary(NameValueCollection col)
         {
             if (col == null)
@@ -135,23 +148,6 @@ namespace Audit.Mvc
                 dict.Add(k, col[k]);
             }
             return dict;
-        }
-
-        private static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)
-        {
-            if (modelState == null)
-            {
-                return null;
-            }
-            var dict = new Dictionary<string, string>();
-            foreach (var state in modelState)
-            {
-                if (state.Value.Errors.Count > 0)
-                {
-                    dict.Add(state.Key, string.Join(", ", state.Value.Errors.Select(e => e.ErrorMessage)));
-                }
-            }
-            return dict.Count > 0 ? dict : null;
         }
 
         internal static AuditScope GetCurrentScope(HttpContextBase httpContext)

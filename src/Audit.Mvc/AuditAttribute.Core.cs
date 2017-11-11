@@ -34,6 +34,10 @@ namespace Audit.Mvc
         /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </summary>
         public string EventTypeName { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the action arguments should be pre-serialized to the audit event.
+        /// </summary>
+        public bool SerializeActionParameters { get; set; }
 
         private const string AuditActionKey = "__private_AuditAction__";
         private const string AuditScopeKey = "__private_AuditScope__";
@@ -54,7 +58,7 @@ namespace Audit.Mvc
                 Headers = IncludeHeaders ? ToDictionary(httpContext.Request.Headers) : null,
                 ActionName = actionDescriptior != null ? actionDescriptior.ActionName : actionDescriptior.DisplayName,
                 ControllerName = actionDescriptior != null ? actionDescriptior.ControllerName : null,
-                ActionParameters = filterContext.ActionArguments
+                ActionParameters = GetActionParameters(filterContext.ActionArguments)
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
@@ -116,6 +120,15 @@ namespace Audit.Mvc
                 auditScope.Dispose();
             }
             base.OnResultExecuted(filterContext);
+        }
+
+        private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)
+        {
+            if (SerializeActionParameters)
+            {
+                return AuditHelper.SerializeParameters(actionArguments);
+            }
+            return actionArguments.ToDictionary(k => k.Key, v => v.Value);
         }
 
         private static IDictionary<string, string> ToDictionary(IEnumerable<KeyValuePair<string, StringValues>> col)
