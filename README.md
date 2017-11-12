@@ -528,7 +528,7 @@ The following packages are extensions to log interactions with different systems
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
-[![Storage providers](https://i.imgur.com/jBglNwZ.png)]()
+[![Storage providers](https://i.imgur.com/V8yfhkl.png)]()
 
 | Package | Description | 
 | ------------------- | ------------------ |
