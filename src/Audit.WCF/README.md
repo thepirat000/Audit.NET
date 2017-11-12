@@ -131,7 +131,7 @@ With this information, you can not just know who did the operation, but also mea
 
 The following table describes the Audit.Wcf output fields:
 
-- <h3>[AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs)</h3>
+- ### [AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs)
 
 Describes an audited WCF event
 
@@ -152,7 +152,7 @@ Describes an audited WCF event
 | InputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Input parameters object values |
 | OutputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Output parameters object values |
 
-- <h3>[AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)</h3>
+- ### [AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)
 
 Describes a WCF fault/exception
 
@@ -165,7 +165,7 @@ Describes a WCF fault/exception
 | FaultReason | string | The fault reason |
 | FaultDetails | [AuditWcfEventElement](#AuditWcfEventElement) | The detail object related to the fault |
 
-- <h3>[AuditWcfEventElement](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventElement.cs)</h3>
+- ### [AuditWcfEventElement](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventElement.cs)
 
 Describes an element/object related to the WCF audit event.
 
