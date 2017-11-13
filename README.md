@@ -528,6 +528,8 @@ The following packages are extensions to log interactions with different systems
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
+<img src="https://i.imgur.com/TG6J1Ff.png" alt="Audit.NET Extensions" width="500" />
+
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
 <img src="https://i.imgur.com/lmzs1gw.png" alt="icon" width="80"/> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
