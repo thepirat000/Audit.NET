@@ -516,13 +516,13 @@ The following packages are extensions to log interactions with different systems
 
 ![Audit.NET Extensions](http://i.imgur.com/CFC92Wq.png)
 
-Package | Description 
-------------------- | ------------------
-**[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)** | Generate detailed server-side audit logs for **Windows Communication Foundation (WCF)** service calls, by configuring a provided behavior.
-**[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)** | Generate detailed audit logs for CRUD operations on **Entity Framework**, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
-**[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)** | Generate detailed audit logs by decorating **Web API** Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core.
-**[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)** | Generate detailed audit logs by decorating **MVC** Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.
-**[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for any class without changing its code by using a proxy.
+<a></a> | Package | Description 
+------------ | ------------------- | ------------------
+<img src="https://i.imgur.com/Sl1hHBz.png" alt="icon" width="128" /> | **[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)** | Generate detailed server-side audit logs for **Windows Communication Foundation (WCF)** service calls, by configuring a provided behavior.
+<img src="https://i.imgur.com/T3NcXaZ.png" alt="icon" width="128"/> | **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)** | Generate detailed audit logs for CRUD operations on **Entity Framework**, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
+<img src="https://i.imgur.com/GkqLSk8.png" alt="icon" width="128"/> | **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)** | Generate detailed audit logs by decorating **Web API** Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core.
+<img src="https://i.imgur.com/5YjHlfd.png" alt="icon" width="128"/> | **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)** | Generate detailed audit logs by decorating **MVC** Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.
+<img src="https://i.imgur.com/hVMM5WF.png" alt="icon" width="128"/> | **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for any class without changing its code by using a proxy.
 
 # Storage providers
 
@@ -530,13 +530,13 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
-<img src="https://i.imgur.com/O4sLsQz.png" alt="icon" width="32" height="32"/> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
-<img src="https://i.imgur.com/PFqjskA.png" alt="icon" width="33" height="32"/> | **[Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md)** | Store the events as rows in **MySQL** database, in JSON format.
-<img src="https://i.imgur.com/qcACnBT.png" alt="icon" width="35" height="32"/> | **[Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md)** | Store the events as rows in a **PostgreSQL** database, in JSON format.
-<img src="https://i.imgur.com/576AU2A.png" alt="icon" width="60" height="32"/> | **[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)** | Store the events in a **Mongo DB** Collection, in BSON format.
-<img src="https://i.imgur.com/Ev87mf9.png" alt="icon" width="35" height="32"/> | **[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)** | Store the events in an **Azure Document DB** Collection, in JSON format.
-<img src="https://i.imgur.com/22VFb3x.png" alt="icon" width="32" height="32"/> | **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)** | Store the events in an **Azure Blob Storage** container, in JSON format.
-<img src="https://i.imgur.com/TXjb2JI.png" alt="icon" width="32" height="32"/> | **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)** | Send Audit Logs as **UDP datagrams** to a network.
-<img src="https://i.imgur.com/p9GXVIH.png" alt="icon" width="32" height="32"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set or publishing to a Redis PubSub channel.
+<img src="https://i.imgur.com/1h5deC6.png" alt="icon" width="60"/> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
+<img src="https://i.imgur.com/PFqjskA.png" alt="icon" width="60"/> | **[Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md)** | Store the events as rows in **MySQL** database, in JSON format.
+<img src="https://i.imgur.com/qcACnBT.png" alt="icon" width="60"/> | **[Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md)** | Store the events as rows in a **PostgreSQL** database, in JSON format.
+<img src="https://i.imgur.com/He2BWJT.png" alt="icon" width="60"/> | **[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)** | Store the events in a **Mongo DB** Collection, in BSON format.
+<img src="https://i.imgur.com/Ev87mf9.png" alt="icon" width="60"/> | **[Audit.NET.AzureDocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md)** | Store the events in an **Azure Document DB** Collection, in JSON format.
+<img src="https://i.imgur.com/22VFb3x.png" alt="icon" width="60"/> | **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)** | Store the events in an **Azure Blob Storage** container, in JSON format.
+<img src="https://i.imgur.com/TXjb2JI.png" alt="icon" width="60"/> | **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)** | Send Audit Logs as **UDP datagrams** to a network.
+<img src="https://i.imgur.com/p9GXVIH.png" alt="icon" width="60"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set or publishing to a Redis PubSub channel.
 
 
