@@ -528,8 +528,6 @@ Package | Description
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
-[![Storage providers](https://i.imgur.com/V8yfhkl.png)]()
-
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
 <img src="https://i.imgur.com/O4sLsQz.png" alt="icon" width="32" height="32"/> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
