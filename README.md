@@ -526,7 +526,7 @@ The following packages are extensions to log interactions with different systems
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
-<img src="https://i.imgur.com/TG6J1Ff.png" alt="Audit.NET Extensions" width="500" />
+<img src="https://i.imgur.com/TG6J1Ff.png" alt="Audit.NET Extensions" width="400" />
 
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
