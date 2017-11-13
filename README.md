@@ -514,8 +514,6 @@ Audit.Core.Configuration.Setup()
 
 The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
 
-![Audit.NET Extensions](http://i.imgur.com/CFC92Wq.png)
-
 <a></a> | Package | Description 
 ------------ | ------------------- | ------------------
 <img src="https://i.imgur.com/Sl1hHBz.png" alt="icon" width="128" /> | **[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)** | Generate detailed server-side audit logs for **Windows Communication Foundation (WCF)** service calls, by configuring a provided behavior.
