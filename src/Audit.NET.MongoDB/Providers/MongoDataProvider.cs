@@ -222,7 +222,6 @@ namespace Audit.MongoDB.Providers
             var db = client.GetDatabase(_database);
             return db.GetCollection<AuditEvent>(_collection).AsQueryable();
         }
-
         /// <summary>
         /// Returns an IQueryable that enables querying against the audit events stored on Azure Document DB, for the audit event type given.
         /// </summary>
@@ -232,6 +231,24 @@ namespace Audit.MongoDB.Providers
             var client = new MongoClient(_connectionString);
             var db = client.GetDatabase(_database);
             return db.GetCollection<T>(_collection).AsQueryable();
+        }
+        /// <summary>
+        /// Returns a native mongo collection of audit events
+        /// </summary>
+        public IMongoCollection<AuditEvent> GetMongoCollection()
+        {
+            var client = new MongoClient(_connectionString);
+            var db = client.GetDatabase(_database);
+            return db.GetCollection<AuditEvent>(_collection);
+        }
+        /// <summary>
+        /// Returns a native mongo collection of audit events
+        /// </summary>
+        public IMongoCollection<T> GetMongoCollection<T>() where T : AuditEvent
+        {
+            var client = new MongoClient(_connectionString);
+            var db = client.GetDatabase(_database);
+            return db.GetCollection<T>(_collection);
         }
         #endregion
     }
