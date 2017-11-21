@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Logs into an Azure Blob Storage</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.AzureStorage</AssemblyTitle>
-    <VersionPrefix>9.0.1</VersionPrefix>
+    <VersionPrefix>9.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

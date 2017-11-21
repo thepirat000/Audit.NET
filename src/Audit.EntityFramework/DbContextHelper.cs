@@ -45,6 +45,9 @@ namespace Audit.EntityFramework
             context.Mode = attrConfig?.Mode ?? localConfig?.Mode ?? globalConfig?.Mode ?? AuditOptionMode.OptOut;
             context.IncludeEntityObjects = attrConfig?.IncludeEntityObjects ?? localConfig?.IncludeEntityObjects ?? globalConfig?.IncludeEntityObjects ?? false;
             context.AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
+#if NET45
+            context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
+#endif
         }
 
         /// <summary>
@@ -112,16 +115,23 @@ namespace Audit.EntityFramework
                     }
                 }
             }
+#if NET45
+            if (efEvent.Associations != null)
+            {
+                foreach (var association in efEvent.Associations)
+                {
+                    var e1 = association.Records[0].InternalEntity;
+                    var e2 = association.Records[1].InternalEntity;
+                    association.Records[0].PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(e1, context.DbContext);
+                    association.Records[1].PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(e2, context.DbContext);
+                }
+            }
+#endif
         }
 
         // Determines whether to include the entity on the audit log or not
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
-        private bool IncludeEntity(IAuditDbContext context, EntityEntry entry, AuditOptionMode mode)
-#elif NET45
-        private bool IncludeEntity(IAuditDbContext context, DbEntityEntry entry, AuditOptionMode mode)
-#endif
+        private bool IncludeEntity(IAuditDbContext context, Type type, AuditOptionMode mode)
         {
-            var type = entry.Entity.GetType();
 #if NET45
             type = ObjectContext.GetObjectType(type);
 #endif
@@ -234,9 +244,10 @@ namespace Audit.EntityFramework
             return context.DbContext.ChangeTracker.Entries()
                 .Where(x => x.State != EntityState.Unchanged
                          && x.State != EntityState.Detached
-                         && IncludeEntity(context, x, context.Mode))
+                         && IncludeEntity(context, x.Entity.GetType(), context.Mode))
                 .ToList();
         }
+
 
         /// <summary>
         /// Gets a unique ID for the current SQL transaction.

@@ -13,5 +13,12 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.SetIncludeEntityObjects<T>(include);
             return this;
         }
+#if NET45
+        public IContextSettingsConfigurator<T> IncludeIndependantAssociations(bool include = true)
+        {
+            Configuration.SetIncludeIndependantAssociations<T>(include);
+            return this;
+        }
+#endif
     }
 }

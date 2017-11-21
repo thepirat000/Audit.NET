@@ -22,5 +22,8 @@ namespace Audit.EntityFramework
         DbContext DbContext { get; }
         void OnScopeSaving(AuditScope auditScope);
         void OnScopeCreated(AuditScope auditScope);
+#if NET45
+        bool IncludeIndependantAssociations { get; set; }
+#endif
     }
 }

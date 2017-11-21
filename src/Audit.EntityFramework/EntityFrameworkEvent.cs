@@ -17,6 +17,10 @@ namespace Audit.EntityFramework
         public string TransactionId { get; set; }
         [JsonProperty(Order = 10)]
         public List<EventEntry> Entries { get; set; }
+#if NET45
+        [JsonProperty(Order = 15, NullValueHandling = NullValueHandling.Ignore)]
+        public List<AssociationEntry> Associations { get; set; }
+#endif
         [JsonProperty(Order = 20)]
         public int Result { get; set; }
         [JsonProperty(Order = 30)]

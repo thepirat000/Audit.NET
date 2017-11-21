@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 
@@ -19,6 +20,87 @@ namespace Audit.IntegrationTest
     [TestFixture(Category ="EF")]
     public class EntityFrameworkTests_Net45
     {
+
+        [Test]
+        public void Test_ManyToManyNoJoinEntity()
+        {
+            using (var context = new Issue78Context())
+            {
+                context.Database.ExecuteSqlCommand(@"
+if not exists (select * from sysobjects where name = 'Events')
+create table [Events]
+(
+	[EventId] int not null primary key
+)
+
+if not exists (select * from sysobjects where name = 'EventLocations')
+create table EventLocations
+(
+	EventLocationId int identity(1,1) not null primary key,
+	[Location] NVARCHAR(MAX) not null,
+	[EventId] int not null,
+	CONSTRAINT FK_EventLocations_ev FOREIGN KEY ([EventId]) REFERENCES [Events] ([EventId])
+
+)
+
+if not exists (select * from sysobjects where name = 'EventAvailabilityResponses')
+create table EventAvailabilityResponses
+(
+	EventAvailabilityResponseId NVARCHAR(36) NOT NULL PRIMARY KEY,
+	Comment NVARCHAR(4000) NOT NULL
+)
+
+if not exists (select * from sysobjects where name = 'EventAvailabilityResponseEventLocations')
+create table EventAvailabilityResponseEventLocations
+(
+	EventLocationId int not null,
+	EventAvailabilityResponseId NVARCHAR(36) NOT NULL,
+	CONSTRAINT PK_EventAvailabilityResponseEventLocations PRIMARY KEY (EventLocationId, EventAvailabilityResponseId),
+	CONSTRAINT FK_EventAvailabilityResponseEventLocations_Loc FOREIGN KEY (EventLocationId) REFERENCES EventLocations (EventLocationId),
+	CONSTRAINT FK_EventAvailabilityResponseEventLocations_Res FOREIGN KEY (EventAvailabilityResponseId) REFERENCES EventAvailabilityResponses (EventAvailabilityResponseId)
+)
+if not exists ( select * from [Events] where [EventId] = 1)
+    insert into [events] values (1)
+");
+            }
+
+            var events = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    events.Add(ev.GetEntityFrameworkEvent());
+                }));
+            var guid = Guid.NewGuid().ToString();
+            using (var context = new Issue78Context())
+            {
+
+                context.EventAvailabilityResponse.Add(new EventAvailabilityResponse()
+                {
+                    EventAvailabilityResponseId = guid,
+                    Comment = "test100",
+                    PreferredEventLocations = new List<EventLocation>() { new EventLocation() { EventLocationId = 1234, EventId = 1, Location = "loc from code" } }
+                });
+                context.SaveChanges();
+            }
+            using (var context = new Issue78Context())
+            {
+                var r = context.EventAvailabilityResponse.First(x => x.EventAvailabilityResponseId == guid);
+                r.PreferredEventLocations.Clear();
+                context.SaveChanges();
+            }
+
+            Assert.AreEqual(2, events.Count);
+            Assert.AreEqual(1, events[0].Associations.Count);
+            Assert.AreEqual(2, events[0].Entries.Count);
+            Assert.AreEqual(1, events[1].Associations.Count);
+            Assert.AreEqual(0, events[1].Entries.Count);
+            Assert.AreEqual("Insert", events[0].Associations[0].Action);
+            Assert.AreEqual("Delete", events[1].Associations[0].Action);
+            Assert.AreEqual(events[0].Associations[0].Records[0].PrimaryKey["EventLocationId"], events[1].Associations[0].Records[0].PrimaryKey["EventLocationId"]);
+            Assert.AreEqual(events[0].Associations[0].Records[1].PrimaryKey["EventAvailabilityResponseId"], events[1].Associations[0].Records[1].PrimaryKey["EventAvailabilityResponseId"]);
+            Assert.AreNotEqual(1234, (int)events[0].Associations[0].Records[0].PrimaryKey["EventLocationId"]);
+        }
+
         [Test]
         public void Test_EFDataProvider()
         {
@@ -414,5 +496,84 @@ SET IDENTITY_INSERT Posts OFF
         public DbSet<OrderAudit> OrderAudit { get; set; }
         public DbSet<OrderlineAudit> OrderlineAudit { get; set; }
     }
+
+
+    #region ManyToManyTest
+    public class EventAvailabilityResponse
+    {
+        public EventAvailabilityResponse()
+        {
+            EventAvailabilityResponseId = Guid.NewGuid().ToString();
+        }
+
+        [Key]
+        [StringLength(36)]
+        public string EventAvailabilityResponseId { get; set; }
+
+        [StringLength(4000)]
+        public string Comment { get; set; }
+        public virtual ICollection<EventLocation> PreferredEventLocations { get; set; }
+    }
+
+    public class EventLocation
+    {
+        public EventLocation()
+        {
+            Location = string.Empty;
+        }
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int EventLocationId { get; set; }
+
+        [Required]
+        public string Location { get; set; }
+
+        public int EventId { get; set; }
+        public virtual Event Event { get; set; }
+
+        public virtual ICollection<EventAvailabilityResponse> EventAvailabilityResponses { get; set; }
+
+    }
+
+    public class Event
+    {
+        public int EventId { get; set; }
+        //public string Text { get; set; }
+    }
+
+    internal class EventLocationConfiguration : EntityTypeConfiguration<EventLocation>
+    {
+        internal EventLocationConfiguration()
+        {
+            ToTable("EventLocations");
+
+            HasMany(e => e.EventAvailabilityResponses)
+                .WithMany(e => e.PreferredEventLocations)
+                .Map(m => m.ToTable("EventAvailabilityResponseEventLocations")
+                .MapLeftKey("EventLocationId").MapRightKey("EventAvailabilityResponseId"));
+        }
+    }
+
+
+    [AuditDbContext(IncludeEntityObjects = false, IncludeIndependantAssociations = true)]
+    public class Issue78Context : AuditDbContext
+    {
+        public Issue78Context()
+            : base("data source=localhost;initial catalog=Audit;integrated security=true;")
+        {
+        }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Configurations.Add(new EventLocationConfiguration());
+            Database.SetInitializer<Issue78Context>(null);
+        }
+
+        public DbSet<EventLocation> EventLocation { get; set; }
+        public DbSet<EventAvailabilityResponse> EventAvailabilityResponse { get; set; }
+        public DbSet<Event> Event { get; set; }
+    }
+    #endregion
 }
 #endif

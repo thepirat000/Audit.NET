@@ -10,6 +10,23 @@ namespace Audit.EntityFramework
     public sealed class AuditDbContextAttribute : Attribute
     {
         internal EfSettings InternalConfig = new EfSettings();
+#if NET45
+        /// <summary>
+        /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
+        /// </summary>
+        public bool IncludeIndependantAssociations
+        { 
+            get
+            {
+                return InternalConfig.IncludeIndependantAssociations.HasValue && InternalConfig.IncludeIndependantAssociations.Value;
+            }
+            set
+            {
+                InternalConfig.IncludeIndependantAssociations = value;
+            }
+        }
+#endif
+
         /// <summary>
         /// To indicate if the output should contain the modified entities objects. (Default is false)
         /// </summary>

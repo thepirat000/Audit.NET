@@ -30,7 +30,13 @@ namespace Audit.EntityFramework
         {
             EnsureConfigFor<T>().IncludeEntityObjects = include;
         }
-
+#if NET45
+        internal static void SetIncludeIndependantAssociations<T>(bool include)
+            where T : IAuditDbContext
+        {
+            EnsureConfigFor<T>().IncludeIndependantAssociations = include;
+        }
+#endif
         internal static void SetMode<T>(AuditOptionMode mode)
             where T : IAuditDbContext
         {

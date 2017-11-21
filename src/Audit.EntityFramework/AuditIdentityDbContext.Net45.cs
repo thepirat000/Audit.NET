@@ -1,5 +1,4 @@
 ﻿#if NET45
-
 using System.Data.Entity.Infrastructure;
 using System.Data.Common;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -165,6 +164,11 @@ namespace Audit.EntityFramework
         ///  - OptIn: No entity is tracked by default, except those decorated with the AuditInclude attribute.
         /// </summary>
         public AuditOptionMode Mode { get; set; }
+
+        /// <summary>
+        /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
+        /// </summary>
+        public bool IncludeIndependantAssociations { get; set; }
 
         /// <summary>
         /// Called after the audit scope is created.

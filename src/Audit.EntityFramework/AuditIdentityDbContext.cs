@@ -153,6 +153,13 @@ namespace Audit.EntityFramework
         /// </summary>
         public AuditOptionMode Mode { get; set; }
 
+#if NET45
+        /// <summary>
+        /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
+        /// </summary>
+        public bool IncludeIndependantAssociations { get; set; }
+#endif
+
         /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.

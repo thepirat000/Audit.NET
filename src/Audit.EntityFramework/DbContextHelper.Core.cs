@@ -187,6 +187,7 @@ namespace Audit.EntityFramework
             var relationalConnection = provider.Instance.GetService<IRelationalConnection>();
             return relationalConnection != null;
         }
+
     }
 }
 #endif

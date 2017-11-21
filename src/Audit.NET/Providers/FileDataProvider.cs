@@ -18,6 +18,13 @@ namespace Audit.Core.Providers
     /// </remarks>
     public class FileDataProvider : AuditDataProvider
     {
+        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+
         private string _filenamePrefix = string.Empty;
         private string _directoryPath = string.Empty;
         private Func<AuditEvent, string> _filenameBuilder;
@@ -64,7 +71,7 @@ namespace Audit.Core.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var fullPath = GetFilePath(auditEvent);
-            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
             File.WriteAllText(fullPath, json);
             return fullPath;
         }
@@ -72,7 +79,7 @@ namespace Audit.Core.Providers
         public override void ReplaceEvent(object path, AuditEvent auditEvent)
         {
             var fullPath = path.ToString();
-            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
             File.WriteAllText(fullPath, json);
         }
 

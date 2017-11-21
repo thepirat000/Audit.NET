@@ -1,6 +1,9 @@
 ﻿#if NET45
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Core;
+using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 
@@ -98,10 +101,11 @@ namespace Audit.EntityFramework
         {
             var dbContext = context.DbContext;
             var modifiedEntries = GetModifiedEntries(context);
-            if (modifiedEntries.Count == 0)
+            if (modifiedEntries.Count == 0 && !context.IncludeIndependantAssociations)
             {
                 return null;
             }
+
             var clientConnectionId = GetClientConnectionId(dbContext.Database.Connection);
             var efEvent = new EntityFrameworkEvent()
             {
@@ -109,8 +113,15 @@ namespace Audit.EntityFramework
                 Database = dbContext.Database.Connection.Database,
                 ConnectionId = clientConnectionId,
                 TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId),
-                DbContext = dbContext
+                DbContext = dbContext,
+                Associations = context.IncludeIndependantAssociations ? GetAssociationEntries(context, context.IncludeEntityObjects) : null
             };
+
+            if (modifiedEntries.Count == 0 && efEvent.Associations == null)
+            {
+                return null;
+            }
+
             foreach (var entry in modifiedEntries)
             {
                 var entity = entry.Entity;
@@ -128,6 +139,49 @@ namespace Audit.EntityFramework
                 });
             }
             return efEvent;
+        }
+
+        private List<AssociationEntry> GetAssociationEntries(IAuditDbContext context, bool includeEntityObjects)
+        {
+            var dbContext = context.DbContext;
+            var result = new List<AssociationEntry>();
+            var objectContext = ((IObjectContextAdapter)dbContext).ObjectContext;
+            foreach (var association in objectContext.ObjectStateManager.GetObjectStateEntries(EntityState.Added).Where(e => e.IsRelationship)
+                                            .Concat(objectContext.ObjectStateManager.GetObjectStateEntries(EntityState.Deleted).Where(e => e.IsRelationship)))
+            {
+                var key1 = association.State == EntityState.Added ? (EntityKey)association.CurrentValues[0] : (EntityKey)association.OriginalValues[0];
+                var key2 = association.State == EntityState.Added ? (EntityKey)association.CurrentValues[1] : (EntityKey)association.OriginalValues[1];
+                var e1 = objectContext.GetObjectByKey(key1);
+                var e2 = objectContext.GetObjectByKey(key2);
+                if (IncludeEntity(context, e1.GetType(), context.Mode) || IncludeEntity(context, e2.GetType(), context.Mode))
+                {
+                    var pk1 = EntityKeyHelper.Instance.GetPrimaryKeyValues(e1, dbContext);
+                    var pk2 = EntityKeyHelper.Instance.GetPrimaryKeyValues(e2, dbContext);
+                    result.Add(new AssociationEntry()
+                    {
+                        Action = association.State == EntityState.Added ? "Insert" : "Delete",
+                        Table = association.EntitySet.Table ?? association.EntitySet.Name,
+                        Records = new []
+                        {
+                            new AssociationEntryRecord()
+                            {
+                                InternalEntity = e1,
+                                Table = GetEntityName(dbContext, e1),
+                                Entity = includeEntityObjects ? e1 : null,
+                                PrimaryKey = pk1
+                            },
+                            new AssociationEntryRecord()
+                            {
+                                InternalEntity = e2,
+                                Table = GetEntityName(dbContext, e2),
+                                Entity = includeEntityObjects ? e2 : null,
+                                PrimaryKey = pk2
+                            }
+                        }
+                    });
+                }
+            }
+            return result.Count == 0 ? null : result;
         }
     }
 }

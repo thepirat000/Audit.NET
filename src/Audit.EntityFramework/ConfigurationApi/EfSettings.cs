@@ -17,5 +17,8 @@ namespace Audit.EntityFramework.ConfigurationApi
         public HashSet<Type> IgnoredTypes { get; set; }
         public Func<Type, bool> IgnoredTypesFilter { get; set; }
         public Func<Type, bool> IncludedTypesFilter { get; set; }
+#if NET45
+        public bool? IncludeIndependantAssociations { get; set; }
+#endif
     }
 }

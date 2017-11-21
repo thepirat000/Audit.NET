@@ -120,9 +120,15 @@ namespace Audit.EntityFramework
         public Dictionary<string, object> ExtraFields { get; } = new Dictionary<string, object>();
 
         public DbContext DbContext { get { return this; } }
+#if NET45
+        /// <summary>
+        /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
+        /// </summary>
+        public bool IncludeIndependantAssociations { get; set; }
+#endif
 #endregion
 
-#region Public methods
+        #region Public methods
         /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.
