@@ -4,7 +4,7 @@
     <Description>Generate tracking information about an operation being executed.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.NET</AssemblyTitle>
-    <VersionPrefix>9.1.1</VersionPrefix>
+    <VersionPrefix>9.1.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45;net40</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

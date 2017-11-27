@@ -296,9 +296,9 @@ Audit.Core.Configuration.Setup()
 
 Mandatory:
 - **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
-- **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties.
 
 Optional:
+- **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties.
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is true).
 
 ### EF Provider configuration examples

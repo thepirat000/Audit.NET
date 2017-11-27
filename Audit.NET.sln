@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.EntityFramework.Core"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.PostgreSql", "src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj", "{109878E3-07D9-4C96-9F8B-17B898D25734}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.FileSystem", "src\Audit.FileSystem\Audit.FileSystem.csproj", "{E49DA113-C5E1-4800-8AF7-A975D50D367F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -247,6 +249,14 @@ Global
 		{109878E3-07D9-4C96-9F8B-17B898D25734}.Release|Any CPU.Build.0 = Release|Any CPU
 		{109878E3-07D9-4C96-9F8B-17B898D25734}.Release|x64.ActiveCfg = Release|Any CPU
 		{109878E3-07D9-4C96-9F8B-17B898D25734}.Release|x64.Build.0 = Release|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Debug|x64.Build.0 = Debug|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|x64.ActiveCfg = Release|Any CPU
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +285,7 @@ Global
 		{6DD15EB0-D93A-49FD-9932-E9EB71287685} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 		{6C3586EB-84E7-49BB-A356-1C36E85206BE} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{109878E3-07D9-4C96-9F8B-17B898D25734} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
+		{E49DA113-C5E1-4800-8AF7-A975D50D367F} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}
