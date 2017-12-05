@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Audit.Core.Extensions;
 using Newtonsoft.Json;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Audit.WebApi
 {
@@ -94,8 +96,10 @@ namespace Audit.WebApi
                 auditAction.ModelStateValid = IncludeModelState ? context.ModelState?.IsValid : null;
                 if (context.HttpContext.Response != null && context.Result != null)
                 {
-                    auditAction.ResponseStatus = context.HttpContext.Response.StatusCode.ToString();
-                    auditAction.ResponseStatusCode = context.HttpContext.Response.StatusCode;
+                    var statusCode = context.Result is ObjectResult && (context.Result as ObjectResult).StatusCode.HasValue ? (context.Result as ObjectResult).StatusCode.Value  
+                        : context.Result is StatusCodeResult ? (context.Result as StatusCodeResult).StatusCode : context.HttpContext.Response.StatusCode;
+                    auditAction.ResponseStatusCode = statusCode;
+                    auditAction.ResponseStatus = GetStatusCodeString(auditAction.ResponseStatusCode);
                     if (IncludeResponseBody)
                     {
                         var bodyType = context.Result?.GetType().GetFullTypeName();
@@ -127,6 +131,16 @@ namespace Audit.WebApi
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
                 auditScope.Save();
             }
+        }
+
+        private string GetStatusCodeString(int statusCode)
+        {
+            var name = ((HttpStatusCode)statusCode).ToString();
+            string[] words = Regex.Matches(name, "(^[a-z]+|[A-Z]+(?![a-z])|[A-Z][a-z]+)")
+                .OfType<Match>()
+                .Select(m => m.Value)
+                .ToArray();
+            return words.Length == 0 ? name : string.Join(" ", words);
         }
 
         private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)
