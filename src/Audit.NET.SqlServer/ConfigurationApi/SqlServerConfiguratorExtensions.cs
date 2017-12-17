@@ -16,7 +16,6 @@ namespace Audit.Core
         /// <param name="idColumnName">The primary key column name.</param>
         /// <param name="jsonColumnName">The column name where to store the json data.</param>
         /// <param name="lastUpdatedDateColumnName">The column name where to store the last updated date.</param>
-        /// <param name="lastUpdatedDateColumnName">The column name where to store the last updated date.</param>
         /// <param name="schema">The schema name to use when storing the events.</param>
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, string connectionString,
             string tableName = "Event", string idColumnName = "Id", string jsonColumnName = "Data", string lastUpdatedDateColumnName = null,
@@ -24,15 +23,16 @@ namespace Audit.Core
         {
             Configuration.DataProvider = new SqlDataProvider()
             {
-                ConnectionString = connectionString,
-                TableName = tableName,
-                IdColumnName = idColumnName,
-                JsonColumnName = jsonColumnName,
-                LastUpdatedDateColumnName = lastUpdatedDateColumnName,
-                Schema = schema
+                ConnectionStringBuilder = ev => connectionString,
+                TableNameBuilder = ev => tableName,
+                IdColumnNameBuilder = ev => idColumnName,
+                JsonColumnNameBuilder = ev => jsonColumnName,
+                LastUpdatedDateColumnNameBuilder = ev => lastUpdatedDateColumnName,
+                SchemaBuilder = ev => schema
             };
             return new CreationPolicyConfigurator();
         }
+
         /// <summary>
         /// Store the events in a Sql Server database.
         /// </summary>
@@ -42,8 +42,16 @@ namespace Audit.Core
         {
             var sqlDbConfig = new SqlServerProviderConfigurator();
             config.Invoke(sqlDbConfig);
-            return UseSqlServer(configurator, sqlDbConfig._connectionString, sqlDbConfig._tableName, 
-                sqlDbConfig._idColumnName, sqlDbConfig._jsonColumnName, sqlDbConfig._lastUpdatedColumnName, sqlDbConfig._schema);
+            Configuration.DataProvider = new SqlDataProvider()
+            {
+                ConnectionStringBuilder = sqlDbConfig._connectionStringBuilder,
+                TableNameBuilder = sqlDbConfig._tableNameBuilder,
+                IdColumnNameBuilder = sqlDbConfig._idColumnNameBuilder,
+                JsonColumnNameBuilder = sqlDbConfig._jsonColumnNameBuilder,
+                LastUpdatedDateColumnNameBuilder = sqlDbConfig._lastUpdatedColumnNameBuilder,
+                SchemaBuilder = sqlDbConfig._schemaBuilder
+            };
+            return new CreationPolicyConfigurator();
         }
     }
 }
