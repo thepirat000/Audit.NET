@@ -1,41 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <Description>Generate detailed Audit Logs for WCF service calls.</Description>
+    <Description>Generate Audit Logs for ASP.NET SignalR invokations</Description>
     <Copyright>Copyright 2016</Copyright>
-    <AssemblyTitle>Audit.Wcf</AssemblyTitle>
+    <AssemblyTitle>Audit.SignalR</AssemblyTitle>
     <VersionPrefix>9.2.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFramework>net45</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.WCF</AssemblyName>
+    <AssemblyName>Audit.SignalR</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.WCF</PackageId>
-    <PackageTags>Audit;Trail;Log;WCF</PackageTags>
-    <PackageIconUrl>http://i.imgur.com/Sl1hHBz.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.WCF</PackageProjectUrl>
+    <PackageId>Audit.SignalR</PackageId>
+    <PackageTags>Audit;SignalR;Trail;Log</PackageTags>
+    <PackageIconUrl>https://i.imgur.com/GB2e52X.jpg</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.SignalR</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
 
 </Project>

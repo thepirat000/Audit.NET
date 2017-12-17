@@ -14,6 +14,7 @@ del "audit.net.udp\bin\debug\*.symbols.nupkg"
 del "audit.net.redis\bin\debug\*.symbols.nupkg"
 del "Audit.NET.PostgreSql\bin\debug\*.symbols.nupkg"
 del "Audit.FileSystem\bin\debug\*.symbols.nupkg"
+del "Audit.SignalR\bin\debug\*.symbols.nupkg"
 
 nuget push "audit.net\bin\debug\*.nupkg" -source %1
 nuget push "audit.mvc\bin\debug\*.nupkg" -source %1
@@ -31,3 +32,4 @@ nuget push "Audit.NET.Udp\bin\debug\*.nupkg" -source %1
 nuget push "Audit.NET.Redis\bin\debug\*.nupkg" -source %1
 nuget push "Audit.NET.PostgreSql\bin\debug\*.nupkg" -source %1
 nuget push "Audit.FileSystem\bin\debug\*.nupkg" -source %1
+nuget push "Audit.SignalR\bin\debug\*.nupkg" -source %1

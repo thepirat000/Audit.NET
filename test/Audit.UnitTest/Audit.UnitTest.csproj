@@ -43,4 +43,10 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.1.2" />
+    <ProjectReference Include="..\..\src\Audit.SignalR\Audit.SignalR.csproj" />
+  </ItemGroup>
+
+
 </Project>

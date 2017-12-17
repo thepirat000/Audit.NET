@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E62475E8-0BE1-4464-BBD9-FD06CC546593}"
 EndProject
@@ -55,7 +55,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.EntityFramework.Core"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.PostgreSql", "src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj", "{109878E3-07D9-4C96-9F8B-17B898D25734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.FileSystem", "src\Audit.FileSystem\Audit.FileSystem.csproj", "{E49DA113-C5E1-4800-8AF7-A975D50D367F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.FileSystem", "src\Audit.FileSystem\Audit.FileSystem.csproj", "{E49DA113-C5E1-4800-8AF7-A975D50D367F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.SignalR", "src\Audit.SignalR\Audit.SignalR.csproj", "{9F750B91-695D-402A-9570-074D25BB4660}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -257,6 +259,14 @@ Global
 		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|x64.ActiveCfg = Release|Any CPU
 		{E49DA113-C5E1-4800-8AF7-A975D50D367F}.Release|x64.Build.0 = Release|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F750B91-695D-402A-9570-074D25BB4660}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -286,6 +296,7 @@ Global
 		{6C3586EB-84E7-49BB-A356-1C36E85206BE} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{109878E3-07D9-4C96-9F8B-17B898D25734} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{E49DA113-C5E1-4800-8AF7-A975D50D367F} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
+		{9F750B91-695D-402A-9570-074D25BB4660} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}
