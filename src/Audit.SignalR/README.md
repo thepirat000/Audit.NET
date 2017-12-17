@@ -54,7 +54,7 @@ public class Startup
     {
         GlobalHost.HubPipeline.AddAuditModule(config => config
             .IncludeHeaders()
-            .Filters
+            .Filters(f => f
                 .IncludeOutgoingEvent(og => og.HubName == "myHub")
                 .IncludeReconnectEvent(false));
         app.MapSignalR();
