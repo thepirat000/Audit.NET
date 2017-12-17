@@ -336,9 +336,9 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseSqlServer(config => config
                         .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
-                        .TableName("Event")
-                        .IdColumnName("EventId")
-                        .JsonColumnName("Data")
+                        .TableName(ev => "Event")
+                        .IdColumnName(ev => "EventId")
+                        .JsonColumnName(ev => "Data")
                         .LastUpdatedColumnName("LastUpdatedDate"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
