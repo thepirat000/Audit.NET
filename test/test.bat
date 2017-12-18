@@ -42,7 +42,8 @@ cd ..
 
 cd Audit.EntityFramework.UnitTest
 "C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
-..\..\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult
+..\..\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql
+..\..\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb
 echo continue...
 pause > nul
 echo Running...
@@ -56,7 +57,7 @@ echo Running...
 cd ..
 
 cd Audit.IntegrationTest
-dotnet test --logger:"console;verbosity=normal"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob"
 echo continue...
 pause > nul
 cd ..

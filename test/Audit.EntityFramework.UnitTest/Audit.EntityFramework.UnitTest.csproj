@@ -89,6 +89,8 @@
     <Compile Include="Event.cs">
       <DependentUpon>ModelIdentity.tt</DependentUpon>
     </Compile>
+    <Compile Include="InheritanceTests.models.cs" />
+    <Compile Include="InheritanceTests.cs" />
     <Compile Include="Model.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

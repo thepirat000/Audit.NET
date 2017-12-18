@@ -3,6 +3,10 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Common;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +14,23 @@ using System.Threading.Tasks;
 namespace Audit.EntityFramework.UnitTest
 {
     [TestFixture]
+    [Category("LocalDb")]
     public class EfTests
     {
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            DbConfiguration.Loaded += (_, a) =>
+            {
+                //a.ReplaceService<DbProviderServices>((s, k) => SqlProviderServices.Instance);
+                a.ReplaceService<IDbConnectionFactory>((s, k) => new LocalDbConnectionFactory("mssqllocaldb"));
+            };
+        }
+
         [SetUp]
         public void SetUp()
         {
+
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsEntities>().Reset();
             Audit.EntityFramework.Configuration.Setup()
