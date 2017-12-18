@@ -6,8 +6,8 @@
     <AssemblyTitle>Audit.Mvc</AssemblyTitle>
     <VersionPrefix>10.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.6;net45;net40</TargetFrameworks>
-    <DefineConstants>TRACE;DEBUG;STRONG_NAME;ASPNET</DefineConstants>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;net45;net40</TargetFrameworks>
+    <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Audit.Mvc</AssemblyName>
@@ -30,6 +30,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">

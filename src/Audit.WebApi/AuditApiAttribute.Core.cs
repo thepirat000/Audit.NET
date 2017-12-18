@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_6 || NET451
+﻿#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using System;
 using System.Collections.Generic;
 using System.Linq;

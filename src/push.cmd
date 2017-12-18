@@ -1,3 +1,6 @@
+@echo off
+cls
+
 del "audit.net\bin\debug\*.symbols.nupkg"
 del "audit.mvc\bin\debug\*.symbols.nupkg"
 del "audit.mvc.core\bin\debug\*.symbols.nupkg"

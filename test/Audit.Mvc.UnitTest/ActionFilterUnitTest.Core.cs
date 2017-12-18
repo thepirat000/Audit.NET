@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP1_0 || NET451
+﻿#if NETCOREAPP1_0 || NETCOREAPP2_0 || NET451
 using Audit.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

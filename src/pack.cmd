@@ -1,3 +1,6 @@
+@echo off
+cls
+
 del "audit.net\bin\debug\*.nupkg"
 del "audit.mvc\bin\debug\*.nupkg"
 del "audit.mvc.core\bin\debug\*.nupkg"
@@ -24,6 +27,7 @@ dotnet build "Audit.NET/"
 dotnet build "Audit.Mvc/"
 dotnet build "Audit.Mvc.Core/"
 dotnet build "Audit.WebApi/"
+dotnet build "Audit.WebApi.Core/"
 dotnet build "Audit.NET.AzureDocumentDB/"
 dotnet build "Audit.NET.MongoDB/"
 dotnet build "Audit.NET.SqlServer/"
@@ -41,6 +45,7 @@ dotnet build "Audit.SignalR/"
 
 dotnet pack "Audit.NET/"
 dotnet pack "Audit.Mvc/"
+dotnet pack "Audit.Mvc.Core/"
 dotnet pack "Audit.WebApi/"
 dotnet pack "Audit.WebApi.Core/"
 dotnet pack "Audit.NET.AzureDocumentDB/"

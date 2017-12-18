@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_6 || NET451
+﻿#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using Audit.Core;
 
 namespace Audit.Mvc
