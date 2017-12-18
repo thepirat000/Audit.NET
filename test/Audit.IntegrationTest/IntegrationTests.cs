@@ -92,6 +92,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("AzureBlob")]
             public void TestStressAzureBlob()
             {
                 Audit.Core.Configuration.Setup()

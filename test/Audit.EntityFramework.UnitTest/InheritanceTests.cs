@@ -132,7 +132,7 @@ namespace Audit.EntityFramework.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(4, evs.Count);
+            Assert.AreEqual(1, evs.Count);
 
             Assert.AreEqual("Insert", evs[0].Entries[0].Action);
             Assert.AreEqual("Entities3", evs[0].Entries[0].Table);
