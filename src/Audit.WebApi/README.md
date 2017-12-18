@@ -21,14 +21,16 @@ PM> Install-Package Audit.WebApi
 
 # IMPORTANT NOTE
 
-If your WebApi project targets a .NET Framework >= 4.5.1, this library will asume you are using ASP.NET Core (MVC 6) and not the old generation of ASP.NET.
+If your project targets the full .NET framework, but you are using AspNet Core (`Microsoft.AspNetCore.Mvc.*`) 
+you should install and reference the `Audit.WebApi.Core` package instead, otherwise it will assume you are targeting
+the old generation of ASP.NET:
 
-In order to use this library on an old ASP.NET project, you will need to:
-- Make your project target .NET framework <= 4.5
-- *Or* use Audit.WebApi version <= 7.1.0
-- *Or* manually import the packaged assembly that targets the framework 4.5 
+```
+PM> Install-Package Audit.WebApi.Core
+```
 
-Refer to the following [issue](https://github.com/thepirat000/Audit.NET/issues/59) for another workaround.
+If your project targets the NET Core framework (NetStandard >= 1.6), there is no difference between using `Audit.WebApi` or `Audit.WebApi.Core` 
+since both assumes AspNet Core.
 
 ## Usage
 

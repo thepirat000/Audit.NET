@@ -1,4 +1,4 @@
-﻿#if NET45 || NET40
+﻿#if NETSTANDARD1_6 || NET451
 using Audit.Core;
 
 namespace Audit.Mvc
@@ -10,7 +10,7 @@ namespace Audit.Mvc
         /// </summary>
         /// <param name="controller">The MVC controller.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
-        public static AuditScope GetCurrentAuditScope(this System.Web.Mvc.Controller controller)
+        public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.Controller controller)
         {
             return AuditAttribute.GetCurrentScope(controller.HttpContext);
         }

@@ -26,13 +26,13 @@ namespace Audit.Core.ConfigurationApi
         /// Attaches an action to be executed by the InsertEvent and the ReplaceEvent methods.
         /// The InsertEvent will generate and return a random Guid as the event id.
         /// </summary>
-        /// <param name="action">The action.</param>
+        /// <param name="insertReplaceAction">The action to be executed by the InsertEvent and the ReplaceEvent methods.</param>
         IDynamicDataProviderConfigurator OnInsertAndReplace(Action<AuditEvent> insertReplaceAction);
         /// <summary>
         /// Attaches an action to be executed by the InsertEvent and the ReplaceEvent methods, the first parameter (event id) will be NULL in case of insert.
         /// The InsertEvent will generate and return a random Guid as the event id.
         /// </summary>
-        /// <param name="action">The action.</param>
+        /// <param name="insertReplaceAction">The action to be executed by the InsertEvent and the ReplaceEvent methods.</param>
         IDynamicDataProviderConfigurator OnInsertAndReplace(Action<object, AuditEvent> insertReplaceAction);
     }
 }

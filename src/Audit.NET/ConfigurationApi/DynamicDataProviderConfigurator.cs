@@ -5,7 +5,9 @@ namespace Audit.Core.ConfigurationApi
 {
     public class DynamicDataProviderConfigurator : IDynamicDataProviderConfigurator
     {
+#pragma warning disable CS3008 // Identifier is not CLS-compliant
         public DynamicDataProvider _dynamicDataProvider;
+#pragma warning restore CS3008 // Identifier is not CLS-compliant
 
         public DynamicDataProviderConfigurator(DynamicDataProvider dynamicDataProvider)
         {

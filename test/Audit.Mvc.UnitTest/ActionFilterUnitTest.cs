@@ -1,4 +1,4 @@
-﻿#if NET45 || NET40
+﻿#if NET45 || NET40 || NET461
 using Audit.Core;
 using Moq;
 using NUnit.Framework;

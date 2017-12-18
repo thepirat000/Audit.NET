@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into a SQL Server database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.SqlServer</AssemblyTitle>
-    <VersionPrefix>9.3.0</VersionPrefix>
+    <VersionPrefix>10.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

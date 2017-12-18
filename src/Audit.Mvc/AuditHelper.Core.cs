@@ -1,5 +1,5 @@
-﻿#if NET40 || NET45
-using System.Web.Mvc;
+﻿#if NETSTANDARD1_6 || NET451
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
