@@ -47,8 +47,8 @@ Audit.Core.Configuration.Setup()
         .LastUpdatedColumnName("LastUpdatedDate"));
 ```
 
-You can provide any of the settings as a function of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage) 
-for example:
+You can provide any of the settings as a function of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage), 
+for example to use a connection string per machine, and different table names:
 
 ```c#
 Audit.Core.Configuration.Setup()
