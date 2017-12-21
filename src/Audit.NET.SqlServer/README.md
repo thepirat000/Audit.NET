@@ -25,13 +25,13 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new SqlDataProvider()
 {
-    ConnectionString =
+    ConnectionStringBuilder = _ =>
         "data source=localhost;initial catalog=Audit;integrated security=true;",
-    Schema = "dbo",
-    TableName = "Event",
-    IdColumnName = "EventId",
-    JsonColumnName = "Data",
-    LastUpdatedDateColumnName = "LastUpdatedDate"
+    SchemaBuilder = _ => "dbo",
+    TableNameBuilder = _ => "Event",
+    IdColumnNameBuilder = _ => "EventId",
+    JsonColumnNameBuilder = _ => "Data",
+    LastUpdatedDateColumnNameBuilder = _ => "LastUpdatedDate"
 };
 ```
 
@@ -46,6 +46,17 @@ Audit.Core.Configuration.Setup()
         .JsonColumnName("Data")
         .LastUpdatedColumnName("LastUpdatedDate"));
 ```
+
+You can provide any of the settings as a function of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage) 
+for example:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseSqlServer(config => config
+        .ConnectionString(ev => GetCnnString(ev.Environment.MachineName))
+        .TableName(ev => ev.EventType == "Order" ? "OrderAudits" : "Audits"));
+```
+
 
 ### Provider Options
 
