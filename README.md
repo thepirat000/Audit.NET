@@ -25,17 +25,6 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET
 ```
 
-## Contents
-
-- [Usage](#usage)
-- [Output](#output)
-- [Custom Fields and Comments](#custom-fields-and-comments)
-- [Discard option](#discard-option)
-- [Data providers](#data-providers)
-- [Event Creation Policy](#event-creation-policy)
-- [Configuration](#configuration)
-- [Extensions](#extensions)
-
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its lifecycle. 
