@@ -281,11 +281,13 @@ namespace Audit.Core
 
         private static Exception GetCurrentException()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             if (Marshal.GetExceptionCode() != 0)
             {
                 return Marshal.GetExceptionForHR(Marshal.GetExceptionCode());
             }
             return null;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private void ProcessExtraFields(object extraFields)

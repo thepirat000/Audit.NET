@@ -25,31 +25,50 @@ namespace Audit.SqlServer.Providers
         /// The SQL connection string builder
         /// </summary>
         public Func<AuditEvent, string> ConnectionStringBuilder { get; set; }
-
+        /// <summary>
+        /// The SQL connection string
+        /// </summary>
+        public string ConnectionString { set { ConnectionStringBuilder = _ => value; } }
         /// <summary>
         /// The SQL events Table Name builder
         /// </summary>
         public Func<AuditEvent, string> TableNameBuilder { get; set; } = ev => "Event";
-
+        /// <summary>
+        /// The SQL events Table Name 
+        /// </summary>
+        public string TableName { set { TableNameBuilder = _ => value; } }
         /// <summary>
         /// The Column Name that stores the JSON
         /// </summary>
         public Func<AuditEvent, string> JsonColumnNameBuilder { get; set; } = ev => "Data";
-
+        /// <summary>
+        /// The Column Name that stores the JSON
+        /// </summary>
+        public string JsonColumnName { set { JsonColumnNameBuilder = _ => value; } }
         /// <summary>
         /// The Column Name that stores the Last Updated Date (NULL to ignore)
         /// </summary>
         public Func<AuditEvent, string> LastUpdatedDateColumnNameBuilder { get; set; } = null;
-
+        /// <summary>
+        /// The Column Name that stores the Last Updated Date (NULL to ignore)
+        /// </summary>
+        public string LastUpdatedDateColumnName { set { LastUpdatedDateColumnNameBuilder = _ => value; } }
         /// <summary>
         /// The Column Name that is the primary ley
         /// </summary>
         public Func<AuditEvent, string> IdColumnNameBuilder { get; set; } = ev => "EventId";
-
+        /// <summary>
+        /// The Column Name that is the primary ley
+        /// </summary>
+        public string IdColumnName { set { IdColumnNameBuilder = _ => value; } }
         /// <summary>
         /// The Schema Name to use (NULL to ignore)
         /// </summary>
         public Func<AuditEvent, string> SchemaBuilder { get; set; } = null;
+        /// <summary>
+        /// The Schema Name to use (NULL to ignore)
+        /// </summary>
+        public string Schema { set { SchemaBuilder = _ => value; } }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {

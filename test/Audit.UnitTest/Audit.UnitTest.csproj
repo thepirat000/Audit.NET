@@ -20,12 +20,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.FileSystem\Audit.FileSystem.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.log4net\Audit.NET.log4net.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />
     <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />

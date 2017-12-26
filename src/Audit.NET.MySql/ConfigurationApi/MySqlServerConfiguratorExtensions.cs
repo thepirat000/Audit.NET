@@ -10,6 +10,7 @@ namespace Audit.Core
         /// <summary>
         /// Store the events in a MySQL database.
         /// </summary>
+        /// <param name="configurator">The configurator object.</param>
         /// <param name="connectionString">The MySQL connection string.</param>
         /// <param name="tableName">The MySQL table name to store the events.</param>
         /// <param name="idColumnName">The primary key column name.</param>
@@ -29,6 +30,7 @@ namespace Audit.Core
         /// <summary>
         /// Store the events in a MySQL database.
         /// </summary>
+        /// <param name="configurator">The configurator object.</param>
         /// <param name="config">The MySQL provider configuration.</param>
         public static ICreationPolicyConfigurator UseMySql(this IConfigurator configurator, Action<IMySqlServerProviderConfigurator> config)
         {

@@ -31,6 +31,7 @@ namespace Audit.SignalR
         /// Adds a custom field to the current Incoming event
         /// </summary>
         /// <typeparam name="TC">The type of the value.</typeparam>
+        /// <param name="hub">The hub object.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="value">The value object.</param>
         /// <param name="serialize">if set to <c>true</c> the field is serialized immediately.</param>

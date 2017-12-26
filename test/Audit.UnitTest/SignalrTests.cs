@@ -330,69 +330,114 @@ namespace Audit.UnitTest
 
     public class TestAuditPipelineModule : AuditPipelineModule
     {
+        private object _locker = new object();
         public List<Tuple<string, object>> Events = new List<Tuple<string, object>>();
 
         public new bool OnBeforeIncoming(IHubIncomingInvokerContext context)
         {
-            Events.Add(new Tuple<string, object>("OnBeforeIncoming", context));
+            lock(_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnBeforeIncoming", context));
+            }
+
             return base.OnBeforeIncoming(context);
         }
         public new object OnAfterIncoming(object result, IHubIncomingInvokerContext context)
         {
-            Events.Add(new Tuple<string, object>("OnAfterIncoming", context));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnAfterIncoming", context));
+            }
+
             return base.OnAfterIncoming(result, context);
         }
 
         public new bool OnBeforeOutgoing(IHubOutgoingInvokerContext context)
         {
-            Events.Add(new Tuple<string, object>("OnBeforeOutgoing", context));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnBeforeOutgoing", context));
+            }
+
             return base.OnBeforeOutgoing(context);
         }
 
         public new void OnAfterOutgoing(IHubOutgoingInvokerContext context)
         {
-            Events.Add(new Tuple<string, object>("OnAfterOutgoing", context));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnAfterOutgoing", context));
+            }
+
             base.OnAfterOutgoing(context);
         }
 
         public new bool OnBeforeConnect(IHub hub)
         {
-            Events.Add(new Tuple<string, object>("OnBeforeConnect", hub));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnBeforeConnect", hub));
+            }
+
             return base.OnBeforeConnect(hub);
         }
 
         public new void OnAfterConnect(IHub hub)
         {
-            Events.Add(new Tuple<string, object>("OnAfterConnect", hub));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnAfterConnect", hub));
+            }
+
             base.OnAfterConnect(hub);
         }
 
         public new bool OnBeforeDisconnect(IHub hub, bool stopCalled)
         {
-            Events.Add(new Tuple<string, object>("OnBeforeDisconnect", hub));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnBeforeDisconnect", hub));
+            }
+
             return base.OnBeforeDisconnect(hub, stopCalled);
         }
 
         public new void OnAfterDisconnect(IHub hub, bool stopCalled)
         {
-            Events.Add(new Tuple<string, object>("OnAfterDisconnect", hub));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnAfterDisconnect", hub));
+            }
+
             base.OnAfterDisconnect(hub, stopCalled);
         }
 
         public new bool OnBeforeReconnect(IHub hub)
         {
-            Events.Add(new Tuple<string, object>("OnBeforeReconnect", hub));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnBeforeReconnect", hub));
+            }
+
             return base.OnBeforeReconnect(hub);
         }
         public new void OnAfterReconnect(IHub hub)
         {
-            Events.Add(new Tuple<string, object>("OnAfterReconnect", hub));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnAfterReconnect", hub));
+            }
+
             base.OnAfterReconnect(hub);
         }
 
         public new void OnIncomingError(ExceptionContext exceptionContext, IHubIncomingInvokerContext invokerContext)
         {
-            Events.Add(new Tuple<string, object>("OnIncomingError", exceptionContext));
+            lock (_locker)
+            {
+                Events.Add(new Tuple<string, object>("OnIncomingError", exceptionContext));
+            }
+
             base.OnIncomingError(exceptionContext, invokerContext);
         }
     }

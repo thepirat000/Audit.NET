@@ -1,39 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Generate Audit Logs from file system events using a FileSystemWatcher</Description>
-    <Copyright>Copyright 2018</Copyright>
-    <AssemblyTitle>Audit.FileSystem</AssemblyTitle>
+    <Description>Log Audit.NET Audit Trail using Apache log4net™</Description>
+    <Copyright>Copyright 2017</Copyright>
+    <AssemblyTitle>Audit.log4net</AssemblyTitle>
     <VersionPrefix>10.0.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;net40</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.FileSystem</AssemblyName>
+    <AssemblyName>Audit.NET.log4net</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.FileSystem</PackageId>
-    <PackageTags>Audit;File System;Log;FileSystemWatcher</PackageTags>
-    <PackageIconUrl>https://i.imgur.com/Fn4thn0.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.FileSystem</PackageProjectUrl>
+    <PackageId>Audit.NET.log4net</PackageId>
+    <PackageTags>Audit;Trail;Log;log4net</PackageTags>
+    <PackageIconUrl>https://i.imgur.com/qxbK98k.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET.log4net/tree/master/src/Audit.NET.log4net</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-    <PackageReference Include="System.IO.FileSystem.Watcher" Version="4.3.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
 
 </Project>

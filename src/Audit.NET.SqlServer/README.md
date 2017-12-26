@@ -25,13 +25,12 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new SqlDataProvider()
 {
-    ConnectionStringBuilder = _ =>
-        "data source=localhost;initial catalog=Audit;integrated security=true;",
-    SchemaBuilder = _ => "dbo",
-    TableNameBuilder = _ => "Event",
-    IdColumnNameBuilder = _ => "EventId",
-    JsonColumnNameBuilder = _ => "Data",
-    LastUpdatedDateColumnNameBuilder = _ => "LastUpdatedDate"
+    ConnectionString = "data source=localhost;initial catalog=Audit;integrated security=true;",
+    Schema = "dbo",
+    TableName = "Event",
+    IdColumnName = "EventId",
+    JsonColumnName = "Data",
+    LastUpdatedDateColumnName = "LastUpdatedDate"
 };
 ```
 
