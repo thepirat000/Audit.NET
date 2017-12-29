@@ -27,13 +27,6 @@ namespace Audit.UnitTest
         [Test]
         public void Test_log4net_InsertOnStartReplaceOnEnd()
         {
-Audit.Core.Configuration.Setup()
-    .UseLog4net(config => config
-        .LogLevel(LogLevel.Debug)
-        .Logger(LogManager.GetLogger("default"))
-        .Message(auditEvent => auditEvent.ToJson()));
-
-
             Audit.Core.Configuration.Setup()
                 .UseLog4net(_ => _
                     .LogLevel(LogLevel.Info));

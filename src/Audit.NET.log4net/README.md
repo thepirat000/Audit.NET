@@ -31,7 +31,7 @@ You can also configure the provider settings by using the fluent API, for exampl
 ```c#
 Audit.Core.Configuration.Setup()
     .UseLog4net(config => config
-        .Logger(LogManager.GetLogger("default"))        
+        .Logger(LogManager.GetLogger(typeof(MyClass)))        
         .LogLevel(LogLevel.Debug)
         .Message(auditEvent => auditEvent.ToJson()));
 ```

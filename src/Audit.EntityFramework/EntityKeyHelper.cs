@@ -228,10 +228,23 @@ public sealed class EntityKeyHelper
                   .SingleOrDefault(m => m.Property.Name == propertyName)?
                 .Column
                 .Name;
-
+        if (columnName == null)
+        {
+            // Try to get the column name from the base type, if any
+            var baseType = GetBaseEntityType(context, type);
+            if (baseType != type)
+            {
+                return GetColumnName(baseType, propertyName, context);
+            }
+        }
+        if (columnName == null)
+        {
+            columnName = propertyName;
+        }
         if (!_columnNamesCache.ContainsKey(type))
         {
-            _columnNamesCache[type] = new Dictionary<string, string>(); // Not thread-safe, but not dangerous since at most it will lost some cached values
+            _columnNamesCache[type] =
+                new Dictionary<string, string>(); // Not thread-safe, but not dangerous since at most it will lost some cached values
         }
         _columnNamesCache[type][propertyName] = columnName;
         return columnName;

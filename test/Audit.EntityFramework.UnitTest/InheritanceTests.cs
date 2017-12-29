@@ -101,6 +101,11 @@ namespace Audit.EntityFramework.UnitTest
 
             Assert.AreEqual("Update", evs[2].Entries[0].Action);
             Assert.AreEqual("Entities", evs[2].Entries[0].Table);
+
+            Assert.AreEqual(4, evs[2].Entries[0].Changes.Count);
+            Assert.IsTrue(evs[2].Entries[0].Changes.Any(ch => 
+                ch.ColumnName == "Timeout" && ((TimeSpan)ch.OriginalValue) == TimeSpan.FromMinutes(5) && ((TimeSpan)ch.NewValue) == TimeSpan.FromMinutes(10)));
+            Assert.IsFalse(evs[2].Entries[0].Changes.Any(ch => ch.ColumnName == null));
             Assert.AreEqual("Inherited 2", (evs[2].Entries[0].Entity as dynamic).Name2);
 
             Assert.AreEqual("Delete", evs[3].Entries[0].Action);
@@ -119,9 +124,10 @@ namespace Audit.EntityFramework.UnitTest
             {
                 dbContext.Database.Initialize(false);
             }
+            DBEntity3 ent;
             using (DataBaseContext context = new DataBaseContext())
             {
-                DBEntity3 ent = new DBEntity3();
+                ent = new DBEntity3();
                 ent.Name = "Base";
                 ent.Name2 = "2";
                 ent.Name3 = guid;
@@ -132,11 +138,29 @@ namespace Audit.EntityFramework.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            using (DataBaseContext context = new DataBaseContext())
+            {
+                ent = context.Entities.First(e => e.ID == ent.ID) as DBEntity3;
+                ent.Name = "BaseX";
+                ent.Name2 = "2X";
+                ent.Name3 = guid + "X";
+                ent.Ticks = 1234;
+                ent.Timeout = TimeSpan.FromMinutes(10);
+
+                context.SaveChanges();
+            }
+
+            Assert.AreEqual(2, evs.Count);
 
             Assert.AreEqual("Insert", evs[0].Entries[0].Action);
             Assert.AreEqual("Entities3", evs[0].Entries[0].Table);
             Assert.AreEqual(guid, (evs[0].Entries[0].Entity as dynamic).Name3);
+
+            //ningun columnname null, todos los name_ newvalue terminan en X
+            Assert.IsFalse(evs[1].Entries[0].Changes.Any(e => e.ColumnName == null));
+            Assert.IsTrue(evs[1].Entries[0].Changes.Where(e => e.ColumnName.StartsWith("Name"))
+                .All(e => e.NewValue.ToString().EndsWith("X")));
+
         }
     }
 
