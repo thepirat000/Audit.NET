@@ -4,7 +4,8 @@
 
 Generate Audit Logs for Windows Communication Foundation (WCF) service calls.
 
-Audit.Wcf provides the server-side infrastructure to log interactions with WCF services. It can record service method calls with caller info and arguments.
+Audit.Wcf provides the server-side infrastructure to log interactions with WCF services. 
+It records detailed information of the service method calls.
 
 ## Install
 
@@ -29,7 +30,7 @@ For example:
 [AuditBehavior(EventType = "{contract}.{operation}")]
 public class OrderService : IOrderService
 {
-  public GetOrderResponse GetOrder(GetOrderRequest request)
+  public async Task<GetOrderResponse> GetOrder(GetOrderRequest request)
   {
     ...
   }
@@ -41,7 +42,7 @@ You can also decorate the specific methods you want to audit, for example:
 public class OrderService : IOrderService
 {
   [AuditBehavior]
-  public GetOrderResponse GetOrder(GetOrderRequest request)
+  public async Task<GetOrderResponse> GetOrder(GetOrderRequest request)
   {
     ...
   }
@@ -140,6 +141,7 @@ Describes an audited WCF event
 | ContractName | string | Name of the contract (service interface) |
 | OperationName | string | Name of the operation (service method) |
 | InstanceQualifiedName | string | Assembly qualified type name of the service instance |
+| IsAsync | boolean | Indicates if the operation is asynchronous |
 | MethodSignature | string | Signature of the audited method |
 | Action | string | Action absolute address |
 | ReplyAction | string |Reply action absolute address |

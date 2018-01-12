@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.Core.Providers
 {
@@ -76,11 +77,43 @@ namespace Audit.Core.Providers
             return fullPath;
         }
 
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var fullPath = GetFilePath(auditEvent);
+            await SaveFileAsync(fullPath, auditEvent);
+            return fullPath;
+        }
+
         public override void ReplaceEvent(object path, AuditEvent auditEvent)
         {
             var fullPath = path.ToString();
             var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
             File.WriteAllText(fullPath, json);
+        }
+
+        public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent)
+        {
+            var fullPath = path.ToString();
+            await SaveFileAsync(fullPath, auditEvent);
+        }
+
+        private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent)
+        {
+            using (var file = File.Open(fullPath, FileMode.Create))
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    using (var writer = new StreamWriter(memoryStream))
+                    {
+                        var serializer = JsonSerializer.CreateDefault(JsonSettings);
+                        serializer.Serialize(writer, auditEvent);
+                        await writer.FlushAsync().ConfigureAwait(false);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        await memoryStream.CopyToAsync(file).ConfigureAwait(false);
+                    }
+                }
+                await file.FlushAsync().ConfigureAwait(false);
+            }
         }
 
         private string GetFilePath(AuditEvent auditEvent)

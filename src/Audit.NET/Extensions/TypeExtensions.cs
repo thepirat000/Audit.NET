@@ -20,13 +20,8 @@ namespace Audit.Core.Extensions
             {
                 return null;
             }
-#if NET40
-            var typeInfo = type;
-            var genericTypes = type.GetGenericArguments();
-#else
             var typeInfo = type.GetTypeInfo();
             var genericTypes = type.GenericTypeArguments;
-#endif
             if (!typeInfo.IsGenericType)
             {
                 return type.Name;

@@ -4,9 +4,9 @@
     <Description>Generate detailed Audit Logs for MVC Controller actions.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.Mvc</AssemblyTitle>
-    <VersionPrefix>10.0.3</VersionPrefix>
+    <VersionPrefix>11.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net45;net40</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -38,13 +38,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
-    <Reference Include="System.Web" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="4.0.30506.0" />
     <Reference Include="System.Web" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

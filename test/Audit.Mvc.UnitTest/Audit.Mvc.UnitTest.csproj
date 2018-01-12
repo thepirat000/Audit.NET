@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451;net45;net40;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451;net45;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.Mvc.UnitTest</AssemblyName>
@@ -79,16 +79,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="moq" Version="4.7.99" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <Reference Include="System" />
-    <Reference Include="System.Web" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="NUnit" Version="3.4.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
-    <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
-    <PackageReference Include="moq" Version="4.0.10827" />
     <Reference Include="System" />
     <Reference Include="System.Web" />
     <Reference Include="Microsoft.CSharp" />

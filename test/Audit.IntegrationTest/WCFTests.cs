@@ -18,6 +18,7 @@ namespace Audit.IntegrationTest.Wcf
     public class WCFTests
     {
         [Test]
+        [Category("WCF")]
         public void WCFTest_CreationPolicy_InsertOnStartReplaceOnEnd()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -54,6 +55,7 @@ namespace Audit.IntegrationTest.Wcf
         }
 
         [Test]
+        [Category("WCF")]
         public void WCFTest_CreationPolicy_InsertOnStartInsertOnEnd()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -90,6 +92,7 @@ namespace Audit.IntegrationTest.Wcf
         }
 
         [Test]
+        [Category("WCF")]
         public void WCFTest_CreationPolicy_InsertOnEnd()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -122,9 +125,11 @@ namespace Audit.IntegrationTest.Wcf
             Assert.AreEqual(1, inserted.Count);
             Assert.AreEqual(0, replaced.Count);
             Assert.AreEqual(100, inserted[0].WcfEvent.Result.Value);
+            Assert.AreEqual(false, inserted[0].WcfEvent.IsAsync);
         }
 
         [Test]
+        [Category("WCF")]
         public void WCFTest_CreationPolicy_Manual()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -158,20 +163,36 @@ namespace Audit.IntegrationTest.Wcf
             Assert.AreEqual(0, replaced.Count);
         }
 
+        private static object Locker = new object();
+        
         [Test]
+        [Category("WCF")]
         public void WCFTest_AuditScope()
         {
-            WCFTest_Concurrency_AuditScope(1, 1);
+            lock (Locker)
+            {
+                WCFTest_Concurrency_AuditScope(1, 1);
+            }
         }
 
         [Test]
+        [Category("WCF")]
         public void WCFTest_Concurrency_AuditScope()
         {
-            WCFTest_Concurrency_AuditScope(1, 1);
-            WCFTest_Concurrency_AuditScope(5, 10);
-            WCFTest_Concurrency_AuditScope(5, 25);
+            lock (Locker)
+            {
+                WCFTest_Concurrency_AuditScope(1, 1);
+            }
+            lock (Locker)
+            {
+                WCFTest_Concurrency_AuditScope(5, 10);
+            }
+            lock (Locker)
+            {
+                WCFTest_Concurrency_AuditScope(5, 25);
+            }
         }
-
+        
         public void WCFTest_Concurrency_AuditScope(int threads, int callsPerThread)
         {
             var provider = new Mock<AuditDataProvider>();
@@ -192,11 +213,8 @@ namespace Audit.IntegrationTest.Wcf
                 return Guid.NewGuid();
             });
 
-            Audit.Core.Configuration.Setup()
-                    .UseCustomProvider(provider.Object);
-
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
-            using (var host = new ServiceHost(typeof(OrderService), basePipeAddress))
+            using (var host = new ServiceHost(new OrderService_AsyncConcurrent_Test(provider.Object), basePipeAddress))
             {
                 var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
                 host.Open();
@@ -255,7 +273,11 @@ namespace Audit.IntegrationTest.Wcf
         [OperationContract]
         GetOrderResponse GetOrder(GetOrderRequest request);
         [OperationContract]
+        Task<GetOrderResponse> GetOrder2Async(GetOrderRequest request);
+        [OperationContract]
         int DoSomething();
+        [OperationContract]
+        Task<string> TestAsync(int sleep);
     }
 
     [DataContract]
@@ -285,7 +307,22 @@ namespace Audit.IntegrationTest.Wcf
         public decimal Total { get; set; }
     }
 
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple,
+        IncludeExceptionDetailInFaults = true)]
+    public class OrderService_AsyncConcurrent_Test : OrderService, IOrderService
+    {
+        private AuditDataProvider _auditDataProvider;
+
+        public OrderService_AsyncConcurrent_Test(AuditDataProvider dp)
+        {
+            _auditDataProvider = dp;
+        }
+
+        public AuditDataProvider AuditDataProvider => _auditDataProvider;
+    }
+
+
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple, IncludeExceptionDetailInFaults = true)]
     public class OrderService : IOrderService
     {
         [AuditBehavior]
@@ -311,6 +348,30 @@ namespace Audit.IntegrationTest.Wcf
                 Success = true,
                 Order = new Order() { OrderId = request.OrderId }
             };
+        }
+
+        [AuditBehavior]
+        public async Task<GetOrderResponse> GetOrder2Async(GetOrderRequest request)
+        {
+            var rnd = new Random();
+            var ctx1 = Audit.WCF.AuditBehavior.CurrentAuditScope;
+            ctx1.SetCustomField("Test-Field-1", request.OrderId);
+            await Task.Delay(rnd.Next(2, 100));
+            var ctx2 = Audit.WCF.AuditBehavior.CurrentAuditScope;
+            ctx2.SetCustomField("Test-Field-2", request.OrderId);
+            await Task.Delay(rnd.Next(2, 100));
+            return new GetOrderResponse()
+            {
+                Success = true,
+                Order = new Order() { OrderId = request.OrderId }
+            };
+        }
+
+        [AuditBehavior]
+        public async Task<string> TestAsync(int sleep)
+        {
+            await Task.Delay(sleep);
+            return sleep.ToString();
         }
 
     }

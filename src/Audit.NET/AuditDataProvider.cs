@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -39,6 +40,29 @@ namespace Audit.Core
         /// <param name="eventId">The event id being replaced.</param>
         public virtual void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
+        }
+
+        /// <summary>
+        /// Insert an event to the data source returning the event id generated
+        /// </summary>
+        /// <param name="auditEvent">The audit event being inserted.</param>
+        public virtual async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            // Default implementation calls the sync operation
+            return await Task.Factory.StartNew(() => InsertEvent(auditEvent));
+        }
+
+        /// <summary>
+        /// Saves the specified audit event.
+        /// Triggered when the scope is saved.
+        /// Override this method to replace the specified audit event on the data source.
+        /// </summary>
+        /// <param name="auditEvent">The audit event.</param>
+        /// <param name="eventId">The event id being replaced.</param>
+        public virtual async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            // Default implementation calls the sync operation
+            await Task.Factory.StartNew(() => ReplaceEvent(eventId, auditEvent));
         }
     }
 }

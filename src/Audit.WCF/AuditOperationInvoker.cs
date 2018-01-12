@@ -6,7 +6,6 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 using Audit.Core;
-using System.Threading;
 using Audit.Core.Extensions;
 
 namespace Audit.WCF
@@ -17,11 +16,11 @@ namespace Audit.WCF
     public class AuditOperationInvoker : IOperationInvoker
     {
         #region Private Fields
-        private string _eventType;
-        private IOperationInvoker _baseInvoker;
-        private DispatchOperation _operation;
-        private OperationDescription _operationDescription;
-        private EventCreationPolicy? _creationPolicy;
+        private readonly string _eventType;
+        private readonly IOperationInvoker _baseInvoker;
+        private readonly DispatchOperation _operation;
+        private readonly OperationDescription _operationDescription;
+        private readonly EventCreationPolicy? _creationPolicy;
         #endregion
 
         #region Constructors
@@ -37,10 +36,7 @@ namespace Audit.WCF
         #endregion
 
         #region Public Methods
-        public bool IsSynchronous
-        {
-            get { return true; }
-        }
+        public bool IsSynchronous => _baseInvoker.IsSynchronous;
 
         public object[] AllocateInputs()
         {
@@ -59,7 +55,8 @@ namespace Audit.WCF
             // Create the Wcf audit event
             var auditWcfEvent = CreateWcfAuditEvent(instance, inputs);
             // Create the audit scope
-            var eventType = _eventType.Replace("{contract}", auditWcfEvent.ContractName).Replace("{operation}", auditWcfEvent.OperationName);
+            var eventType = _eventType.Replace("{contract}", auditWcfEvent.ContractName)
+                .Replace("{operation}", auditWcfEvent.OperationName);
             var auditEventWcf = new AuditEventWcfAction()
             {
                 WcfEvent = auditWcfEvent
@@ -71,7 +68,7 @@ namespace Audit.WCF
                 CreationPolicy = _creationPolicy,
                 AuditEvent = auditEventWcf,
                 DataProvider = GetAuditDataProvider(instance),
-                CallingMethod = _operationDescription.SyncMethod
+                CallingMethod = _operationDescription.SyncMethod ?? _operationDescription.TaskMethod
             }))
             {
                 // Store a reference to this audit scope on a thread static field
@@ -95,6 +92,86 @@ namespace Audit.WCF
             }
             return result;
         }
+
+        /// <summary>
+        /// Asynchronous implementation of the Invoke (Begin)
+        /// </summary>
+        public IAsyncResult InvokeBegin(object instance, object[] inputs, AsyncCallback callback, object state)
+        {
+            IAsyncResult result = null;
+            // Create the Wcf audit event
+            var auditWcfEvent = CreateWcfAuditEvent(instance, inputs);
+            // Create the audit scope
+            var eventType = _eventType.Replace("{contract}", auditWcfEvent.ContractName)
+                .Replace("{operation}", auditWcfEvent.OperationName);
+            var auditEventWcf = new AuditEventWcfAction()
+            {
+                WcfEvent = auditWcfEvent
+            };
+            // Create the audit scope
+            var auditScope = AuditScope.Create(new AuditScopeOptions()
+            {
+                EventType = eventType,
+                CreationPolicy = _creationPolicy,
+                AuditEvent = auditEventWcf,
+                DataProvider = GetAuditDataProvider(instance),
+                CallingMethod = _operationDescription.SyncMethod ?? _operationDescription.TaskMethod
+            });
+            // Store a reference to this audit scope
+            var callbackState = new AuditScopeState()
+            {
+                AuditScope = auditScope,
+                OriginalUserCallback = callback,
+                OriginalUserState = state
+            };
+            AuditBehavior.CurrentAuditScope = auditScope;
+            try
+            {
+                result = _baseInvoker.InvokeBegin(instance, inputs, this.InvokerCallback, callbackState);
+            }
+            catch (Exception ex)
+            {
+                AuditBehavior.CurrentAuditScope = null;
+                auditWcfEvent.Fault = GetWcfFaultData(ex);
+                auditWcfEvent.Success = false;
+                (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                auditScope.Dispose();
+                throw;
+            }
+            AuditBehavior.CurrentAuditScope = null;
+            return new AuditScopeAsyncResult(result, callbackState);
+        }
+
+        /// <summary>
+        /// Asynchronous implementation of the Invoke (End)
+        /// </summary>
+        public object InvokeEnd(object instance, out object[] outputs, IAsyncResult result)
+        {
+            var auditAsyncResult = result as AuditScopeAsyncResult;
+            var auditScopeState = auditAsyncResult.AuditScopeState;
+            object callResult;
+            var auditScope = auditScopeState.AuditScope;
+            var auditWcfEvent = (auditScope.Event as AuditEventWcfAction).WcfEvent;
+            try
+            {
+                callResult = _baseInvoker.InvokeEnd(instance, out outputs, auditAsyncResult.OriginalAsyncResult);
+            }
+            catch (Exception ex)
+            {
+                AuditBehavior.CurrentAuditScope = null;
+                auditWcfEvent.Fault = GetWcfFaultData(ex);
+                auditWcfEvent.Success = false;
+                (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                auditScope.Dispose();
+                throw;
+            }
+            AuditBehavior.CurrentAuditScope = null;
+            auditWcfEvent.OutputParameters = GetEventElements(outputs);
+            auditWcfEvent.Result = new AuditWcfEventElement(callResult);
+            (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+            auditScope.Dispose();
+            return callResult;
+        }
         #endregion
 
         #region Private Methods
@@ -109,7 +186,8 @@ namespace Audit.WCF
                 Action = _operation.Action,
                 ReplyAction = _operation.ReplyAction,
                 ContractName = _operationDescription.DeclaringContract.Name,
-                MethodSignature = _operationDescription.SyncMethod.ToString(),
+                IsAsync = _operationDescription.SyncMethod == null,
+                MethodSignature = (_operationDescription.SyncMethod ?? _operationDescription.TaskMethod).ToString(),
                 OperationName = _operation.Name,
                 ClientAddress = endpoint?.Address,
                 HostAddress = string.Join(", ", operationContext.InstanceContext.Host?.BaseAddresses?.Select(a => a.AbsoluteUri)),
@@ -171,14 +249,10 @@ namespace Audit.WCF
             return result;
         }
 
-        public IAsyncResult InvokeBegin(object instance, object[] inputs, AsyncCallback callback, object state)
+        private void InvokerCallback(IAsyncResult asyncResult)
         {
-            throw new NotImplementedException();
-        }
-
-        public object InvokeEnd(object instance, out object[] outputs, IAsyncResult result)
-        {
-            throw new NotImplementedException();
+            var state = asyncResult.AsyncState as AuditScopeState;
+            state.OriginalUserCallback.Invoke(new AuditScopeAsyncResult(asyncResult, state));
         }
         #endregion
     }

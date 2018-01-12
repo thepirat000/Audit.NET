@@ -10,7 +10,6 @@ dotnet restore
 cd test
 
 cd Audit.Mvc.UnitTest
-dotnet build
 dotnet test --logger:"console;verbosity=normal"
 echo continue...
 
@@ -57,7 +56,9 @@ echo Running...
 cd ..
 
 cd Audit.IntegrationTest
-dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF"
+dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
+dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory=Async"
 echo continue...
 
 cd ..

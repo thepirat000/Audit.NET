@@ -2,7 +2,7 @@
 
 namespace Audit.Core.Providers
 {
-#if NET45 || NET40
+#if NET45
     /// <summary>
     /// Writes to the windows event log
     /// </summary>

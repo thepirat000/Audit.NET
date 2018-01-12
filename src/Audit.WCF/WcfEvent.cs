@@ -14,6 +14,8 @@ namespace Audit.WCF
         public string OperationName { get; set; }
         [JsonProperty(Order = 30)]
         public string InstanceQualifiedName { get; set; }
+        [JsonProperty(Order = 35, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsAsync { get; set; }
         [JsonProperty(Order = 40)]
         public string MethodSignature { get; set; }
         [JsonProperty(Order = 50)]

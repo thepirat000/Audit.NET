@@ -9,10 +9,9 @@
 
 namespace Audit.EntityFramework.UnitTest
 {
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
-
+    
     public partial class Post
     {
         public int Id { get; set; }
@@ -20,7 +19,7 @@ namespace Audit.EntityFramework.UnitTest
         public System.DateTime DateCreated { get; set; }
         public string Content { get; set; }
         public int BlogId { get; set; }
-
+    
         public virtual Blog Blog { get; set; }
     }
 }

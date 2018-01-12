@@ -1,6 +1,7 @@
 using Audit.Core;
 using System;
 using System.Configuration;
+using System.Runtime.Remoting.Messaging;
 using System.ServiceModel.Configuration;
 
 namespace Audit.WCF
@@ -20,20 +21,11 @@ namespace Audit.WCF
         {
             get
             {
-                object auditScope;
-                WcfOperationContext.Current.Items.TryGetValue(WcfContextScopeKey, out auditScope);
-                return auditScope as AuditScope;
+                return CallContext.LogicalGetData(WcfContextScopeKey) as AuditScope;
             }
             internal set
             {
-                if (value == null)
-                {
-                    WcfOperationContext.Current.Items.Remove(WcfContextScopeKey);
-                }
-                else
-                {
-                    WcfOperationContext.Current.Items[WcfContextScopeKey] = value;
-                }
+                CallContext.LogicalSetData(WcfContextScopeKey, value);
             }
         }
 

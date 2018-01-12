@@ -14,12 +14,12 @@ using Newtonsoft.Json;
 
 namespace Audit.UnitTest
 {
-    public class UnitTest
+    public class UnitTestAsync
     {
         [Test]
-        public void Test_FileLog_HappyPath()
+        public async Task Test_FileLog_HappyPath_Async()
         {
-            var dir = Path.Combine(Path.GetTempPath(), "Test_FileLog_HappyPath");
+            var dir = Path.Combine(Path.GetTempPath(), "Test_FileLog_HappyPath_Async");
             if (Directory.Exists(dir))
             {
                 Directory.Delete(dir, true);
@@ -32,9 +32,10 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var target = "start";
-            using (var scope = AuditScope.Create("evt", () => target, new {X = 1}))
+            using (var scope = await AuditScope.CreateAsync("evt", () => target, new { X = 1 }))
             {
                 target = "end";
+                await scope.DisposeAsync();
             }
             var ev = JsonConvert.DeserializeObject<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
             var fileCount = Directory.EnumerateFiles(dir).Count();
@@ -48,7 +49,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ScopeSaveMode_CreateAndSave()
+        public async Task Test_ScopeSaveMode_CreateAndSave_Async()
         {
             var modes = new List<SaveMode>();
             Audit.Core.Configuration.Setup()
@@ -57,14 +58,14 @@ namespace Audit.UnitTest
                     .OnReplace((id, ev) => { }))
                 .WithCreationPolicy(EventCreationPolicy.Manual)
                 .WithAction(a => a
-                    .OnEventSaving(scope => 
+                    .OnEventSaving(scope =>
                     {
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { IsCreateAndSave = true }))
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { IsCreateAndSave = true }))
             {
-                scope.Save();
+                await scope.SaveAsync();
             }
 
             Assert.AreEqual(1, modes.Count);
@@ -72,7 +73,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ScopeSaveMode_InsertOnStartReplaceOnEnd()
+        public async Task Test_ScopeSaveMode_InsertOnStartReplaceOnEnd_Async()
         {
             var modes = new List<SaveMode>();
             Audit.Core.Configuration.Setup()
@@ -86,9 +87,9 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
             {
-                scope.Save();
+                await scope.SaveAsync();
             }
 
             Assert.AreEqual(3, modes.Count);
@@ -98,7 +99,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ScopeSaveMode_InsertOnStartInsertOnEnd()
+        public async Task Test_ScopeSaveMode_InsertOnStartInsertOnEnd_Async()
         {
             var modes = new List<SaveMode>();
             Audit.Core.Configuration.Setup()
@@ -112,9 +113,9 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
             {
-                scope.Save();
+                await scope.SaveAsync();
             }
 
             Assert.AreEqual(3, modes.Count);
@@ -124,7 +125,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ScopeSaveMode_InsertOnEnd()
+        public async Task Test_ScopeSaveMode_InsertOnEnd_Async()
         {
             var modes = new List<SaveMode>();
             Audit.Core.Configuration.Setup()
@@ -138,9 +139,9 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
             {
-                scope.Save();
+                await scope.SaveAsync();
             }
 
             Assert.AreEqual(2, modes.Count);
@@ -149,7 +150,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ScopeSaveMode_Manual()
+        public async Task Test_ScopeSaveMode_Manual_Async()
         {
             var modes = new List<SaveMode>();
             Audit.Core.Configuration.Setup()
@@ -163,9 +164,9 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
             {
-                scope.Save();
+                await scope.SaveAsync();
             }
 
             Assert.AreEqual(1, modes.Count);
@@ -173,7 +174,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ScopeActionsStress()
+        public async Task Test_ScopeActionsStress_Async()
         {
             int counter = 0;
             int counter2 = 0;
@@ -197,18 +198,19 @@ namespace Audit.UnitTest
             var tasks = new List<Task>();
             for (int i = 0; i < MAX; i++)
             {
-                tasks.Add(Task.Factory.StartNew(() =>
+                tasks.Add(Task.Factory.StartNew(async () =>
                 {
-                    AuditScope.CreateAndSave("LoginSuccess", new { username = "federico", id = i });
+                    await AuditScope.CreateAndSaveAsync("LoginSuccess", new { username = "federico", id = i });
                     Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, ev =>
                     {
                         //do nothing, just bother
                         var d = ev.Event.Duration * 1234567;
                     });
-                    AuditScope.CreateAndSave("LoginFailed", new { username = "adriano", id = i * -1 });
+                    await AuditScope.CreateAndSaveAsync("LoginFailed", new { username = "adriano", id = i * -1 });
                 }));
             }
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks.ToArray());
+            await Task.Delay(1000);
             Assert.AreEqual(MAX * 2, counter);
             Assert.AreEqual(MAX * 2, counter2);
             Assert.AreEqual(MAX * 2, counter3);
@@ -217,7 +219,7 @@ namespace Audit.UnitTest
 
 
         [Test]
-        public void Test_DynamicDataProvider()
+        public async Task Test_DynamicDataProvider_Async()
         {
             int onInsertCount = 0, onReplaceCount = 0, onInsertOrReplaceCount = 0;
             Core.Configuration.Setup()
@@ -226,102 +228,43 @@ namespace Audit.UnitTest
                     .OnReplace((obj, ev) => onReplaceCount++)
                     .OnInsertAndReplace(ev => onInsertOrReplaceCount++));
 
-            var scope = AuditScope.Create("et1", null, EventCreationPolicy.Manual);
-            scope.Save();
+            var scope = await AuditScope.CreateAsync("et1", null, EventCreationPolicy.Manual);
+            await scope.SaveAsync();
             scope.SetCustomField("field", "value");
             Assert.AreEqual(1, onInsertCount);
             Assert.AreEqual(0, onReplaceCount);
             Assert.AreEqual(1, onInsertOrReplaceCount);
-            scope.Save();
+            await scope.SaveAsync();
             Assert.AreEqual(1, onInsertCount);
             Assert.AreEqual(1, onReplaceCount);
             Assert.AreEqual(2, onInsertOrReplaceCount);
         }
 
-        [Test]
-        public void Test_TypeExtension()
-        {
-            var s = new List<Dictionary<HashSet<string>, KeyValuePair<int, decimal>>>();
-            var fullname = s.GetType().GetFullTypeName();
-            Assert.AreEqual("List<Dictionary<HashSet<String>,KeyValuePair<Int32,Decimal>>>", fullname);
-        }
+
 
         [Test]
-        public void Test_EntityFramework_Config_Precedence()
-        {
-            EntityFramework.Configuration.Setup()
-                .ForContext<MyContext>(x => x.AuditEventType("ForContext"))
-                .UseOptIn();
-            EntityFramework.Configuration.Setup()
-                .ForAnyContext(x => x.AuditEventType("ForAnyContext").IncludeEntityObjects(true))
-                .UseOptOut();
-
-            var ctx = new MyContext();
-            var ctx2 = new AnotherContext();
-
-            Assert.AreEqual("FromAttr", ctx.AuditEventType);
-            Assert.AreEqual(true, ctx.IncludeEntityObjects);
-            Assert.AreEqual(AuditOptionMode.OptIn, ctx.Mode);
-
-            Assert.AreEqual("ForAnyContext", ctx2.AuditEventType);
-            Assert.AreEqual(AuditOptionMode.OptOut, ctx2.Mode);
-        }
-
-        [Test]
-        public void Test_FluentConfig_FileLog()
-        {
-            int x = 0;
-            Core.Configuration.Setup()
-                .UseFileLogProvider(config => config.Directory(@"C:\").FilenamePrefix("prefix"))
-                .WithCreationPolicy(EventCreationPolicy.Manual)
-                .WithAction(action => action.OnScopeCreated(s => x++));
-            var scope = AuditScope.Create("test", null);
-            scope.Dispose();
-            Assert.AreEqual(typeof(FileDataProvider), Core.Configuration.DataProvider.GetType());
-            Assert.AreEqual("prefix", (Core.Configuration.DataProvider as FileDataProvider).FilenamePrefix);
-            Assert.AreEqual(@"C:\", (Core.Configuration.DataProvider as FileDataProvider).DirectoryPath);
-            Assert.AreEqual(EventCreationPolicy.Manual, Core.Configuration.CreationPolicy);
-            Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
-            Assert.AreEqual(1, x);
-        }
-#if NET451
-        [Test]
-        public void Test_FluentConfig_EventLog()
-        {
-            Core.Configuration.Setup()
-                .UseEventLogProvider(config => config.LogName("LogName").SourcePath("SourcePath").MachineName("MachineName"))
-                .WithCreationPolicy(EventCreationPolicy.Manual);
-            var scope = AuditScope.Create("test", null);
-            scope.Dispose();
-            Assert.AreEqual(typeof(EventLogDataProvider), Core.Configuration.DataProvider.GetType());
-            Assert.AreEqual("LogName", (Core.Configuration.DataProvider as EventLogDataProvider).LogName);
-            Assert.AreEqual("SourcePath", (Core.Configuration.DataProvider as EventLogDataProvider).SourcePath);
-            Assert.AreEqual("MachineName", (Core.Configuration.DataProvider as EventLogDataProvider).MachineName);
-            Assert.AreEqual(EventCreationPolicy.Manual, Core.Configuration.CreationPolicy);
-        }
-#endif
-        [Test]
-        public void Test_StartAndSave()
+        public async Task Test_StartAndSave_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
             var target = "test";
-            AuditScope.CreateAndSave(eventType, new { ExtraField = "extra value" });
+            await AuditScope.CreateAndSaveAsync(eventType, new { ExtraField = "extra value" });
 
-            AuditScope.CreateAndSave(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            await AuditScope.CreateAndSaveAsync(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
 
         }
 
         [Test]
-        public void Test_CustomAction_OnCreating()
+        public async Task Test_CustomAction_OnCreating_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
-            
+
             var eventType = "event type 1";
             var target = "test";
             Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
@@ -338,18 +281,20 @@ namespace Audit.UnitTest
             });
 
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
+            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
             {
                 ev = scope.Event;
             }
             Core.Configuration.ResetCustomActions();
             Assert.True(ev.CustomFields.ContainsKey("custom field"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
         }
 
         [Test]
-        public void Test_CustomAction_OnSaving()
+        public async Task Test_CustomAction_OnSaving_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
@@ -362,18 +307,18 @@ namespace Audit.UnitTest
                 scope.Comment(comment);
             });
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
-                scope.Save();
+                await scope.SaveAsync();
             }
             Core.Configuration.ResetCustomActions();
             Assert.True(ev.Comments.Contains(comment));
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
         }
 
         [Test]
-        public void Test_CustomAction_OnSaving_Discard()
+        public async Task Test_CustomAction_OnSaving_Discard_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
@@ -385,17 +330,18 @@ namespace Audit.UnitTest
                 scope.Discard();
             });
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
-                scope.Save();
+                await scope.SaveAsync();
             }
             Core.Configuration.ResetCustomActions();
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
         }
 
         [Test]
-        public void Test_CustomAction_OnCreating_Double()
+        public async Task Test_CustomAction_OnCreating_Double_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
@@ -413,7 +359,7 @@ namespace Audit.UnitTest
                 scope.SetCustomField(key2, "test");
             });
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
             }
@@ -421,11 +367,13 @@ namespace Audit.UnitTest
             Assert.False(ev.CustomFields.ContainsKey(key1));
             Assert.True(ev.CustomFields.ContainsKey(key2));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
         }
 
         [Test]
-        public void TestSave()
+        public async Task TestSave_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
@@ -433,22 +381,23 @@ namespace Audit.UnitTest
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnEnd))
+            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnEnd))
             {
                 ev = scope.Event;
                 scope.Comment("test");
                 scope.SetCustomField<string>("custom", "value");
                 target = "final";
-                scope.Save(); // this should do nothing because of the creation policy (this no more true since v4.6.2)
-                provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+                await scope.SaveAsync(); // this should do nothing because of the creation policy (this no more true since v4.6.2)
+                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             }
             Assert.AreEqual(eventType, ev.EventType);
             Assert.True(ev.Comments.Contains("test"));
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
         [Test]
-        public void TestDiscard()
+        public async Task TestDiscard_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
@@ -456,7 +405,7 @@ namespace Audit.UnitTest
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnEnd))
+            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnEnd))
             {
                 ev = scope.Event;
                 scope.Comment("test");
@@ -468,78 +417,86 @@ namespace Audit.UnitTest
             Assert.True(ev.Comments.Contains("test"));
             Assert.Null(ev.Target.SerializedNew);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
         }
 
         [Test]
-        public void Test_EventCreationPolicy_InsertOnEnd()
+        public async Task Test_EventCreationPolicy_InsertOnEnd_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd))
+            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd))
             {
                 scope.Comment("test");
-                scope.Save(); // this should do nothing because of the creation policy (this is no more true, since v 4.6.2)
+                await scope.SaveAsync(); // this should do nothing because of the creation policy (this is no more true, since v 4.6.2)
             }
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
         [Test]
-        public void Test_EventCreationPolicy_InsertOnStartReplaceOnEnd()
+        public async Task Test_EventCreationPolicy_InsertOnStartReplaceOnEnd_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd))
+            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd))
             {
                 scope.Comment("test");
+                await scope.DisposeAsync();
             }
-            provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
         }
 
         [Test]
-        public void Test_EventCreationPolicy_InsertOnStartInsertOnEnd()
+        public async Task Test_EventCreationPolicy_InsertOnStartInsertOnEnd_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd))
+            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd))
             {
                 scope.Comment("test");
             }
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
         [Test]
-        public void Test_EventCreationPolicy_Manual()
+        public async Task Test_EventCreationPolicy_Manual_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.Manual))
+            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual))
             {
                 scope.Comment("test");
             }
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
 
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.Manual))
+            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual))
             {
                 scope.Comment("test");
-                scope.Save();
+                await scope.SaveAsync();
                 scope.Comment("test2");
-                scope.Save();
+                await scope.SaveAsync();
             }
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
         }
 
         [Test]
-        public void Test_ExtraFields()
+        public async Task Test_ExtraFields_Async()
         {
             Core.Configuration.DataProvider = new FileDataProvider();
-            var scope = AuditScope.Create("SomeEvent", null, new { @class = "class value", DATA = 123 }, EventCreationPolicy.Manual);
+            var scope = await AuditScope.CreateAsync("SomeEvent", null, new { @class = "class value", DATA = 123 }, EventCreationPolicy.Manual);
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
@@ -548,19 +505,20 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_TwoScopes()
+        public async Task Test_TwoScopes_Async()
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            var scope1 = AuditScope.Create("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, EventCreationPolicy.Manual);
-            scope1.Save();
-            var scope2 = AuditScope.Create("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, EventCreationPolicy.Manual);
-            scope2.Save();
+            var scope1 = await AuditScope.CreateAsync("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, EventCreationPolicy.Manual);
+            await scope1.SaveAsync();
+            var scope2 = await AuditScope.CreateAsync("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, EventCreationPolicy.Manual);
+            await scope2.SaveAsync();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);
             Assert.AreNotEqual(scope1.EventId, scope2.EventId);
-            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
         [AuditDbContext(AuditEventType = "FromAttr")]
