@@ -91,6 +91,17 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Saves the scope asynchronously.
+        /// </summary>
+        public async Task SaveScopeAsync(IAuditDbContext context, AuditScope scope, EntityFrameworkEvent @event)
+        {
+            UpdateAuditEvent(@event, context);
+            (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
+            context.OnScopeSaving(scope);
+            await scope.SaveAsync();
+        }
+
+        /// <summary>
         /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
         /// </summary>
         public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
@@ -233,6 +244,28 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Creates the Audit scope asynchronously.
+        /// </summary>
+        public async Task<AuditScope> CreateAuditScopeAsync(IAuditDbContext context, EntityFrameworkEvent efEvent)
+        {
+            var typeName = context.GetType().Name;
+            var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
+            var auditEfEvent = new AuditEventEntityFramework();
+            auditEfEvent.EntityFrameworkEvent = efEvent;
+            var scope = await AuditScope.CreateAsync(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 3);
+            if (context.ExtraFields != null)
+            {
+                foreach (var field in context.ExtraFields)
+                {
+                    scope.SetCustomField(field.Key, field.Value);
+                }
+            }
+            context.OnScopeCreated(scope);
+            return scope;
+        }
+
+
+        /// <summary>
         /// Gets the modified entries to process.
         /// </summary>
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
@@ -287,7 +320,7 @@ namespace Audit.EntityFramework
             {
                 return await baseSaveChanges();
             }
-            var scope = CreateAuditScope(context, efEvent);
+            var scope = await CreateAuditScopeAsync(context, efEvent);
             try
             {
                 efEvent.Result = await baseSaveChanges();
@@ -296,11 +329,11 @@ namespace Audit.EntityFramework
             {
                 efEvent.Success = false;
                 efEvent.ErrorMessage = ex.GetExceptionInfo();
-                SaveScope(context, scope, efEvent);
+                await SaveScopeAsync(context, scope, efEvent);
                 throw;
             }
             efEvent.Success = true;
-            SaveScope(context, scope, efEvent);
+            await SaveScopeAsync(context, scope, efEvent);
             return efEvent.Result;
         }
 

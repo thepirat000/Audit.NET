@@ -186,6 +186,10 @@ namespace Audit.EntityFramework
         {
             return base.SaveChanges();
         }
+        internal async Task<int> SaveChangesBypassAuditAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
         #endregion
     }
 }

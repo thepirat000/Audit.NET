@@ -2,6 +2,7 @@
 using Audit.Core;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -86,6 +87,53 @@ namespace Audit.EntityFramework.Providers
                 else
                 {
                     dbContext.SaveChanges();
+                }
+            }
+            return null;
+        }
+
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            bool save = false;
+            var efEvent = auditEvent as AuditEventEntityFramework;
+            var dbContext = efEvent.EntityFrameworkEvent.DbContext;
+            foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
+            {
+                Type type;
+#if NETSTANDARD2_0
+                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
+                type = definingType?.ClrType;
+#elif NETSTANDARD1_5 || NET461
+                IEntityType definingType = dbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
+                type = definingType?.ClrType;
+#else
+                type = ObjectContext.GetObjectType(entry.Entry.Entity.GetType());
+#endif
+                if (type != null)
+                {
+                    var mappedType = _auditTypeMapper?.Invoke(type);
+                    if (mappedType != null)
+                    {
+                        var auditEntity = CreateAuditEntity(type, mappedType, entry);
+                        _auditEntityAction?.Invoke(efEvent, entry, auditEntity);
+#if NET45
+                        dbContext.Set(mappedType).Add(auditEntity);
+#else
+                        await dbContext.AddAsync(auditEntity);
+#endif
+                        save = true;
+                    }
+                }
+            }
+            if (save)
+            {
+                if (dbContext is AuditDbContext)
+                {
+                    await (dbContext as AuditDbContext).SaveChangesBypassAuditAsync();
+                }
+                else
+                {
+                    await dbContext.SaveChangesAsync();
                 }
             }
             return null;

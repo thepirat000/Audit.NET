@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
 {
@@ -126,6 +127,101 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
+        public async Task Test_EFDataProvider_Async()
+        {
+            var dp = new EntityFrameworkDataProvider();
+
+            dp.AuditTypeMapper = t =>
+            {
+                if (t == typeof(Order))
+                    return typeof(OrderAudit);
+                if (t == typeof(Orderline))
+                    return typeof(OrderlineAudit);
+                return null;
+            };
+            dp.AuditEntityAction = (ev, entry, obj) =>
+            {
+                var ab = obj as AuditBase;
+                if (ab != null)
+                {
+                    ab.AuditDate = DateTime.UtcNow;
+                    ab.UserName = ev.Environment.UserName;
+                    ab.AuditStatus = entry.Action;
+                }
+            };
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(dp);
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending",
+                    OrderLines = new Collection<Orderline>()
+                    {
+                        new Orderline() { Product = "p1: " + id, Quantity = 2 },
+                        new Orderline() { Product = "p2: " + id, Quantity = 3 }
+                    }
+                };
+                await ctx.AddAsync(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var orderAudit = await ctx.OrderAudit.AsNoTracking().SingleOrDefaultAsync(a => a.Number.Equals(id));
+                Assert.NotNull(orderAudit);
+                var orderlineAudits = await ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(orderAudit.Id)).ToListAsync();
+                Assert.AreEqual(2, orderlineAudits.Count);
+                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
+                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
+                Assert.AreEqual("Insert", orderAudit.AuditStatus);
+                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
+                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
+                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
+                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
+                Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = ctx.Order.Single(a => a.Number.Equals(id));
+                o.Status = "Cancelled";
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var orderAudits = await ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToListAsync();
+                Assert.AreEqual(2, orderAudits.Count);
+                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
+                Assert.AreEqual("Cancelled", orderAudits[0].Status);
+                Assert.AreEqual("Pending", orderAudits[1].Status);
+                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
+                var ol = await ctx.Orderline.SingleAsync(a => a.OrderId.Equals(order.Id) && a.Product.StartsWith("p1"));
+                ctx.Remove(ol);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
+                var orderlineAudits = await ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).OrderByDescending(a => a.AuditDate).ToListAsync();
+                Assert.AreEqual(3, orderlineAudits.Count);
+                Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
+                Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
+            }
+        }
+
+        [Test]
         public void Test_EF_Transaction()
         {
             var provider = new Mock<AuditDataProvider>();
@@ -179,18 +275,7 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
-        public void Test_EF_SaveChangesSync()
-        {
-            Test_EF_Actions(ctx => ctx.SaveChanges());
-        }
-
-        [Test]
-        public void Test_EF_SaveChangesAsync()
-        {
-            Test_EF_Actions(ctx => ctx.SaveChangesAsync().Result);
-        }
-
-        public void Test_EF_Actions(Func<DbContext, int> saveChangesMethod)
+        public void Test_EF_Actions()
         {
             var provider = new Mock<AuditDataProvider>();
             AuditEvent auditEvent = null;
@@ -237,7 +322,7 @@ SET IDENTITY_INSERT Posts OFF
                 var pr = ctx.Posts.FirstOrDefault(x => x.Id == 5);
                 ctx.Remove(pr);
 
-                int result = saveChangesMethod.Invoke(ctx);
+                int result = ctx.SaveChanges();
 
                 Assert.IsFalse(auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent"));
                 var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
@@ -250,6 +335,72 @@ SET IDENTITY_INSERT Posts OFF
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && (e.Entity as Post)?.Id == 5));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && e.ColumnValues["Id"].Equals(5) && (e.Entity as Post)?.Id == 5));
                 provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+
+            }
+        }
+
+        [Test]
+        public async Task Test_EF_Actions_Async()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            AuditEvent auditEvent = null;
+            provider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync((AuditEvent ev) =>
+            {
+                auditEvent = ev;
+                return Guid.NewGuid();
+            });
+            provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(provider.Object);
+
+            using (var ctx = new MyAuditedVerboseContext())
+            {
+                ctx.Database.EnsureCreated();
+                ctx.Database.ExecuteSqlCommand(@"
+--delete from AuditPosts
+--delete from AuditBlogs
+delete from Posts
+delete from Blogs
+SET IDENTITY_INSERT Blogs ON 
+insert into Blogs (id, title, bloggername) values (1, 'abc', 'def')
+insert into Blogs (id, title, bloggername) values (2, 'ghi', 'jkl')
+SET IDENTITY_INSERT Blogs OFF
+SET IDENTITY_INSERT Posts ON
+insert into Posts (id, title, datecreated, content, blogid) values (1, 'my post 1', GETDATE(), 'this is an example 123', 1)
+insert into Posts (id, title, datecreated, content, blogid) values (2, 'my post 2', GETDATE(), 'this is an example 456', 1)
+insert into Posts (id, title, datecreated, content, blogid) values (3, 'my post 3', GETDATE(), 'this is an example 789', 1)
+insert into Posts (id, title, datecreated, content, blogid) values (4, 'my post 4', GETDATE(), 'this is an example 987', 2)
+insert into Posts (id, title, datecreated, content, blogid) values (5, 'my post 5', GETDATE(), 'this is an example 000', 2)
+SET IDENTITY_INSERT Posts OFF
+                    ");
+
+                var postsblog1 = ctx.Blogs.Include(x => x.Posts)
+                    .FirstOrDefault(x => x.Id == 1);
+                postsblog1.BloggerName += "-22";
+
+                ctx.Posts.Add(new Post() { BlogId = 1, Content = "content", DateCreated = DateTime.Now, Title = "title" });
+
+                var ch1 = ctx.Posts.FirstOrDefault(x => x.Id == 1);
+                ch1.Content += "-code";
+
+                var pr = ctx.Posts.FirstOrDefault(x => x.Id == 5);
+                ctx.Remove(pr);
+
+                int result = await ctx.SaveChangesAsync();
+
+                Assert.IsFalse(auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent"));
+                var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
+
+                Assert.AreEqual(4, result);
+                Assert.AreEqual("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && (e.Entity as Post)?.Id == 5));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && e.ColumnValues["Id"].Equals(5) && (e.Entity as Post)?.Id == 5));
+                provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
 
             }
         }
