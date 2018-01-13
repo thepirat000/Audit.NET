@@ -55,6 +55,12 @@ echo continue...
 echo Running...
 cd ..
 
+cd Audit.Integration.AspNetCore
+dotnet run
+echo continue...
+
+cd ..
+
 cd Audit.IntegrationTest
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF"
 dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory!=Async"

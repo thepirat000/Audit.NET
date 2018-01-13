@@ -323,30 +323,45 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 
 A _data provider_ (or _storage provider_) contains the logic to handle the audit event output, where you define what to do with the audit logs.
 
-You can use one of the [data providers included](#data-providers-included) or inject your own mechanism by creating a class that inherits from `AuditDataProvider`, overriding the following methods:
+You can use one of the [data providers included](#data-providers-included) or inject your own mechanism 
+by creating a class that inherits from `AuditDataProvider` and overrides its methods:
 
 - `InsertEvent`: should return a unique ID for the event. 
 - `ReplaceEvent`: should update an event given its ID, this method is only called for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
+
+If your data provider will support asynchronous operations, you must also implement the following methods:
+
+- `InsertEventAsync`: Asynchoronous implementation of the InsertEvent method. 
+- `ReplaceEventAsync`: Asynchoronous implementation of the ReplaceEvent method.
 
 For example:
 ```c#
 public class MyCustomDataProvider : AuditDataProvider
 {
+    // Write the json representation of the event to a randomly named file
     public override object InsertEvent(AuditEvent auditEvent)
     {
-        // AuditEvent provides a ToJson() method
-        string json = auditEvent.ToJson();
-        // Write the json representation of the event to a randomly named file
-        var fileName = "Log" + Guid.NewGuid().ToString() + ".json";
-        File.WriteAllText(fileName, json);
+        var fileName = $"Log{Guid.NewGuid()}.json";
+        File.WriteAllText(fileName, auditEvent.ToJson());
         return fileName;
     }
     // Replaces an existing event given the ID and the event
     public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
-        // Override an existing event
         var fileName = eventId.ToString();
         File.WriteAllText(fileName, auditEvent.ToJson());
+    }
+
+    public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+    {
+        var fileName = $"Log{Guid.NewGuid()}.json";
+        await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
+        return fileName;
+    }
+    public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+    {
+        var fileName = eventId.ToString();
+        await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
     }
 }
 ```
@@ -369,7 +384,9 @@ You can also set the data provider per-scope, by using an appropriate overload o
 AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
 ```
 
-As an anternative to creating your own data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` class. For example:
+### Dynamic data providers 
+
+As an anternative to creating a data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` or `DynamicAsyncDataProvider` classes. For example:
 
 ```c#
 var dataProvider = new DynamicDataProvider();
@@ -386,6 +403,22 @@ Audit.Core.Configuration.Setup()
 		.OnInsert(ev => Console.Write(ev.ToJson())));
 ```
 
+For async operations you should use the `DynamicAsyncDataProvider`, for example:
+
+```c#
+var dataProvider = new DynamicAsyncDataProvider();
+dataProvider.AttachOnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson()));
+Audit.Core.Configuration.DataProvider = dataProvider;
+```
+
+Or by using the fluent API:
+ 
+```c#
+Audit.Core.Configuration.Setup()
+    .UseDynamicAsyncProvider(config => config
+        .OnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson())));
+```
+
 #### Data providers included
 
 The Data Providers included are summarized in the following table:
@@ -395,6 +428,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configure the directory and path. | `.UseFileLogProvider()`
 [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Write the audit logs to the Windows EventLog. | `.UseEventLogProvider()`
 [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Dynamically change the behavior at run-time. Define _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()`
+[DynamicAsyncDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicAsyncDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Dynamically change the behavior at run-time. Define _Insert_ and a _Replace_ actions as asynchronous operations. | `.UseDynamicAsyncProvider()`
 [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()`
 [MySqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/Providers/MySqlDataProvider.cs) | [Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MySql#auditnetmysql) | Store the events as rows in a **MySQL** database table, in JSON format. | `.UseMySql()` 
 [PostgreSqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/Providers/PostgreSqlDataProvider.cs) | [Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.PostgreSql#auditnetpostgresql) | Store the events as rows in a **PostgreSQL** database table, in JSON format. | `.UsePostgreSql()`

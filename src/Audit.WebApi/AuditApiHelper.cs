@@ -13,6 +13,13 @@ namespace Audit.WebApi
 {
     internal static class AuditApiHelper
     {
+        private static JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
+        {
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+
         internal static IDictionary<string, object> SerializeParameters(IDictionary<string, object> parameters)
         {
             if (parameters == null)
@@ -21,7 +28,7 @@ namespace Audit.WebApi
             }
             return parameters.ToDictionary(
                 k => k.Key, 
-                v => v.Value == null ? null : JsonConvert.DeserializeObject(JsonConvert.SerializeObject(v.Value), v.Value.GetType()));
+                v => v.Value == null ? null : JsonConvert.DeserializeObject(JsonConvert.SerializeObject(v.Value, _serializerSettings), v.Value.GetType(), _serializerSettings));
         }
 
         internal static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)

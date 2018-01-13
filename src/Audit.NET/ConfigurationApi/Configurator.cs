@@ -13,6 +13,14 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = dataProvider;
             return new CreationPolicyConfigurator();
         }
+        public ICreationPolicyConfigurator UseDynamicAsyncProvider(Action<IDynamicAsyncDataProviderConfigurator> config)
+        {
+            var dataProvider = new DynamicAsyncDataProvider();
+            var dynamicConfig = new DynamicAsyncDataProviderConfigurator(dataProvider);
+            config.Invoke(dynamicConfig);
+            Configuration.DataProvider = dataProvider;
+            return new CreationPolicyConfigurator();
+        }
         public ICreationPolicyConfigurator UseFileLogProvider(Action<IFileLogProviderConfigurator> config)
         {
             var fileLogConfig = new FileLogProviderConfigurator();

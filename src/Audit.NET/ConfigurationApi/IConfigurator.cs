@@ -12,6 +12,10 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         ICreationPolicyConfigurator UseDynamicProvider(Action<IDynamicDataProviderConfigurator> config);
         /// <summary>
+        /// Use a dynamic asynchronous custom provider for the event output.
+        /// </summary>
+        ICreationPolicyConfigurator UseDynamicAsyncProvider(Action<IDynamicAsyncDataProviderConfigurator> config);
+        /// <summary>
         /// Store the events in files.
         /// </summary>
         /// <param name="config">The file log provider configuration.</param>

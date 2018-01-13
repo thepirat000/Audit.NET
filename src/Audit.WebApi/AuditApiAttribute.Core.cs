@@ -13,6 +13,7 @@ using Audit.Core.Extensions;
 using Newtonsoft.Json;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Audit.WebApi
 {
@@ -50,7 +51,7 @@ namespace Audit.WebApi
         /// Occurs before the action method is invoked.
         /// </summary>
         /// <param name="actionContext">The action context.</param>
-        public override void OnActionExecuting(ActionExecutingContext actionContext)
+        private async Task BeforeExecutingAsync(ActionExecutingContext actionContext)
         {
             var httpContext = actionContext.HttpContext;
             var actionDescriptior = actionContext.ActionDescriptor as ControllerActionDescriptor;
@@ -75,7 +76,7 @@ namespace Audit.WebApi
             {
                 Action = auditAction
             };
-            var auditScope = AuditScope.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior.MethodInfo });
+            var auditScope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior.MethodInfo });
             httpContext.Items[AuditApiActionKey] = auditAction;
             httpContext.Items[AuditApiScopeKey] = auditScope;
         }
@@ -84,7 +85,7 @@ namespace Audit.WebApi
         /// Occurs after the action method is invoked.
         /// </summary>
         /// <param name="context">The action executed context.</param>
-        public override void OnActionExecuted(ActionExecutedContext context)
+        private async Task AfterExecutedAsync(ActionExecutedContext context)
         {
             var httpContext = context.HttpContext;
             var auditAction = httpContext.Items[AuditApiActionKey] as AuditApiAction;
@@ -129,8 +130,15 @@ namespace Audit.WebApi
                 }
                 // Replace the Action field and save
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
-                auditScope.Save();
+                await auditScope.SaveAsync();
             }
+        }
+
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            await BeforeExecutingAsync(context);
+            var actionExecutedContext = await next.Invoke();
+            await AfterExecutedAsync(actionExecutedContext);
         }
 
         private string GetStatusCodeString(int statusCode)

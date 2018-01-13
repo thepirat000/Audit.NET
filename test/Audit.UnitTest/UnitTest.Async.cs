@@ -17,6 +17,42 @@ namespace Audit.UnitTest
     public class UnitTestAsync
     {
         [Test]
+        public async Task Test_DynamicAsyncProvider_Async()
+        {
+            var insertEvs = new List<AuditEvent>();
+            var replaceEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _
+                    .OnInsert(async ev =>
+                    {
+                        await Task.Delay(1);
+                        insertEvs.Add(JsonConvert.DeserializeObject<AuditEvent>(JsonConvert.SerializeObject(ev)));
+                        return Guid.NewGuid();
+                    })
+                    .OnReplace(async (id, ev) =>
+                    {
+                        await Task.Delay(1);
+                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEvent>(JsonConvert.SerializeObject(ev)));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var target = "x1";
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions(){ TargetGetter = () => target }))
+            {
+                target = "x2";
+                await scope.SaveAsync();
+                target = "x3";
+            }
+
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(2, replaceEvs.Count);
+            Assert.AreEqual("x1", insertEvs[0].Target.SerializedOld);
+            Assert.AreEqual("x2", replaceEvs[0].Target.SerializedNew);
+            Assert.AreEqual("x3", replaceEvs[1].Target.SerializedNew);
+        }
+
+
+        [Test]
         public async Task Test_FileLog_HappyPath_Async()
         {
             var dir = Path.Combine(Path.GetTempPath(), "Test_FileLog_HappyPath_Async");

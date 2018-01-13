@@ -10,6 +10,8 @@ using System.Net.Http;
 using System;
 using NUnit.Framework;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Audit.WebApi.UnitTest
@@ -17,7 +19,7 @@ namespace Audit.WebApi.UnitTest
     public class ActionFilterUnitTest
     {
         [Test]
-        public void Test_AuditApiActionFilter_InsertOnEnd()
+        public async Task Test_AuditApiActionFilter_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
@@ -58,7 +60,7 @@ namespace Audit.WebApi.UnitTest
             };
             
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
             var filter = new AuditApiAttribute()
@@ -69,6 +71,7 @@ namespace Audit.WebApi.UnitTest
                 IncludeRequestBody = true,
                 EventTypeName = "TestEvent"
             };
+
             var actionContext = new HttpActionContext()
             {
                 ActionDescriptor = actionDescriptor.Object,
@@ -85,38 +88,36 @@ namespace Audit.WebApi.UnitTest
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-            
-            filter.OnActionExecuting(actionExecutingContext);
-
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var ct = new CancellationTokenSource();
+            await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
-
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
-            actionExecutedContext.Response = new System.Net.Http.HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.OK
-            };
-            filter.OnActionExecuted(actionExecutedContext);
+            await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
-
             Assert.AreEqual(123, ((dynamic)action.RequestBody).Length);
             Assert.AreEqual("application/json", ((dynamic)action.RequestBody).Type);
         }
 
+        
+        // TODO: FIX the following tests:
+
+
         [Test]
-        public void Test_AuditApiActionFilter_Manual()
+        public async Task Test_AuditApiActionFilter_Manual()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
@@ -150,7 +151,7 @@ namespace Audit.WebApi.UnitTest
             };
 
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
             var filter = new AuditApiAttribute()
@@ -166,38 +167,41 @@ namespace Audit.WebApi.UnitTest
                 ControllerContext = controllerContext,
 
             };
+
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
+            var self = new TestClass() { Id = 1 };
+            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
+            Console.WriteLine(JsonConvert.SerializeObject(self, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-
-            filter.OnActionExecuting(actionExecutingContext);
-
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var ct = new CancellationTokenSource();
+            await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
-
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
-            actionExecutedContext.Response = new System.Net.Http.HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.OK
-            };
-            filter.OnActionExecuted(actionExecutedContext);
+            await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
 
         [Test]
-        public void Test_AuditApiActionFilter_InsertOnStartReplaceOnEnd()
+        public async Task Test_AuditApiActionFilter_InsertOnStartReplaceOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
@@ -228,7 +232,7 @@ namespace Audit.WebApi.UnitTest
             var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
 
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditApiAttribute()
@@ -248,21 +252,20 @@ namespace Audit.WebApi.UnitTest
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             actionExecutingContext.ActionArguments.Add("x", arg);
+            var self = new TestClass() { Id = 1 };
+            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
+            Console.WriteLine(JsonConvert.SerializeObject(self, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-
-            filter.OnActionExecuting(actionExecutingContext);
-
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var ct = new CancellationTokenSource();
+            await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
-
-            arg.EventTypeName = "CHANGED!";
-
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
-            actionExecutedContext.Response = new System.Net.Http.HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.OK
-            };
-            filter.OnActionExecuted(actionExecutedContext);
+            await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
@@ -270,11 +273,12 @@ namespace Audit.WebApi.UnitTest
             //Assert
             var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual("get", action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using System.Web.Http.ModelBinding;
@@ -53,7 +55,7 @@ namespace Audit.WebApi
         /// Occurs before the action method is invoked.
         /// </summary>
         /// <param name="actionContext">The action context.</param>
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        private async Task BeforeExecutingAsync(HttpActionContext actionContext)
         {
             var request = actionContext.Request;
             var contextWrapper = new ContextWrapper(request);
@@ -85,7 +87,7 @@ namespace Audit.WebApi
                 AuditEvent = auditEventAction,
                 CallingMethod = (actionContext.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
             };
-            var auditScope = AuditScope.Create(options);
+            var auditScope = await AuditScope.CreateAsync(options);
             contextWrapper.Set(AuditApiActionKey, auditAction);
             contextWrapper.Set(AuditApiScopeKey, auditScope);
         }
@@ -94,7 +96,7 @@ namespace Audit.WebApi
         /// Occurs after the action method is invoked.
         /// </summary>
         /// <param name="actionExecutedContext">The action executed context.</param>
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        private async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext)
         {
             var contextWrapper = new ContextWrapper(actionExecutedContext.Request);
             var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiActionKey);
@@ -126,8 +128,20 @@ namespace Audit.WebApi
                 }
                 // Replace the Action field and save
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
-                auditScope.Save();
+                await auditScope.SaveAsync();
             }
+        }
+
+        public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
+        {
+            await BeforeExecutingAsync(actionContext);
+            await base.OnActionExecutingAsync(actionContext, cancellationToken); 
+        }
+
+        public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
+        {
+            await base.OnActionExecutedAsync(actionExecutedContext, cancellationToken);
+            await AfterExecutedAsync(actionExecutedContext);
         }
 
         private BodyContent GetRequestBody(ContextWrapper contextWrapper)
