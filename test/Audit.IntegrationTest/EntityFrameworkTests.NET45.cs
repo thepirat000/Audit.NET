@@ -14,6 +14,7 @@ using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
 {
@@ -259,16 +260,16 @@ if not exists ( select * from [Events] where [EventId] = 1)
         [Test]
         public void Test_EF_SaveChangesSync()
         {
-            Test_EF_Actions(ctx => ctx.SaveChanges());
+            Test_EF_Actions();
         }
 
         [Test]
-        public void Test_EF_SaveChangesAsync()
+        public async Task Test_EF_SaveChangesAsync()
         {
-            Test_EF_Actions(ctx => ctx.SaveChangesAsync().Result);
+            await Test_EF_ActionsAsync();
         }
 
-        public void Test_EF_Actions(Func<DbContext, int> saveChangesMethod)
+        public void Test_EF_Actions()
         {
             var provider = new Mock<AuditDataProvider>();
             AuditEvent auditEvent = null;
@@ -315,7 +316,7 @@ SET IDENTITY_INSERT Posts OFF
                 var pr = ctx.Posts.FirstOrDefault(x => x.Id == 5);
                 ctx.Entry(pr).State = EntityState.Deleted;
 
-                int result = saveChangesMethod.Invoke(ctx);
+                int result = ctx.SaveChanges();
 
                 var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
 
@@ -329,6 +330,70 @@ SET IDENTITY_INSERT Posts OFF
 
                 provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
 
+            }
+        }
+
+        public async Task Test_EF_ActionsAsync()
+        {
+            var provider = new Mock<AuditDataProvider>();
+            AuditEvent auditEvent = null;
+            provider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync((AuditEvent ev) =>
+            {
+                auditEvent = ev;
+                return Task.FromResult(Guid.NewGuid());
+            });
+            provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(provider.Object);
+
+            Database.SetInitializer<MyAuditedVerboseContext>(new CreateDatabaseIfNotExists<MyAuditedVerboseContext>());
+
+            using (var ctx = new MyAuditedVerboseContext())
+            {
+                //ctx.Database.EnsureCreated();
+                await ctx.Database.ExecuteSqlCommandAsync(@"
+delete from Posts
+delete from Blogs
+SET IDENTITY_INSERT Blogs ON 
+insert into Blogs (id, title, bloggername) values (1, 'abc', 'def')
+insert into Blogs (id, title, bloggername) values (2, 'ghi', 'jkl')
+SET IDENTITY_INSERT Blogs OFF
+SET IDENTITY_INSERT Posts ON
+insert into Posts (id, title, datecreated, content, blogid) values (1, 'my post 1', GETDATE(), 'this is an example 123', 1)
+insert into Posts (id, title, datecreated, content, blogid) values (2, 'my post 2', GETDATE(), 'this is an example 456', 1)
+insert into Posts (id, title, datecreated, content, blogid) values (3, 'my post 3', GETDATE(), 'this is an example 789', 1)
+insert into Posts (id, title, datecreated, content, blogid) values (4, 'my post 4', GETDATE(), 'this is an example 987', 2)
+insert into Posts (id, title, datecreated, content, blogid) values (5, 'my post 5', GETDATE(), 'this is an example 000', 2)
+SET IDENTITY_INSERT Posts OFF
+                    ");
+
+                var postsblog1 = await ctx.Blogs.Include(x => x.Posts)
+                    .FirstOrDefaultAsync(x => x.Id == 1);
+                postsblog1.BloggerName += "-22";
+
+                ctx.Posts.Add(new Post() { BlogId = 1, Content = "content", DateCreated = DateTime.Now, Title = "title" });
+
+                var ch1 = await ctx.Posts.FirstOrDefaultAsync(x => x.Id == 1);
+                ch1.Content += "-code";
+
+                var pr = await ctx.Posts.FirstOrDefaultAsync(x => x.Id == 5);
+                ctx.Entry(pr).State = EntityState.Deleted;
+
+                int result = await ctx.SaveChangesAsync();
+
+                var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
+
+                Assert.AreEqual(4, result);
+                Assert.AreEqual("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && (e.Entity as Post)?.Id == 5));
+                Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && e.ColumnValues["Id"].Equals(5) && (e.Entity as Post)?.Id == 5));
+
+                provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             }
         }
     }
