@@ -16,7 +16,7 @@ namespace Audit.Mvc.UnitTest
     public class ActionFilterUnitTest
     {
         [Test]
-        public void Test_AuditActionFilter_InsertOnEnd()
+        public void Test_MVC_AuditActionFilter_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
@@ -90,7 +90,7 @@ namespace Audit.Mvc.UnitTest
         }
 
         [Test]
-        public void Test_AuditActionFilter_Manual()
+        public void Test_MVC_AuditActionFilter_Manual()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
@@ -158,7 +158,7 @@ namespace Audit.Mvc.UnitTest
         }
 
         [Test]
-        public void Test_AuditActionFilter_InsertOnStartReplaceOnEnd()
+        public void Test_MVC_AuditActionFilter_InsertOnStartReplaceOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();

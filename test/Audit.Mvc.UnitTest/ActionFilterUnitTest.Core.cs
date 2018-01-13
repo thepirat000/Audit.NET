@@ -20,7 +20,7 @@ namespace Audit.Mvc.UnitTest
     {
      
         [Test]
-        public void Test_AuditActionFilter_Core_InsertOnEnd()
+        public async Task Test_MVC_AuditActionFilter_Core_InsertOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequest>();
@@ -51,7 +51,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
@@ -63,24 +63,25 @@ namespace Audit.Mvc.UnitTest
             };
 
             var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
-            filter.OnActionExecuting(actionExecutingContext);
-
-            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
-            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
-
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
-            filter.OnActionExecuted(actionExecutedContext);
 
+            var resultExecuting = new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
             var resultExecute = new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
-            filter.OnResultExecuted(resultExecute);
+
+            await filter.OnActionExecutionAsync(actionExecutingContext, async () => await Task.FromResult(actionExecutedContext));
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+            await filter.OnResultExecutionAsync(resultExecuting, () => Task.FromResult<ResultExecutedContext>(resultExecute));
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
-
+            
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
@@ -90,7 +91,7 @@ namespace Audit.Mvc.UnitTest
         }
 
         [Test]
-        public void Test_AuditActionFilter_Core_InsertOnStartReplaceOnEnd()
+        public async Task Test_MVC_AuditActionFilter_Core_InsertOnStartReplaceOnEnd()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequest>();
@@ -122,7 +123,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditAttribute()
@@ -132,32 +133,28 @@ namespace Audit.Mvc.UnitTest
                 EventTypeName = "TestEvent",
                 SerializeActionParameters = true
             };
-
-            var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
-            filter.OnActionExecuting(actionExecutingContext);
-
-            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
-            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
-
-            (args["x"] as AuditAttribute).EventTypeName = "CHANGED!";
-
-            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ActionParameters["test1"]);
-            Assert.Null(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
             
+            var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
-            filter.OnActionExecuted(actionExecutedContext);
 
+            var resultExecuting = new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
             var resultExecute = new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
-            filter.OnResultExecuted(resultExecute);
+
+            await filter.OnActionExecutionAsync(actionExecutingContext, async () => await Task.FromResult(actionExecutedContext));
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+            await filter.OnResultExecutionAsync(resultExecuting, () => Task.FromResult<ResultExecutedContext>(resultExecute));
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
             Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditAttribute).EventTypeName);
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);
@@ -168,9 +165,8 @@ namespace Audit.Mvc.UnitTest
             Assert.AreEqual(200, action.ResponseStatusCode);
         }
 
-
         [Test]
-        public void Test_AuditActionFilter_Core_Manual()
+        public async Task Test_MVC_AuditActionFilter_Core_Manual()
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequest>();
@@ -201,7 +197,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
             var filter = new AuditAttribute()
@@ -211,29 +207,27 @@ namespace Audit.Mvc.UnitTest
                 EventTypeName = "TestEvent"
             };
 
+
             var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
-            filter.OnActionExecuting(actionExecutingContext);
-
-            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
-            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
-
-            Assert.AreEqual("value1", ((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ActionParameters["test1"]);
-            Assert.Null(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
-
-
             var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
             actionExecutedContext.Result = new ObjectResult("this is the result");
-            filter.OnActionExecuted(actionExecutedContext);
 
+            var resultExecuting = new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
             var resultExecute = new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), new RedirectResult("url"), controller.Object);
-            filter.OnResultExecuted(resultExecute);
+
+            await filter.OnActionExecutionAsync(actionExecutingContext, async () => await Task.FromResult(actionExecutedContext));
+            var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
+            var actionFromController = scopeFromController.Event.GetMvcAuditAction();
+            await filter.OnResultExecutionAsync(resultExecuting, () => Task.FromResult<ResultExecutedContext>(resultExecute));
 
             var action = itemsDict["__private_AuditAction__"] as AuditAction;
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);

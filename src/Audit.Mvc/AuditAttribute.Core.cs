@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Primitives;
 using Audit.Core;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -42,7 +43,7 @@ namespace Audit.Mvc
         private const string AuditActionKey = "__private_AuditAction__";
         private const string AuditScopeKey = "__private_AuditScope__";
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        private async Task BeforeExecutingAsync(ActionExecutingContext filterContext)
         {
             var httpContext = filterContext.HttpContext;
             var request = httpContext.Request;
@@ -68,13 +69,12 @@ namespace Audit.Mvc
             {
                 Action = auditAction
             };
-            var auditScope = AuditScope.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior.MethodInfo });
+            var auditScope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior.MethodInfo });
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
-            base.OnActionExecuting(filterContext);
         }
 
-        public override void OnActionExecuted(ActionExecutedContext filterContext)
+        private async Task AfterExecutedAsync(ActionExecutedContext filterContext)
         {
             var httpContext = filterContext.HttpContext;
             var viewResult = filterContext.Result as ViewResult;
@@ -92,10 +92,14 @@ namespace Audit.Mvc
                 // Replace the Action field
                 (auditScope.Event as AuditEventMvcAction).Action = auditAction;
             }
-            base.OnActionExecuted(filterContext);
+            if (auditAction?.Exception != null)
+            {
+                // An exception was thrown, save the event since OnResultExecutionAsync will not be triggered.
+                await auditScope.SaveAsync();
+            }
         }
 
-        public override void OnResultExecuted(ResultExecutedContext filterContext)
+        public async Task AfterResultAsync(ResultExecutedContext filterContext)
         {
             var httpContext = filterContext.HttpContext;
             var auditAction = httpContext.Items[AuditActionKey] as AuditAction;
@@ -115,11 +119,23 @@ namespace Audit.Mvc
                 (auditScope.Event as AuditEventMvcAction).Action = auditAction;
                 if (auditScope.EventCreationPolicy == EventCreationPolicy.Manual)
                 {
-                    auditScope.Save(); // for backwards compatibility
+                    await auditScope.SaveAsync(); 
                 }
-                auditScope.Dispose();
+                await auditScope.DisposeAsync();
             }
-            base.OnResultExecuted(filterContext);
+        }
+
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            await BeforeExecutingAsync(context);
+            var actionExecutedContext = await next.Invoke();
+            await AfterExecutedAsync(actionExecutedContext);
+        }
+
+        public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+        {
+            var resultExecutionContext = await next.Invoke();
+            await AfterResultAsync(resultExecutionContext);
         }
 
         private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)

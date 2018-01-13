@@ -14,6 +14,9 @@ namespace Audit.Integration.AspNetCore
     {
         static void Main(string[] args)
         {
+            //BuildWebHost(args).RunAsync().GetAwaiter().GetResult();
+            //return;
+
             MainAsync(args).GetAwaiter().GetResult();
         }
 
@@ -23,18 +26,26 @@ namespace Audit.Integration.AspNetCore
             var pc = Console.ForegroundColor;
             var runner = BuildWebHost(args).RunAsync(ct.Token);
 
-            var tests = new WebApiTests(27050);
+            var webApiTests = new WebApiTests(27050);
+            var mvcTests = new MvcTests(27050);
 
             try
             {
                 Console.WriteLine("START - TestInitialize");
-                await tests.TestInitialize();
+                await webApiTests.TestInitialize();
+
+                Console.WriteLine("START - Test_Mvc_Exception_Async");
+                await mvcTests.Test_Mvc_Exception_Async();
+                Console.WriteLine("PASSED - Test_Mvc_Exception_Async");
+                Console.WriteLine("START - Test_Mvc_HappyPath_Async");
+                await mvcTests.Test_Mvc_HappyPath_Async();
+                Console.WriteLine("PASSED - Test_Mvc_HappyPath_Async");
                 Console.WriteLine("PASSED - TestInitialize");
                 Console.WriteLine("START - Test_WebApi_HappyPath_Async");
-                await tests.Test_WebApi_HappyPath_Async();
+                await webApiTests.Test_WebApi_HappyPath_Async();
                 Console.WriteLine("PASSED - Test_WebApi_HappyPath_Async");
                 Console.WriteLine("START - Test_WebApi_Exception_Async");
-                await tests.Test_WebApi_Exception_Async();
+                await webApiTests.Test_WebApi_Exception_Async();
                 Console.WriteLine("PASSED - Test_WebApi_Exception_Async");
 
                 Console.ForegroundColor = ConsoleColor.Green;

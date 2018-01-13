@@ -3,70 +3,62 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Audit.Core;
-using Audit.Integration.AspNetCore.Controllers;
-using Audit.WebApi;
+using Audit.Mvc;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Audit.Integration.AspNetCore
 {
-    public class WebApiTests
+    public class MvcTests
     {
         private int _port;
-        public WebApiTests(int port)
+        public MvcTests(int port)
         {
             _port = port;
         }
 
-        public async Task TestInitialize()
+        public async Task Test_Mvc_HappyPath_Async()
         {
-            var c = new HttpClient();
-            var s = await c.GetStringAsync($"http://localhost:{_port}/api/values");
-            Assert.AreEqual("[\"value1\",\"value2\"]", s);
-        }
-
-        public async Task Test_WebApi_HappyPath_Async()
-        {
-            var insertEvs = new List<AuditApiAction>();
-            var replaceEvs = new List<AuditApiAction>();
+            var insertEvs = new List<AuditAction>();
+            var replaceEvs = new List<AuditAction>();
             Audit.Core.Configuration.Setup()
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                     {
                         await Task.Delay(1);
-                        insertEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                        insertEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
                         return Guid.NewGuid();
                     })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(1);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var c = new HttpClient();
-            var s = await c.GetStringAsync($"http://localhost:{_port}/api/values/10");
-            Assert.AreEqual("10", s);
+            var s = await c.GetStringAsync($"http://localhost:{_port}/test/mytitle");
+            Assert.IsTrue(s.Contains("<h2>mytitle</h2>"));
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual(1, replaceEvs.Count);
-            Assert.AreEqual(null, insertEvs[0].ResponseBody);
-            Assert.AreEqual("10", replaceEvs[0].ResponseBody.Value);
+            Assert.AreEqual(null, insertEvs[0].Model);
+            Assert.AreEqual(@"{""Title"":""mytitle""}", replaceEvs[0].Model.ToString().Replace(" ", "").Replace("\r", "").Replace("\n", ""));
         }
 
-        public async Task Test_WebApi_Exception_Async()
+        public async Task Test_Mvc_Exception_Async()
         {
-            var insertEvs = new List<AuditApiAction>();
-            var replaceEvs = new List<AuditApiAction>();
+            var insertEvs = new List<AuditAction>();
+            var replaceEvs = new List<AuditAction>();
             Audit.Core.Configuration.Setup()
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                     {
                         await Task.Delay(1);
-                        insertEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                        insertEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
                         return Guid.NewGuid();
                     })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(1);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -74,7 +66,7 @@ namespace Audit.Integration.AspNetCore
             string s = null;
             try
             {
-                s = await c.GetStringAsync($"http://localhost:{_port}/api/values/666");
+                s = await c.GetStringAsync($"http://localhost:{_port}/test/666");
             }
             catch (Exception ex)
             {
