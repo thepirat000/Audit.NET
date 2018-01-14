@@ -184,6 +184,14 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("MySql")]
+            public async Task TestMySqlAsync()
+            {
+                SetMySqlSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
             [Category("UDP")]
             public void TestUdp()
             {
@@ -312,6 +320,7 @@ namespace Audit.IntegrationTest
                     });
 
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
+                    await a.DisposeAsync();
                 }
 
                 var evFromApi = await Audit.Core.Configuration.DataProvider.GetEventAsync(ids[0]);

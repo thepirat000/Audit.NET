@@ -72,5 +72,19 @@ namespace Audit.Core
         {
             return JsonConvert.SerializeObject(this, JsonSettings);
         }
+        /// <summary>
+        /// Parses an AuditEvent from its JSON string representation using JSON.NET.
+        /// </summary>
+        public static T FromJson<T>(string json) where T : AuditEvent
+        {
+            return JsonConvert.DeserializeObject<T>(json, JsonSettings);
+        }
+        /// <summary>
+        /// Parses an AuditEvent from its JSON string representation using JSON.NET.
+        /// </summary>
+        public static AuditEvent FromJson(string json) 
+        {
+            return JsonConvert.DeserializeObject<AuditEvent>(json, JsonSettings);
+        }
     }
 }
