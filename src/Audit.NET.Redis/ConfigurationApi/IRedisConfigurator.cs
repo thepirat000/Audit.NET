@@ -21,6 +21,12 @@ namespace Audit.Redis.Configuration
         /// <param name="serializer">The custom serializer to use.</param>
         IRedisConfigurator Serializer(Func<AuditEvent, byte[]> serializer);
         /// <summary>
+        /// Specifies a custom deserializer to retrieve the audit events from the redis server.
+        /// Default is the audit event deserialized from JSon UTF-8 encoded.
+        /// </summary>
+        /// <param name="deserializer">The custom deserializer to use.</param>
+        IRedisConfigurator Deserializer(Func<byte[], AuditEvent> deserializer);
+        /// <summary>
         /// Specifies that the audit events will be stored as Redis Strings.
         /// </summary>
         /// <param name="config">The redis string configurator.</param>

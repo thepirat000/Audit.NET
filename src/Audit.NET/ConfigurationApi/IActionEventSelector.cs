@@ -6,5 +6,6 @@ namespace Audit.Core.ConfigurationApi
     {
         void OnScopeCreated(Action<AuditScope> action);
         void OnEventSaving(Action<AuditScope> action);
+        void OnEventSaved(Action<AuditScope> action);
     }
 }

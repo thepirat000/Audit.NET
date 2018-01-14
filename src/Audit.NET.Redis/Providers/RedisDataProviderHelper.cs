@@ -12,23 +12,26 @@ namespace Audit.Redis.Providers
     {
         internal string _connectionString;
         internal Func<AuditEvent, byte[]> _serializer;
+        internal Func<byte[], AuditEvent> _deserializer;
 
         /// <summary>
         /// Creates a new helper instance with the given connection string
         /// </summary>
         /// <param name="connectionString">The redis connection string to be used</param>
         public RedisDataProviderHelper(string connectionString)
-            : this(connectionString, (Func<AuditEvent, byte[]>) null) { }
+            : this(connectionString, null, null) { }
 
         /// <summary>
         /// Creates a new helper instance with the given connection string and serializer
         /// </summary>
         /// <param name="connectionString">The redis connection string to be used</param>
         /// <param name="serializer">Specifies a custom serializer to store/send the data on/to the redis server</param>
-        public RedisDataProviderHelper(string connectionString, Func<AuditEvent, byte[]> serializer)
+        /// <param name="deserializer">Specifies a custom deserializer to retrieve events from the redis server</param>
+        public RedisDataProviderHelper(string connectionString, Func<AuditEvent, byte[]> serializer, Func<byte[], AuditEvent> deserializer)
         {
             _connectionString = connectionString;
             _serializer = serializer;
+            _deserializer = deserializer;
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace Audit.Redis.Providers
             var strConfig = new RedisStringConfigurator();
             config.Invoke(strConfig);
             return new RedisDataProvider(new RedisProviderString(
-                _connectionString, strConfig._keyBuilder, strConfig._timeToLive, _serializer));
+                _connectionString, strConfig._keyBuilder, strConfig._timeToLive, _serializer, _deserializer));
         }
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace Audit.Redis.Providers
             var hashConfig = new RedisHashConfigurator();
             config.Invoke(hashConfig);
             return new RedisDataProvider(new RedisProviderHash(
-                _connectionString, hashConfig._keyBuilder, hashConfig._timeToLive, _serializer,
+                _connectionString, hashConfig._keyBuilder, hashConfig._timeToLive, _serializer, _deserializer,
                 hashConfig._fieldBuilder));
         }
 
@@ -65,7 +68,7 @@ namespace Audit.Redis.Providers
             var listConfig = new RedisListConfigurator();
             config.Invoke(listConfig);
             return new RedisDataProvider(new RedisProviderList(
-                _connectionString, listConfig._keyBuilder, listConfig._timeToLive, _serializer,
+                _connectionString, listConfig._keyBuilder, listConfig._timeToLive, _serializer, _deserializer,
                 listConfig._maxLength));
         }
 
@@ -78,7 +81,7 @@ namespace Audit.Redis.Providers
             var ssConfig = new RedisSortedSetConfigurator();
             config.Invoke(ssConfig);
             return new RedisDataProvider(new RedisProviderSortedSet(
-                _connectionString, ssConfig._keyBuilder, ssConfig._timeToLive, _serializer,
+                _connectionString, ssConfig._keyBuilder, ssConfig._timeToLive, _serializer, _deserializer,
                 ssConfig._scoreBuilder, ssConfig._maxScoreBuilder, ssConfig._maxScoreExclusive, ssConfig._minScoreBuilder, ssConfig._minScoreExclusive,
                 ssConfig._maxRankBuilder));
         }
