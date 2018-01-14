@@ -166,6 +166,14 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("Mongo")]
+            public async Task TestMongoAsync()
+            {
+                SetMongoSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
             [Category("MySql")]
             public void TestMySql()
             {
@@ -197,6 +205,12 @@ namespace Audit.IntegrationTest
                 var reasonText = "the order was updated because ...";
                 var eventType = "Order:Update";
                 var ev = (AuditEvent)null;
+                var ids = new List<object>();
+                Audit.Core.Configuration.ResetCustomActions();
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+                {
+                    ids.Add(scope.EventId);
+                });
                 //struct
                 using (var a = AuditScope.Create(eventType, () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
@@ -215,6 +229,13 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
+                var evFromApi = Audit.Core.Configuration.DataProvider.GetEvent(ids[0]);
+                Assert.AreEqual(2, ids.Count);
+                Assert.AreEqual(ids[0], ids[1]);
+                Assert.AreEqual(ev.EventType, evFromApi.EventType);
+                Assert.AreEqual(ev.StartDate, evFromApi.StartDate);
+                Assert.AreEqual(ev.EndDate, evFromApi.EndDate);
+                Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
                 Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
                 Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
@@ -259,6 +280,93 @@ namespace Audit.IntegrationTest
                 }
 
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+
+                Audit.Core.Configuration.ResetCustomActions();
+            }
+
+            public async Task TestUpdateAsync()
+            {
+                var order = DbCreateOrder();
+                var reasonText = "the order was updated because ...";
+                var eventType = "Order:Update";
+                var ev = (AuditEvent)null;
+                var ids = new List<object>();
+                Audit.Core.Configuration.ResetCustomActions();
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+                {
+                    ids.Add(scope.EventId);
+                });
+                //struct
+                using (var a = await AuditScope.CreateAsync(eventType, () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
+                {
+                    ev = a.Event;
+                    a.SetCustomField("$TestGuid", Guid.NewGuid());
+
+                    a.SetCustomField("$null", (string)null);
+                    a.SetCustomField("$array.dicts", new[]
+                    {
+                        new Dictionary<string, string>()
+                        {
+                            {"some.dots", "hi!"}
+                        }
+                    });
+
+                    order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
+                }
+
+                var evFromApi = await Audit.Core.Configuration.DataProvider.GetEventAsync(ids[0]);
+                Assert.AreEqual(2, ids.Count);
+                Assert.AreEqual(ids[0], ids[1]);
+                Assert.AreEqual(ev.EventType, evFromApi.EventType);
+                Assert.AreEqual(ev.StartDate, evFromApi.StartDate);
+                Assert.AreEqual(ev.EndDate, evFromApi.EndDate);
+                Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
+                Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
+                Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+
+                order = DbCreateOrder();
+
+                //audit multiple 
+                using (var a = await AuditScope.CreateAsync(eventType, () => new { OrderStatus = order.Status, Items = order.OrderItems }, new { ReferenceId = order.OrderId }))
+                {
+                    ev = a.Event;
+                    order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
+                }
+
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+
+                order = DbCreateOrder();
+
+                using (var audit = await AuditScope.CreateAsync("Order:Update", () => order.Status, new { ReferenceId = order.OrderId }))
+                {
+                    ev = audit.Event;
+                    audit.SetCustomField("Reason", reasonText);
+                    audit.SetCustomField("ItemsBefore", order.OrderItems);
+                    audit.SetCustomField("FirstItem", order.OrderItems.FirstOrDefault());
+
+                    order = DbOrderUpdateStatus(order, IntegrationTests.OrderStatus.Submitted);
+                    audit.SetCustomField("ItemsAfter", order.OrderItems);
+                    audit.Comment("Status Updated to Submitted");
+                    audit.Comment("Another Comment");
+                }
+
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+
+                order = DbCreateOrder();
+
+                using (var audit = await AuditScope.CreateAsync(eventType, () => order, new { ReferenceId = order.OrderId }))
+                {
+                    ev = audit.Event;
+                    audit.SetCustomField("Reason", "reason");
+                    ExecuteStoredProcedure(order, IntegrationTests.OrderStatus.Submitted);
+                    order.Status = IntegrationTests.OrderStatus.Submitted;
+                    audit.Comment("Status Updated to Submitted");
+                }
+
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+
+                Audit.Core.Configuration.ResetCustomActions();
             }
 
             public void TestInsert()

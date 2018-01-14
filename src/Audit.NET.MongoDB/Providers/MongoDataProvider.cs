@@ -6,7 +6,10 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Audit.Core;
 using System.Linq;
+using System.Threading.Tasks;
+using MongoDB.Bson.IO;
 using Newtonsoft.Json;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Audit.MongoDB.Providers
 {
@@ -27,6 +30,7 @@ namespace Audit.MongoDB.Providers
         private string _collection = "Event";
         private bool _ignoreElementNames = false;
         private JsonSerializerSettings _jsonSerializerSettings =  new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+        private JsonWriterSettings _jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
 
         static MongoDataProvider()
         {
@@ -210,6 +214,24 @@ namespace Audit.MongoDB.Providers
             var client = new MongoClient(_connectionString);
             var db = client.GetDatabase(_database);
             return db;
+        }
+
+        public override T GetEvent<T>(object eventId)
+        {
+            var client = new MongoClient(_connectionString);
+            var db = client.GetDatabase(_database);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            var doc = db.GetCollection<BsonDocument>(_collection).Find(filter).FirstOrDefault();
+            return doc == null ? null : JsonConvert.DeserializeObject<T>(doc.ToJson(_jsonWriterSettings), _jsonSerializerSettings);
+        }
+
+        public override async Task<T> GetEventAsync<T>(object eventId)
+        {
+            var client = new MongoClient(_connectionString);
+            var db = client.GetDatabase(_database);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            var doc = await (await db.GetCollection<BsonDocument>(_collection).FindAsync(filter)).FirstOrDefaultAsync();
+            return doc == null ? null : JsonConvert.DeserializeObject<T>(doc.ToJson(_jsonWriterSettings), _jsonSerializerSettings);
         }
 
         #region Events Query        

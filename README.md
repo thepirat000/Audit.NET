@@ -334,6 +334,12 @@ If your data provider will support asynchronous operations, you must also implem
 - `InsertEventAsync`: Asynchoronous implementation of the InsertEvent method. 
 - `ReplaceEventAsync`: Asynchoronous implementation of the ReplaceEvent method.
 
+Also, if your data provider will support event retrieval, you should implement the following methods:
+
+- `GetEvent`: Retrieves an event by id. 
+- `GetEventAsync`: Asynchoronous implementation of the GetEvent method. 
+
+
 For example:
 ```c#
 public class MyCustomDataProvider : AuditDataProvider
@@ -362,6 +368,18 @@ public class MyCustomDataProvider : AuditDataProvider
     {
         var fileName = eventId.ToString();
         await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
+    }
+
+    public override T GetEvent<T>(object eventId)
+    {
+        var fileName = eventId.ToString();
+        return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
+    }
+
+    public override async Task<T> GetEventAsync<T>(object eventId) 
+    {
+        var fileName = eventId.ToString();
+        return await GetFromFileAsync<T>(fileName);
     }
 }
 ```

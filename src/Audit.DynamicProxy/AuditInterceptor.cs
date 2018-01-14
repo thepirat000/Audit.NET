@@ -17,6 +17,9 @@ namespace Audit.DynamicProxy
     /// Ideas stolen from:
     /// https://blog.cincura.net/233489-injecting-logging-into-asynchronous-methods
     /// http://stackoverflow.com/questions/28099669/intercept-async-method-that-returns-generic-task-via-dynamicproxy
+    ///
+    /// No async support:
+    /// https://github.com/castleproject/Core/issues/145
     /// </remarks>
 #if NET45
     [Serializable]

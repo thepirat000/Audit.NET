@@ -62,6 +62,7 @@ namespace Audit.Core
                 {
                     {ActionType.OnScopeCreated, new List<Action<AuditScope>>()},
                     {ActionType.OnEventSaving, new List<Action<AuditScope>>()},
+                    {ActionType.OnEventSaved, new List<Action<AuditScope>>()}
                 };
             }
         }

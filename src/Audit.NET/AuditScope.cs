@@ -403,6 +403,8 @@ namespace Audit.Core
             {
                 _eventId = _dataProvider.InsertEvent(_event);
             }
+            // Execute custom after saving actions
+            Configuration.InvokeScopeCustomActions(ActionType.OnEventSaved, this);
         }
 
         private async Task SaveEventAsync(bool forceInsert = false)
@@ -425,6 +427,8 @@ namespace Audit.Core
             {
                 _eventId = await _dataProvider.InsertEventAsync(_event);
             }
+            // Execute custom after saving actions
+            Configuration.InvokeScopeCustomActions(ActionType.OnEventSaved, this);
         }
         #endregion
     }

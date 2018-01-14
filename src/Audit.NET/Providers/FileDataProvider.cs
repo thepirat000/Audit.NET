@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace Audit.Core.Providers
 {
@@ -91,28 +91,52 @@ namespace Audit.Core.Providers
             File.WriteAllText(fullPath, json);
         }
 
+        public override T GetEvent<T>(object path)
+        {
+            var fullPath = path.ToString();
+            var json = File.ReadAllText(fullPath);
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+
         public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent)
         {
             var fullPath = path.ToString();
             await SaveFileAsync(fullPath, auditEvent);
         }
 
+        public override async Task<T> GetEventAsync<T>(object path) 
+        {
+            var fullPath = path.ToString();
+            return await GetFromFileAsync<T>(fullPath);
+        }
+
         private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent)
         {
-            using (var file = File.Open(fullPath, FileMode.Create))
+            using (FileStream file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, true))
             {
-                using (var memoryStream = new MemoryStream())
+                var jObject = JObject.FromObject(auditEvent);
+                using (var sw = new StreamWriter(file))
                 {
-                    using (var writer = new StreamWriter(memoryStream))
+                    using (var jw = new JsonTextWriter(sw))
                     {
-                        var serializer = JsonSerializer.CreateDefault(JsonSettings);
-                        serializer.Serialize(writer, auditEvent);
-                        await writer.FlushAsync().ConfigureAwait(false);
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-                        await memoryStream.CopyToAsync(file).ConfigureAwait(false);
+                        await jObject.WriteToAsync(jw);
                     }
                 }
-                await file.FlushAsync().ConfigureAwait(false);
+            }
+        }
+
+        private async Task<T> GetFromFileAsync<T>(string fullPath) where T : AuditEvent
+        {
+            using (FileStream file = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+            {
+                using (var sr = new StreamReader(file))
+                {
+                    using (var jr = new JsonTextReader(sr))
+                    {
+                        var jObject = await JObject.LoadAsync(jr);
+                        return jObject.ToObject<T>();
+                    }
+                }
             }
         }
 

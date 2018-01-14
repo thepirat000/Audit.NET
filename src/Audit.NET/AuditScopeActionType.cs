@@ -12,6 +12,10 @@
         /// <summary>
         /// When the Audit Event on the Scope is about to be saved.
         /// </summary>
-        OnEventSaving = 1
+        OnEventSaving = 1,
+        /// <summary>
+        /// After the Audit Event on the Scope is saved (inserted or replaced).
+        /// </summary>
+        OnEventSaved = 2
     }
 }

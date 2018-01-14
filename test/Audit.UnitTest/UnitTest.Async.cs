@@ -73,11 +73,15 @@ namespace Audit.UnitTest
                 target = "end";
                 await scope.DisposeAsync();
             }
+
+            var fileFromProvider = await (Audit.Core.Configuration.DataProvider as FileDataProvider).GetEventAsync($@"{dir}\evt-1.json");
+
             var ev = JsonConvert.DeserializeObject<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
             var fileCount = Directory.EnumerateFiles(dir).Count();
             Directory.Delete(dir, true);
 
             Assert.AreEqual(1, fileCount);
+            Assert.AreEqual(JsonConvert.SerializeObject(ev), JsonConvert.SerializeObject(fileFromProvider));
             Assert.AreEqual("evt", ev.EventType);
             Assert.AreEqual("start", ev.Target.SerializedOld);
             Assert.AreEqual("end", ev.Target.SerializedNew);
