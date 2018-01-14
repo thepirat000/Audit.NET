@@ -43,6 +43,38 @@ namespace Audit.UnitTest
             Assert.AreEqual(events[0].CustomFields["UdpEventId"], events[1].CustomFields["UdpEventId"]);
         }
 
+        [Test]
+        [TestCase("225.0.0.1", 2223, true)]
+        [TestCase("127.0.0.1", 12367, false)]
+        public async Task Test_UdpDataProvider_BasicTest_Async(string ip, int port, bool multicast)
+        {
+            stop = false;
+            events.Clear();
+            var p = new Udp.Providers.UdpDataProvider();
+            p.RemoteAddress = IPAddress.Parse(ip);
+            p.RemotePort = port;
+            var cts = new CancellationTokenSource();
+            var re = new ManualResetEvent(false);
+            var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
+            re.WaitOne();
+            await Task.Delay(1000);
+            using (var scope = await AuditScope.CreateAsync("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd, p))
+            {
+                Task.Delay(100).Wait();
+                await scope.SaveAsync();
+                scope.Discard();
+            }
+            await Task.Delay(2000);
+            stop = true;
+            cts.Cancel();
+            await Task.Delay(2000);
+            Assert.AreEqual(2, events.Count);
+            Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[0].EventType);
+            Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[1].EventType);
+            Assert.NotNull(events[0].CustomFields["UdpEventId"]);
+            Assert.AreEqual(events[0].CustomFields["UdpEventId"], events[1].CustomFields["UdpEventId"]);
+        }
+
         private static bool stop = false;
         private static object locker = new object();
         private static List<AuditEvent> events = new List<AuditEvent>();

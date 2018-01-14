@@ -63,6 +63,17 @@ namespace Audit.Udp.Providers
         }
 
         /// <summary>
+        /// Sends an event to the network asychronously as an UDP datagram
+        /// </summary>
+        /// <param name="auditEvent">The audit event being created.</param>
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var eventId = Guid.NewGuid();
+            await SendAsync(eventId, auditEvent);
+            return eventId;
+        }
+
+        /// <summary>
         /// Sends an event to the network as an UDP datagram, related to a previous event
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>
@@ -70,6 +81,16 @@ namespace Audit.Udp.Providers
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             Send(eventId, auditEvent);
+        }
+
+        /// <summary>
+        /// Sends an event to the network asychronously as an UDP datagram, related to a previous event
+        /// </summary>
+        /// <param name="auditEvent">The audit event.</param>
+        /// <param name="eventId">The event id being replaced.</param>
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            await SendAsync(eventId, auditEvent);
         }
 
         /// <summary>
@@ -90,6 +111,15 @@ namespace Audit.Udp.Providers
             auditEvent.CustomFields["UdpEventId"] = eventId;
             var buffer = SerializeEvent(auditEvent);
             client.SendAsync(buffer, buffer.Length, ep).GetAwaiter().GetResult();
+        }
+
+        private async Task SendAsync(object eventId, AuditEvent auditEvent)
+        {
+            var client = GetSendClient();
+            var ep = new IPEndPoint(RemoteAddress, RemotePort);
+            auditEvent.CustomFields["UdpEventId"] = eventId;
+            var buffer = SerializeEvent(auditEvent);
+            await client.SendAsync(buffer, buffer.Length, ep);
         }
 
         private byte[] SerializeEvent(AuditEvent auditEvent)
