@@ -156,6 +156,14 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("PostgreSQL")]
+            public async Task PostgreSqlAsync()
+            {
+                SetPostgreSqlSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
             [Category("Mongo")]
             public void TestMongo()
             {

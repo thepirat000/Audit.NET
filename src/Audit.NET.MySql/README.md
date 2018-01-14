@@ -50,6 +50,15 @@ Mandatory:
 - **JsonColumnName**: The column name of the event table where the event JSON will be stored.
 - **IdColumnName**: The column name of the event identifier (the primary key column name).
 
+## Query events
+
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+
+```c#
+var event = mySqlDataProvider.GetEvent(1000);
+```
+
+
 ## Table constraints
 
 - The table should exists. 

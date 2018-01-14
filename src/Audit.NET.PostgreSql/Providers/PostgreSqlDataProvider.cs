@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Npgsql;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Audit.PostgreSql.Providers
 {
@@ -94,16 +95,18 @@ namespace Audit.PostgreSql.Providers
         {
             using (var cnn = new NpgsqlConnection(_connectionString))
             {
-                cnn.Open();
-                var cmd = cnn.CreateCommand();
-                var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
-                var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
-                cmd.CommandText = $@"insert into {schema}""{_tableName}"" (""{_dataColumnName}"") values ({data}) RETURNING id";
-                var parameter = cmd.CreateParameter();
-                parameter.ParameterName = "data";
-                parameter.Value = auditEvent.ToJson();
-                cmd.Parameters.Add(parameter);
+                var cmd = GetInsertCommand(cnn, auditEvent);
                 var id = cmd.ExecuteScalar();
+                return id;
+            }
+        }
+
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            using (var cnn = new NpgsqlConnection(_connectionString))
+            {
+                var cmd = GetInsertCommand(cnn, auditEvent);
+                var id = await cmd.ExecuteScalarAsync();
                 return id;
             }
         }
@@ -112,22 +115,54 @@ namespace Audit.PostgreSql.Providers
         {
             using (var cnn = new NpgsqlConnection(_connectionString))
             {
-                cnn.Open();
-                var cmd = cnn.CreateCommand();
-                var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
-                var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
-                var ludScript = string.IsNullOrWhiteSpace(_lastUpdatedDateColumnName) ? "" : $@", ""{_lastUpdatedDateColumnName}"" = CURRENT_TIMESTAMP";
-                cmd.CommandText = $@"update {schema}""{_tableName}"" SET ""{_dataColumnName}"" = {data}{ludScript} WHERE ""{_idColumnName}"" = @id";
-                var dataParameter = cmd.CreateParameter();
-                dataParameter.ParameterName = "data";
-                dataParameter.Value = auditEvent.ToJson();
-                cmd.Parameters.Add(dataParameter);
-                var idParameter = cmd.CreateParameter();
-                idParameter.ParameterName = "id";
-                idParameter.Value = eventId;
-                cmd.Parameters.Add(idParameter);
+                var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            using (var cnn = new NpgsqlConnection(_connectionString))
+            {
+                var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        public override T GetEvent<T>(object eventId)
+        {
+            using (var cnn = new NpgsqlConnection(_connectionString))
+            {
+                var cmd = GetSelectCommand(cnn, eventId);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        var json = reader.GetString(0);
+                        return AuditEvent.FromJson<T>(json);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public override async Task<T> GetEventAsync<T>(object eventId)
+        {
+            using (var cnn = new NpgsqlConnection(_connectionString))
+            {
+                var cmd = GetSelectCommand(cnn, eventId);
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (reader.HasRows)
+                    {
+                        await reader.ReadAsync();
+                        var json = reader.GetString(0);
+                        return AuditEvent.FromJson<T>(json);
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -171,6 +206,52 @@ namespace Audit.PostgreSql.Providers
                     yield return JsonConvert.DeserializeObject<T>(data);
                 }
             }
+        }
+
+        private NpgsqlCommand GetInsertCommand(NpgsqlConnection cnn, AuditEvent auditEvent)
+        {
+            cnn.Open();
+            var cmd = cnn.CreateCommand();
+            var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+            var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
+            cmd.CommandText = $@"insert into {schema}""{_tableName}"" (""{_dataColumnName}"") values ({data}) RETURNING id";
+            var parameter = cmd.CreateParameter();
+            parameter.ParameterName = "data";
+            parameter.Value = auditEvent.ToJson();
+            cmd.Parameters.Add(parameter);
+            return cmd;
+        }
+
+        private NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
+        {
+            cnn.Open();
+            var cmd = cnn.CreateCommand();
+            var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+            var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
+            var ludScript = string.IsNullOrWhiteSpace(_lastUpdatedDateColumnName) ? "" : $@", ""{_lastUpdatedDateColumnName}"" = CURRENT_TIMESTAMP";
+            cmd.CommandText = $@"update {schema}""{_tableName}"" SET ""{_dataColumnName}"" = {data}{ludScript} WHERE ""{_idColumnName}"" = @id";
+            var dataParameter = cmd.CreateParameter();
+            dataParameter.ParameterName = "data";
+            dataParameter.Value = auditEvent.ToJson();
+            cmd.Parameters.Add(dataParameter);
+            var idParameter = cmd.CreateParameter();
+            idParameter.ParameterName = "id";
+            idParameter.Value = eventId;
+            cmd.Parameters.Add(idParameter);
+            return cmd;
+        }
+
+        private NpgsqlCommand GetSelectCommand(NpgsqlConnection cnn, object eventId)
+        {
+            cnn.Open();
+            var cmd = cnn.CreateCommand();
+            var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+            cmd.CommandText = $@"select ""{_dataColumnName}"" from {schema}""{_tableName}"" WHERE ""{_idColumnName}"" = @id";
+            var idParameter = cmd.CreateParameter();
+            idParameter.ParameterName = "id";
+            idParameter.Value = eventId;
+            cmd.Parameters.Add(idParameter);
+            return cmd;
         }
     }
 }

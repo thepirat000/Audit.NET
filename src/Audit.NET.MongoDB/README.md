@@ -52,18 +52,15 @@ An example of the output as seen with [NoSQL Manager for Mongo DB](http://www.mo
 
 ![MongoDB sample](http://i.imgur.com/jyYOypX.png)
 
-## Retrieve events
+## Query events
 
-The Mongo DB data provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
 
 ```c#
 var event = mongoDataProvider.GetEvent("57b60f25be5914a355771629");
 ```
 
-
-## Query events
-
-The Mongo DB data provider includes support for querying the events collection.
+The Mongo DB data provider also includes support for querying the events collection.
 
 You can use the `QueryEvents()` method on `MongoDataProvider` class to run LINQ queries against the audit events.
 

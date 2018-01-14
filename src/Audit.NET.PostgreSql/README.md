@@ -82,7 +82,13 @@ TABLESPACE pg_default;
 
 ## Query events
 
-The Postgre SQL data provider includes (very basic) support for querying the events collection.
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+
+```c#
+var event = mySqlDataProvider.GetEvent(1000);
+```
+
+The Postgre SQL data provider also includes basic support for querying the events collection.
 
 Use the `EnumerateEvents()` method on `PostgreSqlDataProvider` class to run SQL-like queries against the audit events. The `EnumerateEvents()` method accepts any valid Postgre WHERE clause as a parameter.
 
