@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Audit.Core;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
+using System.Threading;
 #if NETSTANDARD1_3 || NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore;
 #endif
@@ -75,7 +77,7 @@ namespace Audit.SqlServer.Providers
             var json = new SqlParameter("json", auditEvent.ToJson());
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
-                var cmdText = string.Format("INSERT INTO {0} ([{1}]) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES (@json)", GetFullTableName(auditEvent), JsonColumnNameBuilder.Invoke(auditEvent), IdColumnNameBuilder.Invoke(auditEvent));
+                var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
                 var result = ctx.Database.SqlQuery<string>(cmdText, json);
                 return result.FirstOrDefault();
@@ -86,16 +88,81 @@ namespace Audit.SqlServer.Providers
             }
         }
 
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var json = new SqlParameter("json", auditEvent.ToJson());
+            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
+            {
+                var cmdText = GetInsertCommandText(auditEvent);
+#if NET45
+                var result = ctx.Database.SqlQuery<string>(cmdText, json);
+                return await result.FirstOrDefaultAsync();
+#elif NETSTANDARD1_3 || NETSTANDARD2_0
+                var result = ctx.FakeIdSet.FromSql(cmdText, json);
+                return (await result.FirstOrDefaultAsync()).Id;
+#endif
+            }
+        }
+
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var json = auditEvent.ToJson();
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
-                var ludScript = LastUpdatedDateColumnNameBuilder != null ? string.Format(", [{0}] = GETUTCDATE()", LastUpdatedDateColumnNameBuilder.Invoke(auditEvent)) : string.Empty;
-                var cmdText = string.Format("UPDATE {0} SET [{1}] = @json{2} WHERE [{3}] = @eventId",
-                    GetFullTableName(auditEvent), JsonColumnNameBuilder.Invoke(auditEvent), ludScript, IdColumnNameBuilder.Invoke(auditEvent));
+                var cmdText = GetReplaceCommandText(auditEvent);
                 ctx.Database.ExecuteSqlCommand(cmdText, new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
             }
+        }
+
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            var json = auditEvent.ToJson();
+            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
+            {
+                var cmdText = GetReplaceCommandText(auditEvent);
+                await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
+            }
+        }
+
+        public override T GetEvent<T>(object eventId)
+        {
+            
+            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(null)))
+            {
+                var cmdText = GetSelectCommandText(null);
+#if NET45
+                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("eventId", eventId));
+                var json = result.FirstOrDefault();
+#elif NETSTANDARD1_3 || NETSTANDARD2_0
+                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("eventId", eventId));
+                var json = result.FirstOrDefault()?.Id;
+#endif
+                if (json != null)
+                {
+                    return AuditEvent.FromJson<T>(json);
+                }
+            }
+            return null;
+        }
+
+        public override async Task<T> GetEventAsync<T>(object eventId)
+        {
+            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(null)))
+            {
+                var cmdText = GetSelectCommandText(null);
+#if NET45
+                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("eventId", eventId));
+                var json = await result.FirstOrDefaultAsync();
+#elif NETSTANDARD1_3 || NETSTANDARD2_0
+                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("eventId", eventId));
+                var json = (await result.FirstOrDefaultAsync())?.Id;
+#endif
+                if (json != null)
+                {
+                    return AuditEvent.FromJson<T>(json);
+                }
+            }
+            return null;
         }
 
         private string GetFullTableName(AuditEvent auditEvent)
@@ -103,6 +170,31 @@ namespace Audit.SqlServer.Providers
             return SchemaBuilder != null 
                 ? string.Format("[{0}].[{1}]", SchemaBuilder.Invoke(auditEvent), TableNameBuilder.Invoke(auditEvent))
                 : string.Format("[{0}]", TableNameBuilder.Invoke(auditEvent));
+        }
+
+        private string GetInsertCommandText(AuditEvent auditEvent)
+        {
+            return string.Format("INSERT INTO {0} ([{1}]) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES (@json)", 
+                GetFullTableName(auditEvent), 
+                JsonColumnNameBuilder.Invoke(auditEvent), 
+                IdColumnNameBuilder.Invoke(auditEvent)); 
+        }
+
+        private string GetReplaceCommandText(AuditEvent auditEvent)
+        {
+            var ludScript = LastUpdatedDateColumnNameBuilder != null ? string.Format(", [{0}] = GETUTCDATE()", LastUpdatedDateColumnNameBuilder.Invoke(auditEvent)) : string.Empty;
+            var cmdText = string.Format("UPDATE {0} SET [{1}] = @json{2} WHERE [{3}] = @eventId",
+                GetFullTableName(auditEvent), JsonColumnNameBuilder.Invoke(auditEvent), ludScript, IdColumnNameBuilder.Invoke(auditEvent));
+            return cmdText;
+        }
+
+        private string GetSelectCommandText(AuditEvent auditEvent)
+        {
+            var cmdText = string.Format("SELECT [{0}] As [Id] FROM {1} WHERE [{2}] = @eventId",
+                JsonColumnNameBuilder.Invoke(auditEvent),
+                GetFullTableName(auditEvent), 
+                IdColumnNameBuilder.Invoke(auditEvent));
+            return cmdText;
         }
     }
 }

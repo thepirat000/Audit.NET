@@ -69,6 +69,14 @@ Optional:
 - **Schema**: The SQL schema to use.
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
 
+## Query events
+
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+
+```c#
+var event = sqlDataProvider.GetEvent(1000);
+```
+
 ## Table constraints
 
 - The table should exists. 

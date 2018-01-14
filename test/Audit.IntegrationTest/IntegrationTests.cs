@@ -146,6 +146,14 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("SQL")]
+            public async Task TestSqlAsync()
+            {
+                SetSqlSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
             [Category("PostgreSQL")]
             public void PostgreSql()
             {
