@@ -376,6 +376,27 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_CustomAction_OnSaved()
+        {
+            object id = null;
+            Core.Configuration.ResetCustomActions();
+            Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev => ev.EventType))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+            Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+            {
+                id = scope.EventId;
+            });
+            using (var scope = AuditScope.Create("eventType as id", null))
+            {
+                scope.Discard();
+            }
+            Core.Configuration.ResetCustomActions();
+
+            Assert.AreEqual("eventType as id", id);
+        }
+
+        [Test]
         public void Test_CustomAction_OnSaving_Discard()
         {
             var provider = new Mock<AuditDataProvider>();

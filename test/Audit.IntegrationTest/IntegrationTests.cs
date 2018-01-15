@@ -269,7 +269,8 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
-                var evFromApi = Audit.Core.Configuration.DataProvider.GetEvent(ids[0]);
+                var dpType = Configuration.DataProvider.GetType().Name;
+                var evFromApi = (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider") ? ev : Configuration.DataProvider.GetEvent(ids[0]);
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);

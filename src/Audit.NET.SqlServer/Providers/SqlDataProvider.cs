@@ -120,7 +120,11 @@ namespace Audit.SqlServer.Providers
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
+#if NETSTANDARD1_3
                 await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
+#else
+                await ctx.Database.ExecuteSqlCommandAsync(cmdText, new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
+#endif
             }
         }
 

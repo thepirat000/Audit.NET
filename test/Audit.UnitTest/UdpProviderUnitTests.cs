@@ -97,9 +97,9 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        [TestCase("225.0.0.1", 2223, true, 10)]
-        [TestCase("127.0.0.1", 12367, false, 10)]
-        [TestCase("226.1.2.15", 5566, true, 50)]
+        [TestCase("225.0.0.1", 2227, true, 10)]
+        [TestCase("127.0.0.1", 12369, false, 10)]
+        [TestCase("226.1.2.15", 5569, true, 50)]
         public void Test_UdpDataProvider_MultiThread(string ip, int port, bool multicast, int N)
         {
             stop = false;
