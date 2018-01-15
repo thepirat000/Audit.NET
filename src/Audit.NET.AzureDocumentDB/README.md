@@ -52,7 +52,13 @@ Mandatory:
 
 ## Query events
 
-The Azure Document DB data provider includes support for querying the events collection.
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+
+```c#
+var event = azureDbDataProvider.GetEvent("eventId");
+```
+
+The Azure Document DB data provider also includes support for querying the events collection.
 
 Use the `QueryEvents()` method on `AzureDbDataProvider` class to run LINQ queries against the audit events.
 

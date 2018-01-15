@@ -6,6 +6,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Audit.AzureDocumentDB.Providers
 {
@@ -58,6 +59,14 @@ namespace Audit.AzureDocumentDB.Providers
             return doc.Id;
         }
 
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var client = GetClient();
+            var collectionUri = GetCollectionUri();
+            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent);
+            return doc.Id;
+        }
+
         public override void ReplaceEvent(object docId, AuditEvent auditEvent)
         {
             var client = GetClient();
@@ -69,6 +78,36 @@ namespace Audit.AzureDocumentDB.Providers
                 doc.Id = docId.ToString();
             }
             client.ReplaceDocumentAsync(docUri, doc).Wait();
+        }
+
+        public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent)
+        {
+            var client = GetClient();
+            var docUri = UriFactory.CreateDocumentUri(_database, _collection, docId.ToString());
+            Document doc;
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
+            {
+                doc = JsonSerializable.LoadFrom<Document>(ms);
+                doc.Id = docId.ToString();
+            }
+            await client.ReplaceDocumentAsync(docUri, doc);
+        }
+
+        public override T GetEvent<T>(object docId)
+        {
+            var client = GetClient();
+            //var docUri = UriFactory.CreateDocumentUri(_database, _collection, docId.ToString());
+            var collectionUri = GetCollectionUri();
+            var sql = new SqlQuerySpec($"SELECT * FROM {_collection} WHERE {_collection}.id = @id",
+                new SqlParameterCollection(new SqlParameter[] { new SqlParameter() { Name = "@id", Value = docId.ToString() } }));
+            return client.CreateDocumentQuery(collectionUri, sql)
+                .AsEnumerable()
+                .FirstOrDefault();
+        }
+
+        public override async Task<T> GetEventAsync<T>(object eventId)
+        {
+            return await Task.FromResult(GetEvent<T>(eventId));
         }
 
         private bool TestConnection()

@@ -73,6 +73,14 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("AzureDocDb")]
+            public async Task TestAzureAsync()
+            {
+                SetAzureSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
             public void TestFile()
             {
                 SetFileSettings();

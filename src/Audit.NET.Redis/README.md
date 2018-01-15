@@ -156,3 +156,10 @@ Audit.Core.Configuration.Setup()
 Mandatory settings:
 - `Channel` to indicate the channel name to use for publishing the events.
 
+## Query events
+
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+
+```c#
+var event = Configuration.DataProvider.GetEvent("eventId");
+```
