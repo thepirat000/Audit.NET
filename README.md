@@ -535,6 +535,7 @@ Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
 The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnScopeCreated`: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
+- `OnEventSaved`: After an Audit Scope's Event is saved. 
 
 ## Configuration Fluent API
 Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
