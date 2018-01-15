@@ -140,9 +140,8 @@ public async Task SaveOrderAsync(Order order)
 ```
 
 > Note: Inside async methods, 
-it is **not** recommended to create the scope within a `using` statement, since the event saving
-could take place when the scope is disposed, but [the `Dispose` method is synchronous](https://github.com/dotnet/roslyn/issues/114). 
-You can explicitly call the `DisposeAsync()` method.
+if you create the scope within a `using` statement, the event saving
+could take place when the scope is disposed, but [the `Dispose` method is synchronous](https://github.com/dotnet/roslyn/issues/114). As a workaround you can explicitly call the `DisposeAsync()` method, or use combination of `SaveAsync()` and `Discard()`.
 
 ## Output
 
