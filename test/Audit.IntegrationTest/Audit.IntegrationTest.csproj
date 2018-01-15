@@ -33,7 +33,7 @@
     <PackageReference Include="NUnit" Version="3.6.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
     <PackageReference Include="Moq" Version="4.7.99" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.3.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj" />

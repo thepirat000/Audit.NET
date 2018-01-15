@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.AzureTableStorage.Providers
 {
@@ -51,11 +52,43 @@ namespace Audit.AzureTableStorage.Providers
             return name;
         }
 
+        public override T GetEvent<T>(object eventId)
+        {
+            var name = eventId.ToString();
+            var container = EnsureContainer(null);
+            var blob = container.GetBlockBlobReference(name);
+            var json = blob.DownloadTextAsync().Result;
+            return AuditEvent.FromJson<T>(json);
+        }
+
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var name = GetBlobName(auditEvent);
+            await UploadAsync(name, auditEvent);
+            return name;
+        }
+
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var name = eventId as string;
             Upload(name, auditEvent);
         }
+
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            var name = eventId as string;
+            await UploadAsync(name, auditEvent);
+        }
+
+        public override async Task<T> GetEventAsync<T>(object eventId)
+        {
+            var name = eventId.ToString();
+            var container = await EnsureContainerAsync(null);
+            var blob = container.GetBlockBlobReference(name);
+            var json = await blob.DownloadTextAsync();
+            return AuditEvent.FromJson<T>(json);
+        }
+
         #endregion
 
         #region Private Methods
@@ -65,6 +98,14 @@ namespace Audit.AzureTableStorage.Providers
             var blob = container.GetBlockBlobReference(name);
             var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
             blob.UploadTextAsync(json).Wait();
+        }
+
+        private async Task UploadAsync(string name, AuditEvent auditEvent)
+        {
+            var container = await EnsureContainerAsync(auditEvent);
+            var blob = container.GetBlockBlobReference(name);
+            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            await blob.UploadTextAsync(json);
         }
 
         private string GetBlobName(AuditEvent auditEvent)
@@ -97,6 +138,13 @@ namespace Audit.AzureTableStorage.Providers
             return EnsureContainer(cnnString, containerName);
         }
 
+        internal async Task<CloudBlobContainer> EnsureContainerAsync(AuditEvent auditEvent)
+        {
+            var cnnString = GetConnectionString(auditEvent);
+            var containerName = GetContainerName(auditEvent);
+            return await EnsureContainerAsync(cnnString, containerName);
+        }
+
         internal CloudBlobContainer EnsureContainer(string cnnString, string containerName)
         {
             CloudBlobContainer result;
@@ -109,6 +157,22 @@ namespace Audit.AzureTableStorage.Providers
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
             container.CreateIfNotExistsAsync().Wait();
+            _containerCache[cacheKey] = container;
+            return container;
+        }
+
+        internal async Task<CloudBlobContainer> EnsureContainerAsync(string cnnString, string containerName)
+        {
+            CloudBlobContainer result;
+            var cacheKey = cnnString + "|" + containerName;
+            if (_containerCache.TryGetValue(cacheKey, out result))
+            {
+                return result;
+            }
+            var storageAccount = CloudStorageAccount.Parse(cnnString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference(containerName);
+            await container.CreateIfNotExistsAsync();
             _containerCache[cacheKey] = container;
             return container;
         }

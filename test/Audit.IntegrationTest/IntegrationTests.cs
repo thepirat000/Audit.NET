@@ -22,9 +22,9 @@ namespace Audit.IntegrationTest
 {
     public class IntegrationTests
     {
-        private const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=xxxxxxxxxxxxxxxxxxx==";
+        private const string AzureBlobCnnString = "xxx";
         private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "xxxxxxxxxx==";
+        private const string AzureDocDbAuthKey = "xxx==";
 
         [TestFixture]
         public class AuditTests
@@ -97,6 +97,14 @@ namespace Audit.IntegrationTest
                 TestUpdate();
                 TestInsert();
                 TestDelete();
+            }
+
+            [Test]
+            [Category("AzureBlob")]
+            public async Task TestAzureBlobAsync()
+            {
+                SetAzureBlobSettings();
+                await TestUpdateAsync();
             }
 
             [Test]
@@ -468,7 +476,7 @@ namespace Audit.IntegrationTest
                     .UseAzureBlobStorage(config => config
                         .ConnectionString(AzureBlobCnnString)
                         //.ContainerName("event")
-                        .ContainerNameBuilder(ev => $"events{ev.StartDate:yyyyMMdd}")
+                        .ContainerNameBuilder(ev => $"events{DateTime.Today:yyyyMMdd}")
                         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }

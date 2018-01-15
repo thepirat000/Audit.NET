@@ -49,6 +49,14 @@ Optional:
 - **ContainerNameBuilder**: A function that takes an Audit Event and returns the container name to use (see the naming restrictions [here](https://docs.microsoft.com/en-us/azure/storage/storage-dotnet-how-to-use-blobs#create-a-container)). By default, "event" is used as the container name.
 - **BlobNameBuilder**: A function that takes an Audit Event and returns a unique blob name for the event. The resulting name can include path information (slash separated sub-folders). By default, a random Guid is used as the blob name.
 
+## Query events
+
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+
+```c#
+var event = blobDataProvider.GetEvent("eventId");
+```
+
 ## Output sample
 
 An example of the output as seen with [Microsoft Azure Storage Explorer](http://storageexplorer.com/):
