@@ -626,7 +626,7 @@ If you like this project please contribute in any of the following ways:
 - [Star](https://github.com/thepirat000/Audit.NET/stargazers) this project on GitHub.
 - Request a new feature or expose any bug you found by creating a [new issue](https://github.com/thepirat000/Audit.NET/issues/new).
 - Ask any questions about the library on [StackOverflow](http://stackoverflow.com/questions/ask?tags=Audit.NET).
-- Subscribe and use the [Gitter Audit.NET channel](https://gitter.im/Audit-NET/Lobby).
+- Subscribe to and use the [Gitter Audit.NET channel](https://gitter.im/Audit-NET/Lobby).
 - Spread the word by blogging about it, or sharing it on social networks:
 <p class="share-buttons">
   <a href="https://www.facebook.com/sharer/sharer.php?u=https://nuget.org/packages/Audit.NET/&amp;t=Check+out+Audit.NET" target="_blank">
