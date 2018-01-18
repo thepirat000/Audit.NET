@@ -487,7 +487,7 @@ The following is the internal state machine representation of the `AuditScope` o
 
 <img src="https://i.imgur.com/7WqGECe.png" alt="AuditScope statecart" />
 
-## Configuration
+# Configuration
 
 ### Data provider
 To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
