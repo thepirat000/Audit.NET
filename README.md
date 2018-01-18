@@ -479,7 +479,13 @@ using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolic
 }
 ```
 
-> If you don't provide a Creation Policy, the default Creation Policy configured will be used (see next section).
+> If you don't provide a Creation Policy, the default Creation Policy configured will be used (see the [configuration](#configuration) section).
+
+# AuditScope statechart
+
+The following is the state machine representation of the `AuditScope` object:
+
+<img src="https://i.imgur.com/7WqGECe.png" alt="AuditScope statecart" />
 
 ## Configuration
 
@@ -581,12 +587,7 @@ Audit.Core.Configuration.Setup()
 Audit.Core.Configuration.Setup()
     .UseDynamicProvider(config => config
         .OnInsert(ev => Console.WriteLine("{0}: {1}->{2}", ev.StartDate, ev.Environment.UserName, ev.EventType)));
-
 ```
-
-# AuditScope statechart
-
-<img src="https://i.imgur.com/7WqGECe.png" alt="AuditScope statecart" />
 
 -----------
 
