@@ -1,6 +1,6 @@
 # Audit.NET
 
-**[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [PROVIDERS](#data-providers) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
+**[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [PROVIDERS](#data-providers) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions) | [CONTRIBUTE](#contribute)**
 
 
 [![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)     
@@ -584,6 +584,9 @@ Audit.Core.Configuration.Setup()
 
 ```
 
+# AuditScope statechart
+
+<img src="https://i.imgur.com/7WqGECe.png" alt="AuditScope statecart" />
 
 -----------
 
