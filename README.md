@@ -476,7 +476,7 @@ The event saving (insert/replace) should be explicitly invoked by calling the `S
 
 You can set the Creation Policy per-scope, for example to explicitly set the Creation Policy to Manual:
 ```c#
-using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolicy.Manual))
+using (var scope = AuditScope.Create(new AuditScopeOptions { CreationPolicy = EventCreationPolicy.Manual }))
 {
     //...
     scope.Save();
