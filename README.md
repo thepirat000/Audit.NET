@@ -481,7 +481,7 @@ using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolic
 
 > If you don't provide a Creation Policy, the default Creation Policy configured will be used (see the [configuration](#configuration) section).
 
-# AuditScope statechart
+## AuditScope statechart
 
 The following is the internal state machine representation of the `AuditScope` object:
 
