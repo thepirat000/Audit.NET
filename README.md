@@ -483,7 +483,7 @@ using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolic
 
 # AuditScope statechart
 
-The following is the state machine representation of the `AuditScope` object:
+The following is the internal state machine representation of the `AuditScope` object:
 
 <img src="https://i.imgur.com/7WqGECe.png" alt="AuditScope statecart" />
 
