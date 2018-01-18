@@ -342,18 +342,21 @@ For example:
 ```c#
 public class MyCustomDataProvider : AuditDataProvider
 {
-    // Write the json representation of the event to a randomly named file
     public override object InsertEvent(AuditEvent auditEvent)
     {
         var fileName = $"Log{Guid.NewGuid()}.json";
         File.WriteAllText(fileName, auditEvent.ToJson());
         return fileName;
     }
-    // Replaces an existing event given the ID and the event
     public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
         var fileName = eventId.ToString();
         File.WriteAllText(fileName, auditEvent.ToJson());
+    }
+    public override T GetEvent<T>(object eventId)
+    {
+        var fileName = eventId.ToString();
+        return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
     }
 
     public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
@@ -367,13 +370,6 @@ public class MyCustomDataProvider : AuditDataProvider
         var fileName = eventId.ToString();
         await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
     }
-
-    public override T GetEvent<T>(object eventId)
-    {
-        var fileName = eventId.ToString();
-        return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
-    }
-
     public override async Task<T> GetEventAsync<T>(object eventId) 
     {
         var fileName = eventId.ToString();
