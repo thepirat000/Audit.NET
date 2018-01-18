@@ -358,7 +358,7 @@ public class MyCustomDataProvider : AuditDataProvider
         var fileName = eventId.ToString();
         return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
     }
-
+    // async implementation:
     public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
     {
         var fileName = $"Log{Guid.NewGuid()}.json";
@@ -383,7 +383,7 @@ You can set a default data provider assigning the `DataProvider` property on the
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
-Or using the fluent API:
+Or using the fluent API `UseCustomProvider` method:
 ```c#
 Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
@@ -395,6 +395,13 @@ You can also set the data provider per-scope, by using an appropriate overload o
 ```c#
 AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
 ```
+
+Or:
+
+```c#
+AuditScope.Create(new AuditScopeOptions { DataProvider = new MyCustomDataProvider() });
+```
+
 
 ### Dynamic data providers 
 
