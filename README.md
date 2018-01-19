@@ -30,8 +30,9 @@ PM> Install-Package Audit.NET
 
 ## Usage
 
-The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its lifecycle. 
-The **Audit Event** is an extensible information container of an audited operation.
+The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its lifecycle. (see [AuditScope statechart](https://github.com/thepirat000/Audit.NET#auditscope-statechart)).
+
+The **Audit Event** is an extensible information container of an audited operation. 
 
 Create an Audit Scope by calling the static `AuditScope.Create` method.
  
