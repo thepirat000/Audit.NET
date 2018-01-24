@@ -3,7 +3,7 @@
 **[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [DATA PROVIDERS](#data-providers) | [CREATION POLICY](#event-creation-policy) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
 
 
-[![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)     
+[![Backers on Open Collective](https://opencollective.com/auditnet/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/auditnet/sponsors/badge.svg)](#sponsors) [![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)     
 [![fede](https://img.shields.io/twitter/follow/thepirat000.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=thepirat000) 
 [![issues-open](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)
 [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)
@@ -646,5 +646,26 @@ If you like this project please contribute in any of the following ways:
   </a>
 </p>
 
-- Become an [OpenCollective](https://opencollective.com/auditnet) backer of this project:
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/auditnet#backer)]
+
 <a href="https://opencollective.com/auditnet#backers" target="_blank"><img src="https://opencollective.com/auditnet/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/auditnet#sponsor)]
+
+<a href="https://opencollective.com/auditnet/sponsor/0/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/1/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/2/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/3/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/4/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/5/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/6/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/7/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/8/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/auditnet/sponsor/9/website" target="_blank"><img src="https://opencollective.com/auditnet/sponsor/9/avatar.svg"></a>
+
+
