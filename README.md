@@ -1,6 +1,6 @@
 # Audit.NET
 
-**[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [PROVIDERS](#data-providers) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
+**[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [DATA PROVIDERS](#data-providers) | [CREATION POLICY](#event-creation-policy) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
 
 
 [![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)     
@@ -31,7 +31,8 @@ PM> Install-Package Audit.NET
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its lifecycle. 
-The **Audit Event** is an extensible information container of an audited operation.
+The **Audit Event** is an extensible information container of an audited operation. 
+See the [audit scope statechart](#auditscope-statechart).
 
 Create an Audit Scope by calling the static `AuditScope.Create` method.
  
@@ -342,20 +343,23 @@ For example:
 ```c#
 public class MyCustomDataProvider : AuditDataProvider
 {
-    // Write the json representation of the event to a randomly named file
     public override object InsertEvent(AuditEvent auditEvent)
     {
         var fileName = $"Log{Guid.NewGuid()}.json";
         File.WriteAllText(fileName, auditEvent.ToJson());
         return fileName;
     }
-    // Replaces an existing event given the ID and the event
     public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
     {
         var fileName = eventId.ToString();
         File.WriteAllText(fileName, auditEvent.ToJson());
     }
-
+    public override T GetEvent<T>(object eventId)
+    {
+        var fileName = eventId.ToString();
+        return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
+    }
+    // async implementation:
     public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
     {
         var fileName = $"Log{Guid.NewGuid()}.json";
@@ -367,13 +371,6 @@ public class MyCustomDataProvider : AuditDataProvider
         var fileName = eventId.ToString();
         await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
     }
-
-    public override T GetEvent<T>(object eventId)
-    {
-        var fileName = eventId.ToString();
-        return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
-    }
-
     public override async Task<T> GetEventAsync<T>(object eventId) 
     {
         var fileName = eventId.ToString();
@@ -387,7 +384,7 @@ You can set a default data provider assigning the `DataProvider` property on the
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
-Or using the fluent API:
+Or using the fluent API `UseCustomProvider` method:
 ```c#
 Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
@@ -399,6 +396,13 @@ You can also set the data provider per-scope, by using an appropriate overload o
 ```c#
 AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
 ```
+
+Or:
+
+```c#
+AuditScope.Create(new AuditScopeOptions { DataProvider = new MyCustomDataProvider() });
+```
+
 
 ### Dynamic data providers 
 
@@ -454,6 +458,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [UdpDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/Providers/UdpDataProvider.cs) | [Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md) | Send Audit Logs as UDP datagrams to a network. | `.UseUdp()`
 [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes or publish to a PubSub channel. | `.UseRedis()`
 [Log4netDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/Providers/Log4netDataProvider.cs) | [Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md) | Store the audit events using [Apache log4net™](https://logging.apache.org/log4net/). | `.UseLog4net()`
+[EntityFrameworkDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/Providers/EntityFrameworkDataProvider.cs) | [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md#entity-framework-data-provider) | Store EntityFramework audit events in the same EF context. | `.UseEntityFramework()`
 
 ## Event Creation Policy
 
@@ -472,16 +477,22 @@ The event saving (insert/replace) should be explicitly invoked by calling the `S
 
 You can set the Creation Policy per-scope, for example to explicitly set the Creation Policy to Manual:
 ```c#
-using (var scope = AuditScope.Create("MyEvent", () => target, EventCreationPolicy.Manual))
+using (var scope = AuditScope.Create(new AuditScopeOptions { CreationPolicy = EventCreationPolicy.Manual }))
 {
     //...
     scope.Save();
 }
 ```
 
-> If you don't provide a Creation Policy, the default Creation Policy configured will be used (see next section).
+> If you don't provide a Creation Policy, the default Creation Policy configured will be used (see the [configuration](#configuration) section).
 
-## Configuration
+## AuditScope statechart
+
+The following is the internal state machine representation of the `AuditScope` object:
+
+<img src="https://i.imgur.com/7WqGECe.png" alt="AuditScope statecart" />
+
+# Configuration
 
 ### Data provider
 To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
@@ -581,9 +592,7 @@ Audit.Core.Configuration.Setup()
 Audit.Core.Configuration.Setup()
     .UseDynamicProvider(config => config
         .OnInsert(ev => Console.WriteLine("{0}: {1}->{2}", ev.StartDate, ev.Environment.UserName, ev.EventType)));
-
 ```
-
 
 -----------
 
@@ -619,4 +628,23 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img src="https://i.imgur.com/abs6duI.png" alt="icon" width="80"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set or publishing to a Redis PubSub channel.
 <img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md)** | Store the audit events using Apache log4net™.
 
+# Contribute
 
+If you like this project please contribute in any of the following ways:
+
+- [Star](https://github.com/thepirat000/Audit.NET/stargazers) this project on GitHub.
+- Request a new feature or expose any bug you found by creating a [new issue](https://github.com/thepirat000/Audit.NET/issues/new).
+- Ask any questions about the library on [StackOverflow](http://stackoverflow.com/questions/ask?tags=Audit.NET).
+- Subscribe to and use the [Gitter Audit.NET channel](https://gitter.im/Audit-NET/Lobby).
+- Spread the word by blogging about it, or sharing it on social networks:
+<p class="share-buttons">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https://nuget.org/packages/Audit.NET/&amp;t=Check+out+Audit.NET" target="_blank">
+    <img width="24" height="24" alt="Share this package on Facebook" src="https://nuget.org/Content/gallery/img/facebook.svg" / >
+  </a>
+  <a href="https://twitter.com/intent/tweet?url=https://nuget.org/packages/Audit.NET/&amp;text=Check+out+Audit.NET" target="_blank">
+    <img width="24" height="24" alt="Tweet this package" src="https://nuget.org/Content/gallery/img/twitter.svg" />
+  </a>
+</p>
+
+- Become an [OpenCollective](https://opencollective.com/auditnet) backer of this project:
+<a href="https://opencollective.com/auditnet#backers" target="_blank"><img src="https://opencollective.com/auditnet/backers.svg?width=890"></a>
