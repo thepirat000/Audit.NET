@@ -66,9 +66,9 @@ var event = mySqlDataProvider.GetEvent(1000);
 
 For example:
 ```SQL
-CREATE TABLE events
+CREATE TABLE event
 (
-	event_id INT unsigned NOT NULL AUTO_INCREMENT, 
+	id INT unsigned NOT NULL AUTO_INCREMENT,
 	inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	last_updated_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	data JSON NOT NULL,
