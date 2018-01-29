@@ -1,5 +1,50 @@
 ﻿--create database Blogs
 --create database ParentChild
+Use [Audit]
+
+Create table [Order]
+(
+	Id BIGINT IDENTITY(1,1) NOT NULL,
+	[Number] nvarchar(Max) NULL,
+	[Status] nvarchar(Max) NULL,
+	CONSTRAINT PK_Order PRIMARY KEY (Id)
+)
+
+Create table [OrderLine]
+(
+	Id BIGINT IDENTITY(1,1) NOT NULL,
+	[Product] nvarchar(Max) NULL,
+	[Quantity] int NOT NULL,
+	[OrderId] BIGINT NOT NULL,
+	CONSTRAINT PK_OrderLine PRIMARY KEY (Id),
+	Constraint FK_OrderLine_Order Foreign Key ([OrderId]) References [Order](Id)
+)
+
+Create table [OrderAudit]
+(
+	Id BIGINT NOT NULL,
+	[Number] nvarchar(Max) NULL,
+	[Status] nvarchar(Max) NULL,
+	AuditDate datetime NOT NULL,
+    AuditStatus nvarchar(Max) NULL,
+    UserName nvarchar(Max) NULL,
+	CONSTRAINT PK_OrderAudit PRIMARY KEY (AuditDate, Id)
+)
+
+Create table [OrderLineAudit]
+(
+	Id BIGINT NOT NULL,
+	[Product] nvarchar(Max) NULL,
+	[Quantity] int NOT NULL,
+	[OrderId] BIGINT NOT NULL,
+	AuditDate datetime NOT NULL,
+    AuditStatus nvarchar(Max) NULL,
+    UserName nvarchar(Max) NULL,
+	CONSTRAINT PK_OrderLineAudit PRIMARY KEY (AuditDate, Id)
+)
+
+
+create database ParentChild
 
 use ParentChild
 

@@ -22,15 +22,15 @@ namespace Audit.IntegrationTest
         [OneTimeSetUp]
         public void Init()
         {
-            var sql1 = @"drop table posts; drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
+            var sql1 = @"if exists (select * from sysobjects where name = 'posts') drop table posts; if exists (select * from sysobjects where name = 'blogs') drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
                         create table posts ( Id int identity(1,1) not null primary key, Title nvarchar(max), DateCreated datetime, Content nvarchar(max), BlogId int not null constraint FK_P_B foreign key references Blogs (id) );";
-            var sql2 = @"drop table child; drop table parent; CREATE TABLE [Parent] (	Id BIGINT IDENTITY(1,1) NOT NULL, [Name] nvarchar(Max) NOT NULL, CONSTRAINT PK_Parent PRIMARY KEY (Id));
+            var sql2 = @"if exists (select * from sysobjects where name = 'child') drop table child; if exists (select * from sysobjects where name = 'parent') drop table parent; CREATE TABLE [Parent] (	Id BIGINT IDENTITY(1,1) NOT NULL, [Name] nvarchar(Max) NOT NULL, CONSTRAINT PK_Parent PRIMARY KEY (Id));
                         CREATE TABLE [Child] ( Id BIGINT IDENTITY(1,1) NOT NULL, [Name] nvarchar(Max) NOT NULL, [Period_Start] datetime NOT NULL, [Period_End] datetime NOT NULL, [ParentId] bigint NOT NULL, CONSTRAINT PK_Child PRIMARY KEY (Id), Constraint FK_Child_Parent Foreign Key ([ParentId]) References Parent(Id));";
             using (var ctx = new MyAuditedVerboseContext())
             {
                 ctx.Database.ExecuteSqlCommand(sql1);
             }
-            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true";
+            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true;";
             using (var ctx = new ApplicationDbContext(SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options))
             {
                 ctx.Database.ExecuteSqlCommand(sql2);
