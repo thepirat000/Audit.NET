@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E62475E8-0BE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5617401-3C5E-4B37-85B0-F33D41F6BEEE}"
 	ProjectSection(SolutionItems) = preProject
+		CHANGELOG.md = CHANGELOG.md
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -66,7 +67,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Mvc.Core", "src\Audit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.log4net", "src\Audit.NET.log4net\Audit.NET.log4net.csproj", "{35345A58-3DE6-4ACF-8951-E8B8DD71E876}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.Integration.AspNetCore", "test\Audit.Integration.AspNetCore\Audit.Integration.AspNetCore.csproj", "{81CDC737-77FC-4035-BF9A-077D773FD071}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Integration.AspNetCore", "test\Audit.Integration.AspNetCore\Audit.Integration.AspNetCore.csproj", "{81CDC737-77FC-4035-BF9A-077D773FD071}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

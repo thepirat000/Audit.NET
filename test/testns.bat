@@ -10,7 +10,7 @@ dotnet restore
 cd test
 
 cd Audit.Mvc.UnitTest
-dotnet test --logger:"console;verbosity=normal"
+dotnet test 
 echo continue...
 
 echo Running...
@@ -18,14 +18,14 @@ echo Running...
 cd ..
 
 cd Audit.UnitTest
-dotnet test --logger:"console;verbosity=normal"
+dotnet test 
 echo continue...
 
 echo Running...
 cd ..
 
 cd Audit.WebApi.UnitTest
-dotnet test --logger:"console;verbosity=normal"
+dotnet test 
 echo continue...
 
 echo Running...
@@ -33,7 +33,7 @@ echo Running...
 cd ..
 
 cd Audit.DynamicProxy.UnitTest
-dotnet test --logger:"console;verbosity=normal"
+dotnet test 
 echo continue...
 
 echo Running...
@@ -49,7 +49,7 @@ echo Running...
 cd ..
 
 cd Audit.Redis.UnitTest
-dotnet test --logger:"console;verbosity=normal"
+dotnet test 
 echo continue...
 
 echo Running...
@@ -62,9 +62,9 @@ echo continue...
 cd ..
 
 cd Audit.IntegrationTest
-dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF"
-dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
-dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory=Async"
+dotnet test  --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF"
+dotnet test  -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
+dotnet test  -f net451 --filter "TestCategory=WCF&TestCategory=Async"
 echo continue...
 
 cd ..
