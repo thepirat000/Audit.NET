@@ -287,7 +287,7 @@ namespace Audit.UnitTest
             Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
             Assert.AreEqual(1, x);
         }
-#if NET451
+#if NET451 || NETCOREAPP2_0
         [Test]
         public void Test_FluentConfig_EventLog()
         {

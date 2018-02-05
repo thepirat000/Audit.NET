@@ -50,16 +50,6 @@ namespace Audit.IntegrationTest
                 string pkt = String.Concat(tokenBytes.Select(i => i.ToString("x2")));
                 Assert.AreEqual(expectedToken, pkt);
             }
-
-
-            [Test]
-            public void TestEventLog()
-            {
-                SetEventLogSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
 #endif
 
             [Test]
@@ -439,14 +429,24 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
             }
 
-#if NET451
+#if NET451 || NETCOREAPP2_0
+            [Test]
+            public void TestEventLog()
+            {
+                SetEventLogSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
             public void SetEventLogSettings()
             {
                 Audit.Core.Configuration.Setup()
                     .UseEventLogProvider(config => config
                         .LogName("Application")
                         .SourcePath("TestApplication")
-                        .MachineName("."))
+                        .MachineName(".")
+                        .MessageBuilder(ev => $"{ev.StartDate} - {ev.EndDate} - {ev.EventType} - {ev.Environment.UserName}"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

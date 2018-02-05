@@ -4,9 +4,9 @@
     <Description>An extensible framework to audit executing operations in .NET and .NET Core.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.NET</AssemblyTitle>
-    <VersionPrefix>11.0.1</VersionPrefix>
+    <VersionPrefix>11.0.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard2.0;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -37,6 +37,12 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Windows.Compatibility">
+      <Version>2.0.0-preview1-25914-04</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

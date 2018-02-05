@@ -32,14 +32,15 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
-#if NET45
-        public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".")
+#if NET45 || NETSTANDARD2_0
+        public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".", Func<AuditEvent, string> messageBuilder = null)
         {
             Configuration.DataProvider = new EventLogDataProvider()
             {
                 LogName = logName,
                 SourcePath = sourcePath,
-                MachineName = machineName
+                MachineName = machineName,
+                MessageBuilder = messageBuilder
             };
             return new CreationPolicyConfigurator();
         }
@@ -47,7 +48,7 @@ namespace Audit.Core.ConfigurationApi
         {
             var eventLogConfig = new EventLogProviderConfigurator();
             config.Invoke(eventLogConfig);
-            return UseEventLogProvider(eventLogConfig._logName, eventLogConfig._sourcePath, eventLogConfig._machineName);
+            return UseEventLogProvider(eventLogConfig._logName, eventLogConfig._sourcePath, eventLogConfig._machineName, eventLogConfig._messageBuilder);
         }
 #endif
         public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "", 

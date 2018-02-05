@@ -29,14 +29,15 @@ namespace Audit.Core.ConfigurationApi
         /// <param name="filenameBuilder">Specifies the filename builder to get the filename to store the audit log for an event.</param>
         ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = null, string filenamePrefix = null, Func<AuditEvent, string> directoryPathBuilder = null,
             Func<AuditEvent, string> filenameBuilder = null);
-#if NET45
+#if NET45 || NETSTANDARD2_0
         /// <summary>
         /// Store the events in the windows Event Log.
         /// </summary>
         /// <param name="logName">The windows event log name to use</param>
         /// <param name="sourcePath">The source path to use</param>
         /// <param name="machineName">The name of the machine where the event logs will be save. Default is "." (local machine)</param>
-        ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".");
+        /// <param name="messageBuilder">A function that takes an AuditEvent and returns the message to log. Default is NULL to log the event JSON representation.</param>
+        ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".", Func<AuditEvent, string> messageBuilder = null);
         /// <summary>
         /// Store the events in the windows Event Log.
         /// </summary>

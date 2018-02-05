@@ -29,9 +29,7 @@ namespace Audit.Core
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
             MethodBase callingMethod = options.CallingMethod;
-#if NET45
-            //This will be possible in future NETStandard: 
-            //See: https://github.com/dotnet/corefx/issues/1797, https://github.com/dotnet/corefx/issues/1784
+#if NET45 || NETSTANDARD2_0
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
@@ -39,7 +37,7 @@ namespace Audit.Core
             {
                 callingMethod = new StackFrame(2 + options.SkipExtraFrames).GetMethod();
             }
-#elif NETSTANDARD1_3
+#else
             environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
             environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
 #endif

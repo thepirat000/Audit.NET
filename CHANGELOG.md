@@ -3,6 +3,15 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [UNRELEASED] - 2018-01
+### Added
+- Adding NETSTANDARD2.0 support to Audit.NET 
+
+### Changed
+- EventLog data provider available on NETCORE 2.0
+- EventLog new MessageBuilder property to allow customizing the logged message
+
+
 ## [11.0.1] - 2018-01-28
 ### Changed
 - Audit.MySql refactor by bgrainger@gmail.com to use MySqlConnector instead of MySql.Data to support real async calls.

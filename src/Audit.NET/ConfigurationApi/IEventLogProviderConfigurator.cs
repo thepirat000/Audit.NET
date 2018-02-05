@@ -1,3 +1,5 @@
+using System;
+
 namespace Audit.Core.ConfigurationApi
 {
     /// <summary>
@@ -20,5 +22,10 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         /// <param name="machineName">The Log Name</param>
         IEventLogProviderConfigurator MachineName(string machineName);
+        /// <summary>
+        /// Specifies the function to obtain the message to log. Default is the event JSON representation.
+        /// </summary>
+        /// <param name="messageBuilder">A function that takes an AuditEvent and returns the message to log</param>
+        IEventLogProviderConfigurator MessageBuilder(Func<AuditEvent, string> messageBuilder);
     }
 }
