@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Audit.DynamicProxy.UnitTest
@@ -12,20 +13,47 @@ namespace Audit.DynamicProxy.UnitTest
     public class DynamicProxyTests
     {
         [Test]
-        public async Task Test_Aync()
+        public async Task Test_CreationPolicyAync()
+        {
+            var inserts = new List<AuditEvent>();
+            var replaces = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(config => config.OnInsert(ev =>
+                {
+                    inserts.Add(JsonConvert.DeserializeObject(ev.ToJson(), ev.GetType()) as AuditEvent);
+                })
+                .OnReplace((id, ev) =>
+                {
+                    replaces.Add(JsonConvert.DeserializeObject(ev.ToJson(), ev.GetType()) as AuditEvent);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var real = new InterceptMe("test");
+            var audited = AuditProxy.Create<InterceptMeBase>(real);
+            var res = await audited.AsyncFunctionAsync("2000");
+
+            Assert.AreEqual("ok", res);
+            Assert.AreEqual(1, inserts.Count);
+            Assert.AreEqual(1, replaces.Count);
+
+            Assert.IsNull(inserts[0].GetAuditInterceptEvent().Result);
+            Assert.AreEqual("Task<String>", replaces[0].GetAuditInterceptEvent().Result.Type);
+            Assert.AreEqual("ok", replaces[0].GetAuditInterceptEvent().Result.Value);
+        }
+
+        [Test]
+        public async Task Test_Async()
         {
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(config => config.OnInsert(ev =>
                 {
                     logs.Add(ev);
-                }));
-
-            //Audit.Core.Configuration.Setup().UseFileLogProvider(@"C:\Temp\1");
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             var real = new InterceptMe("test");
             
-            //var audited = AuditProxy.Create<IInterceptMe>(real);
             var audited = AuditProxy.Create<InterceptMeBase>(real);
 
             audited.AsyncReturningVoidAsync("1000");

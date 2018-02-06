@@ -26,7 +26,7 @@ namespace Audit.Core.Providers
         public string SourcePath { get; set; } = "Application";
 
         /// <summary>
-        /// The Message builder. A function to obtain the message string to log to the vent log.
+        /// The Message builder. A function to obtain the message string to log to the event log.
         /// </summary>
         public Func<AuditEvent, string> MessageBuilder { get; set; }
 

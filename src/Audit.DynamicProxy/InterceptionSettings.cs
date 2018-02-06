@@ -36,5 +36,9 @@ namespace Audit.DynamicProxy
         /// By default all methods are included.
         /// </summary>
         public Func<MethodInfo, bool> MethodFilter { get; set; }
+        /// <summary>
+        /// Gets or sets the event creation policy to use for this interception. Default is NULL to use the globally configured creation policy.
+        /// </summary>
+        public EventCreationPolicy? EventCreationPolicy { get; set; }
     }
 }

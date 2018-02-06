@@ -63,10 +63,10 @@ namespace Audit.DynamicProxy
         /// </summary>
         [JsonProperty(Order = 60, NullValueHandling = NullValueHandling.Ignore)]
         public string Exception { get; set; }
-        [JsonProperty(Order = 70)]
         /// <summary>
         /// The result of the operation
         /// </summary>
+        [JsonProperty(Order = 70)]
         public AuditInterceptArgument Result { get; set; }
     }
 }

@@ -83,7 +83,7 @@ namespace Audit.DynamicProxy
             {
                 SuccessAuditInterceptEvent(invocation, intEvent, result);
             }
-            scope.Save();
+            scope.Dispose();
         }
 
         /// <summary>
@@ -213,7 +213,14 @@ namespace Audit.DynamicProxy
             {
                 InterceptEvent = intEvent
             };
-            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, Settings.AuditDataProvider, auditEventIntercept);
+            var scopeOptions = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                CreationPolicy = Settings.EventCreationPolicy,
+                DataProvider = Settings.AuditDataProvider,
+                AuditEvent = auditEventIntercept
+            };
+            var scope = AuditScope.Create(scopeOptions);
             AuditProxy.CurrentScope = scope;
             // Call the intercepted method (sync part)
             try
@@ -223,7 +230,7 @@ namespace Audit.DynamicProxy
             catch (Exception ex)
             {
                 intEvent.Exception = ex.GetExceptionInfo();
-                scope.Save();
+                scope.Dispose();
                 throw;
             }
             // Handle async calls
@@ -232,7 +239,7 @@ namespace Audit.DynamicProxy
             {
                 if (typeof(Task).IsAssignableFrom(returnType))
                 {
-                    invocation.ReturnValue = InterceptAsync((dynamic)invocation.ReturnValue, invocation, intEvent, scope);
+                    invocation.ReturnValue = InterceptAsync((dynamic) invocation.ReturnValue, invocation, intEvent, scope);
                     return;
                 }
             }
@@ -240,11 +247,11 @@ namespace Audit.DynamicProxy
             // Avoid Task and Task<T> serialization (i.e. when a sync method returns a Task)
             object returnValue = typeof(Task).IsAssignableFrom(returnType) ? null : invocation.ReturnValue;
             SuccessAuditInterceptEvent(invocation, intEvent, returnValue);
-            scope.Save();
             if (!isAsync)
             {
                 AuditProxy.CurrentScope = null;
             }
+            scope.Dispose();
         }
         #endregion
     }

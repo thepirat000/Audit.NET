@@ -38,6 +38,10 @@ namespace Audit.DynamicProxy
         [JsonProperty(Order = 40, NullValueHandling = NullValueHandling.Ignore)]
         public object OutputValue { get; set; }
 
+        public AuditInterceptArgument()
+        {
+        }
+
         public AuditInterceptArgument(string name, Type type, object value, int index)
         {
             Name = name;
