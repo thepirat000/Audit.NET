@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [UNRELEASED] - 2018-01
+## [11.0.2] - 2018-02-09
 ### Added
 - Adding NETSTANDARD2.0 support to Audit.NET 
 
@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - EventLog data provider available on NETCORE 2.0
 - EventLog new MessageBuilder property to allow customizing the logged message
 - Audit.DynamicProxy: allow setting the creation policy.
+- Fixed [#97](https://github.com/thepirat000/Audit.NET/issues/97): WebAPI missing response body when the response was a type inherited from ObjectResult, etc. 
 
 ## [11.0.1] - 2018-01-28
 ### Changed

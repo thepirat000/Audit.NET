@@ -499,7 +499,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UsePostgreSql(config => config
-                        .ConnectionString("Server=127.0.0.1;Port=5432;User Id=fede;Password=fede;Database=postgres;")
+                        .ConnectionString("Server=localhost;Port=5432;User Id=fede;Password=fede;Database=postgres;")
                         .TableName("eventb")
                         .IdColumnName("id")
                         .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)

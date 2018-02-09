@@ -104,22 +104,25 @@ namespace Audit.WebApi
                     if (IncludeResponseBody)
                     {
                         var bodyType = context.Result?.GetType().GetFullTypeName();
-                        auditAction.ResponseBody = new BodyContent() { Type = bodyType };
-                        switch (context.Result?.GetType().Name)
+                        if (bodyType != null)
                         {
-                            case nameof(ObjectResult):
-                                auditAction.ResponseBody.Value = (context.Result as ObjectResult).Value;
-                                break;
-                            case nameof(StatusCodeResult):
-                                auditAction.ResponseBody.Value = string.Format("StatusCode ({0})", (context.Result as StatusCodeResult).StatusCode);
-                                break;
-                            case nameof(RedirectResult):
-                                auditAction.ResponseBody.Value = string.Format("Redirect to {0}", (context.Result as RedirectResult).Url);
-                                break;
-                            default:
-                                // TODO: Handle other result types
-                                auditAction.ResponseBody.Value = string.Format("Result type: {0}", context.Result.GetType().GetFullTypeName());
-                                break;
+                            auditAction.ResponseBody = new BodyContent { Type = bodyType };
+                            if (context.Result is ObjectResult or)
+                            {
+                                auditAction.ResponseBody.Value = or.Value;
+                            }
+                            else if (context.Result is StatusCodeResult sr)
+                            {
+                                auditAction.ResponseBody.Value = string.Format("StatusCode ({0})", sr.StatusCode);
+                            }
+                            else if (context.Result is RedirectResult rr)
+                            {
+                                auditAction.ResponseBody.Value = string.Format("Redirect to {0}", rr.Url);
+                            }
+                            else
+                            {
+                                auditAction.ResponseBody.Value = context.Result.ToString();
+                            }
                         }
                     }
                 }

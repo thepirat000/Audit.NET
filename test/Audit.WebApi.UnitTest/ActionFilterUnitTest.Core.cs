@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Audit.Core;
 using System;
 using System.Threading.Tasks;
+using Audit.Core.Providers;
 using NUnit.Framework;
 
 namespace Audit.WebApi.UnitTest
@@ -83,6 +84,57 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("this is the result", action.ResponseBody.Value);
             Assert.AreEqual(123, action.RequestBody.Length);
             Assert.AreEqual("application/json", action.RequestBody.Type);
+        }
+
+        [Test]
+        public async Task Test_AuditApiActionFilter_InheritedResultType()
+        {
+            // Mock out the context to run the action filter.
+            var request = new Mock<HttpRequest>();
+            request.SetupGet(r => r.ContentType).Returns("application/json");
+            request.SetupGet(r => r.Scheme).Returns("http");
+            request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
+            request.SetupGet(r => r.Path).Returns("/api/values");
+            request.SetupGet(r => r.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues> { { "content-type", "application/json" } }));
+            request.Setup(c => c.ContentLength).Returns(123);
+
+            var httpResponse = new Mock<HttpResponse>();
+            httpResponse.SetupGet(c => c.StatusCode).Returns(200);
+            var itemsDict = new Dictionary<object, object>();
+            var httpContext = new Mock<HttpContext>();
+            httpContext.SetupGet(c => c.Request).Returns(request.Object);
+            httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
+            httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var actionContext = new ActionContext()
+            {
+                HttpContext = httpContext.Object,
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
+                {
+                    ActionName = "get",
+                    ControllerName = "values"
+                }
+            };
+            var args = new Dictionary<string, object>();
+            var filters = new List<IFilterMetadata>();
+            var controller = new Mock<Controller>();
+            Audit.Core.Configuration.DataProvider = new DynamicDataProvider();
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+
+            var filter = new AuditApiAttribute()
+            {
+                IncludeResponseBody = true
+            };
+
+            var actionExecutingContext = new ActionExecutingContext(actionContext, filters, args, controller.Object);
+            var actionExecutedContext = new ActionExecutedContext(actionContext, filters, controller.Object);
+            actionExecutedContext.Result = new OkObjectResult("this is the result");
+
+            await filter.OnActionExecutionAsync(actionExecutingContext, async () => await Task.FromResult(actionExecutedContext));
+            var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
+
+            //Assert
+            Assert.AreEqual("this is the result", action.ResponseBody.Value);
         }
 
         [Test]
