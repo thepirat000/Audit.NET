@@ -628,6 +628,10 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img src="https://i.imgur.com/abs6duI.png" alt="icon" width="80"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set or publishing to a Redis PubSub channel.
 <img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md)** | Store the audit events using Apache log4net™.
 
+# Change Log
+
+For detailed information on changes in new release refer to the [change log](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md).
+
 # Contribute
 
 If you like this project please contribute in any of the following ways:
