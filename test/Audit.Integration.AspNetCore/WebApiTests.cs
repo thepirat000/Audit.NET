@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Integration.AspNetCore.Controllers;
@@ -50,6 +52,34 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(1, replaceEvs.Count);
             Assert.AreEqual(null, insertEvs[0].ResponseBody);
             Assert.AreEqual("10", replaceEvs[0].ResponseBody.Value);
+        }
+
+        public async Task Test_WebApi_Post_Async()
+        {
+            var insertEvs = new List<AuditApiAction>();
+            var replaceEvs = new List<AuditApiAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                    {
+                        await Task.Delay(1);
+                        insertEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                        return Guid.NewGuid();
+                    })
+                    .OnReplace(async (id, ev) =>
+                    {
+                        await Task.Delay(1);
+                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var c = new HttpClient();
+            var s = await c.PostAsync($"http://localhost:{_port}/api/values", new StringContent("{\"value\": \"abc\"}", Encoding.UTF8, "application/json"));
+            Assert.AreEqual(HttpStatusCode.OK, s.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(1, replaceEvs.Count);
+            Assert.AreEqual("{\"value\": \"abc\"}", insertEvs[0].RequestBody.Value);
+            Assert.AreEqual(null, insertEvs[0].ResponseBody);
+            Assert.AreEqual("abc", replaceEvs[0].ResponseBody.Value);
         }
 
         public async Task Test_WebApi_Exception_Async()

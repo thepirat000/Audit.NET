@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [11.0.3] - 2018-02-12
+### Added
+- Added request body for AspNet Core Web API 2 via IncludeRequestBody property.
+
 ## [11.0.2] - 2018-02-09
 ### Added
 - Adding NETSTANDARD2.0 support to Audit.NET 

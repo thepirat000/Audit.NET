@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -33,7 +34,10 @@ namespace Audit.Integration.AspNetCore
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.Use(async (context, next) => {
+                context.Request.EnableRewind();
+                await next();
+            });
             app.UseMvc();
         }
     }

@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Audit.Integration.AspNetCore.Controllers
 {
+    public class Request
+    {
+        public string Value { get; set; }
+    }
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -18,7 +22,7 @@ namespace Audit.Integration.AspNetCore.Controllers
         }
 
         // GET api/values/5
-        [AuditApi(EventTypeName = "api/values", IncludeHeaders = true, IncludeResponseBody = true, IncludeModelState = true)]
+        [AuditApi(EventTypeName = "api/values", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
         [HttpGet("{id}")]
         public async Task<string> Get(int id)
         {
@@ -32,8 +36,10 @@ namespace Audit.Integration.AspNetCore.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        [AuditApi(EventTypeName = "api/values/post", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        public IActionResult Post([FromBody]Request request)
         {
+            return Ok(request.Value);
         }
 
         // PUT api/values/5

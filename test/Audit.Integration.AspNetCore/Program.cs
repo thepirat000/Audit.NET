@@ -33,17 +33,24 @@ namespace Audit.Integration.AspNetCore
             {
                 Console.WriteLine("START - TestInitialize");
                 await webApiTests.TestInitialize();
+                Console.WriteLine("PASSED - TestInitialize");
+
+                Console.WriteLine("START - Test_WebApi_Post_Async");
+                await webApiTests.Test_WebApi_Post_Async();
+                Console.WriteLine("PASSED - Test_WebApi_Post_Async");
 
                 Console.WriteLine("START - Test_Mvc_Exception_Async");
                 await mvcTests.Test_Mvc_Exception_Async();
                 Console.WriteLine("PASSED - Test_Mvc_Exception_Async");
+
                 Console.WriteLine("START - Test_Mvc_HappyPath_Async");
                 await mvcTests.Test_Mvc_HappyPath_Async();
                 Console.WriteLine("PASSED - Test_Mvc_HappyPath_Async");
-                Console.WriteLine("PASSED - TestInitialize");
+
                 Console.WriteLine("START - Test_WebApi_HappyPath_Async");
                 await webApiTests.Test_WebApi_HappyPath_Async();
                 Console.WriteLine("PASSED - Test_WebApi_HappyPath_Async");
+
                 Console.WriteLine("START - Test_WebApi_Exception_Async");
                 await webApiTests.Test_WebApi_Exception_Async();
                 Console.WriteLine("PASSED - Test_WebApi_Exception_Async");
