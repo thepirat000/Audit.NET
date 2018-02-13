@@ -90,7 +90,7 @@ The `AuditApi` attribute can be configured with the following properties:
   - \{action}: replaced with the action method name.
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not. Default is false.
-- **IncludeResquestBody**: Boolean to indicate whether to include the request body or not. Default is false. (Check the following note)
+- **IncludeRequestBody**: Boolean to indicate whether to include the request body or not. Default is false. (Check the following note)
 - **IncludeResponseBody**: Boolean to indicate whether to include response body or not. Default is false.
 - **IncludeModelState**: Boolean to indicate whether to include the Model State info or not. Default is false.
 - **SerializeActionParameters**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
@@ -98,7 +98,7 @@ The `AuditApi` attribute can be configured with the following properties:
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
 
 ### NOTE
-When **IncludeResquestBody** is set to true
+When **IncludeRequestBody** is set to true
 and you are not using a `[FromBody]` parameter (i.e. reading the request body directly from the Request), 
 make sure you enable rewind on the request body stream, otherwise the controller won't be able to read
 the request body since, by default, it's a forwand-only stream that can be read only once. You can enable rewind on your startup logic with the following code:
