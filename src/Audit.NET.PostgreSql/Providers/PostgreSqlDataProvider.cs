@@ -214,7 +214,7 @@ namespace Audit.PostgreSql.Providers
             var cmd = cnn.CreateCommand();
             var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
             var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
-            cmd.CommandText = $@"insert into {schema}""{_tableName}"" (""{_dataColumnName}"") values ({data}) RETURNING id";
+            cmd.CommandText = $@"insert into {schema}""{_tableName}"" (""{_dataColumnName}"") values ({data}) RETURNING (""{_idColumnName}"")";
             var parameter = cmd.CreateParameter();
             parameter.ParameterName = "data";
             parameter.Value = auditEvent.ToJson();
