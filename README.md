@@ -10,9 +10,9 @@
 
 An extensible framework to audit executing operations in .NET including support for .NET Framework ≥ 4.5 and NetCore ≥ 1.0 (NetStandard 1.3).
 
-Generate an [audit log](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
+Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
-With Audit.NET you can generate tracking information about operations being executed. It will log environmental information such as the caller user id, machine name, method name, exceptions, including execution time and duration, and exposing an extensible mechanism in which you can provide extra information or implement your output mechanism for the audit logs.
+With Audit.NET you can generate tracking information about operations being executed. It logs environmental information such as the caller user id, machine name, method name, exceptions, including execution time and duration, and exposing an extensible mechanism to enrich and handle the event output.
 
 [Extensions](#extensions) to log to json Files, Event Log, [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), [PostgreSQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md), [MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md), [AzureBlob](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md), [DocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md) and [Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) are provided. 
 And also extensions to audit different systems such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), [WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md) and [SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md).
@@ -117,7 +117,7 @@ For more information about the `EventCreationPolicy` please see [Event Creation 
 
 ## Asynchronous operations
 
-Asynchronous versions of the operations that saves audit logs are provided. For example:
+Asynchronous versions of the operations that saves audit logs are also provided. For example:
 
 ```c#
 public async Task SaveOrderAsync(Order order)
@@ -139,8 +139,7 @@ public async Task SaveOrderAsync(Order order)
 }
 ```
 
-> Note: Inside async methods, 
-if you create the scope within a `using` statement, the event saving
+> Note: Inside async methods, if you create the scope within a `using` statement, the event saving
 could take place when the scope is disposed, but [the `Dispose` method is synchronous](https://github.com/dotnet/roslyn/issues/114). As a workaround you can explicitly call the `DisposeAsync()` method, or use combination of `SaveAsync()` and `Discard()`.
 
 ## Output
@@ -225,8 +224,7 @@ Field Name | Type | Description
 The `AuditScope` object provides two methods to extend the event output.
 
 - Use `SetCustomField()` method to add any object as a custom field of the event.
-
-- Use `Comment()` to add textual comments to the event.
+- Use `Comment()` to add textual comments to the event's `Comments` array.
 
 For example:
 
@@ -261,6 +259,22 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 ```
 
 > Custom fields are not limited to single properties, you can store any object as well, by default they will be JSON serialized.
+
+### Extending AuditEvent
+
+Another way to enrich the event output is to create a class inheriting from the `AuditEvent` class, then you can pass an instance of your class to the AuditScope.Create method. For example:
+
+```c#
+public class YourAuditEvent : AuditEvent
+{
+    public Guid ReferenceId { get; set; } = Guid.NewGuid();
+}
+
+using (var scope = AuditScope.Create(new AuditScopeOptions { AuditEvent = new YourAuditEvent() }))
+{
+    //...
+}
+```
 
 The output of the previous examples would be:
 
@@ -298,9 +312,9 @@ The output of the previous examples would be:
 
 ## Discard option
 
-The `AuditScope` object has a `Discard()` method to allow the user to discard an event under certain condition.
+The `AuditScope` object has a `Discard()` method to allow the user to discard an event. 
 
-For example, if you want to avoid saving the audit event when an exception is thrown:
+For example, if you want to avoid saving the audit event under certain condition:
 
 ```c#
 using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
