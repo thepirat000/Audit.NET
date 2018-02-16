@@ -67,14 +67,14 @@ There is also a unified overload of the `Create` method that accepts an instance
 ```c#
 var options = new AuditScopeOptions()
 {
-	EventType = "MyEvent",
-	CreationPolicy = EventCreationPolicy.Manual,
-	ExtraFields = new { Action = this.Action },
-	AuditEvent = new MyCustomAuditEvent()
+    EventType = "MyEvent",
+    CreationPolicy = EventCreationPolicy.Manual,
+    ExtraFields = new { Action = this.Action },
+    AuditEvent = new MyCustomAuditEvent()
 };
 using (var scope = AuditScope.Create(options))
 {
-	// ...
+    // ...
 }
 ```
 
