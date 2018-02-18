@@ -663,6 +663,3 @@ If you like this project please contribute in any of the following ways:
     <img width="24" height="24" alt="Tweet this package" src="https://nuget.org/Content/gallery/img/twitter.svg" />
   </a>
 </p>
-
-- Become an [OpenCollective](https://opencollective.com/auditnet) backer of this project:
-<a href="https://opencollective.com/auditnet#backers" target="_blank"><img src="https://opencollective.com/auditnet/backers.svg?width=890"></a>
