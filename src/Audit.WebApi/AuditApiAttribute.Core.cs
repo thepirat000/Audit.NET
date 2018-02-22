@@ -118,23 +118,7 @@ namespace Audit.WebApi
                         var bodyType = context.Result?.GetType().GetFullTypeName();
                         if (bodyType != null)
                         {
-                            auditAction.ResponseBody = new BodyContent { Type = bodyType };
-                            if (context.Result is ObjectResult or)
-                            {
-                                auditAction.ResponseBody.Value = or.Value;
-                            }
-                            else if (context.Result is StatusCodeResult sr)
-                            {
-                                auditAction.ResponseBody.Value = string.Format("StatusCode ({0})", sr.StatusCode);
-                            }
-                            else if (context.Result is RedirectResult rr)
-                            {
-                                auditAction.ResponseBody.Value = string.Format("Redirect to {0}", rr.Url);
-                            }
-                            else
-                            {
-                                auditAction.ResponseBody.Value = context.Result.ToString();
-                            }
+                            auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = GetResponseBody(context.Result) };
                         }
                     }
                 }
@@ -154,6 +138,69 @@ namespace Audit.WebApi
             await BeforeExecutingAsync(context);
             var actionExecutedContext = await next.Invoke();
             await AfterExecutedAsync(actionExecutedContext);
+        }
+
+        private object GetResponseBody(IActionResult result)
+        {
+            if (result is ObjectResult or)
+            {
+                return or.Value;
+            }
+            if (result is StatusCodeResult sr)
+            {
+                return sr.StatusCode;
+            }
+            if (result is JsonResult jr)
+            {
+                return jr.Value;
+            }
+            if (result is ContentResult cr)
+            {
+                return cr.Content;
+            }
+            if (result is FileResult fr)
+            {
+                return fr.FileDownloadName;
+            }
+            if (result is LocalRedirectResult lrr)
+            {
+                return lrr.Url;
+            }
+            if (result is RedirectResult rr)
+            {
+                return rr.Url;
+            }
+            if (result is RedirectToActionResult rta)
+            {
+                return rta.ActionName;
+            }
+            if (result is RedirectToRouteResult rtr)
+            {
+                return rtr.RouteName;
+            }
+            if (result is SignInResult sir)
+            {
+                return sir.Principal?.Identity?.Name;
+            }
+            if (result is PartialViewResult pvr)
+            {
+                return pvr.ViewName;
+            }
+            if (result is ViewComponentResult vc)
+            {
+                return vc.ViewComponentName;
+            }
+            if (result is ViewResult vr)
+            {
+                return vr.ViewName;
+            }
+#if NETSTANDARD2_0
+            if (result is RedirectToPageResult rtp)
+            {
+                return rtp.PageName;
+            }
+#endif
+            return result.ToString();
         }
 
         private string GetStatusCodeString(int statusCode)
