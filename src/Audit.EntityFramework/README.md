@@ -2,9 +2,9 @@
 
 **EntityFramework (EF) Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
 
-Automatically generates Audit Logs for EntityFramework's CRUD operations. **Supporting EF 6 and EF 7 (EF Core)**.
+Automatically generates Audit Logs for EntityFramework's operations. **Supporting EF 6 and EF 7 (EF Core)**.
 
-Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about CRUD operations in your database.
+Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about Insert, Update and Delete operations in your database.
 
 ## Install
 
