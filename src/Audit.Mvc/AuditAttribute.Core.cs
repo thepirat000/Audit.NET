@@ -52,7 +52,7 @@ namespace Audit.Mvc
             var auditAction = new AuditAction()
             {
                 UserName = httpContext.User?.Identity.Name,
-                IpAddress = httpContext.Connection?.RemoteIpAddress.ToString(),
+                IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = string.Format("{0}://{1}{2}", httpContext.Request.Scheme, httpContext.Request.Host, httpContext.Request.Path),
                 HttpMethod = httpContext.Request.Method,
                 FormVariables = httpContext.Request.HasFormContentType ? ToDictionary(httpContext.Request.Form) : null,

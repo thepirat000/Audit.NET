@@ -70,7 +70,7 @@ namespace Audit.WebApi
             var auditAction = new AuditApiAction
             {
                 UserName = httpContext.User?.Identity.Name,
-                IpAddress = httpContext.Connection?.RemoteIpAddress.ToString(),
+                IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = string.Format("{0}://{1}{2}", httpContext.Request.Scheme, httpContext.Request.Host, httpContext.Request.Path),
                 HttpMethod = actionContext.HttpContext.Request.Method,
                 FormVariables = httpContext.Request.HasFormContentType ? ToDictionary(httpContext.Request.Form) : null, 

@@ -34,6 +34,9 @@ namespace Audit.Mvc.UnitTest
             httpContext.SetupGet(c => c.Request).Returns(request.Object);
             httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
             httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var ci = new Mock<ConnectionInfo>();
+            ci.SetupGet(_ => _.RemoteIpAddress).Returns(() => null);
+            httpContext.SetupGet(c => c.Connection).Returns(() => ci.Object);
             var actionContext = new ActionContext()
             {
                 HttpContext = httpContext.Object,
