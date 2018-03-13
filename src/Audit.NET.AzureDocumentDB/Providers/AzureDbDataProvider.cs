@@ -135,47 +135,54 @@ namespace Audit.AzureDocumentDB.Providers
         }
 
         #region Events Query        
+#pragma warning disable CS3001 // Argument feedOptions is not CLS-compliant with default null, just ignore the warning.
         /// <summary>
         /// Returns an IQueryable that enables the creation of queries against the audit events stored on Azure Document DB.
         /// </summary>
-        public IQueryable<AuditEvent> QueryEvents()
+        /// <param name="feedOptions">The options for processing the query results feed.</param>
+        public IQueryable<AuditEvent> QueryEvents(FeedOptions feedOptions = null)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<AuditEvent>(collectionUri);
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, feedOptions);
         }
 
         /// <summary>
         /// Returns an IQueryable that enables the creation of queries against the audit events stored on Azure Document DB, for the audit event type given.
         /// </summary>
         /// <typeparam name="T">The AuditEvent type</typeparam>
-        public IQueryable<T> QueryEvents<T>() where T : AuditEvent
+        /// <param name="feedOptions">The options for processing the query results feed.</param>
+        public IQueryable<T> QueryEvents<T>(FeedOptions feedOptions = null) where T : AuditEvent
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<T>(collectionUri);
+            return client.CreateDocumentQuery<T>(collectionUri, feedOptions);
         }
 
         /// <summary>
         /// Returns an enumeration of audit events for the given Azure Document DB SQL expression.
         /// </summary>
         /// <param name="sqlExpression">The Azure Document DB SQL expression</param>
-        public IEnumerable<AuditEvent> EnumerateEvents(string sqlExpression)
+        /// <param name="feedOptions">The options for processing the query results feed.</param>
+        public IEnumerable<AuditEvent> EnumerateEvents(string sqlExpression, FeedOptions feedOptions = null)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression);
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression, feedOptions);
         }
         /// <summary>
         /// Returns an enumeration of audit events for the given Azure Document DB SQL expression and the event type given.
         /// </summary>
         /// <typeparam name="T">The AuditEvent type</typeparam>
-        public IEnumerable<T> EnumerateEvents<T>(string sqlExpression) where T : AuditEvent
+        /// <param name="sqlExpression">The Azure Document DB SQL expression</param>
+        /// <param name="feedOptions">The options for processing the query results feed.</param>
+        public IEnumerable<T> EnumerateEvents<T>(string sqlExpression, FeedOptions feedOptions = null) where T : AuditEvent
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression);
+            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions);
         }
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
         #endregion
     }
 }
