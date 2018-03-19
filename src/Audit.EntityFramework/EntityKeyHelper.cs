@@ -76,7 +76,7 @@ public sealed class EntityKeyHelper
         dynamic objectSet = method.Invoke(objectContext, null);
 
         var navProps = objectSet.EntitySet.ElementType.NavigationProperties as IEnumerable<NavigationProperty>;
-        string[] keyNames = navProps?.SelectMany(n => n.GetDependentProperties()).Select(fk => fk.Name).ToArray();
+        string[] keyNames = navProps?.SelectMany(n => n.GetDependentProperties()).Select(fk => fk.Name).Distinct().ToArray();
 
         _foreignKeyNamesCache[entityType] = keyNames;
         return keyNames;
