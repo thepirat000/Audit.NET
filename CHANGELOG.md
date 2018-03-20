@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [11.0.7] - 2018-03-19
+### Changed
+- Audit.NET.AzureDocumentDB - Fix [#103]: Added FeedOptions argument to DocumentDb QueryEvents.
+- Audit.EntityFramework - Fix [#104]: Multiple foreing key using the same field as key, causing audit to fail.
+
 ## [11.0.6] - 2018-03-07
 ### Changed
 - Audit.WebApi and Audit.Mvc - Fix [#102]: NULL validation on HttpContext.Connection.RemoteIpAddress 
