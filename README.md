@@ -29,6 +29,9 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.NET
 ```
 
+## Changelog
+Check the [CHANELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md) file.
+
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its lifecycle. 
