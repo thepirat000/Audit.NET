@@ -38,8 +38,7 @@ Check this [issue](https://github.com/aspnet/SignalR/issues/924).
 
 
 ## Usage
-On your ASP.NET startup logic, call the method `Microsoft.AspNet.SignalR.GlobalHost.HubPipeline.AddAuditModule()`
-to setup the audit pipeline. This must be called before `IAppBuilder.MapSignalR()`.
+On your ASP.NET startup logic, call the extension method `AddAuditModule()` defined on namespace `Microsoft.AspNet.SignalR.GlobalHost.HubPipeline`, to setup the audit pipeline. This must be called before `IAppBuilder.MapSignalR()`.
 
 This method provides a fluent API to configure the audit module.
 
