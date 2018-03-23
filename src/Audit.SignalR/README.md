@@ -111,7 +111,7 @@ The module allows to configure filtering of events. By default it will log all t
 - **ReconnectEventsFilter**: Allows to filter Reconnect events.
 - **ErrorEventsFilter**: Allows to filter Error events.
 
-### Extendion Methods
+### Extension Methods
 
 You can access the current [Audit Scope](https://github.com/thepirat000/Audit.NET#usage) 
 for the incoming event inside server-side methods, by calling the Hub extension method `GetIncomingAuditScope()`, 
