@@ -16,16 +16,19 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Data.SqlClient;
 
 namespace Audit.IntegrationTest
 {
-    [TestFixture(Category ="EF")]
+    [TestFixture(Category = "EF")]
     public class EntityFrameworkTests_Core
     {
         [OneTimeSetUp]
         public void Init()
         {
-            var sql = @"drop table posts; drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
+            var sql =
+                @"drop table posts; drop table blogs; create table blogs ( Id int identity(1,1) not null primary key, BloggerName nvarchar(max), Title nvarchar(max) );
                         create table posts ( Id int identity(1,1) not null primary key, Title nvarchar(max), DateCreated datetime, Content nvarchar(max), BlogId int not null constraint FK_P_B foreign key references Blogs (id) );";
             using (var ctx = new MyAuditedVerboseContext())
             {
@@ -34,10 +37,32 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
+        public void Test_EFDataProvider_IdentityContext_Error()
+        {
+            // Issue #106
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config =>
+                {
+                    config
+                        .AuditTypeMapper(typeName => Type.GetType(typeName + "Audit"))
+                        .AuditEntityAction((ev, ent, audEnt) =>
+                        {
+                            ((dynamic)audEnt).Username = "test";
+                        });
+                });
+            using (var db = new AuditNetTestContext())
+            {
+                db.Foos.Add(new Foo());
+                Assert.Throws<DbUpdateException>(() => {
+                    db.SaveChanges();
+                });
+            }
+        }
+
+        [Test]
         public void Test_EFDataProvider()
         {
             var dp = new EntityFrameworkDataProvider();
-
             dp.AuditTypeMapper = t =>
             {
                 if (t == typeof(Order))
@@ -46,6 +71,7 @@ namespace Audit.IntegrationTest
                     return typeof(OrderlineAudit);
                 return null;
             };
+            
             dp.AuditEntityAction = (ev, entry, obj) =>
             {
                 var ab = obj as AuditBase;
@@ -124,6 +150,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
                 Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
             }
+            
         }
 
         [Test]
@@ -586,6 +613,38 @@ SET IDENTITY_INSERT Posts OFF
         public DbSet<OrderAudit> OrderAudit { get; set; }
         public DbSet<OrderlineAudit> OrderlineAudit { get; set; }
     }
+    public class Foo
+    {
+        public int Id { get; set; }
+        [Required]
+        public string Bar { get; set; }
+        public string Car { get; set; }
+    }
+    public class FooAudit
+    {
+        public int Id { get; set; }
+        public string Bar { get; set; }
+        public string Username { get; set; }
+    }
+
+    public class AuditNetTestContext : Audit.EntityFramework.AuditIdentityDbContext
+    {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=FooBar;integrated security=true;");
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+
+        public DbSet<Foo> Foos { get; set; }
+        public DbSet<FooAudit> FooAudits { get; set; }
+        public AuditNetTestContext()
+        {
+
+        }
+    }
+
 }
 #endif
-      

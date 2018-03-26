@@ -24,7 +24,7 @@ namespace Audit.EntityFramework
     /// </summary>
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
     public abstract partial class AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
-        : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IAuditDbContext
+        : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IAuditDbContext, IAuditBypass
 #if NETSTANDARD1_5
         where TUser : IdentityUser<TKey, TUserClaim, TUserRole, TUserLogin>
         where TRole : IdentityRole<TKey, TUserRole, TRoleClaim>
@@ -40,7 +40,7 @@ namespace Audit.EntityFramework
         where TUserToken : IdentityUserToken<TKey>
 #elif NET45
     public abstract partial class AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>
-        : IdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>, IAuditDbContext
+        : IdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>, IAuditDbContext, IAuditBypass
         where TUser : IdentityUser<TKey, TUserLogin, TUserRole, TUserClaim>
         where TRole : IdentityRole<TKey, TUserRole>
         where TUserLogin : IdentityUserLogin<TKey>
@@ -204,6 +204,15 @@ namespace Audit.EntityFramework
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
+        }
+
+        int IAuditBypass.SaveChangesBypassAudit()
+        {
+            return base.SaveChanges();
+        }
+        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        {
+            return await base.SaveChangesAsync();
         }
     }
 }

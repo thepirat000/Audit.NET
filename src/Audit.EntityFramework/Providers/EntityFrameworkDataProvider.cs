@@ -80,9 +80,9 @@ namespace Audit.EntityFramework.Providers
             }
             if (save)
             {
-                if (dbContext is AuditDbContext)
+                if (dbContext is IAuditBypass)
                 {
-                    (dbContext as AuditDbContext).SaveChangesBypassAudit();
+                    (dbContext as IAuditBypass).SaveChangesBypassAudit();
                 }
                 else
                 {
@@ -127,9 +127,9 @@ namespace Audit.EntityFramework.Providers
             }
             if (save)
             {
-                if (dbContext is AuditDbContext)
+                if (dbContext is IAuditBypass)
                 {
-                    await (dbContext as AuditDbContext).SaveChangesBypassAuditAsync();
+                    await (dbContext as IAuditBypass).SaveChangesBypassAuditAsync();
                 }
                 else
                 {

@@ -8,6 +8,7 @@ using System.Data.Entity.Core.Objects;
 #endif
 using Audit.Core;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Audit.EntityFramework
 {

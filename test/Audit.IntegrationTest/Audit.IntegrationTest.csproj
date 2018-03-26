@@ -52,6 +52,12 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>  
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Identity">
+      <Version>2.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   
 </Project>

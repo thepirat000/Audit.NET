@@ -18,7 +18,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base DbContext class for Audit. Inherit your DbContext from this class to enable audit.
     /// </summary>
-    public abstract partial class AuditDbContext : DbContext, IAuditDbContext
+    public abstract partial class AuditDbContext : DbContext, IAuditDbContext, IAuditBypass
     {
         private DbContextHelper _helper = new DbContextHelper();
 
@@ -182,11 +182,11 @@ namespace Audit.EntityFramework
             return await SaveChangesAsync(default(CancellationToken));
         }
 #endif
-        internal int SaveChangesBypassAudit()
+        int IAuditBypass.SaveChangesBypassAudit()
         {
             return base.SaveChanges();
         }
-        internal async Task<int> SaveChangesBypassAuditAsync()
+        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
         {
             return await base.SaveChangesAsync();
         }
