@@ -38,8 +38,7 @@ Check this [issue](https://github.com/aspnet/SignalR/issues/924).
 
 
 ## Usage
-On your ASP.NET startup logic, call the method `Microsoft.AspNet.SignalR.GlobalHost.HubPipeline.AddAuditModule()`
-to setup the audit pipeline. This must be called before `IAppBuilder.MapSignalR()`.
+On your ASP.NET startup logic, call the extension method `AddAuditModule()` defined on namespace `Microsoft.AspNet.SignalR.GlobalHost.HubPipeline`, to setup the audit pipeline. This must be called before `IAppBuilder.MapSignalR()`.
 
 This method provides a fluent API to configure the audit module.
 
@@ -112,7 +111,7 @@ The module allows to configure filtering of events. By default it will log all t
 - **ReconnectEventsFilter**: Allows to filter Reconnect events.
 - **ErrorEventsFilter**: Allows to filter Error events.
 
-### Extendion Methods
+### Extension Methods
 
 You can access the current [Audit Scope](https://github.com/thepirat000/Audit.NET#usage) 
 for the incoming event inside server-side methods, by calling the Hub extension method `GetIncomingAuditScope()`, 
