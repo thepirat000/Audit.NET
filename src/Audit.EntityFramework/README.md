@@ -153,12 +153,12 @@ public class MyDbContext : AuditDbContext
 		AuditDataProvider = new DynamicDataProvider();
 	}
 	
-	protected override void OnScopeCreated(AuditScope auditScope)
+	public override void OnScopeCreated(AuditScope auditScope)
 	{
 		Database.BeginTransaction();
 	}
 
-	protected override void OnScopeSaving(AuditScope auditScope)
+	public override void OnScopeSaving(AuditScope auditScope)
 	{
 		try	
 		{
