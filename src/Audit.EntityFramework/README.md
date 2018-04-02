@@ -283,13 +283,15 @@ Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
         .AuditTypeExplicitMapper(m => m
             .Map<Order, Audit_Order>()
-            .Map<OrderItem, Audit_OrderItem>())
-        .AuditEntityAction<IAudit>((evt, entry, auditEntity) =>
-        {
-            auditEntity.AuditDate = DateTime.UtcNow;
-            auditEntity.UserName = evt.Environment.UserName;
-            auditEntity.AuditAction = entry.Action; // Insert, Update, Delete
-        }));
+            .Map<OrderItem, Audit_OrderItem>()
+            .AuditEntityAction<IAudit>((evt, entry, auditEntity) =>
+            {
+                auditEntity.AuditDate = DateTime.UtcNow;
+                auditEntity.UserName = evt.Environment.UserName;
+                auditEntity.AuditAction = entry.Action; // Insert, Update, Delete
+            })
+        )
+    );
 ```
 
 ### EF Provider Options
