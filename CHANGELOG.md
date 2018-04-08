@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [11.1.0] - 2018-04-08
+### Added
+- Audit.EntityFramework: Added built-in mechanism to Ignore columns and Override column values on the audit logs.
+
+
 ## [11.0.8] - 2018-03-25
 ### Changed
 - Audit.EntityFramework - Fix [#106]: DbEntityValidationException causes AuditEntityAction StackOverflowException.

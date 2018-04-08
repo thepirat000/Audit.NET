@@ -9,6 +9,8 @@ using System.Data.Entity.Core.Objects;
 using Audit.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using Audit.EntityFramework.ConfigurationApi;
 
 namespace Audit.EntityFramework
 {
@@ -21,6 +23,7 @@ namespace Audit.EntityFramework
         AuditDataProvider AuditDataProvider { get; set; }
         Dictionary<string, object> ExtraFields { get; }
         DbContext DbContext { get; }
+        Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
         void OnScopeSaving(AuditScope auditScope);
         void OnScopeCreated(AuditScope auditScope);
 #if NET45

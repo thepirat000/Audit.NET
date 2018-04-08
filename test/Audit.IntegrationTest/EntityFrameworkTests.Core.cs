@@ -36,6 +36,13 @@ namespace Audit.IntegrationTest
             }
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForAnyContext().Reset();
+        }
+
         [Test]
         public void Test_EFDataProvider_IdentityContext_Error()
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
+using Audit.EntityFramework.ConfigurationApi;
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
 using Microsoft.EntityFrameworkCore;
 #elif NET45
@@ -126,7 +127,11 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool IncludeIndependantAssociations { get; set; }
 #endif
-#endregion
+        /// <summary>
+        /// A collection of settings per entity type.
+        /// </summary>
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
+        #endregion
 
         #region Public methods
         /// <summary>

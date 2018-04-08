@@ -70,8 +70,14 @@ The following settings can be configured per DbContext or globally:
    - \{context}: replaced with the Db Context type name.
    - \{database}: replaced with the database name.
 
+The following settings can be configured per entity type:
 
-Change the settings by decorating your DbContext with the `AuditDbContext` attribute, for example:
+- **IgnoredProperties**: To indicate the entity's properties (columns) to be ignored on the audit logs.
+- **OverrideProperties**: To indicate constant values to override properties on the audit logs.
+- **FormatProperties**: To indicate replacement functions for the property's values on the audit logs.
+
+
+Change the settings for a DbContext by decorating it with the `AuditDbContext` attribute, for example:
 
 ```c#
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false, AuditEventType = "{database}_{context}" )]
@@ -80,7 +86,9 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 ...
 ```
 
-To exclude specific entities from the audit (OptOut Mode), you can decorate your entity classes with the `AuditIgnore` attribute, for example:
+#### Include/Ignore entities (tables)
+
+To ignore specific entities on the audit (when using OptOut Mode), you can decorate your entity classes with the `AuditIgnore` attribute, for example:
 ```c#
 [AuditIgnore]
 public class Blog
@@ -90,7 +98,7 @@ public class Blog
 }
 ```
 
-Instead, to include specific entities to the audit (OptIn Mode), you can use the `AuditInclude` attribute:
+Instead, to include specific entities to the audit (when using OptIn Mode), you can use the `AuditInclude` attribute:
 ```c#
 [AuditInclude]
 public class Post
@@ -100,20 +108,40 @@ public class Post
 }
 ```
 
-You can also change the settings of your DbContext by accessing the properties with the same name as in the attribute. For example:
+#### Exclude properties (columns)
+
+The `AuditIgnore` attribute can be used on the entity's properties to indicate that its value should
+*not* be included on the audit logs. For example to prevent storing passwords on the logs:
+
 ```c#
-public class MyEntities : Audit.EntityFramework.AuditDbContext
+public class User
 {
-    public MyEntities()
-    {
-        AuditEventType = "{database}_{context}";
-        Mode = AuditOptionMode.OptOut;
-        IncludeEntityObjects = false;
-    }
+    public int Id { get; set; }
+    [AuditIgnore]
+    public string Password { get; set; }
+    ...
 }
 ```
 
-You can also configure settings by using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
+#### Override properties (columns)
+
+The `AuditOverride` attribute can be used to override a column value with a constant value.
+For example to override the password values with a star "*":
+
+```c#
+public class User
+{
+    [AuditOverride("*")]
+    public string Password { get; set; }
+    ...
+}
+```
+
+Note you can also provide a replacement function of the value, please see next section.
+
+### Fluent API
+
+You can configure the settings via a convenient Fluent API provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
 For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding from the audit the entities whose name ends with `History`:
 ```c#
@@ -123,6 +151,19 @@ Audit.EntityFramework.Configuration.Setup()
         .AuditEventType("{context}:{database}"))
     .UseOptOut()
         .IgnoreAny(t => t.Name.EndsWith("History"));
+```
+
+Another example configuring ignored, overriden and formatted column values. In this example, the Photo column 
+is ignored, the OldPassword will be always null and the Password will be set to a number of stars equal to the number 
+of password characters.
+
+```c#
+Audit.EntityFramework.Configuration.Setup()
+    .ForContext<MyEntities>(config => config
+        .ForEntity<User>(_ => _
+            .Ignore(user => user.Photo)
+            .Override(user => user.OldPassword, null)
+            .Format(user => user.Password, pass => new String('*', pass.Length))));
 ```
 
 In summary, you have three ways to configure the audit for the contexts:

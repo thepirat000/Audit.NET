@@ -11,11 +11,67 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Audit.EntityFramework.ConfigurationApi;
 
 namespace Audit.UnitTest
 {
     public class UnitTest
     {
+        [Test]
+        public void Test_EF_MergeEntitySettings()
+        {
+            var now = DateTime.Now;
+            var helper = new DbContextHelper();
+            var attr = new Dictionary<Type, EfEntitySettings>();
+            var local = new Dictionary<Type, EfEntitySettings>();
+            var global = new Dictionary<Type, EfEntitySettings>();
+            attr[typeof(string)] = new EfEntitySettings()
+            {
+                IgnoredProperties = new HashSet<string>(new[] { "I1" }),
+                OverrideProperties = new Dictionary<string, object>() { { "C1", 1 }, { "C2", "ATTR" } }
+            };
+            local[typeof(string)] = new EfEntitySettings()
+            {
+                IgnoredProperties = new HashSet<string>(new[] { "I1", "I2" }),
+                OverrideProperties = new Dictionary<string, object>() { { "C2", "LOCAL" }, { "C3", now } } 
+            };
+            global[typeof(string)] = new EfEntitySettings()
+            {
+                IgnoredProperties = new HashSet<string>(new[] { "I3" }),
+                OverrideProperties = new Dictionary<string, object>() { { "C2", "GLOBAL" }, { "C4", null } }
+            };
+
+            attr[typeof(int)] = new EfEntitySettings()
+            {
+                IgnoredProperties = new HashSet<string>(new[] { "I3" }),
+                OverrideProperties = new Dictionary<string, object>() { { "C2", "INT" }, { "C4", null } }
+            };
+
+            var merged = helper.MergeEntitySettings(attr, local, global);
+            var mustbenull1 = helper.MergeEntitySettings(null, null, null);
+            var mustbenull2 = helper.MergeEntitySettings(null, new Dictionary<Type, EfEntitySettings>(), null);
+            var mustbenull3 = helper.MergeEntitySettings(new Dictionary<Type, EfEntitySettings>(), new Dictionary<Type, EfEntitySettings>(), new Dictionary<Type, EfEntitySettings>());
+            Assert.AreEqual(2, merged.Count);
+            Assert.IsNull(mustbenull1);
+            Assert.IsNull(mustbenull2);
+            Assert.IsNull(mustbenull3);
+            var merge = merged[typeof(string)];
+            Assert.AreEqual(3, merge.IgnoredProperties.Count);
+            Assert.IsTrue(merge.IgnoredProperties.Contains("I1"));
+            Assert.IsTrue(merge.IgnoredProperties.Contains("I2"));
+            Assert.IsTrue(merge.IgnoredProperties.Contains("I3"));
+            Assert.AreEqual(4, merge.OverrideProperties.Count);
+            Assert.AreEqual(1, merge.OverrideProperties["C1"]);
+            Assert.AreEqual("ATTR", merge.OverrideProperties["C2"]);
+            Assert.AreEqual(now, merge.OverrideProperties["C3"]);
+            Assert.AreEqual(null, merge.OverrideProperties["C4"]);
+            merge = merged[typeof(int)];
+            Assert.AreEqual(1, merge.IgnoredProperties.Count);
+            Assert.IsTrue(merge.IgnoredProperties.Contains("I3"));
+            Assert.AreEqual("INT", merge.OverrideProperties["C2"]);
+            Assert.AreEqual(null, merge.OverrideProperties["C4"]);
+        }
+
         [Test]
         public void Test_FileLog_HappyPath()
         {

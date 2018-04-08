@@ -174,6 +174,12 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj">
+      <Project>{d6c86273-942b-4be7-8764-fa4567f19c9a}</Project>
+      <Name>Audit.NET.SqlServer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

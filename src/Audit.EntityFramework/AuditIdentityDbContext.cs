@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audit.Core;
 using System.Threading;
+using Audit.EntityFramework.ConfigurationApi;
 #if NETSTANDARD1_5
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -159,6 +160,10 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool IncludeIndependantAssociations { get; set; }
 #endif
+        /// <summary>
+        /// A collection of settings per entity type.
+        /// </summary>
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set;  }
 
         /// <summary>
         /// Called after the audit scope is created.

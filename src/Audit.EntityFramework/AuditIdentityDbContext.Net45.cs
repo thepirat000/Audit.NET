@@ -7,6 +7,8 @@ using System.Data.Entity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using System;
+using Audit.EntityFramework.ConfigurationApi;
 
 namespace Audit.EntityFramework
 {
@@ -169,6 +171,11 @@ namespace Audit.EntityFramework
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
         /// </summary>
         public bool IncludeIndependantAssociations { get; set; }
+
+        /// <summary>
+        /// A collection of settings per entity type.
+        /// </summary>
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
 
         /// <summary>
         /// Called after the audit scope is created.

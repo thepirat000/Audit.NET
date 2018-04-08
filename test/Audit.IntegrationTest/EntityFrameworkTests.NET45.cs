@@ -21,6 +21,12 @@ namespace Audit.IntegrationTest
     [TestFixture(Category ="EF")]
     public class EntityFrameworkTests_Net45
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForAnyContext().Reset();
+        }
 
         [Test]
         public void Test_ManyToManyNoJoinEntity()
