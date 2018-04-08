@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Audit.EntityFramework: Added built-in mechanism to Ignore columns and Override column values on the audit logs.
 
+### Changed
+- Audit.EntityFramework: (Core) fix PrimaryKeys, ForeignKeys and ColumnValues to log the column name instead of the property name.
+
 
 ## [11.0.8] - 2018-03-25
 ### Changed

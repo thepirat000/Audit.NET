@@ -71,7 +71,7 @@ namespace Audit.EntityFramework
                     {
                         value = overrideValue;
                     }
-                    result.Add(prop.Name, value);
+                    result.Add(GetColumnName(prop), value);
                 }
             }
             return result;
@@ -175,7 +175,7 @@ namespace Audit.EntityFramework
                 {
                     foreach (var prop in fk.Properties)
                     {
-                        result.Add(prop.Name, entry.Property(prop.Name).CurrentValue);
+                        result.Add(GetColumnName(prop), entry.Property(prop.Name).CurrentValue);
                     }
                 }
             }
@@ -190,7 +190,7 @@ namespace Audit.EntityFramework
             var result = new Dictionary<string, object>();
             foreach(var prop in entry.Properties.Where(p => p.Metadata.IsPrimaryKey()))
             {
-                result.Add(prop.Metadata.Name, prop.CurrentValue); 
+                result.Add(GetColumnName(prop.Metadata), prop.CurrentValue); 
             }
             return result;
         }

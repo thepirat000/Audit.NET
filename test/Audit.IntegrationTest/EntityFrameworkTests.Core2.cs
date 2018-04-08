@@ -85,8 +85,8 @@ namespace Audit.IntegrationTest
             Assert.IsTrue((int)ev.Entries.Single(e => e.Entity is Blog).PrimaryKey.Single().Value > 0);
             Assert.AreEqual(ev.Entries.Single(e => e.Entity is Blog).PrimaryKey.Single().Value, 
                             ev.Entries.Single(e => e.Entity is BlogEx).PrimaryKey.Single().Value);
-            Assert.IsTrue(ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues.ContainsKey("BlogId"));
-            Assert.AreEqual(ev.Entries.Single(e => e.Entity is Blog).PrimaryKey.Single().Value, ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues["BlogId"]);
+            Assert.IsTrue(ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues.ContainsKey("Id"));
+            Assert.AreEqual(ev.Entries.Single(e => e.Entity is Blog).PrimaryKey.Single().Value, ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues["Id"]);
             Assert.AreEqual("this guy", ev.Entries.Single(e => e.Entity is BlogEx).ColumnValues["BloggerName"]);
         }
 
@@ -122,8 +122,8 @@ namespace Audit.IntegrationTest
             Assert.IsTrue(childId > 0);
             Assert.AreEqual(childId, (long)ev.Entries.Single(e => e.Entity is Child).PrimaryKey.Single().Value);
             Assert.AreEqual(childId, ev.Entries.Single(e => e.Entity is Period).PrimaryKey.Single().Value);
-            Assert.IsTrue(ev.Entries.Single(e => e.Entity is Period).ColumnValues.ContainsKey("ChildId"));
-            Assert.AreEqual(childId, ev.Entries.Single(e => e.Entity is Period).ColumnValues["ChildId"]);
+            Assert.IsTrue(ev.Entries.Single(e => e.Entity is Period).ColumnValues.ContainsKey("Id"));
+            Assert.AreEqual(childId, ev.Entries.Single(e => e.Entity is Period).ColumnValues["Id"]);
         }
 
 

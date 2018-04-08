@@ -33,7 +33,7 @@ Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbConte
 For example, if you have a context like this:
 
 ```c#
-public class MyEntities : DbContext
+public class MyContext : DbContext
 {
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -42,7 +42,7 @@ public class MyEntities : DbContext
 
 to enable the audit log, you should change it to inherit from `AuditDbContext`:
 ```c#
-public class MyEntities : Audit.EntityFramework.AuditDbContext
+public class MyContext : Audit.EntityFramework.AuditDbContext
 {
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -143,10 +143,10 @@ Note you can also provide a replacement function of the value, please see next s
 
 You can configure the settings via a convenient Fluent API provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
-For example, to configure a context called `MyEntities`, that should include the objects on the output, using the OptOut mode, excluding from the audit the entities whose name ends with `History`:
+For example, to configure a context called `MyContext`, that should include the objects on the output, using the OptOut mode, excluding from the audit the entities whose name ends with `History`:
 ```c#
 Audit.EntityFramework.Configuration.Setup()
-    .ForContext<MyEntities>(config => config
+    .ForContext<MyContext>(config => config
         .IncludeEntityObjects()
         .AuditEventType("{context}:{database}"))
     .UseOptOut()
@@ -159,7 +159,7 @@ of password characters.
 
 ```c#
 Audit.EntityFramework.Configuration.Setup()
-    .ForContext<MyEntities>(config => config
+    .ForContext<MyContext>(config => config
         .ForEntity<User>(_ => _
             .Ignore(user => user.Photo)
             .Override(user => user.OldPassword, null)
