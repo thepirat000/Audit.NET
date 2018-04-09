@@ -126,12 +126,12 @@ public class User
 #### Override properties (columns)
 
 The `AuditOverride` attribute can be used to override a column value with a constant value.
-For example to override the password values with a star "*":
+For example to override the password values with a NULL value:
 
 ```c#
 public class User
 {
-    [AuditOverride("*")]
+    [AuditOverride(null)]
     public string Password { get; set; }
     ...
 }
