@@ -290,8 +290,7 @@ Another way to customize the output is by using global custom actions, please se
 
 ## Entity Framework Data Provider
 
-If you plan to store the audit logs in the same database as the audited entities, you can use the `EntityFrameworkDataProvider`. Use this if you plan to store the audit trails 
-for each entity type in a table with similar structure.
+If you plan to store the audit logs on the same database as the audited entities, you can use the provided `EntityFrameworkDataProvider`. Use this to store the logs of each table in a an audit table with similar structure.
 
 For example, you want to audit the `Order` and `OrderItem` entity types into the `Audit_Order` and `Audit_OrderItem` trail tables respectively, 
 and the structure of the `Audit_*` tables mimic the original table plus some fields like the event date, an action and the username.
