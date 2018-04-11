@@ -2,7 +2,7 @@
 
 **EntityFramework (EF) Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
 
-Automatically generates Audit Logs for EntityFramework's operations. **Supporting EF 6 and EF 7 (EF Core)**.
+Automatically generates Audit Logs for EntityFramework's operations. **Supporting EF >=6 (including EF Core)**.
 
 Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about Insert, Update and Delete operations in your database.
 
@@ -42,7 +42,7 @@ public class MyContext : DbContext
 
 to enable the audit log, you should change it to inherit from `AuditDbContext`:
 ```c#
-public class MyContext : Audit.EntityFramework.AuditDbContext
+public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramework.AuditDbContext
 {
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -126,12 +126,12 @@ public class User
 #### Override properties (columns)
 
 The `AuditOverride` attribute can be used to override a column value with a constant value.
-For example to override the password values with a star "*":
+For example to override the password values with a NULL value:
 
 ```c#
 public class User
 {
-    [AuditOverride("*")]
+    [AuditOverride(null)]
     public string Password { get; set; }
     ...
 }
@@ -290,11 +290,10 @@ Another way to customize the output is by using global custom actions, please se
 
 ## Entity Framework Data Provider
 
-If you plan to store the audit logs in the same database as the audited entities, you can use the `EntityFrameworkDataProvider`. Use this if you plan to store the audit trails 
-for each entity type in a table with similar structure.
+If you plan to store the audit logs on the same database as the audited entities, you can use the provided `EntityFrameworkDataProvider`. Use this to store the logs of each table in a an audit table with similar structure.
 
-For example, you want to audit the `Order` and `OrderItem` entity types into the `Audit_Order` and `Audit_OrderItem` trail tables respectively, 
-and the structure of the `Audit_*` tables mimic the original table plus some fields like the event date, an action and the username.
+For example, you want to audit `Order` and `OrderItem` tables into `Audit_Order` and `Audit_OrderItem` tables respectively, 
+and the structure of the `Audit_*` tables mimic the audited table plus some fields like the event date, an action and the username:
 
 ![Audit entities](http://i.imgur.com/QvfXS9H.png)
 
