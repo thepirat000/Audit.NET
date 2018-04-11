@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [11.2.0] - 2018-04-11
+### Changed
+- Audit.NET.MongoDB: Fix #114 - MongoDB Dataprovider Date serialization. Changing serialization mechanism to store the .NET DateTime as mongo datetime.
+
 ## [11.1.0] - 2018-04-08
 ### Added
 - Audit.EntityFramework: Added built-in mechanism to Ignore columns and Override column values on the audit logs.

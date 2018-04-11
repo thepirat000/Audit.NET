@@ -3,6 +3,8 @@ using Audit.MongoDB.Providers;
 using Audit.Core.ConfigurationApi;
 using Audit.MongoDB.ConfigurationApi;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using Newtonsoft.Json.Converters;
 
 namespace Audit.Core
 {
@@ -23,7 +25,11 @@ namespace Audit.Core
                 ConnectionString = connectionString,
                 Collection = collection,
                 Database = database,
-                JsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }
+                JsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    Converters = new List<JsonConverter>() { new JavaScriptDateTimeConverter() }
+                }
             };
             return new CreationPolicyConfigurator();
         }
