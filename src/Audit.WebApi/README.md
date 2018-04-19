@@ -73,12 +73,16 @@ public class UsersController : ApiController
 }
 ```
 
-To apply the audit filter to all the controllers, you can add the `AuditApiAttribute` as a global filter, for example:
+To apply the audit filter to all the controllers, you can add the `AuditApiAttribute` as a global filter, for example on your StartUp logic:
 
 ```c#
-public static void Register(HttpConfiguration config)
+public class Startup
 {
-    config.Filters.Add(new AuditApiAttribute());
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc(_ => _
+            .Filters.Add(new AuditApiAttribute()));
+    }
 }
 ```
 
