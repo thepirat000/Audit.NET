@@ -338,20 +338,20 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
 
 ## Data providers
 
-A _data provider_ (or _storage provider_) contains the logic to handle the audit event output, where you define what to do with the audit logs.
+A _data provider_ (or _storage sink_) contains the logic to handle the audit event output, where you define what to do with the audit logs.
 
 You can use one of the [data providers included](#data-providers-included) or inject your own mechanism 
 by creating a class that inherits from `AuditDataProvider` and overrides its methods:
 
-- `InsertEvent`: should return a unique ID for the event. 
-- `ReplaceEvent`: should update an event given its ID, this method is only called for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
+- `InsertEvent`: should store the event and return a unique ID for it. 
+- `ReplaceEvent`: should update an event given its ID. This method is only called for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
 
 If your data provider will support asynchronous operations, you must also implement the following methods:
 
 - `InsertEventAsync`: Asynchoronous implementation of the InsertEvent method. 
 - `ReplaceEventAsync`: Asynchoronous implementation of the ReplaceEvent method.
 
-Also, if your data provider will support event retrieval, you should implement the following methods:
+Also, if your data provider will support event retrieval, you should implement the methods:
 
 - `GetEvent`: Retrieves an event by id. 
 - `GetEventAsync`: Asynchoronous implementation of the GetEvent method. 
@@ -397,7 +397,8 @@ public class MyCustomDataProvider : AuditDataProvider
 }
 ```
 
-You can set a default data provider assigning the `DataProvider` property on the global `Configuration` object. For example:
+You can set a global data provider assigning the `DataProvider` property on the static `Configuration` object. For example:
+
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
@@ -407,6 +408,8 @@ Or using the fluent API `UseCustomProvider` method:
 Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
 ```
+
+**NOTE:** If you don't specify a data provider, it will default to a `FileDataProvider` logging events as .json files into the current working directory.
 
 See [Configuration section](#configuration) for more information.
 
@@ -564,6 +567,18 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnScopeCreated`: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 - `OnEventSaved`: After an Audit Scope's Event is saved. 
+
+### Global switch off
+
+You can disable audit logging by setting the static property `Configuration.AuditDisabled` to `true`. 
+The audit events are globally ignored while this flag is set. For example to disable the audits on certain environment:
+
+```c#
+if (environment.IsDevelopment())
+{
+    Audit.Core.Configuration.AuditDisabled = true;
+}
+```
 
 ## Configuration Fluent API
 Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.

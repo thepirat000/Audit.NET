@@ -17,6 +17,60 @@ namespace Audit.UnitTest
 {
     public class UnitTest
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.AuditDisabled = false;
+        }
+
+        [Test]
+        public void Test_AuditDisable_AllDisabled()
+        {
+            var list = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        list.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            using (var scope = AuditScope.Create("", null, null))
+            {
+                scope.Save();
+                scope.SaveAsync().Wait();
+            }
+            Audit.Core.Configuration.AuditDisabled = false;
+            Assert.AreEqual(0, list.Count);
+        }
+
+        [Test]
+        public void Test_AuditDisable_OnAction()
+        {
+            var list = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        list.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                .WithAction(_ => _.OnEventSaving(scope =>
+                {
+                    Audit.Core.Configuration.AuditDisabled = true;
+                }));
+
+            using (var scope = AuditScope.Create("", null, null))
+            {
+                scope.Save();
+                scope.SaveAsync().Wait();
+            }
+            Audit.Core.Configuration.AuditDisabled = false;
+            Assert.AreEqual(0, list.Count);
+        }
+
         [Test]
         public void Test_EF_MergeEntitySettings()
         {

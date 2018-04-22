@@ -8,6 +8,10 @@ namespace Audit.Core.ConfigurationApi
     public interface IConfigurator
     {
         /// <summary>
+        /// Use a null provider. No audit events will be saved. Useful for testing purposes or to disable the audit logs.
+        /// </summary>
+        ICreationPolicyConfigurator UseNullProvider();
+        /// <summary>
         /// Use a dynamic custom provider for the event output.
         /// </summary>
         ICreationPolicyConfigurator UseDynamicProvider(Action<IDynamicDataProviderConfigurator> config);

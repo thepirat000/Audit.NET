@@ -19,6 +19,10 @@ namespace Audit.Core
         /// Gets or Sets the Default data provider.
         /// </summary>
         public static AuditDataProvider DataProvider { get; set; }
+        /// <summary>
+        /// Global switch to disable audit logging. Default is false.
+        /// </summary>
+        public static bool AuditDisabled { get; set; }
 
         internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
 
@@ -26,6 +30,7 @@ namespace Audit.Core
 
         static Configuration()
         {
+            AuditDisabled = false;
             DataProvider = new FileDataProvider();
             CreationPolicy = EventCreationPolicy.InsertOnEnd;
             ResetCustomActions();
