@@ -58,6 +58,12 @@ public class HomeController : Controller
 
 ## Configuration
 
+### Output
+
+The MVC audit events are stored using a Data Provider. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
+
+### Settings
+
 The `AuditAttribute` can be configured with the following properties:
 - **EventType**: A string that identifies the event type. Can contain the following placeholders: 
   - \{controller}: replaced with the controller name.
@@ -68,22 +74,6 @@ The `AuditAttribute` can be configured with the following properties:
 - **SerializeActionParameters**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
-
-## Output
-
-Audit.Mvc output includes:
-
-- Execution time and duration
-- Environment information such as user, machine, domain and locale.
-- Authenticated username
-- Client IP address
-- Form Variables, Action Parameters
-- Http Headers
-- View Model, View Model State Errors
-- Exceptions
-- Comments and Custom Fields provided
-
-With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your application.
 
 ## Output details
 
