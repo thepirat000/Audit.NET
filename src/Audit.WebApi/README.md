@@ -88,6 +88,12 @@ public class Startup
 
 ## Configuration
 
+### Output
+
+The audit events are stored using a Data Provider. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
+
+### Settings
+
 The `AuditApi` attribute can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
   - \{controller}: replaced with the controller name.
