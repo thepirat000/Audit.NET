@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Audit.EntityFramework.ConfigurationApi;
+using System.Threading;
 
 namespace Audit.UnitTest
 {
@@ -21,6 +22,7 @@ namespace Audit.UnitTest
         public void Setup()
         {
             Audit.Core.Configuration.AuditDisabled = false;
+            Audit.Core.Configuration.ResetCustomActions();
         }
 
         [Test]
@@ -43,10 +45,11 @@ namespace Audit.UnitTest
             };
 
             Audit.Core.Configuration.JsonSettings = jSettings;
-
             using (var scope = AuditScope.Create("TEST", null, null))
             {
             }
+            
+            Assert.AreEqual(1, listEv.Count);
 
             var manualJson = listEv[0].ToJson();
 
@@ -56,7 +59,7 @@ namespace Audit.UnitTest
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
 
-            Assert.AreEqual(1, listEv.Count);
+
             Assert.AreEqual(1, listJson.Count);
 
             var jsonExpected = JsonConvert.SerializeObject(listEv[0], jSettings);
