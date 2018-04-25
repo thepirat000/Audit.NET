@@ -88,6 +88,12 @@ public class Startup
 
 ## Configuration
 
+### Output
+
+The audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
+
+### Settings
+
 The `AuditApi` attribute can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
   - \{controller}: replaced with the controller name.
@@ -118,24 +124,6 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     app.UseMvc();
 }
 ```
-
-## Output
-
-Audit.WebApi output includes:
-
-- Execution time and duration
-- Environment information such as user, machine, domain and locale.
-- Authenticated username
-- Client IP address
-- Form Variables, Action Arguments
-- Http Headers
-- Model State
-- Exception details
-- Request body
-- Response Status and Body
-- Comments and Custom Fields provided
-
-With this information, you can not just know who did the operation, but also measure performance, observe exceptions thrown or get statistics about usage of your API.
 
 ## Output details
 

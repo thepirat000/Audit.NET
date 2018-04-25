@@ -53,11 +53,15 @@ public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramewor
 you should inherit from class `AuditIdentityDbContext`.
 
 ## How it works
-The library intercepts calls to `SaveChanges` / `SaveChangesAsync` methods on the `DbContext` and generates detailed audit logs.
+This library intercepts calls to `SaveChanges()` / `SaveChangesAsync()` on your `DbContext`, to generate [Audit.NET events](https://github.com/thepirat000/Audit.NET#usage) with the affected entities information. 
 
-Each call to `SaveChanges` generates a new audit event that includes information of all the entities affected by the save operation.
+Each call to `SaveChanges` generates an audit event that includes information of all the entities affected by the save operation.
 
 ## Configuration
+
+### Output
+
+The EF audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. This can be set per `DbContext` instance or globally. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on the Audit.NET documentation.
 
 ### Settings
 The following settings can be configured per DbContext or globally:
