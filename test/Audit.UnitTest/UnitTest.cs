@@ -24,6 +24,48 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_AuditEvent_CustomSerializer()
+        {
+            var listEv = new List<AuditEvent>();
+            var listJson = new List<string>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        listEv.Add(ev);
+                        listJson.Add(ev.ToJson());
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var jSettings = new JsonSerializerSettings()
+            {
+               TypeNameHandling = TypeNameHandling.All
+            };
+
+            Audit.Core.Configuration.JsonSettings = jSettings;
+
+            using (var scope = AuditScope.Create("TEST", null, null))
+            {
+            }
+
+            var manualJson = listEv[0].ToJson();
+
+            Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+
+            Assert.AreEqual(1, listEv.Count);
+            Assert.AreEqual(1, listJson.Count);
+
+            var jsonExpected = JsonConvert.SerializeObject(listEv[0], jSettings);
+            Assert.AreEqual(jsonExpected, listJson[0]);
+            Assert.AreEqual(jsonExpected, manualJson);
+            Assert.AreEqual(JsonConvert.SerializeObject(listEv[0], new JsonSerializerSettings()), listEv[0].ToJson(new JsonSerializerSettings()));
+        }
+
+        [Test]
         public void Test_AuditDisable_AllDisabled()
         {
             var list = new List<AuditEvent>();

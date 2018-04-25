@@ -3,7 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [12.0.0] - 2018-??
+## [12.0.1] - 2018-04-24
+### Added
+- Audit.Core: Exposing the global JSON serializer settings as a Configuration option to allow changing the serialization behavior for audit events.
+ 
+## [12.0.0] - 2018-04-22
 ### Added
 - Audit.Core: Added a global audit switch off `Configuration.AuditDisabled`.
 - Audit.Core: Added `NullDataProvider` as an anternative to disable the audit logging.

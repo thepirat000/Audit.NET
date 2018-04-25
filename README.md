@@ -580,6 +580,20 @@ if (environment.IsDevelopment())
 }
 ```
 
+### Global serialization settings
+Most of the data providers serializes audit events in JSON format. 
+You can change the default settings used for this serialization via the static property `Configuration.JsonSettings`.
+For example:
+
+```c#
+Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings()
+{
+    NullValueHandling = NullValueHandling.Ignore,
+    TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
+    Converters = new List<JsonConverter>() { new MyStreamConverter() }
+};
+```
+
 ## Configuration Fluent API
 Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
