@@ -317,6 +317,7 @@ Audit.Core.Configuration.DataProvider = new EntityFrameworkDataProvider()
         a.AuditDate = DateTime.UtcNow;
         a.UserName = evt.Environment.UserName;
         a.AuditAction = entry.Action; // Insert, Update, Delete
+        return true; // return false to ignore the audit
     }
 };
 ```
@@ -344,7 +345,8 @@ Mandatory:
 - **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
 
 Optional:
-- **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties.
+- **AuditEntityAction**: A function to perform on the audit entity before saving it, for example to update specific audit properties like user name
+or the audit date. It can also be used to filter out audit entities. This function returns a boolean value to indicate whether to include the entity on the output log. 
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is true).
 
 ### EF Provider configuration examples
@@ -393,5 +395,21 @@ Audit.Core.Configuration.Setup()
             {
                 // This common action executes for every audited entity
                 auditEntity.AuditDate = DateTime.UtcNow;
+            })));
+```
+
+Ignore certain entities on the audit log:
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(x => x
+        .AuditTypeExplicitMapper(m => m
+            .Map<Order, Audit_Order>((order, auditOrder) =>
+            {
+                if (auditOrder.Status == "Expired")
+                {
+                    return false; // don't want to audit orders in "expired" status
+                }
+                auditOrder.AuditDate = DateTime.UtcNow;
+                return true;
             })));
 ```

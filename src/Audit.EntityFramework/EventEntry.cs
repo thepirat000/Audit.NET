@@ -24,8 +24,23 @@ namespace Audit.EntityFramework
         [JsonIgnore]
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
         internal Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry Entry { get; set; }
+        /// <summary>
+        /// Returns the EntityEntry associated to this audit event entry
+        /// </summary>
+        public Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry GetEntry()
+        {
+            return Entry;
+        }
 #else
         internal System.Data.Entity.Infrastructure.DbEntityEntry Entry { get; set; }
+
+        /// <summary>
+        /// Returns the DbEntityEntry associated to this audit event entry
+        /// </summary>
+        public System.Data.Entity.Infrastructure.DbEntityEntry GetEntry()
+        {
+            return Entry;
+        }
 #endif
     }
 }

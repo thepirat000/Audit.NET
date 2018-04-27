@@ -8,7 +8,7 @@ namespace Audit.EntityFramework.ConfigurationApi
     {
         internal bool _ignoreMatchedProperties = false;
         internal Func<Type, Type> _auditTypeMapper;
-        internal Action<AuditEvent, EventEntry, object> _auditEntityAction;
+        internal Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
 
         public IEntityFrameworkProviderConfiguratorAction AuditTypeMapper(Func<Type, Type> mapper)
         {
@@ -44,19 +44,43 @@ namespace Audit.EntityFramework.ConfigurationApi
 
         public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction(Action<AuditEvent, EventEntry, object> action)
         {
-            _auditEntityAction = action;
+            _auditEntityAction = (ev, ent, obj) =>
+            {
+                action.Invoke(ev, ent, obj);
+                return true;
+            };
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction(Func<AuditEvent, EventEntry, object, bool> function)
+        {
+            _auditEntityAction = function;
             return this;
         }
 
         public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction<T>(Action<AuditEvent, EventEntry, T> action)
         {
-            _auditEntityAction = new Action<AuditEvent, EventEntry, object>((ev, ent, obj) =>
+            _auditEntityAction = (ev, ent, obj) =>
             {
                 if (obj is T)
                 {
                     action.Invoke(ev, ent, (T)obj);
                 }
-            });
+                return true;
+            };
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, bool> function)
+        {
+            _auditEntityAction = (ev, ent, obj) =>
+            {
+                if (obj is T)
+                {
+                    return function.Invoke(ev, ent, (T)obj);
+                }
+                return true;
+            };
             return this;
         }
 
