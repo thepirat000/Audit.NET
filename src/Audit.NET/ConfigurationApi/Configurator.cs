@@ -5,6 +5,13 @@ namespace Audit.Core.ConfigurationApi
 {
     public class Configurator : IConfigurator
     {
+        public ICreationPolicyConfigurator UseNullProvider()
+        {
+            var dataProvider = new NullDataProvider();
+            Configuration.DataProvider = dataProvider;
+            return new CreationPolicyConfigurator();
+        }
+
         public ICreationPolicyConfigurator UseDynamicProvider(Action<IDynamicDataProviderConfigurator> config)
         {
             var dataProvider = new DynamicDataProvider();

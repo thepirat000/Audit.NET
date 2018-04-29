@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
+using Audit.EntityFramework.ConfigurationApi;
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
 using Microsoft.EntityFrameworkCore;
 #elif NET45
@@ -18,7 +19,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base DbContext class for Audit. Inherit your DbContext from this class to enable audit.
     /// </summary>
-    public abstract partial class AuditDbContext : DbContext, IAuditDbContext
+    public abstract partial class AuditDbContext : DbContext, IAuditDbContext, IAuditBypass
     {
         private DbContextHelper _helper = new DbContextHelper();
 
@@ -126,7 +127,11 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool IncludeIndependantAssociations { get; set; }
 #endif
-#endregion
+        /// <summary>
+        /// A collection of settings per entity type.
+        /// </summary>
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
+        #endregion
 
         #region Public methods
         /// <summary>
@@ -182,11 +187,11 @@ namespace Audit.EntityFramework
             return await SaveChangesAsync(default(CancellationToken));
         }
 #endif
-        internal int SaveChangesBypassAudit()
+        int IAuditBypass.SaveChangesBypassAudit()
         {
             return base.SaveChanges();
         }
-        internal async Task<int> SaveChangesBypassAuditAsync()
+        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
         {
             return await base.SaveChangesAsync();
         }

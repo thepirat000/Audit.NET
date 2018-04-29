@@ -7,8 +7,8 @@ namespace Audit.EntityFramework.ConfigurationApi
     public class AuditEntityMapping : IAuditEntityMapping
     {
         private Dictionary<Type, Type> _mapping = new Dictionary<Type, Type>();
-        private Dictionary<Type, Action<AuditEvent, EventEntry, object>> _actions = new Dictionary<Type, Action<AuditEvent, EventEntry, object>>();
-        private Action<AuditEvent, EventEntry, object> _commonAction = null;
+        private Dictionary<Type, Func<AuditEvent, EventEntry, object, bool>> _actions = new Dictionary<Type, Func<AuditEvent, EventEntry, object, bool>>();
+        private Func<AuditEvent, EventEntry, object, bool> _commonAction = null;
 
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>()
         {
@@ -19,11 +19,34 @@ namespace Audit.EntityFramework.ConfigurationApi
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Action<AuditEvent, EventEntry, TAuditEntity> entityAction)
         {
             _mapping[typeof(TSourceEntity)] = typeof(TAuditEntity);
+            _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) =>
+            {
+                entityAction.Invoke(ev, ent, (TAuditEntity) auditEntity);
+                return true;
+            };
+            return this;
+        }
+
+        public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Func<AuditEvent, EventEntry, TAuditEntity, bool> entityAction)
+        {
+            _mapping[typeof(TSourceEntity)] = typeof(TAuditEntity);
             _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) => entityAction.Invoke(ev, ent, (TAuditEntity)auditEntity);
             return this;
         }
 
+
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Action<TSourceEntity, TAuditEntity> entityAction)
+        {
+            _mapping.Add(typeof(TSourceEntity), typeof(TAuditEntity));
+            _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) =>
+            {
+                entityAction.Invoke((TSourceEntity) ent.Entry.Entity, (TAuditEntity) auditEntity);
+                return true;
+            };
+            return this;
+        }
+
+        public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Func<TSourceEntity, TAuditEntity, bool> entityAction)
         {
             _mapping.Add(typeof(TSourceEntity), typeof(TAuditEntity));
             _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) => entityAction.Invoke((TSourceEntity)ent.Entry.Entity, (TAuditEntity)auditEntity);
@@ -32,10 +55,28 @@ namespace Audit.EntityFramework.ConfigurationApi
 
         public void AuditEntityAction(Action<AuditEvent, EventEntry, object> entityAction)
         {
-            _commonAction = entityAction;
+            _commonAction = (ev, ent, auditEntity) =>
+            {
+                entityAction.Invoke(ev, ent, auditEntity);
+                return true;
+            };
+        }
+
+        public void AuditEntityAction(Func<AuditEvent, EventEntry, object, bool> entityAction)
+        {
+            _commonAction = (ev, ent, auditEntity) => entityAction.Invoke(ev, ent, auditEntity);
         }
 
         public void AuditEntityAction<T>(Action<AuditEvent, EventEntry, T> entityAction)
+        {
+            _commonAction = (ev, ent, auditEntity) =>
+            {
+                entityAction.Invoke(ev, ent, (T) auditEntity);
+                return true;
+            };
+        }
+
+        public void AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, bool> entityAction)
         {
             _commonAction = (ev, ent, auditEntity) => entityAction.Invoke(ev, ent, (T)auditEntity);
         }
@@ -50,20 +91,24 @@ namespace Audit.EntityFramework.ConfigurationApi
             };
         }
 
-        internal Action<AuditEvent, EventEntry, object> GetAction()
+        internal Func<AuditEvent, EventEntry, object, bool> GetAction()
         {
             return (ev, ent, auditEntity) =>
             {
-                Action<AuditEvent, EventEntry, object> action = null;
+                Func<AuditEvent, EventEntry, object, bool> action = null;
+                bool include = true;
                 if (_actions.TryGetValue(auditEntity.GetType(), out action))
                 {
-                    action.Invoke(ev, ent, auditEntity);
+                    include = action.Invoke(ev, ent, auditEntity);
                 }
-                if (_commonAction != null)
+                if (include && _commonAction != null)
                 {
-                    _commonAction.Invoke(ev, ent, auditEntity);
+                    include = _commonAction.Invoke(ev, ent, auditEntity);
                 }
+                return include;
             };
         }
+
+
     }
 }

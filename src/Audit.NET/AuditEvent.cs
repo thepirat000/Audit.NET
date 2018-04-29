@@ -59,32 +59,59 @@ namespace Audit.Core
         [JsonProperty]
         public int Duration { get; set; }
 
-        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
-
         /// <summary>
         /// Converts the event to its JSON representation using JSON.NET.
         /// </summary>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, JsonSettings);
+            return JsonConvert.SerializeObject(this, Configuration.JsonSettings);
         }
+
+        /// <summary>
+        /// Converts the event to its JSON representation using JSON.NET with the given serializer settings.
+        /// </summary>
+        /// <param name="settings">Serializer settings to use.</param>
+        public string ToJson(JsonSerializerSettings settings)
+        {
+            return JsonConvert.SerializeObject(this, settings);
+        }
+
         /// <summary>
         /// Parses an AuditEvent from its JSON string representation using JSON.NET.
         /// </summary>
+        /// <param name="json">JSON string with the audit event representation.</param>
         public static T FromJson<T>(string json) where T : AuditEvent
         {
-            return JsonConvert.DeserializeObject<T>(json, JsonSettings);
+            return JsonConvert.DeserializeObject<T>(json, Configuration.JsonSettings);
         }
         /// <summary>
         /// Parses an AuditEvent from its JSON string representation using JSON.NET.
         /// </summary>
+        /// <param name="json">JSON string with the audit event representation.</param>
         public static AuditEvent FromJson(string json) 
         {
-            return JsonConvert.DeserializeObject<AuditEvent>(json, JsonSettings);
+            return JsonConvert.DeserializeObject<AuditEvent>(json, Configuration.JsonSettings);
         }
+
+        /// <summary>
+        /// Parses an AuditEvent from its JSON string representation using JSON.NET with the given serializer settings.
+        /// </summary>
+        /// <param name="settings">Serializer settings to use.</param>
+        /// <param name="json">JSON string with the audit event representation.</param>
+        public static T FromJson<T>(string json, JsonSerializerSettings settings) where T : AuditEvent
+        {
+            return JsonConvert.DeserializeObject<T>(json, settings);
+        }
+
+        /// <summary>
+        /// Parses an AuditEvent from its JSON string representation using JSON.NET with the given serializer settings.
+        /// </summary>
+        /// <param name="json">JSON string with the audit event representation.</param>
+        /// <param name="settings">Serializer settings to use.</param>
+        public static AuditEvent FromJson(string json, JsonSerializerSettings settings)
+        {
+            return JsonConvert.DeserializeObject<AuditEvent>(json, settings);
+        }
+
     }
 }

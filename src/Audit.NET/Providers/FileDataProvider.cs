@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Audit.Core.Providers
 {
+
     /// <summary>
     /// Write the event outputs as files.
     /// </summary>

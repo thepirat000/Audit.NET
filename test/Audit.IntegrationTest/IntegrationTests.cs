@@ -17,6 +17,7 @@ using NUnit.Framework;
 using Audit.AzureDocumentDB.Providers;
 using Audit.AzureDocumentDB.ConfigurationApi;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Audit.IntegrationTest
 {
@@ -264,8 +265,8 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
-                Assert.AreEqual(ev.StartDate, evFromApi.StartDate);
-                Assert.AreEqual(ev.EndDate, evFromApi.EndDate);
+                Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
+                Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
                 Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
                 Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
@@ -350,8 +351,8 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
-                Assert.AreEqual(ev.StartDate, evFromApi.StartDate);
-                Assert.AreEqual(ev.EndDate, evFromApi.EndDate);
+                Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
+                Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
                 Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
                 Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
@@ -514,8 +515,7 @@ namespace Audit.IntegrationTest
                     .UseMongoDB(config => config
                         .ConnectionString("mongodb://localhost:27017")
                         .Database("Audit")
-                        .Collection("Event")
-                        .CustomSerializerSettings(new JsonSerializerSettings() {  NullValueHandling = NullValueHandling.Ignore, TypeNameHandling = TypeNameHandling.All, ReferenceLoopHandling = ReferenceLoopHandling.Ignore }))
+                        .Collection("Event"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

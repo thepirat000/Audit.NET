@@ -25,7 +25,7 @@ namespace Audit.EntityFramework.Providers
     {
         private bool _ignoreMatchedProperties;
         private Func<Type, Type> _auditTypeMapper;
-        private Action<AuditEvent, EventEntry, object> _auditEntityAction;
+        private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
 
         public Func<Type, Type> AuditTypeMapper
         {
@@ -33,7 +33,11 @@ namespace Audit.EntityFramework.Providers
             set { _auditTypeMapper = value; }
         }
 
-        public Action<AuditEvent, EventEntry, object> AuditEntityAction
+        /// <summary>
+        /// Function to execute on the audited entities before saving them. 
+        /// Returns a boolean value indicating whther to include the entity on the logs or not.
+        /// </summary>
+        public Func<AuditEvent, EventEntry, object, bool> AuditEntityAction
         {
             get { return _auditEntityAction; }
             set { _auditEntityAction = value; }
@@ -68,21 +72,23 @@ namespace Audit.EntityFramework.Providers
                     if (mappedType != null)
                     {
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);
-                        _auditEntityAction?.Invoke(efEvent, entry, auditEntity);
+                        if (_auditEntityAction != null && _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                        {
 #if NET45
-                        dbContext.Set(mappedType).Add(auditEntity);
+                            dbContext.Set(mappedType).Add(auditEntity);
 #else
-                        dbContext.Add(auditEntity);
+                            dbContext.Add(auditEntity);
 #endif
-                        save = true;
+                            save = true;
+                        }
                     }
                 }
             }
             if (save)
             {
-                if (dbContext is AuditDbContext)
+                if (dbContext is IAuditBypass)
                 {
-                    (dbContext as AuditDbContext).SaveChangesBypassAudit();
+                    (dbContext as IAuditBypass).SaveChangesBypassAudit();
                 }
                 else
                 {
@@ -127,9 +133,9 @@ namespace Audit.EntityFramework.Providers
             }
             if (save)
             {
-                if (dbContext is AuditDbContext)
+                if (dbContext is IAuditBypass)
                 {
-                    await (dbContext as AuditDbContext).SaveChangesBypassAuditAsync();
+                    await (dbContext as IAuditBypass).SaveChangesBypassAuditAsync();
                 }
                 else
                 {

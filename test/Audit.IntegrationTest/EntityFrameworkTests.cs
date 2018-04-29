@@ -22,6 +22,161 @@ namespace Audit.IntegrationTest
     [TestFixture(Category ="EF")]
     public class EntityFrameworkTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForAnyContext().Reset();
+        }
+
+        [Test]
+        public void Test_EF_Override_Func()
+        {
+            var list = new List<AuditEventEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+                {
+                    list.Add(ev as AuditEventEntityFramework);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>(config => config
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForAnyContext(config => config
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Format(b => b.Title, t => t + "X")));
+
+            var title = Guid.NewGuid().ToString();
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = new Blog()
+                {
+                    Title = title,
+                    BloggerName = "test"
+                };
+                ctx.Blogs.Add(blog);
+                ctx.SaveChanges();
+            }
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = ctx.Blogs.First(b => b.Title == title);
+                blog.BloggerName = "another";
+                blog.Title = "NewTitle";
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(2, list.Count);
+            var entries = list[0].EntityFrameworkEvent.Entries;
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Insert", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual(title + "X", entries[0].ColumnValues["Title"]);
+            entries = list[1].EntityFrameworkEvent.Entries;
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Update", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual("NewTitleX", entries[0].ColumnValues["Title"]);
+            Assert.AreEqual(1, entries[0].Changes.Count);
+            Assert.AreEqual("Title", entries[0].Changes[0].ColumnName);
+            Assert.AreEqual("NewTitleX", entries[0].Changes[0].NewValue);
+            Assert.AreEqual(title + "X", entries[0].Changes[0].OriginalValue);
+        }
+
+        [Test]
+        public void Test_EF_IgnoreOverride_CheckCrossContexts()
+        {
+            var list = new List<AuditEventEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+                {
+                    list.Add(ev as AuditEventEntityFramework);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>(config => config
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyBaseContext>(config => config
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
+
+            var title = Guid.NewGuid().ToString();
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = new Blog()
+                {
+                    Title = title,
+                    BloggerName = "test"
+                };
+                ctx.Blogs.Add(blog);
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(1, list.Count);
+            var entries = list[0].EntityFrameworkEvent.Entries;
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Insert", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual(title, entries[0].ColumnValues["Title"]);
+        }
+
+        [Test]
+        public void Test_IgnoreOverrideProperties_Basic()
+        {
+            var list = new List<AuditEventEntityFramework>();
+            Audit.Core.Configuration.Setup()
+               .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+               {
+                   list.Add(ev as AuditEventEntityFramework);
+               }))
+               .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.EntityFramework.Configuration.Setup()
+              .ForContext<MyTransactionalContext>(config => config
+                  .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+            Audit.EntityFramework.Configuration.Setup()
+              .ForAnyContext(config => config
+                  .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
+
+            var title = Guid.NewGuid().ToString();
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = new Blog()
+                {
+                    Title = title,
+                    BloggerName = "test"
+                };
+                ctx.Blogs.Add(blog);
+                ctx.SaveChanges();
+            }
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = ctx.Blogs.First(b => b.Title == title);
+                blog.BloggerName = "another";
+                blog.Title = "x";
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(2, list.Count);
+            var entries = list[0].EntityFrameworkEvent.Entries;
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Insert", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual(null, entries[0].ColumnValues["Title"]);
+            entries = list[1].EntityFrameworkEvent.Entries;
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Update", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual(null, entries[0].ColumnValues["Title"]);
+            Assert.AreEqual(1, entries[0].Changes.Count);
+            Assert.AreEqual("Title", entries[0].Changes[0].ColumnName);
+            Assert.AreEqual(null, entries[0].Changes[0].NewValue);
+            Assert.AreEqual(null, entries[0].Changes[0].OriginalValue);
+        }
+
+
         [Test]
         public void Test_EF_PrimaryKeyUpdate()
         {

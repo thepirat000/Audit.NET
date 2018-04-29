@@ -29,5 +29,13 @@ namespace Audit.EntityFramework
         public string ErrorMessage { get; set; }
         [JsonIgnore]
         internal DbContext DbContext { get; set; }
+
+        /// <summary>
+        /// Returns the DbContext associated to this event
+        /// </summary>
+        public DbContext GetDbContext()
+        {
+            return DbContext;
+        }
     }
 }

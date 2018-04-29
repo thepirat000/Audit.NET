@@ -1,3 +1,5 @@
+using System;
+
 namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ContextSettingsConfigurator<T> : IContextSettingsConfigurator<T>
@@ -8,6 +10,13 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.SetAuditEventType<T>(eventType);
             return this;
         }
+
+        public IContextSettingsConfigurator<T> ForEntity<TEntity>(Action<IContextEntitySetting<TEntity>> config)
+        {
+            Configuration.SetContextEntitySetting<T, TEntity>(config);
+            return this;
+        }
+
         public IContextSettingsConfigurator<T> IncludeEntityObjects(bool include = true)
         {
             Configuration.SetIncludeEntityObjects<T>(include);

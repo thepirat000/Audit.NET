@@ -1,4 +1,5 @@
 ﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+using Audit.EntityFramework.ConfigurationApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -17,9 +18,9 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the entities changes for this entry.
         /// </summary>
-        /// <param name="dbContext">The database context.</param>
+        /// <param name="context">The audit db context.</param>
         /// <param name="entry">The entry.</param>
-        private List<EventEntryChange> GetChanges(DbContext dbContext, EntityEntry entry)
+        private List<EventEntryChange> GetChanges(IAuditDbContext context, EntityEntry entry)
         {
             var result = new List<EventEntryChange>();
             var props = entry.Metadata.GetProperties();
@@ -28,12 +29,15 @@ namespace Audit.EntityFramework
                 PropertyEntry propEntry = entry.Property(prop.Name);
                 if (propEntry.IsModified)
                 {
-                    result.Add(new EventEntryChange()
+                    if (IncludeProperty(context, entry, prop.Name))
                     {
-                        ColumnName = GetColumnName(prop),
-                        NewValue = propEntry.CurrentValue,
-                        OriginalValue = propEntry.OriginalValue
-                    });
+                        result.Add(new EventEntryChange()
+                        {
+                            ColumnName = GetColumnName(prop),
+                            NewValue = HasPropertyValue(context, entry, prop.Name, propEntry.CurrentValue, out object currValue) ? currValue : propEntry.CurrentValue,
+                            OriginalValue = HasPropertyValue(context, entry, prop.Name, propEntry.OriginalValue, out object origValue) ? origValue : propEntry.OriginalValue
+                        });
+                    }
                 }
             }
             return result;
@@ -50,19 +54,84 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the column values for an insert/delete operation.
         /// </summary>
-        /// <param name="dbContext">The Db Context.</param>
+        /// <param name="context">The audit Db Context.</param>
         /// <param name="entry">The entity entry.</param>
-        private Dictionary<string, object> GetColumnValues(DbContext dbContext, EntityEntry entry)
+        private Dictionary<string, object> GetColumnValues(IAuditDbContext context, EntityEntry entry)
         {
+            var dbContext = context.DbContext;
             var result = new Dictionary<string, object>();
             var props = entry.Metadata.GetProperties();
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
-                var value = (entry.State != EntityState.Deleted) ? propEntry.CurrentValue : propEntry.OriginalValue;
-                result.Add(prop.Name, value);
+                if (IncludeProperty(context, entry, prop.Name))
+                {
+                    object value = entry.State != EntityState.Deleted ? propEntry.CurrentValue : propEntry.OriginalValue;
+                    if (HasPropertyValue(context, entry, prop.Name, value, out object overrideValue))
+                    {
+                        value = overrideValue;
+                    }
+                    result.Add(GetColumnName(prop), value);
+                }
             }
             return result;
+        }
+
+        // Determines if the property should be included or is ignored
+        private bool IncludeProperty(IAuditDbContext context, EntityEntry entry, string propName)
+        {
+            var entityType = GetDefiningType(context.DbContext, entry)?.ClrType;
+            if (entityType == null)
+            {
+                return true;
+            }
+            var ignoredProperties = EnsurePropertiesIgnoreAttrCache(entityType); 
+            if (ignoredProperties != null && ignoredProperties.Contains(propName))
+            {
+                // Property marked with AuditIgnore attribute
+                return false;
+            }
+            if (context.EntitySettings != null && context.EntitySettings.TryGetValue(entityType, out EfEntitySettings settings))
+            {
+                // Check if its ignored from the configuration 
+                return !settings.IgnoredProperties.Contains(propName);
+            }
+            return true;
+        }
+
+        // Determines if a property value should be overriden with a pre-configured value
+        private bool HasPropertyValue(IAuditDbContext context, EntityEntry entry, string propName, object currentValue, out object value)
+        {
+            value = null;
+            var entityType = GetDefiningType(context.DbContext, entry)?.ClrType;
+            if (entityType == null)
+            {
+                return false;
+            }
+            var overrideProperties = EnsurePropertiesOverrideAttrCache(entityType);
+            if (overrideProperties != null && overrideProperties.ContainsKey(propName))
+            {
+                // Property overriden with AuditOverride attribute
+                value = overrideProperties[propName].Value;
+                return true;
+            }
+            if (context.EntitySettings != null && context.EntitySettings.TryGetValue(entityType, out EfEntitySettings settings))
+            {
+                if (settings.OverrideProperties.ContainsKey(propName))
+                {
+                    // property overriden with a constant value
+                    value = settings.OverrideProperties[propName];
+                    return true;
+                }
+                if (settings.FormatProperties.ContainsKey(propName))
+                {
+                    // property overriden with a func value
+                    value = settings.FormatProperties[propName].Invoke(currentValue);
+                    return true;
+
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -70,16 +139,22 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetEntityName(DbContext dbContext, EntityEntry entry)
         {
-#if NETSTANDARD2_0
-            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entity.GetType());
-#else
-            IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
-#endif
+            var definingType = GetDefiningType(dbContext, entry);
             if (definingType == null)
             {
                 return null;
             }
             return definingType.SqlServer().TableName ?? definingType.Name;
+        }
+
+        private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
+        {
+#if NETSTANDARD2_0
+            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entity.GetType());
+#else
+            IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
+#endif
+            return definingType;
         }
 
         /// <summary>
@@ -100,7 +175,7 @@ namespace Audit.EntityFramework
                 {
                     foreach (var prop in fk.Properties)
                     {
-                        result.Add(prop.Name, entry.Property(prop.Name).CurrentValue);
+                        result.Add(GetColumnName(prop), entry.Property(prop.Name).CurrentValue);
                     }
                 }
             }
@@ -115,7 +190,7 @@ namespace Audit.EntityFramework
             var result = new Dictionary<string, object>();
             foreach(var prop in entry.Properties.Where(p => p.Metadata.IsPrimaryKey()))
             {
-                result.Add(prop.Metadata.Name, prop.CurrentValue); 
+                result.Add(GetColumnName(prop.Metadata), prop.CurrentValue); 
             }
             return result;
         }
@@ -152,9 +227,9 @@ namespace Audit.EntityFramework
                     Entity = context.IncludeEntityObjects ? entity : null,
                     Entry = entry,
                     Action = DbContextHelper.GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified ? GetChanges(dbContext, entry) : null,
+                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
                     Table = GetEntityName(dbContext, entry),
-                    ColumnValues = GetColumnValues(dbContext, entry)
+                    ColumnValues = GetColumnValues(context, entry)
                 });
             }
             return efEvent;

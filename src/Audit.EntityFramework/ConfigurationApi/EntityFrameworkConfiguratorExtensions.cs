@@ -13,14 +13,35 @@ namespace Audit.Core
         /// </summary>
         internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, Type> auditTypeMapper = null, Action<AuditEvent, EventEntry, object> auditEntityAction = null, bool ignoreMatchedProperties = false)
         {
-            Configuration.DataProvider = new EntityFrameworkDataProvider()
+            var efdp = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
-                AuditEntityAction = auditEntityAction,
                 IgnoreMatchedProperties = ignoreMatchedProperties
             };
+            if (auditEntityAction != null)
+            {
+                efdp.AuditEntityAction = (auditEvent, entry, auditEntity) =>
+                {
+                    auditEntityAction.Invoke(auditEvent, entry, auditEntity);
+                    return true;
+                };
+            }
+            Configuration.DataProvider = efdp;
             return new CreationPolicyConfigurator();
         }
+
+        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, Type> auditTypeMapper = null, Func<AuditEvent, EventEntry, object, bool> auditEntityAction = null, bool ignoreMatchedProperties = false)
+        {
+            var efdp = new EntityFrameworkDataProvider()
+            {
+                AuditTypeMapper = auditTypeMapper,
+                IgnoreMatchedProperties = ignoreMatchedProperties,
+                AuditEntityAction = auditEntityAction
+            };
+            Configuration.DataProvider = efdp;
+            return new CreationPolicyConfigurator();
+        }
+
         /// <summary>
         /// Store the audits logs in the same EntityFramework model as the audited entities.
         /// </summary>

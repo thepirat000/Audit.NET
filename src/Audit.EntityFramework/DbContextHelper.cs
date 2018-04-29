@@ -25,6 +25,11 @@ namespace Audit.EntityFramework
     {
         // Entities Include/Ignore attributes cache
         private static readonly ConcurrentDictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new ConcurrentDictionary<Type, bool?>();
+        // Ignored properties per entity type attribute cache
+        private static readonly ConcurrentDictionary<Type, HashSet<string>> PropertiesIgnoreAttrCache = new ConcurrentDictionary<Type, HashSet<string>>();
+        // Overriden properties per entity type attribute cache
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, AuditOverrideAttribute>> PropertiesOverrideAttrCache = new ConcurrentDictionary<Type, Dictionary<string, AuditOverrideAttribute>>();
+
         // AuditDbContext Attribute cache
         private static ConcurrentDictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
 
@@ -45,9 +50,54 @@ namespace Audit.EntityFramework
             context.Mode = attrConfig?.Mode ?? localConfig?.Mode ?? globalConfig?.Mode ?? AuditOptionMode.OptOut;
             context.IncludeEntityObjects = attrConfig?.IncludeEntityObjects ?? localConfig?.IncludeEntityObjects ?? globalConfig?.IncludeEntityObjects ?? false;
             context.AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
+            context.EntitySettings = MergeEntitySettings(attrConfig?.EntitySettings, localConfig?.EntitySettings, globalConfig?.EntitySettings);
 #if NET45
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
+        }
+
+        internal Dictionary<Type, EfEntitySettings> MergeEntitySettings(Dictionary<Type, EfEntitySettings> attr, Dictionary<Type, EfEntitySettings> local, Dictionary<Type, EfEntitySettings> global)
+        {
+            var settings = new List<Dictionary<Type, EfEntitySettings>>();
+            if (global != null && global.Count > 0)
+            {
+                settings.Add(global);
+            }
+            if (local != null && local.Count > 0)
+            {
+                settings.Add(local);
+            }
+            if (attr != null && attr.Count > 0)
+            {
+                settings.Add(attr);
+            }
+            if (settings.Count == 0)
+            {
+                return null;
+            }
+            var merged = new Dictionary<Type, EfEntitySettings>(settings[0]);
+            for (int i = 1; i < settings.Count; i++)
+            {
+                foreach(var kvp in settings[i])
+                {
+                    if (!merged.ContainsKey(kvp.Key))
+                    {
+                        merged[kvp.Key] = kvp.Value;
+                    }
+                    else
+                    {
+                        foreach (var ip in kvp.Value.IgnoredProperties)
+                        {
+                            merged[kvp.Key].IgnoredProperties.Add(ip);
+                        }
+                        foreach (var op in kvp.Value.OverrideProperties)
+                        {
+                            merged[kvp.Key].OverrideProperties[op.Key] = op.Value;
+                        }
+                    }
+                }
+            }
+            return merged;
         }
 
         /// <summary>
@@ -184,6 +234,56 @@ namespace Audit.EntityFramework
                 }
             }
             return EntitiesIncludeIgnoreAttrCache[type];
+        }
+
+        private HashSet<string> EnsurePropertiesIgnoreAttrCache(Type type)
+        {
+            if (!PropertiesIgnoreAttrCache.ContainsKey(type))
+            {
+                var ignoredProps = new HashSet<string>();
+                foreach(var prop in type.GetTypeInfo().GetProperties())
+                {
+                    var ignoreAttr = prop.GetCustomAttribute(typeof(AuditIgnoreAttribute));
+                    if (ignoreAttr != null)
+                    {
+                        ignoredProps.Add(prop.Name);
+                    }
+                }
+                if (ignoredProps.Count > 0)
+                {
+                    PropertiesIgnoreAttrCache[type] = ignoredProps;
+                }
+                else
+                {
+                    PropertiesIgnoreAttrCache[type] = null;
+                }
+            }
+            return PropertiesIgnoreAttrCache[type];
+        }
+
+        private Dictionary<string, AuditOverrideAttribute> EnsurePropertiesOverrideAttrCache(Type type)
+        {
+            if (!PropertiesOverrideAttrCache.ContainsKey(type))
+            {
+                var overrideProps = new Dictionary<string, AuditOverrideAttribute>();
+                foreach (var prop in type.GetTypeInfo().GetProperties())
+                {
+                    var overrideAttr = prop.GetCustomAttribute<AuditOverrideAttribute>();
+                    if (overrideAttr != null)
+                    {
+                        overrideProps[prop.Name] = overrideAttr;
+                    }
+                }
+                if (overrideProps.Count > 0)
+                {
+                    PropertiesOverrideAttrCache[type] = overrideProps;
+                }
+                else
+                {
+                    PropertiesOverrideAttrCache[type] = null;
+                }
+            }
+            return PropertiesOverrideAttrCache[type];
         }
 
         /// <summary>

@@ -3,6 +3,43 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.0.2] - 2018-04-????????????
+### Modified
+- Audit.EntityFramework: Fix #120 exposing internal properties EventEntry.Entry (GetEntry) and EntityFrameworkEvent.DbContext (GetDbContext) on model objects.
+- Audit.EntityFramework: Fix #122 allow exlude entities via the audit entity action. Now the AuditEntityAction can be a Func that return a boolean indicating whether to include the entity.
+
+
+## [12.0.1] - 2018-04-24
+### Added
+- Audit.Core: Exposing the global JSON serializer settings as a Configuration option to allow changing the serialization behavior for audit events.
+ 
+## [12.0.0] - 2018-04-22
+### Added
+- Audit.Core: Added a global audit switch off `Configuration.AuditDisabled`.
+- Audit.Core: Added `NullDataProvider` as an anternative to disable the audit logging.
+
+
+## [11.2.0] - 2018-04-11
+### Changed
+- Audit.NET.MongoDB: Fix #114 - MongoDB Dataprovider Date serialization. Changing serialization mechanism to store the .NET DateTime as mongo datetime.
+
+## [11.1.0] - 2018-04-08
+### Added
+- Audit.EntityFramework: Added built-in mechanism to Ignore columns and Override column values on the audit logs.
+
+### Changed
+- Audit.EntityFramework: (Core) fix PrimaryKeys, ForeignKeys and ColumnValues to log the column name instead of the property name.
+
+
+## [11.0.8] - 2018-03-25
+### Changed
+- Audit.EntityFramework - Fix [#106]: DbEntityValidationException causes AuditEntityAction StackOverflowException.
+
+## [11.0.7] - 2018-03-19
+### Changed
+- Audit.NET.AzureDocumentDB - Fix [#103]: Added FeedOptions argument to DocumentDb QueryEvents.
+- Audit.EntityFramework - Fix [#104]: Multiple foreing key using the same field as key, causing audit to fail.
+
 ## [11.0.6] - 2018-03-07
 ### Changed
 - Audit.WebApi and Audit.Mvc - Fix [#102]: NULL validation on HttpContext.Connection.RemoteIpAddress 

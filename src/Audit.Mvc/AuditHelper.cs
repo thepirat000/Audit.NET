@@ -5,18 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Audit.Core;
 
 namespace Audit.Mvc
 {
     internal static class AuditHelper
     {
-        private static JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
-        {
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
-
         internal static IDictionary<string, object> SerializeParameters(IDictionary<string, object> parameters)
         {
             if (parameters == null)
@@ -25,7 +19,7 @@ namespace Audit.Mvc
             }
             return parameters.ToDictionary(
                 k => k.Key, 
-                v => v.Value == null ? null : JsonConvert.DeserializeObject(JsonConvert.SerializeObject(v.Value, _serializerSettings), v.Value.GetType(), _serializerSettings));
+                v => v.Value == null ? null : JsonConvert.DeserializeObject(JsonConvert.SerializeObject(v.Value, Configuration.JsonSettings), v.Value.GetType(), Configuration.JsonSettings));
         }
 
         internal static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)

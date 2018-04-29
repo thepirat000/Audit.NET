@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Audit.Core.Providers;
 using Audit.Core.ConfigurationApi;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Audit.Core
 {
@@ -19,6 +20,14 @@ namespace Audit.Core
         /// Gets or Sets the Default data provider.
         /// </summary>
         public static AuditDataProvider DataProvider { get; set; }
+        /// <summary>
+        /// Global switch to disable audit logging. Default is false.
+        /// </summary>
+        public static bool AuditDisabled { get; set; }
+        /// <summary>
+        /// Global json serializer settings for serializing the audit event on the data providers or by calling the ToJson() method on the AuditEvent.
+        /// </summary>
+        public static JsonSerializerSettings JsonSettings { get; set; }
 
         internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
 
@@ -26,8 +35,14 @@ namespace Audit.Core
 
         static Configuration()
         {
+            AuditDisabled = false;
             DataProvider = new FileDataProvider();
             CreationPolicy = EventCreationPolicy.InsertOnEnd;
+            JsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
             ResetCustomActions();
         }
 

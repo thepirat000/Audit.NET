@@ -7,13 +7,15 @@ using System.Data.Entity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using System;
+using Audit.EntityFramework.ConfigurationApi;
 
 namespace Audit.EntityFramework
 {
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-    public abstract class AuditIdentityDbContext : AuditIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserLogin, IdentityUserRole, IdentityUserClaim>
+    public abstract class AuditIdentityDbContext : AuditIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserLogin, IdentityUserRole, IdentityUserClaim>, IAuditBypass
     {
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
@@ -59,7 +61,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-    public abstract class AuditIdentityDbContext<TUser> : IdentityDbContext<TUser>, IAuditDbContext //AuditIdentityDbContext<TUser, IdentityRole, string, IdentityUserLogin, IdentityUserRole, IdentityUserClaim>
+    public abstract class AuditIdentityDbContext<TUser> : IdentityDbContext<TUser>, IAuditDbContext, IAuditBypass
         where TUser : IdentityUser
     {
         private DbContextHelper _helper = new DbContextHelper();
@@ -171,6 +173,11 @@ namespace Audit.EntityFramework
         public bool IncludeIndependantAssociations { get; set; }
 
         /// <summary>
+        /// A collection of settings per entity type.
+        /// </summary>
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
+
+        /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.
         /// </summary>
@@ -214,6 +221,15 @@ namespace Audit.EntityFramework
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
+        }
+
+        int IAuditBypass.SaveChangesBypassAudit()
+        {
+            return base.SaveChanges();
+        }
+        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        {
+            return await base.SaveChangesAsync();
         }
     }
 }

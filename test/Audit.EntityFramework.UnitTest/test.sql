@@ -107,6 +107,23 @@ Begin
 End
 GO
 
+Drop Proc Update_Blog
+GO
+
+Create Proc Update_Blog
+(
+	@Id int,
+	@Title nvarchar(max),
+	@Name nvarchar(max)
+)
+As
+Begin
+	Update blogs 
+	Set Title = @Title, BloggerName = @Name
+	Where id = @Id
+End
+GO
+
 
 
 insert into blogs (Title, BloggerName)

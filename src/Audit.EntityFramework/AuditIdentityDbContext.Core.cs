@@ -12,7 +12,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-    public abstract class AuditIdentityDbContext : AuditIdentityDbContext<IdentityUser, IdentityRole, string>
+    public abstract class AuditIdentityDbContext : AuditIdentityDbContext<IdentityUser, IdentityRole, string>, IAuditBypass
     {
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
@@ -30,7 +30,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-    public abstract class AuditIdentityDbContext<TUser> : AuditIdentityDbContext<TUser, IdentityRole, string>
+    public abstract class AuditIdentityDbContext<TUser> : AuditIdentityDbContext<TUser, IdentityRole, string>, IAuditBypass
         where TUser : IdentityUser
     {
         /// <summary>
@@ -50,11 +50,11 @@ namespace Audit.EntityFramework
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
 #if NETSTANDARD1_5
-    public abstract class AuditIdentityDbContext<TUser, TRole, TKey> : AuditIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+    public abstract class AuditIdentityDbContext<TUser, TRole, TKey> : AuditIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>, IAuditBypass
         where TUser : IdentityUser<TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>>
         where TRole : IdentityRole<TKey, IdentityUserRole<TKey>, IdentityRoleClaim<TKey>>
 #else
-    public abstract class AuditIdentityDbContext<TUser, TRole, TKey> : AuditIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+    public abstract class AuditIdentityDbContext<TUser, TRole, TKey> : AuditIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>, IAuditBypass
         where TUser : IdentityUser<TKey>
         where TRole : IdentityRole<TKey>
 #endif

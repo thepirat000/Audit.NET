@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+
 namespace Audit.EntityFramework.ConfigurationApi
 {
     /// <summary>
@@ -21,6 +25,11 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="include">if set to <c>true</c> the serialized entities will be included.</param>
         IContextSettingsConfigurator<T> IncludeEntityObjects(bool include = true);
+        /// <summary>
+        /// Sets the configuration for a specific entity (table)
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        IContextSettingsConfigurator<T> ForEntity<TEntity>(Action<IContextEntitySetting<TEntity>> config);
 #if NET45
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
@@ -30,3 +39,4 @@ namespace Audit.EntityFramework.ConfigurationApi
 #endif
     }
 }
+ 
