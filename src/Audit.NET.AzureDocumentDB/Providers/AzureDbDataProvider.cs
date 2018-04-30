@@ -19,6 +19,8 @@ namespace Audit.AzureDocumentDB.Providers
     /// - AuthKey: Auth key for the Azure API
     /// - Database: Database name
     /// - Collection: Collection name
+    /// - ConnectionPolicy: The client connection policy settings
+    /// - DocumentClient: A document client that is reused by your app
     /// </remarks>
     public class AzureDbDataProvider : AuditDataProvider
     {
@@ -30,7 +32,9 @@ namespace Audit.AzureDocumentDB.Providers
 
         public string Collection { get; set; }
 
-        private DocumentClient client;
+        public ConnectionPolicy ConnectionPolicy { get; set; }
+
+        public IDocumentClient DocumentClient { get; set; }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
@@ -90,27 +94,26 @@ namespace Audit.AzureDocumentDB.Providers
             return await Task.FromResult(GetEvent<T>(eventId));
         }
 
-        private DocumentClient GetClient()
+        private IDocumentClient GetClient()
         {
-            if (client == null)
-            {
-                InitializeClient();
-            }
-
-            return client;
+            return DocumentClient ?? InitializeClient();
         }
 
-        private void InitializeClient()
+        private IDocumentClient InitializeClient()
         {
-            var policy = new ConnectionPolicy
-            {
-                ConnectionMode = ConnectionMode.Direct,
-                ConnectionProtocol = Protocol.Tcp
-            };
+            var policy = ConnectionPolicy
+                ?? new ConnectionPolicy
+                {
+                    ConnectionMode = ConnectionMode.Direct,
+                    ConnectionProtocol = Protocol.Tcp
+                };
 
-            client = new DocumentClient(new Uri(ConnectionString), AuthKey, policy);
-
+            var client = new DocumentClient(new Uri(ConnectionString), AuthKey, policy);
             Task.Run(() => { client.OpenAsync(); });
+
+            DocumentClient = client;
+
+            return DocumentClient;
         }
 
         private Uri GetCollectionUri()

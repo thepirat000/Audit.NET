@@ -1,6 +1,8 @@
 ﻿using Audit.AzureDocumentDB.ConfigurationApi;
 using Audit.AzureDocumentDB.Providers;
 using Audit.Core.ConfigurationApi;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 using System;
 
 namespace Audit.Core
@@ -13,15 +15,19 @@ namespace Audit.Core
         /// <param name="connectionString">The mongo DB connection string.</param>
         /// <param name="database">The mongo DB database name.</param>
         /// <param name="collection">The mongo DB collection name.</param>
-        public static ICreationPolicyConfigurator UseAzureDocumentDB(this IConfigurator configurator, string connectionString,
-            string authKey = null, string database = "Audit", string collection = "Event")
+        public static ICreationPolicyConfigurator UseAzureDocumentDB(
+            this IConfigurator configurator, string connectionString,
+            string authKey = null, string database = "Audit", string collection = "Event",
+            ConnectionPolicy connectionPolicy = null, IDocumentClient documentClient = null)
         {
             Configuration.DataProvider = new AzureDbDataProvider()
             {
                 ConnectionString = connectionString,
                 AuthKey = authKey,
                 Collection = collection,
-                Database = database
+                Database = database,
+                ConnectionPolicy = connectionPolicy,
+                DocumentClient = documentClient
             };
             return new CreationPolicyConfigurator();
         }
@@ -29,11 +35,20 @@ namespace Audit.Core
         /// Store the events in an Azure Document DB database.
         /// </summary>
         /// <param name="config">The Document DB provider configuration.</param>
-        public static ICreationPolicyConfigurator UseAzureDocumentDB(this IConfigurator configurator, Action<IDocumentDbProviderConfigurator> config)
+        public static ICreationPolicyConfigurator UseAzureDocumentDB(
+            this IConfigurator configurator, Action<IDocumentDbProviderConfigurator> config)
         {
             var documentDbConfig = new DocumentDbProviderConfigurator();
             config.Invoke(documentDbConfig);
-            return UseAzureDocumentDB(configurator, documentDbConfig._connectionString, documentDbConfig._authKey, documentDbConfig._database, documentDbConfig._collection);
+
+            return UseAzureDocumentDB(
+                configurator,
+                documentDbConfig._connectionString,
+                documentDbConfig._authKey,
+                documentDbConfig._database,
+                documentDbConfig._collection,
+                documentDbConfig._connectionPolicy,
+                documentDbConfig._documentClient);
         }
     }
 }

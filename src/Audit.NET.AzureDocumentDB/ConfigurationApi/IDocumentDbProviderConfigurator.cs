@@ -1,3 +1,6 @@
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+
 namespace Audit.AzureDocumentDB.ConfigurationApi
 {
     public interface IDocumentDbProviderConfigurator
@@ -22,5 +25,17 @@ namespace Audit.AzureDocumentDB.ConfigurationApi
         /// </summary>
         /// <param name="authKey">The auth key.</param>
         IDocumentDbProviderConfigurator AuthKey(string authKey);
+
+        /// <summary>
+        /// Specifies the Azure DocumentDB Client Connection Policy
+        /// </summary>
+        /// <param name="connectionPolicy">The connection policy.</param>
+        IDocumentDbProviderConfigurator ConnectionPolicy(ConnectionPolicy connectionPolicy);
+
+        /// <summary>
+        /// Specifies the Azure DocumentDB Client.
+        /// </summary>
+        /// <param name="documentClient">The configured document client object.</param>
+        IDocumentDbProviderConfigurator DocumentClient(IDocumentClient documentClient);
     }
 }
