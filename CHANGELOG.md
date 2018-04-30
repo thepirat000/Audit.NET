@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [12.0.3] - 2018-04-27
+## [12.0.3] - 2018-04-30
 ### Added
 - Audit.NET.Elasticsearch: New Elasticsearch data provider
 
