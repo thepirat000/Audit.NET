@@ -31,6 +31,7 @@ namespace Audit.Core
             };
             return new CreationPolicyConfigurator();
         }
+
         /// <summary>
         /// Store the events in an Azure Document DB database.
         /// </summary>
@@ -41,14 +42,16 @@ namespace Audit.Core
             var documentDbConfig = new DocumentDbProviderConfigurator();
             config.Invoke(documentDbConfig);
 
-            return UseAzureDocumentDB(
-                configurator,
-                documentDbConfig._connectionString,
-                documentDbConfig._authKey,
-                documentDbConfig._database,
-                documentDbConfig._collection,
-                documentDbConfig._connectionPolicy,
-                documentDbConfig._documentClient);
+            Configuration.DataProvider = new AzureDbDataProvider()
+            {
+                ConnectionStringBuilder = documentDbConfig._connectionStringBuilder,
+                AuthKeyBuilder = documentDbConfig._authKeyBuilder,
+                CollectionBuilder = documentDbConfig._collectionBuilder,
+                DatabaseBuilder = documentDbConfig._databaseBuilder,
+                ConnectionPolicyBuilder = documentDbConfig._connectionPolicyBuilder,
+                DocumentClient = documentDbConfig._documentClient
+            };
+            return new CreationPolicyConfigurator();
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Audit.IntegrationTest
     {
         private const string AzureBlobCnnString = "xxx";
         private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "xxx==";
+        private const string AzureDocDbAuthKey = "x==";
 
         [TestFixture]
         public class AuditTests
@@ -233,6 +233,15 @@ namespace Audit.IntegrationTest
                 TestInsert();
                 TestDelete();
             }
+
+            [Test]
+            [Category("Elasticsearch")]
+            public async Task TestElasticsearchAsync()
+            {
+                SetElasticsearchSettings();
+                await TestUpdateAsync();
+            }
+
             public struct TestStruct
             {
                 public int Id { get; set; }
@@ -371,8 +380,17 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
-                Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
-                Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                var dpType = Configuration.DataProvider.GetType().Name;
+                if (dpType != "ElasticsearchDataProvider")
+                {
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                }
+                else
+                {
+                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedOld.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedNew.ToString()).Order.Status);
+                }
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
@@ -474,8 +492,8 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
-                        .ConnectionString(AzureDocDbUrl)
-                        .AuthKey(AzureDocDbAuthKey))
+                        .ConnectionString(ev => AzureDocDbUrl)
+                        .AuthKey(ev => AzureDocDbAuthKey))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

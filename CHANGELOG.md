@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.0.4] - 2018-04-30
+### Modified
+- Audit.NET.AzureDocumentDB: Allowing builders to pass the connection string, database and collection.
+- Audit.NET.Elasticsearch: Fixing project URL reference on nuget package.
+
 ## [12.0.3] - 2018-04-30
 ### Added
 - Audit.NET.Elasticsearch: New Elasticsearch data provider
