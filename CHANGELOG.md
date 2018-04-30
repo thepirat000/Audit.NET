@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [12.0.3] - 2018-04-27
 ### Added
-- New Elasticsearch data provider
+- Audit.NET.Elasticsearch: New Elasticsearch data provider
 
+### Modified
+- Audit.NET.AzureDocumentDB: Cosmos DB provider enhancements by _ovidiu [AT] ovidiudiaconescu.com_. Caching azure client and allow passing the connection policy.
+- Audit.WebApi: (#124) Making GetRequestBody protected virtual
 
 ## [12.0.2] - 2018-04-27
 ### Modified
@@ -77,7 +80,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [11.0.1] - 2018-01-28
 ### Changed
-- Audit.MySql: refactor by bgrainger@gmail.com to use MySqlConnector instead of MySql.Data to support real async calls.
+- Audit.MySql: refactor by _bgrainger [AT] gmail.com_ to use MySqlConnector instead of MySql.Data to support real async calls.
 
 ## [11.0.0] - 2018-01-14
 ### Added

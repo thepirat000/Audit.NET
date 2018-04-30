@@ -144,7 +144,7 @@ namespace Audit.WebApi
             await AfterExecutedAsync(actionExecutedContext);
         }
 
-        private BodyContent GetRequestBody(ContextWrapper contextWrapper)
+        protected virtual BodyContent GetRequestBody(ContextWrapper contextWrapper)
         {
             var context = contextWrapper.GetHttpContext();
             if (context?.Request?.InputStream != null)

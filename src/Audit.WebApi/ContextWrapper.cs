@@ -10,7 +10,7 @@ namespace Audit.WebApi
     /// <summary>
     /// Wrapper around request context to handle both HttpContext and OwinContext
     /// </summary>
-    internal class ContextWrapper
+    public class ContextWrapper
     {
         private HttpContextBase _httpContext = null;
         private IOwinContext _owinContext = null;
