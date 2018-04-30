@@ -52,7 +52,7 @@ Mandatory:
 
 Optional:
 - **Index**: The Elasticsearch index name to use. Can be NULL to use the default index. 
-- **Type**: The type name to use. Note that types are going to be be removed in future Elasticsearch versions. Can be NULL to use the defualt index.
+- **Type**: The type name to use. Note that types are going to be be removed in future Elasticsearch versions. Can be NULL to use the default type name.
 - **Id**: The id to use for the given audit event. Can be NULL to use an auto-generated id.
 
 ## Query events
