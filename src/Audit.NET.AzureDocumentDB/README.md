@@ -29,7 +29,7 @@ Audit.Core.Configuration.DataProvider = new Audit.AzureDocumentDB.Providers.Azur
     AuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==",
     Database = "Audit",
     CollectionBuilder = auditEvent => auditEvent.EventType,
-	ConnectionPolicy = new ConnectionPolicy { ConnectionMode = ConnectionMode.Direct, ConnectionProtocol = Protocol.Tcp }
+    ConnectionPolicy = new ConnectionPolicy { ConnectionMode = ConnectionMode.Direct, ConnectionProtocol = Protocol.Tcp }
 };
 
 Audit.Core.Configuration.DataProvider = new Audit.AzureDocumentDB.Providers.AzureDbDataProvider()
@@ -48,18 +48,18 @@ Audit.Core.Configuration.Setup()
         .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")
         .Database("Audit")
         .Collection(auditEvent => auditEvent.EventType)
-		.ConnectionPolicy(new ConnectionPolicy
-		{
-			ConnectionMode = ConnectionMode.Direct,
-			ConnectionProtocol = Protocol.Tcp
-		}));
-
+        .ConnectionPolicy(new ConnectionPolicy
+        {
+            ConnectionMode = ConnectionMode.Direct,
+            ConnectionProtocol = Protocol.Tcp
+        }));
 
 Audit.Core.Configuration.Setup()
-	.UseAzureDocumentDB(config => config
-		.DocumentClient(myClient)
-		.Database("Audit")
-        .Collection("Events");
+    .UseAzureDocumentDB(config => config
+        .DocumentClient(myClient)
+        .Database("Audit")
+        .CollectionBuilder = auditEvent => auditEvent.EventType.StartsWith("GET") ? "Web" : "Custom"
+);
 ```
 
 ### Provider options

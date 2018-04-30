@@ -170,10 +170,8 @@ namespace Audit.AzureDocumentDB.Providers
                     ConnectionProtocol = Protocol.Tcp
                 };
 
-            var client = new DocumentClient(new Uri(ConnectionStringBuilder?.Invoke(auditEvent)), AuthKeyBuilder?.Invoke(auditEvent), policy);
-            Task.Run(() => { client.OpenAsync(); });
-
-            DocumentClient = client;
+            DocumentClient = new DocumentClient(new Uri(ConnectionStringBuilder?.Invoke(auditEvent)), AuthKeyBuilder?.Invoke(auditEvent), policy);
+            Task.Run(() => { ((DocumentClient)DocumentClient).OpenAsync(); });
 
             return DocumentClient;
         }
