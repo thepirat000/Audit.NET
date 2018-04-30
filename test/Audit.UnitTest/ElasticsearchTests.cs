@@ -103,10 +103,10 @@ namespace Audit.UnitTest
             Assert.AreEqual(1, guids.Count);
             Assert.AreEqual(1, ins.Count);
             Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("init", ins[0].Target.SerializedOld);
+            Assert.AreEqual("\"init\"", ins[0].Target.SerializedOld);
             Assert.AreEqual(null, ins[0].Target.SerializedNew);
-            Assert.AreEqual("init", repl[0].Target.SerializedOld);
-            Assert.AreEqual("init-end", repl[0].Target.SerializedNew);
+            Assert.AreEqual("\"init\"", repl[0].Target.SerializedOld);
+            Assert.AreEqual("\"init-end\"", repl[0].Target.SerializedNew);
         }
 
         [Test]
@@ -139,10 +139,10 @@ namespace Audit.UnitTest
             Assert.AreEqual(1, guids.Count);
             Assert.AreEqual(1, ins.Count);
             Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("init", ins[0].Target.SerializedOld);
+            Assert.AreEqual("\"init\"", ins[0].Target.SerializedOld);
             Assert.AreEqual(null, ins[0].Target.SerializedNew);
-            Assert.AreEqual("init", repl[0].Target.SerializedOld);
-            Assert.AreEqual("init-end", repl[0].Target.SerializedNew);
+            Assert.AreEqual("\"init\"", repl[0].Target.SerializedOld);
+            Assert.AreEqual("\"init-end\"", repl[0].Target.SerializedNew);
         }
 
     }

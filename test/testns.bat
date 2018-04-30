@@ -4,6 +4,7 @@ start "" /D c:\redis "c:\redis\redis-server.exe"
 net start mysql57
 net start mssqlserver
 net start postgresql-x64-9.6
+net start elasticsearch
 
 cd ..
 dotnet restore
@@ -62,9 +63,10 @@ echo continue...
 cd ..
 
 cd Audit.IntegrationTest
-dotnet test  --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF"
+dotnet test  --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF&TestCategory!=Elasticsearch"
 dotnet test  -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
 dotnet test  -f net451 --filter "TestCategory=WCF&TestCategory=Async"
+dotnet test  -f net451 --filter "TestCategory=Elasticsearch"
 echo continue...
 
 cd ..
@@ -74,5 +76,6 @@ del TestResult.xml /s
 net stop mssqlserver
 net stop mysql57
 net stop postgresql-x64-9.6
+net stop elasticsearch
 taskkill /f /im mongod.exe
 taskkill /f /im redis-server.exe
