@@ -28,6 +28,14 @@ Audit.Core.Configuration.DataProvider = new Audit.AzureDocumentDB.Providers.Azur
     ConnectionString = "https://mycompany.documents.azure.com:443/",
     AuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==",
     Database = "Audit",
+    Collection = "Event",
+	ConnectionPolicy = new ConnectionPolicy { ConnectionMode = ConnectionMode.Direct, ConnectionProtocol = Protocol.Tcp }
+};
+
+Audit.Core.Configuration.DataProvider = new Audit.AzureDocumentDB.Providers.AzureDbDataProvider()
+{
+    DocumentClient = myClient,
+    Database = "Audit",
     Collection = "Event"
 };
 ```
@@ -39,14 +47,31 @@ Audit.Core.Configuration.Setup()
         .ConnectionString("https://mycompany.documents.azure.com:443/")
         .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")
         .Database("Audit")
-        .Collection("Event"));
+        .Collection("Event")
+		.ConnectionPolicy(new ConnectionPolicy
+		{
+			ConnectionMode = ConnectionMode.Direct,
+			ConnectionProtocol = Protocol.Tcp
+		}));
+
+
+Audit.Core.Configuration.Setup()
+	.UseAzureDocumentDB(config => config
+		.DocumentClient(myClient)
+		.Database("Audit")
+        .Collection("Events");
 ```
 
 ### Provider options
 
-Mandatory:
+Mandatory config with a ConnectionString and an AuthKey:
 - **ConnectionString**: The Azure Document DB Connection String.
 - **AuthKey**: The Auth Key to use.
+- **Database**: The audit database name.
+- **Collection**: The events collection name.
+
+Or with a previously configured instance of DocumentClient:
+- **DocumentClient**: An already configured document client.
 - **Database**: The audit database name.
 - **Collection**: The events collection name.
 
