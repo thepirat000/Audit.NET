@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.log4net", "src\Au
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Integration.AspNetCore", "test\Audit.Integration.AspNetCore\Audit.Integration.AspNetCore.csproj", "{81CDC737-77FC-4035-BF9A-077D773FD071}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Elasticsearch", "src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj", "{51E07A8D-EE59-40EC-BE57-736BE91AD548}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -301,6 +303,14 @@ Global
 		{81CDC737-77FC-4035-BF9A-077D773FD071}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81CDC737-77FC-4035-BF9A-077D773FD071}.Release|x64.ActiveCfg = Release|Any CPU
 		{81CDC737-77FC-4035-BF9A-077D773FD071}.Release|x64.Build.0 = Release|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Debug|x64.Build.0 = Debug|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Release|x64.ActiveCfg = Release|Any CPU
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -334,6 +344,7 @@ Global
 		{19A96BB9-0FF0-48C5-9DB1-6ED902422EC6} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{35345A58-3DE6-4ACF-8951-E8B8DD71E876} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{81CDC737-77FC-4035-BF9A-077D773FD071} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
+		{51E07A8D-EE59-40EC-BE57-736BE91AD548} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}

@@ -29,7 +29,9 @@ namespace Audit.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
 
             var module = new TestAuditPipelineModule
             {
@@ -50,7 +52,10 @@ namespace Audit.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
+
 
             var module = new TestAuditPipelineModule
             {
@@ -83,7 +88,9 @@ namespace Audit.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
 
             var module = new TestAuditPipelineModule();
 
@@ -108,7 +115,10 @@ namespace Audit.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
+
 
             var module = new TestAuditPipelineModule();
 
@@ -133,7 +143,10 @@ namespace Audit.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
+
 
             var module = new TestAuditPipelineModule();
 
@@ -161,7 +174,9 @@ namespace Audit.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
 
             var threads = 25;
             var tasks = new Task<string>[threads];

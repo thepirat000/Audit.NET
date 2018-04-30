@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.FileSystem\Audit.FileSystem.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.log4net\Audit.NET.log4net.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />

@@ -21,6 +21,7 @@ del "Audit.NET.PostgreSql\bin\debug\*.nupkg"
 del "Audit.FileSystem\bin\debug\*.nupkg"
 del "Audit.SignalR\bin\debug\*.nupkg"
 del "Audit.NET.log4net\bin\debug\*.nupkg"
+del "Audit.NET.Elasticsearch\bin\debug\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -46,3 +47,5 @@ dotnet pack "Audit.NET.PostgreSql/"
 dotnet pack "Audit.FileSystem/"
 dotnet pack "Audit.SignalR/"
 dotnet pack "Audit.NET.log4net/"
+dotnet pack "Audit.NET.Elasticsearch/"
+

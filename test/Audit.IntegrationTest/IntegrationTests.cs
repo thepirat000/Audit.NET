@@ -25,7 +25,7 @@ namespace Audit.IntegrationTest
     {
         private const string AzureBlobCnnString = "xxx";
         private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "xxx==";
+        private const string AzureDocDbAuthKey = "x==";
 
         [TestFixture]
         public class AuditTests
@@ -224,6 +224,24 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
+            [Test]
+            [Category("Elasticsearch")]
+            public void TestElasticsearch()
+            {
+                SetElasticsearchSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("Elasticsearch")]
+            public async Task TestElasticsearchAsync()
+            {
+                SetElasticsearchSettings();
+                await TestUpdateAsync();
+            }
+
             public struct TestStruct
             {
                 public int Id { get; set; }
@@ -268,14 +286,22 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
-                Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
-                Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                if (dpType != "ElasticsearchDataProvider")
+                {
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                }
+                else
+                {
+                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedOld.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedNew.ToString()).Order.Status);
+                }
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
                 //audit multiple 
-                using (var a = AuditScope.Create(eventType, () => new { OrderStatus = order.Status, Items = order.OrderItems }, new { ReferenceId = order.OrderId }))
+                using (var a = AuditScope.Create(eventType, () => order.Status, new { ReferenceId = order.OrderId }))
                 { 
                    ev = a.Event;
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
@@ -285,7 +311,7 @@ namespace Audit.IntegrationTest
 
                 order = DbCreateOrder();
 
-                using (var audit = AuditScope.Create("Order:Update", () => order.Status, new { ReferenceId = order.OrderId }))
+                using (var audit = AuditScope.Create("Order:Update", () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = audit.Event;
                     audit.SetCustomField("Reason", reasonText);
@@ -302,7 +328,7 @@ namespace Audit.IntegrationTest
 
                 order = DbCreateOrder();
 
-                using (var audit = AuditScope.Create(eventType, () => order, new { ReferenceId = order.OrderId }))
+                using (var audit = AuditScope.Create(eventType, () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = audit.Event;
                     audit.SetCustomField("Reason", "reason");
@@ -354,14 +380,23 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
-                Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
-                Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                var dpType = Configuration.DataProvider.GetType().Name;
+                if (dpType != "ElasticsearchDataProvider")
+                {
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                }
+                else
+                {
+                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedOld.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedNew.ToString()).Order.Status);
+                }
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
                 order = DbCreateOrder();
 
                 //audit multiple 
-                using (var a = await AuditScope.CreateAsync(eventType, () => new { OrderStatus = order.Status, Items = order.OrderItems }, new { ReferenceId = order.OrderId }))
+                using (var a = await AuditScope.CreateAsync(eventType, () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = a.Event;
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
@@ -371,7 +406,7 @@ namespace Audit.IntegrationTest
 
                 order = DbCreateOrder();
 
-                using (var audit = await AuditScope.CreateAsync("Order:Update", () => order.Status, new { ReferenceId = order.OrderId }))
+                using (var audit = await AuditScope.CreateAsync("Order:Update", () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = audit.Event;
                     audit.SetCustomField("Reason", reasonText);
@@ -388,7 +423,7 @@ namespace Audit.IntegrationTest
 
                 order = DbCreateOrder();
 
-                using (var audit = await AuditScope.CreateAsync(eventType, () => order, new { ReferenceId = order.OrderId }))
+                using (var audit = await AuditScope.CreateAsync(eventType, () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = audit.Event;
                     audit.SetCustomField("Reason", "reason");
@@ -406,7 +441,7 @@ namespace Audit.IntegrationTest
             {
                 var ev = (AuditEvent)null;
                 CustomerOrder order = null;
-                using (var audit = AuditScope.Create("Order:Create", () => order))
+                using (var audit = AuditScope.Create("Order:Create", () => new TestStruct() { Id = 123, Order = order }))
                 {
                     ev = audit.Event;
                     order = DbCreateOrder();
@@ -421,7 +456,7 @@ namespace Audit.IntegrationTest
                 IntegrationTests.CustomerOrder order = DbCreateOrder();
                 var ev = (AuditEvent)null;
                 var orderId = order.OrderId;
-                using (var audit = AuditScope.Create("Order:Delete", () => order, new { ReferenceId = order.OrderId }))
+                using (var audit = AuditScope.Create("Order:Delete", () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
                 {
                     ev = audit.Event;
                     DbDeteleOrder(order.OrderId);
@@ -457,8 +492,8 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
-                        .ConnectionString(AzureDocDbUrl)
-                        .AuthKey(AzureDocDbAuthKey))
+                        .ConnectionString(ev => AzureDocDbUrl)
+                        .AuthKey(ev => AzureDocDbAuthKey))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
@@ -543,6 +578,20 @@ namespace Audit.IntegrationTest
                     .ResetActions();
             }
 
+            public void SetElasticsearchSettings()
+            {
+                var uri = new Uri("http://localhost:9200");
+                var ec = new Nest.ElasticClient(uri);
+                ec.DeleteIndex(Nest.Indices.AllIndices, x => x.Index("auditevent"));
+
+                Audit.Core.Configuration.Setup()
+                    .UseElasticsearch(config => config
+                        .ConnectionSettings(uri)
+                        .Index("auditevent")
+                        .Id(ev => Guid.NewGuid()))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+            }
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)
             {
