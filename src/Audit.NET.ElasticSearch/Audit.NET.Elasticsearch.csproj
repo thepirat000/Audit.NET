@@ -17,7 +17,7 @@
     <PackageId>Audit.NET.Elasticsearch</PackageId>
     <PackageTags>Audit;Trail;Log;Elasticsearch</PackageTags>
     <PackageIconUrl>https://i.imgur.com/PbeWVKz.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Elasticsearch</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.ElasticSearch</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
