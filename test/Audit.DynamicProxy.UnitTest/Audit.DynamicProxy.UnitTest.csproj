@@ -5,7 +5,7 @@
     <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.DynamicProxy.UnitTest</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
     <PackageId>Audit.DynamicProxy.UnitTest</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>

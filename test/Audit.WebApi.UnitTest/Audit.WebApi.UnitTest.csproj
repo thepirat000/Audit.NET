@@ -6,7 +6,7 @@
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.WebApi.UnitTest</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.WebApi.UnitTest</PackageId>
