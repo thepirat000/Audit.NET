@@ -91,7 +91,7 @@ namespace Audit.WebApi.UnitTest
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
+            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
@@ -181,7 +181,7 @@ namespace Audit.WebApi.UnitTest
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
+            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
@@ -263,7 +263,89 @@ namespace Audit.WebApi.UnitTest
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request);
+            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
+            var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
+            await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
+
+            var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
+            var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
+
+            //Assert
+            var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
+            Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
+            dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            Assert.AreEqual(action, actionFromController);
+            Assert.AreEqual(scope, scopeFromController);
+            Assert.AreEqual("header-value", action.Headers["test-header"]);
+            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+        }
+
+
+        [Test]
+        public async Task Test_AuditApiActionFilter_CustomContextWrapper()
+        {
+            // Mock out the context to run the action filter.
+            var request = new Mock<HttpRequestBase>();
+
+            //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
+            request.Setup(c => c.ContentType).Returns("application/json");
+
+            var httpResponse = new Mock<HttpResponseBase>();
+
+            httpResponse.Setup(c => c.StatusCode).Returns(200);
+            var itemsDict = new Dictionary<object, object>();
+            var httpContext = new Mock<HttpContextBase>();
+            httpContext.SetupGet(c => c.Request).Returns(request.Object);
+            httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
+            httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            var controllerContext = new HttpControllerContext()
+            {
+                ControllerDescriptor = new HttpControllerDescriptor()
+                {
+                    ControllerName = "values"
+                },
+                Request = new HttpRequestMessage()
+            };
+            controllerContext.Request.Headers.Add("test-header", "header-value");
+            var actionDescriptor = new Mock<HttpActionDescriptor>();
+            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+
+            var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
+
+            var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            var filter = new AuditApiAttribute()
+            {
+                IncludeHeaders = true,
+                IncludeModelState = true,
+                IncludeResponseBody = true,
+                EventTypeName = "TestEvent",
+                SerializeActionParameters = true,
+                ContextWrapperType = typeof(CustomContextWrapper)
+            };
+            var actionContext = new HttpActionContext()
+            {
+                ActionDescriptor = actionDescriptor.Object,
+                ControllerContext = controllerContext,
+
+            };
+            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
+            actionExecutingContext.ActionArguments.Add("test1", "value1");
+            actionExecutingContext.ActionArguments.Add("x", arg);
+            var self = new TestClass() { Id = 1 };
+            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
+
+            actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var ct = new CancellationTokenSource();
+            await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
+            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
@@ -294,5 +376,20 @@ namespace Audit.WebApi.UnitTest
             Self = this;
         }
     }
+
+    public class CustomContextWrapper : ContextWrapper
+    {
+        private readonly HttpRequestMessage _request;
+        public CustomContextWrapper(HttpRequestMessage request) : base(request)
+        {
+            _request = request;
+        }
+        public override HttpContextBase GetHttpContext()
+        {
+            _request.Properties.TryGetValue("MS_HttpContext", out object obj);
+            return obj as HttpContextBase;
+        }
+    }
+
 }
 #endif

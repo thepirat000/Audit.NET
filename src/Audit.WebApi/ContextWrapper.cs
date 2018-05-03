@@ -10,21 +10,28 @@ namespace Audit.WebApi
     /// <summary>
     /// Wrapper around request context to handle both HttpContext and OwinContext
     /// </summary>
-    public class ContextWrapper
+    public class ContextWrapper : IContextWrapper
     {
-        private HttpContextBase _httpContext = null;
-        private IOwinContext _owinContext = null;
-        internal bool IsOwin => _owinContext != null;
+        /// <summary>
+        /// The Http Context
+        /// </summary>
+        protected HttpContextBase HttpContext = null;
+        /// <summary>
+        /// The Owin Context
+        /// </summary>
+        protected IOwinContext OwinContext = null;
+
+        protected bool IsOwin => OwinContext != null;
 
         public ContextWrapper(HttpRequestMessage request)
         {
-            _owinContext = request.GetOwinContext();
-            _httpContext = GetHttpContext(request);
+            OwinContext = request.GetOwinContext();
+            HttpContext = GetHttpContext(request);
         }
 
-        public HttpContextBase GetHttpContext()
+        public virtual HttpContextBase GetHttpContext()
         {
-            return _httpContext;
+            return HttpContext;
         }
 
         private HttpContextBase GetHttpContext(HttpRequestMessage request)
@@ -40,7 +47,7 @@ namespace Audit.WebApi
                     return context;
                 }
             }
-            var currentContext = HttpContext.Current;
+            var currentContext = System.Web.HttpContext.Current;
             return currentContext == null ? null : new HttpContextWrapper(currentContext);
         }
 
@@ -63,17 +70,17 @@ namespace Audit.WebApi
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-        public void Set<T>(string key, T value) where T : class
+        public virtual void Set<T>(string key, T value) where T : class
         {
             if (IsOwin)
             {
-                _owinContext.Set(key, value);
+                OwinContext.Set(key, value);
             }
             else
             {
-                if (_httpContext != null)
+                if (HttpContext != null)
                 {
-                    _httpContext.Items[key] = value;
+                    HttpContext.Items[key] = value;
                 }
             }
         }
@@ -81,17 +88,17 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets a variable from the context
         /// </summary>
-        public T Get<T>(string key) where T : class
+        public virtual T Get<T>(string key) where T : class
         {
             if (IsOwin)
             {
-                return _owinContext.Get<T>(key);
+                return OwinContext.Get<T>(key);
             }
             else
             {
-                if (_httpContext != null && _httpContext.Items.Contains(key))
+                if (HttpContext != null && HttpContext.Items.Contains(key))
                 {
-                    return _httpContext.Items[key] as T;
+                    return HttpContext.Items[key] as T;
                 }
             }
             return null;
@@ -100,11 +107,11 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets the form variables.
         /// </summary>
-        public IDictionary<string, string> GetFormVariables()
+        public virtual IDictionary<string, string> GetFormVariables()
         {
-            if (_httpContext != null)
+            if (HttpContext != null)
             {
-                return ToDictionary(_httpContext?.Request?.Form);
+                return ToDictionary(HttpContext?.Request?.Form);
             }
             return null;
         }
@@ -112,15 +119,15 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets the client IP.
         /// </summary>
-        public string GetClientIp()
+        public virtual string GetClientIp()
         {
             if (IsOwin)
             {
-                return _owinContext.Request.RemoteIpAddress;
+                return OwinContext.Request.RemoteIpAddress;
             }
             else
             {
-                return _httpContext?.Request?.UserHostAddress;
+                return HttpContext?.Request?.UserHostAddress;
             }
         }
     }

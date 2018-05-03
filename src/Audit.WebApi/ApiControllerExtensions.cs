@@ -21,9 +21,10 @@ namespace Audit.WebApi
             return AuditApiAttribute.GetCurrentScope(apiController.HttpContext);
         }
 #elif NET45
-        public static AuditScope GetCurrentAuditScope(this System.Web.Http.ApiController apiController)
+        /// <param name="contextWrapper">The context wrapper instance to use to provide the context. Default is NULL to use the default ContextWrapper.</param>
+        public static AuditScope GetCurrentAuditScope(this System.Web.Http.ApiController apiController, IContextWrapper contextWrapper = null)
         {
-            return AuditApiAttribute.GetCurrentScope(apiController.Request);
+            return AuditApiAttribute.GetCurrentScope(apiController.Request, contextWrapper);
         }
 #endif
         /// <summary>
@@ -37,9 +38,10 @@ namespace Audit.WebApi
             return AuditApiAttribute.GetCurrentScope(httpContext);
         }
 #elif NET45
-        public static AuditScope GetCurrentAuditScope(this HttpRequestMessage httpContext)
+        /// <param name="contextWrapper">The context wrapper instance to use to provide the context. Default is NULL to use the default ContextWrapper.</param>
+        public static AuditScope GetCurrentAuditScope(this HttpRequestMessage httpContext, IContextWrapper contextWrapper = null)
         {
-            return AuditApiAttribute.GetCurrentScope(httpContext);
+            return AuditApiAttribute.GetCurrentScope(httpContext, contextWrapper);
         }
 #endif
     }

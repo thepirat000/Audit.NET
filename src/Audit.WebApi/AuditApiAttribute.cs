@@ -1,4 +1,5 @@
 ﻿#if NET45
+using System;
 using Audit.Core;
 using Audit.Core.Extensions;
 using Newtonsoft.Json;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,10 +49,28 @@ namespace Audit.WebApi
         /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </summary>
         public string EventTypeName { get; set; }
+        /// <summary>
+        /// Gets or sets the class type that will be used as a context wrapper. 
+        /// It must be a class implementing IContextWrapper with a public constructor receiving a single HttpRequestMessage parameter.
+        /// Default is NULL to use the default ContextWrapper class.
+        /// </summary>
+        public Type ContextWrapperType { get; set; }
 
         private const string AuditApiActionKey = "__private_AuditApiAction__";
         private const string AuditApiScopeKey = "__private_AuditApiScope__";
-        
+
+        private IContextWrapper GetContextWrapper(HttpRequestMessage request)
+        {
+            if (ContextWrapperType == null)
+            {
+                return new ContextWrapper(request);
+            }
+            else
+            {
+                return Activator.CreateInstance(ContextWrapperType, new object[] { request }) as IContextWrapper;
+            }
+        }
+
         /// <summary>
         /// Occurs before the action method is invoked.
         /// </summary>
@@ -58,7 +78,7 @@ namespace Audit.WebApi
         private async Task BeforeExecutingAsync(HttpActionContext actionContext)
         {
             var request = actionContext.Request;
-            var contextWrapper = new ContextWrapper(request);
+            var contextWrapper = GetContextWrapper(request);
 
             var auditAction = new AuditApiAction
             {
@@ -98,7 +118,7 @@ namespace Audit.WebApi
         /// <param name="actionExecutedContext">The action executed context.</param>
         private async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext)
         {
-            var contextWrapper = new ContextWrapper(actionExecutedContext.Request);
+            var contextWrapper = GetContextWrapper(actionExecutedContext.Request);
             var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiActionKey);
             var auditScope = contextWrapper.Get<AuditScope>(AuditApiScopeKey);
             if (auditAction != null && auditScope != null)
@@ -144,7 +164,7 @@ namespace Audit.WebApi
             await AfterExecutedAsync(actionExecutedContext);
         }
 
-        protected virtual BodyContent GetRequestBody(ContextWrapper contextWrapper)
+        protected virtual BodyContent GetRequestBody(IContextWrapper contextWrapper)
         {
             var context = contextWrapper.GetHttpContext();
             if (context?.Request?.InputStream != null)
@@ -201,12 +221,11 @@ namespace Audit.WebApi
             }
             return dict;
         }
-
-
-        internal static AuditScope GetCurrentScope(HttpRequestMessage request)
+        
+        internal static AuditScope GetCurrentScope(HttpRequestMessage request, IContextWrapper contextWrapper)
         {
-            var contextWrapper = new ContextWrapper(request);
-            return contextWrapper.Get<AuditScope>(AuditApiScopeKey);
+            var ctx = contextWrapper ?? new ContextWrapper(request);
+            return ctx.Get<AuditScope>(AuditApiScopeKey);
         }
     }
 }

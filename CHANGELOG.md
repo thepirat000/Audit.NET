@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.0.5] - 2018-05-02
+### Modified
+- Audit.WebApi: Adding context wrapper interface IContextWrapper and injection mechanism for Audit.WebApi on full framework. Related to #124.
+
 ## [12.0.4] - 2018-04-30
 ### Modified
 - Audit.NET.AzureDocumentDB: Allowing builders to pass the connection string, database and collection.
