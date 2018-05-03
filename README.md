@@ -316,7 +316,7 @@ The output of the previous examples would be:
 
 ## Discard option
 
-The `AuditScope` object has a `Discard()` method to allow the user to discard an event. 
+The `AuditScope` object has a `Discard()` method to allow the user to discard an event. Discarding an event means it won't be saved.
 
 For example, if you want to avoid saving the audit event under certain condition:
 
