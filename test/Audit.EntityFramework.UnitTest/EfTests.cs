@@ -285,6 +285,7 @@ namespace Audit.EntityFramework.UnitTest
                 .ForContext<BlogsEntities>(x => x.
                     IncludeEntityObjects(true));
             Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {

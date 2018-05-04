@@ -2,20 +2,16 @@
 using System;
 using Audit.Core;
 using Audit.Core.Extensions;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using System.Web.Http.ModelBinding;
 
 namespace Audit.WebApi
 {
@@ -154,13 +150,19 @@ namespace Audit.WebApi
 
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
+            if (Configuration.AuditDisabled)
+            {
+                return;
+            }
             await BeforeExecutingAsync(actionContext);
-            await base.OnActionExecutingAsync(actionContext, cancellationToken); 
         }
 
         public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
         {
-            await base.OnActionExecutedAsync(actionExecutedContext, cancellationToken);
+            if (Configuration.AuditDisabled)
+            {
+                return;
+            }
             await AfterExecutedAsync(actionExecutedContext);
         }
 

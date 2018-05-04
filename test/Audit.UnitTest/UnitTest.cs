@@ -73,14 +73,13 @@ namespace Audit.UnitTest
         {
             var list = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
+                .AuditDisabled(true)
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
                         list.Add(ev);
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
-
-            Audit.Core.Configuration.AuditDisabled = true;
 
             using (var scope = AuditScope.Create("", null, null))
             {

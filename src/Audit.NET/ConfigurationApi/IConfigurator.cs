@@ -8,6 +8,12 @@ namespace Audit.Core.ConfigurationApi
     public interface IConfigurator
     {
         /// <summary>
+        /// Globally disable the audit logs.
+        /// </summary>
+        /// <param name="auditDisabled">A boolean value indicating whether the audit is globally disabled.</param>
+        /// <returns></returns>
+        IConfigurator AuditDisabled(bool auditDisabled);
+        /// <summary>
         /// Use a null provider. No audit events will be saved. Useful for testing purposes or to disable the audit logs.
         /// </summary>
         ICreationPolicyConfigurator UseNullProvider();

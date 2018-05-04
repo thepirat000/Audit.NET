@@ -127,6 +127,11 @@ namespace Audit.Mvc
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            if (Configuration.AuditDisabled)
+            {
+                await next.Invoke();
+                return;
+            }
             await BeforeExecutingAsync(context);
             var actionExecutedContext = await next.Invoke();
             await AfterExecutedAsync(actionExecutedContext);
@@ -134,6 +139,11 @@ namespace Audit.Mvc
 
         public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
+            if (Configuration.AuditDisabled)
+            {
+                await next.Invoke();
+                return;
+            }
             var resultExecutionContext = await next.Invoke();
             await AfterResultAsync(resultExecutionContext);
         }

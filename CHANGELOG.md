@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.0.6] - 2018-05-04
+### Modified
+- Audit.Core: Adding `AuditDisabled()` method to fluent configuration API.
+- Audit.WebApi: Bypassing the filter when audit is globally disabled.
+- Audit.Mvc: Bypassing the filter when audit is globally disabled.
+
 ## [12.0.5] - 2018-05-02
 ### Modified
 - Audit.WebApi: Adding context wrapper interface IContextWrapper and injection mechanism for Audit.WebApi on full framework. Related to #124.

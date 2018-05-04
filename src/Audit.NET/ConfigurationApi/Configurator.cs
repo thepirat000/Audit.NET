@@ -5,6 +5,11 @@ namespace Audit.Core.ConfigurationApi
 {
     public class Configurator : IConfigurator
     {
+        public IConfigurator AuditDisabled(bool auditDisabled)
+        {
+            Configuration.AuditDisabled = auditDisabled;
+            return this;
+        }
         public ICreationPolicyConfigurator UseNullProvider()
         {
             var dataProvider = new NullDataProvider();

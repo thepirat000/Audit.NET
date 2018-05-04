@@ -135,6 +135,11 @@ namespace Audit.WebApi
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            if (Configuration.AuditDisabled)
+            {
+                await next.Invoke();
+                return;
+            }
             await BeforeExecutingAsync(context);
             var actionExecutedContext = await next.Invoke();
             await AfterExecutedAsync(actionExecutedContext);

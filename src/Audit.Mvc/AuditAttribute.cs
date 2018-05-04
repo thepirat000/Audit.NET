@@ -41,6 +41,10 @@ namespace Audit.Mvc
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            if (Configuration.AuditDisabled)
+            {
+                return;
+            }
             var request = filterContext.HttpContext.Request;
             var auditAction = new AuditAction()
             {
@@ -82,6 +86,10 @@ namespace Audit.Mvc
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
+            if (Configuration.AuditDisabled)
+            {
+                return;
+            }
             var auditAction = filterContext.HttpContext.Items[AuditActionKey] as AuditAction;
             if (auditAction != null)
             {
@@ -101,6 +109,10 @@ namespace Audit.Mvc
 
         public override void OnResultExecuted(ResultExecutedContext filterContext)
         {
+            if (Configuration.AuditDisabled)
+            {
+                return;
+            }
             var auditAction = filterContext.HttpContext.Items[AuditActionKey] as AuditAction;
             if (auditAction != null)
             {
