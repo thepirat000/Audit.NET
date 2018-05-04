@@ -102,6 +102,7 @@ The `AuditApi` attribute can be configured with the following properties:
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not. Default is false.
 - **IncludeRequestBody**: Boolean to indicate whether to include the request body or not. Default is false. (Check the following note)
 - **IncludeResponseBody**: Boolean to indicate whether to include response body or not. Default is false.
+- **IncludeResponseBodyFor**: Alternative to IncludeResponseBody, to allow conditionally including the response body only when certain Http Status Codes are returned.
 - **IncludeModelState**: Boolean to indicate whether to include the Model State info or not. Default is false.
 - **SerializeActionParameters**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
  

@@ -12,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using System.Net;
+using System.Linq;
 
 namespace Audit.WebApi
 {
@@ -26,9 +28,17 @@ namespace Audit.WebApi
         /// </summary>
         public bool IncludeModelState { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether the output should include the Http Response body.
+        /// Gets or sets a value indicating whether the output should include the Http Response body
+        /// (Use the alternative IncludeResponseBodyFor to log the body only for certain response status codes).
         /// </summary>
         public bool IncludeResponseBody { get; set; }
+        /// <summary>
+        /// Gets or sets an array of status codes that conditionally indicates when the response body should be included.
+        /// The response body is included only when the request return any of these status codes.
+        /// When set to NULL, the IncludeResponseBody boolean is used to determine whether to include the response body or not.
+        /// When to set to non-NULL, the IncludeResponseBody boolean is ignored.
+        /// </summary>
+        public HttpStatusCode[] IncludeResponseBodyFor { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether the output should include the Http request body string.
         /// </summary>
@@ -51,6 +61,7 @@ namespace Audit.WebApi
         /// Default is NULL to use the default ContextWrapper class.
         /// </summary>
         public Type ContextWrapperType { get; set; }
+
 
         private const string AuditApiActionKey = "__private_AuditApiAction__";
         private const string AuditApiScopeKey = "__private_AuditApiScope__";
@@ -126,7 +137,7 @@ namespace Audit.WebApi
                 {
                     auditAction.ResponseStatus = actionExecutedContext.Response.ReasonPhrase;
                     auditAction.ResponseStatusCode = (int)actionExecutedContext.Response.StatusCode;
-                    if (IncludeResponseBody)
+                    if (ShouldIncludeResponseBody(actionExecutedContext.Response.StatusCode))
                     {
                         var objContent = actionExecutedContext.Response.Content as ObjectContent;
                         auditAction.ResponseBody = new BodyContent
@@ -164,6 +175,15 @@ namespace Audit.WebApi
                 return;
             }
             await AfterExecutedAsync(actionExecutedContext);
+        }
+
+        private bool ShouldIncludeResponseBody(HttpStatusCode responseStatusCode)
+        {
+            if (IncludeResponseBodyFor != null)
+            {
+                return IncludeResponseBodyFor.Contains(responseStatusCode);
+            }
+            return IncludeResponseBody;
         }
 
         protected virtual BodyContent GetRequestBody(IContextWrapper contextWrapper)

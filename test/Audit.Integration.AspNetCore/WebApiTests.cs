@@ -117,5 +117,37 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(1, replaceEvs.Count);
             Assert.IsTrue(replaceEvs[0].Exception.Contains("this is a test exception"));
         }
+
+
+        public async Task Test_WebApi_FilterResponseBody_Included()
+        {
+            var insertEvs = new List<AuditApiAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var c = new HttpClient();
+
+            try
+            {
+                var s = await c.GetStringAsync($"http://localhost:{_port}/api/values/hi/142857");
+                Assert.Fail("Should not be here");
+            }
+            catch (Exception)
+            {
+            }
+
+            // should not log the response body
+            await c.GetStringAsync($"http://localhost:{_port}/api/values/hi/111");
+
+            Assert.AreEqual(2, insertEvs.Count);
+            Assert.AreEqual("this is a bad request test", insertEvs[0].ResponseBody.Value);
+            Assert.IsNull(insertEvs[1].ResponseBody);
+        }
     }
 }

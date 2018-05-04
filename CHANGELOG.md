@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.0.6] - 2018-05-05
+### Modified
+- Audit.WebApi: Adding `IncludeResponseBodyFor` property on `AuditApiAttribute` 
+to allow conditionally Including the Response Body only when certain Http Status codes are returned.
+
+
 ## [12.0.6] - 2018-05-04
 ### Modified
 - Audit.Core: Adding `AuditDisabled()` method to fluent configuration API.

@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into Elasticsearch database</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.Elasticsearch</AssemblyTitle>
-    <VersionPrefix>12.0.6</VersionPrefix>
+    <VersionPrefix>12.0.7</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

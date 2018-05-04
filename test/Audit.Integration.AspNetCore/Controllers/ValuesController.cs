@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,18 @@ namespace Audit.Integration.AspNetCore.Controllers
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
+        }
+
+        [AuditApi(EventTypeName = "api/values", IncludeHeaders = true, IncludeResponseBody = true, IncludeResponseBodyFor = new[] { HttpStatusCode.BadRequest }, IncludeRequestBody = true, IncludeModelState = true)]
+        [HttpGet("hi/{id}")]
+        public async Task<IActionResult> HiGet(int id)
+        {
+            await Task.Delay(1);
+            if (id == 142857)
+            {
+                return BadRequest("this is a bad request test");
+            }
+            return Ok($"hi {id}");
         }
 
         // GET api/values/5

@@ -35,6 +35,10 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_WebApi_FilterResponseBody_Included");
+                await webApiTests.Test_WebApi_FilterResponseBody_Included();
+                Console.WriteLine("PASSED - Test_WebApi_FilterResponseBody_Included");
+
                 Console.WriteLine("START - Test_WebApi_Post_Async");
                 await webApiTests.Test_WebApi_Post_Async();
                 Console.WriteLine("PASSED - Test_WebApi_Post_Async");

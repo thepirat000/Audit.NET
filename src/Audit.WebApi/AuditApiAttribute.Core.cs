@@ -35,6 +35,13 @@ namespace Audit.WebApi
         /// </summary>
         public bool IncludeResponseBody { get; set; }
         /// <summary>
+        /// Gets or sets an array of status codes that conditionally indicates when the response body should be included.
+        /// The response body is included only when the request return any of these status codes.
+        /// When set to NULL, the IncludeResponseBody boolean is used to determine whether to include the response body or not.
+        /// When to set to non-NULL, the IncludeResponseBody boolean is ignored.
+        /// </summary>
+        public HttpStatusCode[] IncludeResponseBodyFor { get; set; }
+        /// <summary>
         /// Gets or sets a value indicating whether the Request Body should be read and incuded on the event.
         /// </summary>
         /// <remarks>
@@ -113,7 +120,7 @@ namespace Audit.WebApi
                         : context.Result is StatusCodeResult ? (context.Result as StatusCodeResult).StatusCode : context.HttpContext.Response.StatusCode;
                     auditAction.ResponseStatusCode = statusCode;
                     auditAction.ResponseStatus = GetStatusCodeString(auditAction.ResponseStatusCode);
-                    if (IncludeResponseBody)
+                    if (ShouldIncludeResponseBody(auditAction.ResponseStatusCode))
                     {
                         var bodyType = context.Result?.GetType().GetFullTypeName();
                         if (bodyType != null)
@@ -143,6 +150,15 @@ namespace Audit.WebApi
             await BeforeExecutingAsync(context);
             var actionExecutedContext = await next.Invoke();
             await AfterExecutedAsync(actionExecutedContext);
+        }
+
+        private bool ShouldIncludeResponseBody(int responseStatusCode)
+        {
+            if (IncludeResponseBodyFor != null)
+            {
+                return IncludeResponseBodyFor.Contains((HttpStatusCode)responseStatusCode);
+            }
+            return IncludeResponseBody;
         }
 
         private object GetResponseBody(IActionResult result)
