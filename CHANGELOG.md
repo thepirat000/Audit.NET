@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [12.0.6] - 2018-05-05
+## [12.0.7] - 2018-05-05
 ### Modified
 - Audit.WebApi: Adding `IncludeResponseBodyFor` and `ExcludeResponseBodyFor` property on `AuditApiAttribute` 
 to allow conditionally Including/Excluding the Response Body from the log, only when certain Http Status codes are returned.
