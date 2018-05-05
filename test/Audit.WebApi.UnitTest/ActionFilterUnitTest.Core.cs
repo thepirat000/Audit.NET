@@ -12,11 +12,64 @@ using System;
 using System.Threading.Tasks;
 using Audit.Core.Providers;
 using NUnit.Framework;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace Audit.WebApi.UnitTest
 {
     public class ActionFilterUnitTest
     {
+        [Test]
+        public async Task Test_AuditApiActionFilter_ShouldIncludeResponseBody()
+        {
+            var testCases = new List<TestExcludeCase>()
+            {
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = null, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = true },
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = null, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = true },
+
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = new [] { HttpStatusCode.OK }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = false },
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = new [] { HttpStatusCode.OK }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = false },
+
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = new [] { HttpStatusCode.BadRequest }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = true },
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = new [] { HttpStatusCode.BadRequest }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = true },
+
+                new TestExcludeCase { ExcludeList = null, IncludeList = new [] { HttpStatusCode.BadRequest }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = true },
+                new TestExcludeCase { ExcludeList = null, IncludeList = new [] { HttpStatusCode.BadRequest }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = true },
+
+                new TestExcludeCase { ExcludeList = null, IncludeList = null, IncludeBoolean = true, ExpectInclude_200 = true, ExpectInclude_400 = true },
+                new TestExcludeCase { ExcludeList = null, IncludeList = null, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = false },
+
+                new TestExcludeCase { ExcludeList = new HttpStatusCode[]{ }, IncludeList = null, IncludeBoolean = true, ExpectInclude_200 = true, ExpectInclude_400 = true },
+                new TestExcludeCase { ExcludeList = new HttpStatusCode[]{ }, IncludeList = null, IncludeBoolean = false, ExpectInclude_200 = true, ExpectInclude_400 = true },
+
+                new TestExcludeCase { ExcludeList = null, IncludeList = new HttpStatusCode[]{ }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = false },
+                new TestExcludeCase { ExcludeList = null, IncludeList = new HttpStatusCode[]{ }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = false },
+
+                new TestExcludeCase { ExcludeList = new HttpStatusCode[]{ }, IncludeList = new [] { HttpStatusCode.BadRequest }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = true },
+                new TestExcludeCase { ExcludeList = new HttpStatusCode[]{ }, IncludeList = new [] { HttpStatusCode.BadRequest }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = true },
+
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = new HttpStatusCode[]{ }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = false },
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.OK }, IncludeList = new HttpStatusCode[]{ }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = false },
+
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.Continue }, IncludeList = new HttpStatusCode[]{ HttpStatusCode.Forbidden }, IncludeBoolean = true, ExpectInclude_200 = false, ExpectInclude_400 = false },
+                new TestExcludeCase { ExcludeList = new [] { HttpStatusCode.Continue }, IncludeList = new HttpStatusCode[]{ HttpStatusCode.Forbidden }, IncludeBoolean = false, ExpectInclude_200 = false, ExpectInclude_400 = false }
+
+            };
+
+            foreach (var testCase in testCases)
+            {
+                var attr = new AuditApiAttribute();
+                attr.ExcludeResponseBodyFor = testCase.ExcludeList;
+                attr.IncludeResponseBodyFor = testCase.IncludeList;
+                attr.IncludeResponseBody = testCase.IncludeBoolean;
+
+                var okIncluded = attr.ShouldIncludeResponseBody((int)HttpStatusCode.OK);
+                var badIncluded = attr.ShouldIncludeResponseBody((int)HttpStatusCode.BadRequest);
+                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {JsonConvert.SerializeObject(testCase)}");
+                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {JsonConvert.SerializeObject(testCase)}");
+            }
+        }
+
         [Test]
         public async Task Test_AuditApiActionFilter_InsertOnEnd()
         {

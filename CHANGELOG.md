@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [12.0.6] - 2018-05-05
 ### Modified
-- Audit.WebApi: Adding `IncludeResponseBodyFor` property on `AuditApiAttribute` 
-to allow conditionally Including the Response Body only when certain Http Status codes are returned.
+- Audit.WebApi: Adding `IncludeResponseBodyFor` and `ExcludeResponseBodyFor` property on `AuditApiAttribute` 
+to allow conditionally Including/Excluding the Response Body from the log, only when certain Http Status codes are returned.
 
 
 ## [12.0.6] - 2018-05-04

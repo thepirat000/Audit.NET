@@ -100,16 +100,17 @@ The `AuditApi` attribute can be configured with the following properties:
   - \{action}: replaced with the action method name.
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not. Default is false.
-- **IncludeRequestBody**: Boolean to indicate whether to include the request body or not. Default is false. (Check the following note)
+- **IncludeRequestBody**: Boolean to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody**: Boolean to indicate whether to include response body or not. Default is false.
-- **IncludeResponseBodyFor**: Alternative to IncludeResponseBody, to allow conditionally including the response body only when certain Http Status Codes are returned.
+- **IncludeResponseBodyFor**: Alternative to _IncludeResponseBody_, to allow conditionally including the response body on the log, when certain Http Status Codes are returned.
+- **ExcludeResponseBodyFor**: Alternative to _IncludeResponseBody_, to allow conditionally excluding the response body from the log, when certain Http Status Codes are returned.
 - **IncludeModelState**: Boolean to indicate whether to include the Model State info or not. Default is false.
 - **SerializeActionParameters**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
  
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
 
 ### NOTE
-When **IncludeRequestBody** is set to true
+When **IncludeRequestBody** is set to true (or when using **IncludeRequestBodyFor**/**ExcludeRequestBodyFor**)
 and you are not using a `[FromBody]` parameter (i.e. reading the request body directly from the Request), 
 make sure you enable rewind on the request body stream, otherwise the controller won't be able to read
 the request body since, by default, it's a forwand-only stream that can be read only once. You can enable rewind on your startup logic with the following code:

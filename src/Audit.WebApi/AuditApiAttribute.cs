@@ -28,17 +28,24 @@ namespace Audit.WebApi
         /// </summary>
         public bool IncludeModelState { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether the output should include the Http Response body
-        /// (Use the alternative IncludeResponseBodyFor to log the body only for certain response status codes).
+        /// Gets or sets a value indicating whether the output should include the Http Response body for all the requests.
+        /// (Use the alternative IncludeResponseBodyFor/ExcludeResponseBodyFor to log the body only for certain response status codes).
         /// </summary>
         public bool IncludeResponseBody { get; set; }
         /// <summary>
         /// Gets or sets an array of status codes that conditionally indicates when the response body should be included.
         /// The response body is included only when the request return any of these status codes.
-        /// When set to NULL, the IncludeResponseBody boolean is used to determine whether to include the response body or not.
+        /// When set to NULL, the IncludeResponseBody boolean is used to determine whether to include the response body or not. Exclude has precedence over Include.
         /// When to set to non-NULL, the IncludeResponseBody boolean is ignored.
         /// </summary>
         public HttpStatusCode[] IncludeResponseBodyFor { get; set; }
+        /// <summary>
+        /// Gets or sets an array of status codes that conditionally indicates when the response body should be excluded.
+        /// The response body is included only when the request return a status code not in this array.
+        /// When set to NULL, the IncludeResponseBodyFor or IncludeResponseBody are used to determine whether to include the response body or not. Exclude has precedence over Include.
+        /// When to set to non-NULL, the IncludeResponseBody boolean is ignored.
+        /// </summary>
+        public HttpStatusCode[] ExcludeResponseBodyFor { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether the output should include the Http request body string.
         /// </summary>
@@ -177,8 +184,20 @@ namespace Audit.WebApi
             await AfterExecutedAsync(actionExecutedContext);
         }
 
-        private bool ShouldIncludeResponseBody(HttpStatusCode responseStatusCode)
+        internal bool ShouldIncludeResponseBody(HttpStatusCode responseStatusCode)
         {
+            if (ExcludeResponseBodyFor != null)
+            {
+                if (ExcludeResponseBodyFor.Contains(responseStatusCode))
+                {
+                    return false;
+                }
+                if (IncludeResponseBodyFor == null)
+                {
+                    // there is an exclude not matched, and there is NO include list
+                    return true;
+                }
+            }
             if (IncludeResponseBodyFor != null)
             {
                 return IncludeResponseBodyFor.Contains(responseStatusCode);
