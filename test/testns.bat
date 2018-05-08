@@ -33,6 +33,11 @@ echo Running...
 
 cd ..
 
+cd Audit.Integration.AspNetCore
+dotnet test --logger:"console;verbosity=normal"
+echo continue...
+cd ..
+
 cd Audit.DynamicProxy.UnitTest
 dotnet test --logger:"console;verbosity=normal"
 echo continue...
@@ -54,12 +59,6 @@ dotnet test --logger:"console;verbosity=normal"
 echo continue...
 
 echo Running...
-cd ..
-
-cd Audit.Integration.AspNetCore
-dotnet run
-echo continue...
-
 cd ..
 
 cd Audit.IntegrationTest

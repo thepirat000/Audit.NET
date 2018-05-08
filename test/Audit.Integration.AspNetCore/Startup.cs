@@ -26,19 +26,6 @@ namespace Audit.Integration.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddMvc(mvc =>
-            {
-                mvc.Filters.Add(new AuditApiGlobalFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "GlobalAudit")
-                    .WithEventType("{verb}.{controller}.{action}")
-                    .IncludeHeaders(ctx => !ctx.ModelState.IsValid)
-                    .IncludeRequestBody()
-                    .IncludeModelState()
-                    .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)));
-            });
-
-
             services.AddMvc(mvc =>
             {
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
@@ -47,7 +34,7 @@ namespace Audit.Integration.AspNetCore
                     .WithEventType("{verb}.{controller}.{action}")
                     .IncludeHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
-                    .IncludeRequestBody());
+                    .IncludeRequestBody()));
             });
         }
 
