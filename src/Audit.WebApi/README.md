@@ -34,9 +34,14 @@ since both assumes AspNet Core.
 
 ## Usage
 
-Decorate with `AuditApi` attribute the Web Api methods/controllers you want to audit. 
+The audit can be enabled in two different ways:
 
-For example:
+1. Statically decorating the controllers to be audited with `AuditApiAttribute`. 
+2. Adding `AuditApiGlobalFilter` as a global action filter. This method allows to dynamically configure the audit settings.
+
+#### 1- Static decoration
+
+Decorate your controller with `AuditApiAttribute`: 
 
 ```c#
 public class UsersController : ApiController
@@ -73,7 +78,7 @@ public class UsersController : ApiController
 }
 ```
 
-To apply the audit filter to all the controllers, you can add the `AuditApiAttribute` as a global filter, for example on your StartUp logic:
+You can also add the `AuditApiAttribute` as a global filter, for example for Asp.NET Core:
 
 ```c#
 public class Startup
@@ -86,6 +91,36 @@ public class Startup
 }
 ```
 
+> For custom configuration it is recommended to use the 
+> `AuditApiGlobalFilter` as a global filter. See next section.
+
+#### 2- Global action filter
+
+Alternatively, you can add one or more `AuditApiGlobalFilter` as global action filters. 
+This method allows to dynamically change the audit settings as functions of the context, via a fluent API.
+
+Note this action filter cannot be used to statically decorate the controllers.
+
+```c#
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc(mvc =>
+        {
+            mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+                .LogActionIf(d => d.ControllerName == "Orders" && d.ActionName != "GetOrder")
+                .WithEventType("{verb}.{controller}.{action}")
+                .IncludeHeaders(ctx => !ctx.ModelState.IsValid)
+                .IncludeRequestBody()
+                .IncludeModelState()
+                .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)));
+        });
+    }
+
+```
+
+
 ## Configuration
 
 ### Output
@@ -94,7 +129,7 @@ The audit events are stored using a _Data Provider_. You can use one of the [ava
 
 ### Settings
 
-The `AuditApi` attribute can be configured with the following properties:
+The `AuditApiAttribute` can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
   - \{controller}: replaced with the controller name.
   - \{action}: replaced with the action method name.
@@ -107,6 +142,18 @@ The `AuditApi` attribute can be configured with the following properties:
 - **IncludeModelState**: Boolean to indicate whether to include the Model State info or not. Default is false.
 - **SerializeActionParameters**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
  
+The `AuditApiGlobalFilter` can be configured with the following methods:
+- **LogActionIf()** / **LogRequestIf()**: A function of the `ContollerActionDescriptor` / `HttpRequest` to determine whether the action should be logged or not.
+- **WithEventType()**: A string (or a function of the executing context that returns a string) that identifies the event type. Can contain the following placeholders: 
+  - \{controller}: replaced with the controller name.
+  - \{action}: replaced with the action method name.
+  - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
+- **IncludeHeaders()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
+- **IncludeRequestBody()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
+- **IncludeResponseBody()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include response body or not. Default is false.
+- **IncludeModelState()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include the Model State info or not. Default is false.
+
+
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
 
 ### NOTE

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Audit.Integration.AspNetCore.Controllers;
+using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Internal;
@@ -24,7 +26,29 @@ namespace Audit.Integration.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+
+            services.AddMvc(mvc =>
+            {
+                mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+                    .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "GlobalAudit")
+                    .WithEventType("{verb}.{controller}.{action}")
+                    .IncludeHeaders(ctx => !ctx.ModelState.IsValid)
+                    .IncludeRequestBody()
+                    .IncludeModelState()
+                    .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)));
+            });
+
+
+            services.AddMvc(mvc =>
+            {
+                mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+                //mvc.AddAuditFilter(config => config
+                    .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "GlobalAudit")
+                    .WithEventType("{verb}.{controller}.{action}")
+                    .IncludeHeaders()
+                    .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
+                    .IncludeRequestBody());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,10 +58,12 @@ namespace Audit.Integration.AspNetCore
             {
                 app.UseDeveloperExceptionPage();
             }
+            
             app.Use(async (context, next) => {
                 context.Request.EnableRewind();
                 await next();
             });
+       
             app.UseMvc();
         }
     }

@@ -63,8 +63,8 @@ namespace Audit.WebApi.UnitTest
                 attr.IncludeResponseBodyFor = testCase.IncludeList;
                 attr.IncludeResponseBody = testCase.IncludeBoolean;
 
-                var okIncluded = attr.ShouldIncludeResponseBody((int)HttpStatusCode.OK);
-                var badIncluded = attr.ShouldIncludeResponseBody((int)HttpStatusCode.BadRequest);
+                var okIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.OK);
+                var badIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.BadRequest);
                 Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {JsonConvert.SerializeObject(testCase)}");
                 Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {JsonConvert.SerializeObject(testCase)}");
             }

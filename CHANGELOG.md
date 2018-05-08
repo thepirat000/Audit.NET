@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.0] - 2018-05-08
+### Added
+- Audit.WebApi: Adding `AuditApiGlobalFilter` a configurable global filter as an alternative
+to decorate the controllers with `AuditApiAttribute`.
+
 ## [12.0.7] - 2018-05-05
 ### Modified
 - Audit.WebApi: Adding `IncludeResponseBodyFor` and `ExcludeResponseBodyFor` property on `AuditApiAttribute` 

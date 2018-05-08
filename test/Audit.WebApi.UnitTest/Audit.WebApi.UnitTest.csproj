@@ -20,6 +20,10 @@
     <DebugType Condition=" '$(TargetFramework)' != 'netcoreapp1.0' And '$(TargetFramework)' != 'netcoreapp2.0'">Full</DebugType>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp1.0|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>

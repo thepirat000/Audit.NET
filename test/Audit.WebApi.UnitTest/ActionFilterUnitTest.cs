@@ -139,10 +139,10 @@ namespace Audit.WebApi.UnitTest
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
+            var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
@@ -229,10 +229,10 @@ namespace Audit.WebApi.UnitTest
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
+            var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
@@ -311,10 +311,10 @@ namespace Audit.WebApi.UnitTest
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
+            var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 
@@ -384,7 +384,7 @@ namespace Audit.WebApi.UnitTest
             {
                 ActionDescriptor = actionDescriptor.Object,
                 ControllerContext = controllerContext,
-
+                
             };
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
@@ -393,10 +393,10 @@ namespace Audit.WebApi.UnitTest
             actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
 
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null);
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
-            var scopeFromController = AuditApiAttribute.GetCurrentScope(controllerContext.Request, null);
+            var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
             await filter.OnActionExecutedAsync(actionExecutedContext, ct.Token);
 

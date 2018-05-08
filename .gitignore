@@ -267,3 +267,5 @@ Docs/
 /src/UpgradeVersion.exe
 /src/StrongName/Audit.NET.snk
 /test/Audit.TestRunnerFull
+/test/Audit.Integration.AspNet
+/test/Audit.Integration.AspNet.Runner
