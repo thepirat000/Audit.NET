@@ -34,7 +34,7 @@ echo Running...
 cd ..
 
 cd Audit.Integration.AspNetCore
-dotnet test --logger:"console;verbosity=normal"
+dotnet run
 echo continue...
 cd ..
 
