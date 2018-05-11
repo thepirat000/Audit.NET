@@ -40,10 +40,10 @@ This library is implemented as an [action filter](https://docs.microsoft.com/en-
 
 The audit action filter can be enabled in two different ways:
 
-1. Statically decorating the controllers/actions to be audited with `AuditApiAttribute`. 
+1. Decorating the controllers/actions to be audited with `AuditApiAttribute` attribute. 
 2. Adding `AuditApiGlobalFilter` as a global action filter. This method allows to dynamically configure the audit settings.
 
-#### 1- Static decoration
+#### 1- AuditApiAttribute decoration
 
 Decorate your controller with `AuditApiAttribute`: 
 
