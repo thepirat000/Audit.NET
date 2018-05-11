@@ -32,11 +32,15 @@ PM> Install-Package Audit.WebApi.Core
 If your project targets the NET Core framework (NetStandard >= 1.6), there is no difference between using `Audit.WebApi` or `Audit.WebApi.Core` 
 since both assumes AspNet Core.
 
+## How it works
+
+This library is implemented as an [action filter](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#action-filters) that intercepts the execution of action methods to generate a detailed audit trail.
+
 ## Usage
 
-The audit can be enabled in two different ways:
+The audit action filter can be enabled in two different ways:
 
-1. Statically decorating the controllers to be audited with `AuditApiAttribute`. 
+1. Statically decorating the controllers/actions to be audited with `AuditApiAttribute`. 
 2. Adding `AuditApiGlobalFilter` as a global action filter. This method allows to dynamically configure the audit settings.
 
 #### 1- Static decoration
