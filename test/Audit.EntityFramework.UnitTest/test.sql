@@ -2,6 +2,13 @@
 --create database ParentChild
 Use [Audit]
 
+drop table [OrderLineAudit]
+drop table [OrderAudit]
+drop table [OrderLine]
+drop table [Order]
+GO
+
+
 Create table [Order]
 (
 	Id BIGINT IDENTITY(1,1) NOT NULL,

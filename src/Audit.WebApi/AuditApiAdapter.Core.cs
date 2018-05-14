@@ -18,7 +18,6 @@ namespace Audit.WebApi
 {
     internal class AuditApiAdapter
     {
-        // TODO check this
         private const string AuditApiActionKey = "__private_AuditApiAction__";
         private const string AuditApiScopeKey = "__private_AuditApiScope__";
         

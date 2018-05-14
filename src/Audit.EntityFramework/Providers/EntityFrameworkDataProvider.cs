@@ -72,7 +72,7 @@ namespace Audit.EntityFramework.Providers
                     if (mappedType != null)
                     {
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);
-                        if (_auditEntityAction != null && _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                        if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
                         {
 #if NET45
                             dbContext.Set(mappedType).Add(auditEntity);
@@ -121,13 +121,15 @@ namespace Audit.EntityFramework.Providers
                     if (mappedType != null)
                     {
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);
-                        _auditEntityAction?.Invoke(efEvent, entry, auditEntity);
+                        if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                        {
 #if NET45
-                        dbContext.Set(mappedType).Add(auditEntity);
+                            dbContext.Set(mappedType).Add(auditEntity);
 #else
-                        await dbContext.AddAsync(auditEntity);
+                            await dbContext.AddAsync(auditEntity);
 #endif
-                        save = true;
+                            save = true;
+                        }
                     }
                 }
             }

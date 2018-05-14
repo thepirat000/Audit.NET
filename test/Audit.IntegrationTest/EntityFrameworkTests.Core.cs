@@ -102,6 +102,44 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(0, orderlineAudits.Count);
             }
         }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityDisabled_Fluent_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeMapper(typeName => Type.GetType(typeName + "Audit"))
+                    .AuditEntityAction((ev, ent, audEnt) =>
+                    {
+                        return false;
+                    })
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending",
+                    OrderLines = new Collection<Orderline>()
+                    {
+                        new Orderline() { Product = "p1: " + id, Quantity = 2 },
+                        new Orderline() { Product = "p2: " + id, Quantity = 3 }
+                    }
+                };
+                await ctx.AddAsync(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
+                var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
+                Assert.AreEqual(0, orderlineAudits.Count);
+            }
+        }
+
         [Test]
         public void Test_EFDataProvider_AuditEntityDisabled()
         {
@@ -146,7 +184,52 @@ namespace Audit.IntegrationTest
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
                 Assert.AreEqual(0, orderlineAudits.Count);
             }
+        }
 
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityDisabledAsync()
+        {
+            var dp = new EntityFrameworkDataProvider();
+            dp.AuditTypeMapper = t =>
+            {
+                if (t == typeof(Order))
+                    return typeof(OrderAudit);
+                if (t == typeof(Orderline))
+                    return typeof(OrderlineAudit);
+                return null;
+            };
+
+            dp.AuditEntityAction = (ev, entry, obj) =>
+            {
+                // return false to avoid saving
+                return false;
+            };
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(dp);
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending",
+                    OrderLines = new Collection<Orderline>()
+                    {
+                        new Orderline() { Product = "p1: " + id, Quantity = 2 },
+                        new Orderline() { Product = "p2: " + id, Quantity = 3 }
+                    }
+                };
+                await ctx.AddAsync(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
+                var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
+                Assert.AreEqual(0, orderlineAudits.Count);
+            }
         }
 
         [Test]
