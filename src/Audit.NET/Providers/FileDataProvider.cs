@@ -20,7 +20,7 @@ namespace Audit.Core.Providers
     /// </remarks>
     public class FileDataProvider : AuditDataProvider
     {
-        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        public JsonSerializerSettings JsonSettings { get; set; } = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
             NullValueHandling = NullValueHandling.Ignore,
@@ -96,7 +96,7 @@ namespace Audit.Core.Providers
         {
             var fullPath = path.ToString();
             var json = File.ReadAllText(fullPath);
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json, JsonSettings);
         }
 
         public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent)
@@ -115,7 +115,7 @@ namespace Audit.Core.Providers
         {
             using (FileStream file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, true))
             {
-                var jObject = JObject.FromObject(auditEvent);
+                var jObject = JObject.FromObject(auditEvent, JsonSerializer.Create(JsonSettings));
                 using (var sw = new StreamWriter(file))
                 {
                     using (var jw = new JsonTextWriter(sw))
@@ -135,7 +135,7 @@ namespace Audit.Core.Providers
                     using (var jr = new JsonTextReader(sr))
                     {
                         var jObject = await JObject.LoadAsync(jr);
-                        return jObject.ToObject<T>();
+                        return jObject.ToObject<T>(JsonSerializer.Create(JsonSettings));
                     }
                 }
             }
