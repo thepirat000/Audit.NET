@@ -1,5 +1,6 @@
 using System;
 using Audit.Core.Providers;
+using Newtonsoft.Json;
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -37,7 +38,7 @@ namespace Audit.Core.ConfigurationApi
         {
             var fileLogConfig = new FileLogProviderConfigurator();
             config.Invoke(fileLogConfig);
-            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix, fileLogConfig._directoryPathBuilder, fileLogConfig._filenameBuilder);
+            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix, fileLogConfig._directoryPathBuilder, fileLogConfig._filenameBuilder, fileLogConfig._jsonSettings);
         }
         public ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider)
         {
@@ -64,15 +65,22 @@ namespace Audit.Core.ConfigurationApi
         }
 #endif
         public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "", 
-            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null)
+            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null,
+            JsonSerializerSettings jsonSettings = null)
         {
-            Configuration.DataProvider = new FileDataProvider()
+            var fdp = new FileDataProvider()
             {
                 DirectoryPath = directoryPath,
                 FilenamePrefix = filenamePrefix,
                 DirectoryPathBuilder = directoryPathBuilder,
                 FilenameBuilder = filenameBuilder
             };
+            if (jsonSettings != null)
+            {
+                fdp.JsonSettings = jsonSettings;
+            }
+            Configuration.DataProvider = fdp;
+
             return new CreationPolicyConfigurator();
         }
     }

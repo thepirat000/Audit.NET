@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 
 namespace Audit.Core.ConfigurationApi
@@ -7,6 +8,12 @@ namespace Audit.Core.ConfigurationApi
     /// </summary>
     public interface IFileLogProviderConfigurator
     {
+        /// <summary>
+        /// Specifies the JSON settings to use to serialize the audit events.
+        /// </summary>
+        /// <param name="jsonSettings">JSON settings to use.</param>
+        IFileLogProviderConfigurator JsonSettings(JsonSerializerSettings jsonSettings);
+
         /// <summary>
         /// Specifies the directory where to store the audit log files. This setting is ignored when using DirectoryBuilder.
         /// </summary>

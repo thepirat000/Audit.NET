@@ -81,6 +81,14 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            public async Task TestFileAsync()
+            {
+                SetFileSettings();
+                await TestUpdateAsync();
+            }
+
+
+            [Test]
             [Category("AzureBlob")]
             public void TestAzureBlob()
             {
@@ -503,7 +511,8 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseFileLogProvider(fl => fl
                         .FilenameBuilder(_ => $"{_.Environment.UserName}_{DateTime.Now.Ticks}.json")
-                        .DirectoryBuilder(_ => $@"C:\Temp\Logs\{DateTime.Now:yyyy-MM-dd}"))
+                        .DirectoryBuilder(_ => $@"C:\Temp\Logs\{DateTime.Now:yyyy-MM-dd}")
+                        .JsonSettings(new JsonSerializerSettings()))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 

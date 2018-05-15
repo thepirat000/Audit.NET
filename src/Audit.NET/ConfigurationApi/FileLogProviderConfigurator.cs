@@ -1,13 +1,21 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Audit.Core.ConfigurationApi
 {
     public class FileLogProviderConfigurator : IFileLogProviderConfigurator
     {
+        internal JsonSerializerSettings _jsonSettings = null;
         internal string _directoryPath = "";
         internal string _filenamePrefix = "";
         internal Func<AuditEvent, string> _filenameBuilder;
         internal Func<AuditEvent, string> _directoryPathBuilder;
+
+        public IFileLogProviderConfigurator JsonSettings(JsonSerializerSettings jsonSettings)
+        {
+            _jsonSettings = jsonSettings;
+            return this;
+        }
 
         public IFileLogProviderConfigurator Directory(string directoryPath)
         {

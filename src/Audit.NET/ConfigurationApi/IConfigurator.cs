@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 
 namespace Audit.Core.ConfigurationApi
@@ -37,8 +38,10 @@ namespace Audit.Core.ConfigurationApi
         /// <param name="filenamePrefix">Specifies the filename prefix to use in the audit log files.</param>
         /// <param name="directoryPathBuilder">Specifies the directory builder to get the path where to store the audit log files. If this setting is provided, directoryPath setting will be ignored.</param>
         /// <param name="filenameBuilder">Specifies the filename builder to get the filename to store the audit log for an event.</param>
-        ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = null, string filenamePrefix = null, Func<AuditEvent, string> directoryPathBuilder = null,
-            Func<AuditEvent, string> filenameBuilder = null);
+        /// <param name="jsonSettings">Specifies the JSON settings to use to serialize the audit events.</param>
+        ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "",
+            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null,
+            JsonSerializerSettings jsonSettings = null);
 #if NET45 || NETSTANDARD2_0
         /// <summary>
         /// Store the events in the windows Event Log.
