@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.3] - 2018-05-15
+### Modified
+- Audit.NET.AzureDocumentDB: Fix #126: AzureDocumentDb not respecting the global JsonSettings.
+
 ## [12.1.2] - 2018-05-15
 ### Modified
 - Audit.Core: Fix bug #126: FileDataProvider not respecting JsonSettings. Exposed JsonSettings as a property of the FileDataProvider and fixed async methods.

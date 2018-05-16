@@ -170,7 +170,7 @@ namespace Audit.AzureDocumentDB.Providers
                     ConnectionProtocol = Protocol.Tcp
                 };
 
-            DocumentClient = new DocumentClient(new Uri(ConnectionStringBuilder?.Invoke(auditEvent)), AuthKeyBuilder?.Invoke(auditEvent), policy);
+            DocumentClient = new DocumentClient(new Uri(ConnectionStringBuilder?.Invoke(auditEvent)), AuthKeyBuilder?.Invoke(auditEvent), Configuration.JsonSettings, policy);
             Task.Run(() => { ((DocumentClient)DocumentClient).OpenAsync(); });
 
             return DocumentClient;
@@ -181,7 +181,7 @@ namespace Audit.AzureDocumentDB.Providers
             return UriFactory.CreateDocumentCollectionUri(DatabaseBuilder?.Invoke(auditEvent), CollectionBuilder.Invoke(auditEvent));
         }
 
-        #region Events Query        
+#region Events Query        
         /// <summary>
         /// Returns an IQueryable that enables the creation of queries against the audit events stored on Azure Document DB.
         /// </summary>
@@ -232,6 +232,6 @@ namespace Audit.AzureDocumentDB.Providers
             var collectionUri = GetCollectionUri(auditEvent);
             return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions);
         }
-        #endregion
+#endregion
     }
 }

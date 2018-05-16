@@ -23,14 +23,10 @@ namespace Audit.IntegrationTest
 {
     public class IntegrationTests
     {
-        private const string AzureBlobCnnString = "xxx";
-        private const string AzureDocDbUrl = "https://thepirat.documents.azure.com:443/";
-        private const string AzureDocDbAuthKey = "x==";
 
         [TestFixture]
         public class AuditTests
         {
-
 #if NET451
             [Test]
             public void Test_StrongName_PublicToken()
@@ -57,7 +53,7 @@ namespace Audit.IntegrationTest
             [Category("AzureDocDb")]
             public void TestAzure()
             {
-                SetAzureSettings();
+                SetAzureDocDbSettings();
                 TestUpdate();
                 TestInsert();
                 TestDelete();
@@ -67,7 +63,7 @@ namespace Audit.IntegrationTest
             [Category("AzureDocDb")]
             public async Task TestAzureAsync()
             {
-                SetAzureSettings();
+                SetAzureDocDbSettings();
                 await TestUpdateAsync();
             }
 
@@ -112,7 +108,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                    .UseAzureBlobStorage(config => config
-                       .ConnectionString(AzureBlobCnnString)
+                       .ConnectionString(AzureSettings.AzureBlobCnnString)
                        .ContainerNameBuilder(ev => ev.EventType)
                        .BlobNameBuilder(ev => $"{ev.EventType}_{Guid.NewGuid()}.json"))
                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
@@ -131,7 +127,7 @@ namespace Audit.IntegrationTest
                 });
 
                 // Assert events are on correct container 
-                var storageAccount = CloudStorageAccount.Parse(AzureBlobCnnString);
+                var storageAccount = CloudStorageAccount.Parse(AzureSettings.AzureBlobCnnString);
                 var blobClient = storageAccount.CreateCloudBlobClient();
                 for (int i = 1; i <= 3; i++)
                 {
@@ -496,12 +492,12 @@ namespace Audit.IntegrationTest
             }
 #endif
 
-            public void SetAzureSettings()
+            public void SetAzureDocDbSettings()
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
-                        .ConnectionString(ev => AzureDocDbUrl)
-                        .AuthKey(ev => AzureDocDbAuthKey))
+                        .ConnectionString(ev => AzureSettings.AzureDocDbUrl)
+                        .AuthKey(ev => AzureSettings.AzureDocDbAuthKey))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
@@ -520,7 +516,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseAzureBlobStorage(config => config
-                        .ConnectionString(AzureBlobCnnString)
+                        .ConnectionString(AzureSettings.AzureBlobCnnString)
                         //.ContainerName("event")
                         .ContainerNameBuilder(ev => $"events{DateTime.Today:yyyyMMdd}")
                         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
@@ -658,5 +654,12 @@ namespace Audit.IntegrationTest
             Submitted = 4,
             Cancelled = 10
         }
+
+        public class Loop
+        {
+            public int Id { get; set; }
+            public Loop Inner { get; set; }
+        }
+
     }
 }
