@@ -71,9 +71,26 @@ The `AuditAttribute` can be configured with the following properties:
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not.
 - **IncludeModel**: Boolean to indicate whether to include the View Model or not.
+- **IncludeRequestBody**: Boolean to indicate whether to include or exclude the request body from the logs. Default is false. (Check following note)
+- **IncludeResponseBody**: Boolean to indicate whether to include response body or not. Default is false.
 - **SerializeActionParameters**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
+
+### NOTE
+When **IncludeRequestBody** is set to true you may need to enable rewind on the request body stream, otherwise the controller won't be able to read
+the request body more than once (by default it's a forwand-only stream that can be read only once). You can enable rewind on your startup logic with the following startup code:
+
+```c#
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    app.Use(async (context, next) => { 
+        context.Request.EnableRewind();
+        await next();
+    });
+}
+```
+
 
 ## Output details
 
@@ -90,6 +107,8 @@ The following table describes the Audit.Mvc output fields:
 | **ViewPath** | string | View physical path (if any) |
 | **FormVariables** | Object | Form-data input variables passed to the action |
 | **ActionParameters** | Object | The action parameters passed |
+| **RequestBody** | [BodyContent](#bodycontent) | The request body (optional) |
+| **ResponseBody** | [BodyContent](#bodycontent) | The response body (optional) |
 | **UserName** | string | Username on the HttpContext Identity |
 | **RequestUrl** | string | URL of the request |
 | **IpAddress** | string | Client IP address |
@@ -101,6 +120,13 @@ The following table describes the Audit.Mvc output fields:
 | **ModelStateErrors** | string | Error description when the model is invalid |
 | **RedirectLocation** | string | The redirect location (if any) |
 | **Exception** | string | The exception thrown details (if any) |
+
+### [BodyContent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/BodyContent.cs)
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Type** | string | The body type reported |
+| **Length** | long? | The length of the body if reported |
+| **Value** | Object | The body content |
 
 ## Customization
 

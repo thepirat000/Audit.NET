@@ -19,6 +19,10 @@ namespace Audit.Mvc
         public IDictionary<string, string> FormVariables { get; set; }
         [JsonProperty(Order = 20)]
         public IDictionary<string, object> ActionParameters { get; set; }
+        [JsonProperty(Order = 22, NullValueHandling = NullValueHandling.Ignore)]
+        public BodyContent RequestBody { get; set; }
+        [JsonProperty(Order = 23, NullValueHandling = NullValueHandling.Ignore)]
+        public BodyContent ResponseBody { get; set; }
         [JsonProperty(Order = 25)]
         public string UserName { get; set; }
         [JsonProperty(Order = 30)]

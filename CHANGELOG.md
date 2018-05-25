@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.4] - 2018-05-25
+### Added
+- Audit.Mvc and Audit.Mvc.Core: Adding request and response bodies to the logs, optional via IncludeRequestBody and IncludeResponseBody properties on the action filter attribute.
+
 ## [12.1.3] - 2018-05-15
 ### Modified
 - Audit.NET.AzureDocumentDB: Fix #126: AzureDocumentDb not respecting the global JsonSettings.

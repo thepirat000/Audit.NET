@@ -1,8 +1,9 @@
 ﻿#if NET45
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using Audit.Core;
@@ -20,9 +21,22 @@ namespace Audit.Mvc
         /// </summary>
         public bool IncludeModel { get; set; }
         /// <summary>
+        /// Gets or sets a value indicating whether the Request Body content should be read and incuded.
+        /// </summary>
+        /// <remarks>
+        /// When IncludeResquestBody is set to true and you are not using a [FromBody] parameter (i.e.reading the request body directly from the Request)
+        /// make sure you enable rewind on the request body stream, otherwise the controller won't be able to read the request body since, by default, 
+        /// it's a forwand-only stream that can be read only once. 
+        /// </remarks>
+        public bool IncludeRequestBody { get; set; }
+        /// <summary>
         /// Gets or sets a value indicating whether the output should include the Http Request Headers.
         /// </summary>
         public bool IncludeHeaders { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the output should include the Http Response body content.
+        /// </summary>
+        public bool IncludeResponseBody { get; set; }
         /// <summary>
         /// Gets or sets a value indicating the event type name
         /// Can contain the following placeholders:
@@ -59,6 +73,7 @@ namespace Audit.Mvc
                 FormVariables = ToDictionary(request.Form),
                 Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
 #endif
+                RequestBody = IncludeRequestBody ? GetRequestBody(filterContext.HttpContext) : null,
                 HttpMethod = request.HttpMethod,
                 ActionName = filterContext.ActionDescriptor?.ActionName,
                 ControllerName = filterContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
@@ -97,6 +112,7 @@ namespace Audit.Mvc
                 auditAction.Model = IncludeModel ? filterContext.Controller?.ViewData.Model : null;
                 auditAction.ModelStateValid = IncludeModel ? filterContext.Controller?.ViewData.ModelState.IsValid : null;
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
+                auditAction.ResponseBody = IncludeResponseBody ? GetResponseBody(filterContext.Result) : null;
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
@@ -124,6 +140,7 @@ namespace Audit.Mvc
                 auditAction.ResponseStatus = filterContext.HttpContext.Response.Status;
                 auditAction.ResponseStatusCode = filterContext.HttpContext.Response.StatusCode;
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
+                auditAction.ResponseBody = IncludeResponseBody ? GetResponseBody(filterContext.Result) : null;
             }
             var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
@@ -160,6 +177,78 @@ namespace Audit.Mvc
                 dict.Add(k, col[k]);
             }
             return dict;
+        }
+
+        protected virtual BodyContent GetRequestBody(HttpContextBase context)
+        {
+            if (context?.Request?.InputStream != null)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    context.Request.InputStream.Seek(0, SeekOrigin.Begin);
+                    context.Request.InputStream.CopyTo(stream);
+                    var body = Encoding.UTF8.GetString(stream.ToArray());
+                    return new BodyContent
+                    {
+                        Type = context.Request.ContentType,
+                        Length = context.Request.ContentLength,
+                        Value = body
+                    };
+                }
+            }
+            return null;
+        }
+
+        private BodyContent GetResponseBody(ActionResult result)
+        {
+            var content = new BodyContent() { Type = result.GetType().Name };
+            if (result is ContentResult or)
+            {
+                content.Length = or.Content?.Length;
+                content.Type = or.ContentType;
+                content.Value = or.Content;
+            }
+            else if (result is EmptyResult er)
+            {
+                content.Value = "";
+            }
+            else if (result is FileResult fr)
+            {
+                content.Value = fr.FileDownloadName;
+            }
+            else if (result is JsonResult jr)
+            {
+                content.Value = jr.Data;
+            }
+            else if (result is JavaScriptResult jsr)
+            {
+                content.Value = jsr.Script;
+            }
+            else if (result is ContentResult cr)
+            {
+                content.Value = cr.Content;
+            }
+            else if (result is RedirectResult rr)
+            {
+                content.Value = rr.Url;
+            }
+            else if (result is RedirectToRouteResult rtr)
+            {
+                content.Value = rtr.RouteName;
+            }
+            else if (result is PartialViewResult pvr)
+            {
+                content.Value = pvr.ViewName;
+            }
+            else if (result is ViewResultBase vr)
+            {
+                content.Value = vr.ViewName;
+            }
+            else
+            {
+                content.Value = result.ToString();
+            }
+            return content;
         }
 
         internal static AuditScope GetCurrentScope(HttpContextBase httpContext)
