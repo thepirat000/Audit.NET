@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.5] - 2018-06-02
+### Modified
+- Audit.EntityFramework and Audit.EntityFramework.Core: Fix #128 to be compatible with new EF Core 2.1 lazy loading feature.
+
 ## [12.1.4] - 2018-05-25
 ### Added
 - Audit.Mvc and Audit.Mvc.Core: Adding request and response bodies to the logs, optional via IncludeRequestBody and IncludeResponseBody properties on the action filter attribute.

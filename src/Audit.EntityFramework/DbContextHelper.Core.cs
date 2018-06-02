@@ -149,8 +149,8 @@ namespace Audit.EntityFramework
 
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
-#if NETSTANDARD2_0
-            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entity.GetType());
+#if NETSTANDARD2_0 || NET461
+            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
 #else
             IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
 #endif
