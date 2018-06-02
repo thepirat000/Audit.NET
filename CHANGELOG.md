@@ -4,8 +4,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [12.1.5] - 2018-06-02
+### Added
+- Audit.NET.EventLog.Core: Created this new assembly/package to output events to the windows eventlog when targeting net core 2.0.
+ 
 ### Modified
 - Audit.EntityFramework and Audit.EntityFramework.Core: Fix #128 to be compatible with new EF Core 2.1 lazy loading feature.
+- Audit.NET: Removing Microsoft.Windows.Compatibility dependency from Audit.NET package
 
 ## [12.1.4] - 2018-05-25
 ### Added

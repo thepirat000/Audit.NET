@@ -1,10 +1,12 @@
 ﻿using Audit.Core;
 using System;
 using Moq;
+using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
 using System.Collections.Generic;
 using Audit.Core.Extensions;
+using Audit.Core.ConfigurationApi;
 using System.Diagnostics;
 using NUnit.Framework;
 using System.Threading.Tasks;

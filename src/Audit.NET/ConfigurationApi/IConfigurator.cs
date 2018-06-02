@@ -42,7 +42,7 @@ namespace Audit.Core.ConfigurationApi
         ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "",
             Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null,
             JsonSerializerSettings jsonSettings = null);
-#if NET45 || NETSTANDARD2_0
+#if NET45
         /// <summary>
         /// Store the events in the windows Event Log.
         /// </summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Audit.Core;
 using Audit.Core.Providers;
+using Audit.Core.ConfigurationApi;
 using Audit.Udp.Providers;
 using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;

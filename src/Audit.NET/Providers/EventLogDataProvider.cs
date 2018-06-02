@@ -1,9 +1,9 @@
-﻿using System;
+﻿#if NET45 || EVENTLOG_CORE
+using System;
 using System.Diagnostics;
 
 namespace Audit.Core.Providers
 {
-#if NET45 || NETSTANDARD2_0
     /// <summary>
     /// Writes to the windows event log
     /// </summary>
@@ -56,5 +56,5 @@ namespace Audit.Core.Providers
             InsertEvent(auditEvent);
         }
     }
-#endif
 }
+#endif

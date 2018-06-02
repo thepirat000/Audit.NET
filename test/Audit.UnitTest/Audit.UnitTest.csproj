@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.0" />
   </ItemGroup>
