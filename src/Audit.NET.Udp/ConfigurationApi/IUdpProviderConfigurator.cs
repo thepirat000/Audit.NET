@@ -18,8 +18,8 @@ namespace Audit.Udp.Configuration
         /// <summary>
         /// Specifies the address of the remote host or multicast group to which the underlying UdpClient should send the audit events.
         /// </summary>
-        /// <param name="ipString">The IP string.</param>
-        IUdpProviderConfigurator RemoteAddress(string ipString);
+        /// <param name="address">The host name or IP address.</param>
+        IUdpProviderConfigurator RemoteAddress(string address);
         /// <summary>
         /// Specifies the port of the remote host or multicast group to which the underlying UdpClient should send the audit events.
         /// </summary>

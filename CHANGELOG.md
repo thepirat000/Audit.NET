@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.6] - 2018-06-04
+### Modified
+- Audit.NET.Udp: Fix #129. Allow specifying host name on the Udp Configuration as an alternative to the IP address. 
+
 ## [12.1.5] - 2018-06-02
 ### Added
 - Audit.NET.EventLog.Core: Created this new assembly/package to output events to the windows eventlog when targeting net core 2.0.

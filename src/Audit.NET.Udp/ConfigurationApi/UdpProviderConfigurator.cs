@@ -1,7 +1,9 @@
 ﻿using Audit.Core;
 using Audit.Udp.Providers;
 using System;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Audit.Udp.Configuration
 {
@@ -18,9 +20,10 @@ namespace Audit.Udp.Configuration
             _remoteAddress = address;
             return this;
         }
-        public IUdpProviderConfigurator RemoteAddress(string ipString)
+
+        public IUdpProviderConfigurator RemoteAddress(string address)
         {
-            _remoteAddress = IPAddress.Parse(ipString);
+            _remoteAddress = GetIPAddress(address);
             return this;
         }
 
@@ -46,6 +49,16 @@ namespace Audit.Udp.Configuration
         {
             _customDeserializer = customDeserializer;
             return this;
+        }
+
+        internal static IPAddress GetIPAddress(string address)
+        {
+            if (!IPAddress.TryParse(address, out IPAddress addr))
+            {
+                var hostEntry = Dns.GetHostEntryAsync(address).GetAwaiter().GetResult();
+                addr = hostEntry.AddressList.First(x => x.AddressFamily == AddressFamily.InterNetwork);
+            }
+            return addr;
         }
     }
 }

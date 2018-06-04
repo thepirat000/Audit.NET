@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Audit.Udp.Configuration;
 
 namespace Audit.UnitTest
 {
@@ -16,12 +17,13 @@ namespace Audit.UnitTest
         [Test]
         [TestCase("225.0.0.1", 2222, true)]
         [TestCase("127.0.0.1", 12366, false)]
+        [TestCase("localhost", 12366, false)]
         public void Test_UdpDataProvider_BasicTest(string ip, int port, bool multicast)
         {
             stop = false;
             events.Clear();
             var p = new Udp.Providers.UdpDataProvider();
-            p.RemoteAddress = IPAddress.Parse(ip);
+            p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
             var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
@@ -46,19 +48,23 @@ namespace Audit.UnitTest
         [Test]
         [TestCase("225.0.0.1", 2223, true)]
         [TestCase("127.0.0.1", 12367, false)]
+        [TestCase("localhost", 12367, false)]
         public async Task Test_UdpDataProvider_BasicTest_Async(string ip, int port, bool multicast)
         {
             stop = false;
             events.Clear();
-            var p = new Udp.Providers.UdpDataProvider();
-            p.RemoteAddress = IPAddress.Parse(ip);
-            p.RemotePort = port;
+
+            Audit.Core.Configuration.Setup()
+                .UseUdp(_ => _
+                    .RemoteAddress(ip)
+                    .RemotePort(port));
+
             var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
             await Task.Delay(1000);
-            using (var scope = await AuditScope.CreateAsync("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd, p))
+            using (var scope = await AuditScope.CreateAsync("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd))
             {
                 Task.Delay(100).Wait();
                 await scope.SaveAsync();
@@ -79,10 +85,10 @@ namespace Audit.UnitTest
         private static object locker = new object();
         private static List<AuditEvent> events = new List<AuditEvent>();
 
-        private void Listen(ManualResetEvent re, string ipAddress, int port, bool isMulticast)
+        private void Listen(ManualResetEvent re, string address, int port, bool isMulticast)
         {
             var dp = new Udp.Providers.UdpDataProvider();
-            dp.RemoteAddress = IPAddress.Parse(ipAddress);
+            dp.RemoteAddress = UdpProviderConfigurator.GetIPAddress(address);
             dp.RemotePort = port;
             dp.MulticastMode = isMulticast ? Udp.Providers.MulticastMode.Enabled : Udp.Providers.MulticastMode.Disabled;
             re.Set();
@@ -99,13 +105,14 @@ namespace Audit.UnitTest
         [Test]
         [TestCase("225.0.0.1", 2227, true, 10)]
         [TestCase("127.0.0.1", 12369, false, 10)]
+        [TestCase("localhost", 12369, false, 10)]
         [TestCase("226.1.2.15", 5569, true, 50)]
         public void Test_UdpDataProvider_MultiThread(string ip, int port, bool multicast, int N)
         {
             stop = false;
             events.Clear();
             var p = new Udp.Providers.UdpDataProvider();
-            p.RemoteAddress = IPAddress.Parse(ip);
+            p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
             var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
@@ -147,7 +154,7 @@ namespace Audit.UnitTest
             stop = false;
             events.Clear();
             var p = new Udp.Providers.UdpDataProvider();
-            p.RemoteAddress = IPAddress.Parse(ip);
+            p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
 
             var cts = new CancellationTokenSource();
@@ -170,7 +177,7 @@ namespace Audit.UnitTest
         public void Test_UdpDataProvider_PacketOverflow(string ip, int port, bool multicast)
         {
             var p = new Udp.Providers.UdpDataProvider();
-            p.RemoteAddress = IPAddress.Parse(ip);
+            p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
             var target = Enumerable.Range(1, 66000).Select(_ => (byte)255).ToArray();
             Assert.Throws<SocketException>(() =>
