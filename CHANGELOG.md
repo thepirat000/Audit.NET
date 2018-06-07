@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.7] - 2018-06-06
+### Modified
+- Audit.WebApi and Audit.WebApi.Core: Fix #131. Swallow `InvalidDataException` when accessing the Request.Form getter and return NULL is case of that type of exception.
+Only for the asp.net core version
+
 ## [12.1.6] - 2018-06-04
 ### Modified
 - Audit.NET.Udp: Fix #129. Allow specifying host name on the Udp Configuration as an alternative to the IP address. 

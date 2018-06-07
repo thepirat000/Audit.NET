@@ -23,10 +23,15 @@ namespace Audit.Integration.AspNetCore.Controllers
         }
 
         [HttpPost("GlobalAudit")]
-        //[ActionName("GlobalName")]
         public async Task<IActionResult> GlobalAudit([FromBody]Request request)
         {
             return Ok(request.Value);
+        }
+
+        [HttpPost("TestForm")]
+        public async Task<IActionResult> TestForm()
+        {
+            return Ok();
         }
 
         [AuditApi(EventTypeName = "api/values", IncludeHeaders = true, IncludeResponseBody = true, IncludeResponseBodyFor = new[] { HttpStatusCode.BadRequest }, IncludeRequestBody = true, IncludeModelState = true)]

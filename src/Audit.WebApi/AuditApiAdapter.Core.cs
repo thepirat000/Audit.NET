@@ -1,4 +1,5 @@
 ﻿#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+using System;
 using Audit.Core;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace Audit.WebApi
                 IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = string.Format("{0}://{1}{2}", httpContext.Request.Scheme, httpContext.Request.Host, httpContext.Request.Path),
                 HttpMethod = actionContext.HttpContext.Request.Method,
-                FormVariables = httpContext.Request.HasFormContentType ? ToDictionary(httpContext.Request.Form) : null,
+                FormVariables = GetFormVariables(httpContext),
                 Headers = includeHeaders ? ToDictionary(httpContext.Request.Headers) : null,
                 ActionName = actionDescriptior != null ? actionDescriptior.ActionName : actionContext.ActionDescriptor.DisplayName,
                 ControllerName = actionDescriptior != null ? actionDescriptior.ControllerName : null,
@@ -54,6 +55,25 @@ namespace Audit.WebApi
             var auditScope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior.MethodInfo });
             httpContext.Items[AuditApiActionKey] = auditAction;
             httpContext.Items[AuditApiScopeKey] = auditScope;
+        }
+
+        private IDictionary<string, string> GetFormVariables(HttpContext context)
+        {
+            if (!context.Request.HasFormContentType)
+            {
+                return null;
+            }
+            IFormCollection formCollection;
+            try
+            {
+                formCollection = context.Request.Form;
+            }
+            catch (InvalidDataException)
+            {
+                // InvalidDataException could be thrown if the form count exceeds the limit, etc
+                return null;
+            }
+            return ToDictionary(formCollection);
         }
 
         /// <summary>

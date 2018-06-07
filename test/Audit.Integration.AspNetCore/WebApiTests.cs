@@ -26,6 +26,42 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("[\"value1\",\"value2\"]", s);
         }
 
+        public async Task Test_WebApi_FormCollectionLimit_Async()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/values/TestForm";
+            var nvc = new List<KeyValuePair<string, string>>();
+            nvc.Add(new KeyValuePair<string, string>("a", "1"));
+            nvc.Add(new KeyValuePair<string, string>("b", "2"));
+
+            
+            var client = new HttpClient();
+            var req = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(nvc) };
+            var res = await client.SendAsync(req);
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(200, insertEvs[0].GetWebApiAuditAction().ResponseStatusCode);
+            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().FormVariables);
+
+            nvc.Add(new KeyValuePair<string, string>("c", "3"));
+            req = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(nvc) };
+            res = await client.SendAsync(req);
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(2, insertEvs.Count);
+            // Form should be null since the api is limited to 2
+            Assert.IsNull(insertEvs[1].GetWebApiAuditAction().FormVariables);
+        }
+
         public async Task Test_WebApi_GlobalFilter_Async()
         {
             var insertEvs = new List<AuditEvent>();

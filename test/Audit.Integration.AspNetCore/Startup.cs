@@ -6,6 +6,7 @@ using Audit.Integration.AspNetCore.Controllers;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,11 +27,16 @@ namespace Audit.Integration.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueCountLimit = 2;
+            });
+
             services.AddMvc(mvc =>
             {
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                 //mvc.AddAuditFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "GlobalAudit")
+                    .LogActionIf(d => d.ControllerName == "Values" && (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm"))
                     .WithEventType("{verb}.{controller}.{action}")
                     .IncludeHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)

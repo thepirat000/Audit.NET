@@ -3,7 +3,6 @@ using Audit.Core;
 using Audit.WebApi.ConfigurationApi;
 #if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using Microsoft.AspNetCore.Http;
-using System;
 #elif NET45
 using System.Web;
 using System.Net.Http;
