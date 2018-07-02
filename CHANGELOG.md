@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.8] - 2018-07-01
+### Modified
+- Audit.EntityFramework: Fix #127: (For EF 6) Foreign keys are set to NULL when deleting a relation
+entity (many-to-many), this was making NULL the column values holding the foreign key. Adding
+a workaround to avoid updating the foreign column values from the foreign key values that are set to NULL by EF.
+
 ## [12.1.7] - 2018-06-06
 ### Modified
 - Audit.WebApi and Audit.WebApi.Core: Fix #131. Swallow `InvalidDataException` when accessing the Request.Form getter and return NULL is case of that type of exception.
