@@ -170,6 +170,13 @@ namespace Audit.EntityFramework
                 var fks = GetForeignKeys(context.DbContext, entry);
                 foreach (var fk in fks)
                 {
+#if NET45
+                    // When deleting an entity, sometimes the foreign keys are set to NULL by EF. This only happens on EF6.
+                    if (fk.Value == null)
+                    {
+                        continue;
+                    }
+#endif
                     if (efEntry.ColumnValues.ContainsKey(fk.Key))
                     {
                         efEntry.ColumnValues[fk.Key] = fk.Value;
