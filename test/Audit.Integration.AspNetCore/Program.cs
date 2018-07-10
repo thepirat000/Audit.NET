@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Audit.WebApi;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,8 +15,15 @@ namespace Audit.Integration.AspNetCore
     {
         static void Main(string[] args)
         {
-            //BuildWebHost(args).RunAsync().GetAwaiter().GetResult();
-            //return;
+
+            /*Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    var x = ev.GetWebApiAuditAction();
+                }));
+
+            BuildWebHost(args).RunAsync().GetAwaiter().GetResult();
+            return;*/
 
             MainAsync(args).GetAwaiter().GetResult();
         }
@@ -70,7 +78,7 @@ namespace Audit.Integration.AspNetCore
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("\nALL TESTS PASSED");
             }
-            catch (Exception e)
+            catch
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\nSOME TEST FAILED");

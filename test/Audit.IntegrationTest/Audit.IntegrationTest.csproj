@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net451</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.IntegrationTest</AssemblyName>
     <PackageId>Audit.IntegrationTest</PackageId>
@@ -11,7 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <DebugType Condition=" '$(TargetFramework)' == 'net451' ">Full</DebugType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,21 +27,23 @@
     <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
     <ProjectReference Include="..\..\src\Audit.WebApi\Audit.WebApi.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Redis\Audit.NET.Redis.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NUnit" Version="3.6.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0-preview-20180610-02" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Moq" Version="4.8.1" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.0" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
-    <ProjectReference Include="..\..\src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>  
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'net451' ">
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.0" />
   </ItemGroup>  
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
@@ -57,9 +59,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity">
-      <Version>2.1.0</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.0" />
   </ItemGroup>
-  
+
 </Project>

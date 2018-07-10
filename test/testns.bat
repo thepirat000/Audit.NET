@@ -67,12 +67,10 @@ dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=AzureDocD
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=AzureBlob"
 dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
 dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory=Async"
-dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=Elasticsearch"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Elasticsearch"
 echo continue...
 
 cd ..
-
-del TestResult.xml /s
 
 net stop mssqlserver
 net stop mysql57

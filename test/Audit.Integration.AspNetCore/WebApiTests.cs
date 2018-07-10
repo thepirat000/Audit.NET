@@ -165,7 +165,7 @@ namespace Audit.Integration.AspNetCore
             {
                 s = await c.GetStringAsync($"http://localhost:{_port}/api/values/666");
             }
-            catch (Exception ex)
+            catch 
             {
             }
             finally

@@ -458,7 +458,7 @@ SET IDENTITY_INSERT Posts OFF
         public override void OnScopeSaving(AuditScope auditScope)
         {
             if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
-                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"] == "ROLLBACK")
+                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].Equals("ROLLBACK"))
             {
                 Database.CurrentTransaction.Rollback();
             }

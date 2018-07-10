@@ -70,7 +70,9 @@ namespace Audit.Elasticsearch.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
+#pragma warning disable CS0618 // Type or member is obsolete
             var createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), TypeNameBuilder?.Invoke(auditEvent), id);
+#pragma warning restore CS0618 // Type or member is obsolete
             var response = _client.Value.Create(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
@@ -86,7 +88,9 @@ namespace Audit.Elasticsearch.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
+#pragma warning disable CS0618 // Type or member is obsolete
             var createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), TypeNameBuilder?.Invoke(auditEvent), id);
+#pragma warning restore CS0618 // Type or member is obsolete
             var response = await _client.Value.CreateAsync(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {

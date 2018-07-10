@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.9] - 2018-07-10
+### Added
+- Audit.NET.AzureStorage: Adding new data provider for storing events on **Azure Tables** `AzureTableDataProvider`.
+
 ## [12.1.8] - 2018-07-01
 ### Modified
 - Audit.EntityFramework: Fix #127: (For EF 6) Foreign keys are set to NULL when deleting a relation

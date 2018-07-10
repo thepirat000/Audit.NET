@@ -148,6 +148,24 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("AzureBlob")]
+            public void TestAzureTable()
+            {
+                SetAzureTableSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("AzureBlob")]
+            public async Task TestAzureTableAsync()
+            {
+                SetAzureTableSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
             [Category("SQL")]
             public void TestSql()
             {
@@ -284,7 +302,7 @@ namespace Audit.IntegrationTest
                 }
 
                 var dpType = Configuration.DataProvider.GetType().Name;
-                var evFromApi = (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider") ? ev : Configuration.DataProvider.GetEvent(ids[0]);
+                var evFromApi = (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider" || dpType == "AzureTableDataProvider") ? ev : Configuration.DataProvider.GetEvent(ids[0]);
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
@@ -378,14 +396,14 @@ namespace Audit.IntegrationTest
                     await a.DisposeAsync();
                 }
 
-                var evFromApi = await Audit.Core.Configuration.DataProvider.GetEventAsync(ids[0]);
+                var dpType = Configuration.DataProvider.GetType().Name;
+                var evFromApi = (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider" || dpType == "AzureTableDataProvider") ? ev : await Audit.Core.Configuration.DataProvider.GetEventAsync(ids[0]);
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
                 Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
-                var dpType = Configuration.DataProvider.GetType().Name;
                 if (dpType != "ElasticsearchDataProvider")
                 {
                     Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
@@ -524,6 +542,18 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
+            public void SetAzureTableSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseAzureTableStorage(config => config
+                        .ConnectionString(AzureSettings.AzureBlobCnnString)
+                        .TableName($"events{DateTime.Today:yyyyMMdd}")
+                        .EntityBuilder(_ => _
+                            .PartitionKey("testpart")
+                            .Columns(cols => cols.FromObject(ev => new { ev.EventType, ev.Environment.UserName, ev.StartDate, ev.Duration }))))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+             }
+        
             public void SetSqlSettings()
             {
                 Audit.Core.Configuration.Setup()

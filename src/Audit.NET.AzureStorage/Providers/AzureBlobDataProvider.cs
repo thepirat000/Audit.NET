@@ -12,37 +12,32 @@ namespace Audit.AzureTableStorage.Providers
 {
     public class AzureBlobDataProvider : AuditDataProvider
     {
-        private static IDictionary<string, CloudBlobContainer> _containerCache = new Dictionary<string, CloudBlobContainer>();
-        private Func<AuditEvent, string> _connectionStringBuilder = null;
-        private Func<AuditEvent, string> _blobNameBuilder = null;
-        private Func<AuditEvent, string> _containerNameBuilder = null;
+        private static readonly IDictionary<string, CloudBlobContainer> ContainerCache = new Dictionary<string, CloudBlobContainer>();
 
         /// <summary>
         /// Gets or sets a function that returns a unique name for the blob (can contain folders).
         /// </summary>
-        public Func<AuditEvent, string> BlobNameBuilder
-        {
-            get { return _blobNameBuilder; }
-            set { _blobNameBuilder = value; }
-        }
+        public Func<AuditEvent, string> BlobNameBuilder { get; set; }
 
         /// <summary>
         /// Gets or sets a function that returns a container name for the event.
         /// </summary>
-        public Func<AuditEvent, string> ContainerNameBuilder
-        {
-            get { return _containerNameBuilder; }
-            set { _containerNameBuilder = value; }
-        }
+        public Func<AuditEvent, string> ContainerNameBuilder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the container name to use.
+        /// </summary>
+        public string ContainerName { set { ContainerNameBuilder = _ => value; } }
 
         /// <summary>
         /// Gets or sets the Azure Storage connection string
         /// </summary>
-        public Func<AuditEvent, string> ConnectionStringBuilder
-        {
-            get { return _connectionStringBuilder; }
-            set { _connectionStringBuilder = value; }
-        }
+        public Func<AuditEvent, string> ConnectionStringBuilder { get; set; }
+
+        /// <summary>
+        /// Sets the Azure Storage connection string
+        /// </summary>
+        public string ConnectionString { set { ConnectionStringBuilder = _ => value; } }
 
         #region Overrides
         public override object InsertEvent(AuditEvent auditEvent)
@@ -110,25 +105,25 @@ namespace Audit.AzureTableStorage.Providers
 
         private string GetBlobName(AuditEvent auditEvent)
         {
-            if (_blobNameBuilder != null)
+            if (BlobNameBuilder != null)
             {
-                return _blobNameBuilder.Invoke(auditEvent);
+                return BlobNameBuilder.Invoke(auditEvent);
             }
             return string.Format("{0}.json", Guid.NewGuid());
         }
 
         private string GetContainerName(AuditEvent auditEvent)
         {
-            if (_containerNameBuilder != null)
+            if (ContainerNameBuilder != null)
             {
-                return _containerNameBuilder.Invoke(auditEvent);
+                return ContainerNameBuilder.Invoke(auditEvent);
             }
             return "event";
         }
 
         private string GetConnectionString(AuditEvent auditEvent)
         {
-            return _connectionStringBuilder?.Invoke(auditEvent);
+            return ConnectionStringBuilder?.Invoke(auditEvent);
         }
 
         internal CloudBlobContainer EnsureContainer(AuditEvent auditEvent)
@@ -149,7 +144,7 @@ namespace Audit.AzureTableStorage.Providers
         {
             CloudBlobContainer result;
             var cacheKey = cnnString + "|" + containerName;
-            if (_containerCache.TryGetValue(cacheKey, out result))
+            if (ContainerCache.TryGetValue(cacheKey, out result))
             {
                 return result;
             }
@@ -157,7 +152,7 @@ namespace Audit.AzureTableStorage.Providers
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
             container.CreateIfNotExistsAsync().Wait();
-            _containerCache[cacheKey] = container;
+            ContainerCache[cacheKey] = container;
             return container;
         }
 
@@ -165,7 +160,7 @@ namespace Audit.AzureTableStorage.Providers
         {
             CloudBlobContainer result;
             var cacheKey = cnnString + "|" + containerName;
-            if (_containerCache.TryGetValue(cacheKey, out result))
+            if (ContainerCache.TryGetValue(cacheKey, out result))
             {
                 return result;
             }
@@ -173,7 +168,7 @@ namespace Audit.AzureTableStorage.Providers
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
             await container.CreateIfNotExistsAsync();
-            _containerCache[cacheKey] = container;
+            ContainerCache[cacheKey] = container;
             return container;
         }
         #endregion

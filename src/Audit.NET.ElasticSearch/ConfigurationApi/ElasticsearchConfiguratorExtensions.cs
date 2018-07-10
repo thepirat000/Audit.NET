@@ -24,7 +24,9 @@ namespace Audit.Core
                 ConnectionSettings = settings,
                 IdBuilder = idBuilder,
                 IndexBuilder = indexBuilder,
+#pragma warning disable 618
                 TypeNameBuilder = typeNameBuilder
+#pragma warning restore 618
             };
             return new CreationPolicyConfigurator();
         }
@@ -43,7 +45,9 @@ namespace Audit.Core
                 ConnectionSettings = elasDbConfig._connectionSettings,
                 IdBuilder = elasDbConfig._idBuilder,
                 IndexBuilder = elasDbConfig._indexBuilder,
+#pragma warning disable 618
                 TypeNameBuilder = elasDbConfig._typeNameBuilder
+#pragma warning restore 618
             };
             return new CreationPolicyConfigurator();
         }

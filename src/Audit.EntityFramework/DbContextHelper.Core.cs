@@ -238,6 +238,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Tries to get the current transaction identifier.
         /// </summary>
+        /// <param name="dbContext">The DB context.</param>
         /// <param name="clientConnectionId">The client ConnectionId.</param>
         private string GetCurrentTransactionId(DbContext dbContext, string clientConnectionId)
         {

@@ -140,7 +140,7 @@ namespace Audit.AzureDocumentDB.Providers
         /// <summary>
         /// Gets an event stored on cosmos DB from its document id on the collection returned by calling the collection builder with a null AuditEvent.
         /// </summary>
-        /// <param name="docId">The document id</param>
+        /// <param name="eventId">The event id</param>
         public override async Task<T> GetEventAsync<T>(object eventId)
         {
             return await Task.FromResult(GetEvent<T>(eventId));

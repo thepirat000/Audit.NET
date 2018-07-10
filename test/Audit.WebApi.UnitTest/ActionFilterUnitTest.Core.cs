@@ -20,7 +20,7 @@ namespace Audit.WebApi.UnitTest
     public class ActionFilterUnitTest
     {
         [Test]
-        public async Task Test_AuditApiActionFilter_ShouldIncludeResponseBody()
+        public void Test_AuditApiActionFilter_ShouldIncludeResponseBody()
         {
             var testCases = new List<TestExcludeCase>()
             {

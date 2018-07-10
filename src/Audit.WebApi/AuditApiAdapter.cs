@@ -22,7 +22,6 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs before the action method is invoked.
         /// </summary>
-        /// <param name="actionContext">The action context.</param>
         public async Task BeforeExecutingAsync(HttpActionContext actionContext, IContextWrapper contextWrapper, bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName)
         {
             var request = actionContext.Request;
@@ -61,7 +60,6 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs after the action method is invoked.
         /// </summary>
-        /// <param name="actionExecutedContext">The action executed context.</param>
         public async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext, IContextWrapper contextWrapper, bool includeModelState, bool includeResponseBody)
         {
             var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiActionKey);

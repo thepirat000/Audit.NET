@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Audit.WebApi;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Audit.Integration.AspNetCore.Controllers
@@ -22,15 +24,35 @@ namespace Audit.Integration.AspNetCore.Controllers
             return new string[] { "value1", "value2" };
         }
 
+        [HttpPost("FileUpload")]
+        [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        public async Task<IActionResult> FileUpload(ICollection<IFormFile> files)
+        {
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    using (var fileStream = new FileStream(Path.Combine(@"d:\temp\", file.FileName), FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                }
+            }
+            return Ok();
+        }
+
+
         [HttpPost("GlobalAudit")]
         public async Task<IActionResult> GlobalAudit([FromBody]Request request)
         {
+            await Task.Delay(0);
             return Ok(request.Value);
         }
 
         [HttpPost("TestForm")]
         public async Task<IActionResult> TestForm()
         {
+            await Task.Delay(0);
             return Ok();
         }
 

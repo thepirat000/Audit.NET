@@ -85,7 +85,9 @@ namespace Audit.UnitTest
             ela.IndexBuilder = ev => "auditevent";
             ela.IdBuilder = ev => { var g = Guid.NewGuid().ToString().Replace("-", "/"); guids.Add(g); return g; };
 
+#pragma warning disable CS0618 // Type or member is obsolete
             ela.TypeNameBuilder = ev => "spe/c/ial";
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(ela)
@@ -120,7 +122,9 @@ namespace Audit.UnitTest
             ela.IndexBuilder = ev => "auditevent";
             ela.IdBuilder = ev => { var g = Guid.NewGuid().ToString().Replace("-", "/"); guids.Add(g); return g; };
 
+#pragma warning disable CS0618 // Type or member is obsolete
             ela.TypeNameBuilder = ev => "spe/c/ial";
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(ela)

@@ -1,7 +1,6 @@
 ﻿using Audit.Core;
 using System;
 using Moq;
-using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
 using System.Collections.Generic;
@@ -466,7 +465,6 @@ namespace Audit.UnitTest
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            var target = "test";
             AuditScope.CreateAndSave(eventType, new { ExtraField = "extra value" });
 
             AuditScope.CreateAndSave(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
@@ -559,7 +557,6 @@ namespace Audit.UnitTest
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
-            var comment = "comment test";
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
             {
                 scope.Discard();
@@ -746,15 +743,15 @@ namespace Audit.UnitTest
         [AuditDbContext(AuditEventType = "FromAttr")]
         public class MyContext : AuditDbContext
         {
-            public string AuditEventType { get { return base.AuditEventType; } }
-            public bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
-            public AuditOptionMode Mode { get { return base.Mode; } }
+            public override string AuditEventType { get { return base.AuditEventType; } }
+            public override bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
+            public override AuditOptionMode Mode { get { return base.Mode; } }
         }
         public class AnotherContext : AuditDbContext
         {
-            public string AuditEventType { get { return base.AuditEventType; } }
-            public bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
-            public AuditOptionMode Mode { get { return base.Mode; } }
+            public override string AuditEventType { get { return base.AuditEventType; } }
+            public override bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
+            public override AuditOptionMode Mode { get { return base.Mode; } }
         }
     }
 }
