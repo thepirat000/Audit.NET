@@ -96,7 +96,7 @@ Audit.Core.Configuration.Setup()
         .EntityBuilder(e => e
             .PartitionKey($"Events{ev.StartDate:yyyyMM}")
             .RowKey(ev => Guid.NewGuid().ToString())
-            .Columns(c => c.FromObject(ev => new { ev.StartDate, AuditEventJson = ev.ToJson() }))));
+            .Columns(c => c.FromObject(ev => new { Date = ev.StartDate, AuditEventJson = ev.ToJson() }))));
 ```
 
 #### Provider Options
