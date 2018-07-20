@@ -11,6 +11,7 @@ namespace Audit.Core
         /// <summary>
         /// Send the events over a network as UDP packets.
         /// </summary>
+        /// <param name="configurator">The Audit.NET Configurator</param>
         /// <param name="remoteAddress">The address of the remote host or multicast group to which the underlying UdpClient should send the audit events.</param>
         /// <param name="remotePort">The port number of the remote host or multicast group to which the underlying UdpClient should send the audit events.</param>
         /// <param name="multicastMode">The multicast mode.</param>
@@ -34,6 +35,7 @@ namespace Audit.Core
         /// <summary>
         /// Send the events over a network as UDP packets.
         /// </summary>
+        /// <param name="configurator">The Audit.NET Configurator</param>
         /// <param name="config">The UDP provider configuration.</param>
         public static ICreationPolicyConfigurator UseUdp(this IConfigurator configurator, Action<IUdpProviderConfigurator> config)
         {

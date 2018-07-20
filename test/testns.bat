@@ -45,6 +45,12 @@ echo continue...
 echo Running...
 cd ..
 
+cd Audit.EntityFramework.Core.UnitTest
+dotnet test --logger:"console;verbosity=normal"
+
+echo Running...
+cd ..
+
 cd Audit.EntityFramework.UnitTest
 "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"
 ..\..\packages\NUnit.ConsoleRunner.3.7.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql

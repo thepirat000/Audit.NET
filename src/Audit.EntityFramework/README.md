@@ -232,7 +232,7 @@ Audit.EntityFramework output includes:
 - Affected column data including primary key, original and new values
 - Model validation results
 - Exception details
-- Transaction identifier (to group logs that are part of the same SQL transaction)
+- Transaction identifiers (to group logs that are part of the same SQL or ambient transaction)
 - Entity object graphs (optional with `IncludeEntityObjects` configuration)
 - Execution time and duration
 
@@ -248,6 +248,7 @@ The following tables describes the Audit.EntityFramework output fields:
 | **Database** | string | Name of the database affected |
 | **ConnectionId** | Guid | Unique client connection ID (only available when the connection is open at the beginning of the event) |
 | **TransactionId** | string | Unique identifier for the DB transaction used on the audited operation (if any). To group events that are part of the same transaction. |
+| **AmbientTransactionId** | string | Unique identifier for the ambient transaction used on the audited operation (if any). To group events that are part of the same ambient transaction. |
 | **Entries** | Array of [EventEntry](#evententry) | Array with information about the entities affected by the audited operation |
 | **Result** | integer | Result of the SaveChanges call. Is the number of objects affected by the operation. |
 | **Success** | boolean | Boolean to indicate if the operation was successful |

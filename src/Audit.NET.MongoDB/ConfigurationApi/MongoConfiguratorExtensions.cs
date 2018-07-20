@@ -13,6 +13,7 @@ namespace Audit.Core
         /// <summary>
         /// Store the events in a MongoDB database.
         /// </summary>
+        /// <param name="configurator">The Audit.NET Configurator</param>
         /// <param name="connectionString">The mongo DB connection string.</param>
         /// <param name="database">The mongo DB database name.</param>
         /// <param name="collection">The mongo DB collection name.</param>
@@ -36,6 +37,7 @@ namespace Audit.Core
         /// <summary>
         /// Store the events in a MongoDB database.
         /// </summary>
+        /// <param name="configurator">The Audit.NET Configurator</param>
         /// <param name="config">The mongo DB provider configuration.</param>
         public static ICreationPolicyConfigurator UseMongoDB(this IConfigurator configurator, Action<IMongoProviderConfigurator> config)
         {

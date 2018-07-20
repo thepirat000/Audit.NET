@@ -213,6 +213,7 @@ namespace Audit.EntityFramework
                 Entries = new List<EventEntry>(),
                 Database = dbConnection?.Database,
                 ConnectionId = clientConnectionId,
+                AmbientTransactionId = GetAmbientTransactionId(),
                 TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId),
                 DbContext = dbContext
             };
@@ -233,6 +234,20 @@ namespace Audit.EntityFramework
                 });
             }
             return efEvent;
+        }
+
+        private string GetAmbientTransactionId()
+        {
+#if NETSTANDARD2_0 || NET461
+            var tranInfo = System.Transactions.Transaction.Current?.TransactionInformation;
+            if (tranInfo != null)
+            {
+                return tranInfo.DistributedIdentifier != Guid.Empty ? tranInfo.DistributedIdentifier.ToString() : tranInfo.LocalIdentifier;
+            }
+            return null;
+#else
+            return null;
+#endif
         }
 
         /// <summary>
