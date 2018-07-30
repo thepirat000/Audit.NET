@@ -292,7 +292,7 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 ## Web API template (dotnet new)
 
 If you are creating an ASP.NET Core Web API project from scratch, you can use the 
-**dotnet new template** provided on the library [Audit.WebApi.Template]().
+**dotnet new template** provided on the library [Audit.WebApi.Template](https://www.nuget.org/packages/Audit.WebApi.Template/).
 This allows to quickly generate an *audit-enabled* Web API project that can be used
 as a starting point for your project or as a working example.
 
