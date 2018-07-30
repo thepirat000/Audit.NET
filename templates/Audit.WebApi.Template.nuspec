@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Audit.WebApi.Template</id>
+    <version>0.0.1</version>
+    <description>Audited Web API</description>
+    <authors>Federico Colombo</authors>
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+  </metadata>
+  <files>
+    <file src="**\" exclude="**\.git\**\*.*;**\.vs\**\*.*;**\bin\**\*.*;**\obj\**\*.*;**\*.csproj.user"/>
+  </files>
+</package>
