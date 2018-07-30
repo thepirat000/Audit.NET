@@ -185,6 +185,7 @@ The following table describes the Audit.WebApi output fields:
 ### [Action](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/AuditApiAction.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
+| **TraceId** | string | A unique identifier per request |
 | **HttpMethod** | string | HTTP method (GET, POST, etc) |
 | **ControllerName** | string | The controller name |
 | **ActionName** | string | The action name |
@@ -248,6 +249,7 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
    "EndDate":"2017-03-09T18:03:05.5307604-06:00",
    "Duration":2,
    "Action":{  
+      "TraceId": "0HLFLQP4HGFAF_00000001",
       "HttpMethod":"POST",
       "ControllerName":"Values",
       "ActionName":"Post",

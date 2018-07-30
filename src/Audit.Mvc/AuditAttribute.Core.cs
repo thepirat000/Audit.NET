@@ -76,7 +76,8 @@ namespace Audit.Mvc
                 ActionName = actionDescriptior?.ActionName ?? actionDescriptior?.DisplayName,
                 ControllerName = actionDescriptior?.ControllerName,
                 ActionParameters = GetActionParameters(filterContext.ActionArguments),
-                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = IncludeRequestBody ? GetRequestBody(filterContext) : null }
+                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = IncludeRequestBody ? GetRequestBody(filterContext) : null },
+                TraceId = httpContext.TraceIdentifier
             };
 
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}")

@@ -77,7 +77,8 @@ namespace Audit.Mvc
                 HttpMethod = request.HttpMethod,
                 ActionName = filterContext.ActionDescriptor?.ActionName,
                 ControllerName = filterContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = GetActionParameters(filterContext.ActionParameters)
+                ActionParameters = GetActionParameters(filterContext.ActionParameters),
+                TraceId = null
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)

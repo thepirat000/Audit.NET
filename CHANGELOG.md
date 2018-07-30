@@ -3,10 +3,13 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.1.11] - 2018-07-??
+### Added
+- Audit.WebApi, Audit.WebApi.Core and Audit.Mvc.Core: Added `TraceId` field on the output, with a correlation id per request.
+
 ## [12.1.10] - 2018-07-20
 ### Added
 - Audit.EntityFramework and Audit.EntityFramework.Core: Adding support for ambien transactions (i.e. TransactionScope) on EF Core 2.1. Added AmbientTransactionId field to EF event output.
-
 
 ## [12.1.9] - 2018-07-10
 ### Added

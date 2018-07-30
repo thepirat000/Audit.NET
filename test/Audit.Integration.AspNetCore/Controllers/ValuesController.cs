@@ -76,7 +76,7 @@ namespace Audit.Integration.AspNetCore.Controllers
             await Task.Delay(1);
             if (id == 666)
             {
-                throw new Exception("this is a test exception");
+                throw new Exception("*************** THIS IS A TEST EXCEPTION **************");
             }
             return $"{id}";
         }

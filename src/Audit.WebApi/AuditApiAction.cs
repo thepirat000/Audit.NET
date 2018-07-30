@@ -5,6 +5,8 @@ namespace Audit.WebApi
 {
     public class AuditApiAction
     {
+        [JsonProperty(Order = -1, NullValueHandling = NullValueHandling.Ignore)]
+        public string TraceId { get; set; }
         [JsonProperty(Order = 0)]
         public string HttpMethod { get; set; }
         [JsonProperty(Order = 5)]

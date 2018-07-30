@@ -5,6 +5,8 @@ namespace Audit.Mvc
 {
     public class AuditAction
     {
+        [JsonProperty(Order = -1, NullValueHandling = NullValueHandling.Ignore)]
+        public string TraceId { get; set; }
         [JsonProperty(Order = 0)]
         public string HttpMethod { get; set; }
         [JsonProperty(Order = 5)]

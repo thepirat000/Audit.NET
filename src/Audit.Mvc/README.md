@@ -100,6 +100,7 @@ The following table describes the Audit.Mvc output fields:
 
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
+| **TraceId** | string | A unique identifier per request |
 | **HttpMethod** | string | HTTP method (GET, POST, etc) |
 | **ControllerName** | string | The controller name |
 | **ActionName** | string | The action name |
@@ -164,6 +165,7 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
     "EndDate": "2016-08-22T18:31:23.1834012-05:00",
     "Duration": 8529,
     "Action": {
+        "TraceId": "0HLFLQP4HGFAG_00000001",
         "HttpMethod": "GET",
         "ControllerName": "Home",
         "ActionName": "Index",
@@ -199,6 +201,7 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
     "EndDate": "2016-08-22T18:31:15.1705128-05:00",
     "Duration": 15000,
     "Action": {
+        "TraceId": "0HLFLQP4HGFAG_00000002",
         "HttpMethod": "POST",
         "ControllerName": "Home",
         "ActionName": "TestPost",

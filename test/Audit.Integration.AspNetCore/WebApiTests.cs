@@ -58,6 +58,9 @@ namespace Audit.Integration.AspNetCore
 
             Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
             Assert.AreEqual(2, insertEvs.Count);
+            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().TraceId);
+            Assert.IsNotNull(insertEvs[1].GetWebApiAuditAction().TraceId);
+            Assert.AreNotEqual(insertEvs[0].GetWebApiAuditAction().TraceId, insertEvs[1].GetWebApiAuditAction().TraceId);
             // Form should be null since the api is limited to 2
             Assert.IsNull(insertEvs[1].GetWebApiAuditAction().FormVariables);
         }

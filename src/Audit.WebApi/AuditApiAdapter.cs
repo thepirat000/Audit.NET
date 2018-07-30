@@ -25,6 +25,7 @@ namespace Audit.WebApi
         public async Task BeforeExecutingAsync(HttpActionContext actionContext, IContextWrapper contextWrapper, bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName)
         {
             var request = actionContext.Request;
+            
             var auditAction = new AuditApiAction
             {
                 UserName = actionContext.RequestContext?.Principal?.Identity?.Name,
@@ -36,7 +37,8 @@ namespace Audit.WebApi
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
                 ActionParameters = GetActionParameters(actionContext.ActionArguments, serializeParams),
-                RequestBody = includeRequestBody ? GetRequestBody(contextWrapper) : null
+                RequestBody = includeRequestBody ? GetRequestBody(contextWrapper) : null,
+                TraceId = request.GetCorrelationId().ToString()
             };
             var eventType = (eventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)

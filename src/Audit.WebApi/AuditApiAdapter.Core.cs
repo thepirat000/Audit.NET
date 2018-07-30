@@ -41,7 +41,8 @@ namespace Audit.WebApi
                 ActionName = actionDescriptior != null ? actionDescriptior.ActionName : actionContext.ActionDescriptor.DisplayName,
                 ControllerName = actionDescriptior != null ? actionDescriptior.ControllerName : null,
                 ActionParameters = GetActionParameters(actionContext.ActionArguments, serializeParams),
-                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = includeRequestBody ? GetRequestBody(actionContext) : null }
+                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = includeRequestBody ? GetRequestBody(actionContext) : null },
+                TraceId = httpContext.TraceIdentifier
             };
             var eventType = (eventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
