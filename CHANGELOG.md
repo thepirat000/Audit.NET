@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [12.1.11] - 2018-07-??
+## [12.1.11] - 2018-07-30
 ### Added
 - Audit.WebApi, Audit.WebApi.Core and Audit.Mvc.Core: Added `TraceId` field on the output, with a correlation id per request.
 
