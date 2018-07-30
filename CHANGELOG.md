@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [12.1.11] - 2018-07-30
 ### Added
 - Audit.WebApi, Audit.WebApi.Core and Audit.Mvc.Core: Added `TraceId` field on the output, with the internal ASP.NET correlation id per request.
+- Added Audit.WebApi.Template dotnet new template.
 
 ## [12.1.10] - 2018-07-20
 ### Added
