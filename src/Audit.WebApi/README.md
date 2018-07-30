@@ -304,7 +304,7 @@ dotnet new -i Audit.WebApi.Template
 
 Once you install the template, you should see it on the dotnet new templates list with the name `webapiaudit` as follows:
 
-[IMAGE!]
+![capture](https://i.imgur.com/3zsw7ZP.png)
 
 You can now create a new project on the current folder by running:
 
