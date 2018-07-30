@@ -112,7 +112,7 @@ public class Startup
     {
         services.AddMvc(mvc =>
         {
-            mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+            mvc.AddAuditFilter(config => config
                 .LogActionIf(d => d.ControllerName == "Orders" && d.ActionName != "GetOrder")
                 .WithEventType("{verb}.{controller}.{action}")
                 .IncludeHeaders(ctx => !ctx.ModelState.IsValid)
