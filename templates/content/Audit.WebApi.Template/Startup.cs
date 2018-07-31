@@ -26,12 +26,11 @@ namespace Audit.WebApi.Template
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IValuesProvider, ValuesProvider>();
 
-            services.AddMvcAudit();
-
 #if (EnableEntityFramework)
             // TODO: Configure your context connection
             services.AddDbContext<MyContext>(_ => _.UseInMemoryDatabase("default"));
 #endif
+            services.AddMvcAudit();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

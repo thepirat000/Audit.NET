@@ -44,9 +44,9 @@ namespace Audit.WebApi.Template
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // Add a RequestId so the audit events can be grouped per request
-            var serviceProvider = serviceCollection.BuildServiceProvider();
             Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
             {
+                var serviceProvider = serviceCollection.BuildServiceProvider();
                 var httpContext = serviceProvider.GetService<IHttpContextAccessor>().HttpContext;
                 scope.Event.CustomFields[CorrelationIdField] = httpContext.TraceIdentifier;
             });
