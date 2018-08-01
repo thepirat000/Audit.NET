@@ -3,6 +3,7 @@ using Audit.WebApi.Template.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 #if (EnableEntityFramework)
@@ -31,7 +32,10 @@ namespace Audit.WebApi.Template
             // TODO: Configure your context connection
             services.AddDbContext<MyContext>(_ => _.UseInMemoryDatabase("default"));
 #endif
-            services.AddMvcAudit();
+            services
+                .ConfigureAudit()
+                .AddMvc(_ => _.AddAudit())
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +48,7 @@ namespace Audit.WebApi.Template
 
             app.UseMvc();
 
-            app.AddAuditCorrelationId(contextAccessor);
+            app.UseAuditCorrelationId(contextAccessor);
         }
     }
 }

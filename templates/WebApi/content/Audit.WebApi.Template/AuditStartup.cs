@@ -13,9 +13,26 @@ namespace Audit.WebApi.Template
     {
         private const string CorrelationIdField = "CorrelationId";
 
-        public static void AddMvcAudit(this IServiceCollection serviceCollection)
+        /// <summary>
+        /// Add the global audit filter to the MVC pipeline
+        /// </summary>
+        public static MvcOptions AddAudit(this MvcOptions mvcOptions)
         {
-            // Audit general configuration
+            mvcOptions.AddAuditFilter(a => a
+                    .LogAllActions()
+                    .WithEventType("MVC:{verb}:{controller}:{action}")
+                    .IncludeHeaders()
+                    .IncludeModelState()
+                    .IncludeRequestBody()
+                    .IncludeResponseBody());
+            return mvcOptions;
+        }
+
+        /// <summary>
+        /// Global Audit configuration
+        /// </summary>
+        public static IServiceCollection ConfigureAudit(this IServiceCollection serviceCollection)
+        {
             // TODO: Configure the audit data provider and options. For more info see https://github.com/thepirat000/Audit.NET#data-providers.
             Audit.Core.Configuration.Setup()
                 .UseFileLogProvider(_ => _
@@ -31,24 +48,15 @@ namespace Audit.WebApi.Template
                 .UseOptOut();
 #endif
 
-            // Add Mvc services. Audit enabled for all the actions.
-            serviceCollection
-                .AddMvc(_ => _
-                    .AddAuditFilter(a => a
-                        .LogAllActions()
-                        .WithEventType("MVC:{verb}:{controller}:{action}")
-                        .IncludeHeaders()
-                        .IncludeModelState()
-                        .IncludeRequestBody()
-                        .IncludeResponseBody()))
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-
+            return serviceCollection;
         }
 
-        public static void AddAuditCorrelationId(this IApplicationBuilder app, IHttpContextAccessor ctxAccesor)
+        /// <summary>
+        /// Add a RequestId so the audit events can be grouped per request
+        /// </summary>
+        public static void UseAuditCorrelationId(this IApplicationBuilder app, IHttpContextAccessor ctxAccesor)
         {
-            // Add a RequestId so the audit events can be grouped per request
+            
             Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
             {
                 var httpContext = ctxAccesor.HttpContext;
