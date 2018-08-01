@@ -1,8 +1,8 @@
 ﻿using Audit.Core;
-using Audit.WebApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 #if (EnableEntityFramework)
 using Audit.WebApi.Template.Providers.Database;
 #endif
@@ -43,14 +43,17 @@ namespace Audit.WebApi.Template
                         .IncludeResponseBody()))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+
+        }
+
+        public static void AddAuditCorrelationId(this IApplicationBuilder app, IHttpContextAccessor ctxAccesor)
+        {
             // Add a RequestId so the audit events can be grouped per request
             Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
             {
-                var serviceProvider = serviceCollection.BuildServiceProvider();
-                var httpContext = serviceProvider.GetService<IHttpContextAccessor>().HttpContext;
+                var httpContext = ctxAccesor.HttpContext;
                 scope.Event.CustomFields[CorrelationIdField] = httpContext.TraceIdentifier;
             });
         }
-
     }
 }

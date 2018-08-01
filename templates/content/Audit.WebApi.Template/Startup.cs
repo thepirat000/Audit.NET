@@ -1,4 +1,5 @@
-﻿using Audit.WebApi.Template.Providers;
+﻿using System;
+using Audit.WebApi.Template.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,7 @@ namespace Audit.WebApi.Template
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IHttpContextAccessor contextAccessor)
         {
             if (env.IsDevelopment())
             {
@@ -42,6 +43,8 @@ namespace Audit.WebApi.Template
             }
 
             app.UseMvc();
+
+            app.AddAuditCorrelationId(contextAccessor);
         }
     }
 }
