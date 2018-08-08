@@ -70,6 +70,24 @@ namespace Audit.Core.Providers
             set { _directoryPath = value; }
         }
 
+        public FileDataProvider()
+        {
+        }
+
+        public FileDataProvider(Action<ConfigurationApi.IFileLogProviderConfigurator> config)
+        {
+            var fileConfig = new ConfigurationApi.FileLogProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(fileConfig);
+                _directoryPath = fileConfig._directoryPath;
+                _directoryPathBuilder = fileConfig._directoryPathBuilder;
+                _filenameBuilder = fileConfig._filenameBuilder;
+                _filenamePrefix = fileConfig._filenamePrefix;
+                JsonSettings = fileConfig._jsonSettings;
+            }
+        }
+
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var fullPath = GetFilePath(auditEvent);

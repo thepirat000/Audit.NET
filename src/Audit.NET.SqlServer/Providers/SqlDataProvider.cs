@@ -72,6 +72,25 @@ namespace Audit.SqlServer.Providers
         /// </summary>
         public string Schema { set { SchemaBuilder = _ => value; } }
 
+        public SqlDataProvider()
+        {
+        }
+
+        public SqlDataProvider(Action<Configuration.ISqlServerProviderConfigurator> config)
+        {
+            var sqlConfig = new Configuration.SqlServerProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(sqlConfig);
+                ConnectionStringBuilder = sqlConfig._connectionStringBuilder;
+                IdColumnNameBuilder = sqlConfig._idColumnNameBuilder;
+                JsonColumnNameBuilder = sqlConfig._jsonColumnNameBuilder;
+                LastUpdatedDateColumnNameBuilder = sqlConfig._lastUpdatedColumnNameBuilder;
+                SchemaBuilder = sqlConfig._schemaBuilder;
+                TableNameBuilder = sqlConfig._tableNameBuilder;
+            }
+        }
+
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var json = new SqlParameter("json", auditEvent.ToJson());

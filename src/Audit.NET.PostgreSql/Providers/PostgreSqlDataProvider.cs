@@ -1,6 +1,7 @@
 ﻿using Audit.Core;
 using Newtonsoft.Json;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -89,6 +90,26 @@ namespace Audit.PostgreSql.Providers
         {
             get { return _schema; }
             set { _schema = value; }
+        }
+
+        public PostgreSqlDataProvider()
+        {
+        }
+
+        public PostgreSqlDataProvider(Action<Configuration.IPostgreSqlProviderConfigurator> config)
+        {
+            var pgConfig = new Configuration.PostgreSqlProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(pgConfig);
+                _connectionString = pgConfig._connectionString;
+                _dataColumnName = pgConfig._dataColumnName;
+                _dataType = pgConfig._dataColumnType.ToString();
+                _idColumnName = pgConfig._idColumnName;
+                _lastUpdatedDateColumnName = pgConfig._lastUpdatedColumnName;
+                _schema = pgConfig._schema;
+                _tableName = pgConfig._tableName;
+            }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)

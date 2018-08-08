@@ -36,6 +36,22 @@ namespace Audit.log4net.Providers
         /// </summary>
         public Func<AuditEvent, object, object> LogMessageBuilder { get; set; }
 
+        public Log4netDataProvider()
+        {
+        }
+
+        public Log4netDataProvider(Action<Configuration.ILog4netConfigurator> config)
+        {
+            var logConfig = new Configuration.Log4netConfigurator();
+            if (config != null)
+            {
+                config.Invoke(logConfig);
+                LoggerBuilder = logConfig._loggerBuilder;
+                LogLevelBuilder = logConfig._logLevelBuilder;
+                LogMessageBuilder = logConfig._messageBuilder;
+            }
+        }
+
         private ILog GetLogger(AuditEvent auditEvent)
         {
             return LoggerBuilder == null ? LogManager.GetLogger(auditEvent.GetType()) : LoggerBuilder.Invoke(auditEvent);

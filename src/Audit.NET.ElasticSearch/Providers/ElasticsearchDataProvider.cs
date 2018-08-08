@@ -58,6 +58,22 @@ namespace Audit.Elasticsearch.Providers
             _client = new Lazy<IElasticClient>(() => new ElasticClient(ConnectionSettings));
         }
 
+        public ElasticsearchDataProvider(Action<Configuration.IElasticsearchProviderConfigurator> config)
+        {
+            _client = new Lazy<IElasticClient>(() => new ElasticClient(ConnectionSettings));
+            var elConfig = new Configuration.ElasticsearchProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(elConfig);
+                ConnectionSettings = elConfig._connectionSettings;
+                IdBuilder = elConfig._idBuilder;
+                IndexBuilder = elConfig._indexBuilder;
+#pragma warning disable CS0618 // Type or member is obsolete
+                TypeNameBuilder = elConfig._typeNameBuilder;
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+        }
+
         public override object Serialize<T>(T value)
         {
             if (value == null)

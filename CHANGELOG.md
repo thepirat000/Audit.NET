@@ -3,6 +3,17 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.2.0] - 2018-08-08
+### Added
+- Audit.NET: Added FileDataProvider constructor overload with fluent API.
+- Audit.NET.SqlServer: Added SqlDataProvider constructor overload with fluent API.
+- Audit.NET.PostgreSql: Added PostgreSqlDataProvider constructor overload with fluent API.
+- Audit.NET.MySql: Added MySqlDataProvider constructor overload with fluent API.
+- Audit.NET.MongoDB: Added MongoDataProvider constructor overload with fluent API.
+- Audit.NET.log4net: Added Log4netDataProvider constructor overload with fluent API.
+- Audit.NET.ElasticSearch: Added ElasticSearchDataProvider constructor overload with fluent API.
+
+
 ## [12.1.11] - 2018-07-30
 ### Added
 - Audit.WebApi, Audit.WebApi.Core and Audit.Mvc.Core: Added `TraceId` field on the output, with the internal ASP.NET correlation id per request.

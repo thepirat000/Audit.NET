@@ -28,6 +28,97 @@ namespace Audit.IntegrationTest
         [TestFixture]
         public class AuditTests
         {
+            [Test]
+            public void Test_FileDataProvider_FluentApi()
+            {
+                var x = new FileDataProvider(_ => _
+                    .Directory(@"c:\t")
+                    .FilenameBuilder(ev => "fn")
+                    .FilenamePrefix("px")
+                    .JsonSettings(new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Populate }));
+                Assert.AreEqual(@"c:\t", x.DirectoryPath);
+                Assert.AreEqual("fn", x.FilenameBuilder.Invoke(null));
+                Assert.AreEqual("px", x.FilenamePrefix);
+                Assert.AreEqual(DefaultValueHandling.Populate, x.JsonSettings.DefaultValueHandling);
+            }
+
+            [Test]
+            public void Test_ElasticSearchDataProvider_FluentApi()
+            {
+                var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
+                    .ConnectionSettings(new Elasticsearch.Providers.AuditConnectionSettings(new Uri("http://server/")))
+                    .Id(ev => "id")
+                    .Index("ix")
+                    .Type(ev => Nest.TypeName.From<int>()));
+
+                Assert.AreEqual("http://server/", (x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()));
+                Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
+                Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
+                Assert.AreEqual(Nest.TypeName.From<int>(), x.TypeNameBuilder.Invoke(null));
+            }
+            [Test]
+            public void Test_MongoDataProvider_FluentApi()
+            {
+                var x = new MongoDB.Providers.MongoDataProvider(_ => _
+                    .ConnectionString("c")
+                    .Collection("col")
+                    .CustomSerializerSettings(new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate })
+                    .Database("db"));
+                Assert.AreEqual("c", x.ConnectionString);
+                Assert.AreEqual("col", x.Collection);
+                Assert.AreEqual(DefaultValueHandling.IgnoreAndPopulate, x.JsonSerializerSettings.DefaultValueHandling);
+                Assert.AreEqual("db", x.Database);
+            }
+
+            [Test]
+            public void Test_MySqlDataProvider_FluentApi()
+            {
+                var x = new MySql.Providers.MySqlDataProvider(_ => _
+                    .ConnectionString("c")
+                    .IdColumnName("id")
+                    .JsonColumnName("j")
+                    .TableName("t"));
+                Assert.AreEqual("c", x.ConnectionString);
+                Assert.AreEqual("id", x.IdColumnName);
+                Assert.AreEqual("j", x.JsonColumnName);
+                Assert.AreEqual("t", x.TableName);
+            }
+
+            [Test]
+            public void Test_PostgreDataProvider_FluentApi()
+            {
+                var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                    .ConnectionString("c")
+                    .DataColumn("dc")
+                    .IdColumnName("id")
+                    .LastUpdatedColumnName("lud")
+                    .Schema("sc")
+                    .TableName("t"));
+                Assert.AreEqual("c", x.ConnectionString);
+                Assert.AreEqual("dc", x.DataColumnName);
+                Assert.AreEqual("id", x.IdColumnName);
+                Assert.AreEqual("lud", x.LastUpdatedDateColumnName);
+                Assert.AreEqual("sc", x.Schema);
+                Assert.AreEqual("t", x.TableName);
+            }
+            [Test]
+            public void Test_SqlDataProvider_FluentApi()
+            {
+                var x = new SqlDataProvider(_ => _
+                    .ConnectionString("cnnString")
+                    .IdColumnName(ev => ev.EventType)
+                    .JsonColumnName("json")
+                    .LastUpdatedColumnName("last")
+                    .Schema(ev => "schema")
+                    .TableName("table"));
+                Assert.AreEqual("cnnString", x.ConnectionStringBuilder.Invoke(null));
+                Assert.AreEqual("evType", x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }));
+                Assert.AreEqual("json", x.JsonColumnNameBuilder.Invoke(null));
+                Assert.AreEqual("last", x.LastUpdatedDateColumnNameBuilder.Invoke(null));
+                Assert.AreEqual("schema", x.SchemaBuilder.Invoke(null));
+                Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
+            }
+
 #if NET451
             [Test]
             public void Test_StrongName_PublicToken()

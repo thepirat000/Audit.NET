@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
 using MySql.Data.MySqlClient;
@@ -56,6 +57,23 @@ namespace Audit.MySql.Providers
         {
             get { return _idColumnName; }
             set { _idColumnName = value; }
+        }
+
+        public MySqlDataProvider()
+        {
+        }
+
+        public MySqlDataProvider(Action<Configuration.IMySqlServerProviderConfigurator> config)
+        {
+            var mysqlConfig = new Configuration.MySqlServerProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(mysqlConfig);
+                _connectionString = mysqlConfig._connectionString;
+                _idColumnName = mysqlConfig._idColumnName;
+                _jsonColumnName = mysqlConfig._jsonColumnName;
+                _tableName = mysqlConfig._tableName;
+            }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)

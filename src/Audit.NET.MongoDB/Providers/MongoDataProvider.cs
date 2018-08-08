@@ -58,6 +58,23 @@ namespace Audit.MongoDB.Providers
         /// </summary>
         public JsonSerializerSettings JsonSerializerSettings { get; set; } = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new List<JsonConverter>() { new JavaScriptDateTimeConverter() } };
 
+        public MongoDataProvider()
+        {
+        }
+
+        public MongoDataProvider(Action<ConfigurationApi.IMongoProviderConfigurator> config)
+        {
+            var mongoConfig = new ConfigurationApi.MongoProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(mongoConfig);
+                Collection = mongoConfig._collection;
+                ConnectionString = mongoConfig._connectionString;
+                Database = mongoConfig._database;
+                JsonSerializerSettings = mongoConfig._jsonSerializerSettings;
+            }
+        }
+
         private static void ConfigureBsonMapping()
         {
             var pack = new ConventionPack();
