@@ -43,6 +43,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
             {
                 var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
@@ -56,7 +57,9 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
                 Assert.AreEqual(Nest.TypeName.From<int>(), x.TypeNameBuilder.Invoke(null));
             }
+
             [Test]
+            [Category("Mongo")]
             public void Test_MongoDataProvider_FluentApi()
             {
                 var x = new MongoDB.Providers.MongoDataProvider(_ => _
@@ -71,6 +74,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("MySql")]
             public void Test_MySqlDataProvider_FluentApi()
             {
                 var x = new MySql.Providers.MySqlDataProvider(_ => _
@@ -85,6 +89,7 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("PostgreSQL")]
             public void Test_PostgreDataProvider_FluentApi()
             {
                 var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
@@ -101,7 +106,9 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("sc", x.Schema);
                 Assert.AreEqual("t", x.TableName);
             }
+
             [Test]
+            [Category("SQL")]
             public void Test_SqlDataProvider_FluentApi()
             {
                 var x = new SqlDataProvider(_ => _
