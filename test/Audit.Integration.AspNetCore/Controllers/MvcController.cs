@@ -23,7 +23,7 @@ namespace Audit.Integration.AspNetCore.Controllers
             await Task.Delay(1);
             if (title == "666")
             {
-                throw new Exception("this is a test exception");
+                throw new Exception("*************** THIS IS A TEST EXCEPTION **************");
             }
             return View(new TestModelClass(){Title = title});
         }

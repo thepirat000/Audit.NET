@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from file system events using a FileSystemWatcher</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.FileSystem</AssemblyTitle>
-    <VersionPrefix>12.2.0</VersionPrefix>
+    <VersionPrefix>12.2.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

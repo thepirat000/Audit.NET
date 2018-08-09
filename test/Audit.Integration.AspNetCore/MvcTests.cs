@@ -77,7 +77,7 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(null, s);
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual(1, replaceEvs.Count);
-            Assert.IsTrue(replaceEvs[0].Exception.Contains("this is a test exception"));
+            Assert.IsTrue(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), "returned exception: " + replaceEvs[0].Exception);
         }
     }
 }
