@@ -78,7 +78,7 @@ namespace Audit.WebApi
         }
         protected string EventTypeName(ActionExecutingContext actionContext)
         {
-            return _eventTypeNameBuilder != null ? _eventTypeNameBuilder.Invoke(actionContext) : null;
+            return _eventTypeNameBuilder?.Invoke(actionContext);
         }
 #if NET45
         protected IContextWrapper ContextWrapper(HttpRequestMessage request)

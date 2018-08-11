@@ -336,8 +336,10 @@ namespace Audit.EntityFramework
         {
             var typeName = context.GetType().Name;
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
-            var auditEfEvent = new AuditEventEntityFramework();
-            auditEfEvent.EntityFrameworkEvent = efEvent;
+            var auditEfEvent = new AuditEventEntityFramework
+            {
+                EntityFrameworkEvent = efEvent
+            };
             var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 3);
             if (context.ExtraFields != null)
             {
@@ -357,8 +359,10 @@ namespace Audit.EntityFramework
         {
             var typeName = context.GetType().Name;
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
-            var auditEfEvent = new AuditEventEntityFramework();
-            auditEfEvent.EntityFrameworkEvent = efEvent;
+            var auditEfEvent = new AuditEventEntityFramework
+            {
+                EntityFrameworkEvent = efEvent
+            };
             var scope = await AuditScope.CreateAsync(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 3);
             if (context.ExtraFields != null)
             {

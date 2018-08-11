@@ -10,6 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Audit.WebApi.Template.Providers.Database;
 #endif
+#if (Swagger)
+using System.IO;
+using Swashbuckle.AspNetCore.Swagger;
+#endif
 
 namespace Audit.WebApi.Template
 {
@@ -32,6 +36,22 @@ namespace Audit.WebApi.Template
             // TODO: Configure your context connection
             services.AddDbContext<MyContext>(_ => _.UseInMemoryDatabase("default"));
 #endif
+#if (Swagger)
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "Audit.WebApi.Template API",
+                    Description = "Audit.WebApi.Template API"
+                });
+                var basePath = AppContext.BaseDirectory;
+                var xmlPath = Path.Combine(basePath, "Audit.WebApi.Template.xml");
+                c.IncludeXmlComments(xmlPath);
+                c.DescribeAllParametersInCamelCase();
+                c.DescribeStringEnumsInCamelCase();
+            });
+#endif
             services
                 .ConfigureAudit()
                 .AddMvc(_ => _.AddAudit())
@@ -45,7 +65,13 @@ namespace Audit.WebApi.Template
             {
                 app.UseDeveloperExceptionPage();
             }
-
+#if (Swagger)
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit.WebApi.Template API");
+            });
+#endif
             app.UseMvc();
 
             app.UseAuditCorrelationId(contextAccessor);

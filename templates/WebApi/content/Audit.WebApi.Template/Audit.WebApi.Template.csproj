@@ -10,9 +10,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <!--#if (EnableEntityFramework)-->
-    <DefineConstants>EnableEntityFramework</DefineConstants>
+    <DefineConstants>DEBUG;EnableEntityFramework;NETCOREAPP;NETCOREAPP2_1</DefineConstants>
+    <!--#endif-->
+    <!--#if (Swagger)-->
+    <DefineConstants>DEBUG;Swagger;NETCOREAPP;NETCOREAPP2_1</DefineConstants>
     <!--#endif-->
     <NoWarn>1701;1702;CS1591</NoWarn>
   </PropertyGroup>
@@ -27,6 +29,11 @@
     <!--#if (EnableEntityFramework)-->
     <PackageReference Include="Audit.EntityFramework.Core" Version="*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <!--#endif-->
+
+    <!--#if (Swagger)-->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <!--#endif-->
   </ItemGroup>
 

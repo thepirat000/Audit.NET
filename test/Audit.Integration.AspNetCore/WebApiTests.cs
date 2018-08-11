@@ -13,7 +13,7 @@ namespace Audit.Integration.AspNetCore
 {
     public class WebApiTests
     {
-        private int _port;
+        private readonly int _port;
         public WebApiTests(int port)
         {
             _port = port;
@@ -39,11 +39,13 @@ namespace Audit.Integration.AspNetCore
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             var url = $"http://localhost:{_port}/api/values/TestForm";
-            var nvc = new List<KeyValuePair<string, string>>();
-            nvc.Add(new KeyValuePair<string, string>("a", "1"));
-            nvc.Add(new KeyValuePair<string, string>("b", "2"));
+            var nvc = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("a", "1"),
+                new KeyValuePair<string, string>("b", "2")
+            };
 
-            
+
             var client = new HttpClient();
             var req = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(nvc) };
             var res = await client.SendAsync(req);

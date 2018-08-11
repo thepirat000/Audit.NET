@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Audit.WebApi;
 #if (EnableEntityFramework)
 using Audit.WebApi.Template.Providers.Database;
 #endif

@@ -77,8 +77,10 @@ namespace Audit.MongoDB.Providers
 
         private static void ConfigureBsonMapping()
         {
-            var pack = new ConventionPack();
-            pack.Add(new IgnoreIfNullConvention(true));
+            var pack = new ConventionPack
+            {
+                new IgnoreIfNullConvention(true)
+            };
             ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof(AuditEvent));
 
             BsonClassMap.RegisterClassMap<AuditTarget>(cm =>

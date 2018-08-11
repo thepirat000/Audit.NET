@@ -11,7 +11,7 @@ namespace Audit.Integration.AspNetCore
 {
     public class MvcTests
     {
-        private int _port;
+        private readonly int _port;
         public MvcTests(int port)
         {
             _port = port;

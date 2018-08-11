@@ -30,7 +30,13 @@
       "type": "parameter",
       "dataType": "bool",
       "defaultValue": "false"
+    },
+    "Swagger": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false"
     }
+
   },
   "sources": [
     {

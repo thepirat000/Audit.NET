@@ -46,16 +46,20 @@ namespace Audit.IntegrationTest
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
                     .ConnectionSettings(new Elasticsearch.Providers.AuditConnectionSettings(new Uri("http://server/")))
                     .Id(ev => "id")
                     .Index("ix")
                     .Type(ev => Nest.TypeName.From<int>()));
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 Assert.AreEqual("http://server/", (x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()));
                 Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
                 Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.AreEqual(Nest.TypeName.From<int>(), x.TypeNameBuilder.Invoke(null));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             [Test]

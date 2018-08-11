@@ -8,7 +8,7 @@
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+    <NoWarn>1701;1702;1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Audit.DynamicProxy</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
