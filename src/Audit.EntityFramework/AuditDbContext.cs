@@ -170,28 +170,6 @@ namespace Audit.EntityFramework
             return _helper.SaveChanges(this, () => base.SaveChanges());
         }
 
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
-        /// <summary>
-        /// Saves all changes made in this context to the database.
-        /// </summary>
-        /// <param name="acceptAllChangesOnSuccess">Indicates whether Microsoft.EntityFrameworkCore.ChangeTracking.ChangeTracker.AcceptAllChanges
-        /// is called after the changes have been sent successfully to the database.</param>
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
-        }
-
-        /// <summary>
-        /// Saves all changes made in this context to the database.
-        /// </summary>
-        /// <param name="acceptAllChangesOnSuccess">Indicates whether Microsoft.EntityFrameworkCore.ChangeTracking.ChangeTracker.AcceptAllChanges
-        /// is called after the changes have been sent successfully to the database.</param>
-        /// <param name="cancellationToken">A System.Threading.CancellationToken to observe while waiting for the task to complete</param>
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
-        }
-#endif
         /// <summary>
         /// Saves the changes asynchronously.
         /// </summary>
