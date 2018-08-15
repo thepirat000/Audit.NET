@@ -139,12 +139,15 @@ namespace Audit.WebApi
         private IDictionary<string, object> GetActionParameters(ReflectedHttpActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
         {
             var args = actionArguments.ToDictionary(k => k.Key, v => v.Value);
-            foreach (var param in actionDescriptor.ActionBinding.ParameterBindings)
+            if (actionDescriptor.ActionBinding?.ParameterBindings != null)
             {
-                var paramDescriptor = param.Descriptor as ReflectedHttpParameterDescriptor;
-                if (paramDescriptor?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) != null)
+                foreach (var param in actionDescriptor.ActionBinding.ParameterBindings)
                 {
-                    args.Remove(paramDescriptor.ParameterName);
+                    var paramDescriptor = param.Descriptor as ReflectedHttpParameterDescriptor;
+                    if (paramDescriptor?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) != null)
+                    {
+                        args.Remove(paramDescriptor.ParameterName);
+                    }
                 }
             }
             if (serializeParams)

@@ -13,6 +13,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -102,8 +103,9 @@ namespace Audit.WebApi.UnitTest
                 Request = new HttpRequestMessage()
             };
             controllerContext.Request.Headers.Add("test-header", "header-value");
-            var actionDescriptor = new Mock<HttpActionDescriptor>();
-            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+            var actionDescriptor = new ReflectedHttpActionDescriptor();
+            actionDescriptor.MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First();
+            actionDescriptor.ActionBinding = new HttpActionBinding();
 
             var args = new Dictionary<string, object>()
             {
@@ -125,11 +127,11 @@ namespace Audit.WebApi.UnitTest
 
             var actionContext = new HttpActionContext()
             {
-                ActionDescriptor = actionDescriptor.Object,
+                ActionDescriptor = actionDescriptor,
                 ControllerContext = controllerContext,
                 
             };
-            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
+            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             var self = new TestClass() { Id = 1 };
             actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
@@ -155,7 +157,7 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual(actionDescriptor.MethodInfo.Name, action.ActionName);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
@@ -193,8 +195,9 @@ namespace Audit.WebApi.UnitTest
                 Request = new HttpRequestMessage()
             };
             controllerContext.Request.Headers.Add("test-header", "header-value");
-            var actionDescriptor = new Mock<HttpActionDescriptor>();
-            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+            var actionDescriptor = new ReflectedHttpActionDescriptor();
+            actionDescriptor.MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First();
+            actionDescriptor.ActionBinding = new HttpActionBinding();
 
             var args = new Dictionary<string, object>()
             {
@@ -214,12 +217,12 @@ namespace Audit.WebApi.UnitTest
             };
             var actionContext = new HttpActionContext()
             {
-                ActionDescriptor = actionDescriptor.Object,
+                ActionDescriptor = actionDescriptor,
                 ControllerContext = controllerContext,
 
             };
 
-            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
+            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             var self = new TestClass() { Id = 1 };
             actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
@@ -247,7 +250,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual(actionDescriptor.MethodInfo.Name, action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
 
@@ -277,8 +280,9 @@ namespace Audit.WebApi.UnitTest
                 Request = new HttpRequestMessage()
             };
             controllerContext.Request.Headers.Add("test-header", "header-value");
-            var actionDescriptor = new Mock<HttpActionDescriptor>();
-            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+            var actionDescriptor = new ReflectedHttpActionDescriptor();
+            actionDescriptor.MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First();
+            actionDescriptor.ActionBinding = new HttpActionBinding();
 
             var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
 
@@ -296,11 +300,11 @@ namespace Audit.WebApi.UnitTest
             };
             var actionContext = new HttpActionContext()
             {
-                ActionDescriptor = actionDescriptor.Object,
+                ActionDescriptor = actionDescriptor,
                 ControllerContext = controllerContext,
 
             };
-            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
+            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             actionExecutingContext.ActionArguments.Add("x", arg);
             var self = new TestClass() { Id = 1 };
@@ -331,7 +335,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
+            Assert.AreEqual(actionDescriptor.MethodInfo.Name, action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
 
@@ -362,8 +366,9 @@ namespace Audit.WebApi.UnitTest
                 Request = new HttpRequestMessage()
             };
             controllerContext.Request.Headers.Add("test-header", "header-value");
-            var actionDescriptor = new Mock<HttpActionDescriptor>();
-            actionDescriptor.Setup(c => c.ActionName).Returns("get");
+            var actionDescriptor = new ReflectedHttpActionDescriptor();
+            actionDescriptor.MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First();
+            actionDescriptor.ActionBinding = new HttpActionBinding();
 
             var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
 
@@ -382,11 +387,11 @@ namespace Audit.WebApi.UnitTest
             };
             var actionContext = new HttpActionContext()
             {
-                ActionDescriptor = actionDescriptor.Object,
+                ActionDescriptor = actionDescriptor,
                 ControllerContext = controllerContext,
                 
             };
-            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor.Object);
+            var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             actionExecutingContext.ActionArguments.Add("x", arg);
             var self = new TestClass() { Id = 1 };
@@ -413,7 +418,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(action.ActionName));
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
         }
     }
