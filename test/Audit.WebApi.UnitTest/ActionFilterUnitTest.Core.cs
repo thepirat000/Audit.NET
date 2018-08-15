@@ -14,6 +14,9 @@ using Audit.Core.Providers;
 using NUnit.Framework;
 using System.Net;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using System.Reflection;
+using System.Linq;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -100,7 +103,9 @@ namespace Audit.WebApi.UnitTest
                 ActionDescriptor = new ControllerActionDescriptor()
                 {
                     ActionName = "get",
-                    ControllerName = "values"
+                    ControllerName = "values",
+                    Parameters = new List<ParameterDescriptor>(),
+                    MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First()
                 }
             };
             var args = new Dictionary<string, object>()
@@ -169,7 +174,9 @@ namespace Audit.WebApi.UnitTest
                 ActionDescriptor = new ControllerActionDescriptor()
                 {
                     ActionName = "get",
-                    ControllerName = "values"
+                    ControllerName = "values",
+                    Parameters = new List<ParameterDescriptor>(),
+                    MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First()
                 }
             };
             var args = new Dictionary<string, object>();
@@ -218,7 +225,9 @@ namespace Audit.WebApi.UnitTest
                 ActionDescriptor = new ControllerActionDescriptor()
                 {
                     ActionName = "get",
-                    ControllerName = "values"
+                    ControllerName = "values",
+                    Parameters = new List<ParameterDescriptor>(),
+                    MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First()
                 }
             };
             var args = new Dictionary<string, object>()
@@ -285,7 +294,9 @@ namespace Audit.WebApi.UnitTest
                 ActionDescriptor = new ControllerActionDescriptor()
                 {
                     ActionName = "get",
-                    ControllerName = "values"
+                    ControllerName = "values",
+                    Parameters = new List<ParameterDescriptor>(),
+                    MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First()
                 }
             };
             var args = new Dictionary<string, object>()
