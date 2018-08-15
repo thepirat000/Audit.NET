@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [12.2.2] - 2018-08-15
 ### Modified
 - Audit.WebApi, Audit.WebApi.Core: Adding AuditIgnoreAttribute for controller, actions and arguments.
-
+- Audit.EntityFramework: Adding DefaultAuditContext and documentation on readme.md about using the library without inheritance.
 
 ## [12.2.1] - 2018-08-09
 ### Modified

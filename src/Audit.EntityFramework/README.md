@@ -52,10 +52,41 @@ public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramewor
 > If you're using [IdentityDbContext](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx) instead of DbContext, 
 you should inherit from class `AuditIdentityDbContext`.
 
+## Without inheritance
+
+You can use the library without inheriting from `DbContext`/`AuditIdentityDbContext`.
+In order to to that, you can define your `DbContext` in the following way:
+
+```c#
+public class MyContext : DbContext
+{
+    private static DbContextHelper _helper = new DbContextHelper();
+    private readonly IAuditDbContext _auditContext;
+
+    public MyContext(DbContextOptions<MyContext> options) : base(options)
+    {
+        _auditContext = new DefaultAuditContext(this);
+        _helper.SetConfig(_auditContext);
+    }
+
+    public override int SaveChanges()
+    {
+        return _helper.SaveChanges(_auditContext, () => base.SaveChanges());
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+    {
+        return await _helper.SaveChangesAsync(_auditContext, () => base.SaveChangesAsync(cancellationToken));
+    }
+}
+```
+
+
 ## How it works
 This library intercepts calls to `SaveChanges()` / `SaveChangesAsync()` on your `DbContext`, to generate [Audit.NET events](https://github.com/thepirat000/Audit.NET#usage) with the affected entities information. 
 
 Each call to `SaveChanges` generates an audit event that includes information of all the entities affected by the save operation.
+
 
 ## Configuration
 
