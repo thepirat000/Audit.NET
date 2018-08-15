@@ -3,8 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [12.2.2] - 2018-????????
-????
+## [12.2.2] - 2018-08-15
+### Modified
+- Audit.WebApi, Audit.WebApi.Core: Adding AuditIgnoreAttribute for controller, actions and arguments.
 
 
 ## [12.2.1] - 2018-08-09

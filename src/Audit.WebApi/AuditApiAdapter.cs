@@ -11,6 +11,8 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using System.Net.Http.Headers;
 using System.Collections.Specialized;
+using System.Reflection;
+using System.Linq;
 
 namespace Audit.WebApi
 {
@@ -18,6 +20,22 @@ namespace Audit.WebApi
     {
         private const string AuditApiActionKey = "__private_AuditApiAction__";
         private const string AuditApiScopeKey = "__private_AuditApiScope__";
+
+        public bool IsActionIgnored(HttpActionContext actionContext)
+        {
+            var actionDescriptor = actionContext.ActionDescriptor as ReflectedHttpActionDescriptor;
+            var controllerIgnored = actionDescriptor?.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttribute<AuditIgnoreAttribute>(true);
+            if (controllerIgnored != null)
+            {
+                return true;
+            }
+            var actionIgnored = actionDescriptor.MethodInfo.GetCustomAttribute<AuditIgnoreAttribute>(true);
+            if (actionIgnored != null)
+            {
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Occurs before the action method is invoked.
@@ -36,7 +54,7 @@ namespace Audit.WebApi
                 Headers = includeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = GetActionParameters(actionContext.ActionArguments, serializeParams),
+                ActionParameters = GetActionParameters(actionContext.ActionDescriptor as ReflectedHttpActionDescriptor, actionContext.ActionArguments, serializeParams),
                 RequestBody = includeRequestBody ? GetRequestBody(contextWrapper) : null,
                 TraceId = request.GetCorrelationId().ToString()
             };
@@ -118,13 +136,22 @@ namespace Audit.WebApi
             return null;
         }
 
-        private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments, bool serializeParams)
+        private IDictionary<string, object> GetActionParameters(ReflectedHttpActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
         {
+            var args = actionArguments.ToDictionary(k => k.Key, v => v.Value);
+            foreach (var param in actionDescriptor.ActionBinding.ParameterBindings)
+            {
+                var paramDescriptor = param.Descriptor as ReflectedHttpParameterDescriptor;
+                if (paramDescriptor?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) != null)
+                {
+                    args.Remove(paramDescriptor.ParameterName);
+                }
+            }
             if (serializeParams)
             {
-                return AuditApiHelper.SerializeParameters(actionArguments);
+                return AuditApiHelper.SerializeParameters(args);
             }
-            return actionArguments;
+            return args;
         }
 
         private static IDictionary<string, string> ToDictionary(HttpRequestHeaders col)

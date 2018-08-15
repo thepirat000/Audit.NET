@@ -79,7 +79,7 @@ namespace Audit.WebApi
         
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
-            if (Configuration.AuditDisabled)
+            if (Configuration.AuditDisabled || _adapter.IsActionIgnored(actionContext))
             {
                 return;
             }
@@ -88,7 +88,7 @@ namespace Audit.WebApi
 
         public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
         {
-            if (Configuration.AuditDisabled)
+            if (Configuration.AuditDisabled || _adapter.IsActionIgnored(actionExecutedContext.ActionContext))
             {
                 return;
             }

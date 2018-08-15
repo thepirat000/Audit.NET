@@ -90,7 +90,9 @@ namespace Audit.WebApi
 #if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (Configuration.AuditDisabled || (_logDisabledBuilder != null && _logDisabledBuilder.Invoke(context)))
+            if (Configuration.AuditDisabled 
+                || (_logDisabledBuilder != null && _logDisabledBuilder.Invoke(context))
+                || _adapter.IsActionIgnored(context))
             {
                 await next.Invoke();
                 return;
@@ -102,7 +104,9 @@ namespace Audit.WebApi
 #else
         public override async Task OnActionExecutingAsync(ActionExecutingContext actionContext, CancellationToken cancellationToken)
         {
-            if (Configuration.AuditDisabled || (_logDisabledBuilder != null && _logDisabledBuilder.Invoke(actionContext)))
+            if (Configuration.AuditDisabled 
+                || (_logDisabledBuilder != null && _logDisabledBuilder.Invoke(actionContext))
+                || _adapter.IsActionIgnored(actionContext))
             {
                 return;
             }
@@ -112,7 +116,9 @@ namespace Audit.WebApi
 
         public override async Task OnActionExecutedAsync(ActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
         {
-            if (Configuration.AuditDisabled)
+            if (Configuration.AuditDisabled
+                || (_logDisabledBuilder != null && _logDisabledBuilder.Invoke(actionExecutedContext.ActionContext))
+                || _adapter.IsActionIgnored(actionExecutedContext.ActionContext))
             {
                 return;
             }

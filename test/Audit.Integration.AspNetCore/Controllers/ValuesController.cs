@@ -14,6 +14,7 @@ namespace Audit.Integration.AspNetCore.Controllers
     {
         public string Value { get; set; }
     }
+
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -41,9 +42,8 @@ namespace Audit.Integration.AspNetCore.Controllers
             return Ok();
         }
 
-
         [HttpPost("GlobalAudit")]
-        public async Task<IActionResult> GlobalAudit([FromBody]Request request)
+        public async Task<IActionResult> GlobalAudit([AuditIgnore][FromBody]Request request)
         {
             await Task.Delay(0);
             return Ok(request.Value);
@@ -55,6 +55,22 @@ namespace Audit.Integration.AspNetCore.Controllers
             await Task.Delay(0);
             return Ok();
         }
+
+        [HttpPost("TestIgnoreParam")]
+        public async Task<IActionResult> TestIgnoreParam(string user, [AuditIgnore][FromQuery(Name = "pass")] string password)
+        {
+            await Task.Delay(0);
+            return Ok();
+        }
+
+        [HttpPost("TestIgnoreAction")]
+        [AuditIgnore]
+        public async Task<IActionResult> TestIgnoreAction()
+        {
+            await Task.Delay(0);
+            return Ok();
+        }
+
 
         [AuditApi(EventTypeName = "api/values", IncludeHeaders = true, IncludeResponseBody = true, IncludeResponseBodyFor = new[] { HttpStatusCode.BadRequest }, IncludeRequestBody = true, IncludeModelState = true)]
         [HttpGet("hi/{id}")]

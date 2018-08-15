@@ -26,6 +26,52 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("[\"value1\",\"value2\"]", s);
         }
 
+        public async Task Test_WebApi_AuditIgnoreAttribute_Action_Async()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/values/TestIgnoreAction";
+            var client = new HttpClient();
+            var req = new HttpRequestMessage(HttpMethod.Post, url);
+            var res = await client.SendAsync(req);
+
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(0, insertEvs.Count);
+        }
+
+        public async Task Test_WebApi_AuditIgnoreAttribute_Param_Async()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/values/TestIgnoreParam?user=john&pass=secret";
+            var client = new HttpClient();
+            var req = new HttpRequestMessage(HttpMethod.Post, url);
+            var res = await client.SendAsync(req);
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(1, insertEvs[0].GetWebApiAuditAction().ActionParameters.Count);
+            Assert.IsTrue(insertEvs[0].GetWebApiAuditAction().ActionParameters.ContainsKey("user"));
+            Assert.IsFalse(insertEvs[0].GetWebApiAuditAction().ActionParameters.ContainsKey("password"));
+        }
+
         public async Task Test_WebApi_FormCollectionLimit_Async()
         {
             var insertEvs = new List<AuditEvent>();
@@ -86,6 +132,7 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(HttpStatusCode.OK, s.StatusCode);
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual("{\"value\": \"def\"}", insertEvs[0].GetWebApiAuditAction().RequestBody.Value);
+            Assert.AreEqual(0, insertEvs[0].GetWebApiAuditAction().ActionParameters.Count, "request should not be logged on action params because it's ignored");
             Assert.AreEqual("def", insertEvs[0].GetWebApiAuditAction().ResponseBody.Value);
             Assert.AreEqual(200, insertEvs[0].GetWebApiAuditAction().ResponseStatusCode);
             Assert.AreEqual("POST.Values.GlobalAudit", insertEvs[0].EventType);

@@ -36,7 +36,7 @@ namespace Audit.Integration.AspNetCore
             {
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                 //mvc.AddAuditFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "Values" && (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm"))
+                    .LogActionIf(d => d.ControllerName == "Values" && (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore")))
                     .WithEventType("{verb}.{controller}.{action}")
                     .IncludeHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
