@@ -48,7 +48,7 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetColumnName(IProperty prop)
         {
-            return prop.SqlServer().ColumnName ?? prop.Name;
+            return prop.Relational().ColumnName ?? prop.Name;
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-            return definingType.SqlServer().TableName ?? definingType.Name;
+            return definingType.Relational().TableName ?? definingType.Name;
         }
 
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
