@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -410,10 +409,26 @@ namespace Audit.EntityFramework
 
         public string GetClientConnectionId(DbConnection connection)
         {
+            if (connection == null)
+            {
+                return null;
+            }
+#if NETSTANDARD1_5 || NETSTANDARD2_0
+            try
+            {
+                var connId = ((connection as dynamic).ClientConnectionId) as Guid?;
+                return connId.HasValue && !connId.Value.Equals(Guid.Empty) ? connId.Value.ToString() : null;
+            }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+            {
+                return null;
+            }
+#else
             // Get the connection id (returns NULL if the connection is not open)
-            var sqlConnection = connection as SqlConnection;
+            var sqlConnection = connection as System.Data.SqlClient.SqlConnection;
             var connId = sqlConnection?.ClientConnectionId;
-            return connId.HasValue && !connId.Equals(Guid.Empty) ? connId.Value.ToString() : null;
+            return connId.HasValue && !connId.Value.Equals(Guid.Empty) ? connId.Value.ToString() : null;
+#endif
         }
 
         /// <summary>
