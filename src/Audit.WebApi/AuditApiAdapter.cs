@@ -23,14 +23,14 @@ namespace Audit.WebApi
 
         public bool IsActionIgnored(HttpActionContext actionContext)
         {
-            var actionDescriptor = actionContext.ActionDescriptor as ReflectedHttpActionDescriptor;
-            var controllerIgnored = actionDescriptor?.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttribute<AuditIgnoreAttribute>(true);
-            if (controllerIgnored != null)
+            var actionDescriptor = actionContext?.ActionDescriptor;
+            var controllerIgnored = actionDescriptor?.ControllerDescriptor?.GetCustomAttributes<AuditIgnoreAttribute>(true).Any();
+            if (controllerIgnored.GetValueOrDefault())
             {
                 return true;
             }
-            var actionIgnored = actionDescriptor.MethodInfo.GetCustomAttribute<AuditIgnoreAttribute>(true);
-            if (actionIgnored != null)
+            var actionIgnored = actionDescriptor?.GetCustomAttributes<AuditIgnoreAttribute>(true).Any();
+            if (actionIgnored.GetValueOrDefault())
             {
                 return true;
             }
