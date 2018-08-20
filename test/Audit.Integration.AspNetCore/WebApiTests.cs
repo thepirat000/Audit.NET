@@ -227,6 +227,7 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual(1, replaceEvs.Count);
             Assert.IsTrue(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), "returned exception: " + replaceEvs[0].Exception);
+            Assert.IsTrue(replaceEvs[0].Exception.Contains("at Audit.Integration.AspNetCore.Controllers.ValuesController"), "stacktrace not found");
         }
 
 

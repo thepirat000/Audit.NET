@@ -9,7 +9,7 @@ namespace Audit.Core.Extensions
     public static class ExceptionExtensions
     {
         /// <summary>
-        /// Gets a string including the type and messages for the given exception and its inner exceptions.
+        /// Returns a string representation of the given exception.
         /// </summary>
         /// <param name="exception">The exception</param>
         public static string GetExceptionInfo(this Exception exception)
@@ -18,18 +18,8 @@ namespace Audit.Core.Extensions
             {
                 return null;
             }
-            if (exception is AggregateException)
-            {
-                var aggEx = exception as AggregateException;
-                return string.Join(" | ", aggEx.InnerExceptions?.Select(ex => GetExceptionInfo(ex)));
-            }
-            string exceptionInfo = $"({exception.GetType().Name}) {exception.Message}";
-            Exception inner = exception;
-            while ((inner = inner.InnerException) != null)
-            {
-                exceptionInfo += " -> " + inner.Message;
-            }
-            return exceptionInfo;
+            // Using ex.ToString since, by default, it contains the stacktrace and inner exceptions.
+            return exception.ToString();
         }
     }
 }

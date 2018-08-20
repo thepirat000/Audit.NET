@@ -78,7 +78,7 @@ namespace Audit.Integration.AspNetCore
                 Console.WriteLine("START - Test_WebApi_HappyPath_Async");
                 await webApiTests.Test_WebApi_HappyPath_Async();
                 Console.WriteLine("PASSED - Test_WebApi_HappyPath_Async");
-
+                
                 Console.WriteLine("START - Test_WebApi_Exception_Async");
                 await webApiTests.Test_WebApi_Exception_Async();
                 Console.WriteLine("PASSED - Test_WebApi_Exception_Async");
