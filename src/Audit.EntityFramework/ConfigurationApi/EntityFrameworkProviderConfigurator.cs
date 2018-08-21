@@ -1,6 +1,12 @@
 ﻿using System;
 using Audit.Core;
 using System.Reflection;
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+using Microsoft.EntityFrameworkCore;
+#elif NET45
+using System.Data.Entity;
+#endif
+
 
 namespace Audit.EntityFramework.ConfigurationApi
 {
@@ -9,6 +15,19 @@ namespace Audit.EntityFramework.ConfigurationApi
         internal bool _ignoreMatchedProperties = false;
         internal Func<Type, Type> _auditTypeMapper;
         internal Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
+        internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
+
+        public IEntityFrameworkProviderConfigurator UseDbContext(Func<AuditEventEntityFramework, DbContext> dbContextBuilder)
+        {
+            _dbContextBuilder = dbContextBuilder;
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfigurator UseDbContext<T>(params object[] constructorArgs) where T : DbContext
+        {
+            _dbContextBuilder = ev => (T)Activator.CreateInstance(typeof(T), constructorArgs);
+            return this;
+        }
 
         public IEntityFrameworkProviderConfiguratorAction AuditTypeMapper(Func<Type, Type> mapper)
         {

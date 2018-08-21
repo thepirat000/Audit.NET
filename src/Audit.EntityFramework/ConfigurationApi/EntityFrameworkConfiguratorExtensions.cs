@@ -3,6 +3,11 @@ using Audit.Core.ConfigurationApi;
 using Audit.EntityFramework.Providers;
 using Audit.EntityFramework;
 using Audit.EntityFramework.ConfigurationApi;
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+using Microsoft.EntityFrameworkCore;
+#elif NET45
+using System.Data.Entity;
+#endif
 
 namespace Audit.Core
 {
@@ -30,13 +35,15 @@ namespace Audit.Core
             return new CreationPolicyConfigurator();
         }
 
-        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, Type> auditTypeMapper = null, Func<AuditEvent, EventEntry, object, bool> auditEntityAction = null, bool ignoreMatchedProperties = false)
+        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, Type> auditTypeMapper = null, Func<AuditEvent, EventEntry, object, bool> auditEntityAction = null, bool ignoreMatchedProperties = false,
+            Func<AuditEventEntityFramework, DbContext> dbContextBuilder = null)
         {
             var efdp = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
                 IgnoreMatchedProperties = ignoreMatchedProperties,
-                AuditEntityAction = auditEntityAction
+                AuditEntityAction = auditEntityAction,
+                DbContextBuilder = dbContextBuilder
             };
             Configuration.DataProvider = efdp;
             return new CreationPolicyConfigurator();
@@ -51,7 +58,8 @@ namespace Audit.Core
         {
             var efConfig = new EntityFrameworkProviderConfigurator();
             config.Invoke(efConfig);
-            return UseEntityFramework(configurator, efConfig._auditTypeMapper, efConfig._auditEntityAction, efConfig._ignoreMatchedProperties);
+            return UseEntityFramework(configurator, efConfig._auditTypeMapper, efConfig._auditEntityAction, efConfig._ignoreMatchedProperties, efConfig._dbContextBuilder);
         }
     }
 }
+ 

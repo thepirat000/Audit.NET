@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 #elif NET45
+using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 #endif
 
@@ -26,6 +27,7 @@ namespace Audit.EntityFramework.Providers
         private bool _ignoreMatchedProperties;
         private Func<Type, Type> _auditTypeMapper;
         private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
+        private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
 
         public Func<Type, Type> AuditTypeMapper
         {
@@ -49,19 +51,29 @@ namespace Audit.EntityFramework.Providers
             set { _ignoreMatchedProperties = value; }
         }
 
+        /// <summary>
+        /// Function that returns the DbContext to use for Audit Tables (default is the same context as the one audited)
+        /// </summary>
+        public Func<AuditEventEntityFramework, DbContext> DbContextBuilder
+        {
+            get { return _dbContextBuilder; }
+            set { _dbContextBuilder = value; }
+        }
+
         public override object InsertEvent(AuditEvent auditEvent)
         {
             bool save = false;
             var efEvent = auditEvent as AuditEventEntityFramework;
-            var dbContext = efEvent.EntityFrameworkEvent.DbContext;
+            var localDbContext = efEvent.EntityFrameworkEvent.DbContext;
+            var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach(var entry in efEvent.EntityFrameworkEvent.Entries)
             {
                 Type type;
 #if NETSTANDARD2_0
-                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
+                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
                 type = definingType?.ClrType;
 #elif NETSTANDARD1_5 || NET461
-                IEntityType definingType = dbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
+                IEntityType definingType = localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
                 type = definingType?.ClrType;
 #else
                 type = ObjectContext.GetObjectType(entry.Entry.Entity.GetType());
@@ -75,9 +87,9 @@ namespace Audit.EntityFramework.Providers
                         if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
                         {
 #if NET45
-                            dbContext.Set(mappedType).Add(auditEntity);
+                            auditDbContext.Set(mappedType).Add(auditEntity);
 #else
-                            dbContext.Add(auditEntity);
+                            auditDbContext.Add(auditEntity);
 #endif
                             save = true;
                         }
@@ -86,13 +98,13 @@ namespace Audit.EntityFramework.Providers
             }
             if (save)
             {
-                if (dbContext is IAuditBypass)
+                if (auditDbContext is IAuditBypass)
                 {
-                    (dbContext as IAuditBypass).SaveChangesBypassAudit();
+                    (auditDbContext as IAuditBypass).SaveChangesBypassAudit();
                 }
                 else
                 {
-                    dbContext.SaveChanges();
+                    auditDbContext.SaveChanges();
                 }
             }
             return null;
@@ -102,15 +114,16 @@ namespace Audit.EntityFramework.Providers
         {
             bool save = false;
             var efEvent = auditEvent as AuditEventEntityFramework;
-            var dbContext = efEvent.EntityFrameworkEvent.DbContext;
+            var localDbContext = efEvent.EntityFrameworkEvent.DbContext;
+            var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
             {
                 Type type;
 #if NETSTANDARD2_0
-                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
+                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
                 type = definingType?.ClrType;
 #elif NETSTANDARD1_5 || NET461
-                IEntityType definingType = dbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
+                IEntityType definingType = localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
                 type = definingType?.ClrType;
 #else
                 type = ObjectContext.GetObjectType(entry.Entry.Entity.GetType());
@@ -124,9 +137,9 @@ namespace Audit.EntityFramework.Providers
                         if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
                         {
 #if NET45
-                            dbContext.Set(mappedType).Add(auditEntity);
+                            auditDbContext.Set(mappedType).Add(auditEntity);
 #else
-                            await dbContext.AddAsync(auditEntity);
+                            await auditDbContext.AddAsync(auditEntity);
 #endif
                             save = true;
                         }
@@ -135,13 +148,13 @@ namespace Audit.EntityFramework.Providers
             }
             if (save)
             {
-                if (dbContext is IAuditBypass)
+                if (auditDbContext is IAuditBypass)
                 {
-                    await (dbContext as IAuditBypass).SaveChangesBypassAuditAsync();
+                    await (auditDbContext as IAuditBypass).SaveChangesBypassAuditAsync();
                 }
                 else
                 {
-                    await dbContext.SaveChangesAsync();
+                    await auditDbContext.SaveChangesAsync();
                 }
             }
             return null;

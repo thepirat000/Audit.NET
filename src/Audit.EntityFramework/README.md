@@ -326,14 +326,16 @@ Another way to customize the output is by using global custom actions, please se
 
 ## Entity Framework Data Provider
 
-If you plan to store the audit logs on the same database as the audited entities, you can use the provided `EntityFrameworkDataProvider`. Use this to store the logs of each table in a an audit table with similar structure.
+If you plan to store the audit logs via EntityFramework, on the same or a different DbContext, you can use the provided `EntityFrameworkDataProvider`. 
+Use this to store the logs of each table in an audit table with similar structure.
 
 For example, you want to audit `Order` and `OrderItem` tables into `Audit_Order` and `Audit_OrderItem` tables respectively, 
 and the structure of the `Audit_*` tables mimic the audited table plus some fields like the event date, an action and the username:
 
 ![Audit entities](http://i.imgur.com/QvfXS9H.png)
 
-Note the audit trail tables must be mapped on the same model as the audited entities.
+> Note that by default the library assumes the same DbContext audited will contain all the audit tables. 
+> This is not mandatory and you can provide a _DbContext_ per audit event.
 
 ### EF Provider configuration
 
@@ -377,6 +379,7 @@ Mandatory:
 - **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
 
 Optional:
+- **UseDbContext**: A function that returns the DbContext to use for storing the audit events, by default it will use the same context being audited. 
 - **AuditEntityAction**: A function to perform on the audit entity before saving it, for example to update specific audit properties like user name
 or the audit date. It can also be used to filter out audit entities. This function returns a boolean value to indicate whether to include the entity on the output log. 
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is true).
@@ -445,3 +448,20 @@ Audit.Core.Configuration.Setup()
                 return true;
             })));
 ```
+
+
+To set a custom DbContext for storing the audit events, for example when your Audit_* entities 
+are defined in a different database and context (i.e. `AuditDatabaseDbContext`):
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(x => x
+        .UseDbContext<AuditDatabaseDbContext>()
+        .AuditTypeExplicitMapper(m => m
+            .Map<Order, Audit_Order>()
+            .AuditEntityAction<IAudit>((ev, ent, auditEntity) =>
+            {
+                auditEntity.AuditDate = DateTime.UtcNow;
+            })));
+```
+
