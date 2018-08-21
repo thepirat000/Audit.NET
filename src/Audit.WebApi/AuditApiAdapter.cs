@@ -54,7 +54,7 @@ namespace Audit.WebApi
                 Headers = includeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = GetActionParameters(actionContext.ActionDescriptor as ReflectedHttpActionDescriptor, actionContext.ActionArguments, serializeParams),
+                ActionParameters = GetActionParameters(actionContext.ActionDescriptor, actionContext.ActionArguments, serializeParams),
                 RequestBody = includeRequestBody ? GetRequestBody(contextWrapper) : null,
                 TraceId = request.GetCorrelationId().ToString()
             };
@@ -70,7 +70,8 @@ namespace Audit.WebApi
             {
                 EventType = eventType,
                 AuditEvent = auditEventAction,
-                CallingMethod = (actionContext.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
+                // the inner ActionDescriptor is of type ReflectedHttpActionDescriptor even when using api versioning:
+                CallingMethod = (actionContext.ActionDescriptor?.ActionBinding?.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
             };
             var auditScope = await AuditScope.CreateAsync(options);
             contextWrapper.Set(AuditApiActionKey, auditAction);
@@ -136,17 +137,17 @@ namespace Audit.WebApi
             return null;
         }
 
-        private IDictionary<string, object> GetActionParameters(ReflectedHttpActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
+        private IDictionary<string, object> GetActionParameters(HttpActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
         {
             var args = actionArguments.ToDictionary(k => k.Key, v => v.Value);
-            if (actionDescriptor.ActionBinding?.ParameterBindings != null)
+            var parameters = actionDescriptor.GetParameters();
+            if (parameters != null)
             {
-                foreach (var param in actionDescriptor.ActionBinding.ParameterBindings)
+                foreach(var param in parameters)
                 {
-                    var paramDescriptor = param.Descriptor as ReflectedHttpParameterDescriptor;
-                    if (paramDescriptor?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) != null)
+                    if (param.GetCustomAttributes<AuditIgnoreAttribute>().Any())
                     {
-                        args.Remove(paramDescriptor.ParameterName);
+                        args.Remove(param.ParameterName);
                     }
                 }
             }

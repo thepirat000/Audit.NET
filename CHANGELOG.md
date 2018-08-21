@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [12.3.3] - 2018-08-21
+### Modified
+- Audit.WebApi: Fix bug #147 for Microsoft.AspNet.WebApi.Versioning package compatibility.
+
 ## [12.3.2] - 2018-08-20
 ### Modified
 - Audit.EntityFramework.Core: Replace Microsoft.EntityFrameworkCore.SqlServer dependency in Audit.EntityFramework.Core with Microsoft.EntityFrameworkCore.Relational. (thanks to https://github.com/Deilan).
