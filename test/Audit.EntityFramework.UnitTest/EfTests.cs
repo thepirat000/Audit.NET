@@ -9,11 +9,11 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using DataBaseService;
 
 namespace Audit.EntityFramework.UnitTest
 {
+
     [TestFixture]
     [Category("LocalDb")]
     public class EfTests

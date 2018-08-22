@@ -1,5 +1,6 @@
 ﻿#if NET45
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core.Mapping;
@@ -24,13 +25,13 @@ public sealed class EntityKeyHelper
     //Singleton
     private static readonly Lazy<EntityKeyHelper> LazyInstance = new Lazy<EntityKeyHelper>(() => new EntityKeyHelper());
     //Type -> KeyNames
-    private readonly Dictionary<Type, string[]> _keyNamesCache = new Dictionary<Type, string[]>();
+    private readonly ConcurrentDictionary<Type, string[]> _keyNamesCache = new ConcurrentDictionary<Type, string[]>();
     //Type -> ForeignKeyNames
-    private readonly Dictionary<Type, string[]> _foreignKeyNamesCache = new Dictionary<Type, string[]>();
+    private readonly ConcurrentDictionary<Type, string[]> _foreignKeyNamesCache = new ConcurrentDictionary<Type, string[]>();
     //Type -> TableName
-    private readonly Dictionary<Type, string> _tableNamesCache = new Dictionary<Type, string>();
+    private readonly ConcurrentDictionary<Type, string> _tableNamesCache = new ConcurrentDictionary<Type, string>();
     //Type -> PropertyName -> ColumnName
-    private readonly Dictionary<Type, Dictionary<string, string>> _columnNamesCache = new Dictionary<Type, Dictionary<string, string>>();
+    private readonly ConcurrentDictionary<Type, Dictionary<string, string>> _columnNamesCache = new ConcurrentDictionary<Type, Dictionary<string, string>>();
 
     private EntityKeyHelper() { }
 
@@ -39,7 +40,7 @@ public sealed class EntityKeyHelper
         get { return LazyInstance.Value; }
     }
 
-#region Private Methods
+    #region Private Methods
     private string[] GetKeyNames(DbContext context, Type entityType)
     {
         entityType = GetBaseEntityType(context, entityType);
@@ -102,7 +103,7 @@ public sealed class EntityKeyHelper
             .Single(x => x.Name == entityType.Name);
 
         var entitySetMappings = metadata.GetItems<EntityContainerMapping>(DataSpace.CSSpace).Single().EntitySetMappings.ToList();
-        
+
         // Find the mapping between conceptual and storage model for this entity set
         var mapping = entitySetMappings.SingleOrDefault(x => x.EntitySet.Name == entitySet.Name);
         if (mapping != null)
@@ -131,7 +132,7 @@ public sealed class EntityKeyHelper
 
     private Type GetBaseEntityType(DbContext context, Type type)
     {
-        var objectContext = ((IObjectContextAdapter) context).ObjectContext;
+        var objectContext = ((IObjectContextAdapter)context).ObjectContext;
         type = ObjectContext.GetObjectType(type);
         if (type.BaseType != null && type.BaseType != typeof(object))
         {
@@ -143,9 +144,9 @@ public sealed class EntityKeyHelper
         }
         return type;
     }
-#endregion
+    #endregion
 
-#region Public Methods
+    #region Public Methods
     /// <summary>
     /// Gets the primary key keys and values for a given entity in a given db context.
     /// </summary>
@@ -249,6 +250,6 @@ public sealed class EntityKeyHelper
         _columnNamesCache[type][propertyName] = columnName;
         return columnName;
     }
-#endregion
+    #endregion
 }
 #endif

@@ -87,6 +87,7 @@
     <Compile Include="Blog.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="EfStressTests.cs" />
     <Compile Include="Event.cs">
       <DependentUpon>ModelIdentity.tt</DependentUpon>
     </Compile>
