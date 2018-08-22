@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Audit.EntityFramework.UnitTest
 {
     [TestFixture]
-    [Category("LocalDb")]
+    [Category("Stress")]
     public class EfStressTests
     {
         private object _locker = new object();
