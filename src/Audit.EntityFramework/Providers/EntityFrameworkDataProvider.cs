@@ -20,7 +20,7 @@ namespace Audit.EntityFramework.Providers
     /// Settings:
     /// - AuditTypeMapper: A function that maps an entity type to its audited type (i.e. Order -> OrderAudit, etc)
     /// - AuditEntityAction: An action to perform on the audit entity before saving it
-    /// - IgnoreMatchedProperties: Set to true to avoid the property values copy from the entity to the audited entity (default is true)
+    /// - IgnoreMatchedProperties: Set to true to avoid the property values copy from the entity to the audited entity (default is false)
     /// </remarks>
     public class EntityFrameworkDataProvider : AuditDataProvider
     {
