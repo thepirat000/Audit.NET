@@ -401,8 +401,22 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
+the AuditEvent (shown here as `ev`) in an instance of `AuditEventEntityFramework`. As such, it can be casted to that type or by using the helper method `ev.GetEntityFrameworkEvent()`.
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(x => x
+        .AuditTypeNameMapper(typeName => "Audit_" + typeName)
+        .AuditEntityAction<IAudit>((ev, ent, auditEntity) =>
+        {
+	    var entityFrameworkEvent = ev.GetEntityFrameworkEvent();
+	    auditEntity.TransactionId = entityFrameworkEvent.TransactionId;
+        }));
+```
+
 If your audit trail entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
 to configure the action to be performed to each audit trail entity before saving:
+
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(x => x
@@ -415,6 +429,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 Use the explicit mapper to provide granular configuration per audit type:
+
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(x => x
@@ -433,6 +448,7 @@ Audit.Core.Configuration.Setup()
 ```
 
 Ignore certain entities on the audit log:
+
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(x => x
