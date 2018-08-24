@@ -5,6 +5,15 @@ namespace Audit.EntityFramework
     public static class AuditEventExtensions
     {
         /// <summary>
+        /// Gets the Entity Framework Event portion of the Audit Event on the given scope.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        public static EntityFrameworkEvent GetEntityFrameworkEvent(this AuditScope auditScope)
+        {
+            return auditScope?.Event.GetEntityFrameworkEvent();
+        }
+
+        /// <summary>
         /// Gets the Entity Framework Event portion of the Audit Event.
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>

@@ -5,6 +5,15 @@ namespace Audit.DynamicProxy
     public static class AuditEventExtensions
     {
         /// <summary>
+        /// Gets the Dynamic Interception Event portion of the Audit Event for the given scope.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        public static InterceptEvent GetAuditInterceptEvent(this AuditScope auditScope)
+        {
+            return auditScope?.Event.GetAuditInterceptEvent();
+        }
+
+        /// <summary>
         /// Gets the Dynamic Interception Event portion of the Audit Event.
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>

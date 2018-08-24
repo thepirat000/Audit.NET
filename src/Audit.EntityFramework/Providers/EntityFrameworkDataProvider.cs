@@ -64,6 +64,10 @@ namespace Audit.EntityFramework.Providers
         {
             bool save = false;
             var efEvent = auditEvent as AuditEventEntityFramework;
+            if (efEvent == null)
+            {
+                return null;
+            }
             var localDbContext = efEvent.EntityFrameworkEvent.DbContext;
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach(var entry in efEvent.EntityFrameworkEvent.Entries)
@@ -114,6 +118,10 @@ namespace Audit.EntityFramework.Providers
         {
             bool save = false;
             var efEvent = auditEvent as AuditEventEntityFramework;
+            if (efEvent == null)
+            {
+                return null;
+            }
             var localDbContext = efEvent.EntityFrameworkEvent.DbContext;
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach (var entry in efEvent.EntityFrameworkEvent.Entries)

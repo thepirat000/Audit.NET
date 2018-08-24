@@ -59,6 +59,7 @@ namespace Audit.IntegrationTest
                 });
             using (var db = new AuditNetTestContext())
             {
+                db.Database.EnsureCreated();
                 db.Foos.Add(new Foo());
                 Assert.Throws<DbUpdateException>(() => {
                     db.SaveChanges();
@@ -639,7 +640,7 @@ namespace Audit.IntegrationTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                 .WithAction(x => x.OnScopeCreated(sc =>
                 {
-                    var wcfEvent = sc.Event.GetEntityFrameworkEvent();
+                    var wcfEvent = sc.GetEntityFrameworkEvent();
                     Assert.AreEqual("Blogs", wcfEvent.Database);
                 }));
             int blogId;
@@ -873,8 +874,8 @@ SET IDENTITY_INSERT Posts OFF
         }
         public override void OnScopeSaving(AuditScope auditScope)
         {
-            if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
-                && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].ToString() == "ROLLBACK")
+            if (auditScope.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
+                && auditScope.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].ToString() == "ROLLBACK")
             {
                 GetCurrentTran().Rollback();
             }

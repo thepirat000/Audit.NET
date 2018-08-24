@@ -11,6 +11,7 @@ namespace Audit.EntityFramework.UnitTest
     public class EfStressTests
     {
         private object _locker = new object();
+        private List<EntityFrameworkEvent> _events = new List<EntityFrameworkEvent>();
         private List<string> _blogTitleList = new List<string>();
 
         [OneTimeSetUp]
@@ -21,6 +22,14 @@ namespace Audit.EntityFramework.UnitTest
         [SetUp]
         public void SetUp()
         {
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    lock (_locker)
+                    {
+                        _events.Add(ev.GetEntityFrameworkEvent());
+                    }
+                }));
 
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsEntities>().Reset();
@@ -41,6 +50,7 @@ namespace Audit.EntityFramework.UnitTest
                 tasks.Add(Task.Run(() => SaveFromOneThread()));
             }
             Task.WaitAll(tasks.ToArray());
+            Assert.AreEqual(N*2, _events.Count);
             Assert.AreEqual(N, _blogTitleList.Count);
         }
 
