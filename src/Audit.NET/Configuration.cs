@@ -66,6 +66,31 @@ namespace Audit.Core
                 AuditScopeActions[when].Add(action);
             }
         }
+
+        /// <summary>
+        /// Attaches a global action to be performed on the audit scope before the audit event is saved.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        public static void AddOnSavingAction(Action<AuditScope> action)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnEventSaving].Add(action);
+            }
+        }
+
+        /// <summary>
+        /// Attaches a global action to be performed on the audit scope right after it is created and before any saving.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        public static void AddOnCreatedAction(Action<AuditScope> action)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnScopeCreated].Add(action);
+            }
+        }
+
         /// <summary>
         /// Resets the audit scope handlers. Removes all the attached actions for the Audit Scopes.
         /// </summary>

@@ -381,7 +381,7 @@ namespace Audit.IntegrationTest
                 var ev = (AuditEvent)null;
                 var ids = new List<object>();
                 Audit.Core.Configuration.ResetCustomActions();
-                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+                Audit.Core.Configuration.AddOnSavingAction(scope =>
                 {
                     ids.Add(scope.EventId);
                 });

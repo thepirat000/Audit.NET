@@ -13,7 +13,7 @@ namespace Audit.Core
         /// <summary>
         /// The enviroment information
         /// </summary>
-        [JsonProperty]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public AuditEventEnvironment Environment { get; set; }
 
         /// <summary>

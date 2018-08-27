@@ -481,7 +481,7 @@ namespace Audit.UnitTest
             
             var eventType = "event type 1";
             var target = "test";
-            Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+            Core.Configuration.AddOnCreatedAction(scope =>
             {
                 scope.SetCustomField("custom field", "test");
                 if (scope.EventType == eventType)
@@ -489,7 +489,7 @@ namespace Audit.UnitTest
                     scope.Discard();
                 }
             });
-            Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
+            Core.Configuration.AddOnSavingAction(scope =>
             {
                 Assert.True(false, "This should not be executed");
             });

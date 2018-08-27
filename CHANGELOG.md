@@ -8,7 +8,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Audit.Core: Adding GetXxxxxEvent() extensions to AuditScope in addition to the AuditEvent.
 - Audit.EntityFramework: Added validation on EF Data Provider to ignore non EF events.
 
-
 ## [12.3.5] - 2018-08-22
 ### Modified
 - Audit.EntityFramework: Fix #150: Race condition on Audit.EF .NET Framework version, when multiple threads are calling EF SaveChanges. 
