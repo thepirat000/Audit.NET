@@ -23,6 +23,7 @@ del "Audit.SignalR\bin\debug\*.nupkg"
 del "Audit.NET.log4net\bin\debug\*.nupkg"
 del "Audit.NET.Elasticsearch\bin\debug\*.nupkg"
 del "Audit.NET.EventLog.Core\bin\debug\*.nupkg"
+del "Audit.NET.DynamoDB\bin\debug\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -50,5 +51,5 @@ dotnet pack "Audit.SignalR/"
 dotnet pack "Audit.NET.log4net/"
 dotnet pack "Audit.NET.Elasticsearch/"
 dotnet pack "Audit.NET.EventLog.Core/"
-
+dotnet pack "Audit.NET.DynamoDB/"
 
