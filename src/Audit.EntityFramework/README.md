@@ -19,13 +19,21 @@ PM> Install-Package Audit.EntityFramework
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
 [![NuGet Count](https://img.shields.io/nuget/dt/Audit.EntityFramework.svg)](https://www.nuget.org/packages/Audit.EntityFramework/)
 
-## Note 
+## Notes 
 
-If you are targeting the full .NET framework but want to use EntityFrameworkCore (EF >= 7), you should install the `Audit.EntityFramework.Core` package instead:
+The Asp Net Core identity integration was moved to a new package `Audit.EntityFramework.Identity`/`Audit.EntityFramework.Identity.Core`, 
+this was to avoid the reference to `AspNetCore.Identity` if you are not using it. So, if you use [IdentityDbContext](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx), you must also install the library:
+
+```
+PM> Install-Package Audit.EntityFramework.Identity
+```
+
+If you target the full .NET framework but want to use EntityFrameworkCore (EF >= 7), you should install the `Audit.EntityFramework.Core` package instead:
 
 ```
 PM> Install-Package Audit.EntityFramework.Core
 ```
+
 
 ## Usage
 Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
@@ -50,7 +58,7 @@ public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramewor
 ```
 
 > If you're using [IdentityDbContext](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx) instead of DbContext, 
-you should inherit from class `AuditIdentityDbContext`.
+you can install the package `Audit.EntityFramework.Identity` or `Audit.EntityFramework.Identity.Core` and inherit from the class `AuditIdentityDbContext` instead of `AuditDbContext`.
 
 ## Without inheritance
 

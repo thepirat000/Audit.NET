@@ -177,6 +177,10 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Audit.EntityFramework.Identity\Audit.EntityFramework.Identity.csproj">
+      <Project>{5d72ec4d-e147-4958-b4e7-afcc019de54f}</Project>
+      <Name>Audit.EntityFramework.Identity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj">
       <Project>{d6c86273-942b-4be7-8764-fa4567f19c9a}</Project>
       <Name>Audit.NET.SqlServer</Name>

@@ -1,21 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Generate Audit Logs from EntityFramework context changes</Description>
-    <Copyright>Copyright 2016</Copyright>
-    <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
+    <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
+    <Copyright>Copyright 2018</Copyright>
+    <AssemblyTitle>Audit.EntityFramework.Identity.Core</AssemblyTitle>
     <VersionPrefix>13.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.EntityFramework.Core</AssemblyName>
+    <AssemblyName>Audit.EntityFramework.Identity.Core</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.EntityFramework.Core</PackageId>
-    <PackageTags>Audit;Trail;Log;EntityFramework;Core</PackageTags>
+    <PackageId>Audit.EntityFramework.Identity.Core</PackageId>
+    <PackageTags>Audit;Trail;Log;EntityFramework;Core;AspNet;Identity</PackageTags>
     <PackageIconUrl>http://i.imgur.com/T3NcXaZ.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.EntityFramework</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Audit.EntityFramework\**\*.cs" Exclude="..\Audit.EntityFramework\obj\**\*.*;..\**\AssemblyInfo.cs" />
+    <Compile Include="..\Audit.EntityFramework.Identity\**\*.cs" Exclude="..\Audit.EntityFramework.Identity\obj\**\*.*;..\**\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,26 +35,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.1" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Transactions" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.2" />
   </ItemGroup>
 
 </Project>

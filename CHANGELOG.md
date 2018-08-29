@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [13.0.0] - 2018-08-30
+### Modified
+- Audit.EntityFramework and Audit.EntityFramework.Core: Created new nuget packages `Audit.EntityFramework.Identity` and `Audit.EntityFramework.Identity.Core` 
+to remove the AspNet.Identity dependency.
+
+
 ## [12.3.6] - 2018-08-29
 ### Added
 - Audit.NET.DynamoDB: Adding new extension **Audit.NET.DynamoDB** to save audit events into Amazon DynamoDB using the `AWSSDK.DynamoDBv2` document model.

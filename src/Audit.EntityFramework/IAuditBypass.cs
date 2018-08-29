@@ -2,7 +2,7 @@
 
 namespace Audit.EntityFramework
 {
-    internal interface IAuditBypass
+    public interface IAuditBypass
     {
         int SaveChangesBypassAudit();
         Task<int> SaveChangesBypassAuditAsync();

@@ -174,8 +174,8 @@ namespace Audit.EntityFramework.Providers
             var auditEntity = Activator.CreateInstance(auditType);
             if (!_ignoreMatchedProperties)
             {
-                var auditFields = auditType.GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(k => k.Name);
-                var entityFields = definingType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                var auditFields = auditType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).ToDictionary(k => k.Name);
+                var entityFields = definingType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 foreach (var field in entityFields.Where(af => auditFields.ContainsKey(af.Name)))
                 {
                     var value = field.GetValue(entity);
