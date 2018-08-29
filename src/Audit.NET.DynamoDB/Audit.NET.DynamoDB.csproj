@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.NET.DynamoDB</PackageId>
     <PackageTags>Audit;Trail;Log;DynamoDB</PackageTags>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl>https://i.imgur.com/kIGe4Z5.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.DynamoDB</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
