@@ -257,7 +257,7 @@ namespace Audit.IntegrationTest
             [Category("Dynamo")]
             public void TestStressDynamo()
             {
-                int N = 64;
+                int N = 32;
                 SetDynamoSettings();
                 var hashes = new HashSet<string>();
                 int count = 0;
