@@ -57,21 +57,23 @@ Audit.Core.Configuration.Setup()
 
 ### Provider Options
 
-- **Client**: The DynamoDB client instance creator `AmazonDynamoDBClient`. 
+- **Client**: The DynamoDB client creator `AmazonDynamoDBClient`. 
 - **TableNameBuilder**: A function of the audit event that returns the Table Name to use.
 - **CustomAttributes**: A dictionary with any additional field to eb included on the audit event and document.
 
 ### Fluent API Methods
 
-Connection level:
+The provider options can be set with a fluent API described by the following methods:
+
+##### Connection level
 - **WithClient()**: Use the given DynamoDB client instance (`AmazonDynamoDBClient`).
 - **UseConfig()**: Alternative to `WithClient()`, to use a DynamoDB client with the given settings (`AmazonDynamoDBConfig`).
 - **UseUrl()**: Alternative to use a DynamoDB client only specifying the service URL.
 
-Table level:
+##### Table level
 - **Table()**: To specify the table name (as a string or a function of the audit event).
 
-Attributes level:
+##### Attributes level
 - **SetAttribute()**: To specify additional top-level attributes on the document before saving.
 
 ## Query events

@@ -1,9 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+   <PropertyGroup>
+    <Description>Store Audit.NET Trail Logs into Amazon DynamoDB</Description>
+    <Copyright>Copyright 2018</Copyright>
+    <AssemblyTitle>Audit.DynamoDB</AssemblyTitle>
+    <VersionPrefix>12.3.6</VersionPrefix>
+    <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Audit.NET.DynamoDB</AssemblyName>
+    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Audit.NET.DynamoDB</PackageId>
+    <PackageTags>Audit;Trail;Log;DynamoDB</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.DynamoDB</PackageProjectUrl>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.13" />
   </ItemGroup>
