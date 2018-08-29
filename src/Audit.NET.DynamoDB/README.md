@@ -59,7 +59,7 @@ Audit.Core.Configuration.Setup()
 
 - **Client**: The DynamoDB client creator `AmazonDynamoDBClient`. 
 - **TableNameBuilder**: A function of the audit event that returns the Table Name to use.
-- **CustomAttributes**: A dictionary with any additional field to eb included on the audit event and document.
+- **CustomAttributes**: A dictionary with additional fields to be included in the document and as custom fields on the audit event.
 
 ### Fluent API Methods
 
@@ -100,8 +100,6 @@ var event = dynamoDataProvider.GetEvent("A001-005283", 2018);
 var event = dynamoDataProvider.GetEvent("A001-005283");
 ```
 
-
-
 --------
 
 ## Constraints
@@ -110,7 +108,7 @@ This provider has the following constraints:
 
 - The table to store the audit events must exists on DynamoDB. 
 - Its indexes must consist of top-level properties of the audit event. 
-(Note you can extend the [AuditEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEvent.cs) class or add [Custom Fields](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) as new top-level properties if necessary) 
+(Note you can add properties to the AuditEvent as [Custom Fields](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) with the `SetAttribute()` method on the provider configuration)
 
 The following is an example of a table creation using the [AWSSDK.DynamoDBv2](https://www.nuget.org/packages/AWSSDK.DynamoDBv2/) library:
 
@@ -136,19 +134,27 @@ await client.CreateTableAsync(new CreateTableRequest()
 });
 ```
 
-In this case, the primary key is defined as a Hash and a Range key, with `EventId` being the hash, 
-and `EventType` being the range. 
+In this case, the primary key is defined as a Hash and a Range key, with `EventId` being the hash, and `EventType` being the range. 
 Both must be top-level properties of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage), 
-but since the `EventId` is not a built-in property, you can add it as a [Custom Field](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments) with a [Custom Action](https://github.com/thepirat000/Audit.NET#custom-actions):
-
+but since the `EventId` is not a built-in property, you can configure it as a [Custom Field](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments):
 
 ```c#
-// on your startup logic:
+Audit.Core.Configuration.Setup()
+    .UseDynamoDB(config => config
+        .UseUrl(url)
+        .Table("AuditEvents")
+        .SetAttribute("EventId", ev => Guid.NewGuid()));
+```
+
+Or you can use a global [Custom Action](https://github.com/thepirat000/Audit.NET#custom-actions) instead with the same outcome:
+
+```c#
 Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
     scope.SetCustomField("EventId", Guid.NewGuid());
 });
 ```
+
 
 
 
