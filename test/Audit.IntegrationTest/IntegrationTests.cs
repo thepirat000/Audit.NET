@@ -19,6 +19,10 @@ using Audit.AzureDocumentDB.Providers;
 using Audit.AzureDocumentDB.ConfigurationApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
+using Audit.DynamoDB.Providers;
+using Amazon.DynamoDBv2.DocumentModel;
 
 namespace Audit.IntegrationTest
 {
@@ -217,11 +221,11 @@ namespace Audit.IntegrationTest
                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
                 var rnd = new Random();
-                
+
                 //Parallel random insert into event1, event2 and event3 containers
                 Parallel.ForEach(Enumerable.Range(1, 100), i =>
                 {
-                    var eventType =  "event" + rnd.Next(1, 4); //1..3
+                    var eventType = "event" + rnd.Next(1, 4); //1..3
                     var x = "start";
                     using (var s = AuditScope.Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd))
                     {
@@ -248,6 +252,56 @@ namespace Audit.IntegrationTest
                     } while (continuationToken != null);
                 }
             }
+
+            [Test]
+            [Category("Dynamo")]
+            public void TestStressDynamo()
+            {
+                int N = 64;
+                SetDynamoSettings();
+                var hashes = new HashSet<string>();
+                int count = 0;
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+                {
+                    count++;
+                    hashes.Add((scope.EventId as object[])[0].ToString());
+                });
+
+                var rnd = new Random();
+
+                //Parallel random insert into event1, event2 and event3 containers
+                Parallel.ForEach(Enumerable.Range(1, N), i =>
+                {
+                    var eventType = "AuditEvents";
+                    var x = "start";
+                    using (var s = AuditScope.Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd))
+                    {
+                        x = "end";
+                    }
+                });
+
+                Assert.AreEqual(N, hashes.Count);
+                Assert.AreEqual(N*2, count);
+
+                // Assert events
+                int maxCheck = N / 4;
+                int check = 0;
+                foreach(var hash in hashes)
+                {
+                    if (check++ > maxCheck)
+                    {
+                        break;
+                    }
+                    var ddp = (Configuration.DataProvider as DynamoDataProvider);
+                    var ev = ddp.GetEvent<AuditEvent>((Primitive)hash, (Primitive)DateTime.Now.Year);
+
+                    Assert.NotNull(ev);
+                    Assert.AreEqual("AuditEvents", ev.EventType);
+                    Assert.AreEqual(DateTime.Now.Year, ev.CustomFields["SortKey"]);
+                    Assert.AreEqual(hash, ev.CustomFields["HashKey"]);
+                }
+            }
+
 
             [Test]
             [Category("AzureBlob")]
@@ -367,6 +421,24 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 
+            [Test]
+            [Category("Dynamo")]
+            public void TestDynamo()
+            {
+                SetDynamoSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("Dynamo")]
+            public async Task TestDynamoAsync()
+            {
+                SetDynamoSettings();
+                await TestUpdateAsync();
+            }
+
             public struct TestStruct
             {
                 public int Id { get; set; }
@@ -381,7 +453,7 @@ namespace Audit.IntegrationTest
                 var ev = (AuditEvent)null;
                 var ids = new List<object>();
                 Audit.Core.Configuration.ResetCustomActions();
-                Audit.Core.Configuration.AddOnSavingAction(scope =>
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
                 {
                     ids.Add(scope.EventId);
                 });
@@ -427,8 +499,8 @@ namespace Audit.IntegrationTest
 
                 //audit multiple 
                 using (var a = AuditScope.Create(eventType, () => order.Status, new { ReferenceId = order.OrderId }))
-                { 
-                   ev = a.Event;
+                {
+                    ev = a.Event;
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
@@ -654,8 +726,8 @@ namespace Audit.IntegrationTest
                             .PartitionKey("testpart")
                             .Columns(cols => cols.FromObject(ev => new { ev.EventType, ev.Environment.UserName, ev.StartDate, ev.Duration }))))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
-             }
-        
+            }
+
             public void SetSqlSettings()
             {
                 Audit.Core.Configuration.Setup()
@@ -694,7 +766,7 @@ namespace Audit.IntegrationTest
             }
 
             public void SetMySqlSettings()
-            { 
+            {
                 Audit.Core.Configuration.Setup()
                     .UseMySql(config => config
                         .ConnectionString("Server=localhost; Database=events; Uid=admin; Pwd=admin;")
@@ -729,6 +801,52 @@ namespace Audit.IntegrationTest
                         .Id(ev => Guid.NewGuid()))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
+            }
+
+            public void SetDynamoSettings()
+            {
+                var url = "http://localhost:8000";
+                var tableName = "AuditEvents";
+                CreateDynamoTable(tableName).GetAwaiter().GetResult();
+
+                Audit.Core.Configuration.Setup()
+                    .UseDynamoDB(config => config
+                        .UseUrl(url)
+                        .Table(tableName)
+                        .SetAttribute("HashKey", Guid.NewGuid())
+                        .SetAttribute("SortKey", ev => ev.StartDate.Year))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+            }
+
+            private async Task CreateDynamoTable(string tableName)
+            {
+                AmazonDynamoDBConfig ddbConfig = new AmazonDynamoDBConfig();
+                ddbConfig.ServiceURL = "http://localhost:8000";
+                var client = new AmazonDynamoDBClient(ddbConfig);
+                try
+                {
+                    await client.DeleteTableAsync(tableName);
+                }
+                catch
+                {
+                }
+
+                await client.CreateTableAsync(new CreateTableRequest()
+                {
+                    TableName = tableName,
+                    KeySchema = new List<KeySchemaElement>()
+                    {
+                        new KeySchemaElement("HashKey", KeyType.HASH),
+                        new KeySchemaElement("SortKey", KeyType.RANGE)
+                    },
+                    AttributeDefinitions = new List<AttributeDefinition>()
+                    {
+                        new AttributeDefinition("HashKey", ScalarAttributeType.S),
+                        new AttributeDefinition("SortKey", ScalarAttributeType.N)
+                    },
+                    ProvisionedThroughput = new ProvisionedThroughput(100, 100)
+                });
             }
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)

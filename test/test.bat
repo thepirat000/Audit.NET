@@ -71,10 +71,13 @@ cd ..
 
 cd Audit.IntegrationTest
 
-dotnet test --logger:"console;verbosity=normal"  --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF&TestCategory!=Elasticsearch"
-dotnet test --logger:"console;verbosity=normal"  -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
-dotnet test --logger:"console;verbosity=normal"  -f net451 --filter "TestCategory=WCF&TestCategory=Async"
-dotnet test --logger:"console;verbosity=normal"  -f net451 --filter "TestCategory=Elasticsearch"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF&TestCategory!=Elasticsearch&TestCategory!=Dynamo"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=AzureDocDb"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=AzureBlob"
+dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory!=Async"
+dotnet test --logger:"console;verbosity=normal" -f net451 --filter "TestCategory=WCF&TestCategory=Async"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Elasticsearch"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Dynamo"
 echo continue...
 pause > nul
 cd ..

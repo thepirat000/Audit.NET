@@ -93,6 +93,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mvc", "Mvc", "{544B332C-74C
 		templates\MVC\content\Audit.Mvc.Template\.template.config\template.json = templates\MVC\content\Audit.Mvc.Template\.template.config\template.json
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.DynamoDB", "src\Audit.NET.DynamoDB\Audit.NET.DynamoDB.csproj", "{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -365,6 +367,14 @@ Global
 		{D37736EB-5A3F-4D5B-BCF4-45B04BD187EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D37736EB-5A3F-4D5B-BCF4-45B04BD187EB}.Release|x64.ActiveCfg = Release|Any CPU
 		{D37736EB-5A3F-4D5B-BCF4-45B04BD187EB}.Release|x64.Build.0 = Release|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -405,6 +415,7 @@ Global
 		{D37736EB-5A3F-4D5B-BCF4-45B04BD187EB} = {C874D041-824A-4B4B-A27B-851E7B387AED}
 		{C874D041-824A-4B4B-A27B-851E7B387AED} = {47AB2E9F-353B-4C6E-B04A-6622DE5F407D}
 		{544B332C-74C2-46AE-8298-3FBB3D4E847A} = {47AB2E9F-353B-4C6E-B04A-6622DE5F407D}
+		{EBA6C83E-3C3A-4FA7-84EA-16BAC7A828D2} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}

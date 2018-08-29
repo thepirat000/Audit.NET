@@ -58,6 +58,9 @@ namespace Audit.Elasticsearch.Providers
             _client = new Lazy<IElasticClient>(() => new ElasticClient(ConnectionSettings));
         }
 
+        /// <summary>
+        /// Creates an instance of ElasticsearchDataProvider with the given configuration.
+        /// </summary>
         public ElasticsearchDataProvider(Action<Configuration.IElasticsearchProviderConfigurator> config)
         {
             _client = new Lazy<IElasticClient>(() => new ElasticClient(ConnectionSettings));

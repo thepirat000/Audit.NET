@@ -106,6 +106,18 @@ namespace Audit.Core
                 };
             }
         }
+
+        /// <summary>
+        /// Removes all the attached actions for the given action type.
+        /// </summary>
+        public static void ResetCustomActions(ActionType actionType)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[actionType].Clear();
+            }
+        }
+        
         /// <summary>
         /// Invokes the scope custom actions.
         /// </summary>

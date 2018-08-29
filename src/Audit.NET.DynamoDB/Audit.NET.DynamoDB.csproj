@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+
+</Project>
