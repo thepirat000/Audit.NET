@@ -813,7 +813,7 @@ namespace Audit.IntegrationTest
                     .UseDynamoDB(config => config
                         .UseUrl(url)
                         .Table(tableName)
-                        .SetAttribute("HashKey", Guid.NewGuid())
+                        .SetAttribute("HashKey", ev => Guid.NewGuid())
                         .SetAttribute("SortKey", ev => ev.StartDate.Year))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();

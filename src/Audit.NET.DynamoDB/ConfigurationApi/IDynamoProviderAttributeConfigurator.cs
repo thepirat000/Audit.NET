@@ -14,13 +14,7 @@ namespace Audit.DynamoDB.Configuration
         /// </summary>
         /// <param name="attributeName">The attribute name</param>
         /// <param name="valueBuilder">A function of the audit event that returns the attribute value</param>
-        IDynamoProviderAttributeConfigurator SetAttribute(string attributeName, Func<AuditEvent, Primitive> valueBuilder);
-        /// <summary>
-        /// Adds an extra attribute (as a constant value) to the document
-        /// </summary>
-        /// <param name="attributeName">The attribute name</param>
-        /// <param name="value">The attribute value</param>
-        IDynamoProviderAttributeConfigurator SetAttribute(string attributeName, Primitive value);
+        IDynamoProviderAttributeConfigurator SetAttribute(string attributeName, Func<AuditEvent, object> valueBuilder);
     }
 
 }

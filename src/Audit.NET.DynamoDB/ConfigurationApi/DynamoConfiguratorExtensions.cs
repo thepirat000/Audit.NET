@@ -37,7 +37,7 @@ namespace Audit.Core
             {
                 Client = dynaDbConfig._clientFactory,
                 TableNameBuilder = dynaDbConfig._tableConfigurator?._tableNameBuilder,
-                ExtraAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes
+                CustomAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes
             };
             return new CreationPolicyConfigurator();
         }

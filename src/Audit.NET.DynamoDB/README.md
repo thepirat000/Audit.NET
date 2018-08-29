@@ -59,6 +59,7 @@ Audit.Core.Configuration.Setup()
 
 - **Client**: The DynamoDB client instance creator `AmazonDynamoDBClient`. 
 - **TableNameBuilder**: A function of the audit event that returns the Table Name to use.
+- **CustomAttributes**: A dictionary with any additional field to eb included on the audit event and document.
 
 ### Fluent API Methods
 
@@ -81,7 +82,22 @@ This provider implements `GetEvent` and `GetEventAsync` methods to obtain an aud
 var event = dynamoDataProvider.GetEvent((Primitive)1234);
 ```
 
-> The `eventId` parameter on `GetEvent(object eventId)` must be of type [`Primitive`](https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/DynamoDBv2/TPrimitive.html) or `Primitive[]`
+> The `eventId` parameter on the generic `GetEvent(object eventId)` must be of type [`Primitive`](https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/DynamoDBv2/TPrimitive.html), 
+> [`DynamoDBEntry`](https://docs.aws.amazon.com/sdkfornet1/latest/apidocs/html/T_Amazon_DynamoDB_DocumentModel_DynamoDBEntry.htm) or an array of any of these two types. 
+> The first (or only) element must be the Hash key, and the second element should be the range key (or NULL if not using a range).
+
+There are more convenient overloads of the `GetEvent`/`GetEventAsync` methods that accepts the Primitives without needing to cast the parameters:
+
+```c#
+// Get event with the given HASH and RANGE
+var event = dynamoDataProvider.GetEvent("A001-005283", 2018);
+```
+
+```c#
+// Get event with the given HASH
+var event = dynamoDataProvider.GetEvent("A001-005283");
+```
+
 
 
 --------

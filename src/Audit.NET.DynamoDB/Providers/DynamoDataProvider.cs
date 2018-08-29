@@ -16,9 +16,9 @@ namespace Audit.DynamoDB.Providers
         private static readonly ConcurrentDictionary<string, Table> TableCache = new ConcurrentDictionary<string, Table>();
 
         /// <summary>
-        /// Top-level attributes to be added to the document before saving
+        /// Top-level attributes to be added to the event and document before saving
         /// </summary>
-        public Dictionary<string, Func<AuditEvent, Primitive>> ExtraAttributes { get; set; } = new Dictionary<string, Func<AuditEvent, Primitive>>();
+        public Dictionary<string, Func<AuditEvent, object>> CustomAttributes { get; set; } = new Dictionary<string, Func<AuditEvent, object>>();
 
         /// <summary>
         /// Factory that creates the client
@@ -66,7 +66,7 @@ namespace Audit.DynamoDB.Providers
                 config.Invoke(dynaDbConfig);
                 Client = dynaDbConfig._clientFactory;
                 TableNameBuilder = dynaDbConfig._tableConfigurator?._tableNameBuilder;
-                ExtraAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes;
+                CustomAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes;
             }
         }
 
@@ -76,7 +76,7 @@ namespace Audit.DynamoDB.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var table = GetTable(auditEvent);
-            var document = CreateDocument(auditEvent);
+            var document = CreateDocument(auditEvent, true);
             table.PutItemAsync(document).GetAwaiter().GetResult();
             return GetKeyValues(document, table);
         }
@@ -87,7 +87,7 @@ namespace Audit.DynamoDB.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var table = GetTable(auditEvent);
-            var document = CreateDocument(auditEvent);
+            var document = CreateDocument(auditEvent, true);
             await table.PutItemAsync(document);
             return GetKeyValues(document, table);
         }
@@ -97,7 +97,9 @@ namespace Audit.DynamoDB.Providers
         /// </summary>
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            InsertEvent(auditEvent);
+            var table = GetTable(auditEvent);
+            var document = CreateDocument(auditEvent, false);
+            table.PutItemAsync(document).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -105,7 +107,9 @@ namespace Audit.DynamoDB.Providers
         /// </summary>
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
-            await InsertEventAsync(auditEvent);
+            var table = GetTable(auditEvent);
+            var document = CreateDocument(auditEvent, false);
+            await table.PutItemAsync(document);
         }
 
         /// <summary>
@@ -259,17 +263,16 @@ namespace Audit.DynamoDB.Providers
             return keyValues.ToArray();
         }
 
-        private Document CreateDocument(AuditEvent auditEvent)
+        private Document CreateDocument(AuditEvent auditEvent, bool addCustomFields)
         {
-            var document = Document.FromJson(auditEvent.ToJson());
-            if (ExtraAttributes != null)
+            if (addCustomFields && CustomAttributes != null)
             {
-                foreach (var attrib in ExtraAttributes)
+                foreach (var attrib in CustomAttributes)
                 {
-                    document[attrib.Key] = attrib.Value.Invoke(auditEvent);
+                    auditEvent.CustomFields[attrib.Key] = attrib.Value.Invoke(auditEvent);
                 }
             }
-            return document;
+            return Document.FromJson(auditEvent.ToJson());
         }
     }
 }
