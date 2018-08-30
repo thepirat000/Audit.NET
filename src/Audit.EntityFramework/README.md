@@ -224,7 +224,7 @@ The `AuditDbContext` has the following virtual methods that can be overriden to 
 - **OnScopeCreated**: Called before the EF operation execution and after the `AuditScope` creation.
 - **OnScopeSaving**: Called after the EF operation execution and before the `AuditScope` saving.
 
-This is useful to, for example, save the audit logs in the same transaction as the CRUD operation being audited, so when the audit logging fails the audited operation is rolled back.
+This is useful to, for example, save the audit logs in the same transaction as the operation being audited, so when the audit logging fails the audited operation is rolled back.
 
 ```c#
 public class MyDbContext : AuditDbContext
