@@ -98,7 +98,7 @@ Each call to `SaveChanges` generates an audit event that includes information of
 
 ### Output
 
-The EF audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. This can be set per `DbContext` instance or globally. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on the Audit.NET documentation.
+The EF audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. This can be set per `DbContext` instance or globally. If you plan to store the audit logs with EF, you can use the [Entity Framework Data Provider](#entity-framework-data-provider). 
 
 ### Settings
 The following settings can be configured per DbContext or globally:
