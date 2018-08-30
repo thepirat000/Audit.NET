@@ -231,8 +231,8 @@ public class MyDbContext : AuditDbContext
 {
 	public MyDbContext()
 	{
-		// Set an empty DynamicDataProvider to avoid saving on the data provider
-		AuditDataProvider = new DynamicDataProvider();
+		// Set a NULL data provider, since log saving is done in this class 
+		AuditDataProvider = new NullDataProvider();
 	}
 	
 	public override void OnScopeCreated(AuditScope auditScope)
@@ -257,7 +257,7 @@ public class MyDbContext : AuditDbContext
 }
 ```
 
-> Note that in the example above, since we want the event saving to be done on the `OnScopeSaving` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this can be done specifying an empty dynamic provider.
+> Note that in the example above, since we want the event saving to be done on the `OnScopeSaving` method, we need to bypass the [Data Provider](https://github.com/thepirat000/Audit.NET#data-providers) and this can be done specifying a `NullDataProvider`.
 
 ## Output
 
