@@ -229,31 +229,31 @@ This is useful to, for example, save the audit logs in the same transaction as t
 ```c#
 public class MyDbContext : AuditDbContext
 {
-	public MyDbContext()
-	{
-		// Set a NULL data provider, since log saving is done in this class 
-		AuditDataProvider = new NullDataProvider();
-	}
-	
-	public override void OnScopeCreated(AuditScope auditScope)
-	{
-		Database.BeginTransaction();
-	}
+    public MyDbContext()
+    {
+        // Set a NULL data provider, since log saving is done in this class 
+        AuditDataProvider = new NullDataProvider();
+    }
+    
+    public override void OnScopeCreated(AuditScope auditScope)
+    {
+        Database.BeginTransaction();
+    }
 
-	public override void OnScopeSaving(AuditScope auditScope)
-	{
-		try	
-		{
-			// ... custom log saving ...
-		}
-		catch
-		{
-			// Rollback call is not mandatory. If exception thrown, the transaction won't get commited
-			Database.CurrentTransaction.Rollback(); 
-			throw;
-		}
-		Database.CurrentTransaction.Commit();
-	}
+    public override void OnScopeSaving(AuditScope auditScope)
+    {
+        try 
+        {
+            // ... custom log saving ...
+        }
+        catch
+        {
+            // Rollback call is not mandatory. If exception thrown, the transaction won't get commited
+            Database.CurrentTransaction.Rollback(); 
+            throw;
+        }
+        Database.CurrentTransaction.Commit();
+    }
 }
 ```
 
