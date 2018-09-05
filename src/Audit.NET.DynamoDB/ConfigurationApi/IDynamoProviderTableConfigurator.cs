@@ -18,7 +18,7 @@ namespace Audit.DynamoDB.Configuration
         /// <summary>
         /// Specify a table name that is a function of the audit event
         /// </summary>
-        /// <param name="tableName">The table name builder</param>
+        /// <param name="tableNameBuilder">The table name builder</param>
         IDynamoProviderAttributeConfigurator Table(Func<AuditEvent, string> tableNameBuilder);
     }
 

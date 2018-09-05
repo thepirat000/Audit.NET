@@ -243,8 +243,7 @@ namespace Audit.DynamoDB.Providers
         private Table GetTable(AuditEvent auditEvent)
         {
             var tableName = TableNameBuilder?.Invoke(auditEvent) ?? auditEvent?.GetType().Name ?? "AuditEvent";
-            Table table;
-            if (TableCache.TryGetValue(tableName, out table))
+            if (TableCache.TryGetValue(tableName, out Table table))
             {
                 return table;
             }

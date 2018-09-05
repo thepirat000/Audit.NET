@@ -821,8 +821,10 @@ namespace Audit.IntegrationTest
 
             private async Task CreateDynamoTable(string tableName)
             {
-                AmazonDynamoDBConfig ddbConfig = new AmazonDynamoDBConfig();
-                ddbConfig.ServiceURL = "http://localhost:8000";
+                AmazonDynamoDBConfig ddbConfig = new AmazonDynamoDBConfig
+                {
+                    ServiceURL = "http://localhost:8000"
+                };
                 var client = new AmazonDynamoDBClient(ddbConfig);
                 try
                 {
