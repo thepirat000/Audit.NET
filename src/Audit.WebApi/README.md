@@ -40,7 +40,7 @@ class that can be configured to log requests that does not reach the action filt
 
 ## Usage
 
-The audit action filter can be enabled in different ways:
+The audit can be enabled in different ways:
 
 1. **Local Action Filter**: Decorating the controllers/actions to be audited with `AuditApi` action filter attribute. 
 2. **Global Action Filter**: Adding the `AuditApiGlobalFilter` action filter as a global filter. This method allows more dynamic configuration of the audit settings.
