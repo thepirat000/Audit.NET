@@ -42,12 +42,13 @@ class that can be configured to log requests that does not reach the action filt
 
 ### Action Filter
 
-The audit action filter can be enabled in two different ways:
+The audit action filter can be enabled in different ways:
 
-1. Decorating the controllers/actions to be audited with `AuditApiAttribute` attribute. 
-2. Adding `AuditApiGlobalFilter` as a global action filter. This method allows to dynamically configure the audit settings.
+1. **Local Action Filter**: Decorating the controllers/actions to be audited with `AuditApi` action filter attribute. 
+2. **Global Action Filter**: Adding the `AuditApiGlobalFilter` action filter as a global filter. This method allows more dynamic configuration of the audit settings.
+3. **Middleware** (only for Asp.Net Core): Adding the `AuditMiddleware` to the pipeline. This method allow to audit request that doesn't get to the action filter.
 
-#### 1- AuditApi Attribute decoration
+#### 1- Local Action Filter
 
 Decorate your controller with `AuditApiAttribute`: 
 
@@ -102,12 +103,12 @@ public class Startup
 > For custom configuration it is recommended to use the 
 > `AuditApiGlobalFilter` as a global filter. See next section.
 
-#### 2- Global action filter
+#### 2- Global Action Filter
 
 Alternatively, you can add one or more `AuditApiGlobalFilter` as global action filters. 
 This method allows to dynamically change the audit settings as functions of the context, via a fluent API.
 
-Note this action filter cannot be used to statically decorate the controllers.
+> Note this action filter cannot be used to statically decorate the controllers.
 
 ```c#
 public class Startup
@@ -128,10 +129,10 @@ public class Startup
 
 ```
 
-### Middleware
+#### 3- Middleware
 
-For Asp.NET Core, you can additionaly configure a [middleware](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-2.1)
-to be able to log requests that doesn't get into an action filter (i.e. request that cannot be routed, or arguments that cannot be parsed). 
+For Asp.NET Core, you can additionally (or alternatively) configure a [middleware](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-2.1)
+to be able to log requests that doesn't get into an action filter (i.e. request that cannot be routed, etc). 
 
 On your startup `Configure` method, call the `UseAuditMiddleware()` extension method:
 
@@ -155,12 +156,12 @@ public class Startup
 > Note you should call `UseAuditMiddleware()` before `UseMvc()`, otherwise the middleware will 
 > not be able to process MVC actions.
 
-You can mix the Audit Middleware together with the Action Filter, or use one or the other. Take into account that:
+You can mix the **Audit Middleware** together with the **Action Filters**, or use one or the other. Take into account that:
 
 - Middleware logs any request regardless if an action is reached or not.
 - Action Filter includes specific MVC context info, like controller name, action name, action arguments and model state.
-- Only one Audit Event is saved per request, even if an action is processed by both the Middleware and the Action Filter.
-- The `AuditIgnore` atribute only applies for the Action Filter and has no effect on the requests logged by the Middleware.
+- Only one Audit Event is generated per request, even if an action is processed by the Middleware and/or multiple Action Filters.
+- The `AuditIgnore` atribute only applies for the Action Filter. It has no effect on the requests logged by the Middleware.
 
 ## Configuration
 

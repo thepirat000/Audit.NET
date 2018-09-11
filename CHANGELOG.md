@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [13.1.2] - 2018-09-??
+### Modified
+- Audit.WebApi.Core: (#158) Moving `GetAuditScope` extension method to `ControllerBase` instead of `Controller`.
+
 ## [13.1.1] - 2018-09-10
 ### Modified
 - Audit.WebApi / Audit.WebApi.Core: Have request/response bodies retrieval mutually exclusive between ActionFilter and MiddleWare.

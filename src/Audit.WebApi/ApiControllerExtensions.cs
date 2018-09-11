@@ -41,7 +41,7 @@ namespace Audit.WebApi
         /// </summary>
         /// <param name="apiController">The API controller.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
-        public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.Controller apiController)
+        public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.ControllerBase apiController)
         {
             return AuditApiAdapter.GetCurrentScope(apiController.HttpContext);
         }
