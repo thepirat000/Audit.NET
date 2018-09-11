@@ -82,6 +82,8 @@ namespace Audit.WebApi.UnitTest
             request.SetupGet(r => r.Scheme).Returns("http");
             request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
             request.SetupGet(r => r.Path).Returns("/api/values");
+            request.SetupGet(r => r.QueryString).Returns(new QueryString(""));
+            request.SetupGet(r => r.PathBase).Returns(new PathString(""));
             request.SetupGet(r => r.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues> { { "content-type", "application/json" } }));
             request.Setup(c => c.ContentLength).Returns(123);
 
@@ -124,6 +126,7 @@ namespace Audit.WebApi.UnitTest
                 IncludeHeaders = true,
                 IncludeModelState = true,
                 IncludeResponseBody = true,
+                IncludeRequestBody = true,
                 EventTypeName = "TestEvent"
             };
 
@@ -157,6 +160,8 @@ namespace Audit.WebApi.UnitTest
             request.SetupGet(r => r.Scheme).Returns("http");
             request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
             request.SetupGet(r => r.Path).Returns("/api/values");
+            request.SetupGet(r => r.QueryString).Returns(new QueryString(""));
+            request.SetupGet(r => r.PathBase).Returns(new PathString(""));
             request.SetupGet(r => r.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues> { { "content-type", "application/json" } }));
             request.Setup(c => c.ContentLength).Returns(123);
 
@@ -210,6 +215,8 @@ namespace Audit.WebApi.UnitTest
             request.SetupGet(r => r.Scheme).Returns("http");
             request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
             request.SetupGet(r => r.Path).Returns("/api/values");
+            request.SetupGet(r => r.QueryString).Returns(new QueryString(""));
+            request.SetupGet(r => r.PathBase).Returns(new PathString(""));
             request.SetupGet(r => r.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues>{ { "content-type", "application/json" } }));
             var httpResponse = new Mock<HttpResponse>();
             httpResponse.SetupGet(c => c.StatusCode).Returns(200);
@@ -279,6 +286,8 @@ namespace Audit.WebApi.UnitTest
             request.SetupGet(r => r.Scheme).Returns("http");
             request.SetupGet(r => r.Host).Returns(new HostString("200.10.10.20:1010"));
             request.SetupGet(r => r.Path).Returns("/api/values");
+            request.SetupGet(r => r.QueryString).Returns(new QueryString(""));
+            request.SetupGet(r => r.PathBase).Returns(new PathString(""));
             request.SetupGet(r => r.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues> { { "content-type", "application/json" } }));
             var httpResponse = new Mock<HttpResponse>();
             httpResponse.SetupGet(c => c.StatusCode).Returns(200);

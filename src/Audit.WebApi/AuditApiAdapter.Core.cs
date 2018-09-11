@@ -68,9 +68,13 @@ namespace Audit.WebApi
         {
             var httpContext = actionContext.HttpContext;
             var actionDescriptor = actionContext.ActionDescriptor as ControllerActionDescriptor;
-            var action = httpContext.Items[AuditApiHelper.AuditApiActionKey] as AuditApiAction;
+            AuditApiAction action = null;
+            if (httpContext.Items.ContainsKey(AuditApiHelper.AuditApiActionKey))
+            {
+                action = httpContext.Items[AuditApiHelper.AuditApiActionKey] as AuditApiAction;
+            }
             if (action == null)
-            { 
+            {
                 action = new AuditApiAction
                 {
                     UserName = httpContext.User?.Identity.Name,
