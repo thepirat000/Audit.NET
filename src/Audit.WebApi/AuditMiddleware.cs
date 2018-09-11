@@ -131,13 +131,13 @@ namespace Audit.WebApi
                     var statusCode = context.Response.StatusCode;
                     auditAction.ResponseStatusCode = statusCode;
                     auditAction.ResponseStatus = AuditApiHelper.GetStatusCodeString(statusCode);
-                    if (includeResponseBody)
+                    if (includeResponseBody && auditAction.ResponseBody == null)
                     {
                         auditAction.ResponseBody = new BodyContent
                         {
                             Type = context.Response.ContentType,
                             Length = context.Response.ContentLength,
-                            Value = includeResponseBody ? AuditApiHelper.GetResponseBody(context) : null
+                            Value = AuditApiHelper.GetResponseBody(context)
                         };
                     }
                 }

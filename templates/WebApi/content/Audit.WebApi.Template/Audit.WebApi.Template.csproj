@@ -24,7 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Audit.WebApi.Core" Version="*" />
+
+    
+    
+    
+    <!--<PackageReference Include="Audit.WebApi.Core" Version="*" />-->
+    
+    
+    
+    
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <!--#if (EnableEntityFramework)-->
     <PackageReference Include="Audit.EntityFramework.Core" Version="*" />
@@ -35,6 +43,10 @@
     <!--#if (Swagger)-->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <!--#endif-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Audit.WebApi.Core\Audit.WebApi.Core.csproj" />
   </ItemGroup>
 
 </Project>

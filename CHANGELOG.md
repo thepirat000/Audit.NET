@@ -3,7 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [13.1.0] - 2018-09-??
+## [13.1.1] - 2018-09-10
+### Modified
+- Audit.WebApi / Audit.WebApi.Core: Have request/response bodies retrieval mutually exclusive between ActionFilter and MiddleWare.
+- Audit.WebApi.Template: Adding middleware to webapi default template. 
+
+## [13.1.0] - 2018-09-10
 ### Added
 - Audit.WebApi / Audit.WebApi.Core: Added new middleware to complement the action filter audits and be able to log any request regardless
 if an action is reached or not.

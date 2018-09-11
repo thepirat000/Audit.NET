@@ -10,7 +10,7 @@ using Audit.WebApi.Template.Providers.Database;
 
 namespace Audit.WebApi.Template
 {
-    public static class AuditStartup
+    public static class AuditConfiguration
     {
         private const string CorrelationIdField = "CorrelationId";
 
@@ -19,10 +19,10 @@ namespace Audit.WebApi.Template
         /// </summary>
         public static MvcOptions AddAudit(this MvcOptions mvcOptions)
         {
+            // Configure the global Action Filter
             mvcOptions.AddAuditFilter(a => a
                     .LogAllActions()
                     .WithEventType("MVC:{verb}:{controller}:{action}")
-                    .IncludeHeaders()
                     .IncludeModelState()
                     .IncludeRequestBody()
                     .IncludeResponseBody());
@@ -50,6 +50,17 @@ namespace Audit.WebApi.Template
 #endif
 
             return serviceCollection;
+        }
+
+        public static void UseAuditMiddleware(this IApplicationBuilder app)
+        {
+            // Configure the Middleware
+            app.UseAuditMiddleware(_ => _
+                .FilterByRequest(r => !r.Path.Value.EndsWith("favicon.ico"))
+                .IncludeHeaders()
+                .IncludeRequestBody()
+                .IncludeResponseBody()
+                .WithEventType("HTTP:{verb}:{url}"));
         }
 
         /// <summary>

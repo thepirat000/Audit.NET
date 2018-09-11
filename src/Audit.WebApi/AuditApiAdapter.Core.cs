@@ -92,7 +92,7 @@ namespace Audit.WebApi
             {
                 action.Headers = AuditApiHelper.ToDictionary(httpContext.Request.Headers);
             }
-            if (includeRequestBody)
+            if (includeRequestBody && action.RequestBody == null)
             {
                 action.RequestBody = new BodyContent
                 {
@@ -126,11 +126,8 @@ namespace Audit.WebApi
                     auditAction.ResponseStatus = AuditApiHelper.GetStatusCodeString(auditAction.ResponseStatusCode);
                     if (includeResponseBody)
                     {
-                        var bodyType = context.Result?.GetType().GetFullTypeName();
-                        if (bodyType != null)
-                        {
-                            auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = GetResponseBody(context.Result) };
-                        }
+                        var bodyType = context.Result.GetType().GetFullTypeName();
+                        auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = GetResponseBody(context.Result) };
                     }
                 }
                 else

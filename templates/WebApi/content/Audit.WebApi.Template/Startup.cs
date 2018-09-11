@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http.Internal;
 #if (EnableEntityFramework)
 using Microsoft.EntityFrameworkCore;
 using Audit.WebApi.Template.Providers.Database;
@@ -65,6 +66,7 @@ namespace Audit.WebApi.Template
             {
                 app.UseDeveloperExceptionPage();
             }
+
 #if (Swagger)
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -72,8 +74,14 @@ namespace Audit.WebApi.Template
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit.WebApi.Template API");
             });
 #endif
-            app.UseMvc();
+            app.Use(async (context, next) => {
+                context.Request.EnableRewind();
+                await next();
+            });
 
+            app.UseAuditMiddleware();
+
+            app.UseMvc();
             app.UseAuditCorrelationId(contextAccessor);
         }
     }
