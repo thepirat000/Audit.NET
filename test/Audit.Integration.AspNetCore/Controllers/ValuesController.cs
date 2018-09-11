@@ -10,6 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Audit.Integration.AspNetCore.Controllers
 {
+    [AuditApi(EventTypeName = "FromControllerAttribute", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+    [Route("api/[controller]")]
+    public class MoreValuesController : Controller
+    {
+        [HttpGet]
+        [AuditApi(EventTypeName = "FromActionAttribute", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        public IEnumerable<string> Get()
+        {
+            return new string[] { "value1", "value2", "value3" };
+        }
+
+    }
+
     public class Request
     {
         public string Value { get; set; }
@@ -24,6 +37,7 @@ namespace Audit.Integration.AspNetCore.Controllers
         {
             return new string[] { "value1", "value2" };
         }
+
 
         [HttpPost("FileUpload")]
         [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
@@ -68,7 +82,7 @@ namespace Audit.Integration.AspNetCore.Controllers
         public async Task<IActionResult> TestIgnoreAction()
         {
             await Task.Delay(0);
-            return Ok();
+            return Ok("hi");
         }
 
 
@@ -104,6 +118,24 @@ namespace Audit.Integration.AspNetCore.Controllers
         {
             return Ok(request.Value);
         }
+
+        [AuditApi(EventTypeName = "api/values/PostMix", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        [HttpPost("PostMix")]
+        public IActionResult PostMix([FromBody]Request request, [FromQuery]string middleware)
+        {
+            return Ok(request.Value);
+        }
+
+        [HttpPost("PostMiddleware")]
+        public IActionResult PostMiddleware([FromBody]Request request)
+        {
+            if (request.Value == "666")
+            {
+                throw new Exception("THIS IS A TEST EXCEPTION 666");
+            }
+            return Ok(request.Value);
+        }
+
 
         // PUT api/values/5
         [HttpPut("{id}")]

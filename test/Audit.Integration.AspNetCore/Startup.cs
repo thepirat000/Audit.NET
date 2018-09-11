@@ -35,8 +35,8 @@ namespace Audit.Integration.AspNetCore
             services.AddMvc(mvc =>
             {
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
-                //mvc.AddAuditFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "Values" && (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore")))
+                    .LogActionIf(d => d.ControllerName == "MoreValues" ||
+                        (d.ControllerName == "Values" && (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix"))))
                     .WithEventType("{verb}.{controller}.{action}")
                     .IncludeHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
@@ -56,7 +56,14 @@ namespace Audit.Integration.AspNetCore
                 context.Request.EnableRewind();
                 await next();
             });
-       
+
+            app.UseAuditMiddleware(_ => _
+                .IncludeRequestBody(true)
+                .IncludeResponseBody(ctx => !ctx.Request.QueryString.HasValue || !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))
+                .IncludeHeaders(true)
+                .WithEventType("{verb}.{url}")
+                .FilterByRequest(r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));
+
             app.UseMvc();
         }
     }

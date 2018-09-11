@@ -9,11 +9,11 @@ namespace Audit.WebApi
         public string TraceId { get; set; }
         [JsonProperty(Order = 0)]
         public string HttpMethod { get; set; }
-        [JsonProperty(Order = 5)]
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)]
         public string ControllerName { get; set; }
-        [JsonProperty(Order = 10)]
+        [JsonProperty(Order = 10, NullValueHandling = NullValueHandling.Ignore)]
         public string ActionName { get; set; }
-        [JsonProperty(Order = 15)]
+        [JsonProperty(Order = 15, NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, object> ActionParameters { get; set; }
         [JsonProperty(Order = 17)]
         public IDictionary<string, string> FormVariables { get; set; }
@@ -39,5 +39,9 @@ namespace Audit.WebApi
         public IDictionary<string, string> ModelStateErrors { get; set; }
         [JsonProperty(Order = 999, NullValueHandling = NullValueHandling.Ignore)]
         public string Exception { get; set; }
+#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+        [JsonIgnore]
+        internal bool IsMiddleware { get; set; }
+#endif
     }
 }

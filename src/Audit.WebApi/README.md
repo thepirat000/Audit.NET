@@ -34,16 +34,22 @@ since both assumes AspNet Core.
 
 ## How it works
 
-This library is implemented as an [action filter](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#action-filters) that intercepts the execution of action methods to generate a detailed audit trail.
+This library is implemented as an [action filter](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#action-filters) 
+that intercepts the execution of action methods to generate a detailed audit trail.
+
+For Asp.NET Core, it is also implemented as a [Middleware](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-2.1) 
+class that can be configured to log requests that does not reach the action filter (i.e. unsolved routes, parsing errors, etc).
 
 ## Usage
+
+### Action Filter
 
 The audit action filter can be enabled in two different ways:
 
 1. Decorating the controllers/actions to be audited with `AuditApiAttribute` attribute. 
 2. Adding `AuditApiGlobalFilter` as a global action filter. This method allows to dynamically configure the audit settings.
 
-#### 1- AuditApiAttribute decoration
+#### 1- AuditApi Attribute decoration
 
 Decorate your controller with `AuditApiAttribute`: 
 
@@ -124,6 +130,40 @@ public class Startup
 
 ```
 
+### Middleware
+
+For Asp.NET Core, you can additionaly configure a [middleware](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-2.1)
+to be able to log requests that doesn't get into an action filter (i.e. request that cannot be routed, or arguments that cannot be parsed). 
+
+On your startup `Configure` method, call the `UseAuditMiddleware()` extension method:
+
+```c#
+public class Startup
+{
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseAuditMiddleware(_ => _
+            .FilterByRequest(rq => rq.Method != "GET")
+            .FilterByResponse(rs => rs.StatusCode != 200)
+            .WithEventType("{verb}:{url}")
+            .IncludeHeaders()
+            .IncludeRequestBody()
+            .IncludeResponseBody());
+
+        app.UseMvc();
+    }
+}
+```
+
+> Note you should call `UseAuditMiddleware()` before `UseMvc()`, otherwise the middleware will 
+> not be able to process MVC actions.
+
+You can mix the Audit Middleware together with the Action Filter, or use one or the other. Take into account that:
+
+- Middleware logs any request regardless if an action is reached or not.
+- Action Filter includes specific MVC context info, like controller name, action name, action arguments and model state.
+- Only one Audit Event is saved per request, even if an action is processed by both the Middleware and the Action Filter.
+- The `AuditIgnore` atribute only applies for the Action Filter and has no effect on the requests logged by the Middleware.
 
 ## Configuration
 
@@ -131,7 +171,7 @@ public class Startup
 
 The audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
 
-### Settings
+### Settings (Action Filter)
 
 The `AuditApiAttribute` can be configured with the following properties:
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
@@ -152,11 +192,11 @@ The `AuditApiGlobalFilter` can be configured with the following methods:
   - \{controller}: replaced with the controller name.
   - \{action}: replaced with the action method name.
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
+  - \{url}: replaced with the request URL.
 - **IncludeHeaders()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
 - **IncludeRequestBody()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include response body or not. Default is false.
 - **IncludeModelState()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include the Model State info or not. Default is false.
-
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
 
@@ -178,8 +218,20 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
+### Settings (Middleware)
+
+- **FilterByRequest()**: A function of the `HttpRequest` to determine whether the request should be logged or not.
+- **FilterByResponse()**: A function of the `HttpResponse` to determine whether the request should be logged or not.
+- **IncludeHeaders()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
+- **IncludeRequestBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
+- **IncludeResponseBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include response body or not. Default is false.
+- **WithEventType()**: A string (or a function of the HTTP context that returns a string) that identifies the event type. Can contain the following placeholders: 
+  - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
+  - \{url}: replaced with the request URL.
+
+
 ## Audit Ignore attribute
-To selectively exclude certain controllers, actions or action parameters, you can decorate them with `AuditIgnore` attribute.
+To selectively exclude certain controllers, actions or action parameters, you can decorate them with `AuditIgnore` attribute. 
 
 For example:
 

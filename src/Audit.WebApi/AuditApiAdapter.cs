@@ -18,9 +18,6 @@ namespace Audit.WebApi
 {
     internal class AuditApiAdapter
     {
-        private const string AuditApiActionKey = "__private_AuditApiAction__";
-        private const string AuditApiScopeKey = "__private_AuditApiScope__";
-
         public bool IsActionIgnored(HttpActionContext actionContext)
         {
             var actionDescriptor = actionContext?.ActionDescriptor;
@@ -60,7 +57,8 @@ namespace Audit.WebApi
             };
             var eventType = (eventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
-                .Replace("{action}", auditAction.ActionName);
+                .Replace("{action}", auditAction.ActionName)
+                .Replace("{url}", auditAction.RequestUrl);
             // Create the audit scope
             var auditEventAction = new AuditEventWebApi()
             {
@@ -74,8 +72,8 @@ namespace Audit.WebApi
                 CallingMethod = (actionContext.ActionDescriptor?.ActionBinding?.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
             };
             var auditScope = await AuditScope.CreateAsync(options);
-            contextWrapper.Set(AuditApiActionKey, auditAction);
-            contextWrapper.Set(AuditApiScopeKey, auditScope);
+            contextWrapper.Set(AuditApiHelper.AuditApiActionKey, auditAction);
+            contextWrapper.Set(AuditApiHelper.AuditApiScopeKey, auditScope);
         }
 
         /// <summary>
@@ -83,8 +81,8 @@ namespace Audit.WebApi
         /// </summary>
         public async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext, IContextWrapper contextWrapper, bool includeModelState, bool includeResponseBody)
         {
-            var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiActionKey);
-            var auditScope = contextWrapper.Get<AuditScope>(AuditApiScopeKey);
+            var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiHelper.AuditApiActionKey);
+            var auditScope = contextWrapper.Get<AuditScope>(AuditApiHelper.AuditApiScopeKey);
             if (auditAction != null && auditScope != null)
             {
                 auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
@@ -189,7 +187,7 @@ namespace Audit.WebApi
         internal static AuditScope GetCurrentScope(HttpRequestMessage request, IContextWrapper contextWrapper)
         {
             var ctx = contextWrapper ?? new ContextWrapper(request);
-            return ctx.Get<AuditScope>(AuditApiScopeKey);
+            return ctx.Get<AuditScope>(AuditApiHelper.AuditApiScopeKey);
         }
     }
 }
