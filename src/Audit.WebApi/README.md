@@ -2,9 +2,7 @@
 
 **ASP.NET Web API Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
-Generate Audit Trails for Web API calls.
-
-Audit.WebApi provides the infrastructure to log interactions with ASP.NET Web API Controllers. It can record action method calls with caller info and arguments.
+Generate Audit Trails for Web API calls. This library provides a configurable infrastructure to log interactions with your Asp.NET (or Asp.NET Core) Web API.
 
 ## Install
 
@@ -144,7 +142,6 @@ public class Startup
     {
         app.UseAuditMiddleware(_ => _
             .FilterByRequest(rq => rq.Method != "GET")
-            .FilterByResponse(rs => rs.StatusCode != 200)
             .WithEventType("{verb}:{url}")
             .IncludeHeaders()
             .IncludeRequestBody()
@@ -220,12 +217,11 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 ### Settings (Middleware)
 
-- **FilterByRequest()**: A function of the `HttpRequest` to determine whether the request should be logged or not.
-- **FilterByResponse()**: A function of the `HttpResponse` to determine whether the request should be logged or not.
+- **FilterByRequest()**: A function of the `HttpRequest` to determine whether the request should be logged or not, by default all requests are logged.
 - **IncludeHeaders()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
 - **IncludeRequestBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include response body or not. Default is false.
-- **WithEventType()**: A string (or a function of the HTTP context that returns a string) that identifies the event type. Can contain the following placeholders: 
+- **WithEventType()**: A string (or a function of the HTTP context that returns a string) that identifies the event type. Can contain the following placeholders (default is "{verb} {url}"): 
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
   - \{url}: replaced with the request URL.
 
