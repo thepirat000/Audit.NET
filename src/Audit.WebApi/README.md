@@ -140,7 +140,7 @@ public class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.UseAuditMiddleware(_ => _
-            .FilterByRequest(rq => rq.Method != "GET")
+            .FilterByRequest(rq => !rq.Path.Value.EndsWith("favicon.ico"))
             .WithEventType("{verb}:{url}")
             .IncludeHeaders()
             .IncludeRequestBody()

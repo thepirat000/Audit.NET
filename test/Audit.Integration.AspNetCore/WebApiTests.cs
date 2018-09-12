@@ -42,8 +42,11 @@ namespace Audit.Integration.AspNetCore
             var rqBody = "{\"value\": \"mix\"}";
             var res = await client.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "application/json"));
 
+            var responseBody = await res.Content.ReadAsStringAsync();
+
             Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
             Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual("mix", responseBody);
             var action = insertEvs[0].GetWebApiAuditAction();
             Assert.AreEqual("PostMix", action.ActionName);
             Assert.AreEqual("Values", action.ControllerName);

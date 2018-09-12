@@ -3,9 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [13.1.2] - 2018-09-??
+## [13.1.2] - 2018-09-12
 ### Modified
 - Audit.WebApi.Core: (#158) Moving `GetAuditScope` extension method to `ControllerBase` instead of `Controller`.
+- Audit.Template.WebApi and Audit.Template Mvc: Using the built-in extension for registering a IHttpContextAccessor (#160)
+- Audit.WebApi.Core: (Fix bug #161) Empty http response when using IncludeResponseBody on both the middleware and the audit filter.
 
 ## [13.1.1] - 2018-09-10
 ### Modified

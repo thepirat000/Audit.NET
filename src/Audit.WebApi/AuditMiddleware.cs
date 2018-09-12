@@ -52,6 +52,7 @@ namespace Audit.WebApi
                 {
                     context.Response.Body = responseBody;
                     await InvokeNextAsync(context, true);
+                    responseBody.Seek(0L, SeekOrigin.Begin);
                     await responseBody.CopyToAsync(originalBody);
                 }
             }
