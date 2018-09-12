@@ -33,7 +33,7 @@ Check the [CHANELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHA
 
 ## Usage
 
-The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its lifecycle. 
+The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its life cycle. 
 The **Audit Event** is an extensible information container of an audited operation. 
 See the [audit scope statechart](#auditscope-statechart).
 
@@ -329,7 +329,7 @@ using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
     }
     catch (Exception ex)
     {
-        //If an exception is thown, discard the audit event
+        //If an exception is thrown, discard the audit event
         scope.Discard();
     }
 }
@@ -426,7 +426,7 @@ AuditScope.Create(new AuditScopeOptions { DataProvider = new MyCustomDataProvide
 
 ### Dynamic data providers 
 
-As an anternative to creating a data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` or `DynamicAsyncDataProvider` classes. For example:
+As an alternative to creating a data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` or `DynamicAsyncDataProvider` classes. For example:
 
 ```c#
 var dataProvider = new DynamicDataProvider();
@@ -541,7 +541,7 @@ You can configure Custom Actions that are executed for all the Audit Scopes in y
 
 Call the static `AddCustomAction()` method on `Audit.Core.Configuration` class to attach a custom action. 
 
-For example, to globally discard the events under centain condition:
+For example, to globally discard the events under a certain condition:
 ```c#
 Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
@@ -656,7 +656,7 @@ The following packages are extensions to log interactions with different systems
 <img src="https://i.imgur.com/5YjHlfd.png" alt="icon" width="90"/> | **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)** | Generate detailed audit logs by decorating **MVC** Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.
 <img src="https://i.imgur.com/hVMM5WF.png" alt="icon" width="90"/> | **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for any class without changing its code by using a proxy.
 <img src="https://i.imgur.com/Fn4thn0.png" alt="icon" width="90"/> | **[Audit.FileSystem](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md)** | Generate audit logs by intercepting file system events via FileSystemWatcher.
-<img src="https://i.imgur.com/GB2e52X.jpg" alt="icon" width="90"/> | **[Audit.SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md)** | Generate audit logs for SignalR invokations by intercepting the hub processing
+<img src="https://i.imgur.com/GB2e52X.jpg" alt="icon" width="90"/> | **[Audit.SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md)** | Generate audit logs for SignalR invocations by intercepting the hub processing
 
 # Storage providers
 
