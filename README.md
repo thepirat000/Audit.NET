@@ -157,34 +157,34 @@ An example of the output in JSON:
 
 ```javascript
 {
-	"EventType": "Order:Update",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
-		"Exception": null,
-		"Culture": "en-GB"
-	},
-	"StartDate": "2016-08-23T11:33:14.653191-05:00",
-	"EndDate": "2016-08-23T11:33:23.1820786-05:00",
-	"Duration": 8529,
-	"Target": {
-		"Type": "Order",
-		"Old": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": 2,
-			"OrderItems": [{
-				"Sku": "1002",
-				"Quantity": 3.0
-			}]
-		},
-		"New": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": -1,
-			"OrderItems": null
-		}
-	}
+    "EventType": "Order:Update",
+    "Environment": {
+        "UserName": "Federico",
+        "MachineName": "HP",
+        "DomainName": "HP",
+        "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+        "Exception": null,
+        "Culture": "en-GB"
+    },
+    "StartDate": "2016-08-23T11:33:14.653191-05:00",
+    "EndDate": "2016-08-23T11:33:23.1820786-05:00",
+    "Duration": 8529,
+    "Target": {
+        "Type": "Order",
+        "Old": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": 2,
+            "OrderItems": [{
+                "Sku": "1002",
+                "Quantity": 3.0
+            }]
+        },
+        "New": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": -1,
+            "OrderItems": null
+        }
+    }
 }
 ```
 
