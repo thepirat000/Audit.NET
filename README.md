@@ -283,33 +283,33 @@ The output of the previous examples would be:
 
 ```javascript
 {
-	"EventType": "Order:Update",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
-		"Exception": null,
-		"Culture": "en-GB"
-	},
-	"Target": {
-		"Type": "Order",
-		"Old": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": 2,
-			
-		},
-		"New": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": -1,
-			
-		}
-	},
-	"ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",           // <-- Custom Field
-	"Comments": ["Status Updated to Cancelled"],                     // <-- Comments
-	"StartDate": "2016-08-23T11:34:44.656101-05:00",
-	"EndDate": "2016-08-23T11:34:55.1810821-05:00",
-	"Duration": 8531
+    "EventType": "Order:Update",
+    "Environment": {
+        "UserName": "Federico",
+        "MachineName": "HP",
+        "DomainName": "HP",
+        "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+        "Exception": null,
+        "Culture": "en-GB"
+    },
+    "Target": {
+        "Type": "Order",
+        "Old": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": 2,
+            
+        },
+        "New": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": -1,
+            
+        }
+    },
+    "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",           // <-- Custom Field
+    "Comments": ["Status Updated to Cancelled"],                     // <-- Comments
+    "StartDate": "2016-08-23T11:34:44.656101-05:00",
+    "EndDate": "2016-08-23T11:34:55.1810821-05:00",
+    "Duration": 8531
 }
 ```
 
