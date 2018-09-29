@@ -54,10 +54,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 context.Blogs.Add(new Blog { BloggerName = guid, Title = "Test_EFFailureLogging" });
                 context.SaveChanges();
-
-                context.Blogs.Add(new Blog { BloggerName = guid, Title = longText });
+               
                 try
                 {
+                    context.Blogs.Add(new Blog { BloggerName = guid, Title = longText });
+                    // This fails because of the long title
                     context.SaveChanges();
                 }
                 catch (DbUpdateException)
