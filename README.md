@@ -157,34 +157,34 @@ An example of the output in JSON:
 
 ```javascript
 {
-	"EventType": "Order:Update",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
-		"Exception": null,
-		"Culture": "en-GB"
-	},
-	"StartDate": "2016-08-23T11:33:14.653191-05:00",
-	"EndDate": "2016-08-23T11:33:23.1820786-05:00",
-	"Duration": 8529,
-	"Target": {
-		"Type": "Order",
-		"Old": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": 2,
-			"OrderItems": [{
-				"Sku": "1002",
-				"Quantity": 3.0
-			}]
-		},
-		"New": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": -1,
-			"OrderItems": null
-		}
-	}
+    "EventType": "Order:Update",
+    "Environment": {
+        "UserName": "Federico",
+        "MachineName": "HP",
+        "DomainName": "HP",
+        "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+        "Exception": null,
+        "Culture": "en-GB"
+    },
+    "StartDate": "2016-08-23T11:33:14.653191-05:00",
+    "EndDate": "2016-08-23T11:33:23.1820786-05:00",
+    "Duration": 8529,
+    "Target": {
+        "Type": "Order",
+        "Old": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": 2,
+            "OrderItems": [{
+                "Sku": "1002",
+                "Quantity": 3.0
+            }]
+        },
+        "New": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": -1,
+            "OrderItems": null
+        }
+    }
 }
 ```
 
@@ -283,33 +283,33 @@ The output of the previous examples would be:
 
 ```javascript
 {
-	"EventType": "Order:Update",
-	"Environment": {
-		"UserName": "Federico",
-		"MachineName": "HP",
-		"DomainName": "HP",
-		"CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
-		"Exception": null,
-		"Culture": "en-GB"
-	},
-	"Target": {
-		"Type": "Order",
-		"Old": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": 2,
-			
-		},
-		"New": {
-			"OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
-			"Status": -1,
-			
-		}
-	},
-	"ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",           // <-- Custom Field
-	"Comments": ["Status Updated to Cancelled"],                     // <-- Comments
-	"StartDate": "2016-08-23T11:34:44.656101-05:00",
-	"EndDate": "2016-08-23T11:34:55.1810821-05:00",
-	"Duration": 8531
+    "EventType": "Order:Update",
+    "Environment": {
+        "UserName": "Federico",
+        "MachineName": "HP",
+        "DomainName": "HP",
+        "CallingMethodName": "Audit.UnitTest.AuditTests.TestUpdate()",
+        "Exception": null,
+        "Culture": "en-GB"
+    },
+    "Target": {
+        "Type": "Order",
+        "Old": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": 2,
+            
+        },
+        "New": {
+            "OrderId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",
+            "Status": -1,
+            
+        }
+    },
+    "ReferenceId": "39dc0d86-d5fc-4d2e-b918-fb1a97710c99",           // <-- Custom Field
+    "Comments": ["Status Updated to Cancelled"],                     // <-- Comments
+    "StartDate": "2016-08-23T11:34:44.656101-05:00",
+    "EndDate": "2016-08-23T11:34:55.1810821-05:00",
+    "Duration": 8531
 }
 ```
 
@@ -652,11 +652,11 @@ The following packages are extensions to log interactions with different systems
 ------------ | ------------------- | ------------------
 <img src="https://i.imgur.com/Sl1hHBz.png" alt="icon" width="90" /> | **[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)** | Generate detailed server-side audit logs for **Windows Communication Foundation (WCF)** service calls, by configuring a provided behavior.
 <img src="https://i.imgur.com/T3NcXaZ.png" alt="icon" width="90"/> | **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)** | Generate detailed audit logs for saving operations on **Entity Framework**, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
-<img src="https://i.imgur.com/GkqLSk8.png" alt="icon" width="90"/> | **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)** | Generate detailed audit logs by decorating **Web API** Methods and Controllers with an action filter attribute. Includes support for ASP.NET Core.
+<img src="https://i.imgur.com/GkqLSk8.png" alt="icon" width="90"/> | **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)** | Generate detailed audit logs by decorating **Web API** Methods and Controllers with an action filter attribute, or by using a middleware. Includes support for ASP.NET Core.
 <img src="https://i.imgur.com/5YjHlfd.png" alt="icon" width="90"/> | **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)** | Generate detailed audit logs by decorating **MVC** Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.
-<img src="https://i.imgur.com/hVMM5WF.png" alt="icon" width="90"/> | **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for any class without changing its code by using a proxy.
-<img src="https://i.imgur.com/Fn4thn0.png" alt="icon" width="90"/> | **[Audit.FileSystem](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md)** | Generate audit logs by intercepting file system events via FileSystemWatcher.
-<img src="https://i.imgur.com/GB2e52X.jpg" alt="icon" width="90"/> | **[Audit.SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md)** | Generate audit logs for SignalR invocations by intercepting the hub processing
+<img src="https://i.imgur.com/hVMM5WF.png" alt="icon" width="90"/> | **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for **any class** without changing its code by using a proxy.
+<img src="https://i.imgur.com/Fn4thn0.png" alt="icon" width="90"/> | **[Audit.FileSystem](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md)** | Generate audit logs by intercepting **file system** events via FileSystemWatcher.
+<img src="https://i.imgur.com/GB2e52X.jpg" alt="icon" width="90"/> | **[Audit.SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md)** | Generate audit logs for **SignalR** invocations by intercepting the hub processing
 
 # Storage providers
 
