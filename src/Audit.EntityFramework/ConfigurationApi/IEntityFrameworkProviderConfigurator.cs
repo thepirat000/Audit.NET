@@ -10,12 +10,12 @@ namespace Audit.EntityFramework.ConfigurationApi
     public interface IEntityFrameworkProviderConfigurator
     {
         /// <summary>
-        /// Provides a custom Db Context to use **for storing the Audit Events**. By default it uses the same DbContext that is being audited.
+        /// Provides a custom Db Context to use **for storing the Audit Events**. By default it uses the same DbContext instance that is being audited.
         /// </summary>
         /// <param name="dbContextBuilder">A function that given an EF audit event, returns a custom DbContext to use **for storing the audit events**.</param>
         IEntityFrameworkProviderConfigurator UseDbContext(Func<AuditEventEntityFramework, DbContext> dbContextBuilder);
         /// <summary>
-        /// Provides a custom Db Context to use **for storing the Audit Events**. By default it uses the same DbContext that is being audited.
+        /// Provides a custom Db Context to use **for storing the Audit Events**. By default it uses the same DbContext instance that is being audited.
         /// </summary>
         /// <param name="constructorArgs">The arguments to pass to the <typeparamref name="T"/> constructor, if any.</param>
         IEntityFrameworkProviderConfigurator UseDbContext<T>(params object[] constructorArgs) where T : DbContext;

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
+using Audit.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -20,6 +22,57 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
+            new BlogsContext().Database.EnsureCreated();
+        }
+
+        [Test]
+        public void Test_EFFailureLogging()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(_ => _
+                    .UseDbContext<BlogsContext>()
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Blog, BlogAudit>((blog, blogAudit) =>
+                        {
+                            blogAudit.BlogId = blog.Id;
+                        })
+                        .Map<Post, PostAudit>((post, postAudit) =>
+                        {
+                            postAudit.PostId = post.Id;
+                        })
+                        .AuditEntityAction<IAuditEntity>((ev, entry, entity) =>
+                        {
+                            entity.AuditAction = entry.Action;
+                            entity.AuditDate = DateTime.Now;
+                            entity.AuditUser = Environment.UserName;
+                            entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
+                        })));
+
+            var guid = Guid.NewGuid().ToString();
+            var longText = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+            using (var context = new BlogsContext())
+            {
+                context.Blogs.Add(new Blog { BloggerName = guid, Title = "Test_EFFailureLogging" });
+                context.SaveChanges();
+
+                context.Blogs.Add(new Blog { BloggerName = guid, Title = longText });
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (DbUpdateException)
+                {
+                }
+
+                var audits = context.BlogsAudits.Where(a => a.BloggerName == guid).OrderBy(a => a.AuditDate).ToList();
+
+                Assert.AreEqual(2, audits.Count);
+                Assert.AreEqual("Test_EFFailureLogging", audits[0].Title);
+                Assert.AreEqual(longText, audits[1].Title);
+                Assert.IsTrue(audits[1].Exception.Length > 5);
+            }
+
+
         }
 
         [Test]
