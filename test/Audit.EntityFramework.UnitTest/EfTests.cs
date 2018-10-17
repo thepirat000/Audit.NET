@@ -59,7 +59,7 @@ namespace Audit.EntityFramework.UnitTest
                 .ForAnyContext(config => config
                     .ForEntity<Blog>(_ => _.Format(b => b.Title, t => t + "X")));
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(1, 25);
             using (var ctx = new BlogsEntities())
             {
                 var blog = new Blog()
@@ -116,7 +116,7 @@ namespace Audit.EntityFramework.UnitTest
                 .ForContext<DataBaseContext>(config => config
                     .ForEntity<Blog>(_ => _.Override<string>("Title", null)));
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new BlogsEntities())
             {
                 var blog = new Blog()
@@ -152,7 +152,7 @@ namespace Audit.EntityFramework.UnitTest
                   .ForEntity<Blog>(_ => _.Ignore("BloggerName")
                                          .Override(blog => blog.Title, "******")));
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(1, 25);
             using (var ctx = new BlogsEntities())
             {
                 var blog = new Blog()
@@ -211,7 +211,7 @@ namespace Audit.EntityFramework.UnitTest
                 .Reset()
                 .UseOptOut();
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(1, 25);
             using (var ctx = new BlogsEntities())
             {
                 var blog = new Blog()
