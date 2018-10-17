@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Store Audit.NET Trail Logs into an Azure Document DB database</Description>
@@ -6,7 +6,7 @@
     <AssemblyTitle>Audit.AzureDocumentDB</AssemblyTitle>
     <VersionPrefix>13.1.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>net45;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.6;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1573;1591;3001;3003</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -37,4 +37,8 @@
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="1.9.1" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.1.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />  </ItemGroup>
+    
 </Project>
