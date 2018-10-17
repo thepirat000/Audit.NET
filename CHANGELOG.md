@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [13.1.3] - 2018-10-17
+### Modified
+- Audit.WebApi and Audit.Mvc: Upgrading AspNetCore libraries from GitHub suggestion because of security vulnerability.
+
 ## [13.1.2] - 2018-09-12
 ### Modified
 - Audit.WebApi.Core: (#158) Moving `GetAuditScope` extension method to `ControllerBase` instead of `Controller`.
