@@ -47,7 +47,7 @@ namespace Audit.IntegrationTest
                 .ForAnyContext(config => config
                     .ForEntity<IntegrationTest.Blog>(_ => _.Format(b => b.Title, t => t + "X")));
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
             {
                 var blog = new Blog()
@@ -101,7 +101,7 @@ namespace Audit.IntegrationTest
                 .ForContext<MyBaseContext>(config => config
                     .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
             {
                 var blog = new Blog()
@@ -139,7 +139,7 @@ namespace Audit.IntegrationTest
               .ForAnyContext(config => config
                   .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
 
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
             {
                 var blog = new Blog()
