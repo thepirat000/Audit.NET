@@ -61,7 +61,7 @@ namespace Audit.EntityFramework.UnitTest
             {
                 var blog = new Blog()
                 {
-                    BloggerName = Guid.NewGuid().ToString(),
+                    BloggerName = Guid.NewGuid().ToString().Substring(0, 25),
                     Title = blogTitle
                 };
                 
