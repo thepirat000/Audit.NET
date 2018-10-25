@@ -60,6 +60,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                     context.Blogs.Add(new Blog { BloggerName = guid, Title = longText });
                     // This fails because of the long title
                     context.SaveChanges();
+                    Assert.Fail("Should have thrown DbUpdateException");
                 }
                 catch (DbUpdateException)
                 {
