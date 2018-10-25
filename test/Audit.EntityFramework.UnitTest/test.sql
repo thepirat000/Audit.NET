@@ -83,7 +83,7 @@ Drop Table Blogs
 Create table Blogs
 (
 	Id int identity(1,1) not null primary key,
-	Title nvarchar(max),
+	Title nvarchar(25),
 	BloggerName nvarchar(max)
 )
 

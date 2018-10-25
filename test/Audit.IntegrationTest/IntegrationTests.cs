@@ -376,6 +376,38 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("Mongo")]
+            public void TestMongoDateSerialization()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseMongoDB(config => config
+                        .ConnectionString("mongodb://localhost:27017")
+                        .Database("Audit")
+                        .Collection("Event"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                    .ResetActions();
+
+                object evId = null;
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, s =>
+                {
+                    if (evId != null)
+                    {
+                        Assert.Fail("evId should be null");
+                    }
+                    evId = s.EventId;
+                });
+                var now = DateTime.UtcNow;
+                using (var s = AuditScope.Create("test", null, new { someDate = now }))
+                {
+                }
+                Audit.Core.Configuration.ResetCustomActions();
+                var dp = Audit.Core.Configuration.DataProvider as MongoDataProvider;
+                var evt = dp.GetEvent(evId);
+
+                Assert.AreEqual(now.ToString("yyyyMMddHHmmss"), (evt.CustomFields["someDate"] as DateTime?).Value.ToString("yyyyMMddHHmmss"));
+            }
+
+            [Test]
             [Category("MySql")]
             public void TestMySql()
             {

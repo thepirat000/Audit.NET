@@ -188,7 +188,7 @@ namespace Audit.MongoDB.Providers
             {
                 return null;
             }
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, JsonSerializerSettings));
+            return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSerializerSettings), value.GetType(), JsonSerializerSettings);
         }
 
         private void TestConnection()

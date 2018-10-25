@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate detailed Audit Logs for AspNet Core MVC Controller actions.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.Mvc.Core</AssemblyTitle>
-    <VersionPrefix>13.1.3</VersionPrefix>
+    <VersionPrefix>13.1.4</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net451</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
