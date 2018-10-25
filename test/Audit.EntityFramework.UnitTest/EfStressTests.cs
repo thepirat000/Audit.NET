@@ -56,12 +56,12 @@ namespace Audit.EntityFramework.UnitTest
 
         private void SaveFromOneThread()
         {
-            var blogTitle = Guid.NewGuid().ToString().Substring(0, 25);
+            var blogTitle = Guid.NewGuid().ToString().Substring(0, 20);
             using (var ctx = new BlogsEntities())
             {
                 var blog = new Blog()
                 {
-                    BloggerName = Guid.NewGuid().ToString().Substring(0, 25),
+                    BloggerName = Guid.NewGuid().ToString().Substring(0, 20),
                     Title = blogTitle
                 };
                 
@@ -76,7 +76,7 @@ namespace Audit.EntityFramework.UnitTest
                     {
                         BlogId = blogId,
                         DateCreated = DateTime.UtcNow,
-                        Title = Guid.NewGuid().ToString().Substring(0, 25),
+                        Title = Guid.NewGuid().ToString().Substring(0, 20),
                         Content = Guid.NewGuid().ToString()
                     });
                 }
