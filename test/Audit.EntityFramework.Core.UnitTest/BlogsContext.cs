@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Audit.EntityFramework.Core.UnitTest
@@ -81,6 +82,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public virtual ICollection<Post> Posts { get; set; }
 
         [Key]
+        [Column("AuditId")]
         public int AuditId { get; set; }
         public string AuditAction { get; set; }
         public DateTime AuditDate { get; set; }
