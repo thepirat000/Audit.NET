@@ -43,6 +43,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     }
     public class Blog : BaseEntity
     {
+        [Key]
         public override int Id { get; set; }
         [MaxLength(25)]
         public string Title { get; set; }
@@ -51,6 +52,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     }
     public class Post : BaseEntity
     {
+        [Key]
         public override int Id { get; set; }
         [MaxLength(20)]
         public string Title { get; set; }
@@ -69,7 +71,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public int BlogId { get; set; }
 
         [Key]
-        public int AuditId { get; set; }
+        public int PostAuditId { get; set; }
         public string AuditAction { get; set; }
         public DateTime AuditDate { get; set; }
         public string AuditUser { get; set; }
@@ -83,8 +85,8 @@ namespace Audit.EntityFramework.Core.UnitTest
         public virtual ICollection<Post> Posts { get; set; }
 
         [Key]
-        [Column("AuditId")]
-        public int AuditId { get; set; }
+        [Column("BlogAuditId")]
+        public int BlogAuditId { get; set; }
         public string AuditAction { get; set; }
         public DateTime AuditDate { get; set; }
         public string AuditUser { get; set; }
@@ -95,7 +97,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     public class CommonAudit : IAuditEntity
     {
         [Key]
-        public int AuditId { get; set; }
+        public int CommonAuditId { get; set; }
 
         public string EntityType { get; set; }
         public int EntityId { get; set; }
