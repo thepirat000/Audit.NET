@@ -110,7 +110,10 @@ namespace Audit.EntityFramework.ConfigurationApi
                 var entityType = ent.EntityType;
                 if (entityType != null && _mapping.TryGetValue(entityType, out map))
                 {
-                    include = map.Action.Invoke(ev, ent, auditEntity);
+                    if (map.Action != null)
+                    {
+                        include = map.Action.Invoke(ev, ent, auditEntity);
+                    }
                 }
                 if (include && _commonAction != null)
                 {
