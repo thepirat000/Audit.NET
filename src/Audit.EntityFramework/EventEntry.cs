@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Audit.EntityFramework
@@ -21,6 +22,13 @@ namespace Audit.EntityFramework
         public bool Valid { get; set; }
         [JsonProperty(Order = 60, NullValueHandling = NullValueHandling.Ignore)]
         public List<string> ValidationResults { get; set; }
+
+        /// <summary>
+        /// The source entity type (not included on the output)
+        /// </summary>
+        [JsonIgnore]
+        public Type EntityType { get; set; }
+
         [JsonIgnore]
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
         internal Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry Entry { get; set; }

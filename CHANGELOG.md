@@ -3,10 +3,13 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [13.2.0] - 2018-10-31
+### Modified
+- Audit.EntityFramework and Audit.EntityFramework.Core: Allow mapping multiple entity types to the same audit type with independent actions. (#175)
+
 ## [13.1.5] - 2018-10-30
 ### Modified
 - Audit.PostgreSQL: Fix casing for schema name, allowing case-sensitive schemas. (#174)
-
 
 ## [13.1.4] - 2018-10-25
 ### Modified

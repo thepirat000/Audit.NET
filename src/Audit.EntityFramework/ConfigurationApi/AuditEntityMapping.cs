@@ -6,50 +6,60 @@ namespace Audit.EntityFramework.ConfigurationApi
 {
     public class AuditEntityMapping : IAuditEntityMapping
     {
-        private Dictionary<Type, Type> _mapping = new Dictionary<Type, Type>();
-        private Dictionary<Type, Func<AuditEvent, EventEntry, object, bool>> _actions = new Dictionary<Type, Func<AuditEvent, EventEntry, object, bool>>();
+        private Dictionary<Type, MappingInfo> _mapping = new Dictionary<Type, MappingInfo>();
         private Func<AuditEvent, EventEntry, object, bool> _commonAction = null;
 
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>()
         {
-            _mapping.Add(typeof(TSourceEntity), typeof(TAuditEntity));
+            _mapping[typeof(TSourceEntity)] = new MappingInfo() { TargetType = typeof(TAuditEntity) };
             return this;
         }
 
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Action<AuditEvent, EventEntry, TAuditEntity> entityAction)
         {
-            _mapping[typeof(TSourceEntity)] = typeof(TAuditEntity);
-            _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) =>
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
             {
-                entityAction.Invoke(ev, ent, (TAuditEntity) auditEntity);
-                return true;
+                TargetType = typeof(TAuditEntity),
+                Action = (ev, ent, auditEntity) =>
+                {
+                    entityAction.Invoke(ev, ent, (TAuditEntity)auditEntity);
+                    return true;
+                }
             };
             return this;
         }
 
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Func<AuditEvent, EventEntry, TAuditEntity, bool> entityAction)
         {
-            _mapping[typeof(TSourceEntity)] = typeof(TAuditEntity);
-            _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) => entityAction.Invoke(ev, ent, (TAuditEntity)auditEntity);
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
+            {
+                TargetType = typeof(TAuditEntity),
+                Action = (ev, ent, auditEntity) => entityAction.Invoke(ev, ent, (TAuditEntity)auditEntity)
+            };
             return this;
         }
 
-
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Action<TSourceEntity, TAuditEntity> entityAction)
         {
-            _mapping.Add(typeof(TSourceEntity), typeof(TAuditEntity));
-            _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) =>
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
             {
-                entityAction.Invoke((TSourceEntity) ent.Entry.Entity, (TAuditEntity) auditEntity);
-                return true;
+                TargetType = typeof(TAuditEntity),
+                Action = (ev, ent, auditEntity) =>
+                {
+                    entityAction.Invoke((TSourceEntity)ent.Entry.Entity, (TAuditEntity)auditEntity);
+                    return true;
+                }
             };
             return this;
         }
 
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>(Func<TSourceEntity, TAuditEntity, bool> entityAction)
         {
-            _mapping.Add(typeof(TSourceEntity), typeof(TAuditEntity));
-            _actions[typeof(TAuditEntity)] = (ev, ent, auditEntity) => entityAction.Invoke((TSourceEntity)ent.Entry.Entity, (TAuditEntity)auditEntity);
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
+            {
+                TargetType = typeof(TAuditEntity),
+                Action = (ev, ent, auditEntity) => entityAction.Invoke((TSourceEntity)ent.Entry.Entity, (TAuditEntity)auditEntity)
+            };
             return this;
         }
 
@@ -71,7 +81,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             _commonAction = (ev, ent, auditEntity) =>
             {
-                entityAction.Invoke(ev, ent, (T) auditEntity);
+                entityAction.Invoke(ev, ent, (T)auditEntity);
                 return true;
             };
         }
@@ -85,9 +95,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             return t =>
             {
-                Type mappedType = null;
-                _mapping.TryGetValue(t, out mappedType);
-                return mappedType;
+                MappingInfo map = null;
+                _mapping.TryGetValue(t, out map);
+                return map?.TargetType;
             };
         }
 
@@ -95,11 +105,12 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             return (ev, ent, auditEntity) =>
             {
-                Func<AuditEvent, EventEntry, object, bool> action = null;
+                MappingInfo map = null;
                 bool include = true;
-                if (_actions.TryGetValue(auditEntity.GetType(), out action))
+                var entityType = ent.EntityType;
+                if (entityType != null && _mapping.TryGetValue(entityType, out map))
                 {
-                    include = action.Invoke(ev, ent, auditEntity);
+                    include = map.Action.Invoke(ev, ent, auditEntity);
                 }
                 if (include && _commonAction != null)
                 {

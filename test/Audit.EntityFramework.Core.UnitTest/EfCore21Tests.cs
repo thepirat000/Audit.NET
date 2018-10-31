@@ -26,6 +26,65 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
+        public void Test_EF_MapMultipleTypesToSameAuditType()
+        {
+            var guid = Guid.NewGuid().ToString();
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(_ => _
+                    .UseDbContext<BlogsContext>()
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Blog, CommonAudit>((blog, commonAudit) =>
+                        {
+                            commonAudit.EntityType = "Blog";
+                            commonAudit.EntityId = blog.Id;
+                            commonAudit.Title = blog.Title;
+                            commonAudit.Group = guid;
+                        })
+                        .Map<Post, CommonAudit>((post, commonAudit) =>
+                        {
+                            commonAudit.EntityType = "Post";
+                            commonAudit.EntityId = post.Id;
+                            commonAudit.Title = post.Title;
+                            commonAudit.Group = guid;
+                        })
+                        .AuditEntityAction<IAuditEntity>((ev, entry, entity) =>
+                        {
+                            entity.AuditAction = entry.Action;
+                            entity.AuditDate = DateTime.Now;
+                            entity.AuditUser = Environment.UserName;
+                            entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
+                        })));
+
+            using (var context = new BlogsContext())
+            {
+                context.Blogs.Add(new Blog { BloggerName = guid, Title = "TestBlog" });
+                context.SaveChanges();
+
+                var blog = context.Blogs.First(b => b.BloggerName == guid);
+
+                context.Posts.Add(new Post() { BlogId = blog.Id, Blog = blog, Title = "TestPost", Content = guid });
+                context.SaveChanges();
+
+                var post = context.Posts.First(b => b.Content == guid);
+
+                var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
+
+                Assert.AreEqual(2, audits.Count);
+                Assert.AreEqual("Blog", audits[0].EntityType);
+                Assert.AreEqual(blog.Id, audits[0].EntityId);
+                Assert.AreEqual(blog.Title, audits[0].Title);
+
+                Assert.AreEqual("Post", audits[1].EntityType);
+                Assert.AreEqual(post.Id, audits[1].EntityId);
+                Assert.AreEqual(post.Title, audits[1].Title);
+
+                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
+                Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
+            }
+        }
+
+        [Test]
         public void Test_EFFailureLogging()
         {
             Audit.Core.Configuration.Setup()

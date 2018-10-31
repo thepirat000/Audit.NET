@@ -27,6 +27,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 
         public DbSet<BlogAudit> BlogsAudits { get; set; }
         public DbSet<PostAudit> PostsAudits { get; set; }
+        public DbSet<CommonAudit> CommonAudits { get; set; }
     }
 
     public abstract class BaseEntity
@@ -91,4 +92,21 @@ namespace Audit.EntityFramework.Core.UnitTest
 
     }
 
+    public class CommonAudit : IAuditEntity
+    {
+        [Key]
+        public int AuditId { get; set; }
+
+        public string EntityType { get; set; }
+        public int EntityId { get; set; }
+        public string Title { get; set; }
+        public string Group { get; set; }
+
+
+        public string AuditAction { get; set; }
+        public DateTime AuditDate { get; set; }
+        public string AuditUser { get; set; }
+        public string Exception { get; set; }
+
+    }
 }

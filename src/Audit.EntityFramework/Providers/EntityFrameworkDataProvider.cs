@@ -84,6 +84,7 @@ namespace Audit.EntityFramework.Providers
 #endif
                 if (type != null)
                 {
+                    entry.EntityType = type;
                     var mappedType = _auditTypeMapper?.Invoke(type);
                     if (mappedType != null)
                     {
@@ -138,6 +139,7 @@ namespace Audit.EntityFramework.Providers
 #endif
                 if (type != null)
                 {
+                    entry.EntityType = type;
                     var mappedType = _auditTypeMapper?.Invoke(type);
                     if (mappedType != null)
                     {

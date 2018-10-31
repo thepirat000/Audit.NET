@@ -1,4 +1,5 @@
-﻿using Audit.Core;
+﻿using System;
+using Audit.Core;
 using Newtonsoft.Json;
 
 namespace Audit.EntityFramework
