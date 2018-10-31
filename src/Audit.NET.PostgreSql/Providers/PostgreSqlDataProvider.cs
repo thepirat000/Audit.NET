@@ -217,7 +217,7 @@ namespace Audit.PostgreSql.Providers
             {
                 cnn.Open();
                 var cmd = cnn.CreateCommand();
-                var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+                var schema = GetSchema();
                 var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
                 cmd.CommandText = $@"SELECT ""{_dataColumnName}"" FROM {schema}""{_tableName}"" {where}";
                 var dr = cmd.ExecuteReader();
@@ -233,7 +233,7 @@ namespace Audit.PostgreSql.Providers
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
-            var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+            var schema = GetSchema();
             var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
             cmd.CommandText = $@"insert into {schema}""{_tableName}"" (""{_dataColumnName}"") values ({data}) RETURNING (""{_idColumnName}"")";
             var parameter = cmd.CreateParameter();
@@ -247,7 +247,7 @@ namespace Audit.PostgreSql.Providers
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
-            var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+            var schema = GetSchema();
             var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
             var ludScript = string.IsNullOrWhiteSpace(_lastUpdatedDateColumnName) ? "" : $@", ""{_lastUpdatedDateColumnName}"" = CURRENT_TIMESTAMP";
             cmd.CommandText = $@"update {schema}""{_tableName}"" SET ""{_dataColumnName}"" = {data}{ludScript} WHERE ""{_idColumnName}"" = @id";
@@ -266,13 +266,18 @@ namespace Audit.PostgreSql.Providers
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
-            var schema = string.IsNullOrWhiteSpace(_schema) ? "" : (_schema + ".");
+            var schema = GetSchema();
             cmd.CommandText = $@"select ""{_dataColumnName}"" from {schema}""{_tableName}"" WHERE ""{_idColumnName}"" = @id";
             var idParameter = cmd.CreateParameter();
             idParameter.ParameterName = "id";
             idParameter.Value = eventId;
             cmd.Parameters.Add(idParameter);
             return cmd;
+        }
+
+        private string GetSchema()
+        {
+            return string.IsNullOrWhiteSpace(_schema) ? "" : (@"""" + _schema + @""".");
         }
     }
 }
