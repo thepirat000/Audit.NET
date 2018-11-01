@@ -392,7 +392,7 @@ Optional:
 
 The `UseEntityFramework` method provides several ways to indicate the Type Mapper and the Audit Action.
 
-##### Map by type name:
+#### Map by type name:
 
 You can map the audited entity to its audit log entity by the entity name using the `AuditTypeNameMapper` method, for example to prepend `Audit_` to the entity name. 
 This assumes both entity types are defined on the same assembly and namespace:
@@ -421,7 +421,7 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
-##### Common action:
+#### Common action:
 
 If your audit log entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
 to configure the action to be performed to each audit trail entity before saving:
@@ -437,7 +437,7 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
-##### Use the explicit mapper to provide granular configuration per audit type:
+#### Use the explicit mapper to provide granular configuration per audit type:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -456,7 +456,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-##### Ignore certain entities on the audit log:
+#### Ignore certain entities on the audit log:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -473,7 +473,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-##### Custom DbContext instance:
+#### Custom DbContext instance:
 
 To set a custom DbContext instance for storing the audit events, for example when your Audit_* entities 
 are defined in a different database and context (i.e. `AuditDatabaseDbContext`):
@@ -490,7 +490,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-##### Map multiple entity types to the same audit type with independent actions:
+#### Map multiple entity types to the same audit type with independent actions:
 
 When you want to store the audit logs of different entities in the same audit table, for example:
 
