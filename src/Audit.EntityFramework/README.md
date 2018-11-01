@@ -331,16 +331,16 @@ Another way to customize the output is by using global custom actions, please se
 
 ## Entity Framework Data Provider
 
-If you plan to store the audit logs via EntityFramework, on the same or a different DbContext, you can use the provided `EntityFrameworkDataProvider`. 
-Use this to store the logs of each table in an audit table with similar structure.
+If you plan to store the audit logs via EntityFramework, you can use the provided `EntityFrameworkDataProvider`. 
+Use this to store the logs on audit tables handled by EntityFramework.
 
 For example, you want to audit `Order` and `OrderItem` tables into `Audit_Order` and `Audit_OrderItem` tables respectively, 
 and the structure of the `Audit_*` tables mimic the audited table plus some fields like the event date, an action and the username:
 
 ![Audit entities](http://i.imgur.com/QvfXS9H.png)
 
-> Note that by default the library assumes the same DbContext audited will contain all the audit tables. 
-> This is not mandatory and you can provide a _DbContext_ per audit event.
+> Note that, by default, the library uses the same `DbContext` audited to store the audit logs. 
+> This is not mandatory and you can provide a different _DbContext_ instance per audit event.
 
 ### EF Provider configuration
 
@@ -392,7 +392,9 @@ Optional:
 
 The `UseEntityFramework` method provides several ways to indicate the Type Mapper and the Audit Action.
 
-You can map the audited entity to its audit trail entity by the entity name using the `AuditTypeNameMapper` method, for example to prepend `Audit_` to the entity name. 
+##### Map by type name:
+
+You can map the audited entity to its audit log entity by the entity name using the `AuditTypeNameMapper` method, for example to prepend `Audit_` to the entity name. 
 This assumes both entity types are defined on the same assembly and namespace:
 
 ```c#
@@ -419,7 +421,9 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
-If your audit trail entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
+##### Common action:
+
+If your audit log entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
 to configure the action to be performed to each audit trail entity before saving:
 
 ```c#
@@ -433,7 +437,7 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
-Use the explicit mapper to provide granular configuration per audit type:
+##### Use the explicit mapper to provide granular configuration per audit type:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -452,7 +456,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-Ignore certain entities on the audit log:
+##### Ignore certain entities on the audit log:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -469,8 +473,9 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
+##### Custom DbContext instance:
 
-To set a custom DbContext for storing the audit events, for example when your Audit_* entities 
+To set a custom DbContext instance for storing the audit events, for example when your Audit_* entities 
 are defined in a different database and context (i.e. `AuditDatabaseDbContext`):
 
 ```c#
@@ -485,3 +490,35 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
+##### Map multiple entity types to the same audit type with independent actions:
+
+When you want to store the audit logs of different entities in the same audit table, for example:
+
+![Audit entities 2](https://i.imgur.com/oNxnhUh.png)
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(ef => ef
+        .AuditTypeExplicitMapper(m => m
+            .Map<Blog, AuditLog>((blog, audit) =>
+            {
+                // Action for Blog -> AuditLog
+                audit.TableName = "Blog";
+                audit.TablePK = blog.Id;
+                audit.Title = blog.Title;
+            })
+            .Map<Post, AuditLog>((post, audit) =>
+            {
+                // Action for Post -> AuditLog
+                audit.TableName = "Post";
+                audit.TablePK = post.Id;
+                audit.Title = post.Title;
+            })
+            .AuditEntityAction<AuditLog>((evt, entry, audit) =>
+            {
+                // Common action on AuditLog
+                audit.AuditDate = DateTime.UtcNow;
+                audit.AuditAction = entry.Action;
+                audit.AuditUsername = Environment.UserName;
+            })));
+```
