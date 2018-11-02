@@ -522,3 +522,18 @@ Audit.Core.Configuration.Setup()
                 audit.AuditUsername = Environment.UserName;
             })));
 ```
+
+Another example for all entities mapping to a single audit log table that stores the changes in a JSON column:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(_ => _
+        .AuditTypeMapper(t => typeof(AuditLog))  
+        .AuditEntityAction<AuditLog>((ev, entry, entity) =>
+        {
+            entity.AuditData = JsonConvert.SerializeObject(entry);
+            entity.EntityType = entry.EntityType.Name;
+            entity.AuditDate = DateTime.Now;
+            entity.AuditUser = Environment.UserName;
+        }));
+```

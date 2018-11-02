@@ -6,6 +6,7 @@ using System.Linq;
 using System.Transactions;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -83,6 +84,55 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
             }
         }
+
+        [Test]
+        public void Test_EF_MapAllTypesToSameAuditType()
+        {
+            var guid = Guid.NewGuid().ToString();
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(_ => _
+                    .UseDbContext<BlogsContext>()
+                    .AuditTypeMapper(t => typeof(CommonAudit))
+                    .AuditEntityAction<CommonAudit>((ev, entry, entity) =>
+                    {
+                        entity.AuditAction = JsonConvert.SerializeObject(entry);
+                        entity.Group = guid;
+                        entity.EntityId = (int)entry.PrimaryKey.First().Value;
+                        entity.EntityType = entry.EntityType.Name;
+                        entity.AuditDate = DateTime.Now;
+                        entity.AuditUser = Environment.UserName;
+                        entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
+                    }));
+
+            using (var context = new BlogsContext())
+            {
+                context.Blogs.Add(new Blog { BloggerName = guid, Title = "TestBlog" });
+                context.SaveChanges();
+
+                var blog = context.Blogs.First(b => b.BloggerName == guid);
+
+                context.Posts.Add(new Post() { BlogId = blog.Id, Blog = blog, Title = "TestPost", Content = guid });
+                context.SaveChanges();
+
+                var post = context.Posts.First(b => b.Content == guid);
+
+                var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
+
+                Assert.AreEqual(2, audits.Count);
+                Assert.AreEqual("Blog", audits[0].EntityType);
+                Assert.AreEqual(blog.Id, audits[0].EntityId);
+                Assert.AreEqual(blog.Title, audits[0].Title);
+
+                Assert.AreEqual("Post", audits[1].EntityType);
+                Assert.AreEqual(post.Id, audits[1].EntityId);
+                Assert.AreEqual(post.Title, audits[1].Title);
+
+                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
+                Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
+            }
+        }
+
 
         [Test]
         public void Test_EFFailureLogging()
