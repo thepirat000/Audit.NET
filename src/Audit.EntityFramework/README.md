@@ -524,8 +524,6 @@ Audit.Core.Configuration.Setup()
 	    .IgnoreMatchedProperties()));
 ```
 
-> Note the use of `.IgnoreMatchedProperties()` to avoid the library trying to set properties automatically by matching names between the audited entities and the type `AuditLog`.
-
 Another example for all entities mapping to a single audit log table that stores the changes in a JSON column:
 
 ```c#
@@ -541,3 +539,5 @@ Audit.Core.Configuration.Setup()
         })
 	.IgnoreMatchedProperties());
 ```
+
+> Note the use of `.IgnoreMatchedProperties()` to avoid the library trying to set properties automatically by matching names between the audited entities and the type `AuditLog`.
