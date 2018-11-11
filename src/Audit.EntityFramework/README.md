@@ -520,8 +520,8 @@ Audit.Core.Configuration.Setup()
                 audit.AuditDate = DateTime.UtcNow;
                 audit.AuditAction = entry.Action;
                 audit.AuditUsername = Environment.UserName;
-            })
-	    .IgnoreMatchedProperties()));
+            }))
+	.IgnoreMatchedProperties());
 ```
 
 Another example for all entities mapping to a single audit log table that stores the changes in a JSON column:
