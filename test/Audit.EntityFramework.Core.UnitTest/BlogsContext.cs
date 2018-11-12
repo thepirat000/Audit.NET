@@ -84,6 +84,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         [Column("BlogAuditId")]
         public int BlogAuditId { get; set; }

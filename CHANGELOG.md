@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [13.2.1] - 2018-11-12
+### Modified
+- Audit.EntityFramework and Audit.EntityFramework.Core: Fix parameter default for `IgnoreMatchedProperties(bool)` on configuration API to be _true_.
+
+
 ## [13.2.0] - 2018-10-31
 ### Modified
 - Audit.EntityFramework and Audit.EntityFramework.Core: Allow mapping multiple entity types to the same audit type with independent actions. (#175)

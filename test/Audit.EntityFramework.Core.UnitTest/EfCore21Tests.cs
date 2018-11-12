@@ -64,7 +64,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 
                 var blog = context.Blogs.First(b => b.BloggerName == guid);
 
-                context.Posts.Add(new Post() { BlogId = blog.Id, Blog = blog, Title = "TestPost", Content = guid });
+                context.Posts.Add(new Post() { BlogId = blog.Id, Title = "TestPost", Content = guid });
                 context.SaveChanges();
 
                 var post = context.Posts.First(b => b.Content == guid);

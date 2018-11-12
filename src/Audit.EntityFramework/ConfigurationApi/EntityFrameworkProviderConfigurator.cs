@@ -103,7 +103,7 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
-        public void IgnoreMatchedProperties(bool ignore = false)
+        public void IgnoreMatchedProperties(bool ignore = true)
         {
             _ignoreMatchedProperties = ignore;
         }
