@@ -226,7 +226,7 @@ Field Name | Type | Description
 
 The `AuditScope` object provides two methods to extend the event output.
 
-- Use `SetCustomField()` method to add any object as a custom field of the event.
+- Use `SetCustomField()` method to add any object as an extra field to the event.
 - Use `Comment()` to add textual comments to the event's `Comments` array.
 
 For example:
