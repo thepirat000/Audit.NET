@@ -1,4 +1,5 @@
 @echo off
+start "" /D D:\DynamoDB "D:\DynamoDB\run.bat"
 start "" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 start "" /D c:\redis "c:\redis\redis-server.exe"
 net start mysql57

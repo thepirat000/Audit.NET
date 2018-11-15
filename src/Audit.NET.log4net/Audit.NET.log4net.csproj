@@ -4,7 +4,7 @@
     <Description>Log Audit.NET Audit Trail using Apache log4net™</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.log4net</AssemblyTitle>
-    <VersionPrefix>13.2.1</VersionPrefix>
+    <VersionPrefix>13.2.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

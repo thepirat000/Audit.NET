@@ -175,7 +175,7 @@ namespace Audit.EntityFramework
                 {
                     foreach (var prop in fk.Properties)
                     {
-                        result.Add(GetColumnName(prop), entry.Property(prop.Name).CurrentValue);
+                        result[GetColumnName(prop)] = entry.Property(prop.Name).CurrentValue;
                     }
                 }
             }

@@ -27,6 +27,80 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
+        public void Test_EF_CompositeRepeatedForeignKey()
+        {
+            // Issue #178
+            var events = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    events.Add(ev.GetEntityFrameworkEvent());
+                }));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<DemoContext>(cfg => cfg.IncludeEntityObjects());
+
+            var id = new Random().Next();
+
+            using (var ctx = new DemoContext())
+            {
+                var tenant = new Tenant() { Id = id, Name = "tenant" };
+                ctx.Tenants.Add(tenant);
+
+                ctx.SaveChanges();
+
+                var employee1 = new Employee() { Id = id + 1, Name = "test1", TenantId = tenant.Id };
+                ctx.Employees.Add(employee1);
+                var employee2 = new Employee() { Id = id + 2, Name = "test2", TenantId = tenant.Id };
+                ctx.Employees.Add(employee2);
+
+                ctx.SaveChanges();
+
+                var petty = new PettyCashTransaction() { Id = id + 3, EmployeeId = employee1.Id, TenantId = tenant.Id, TrusteeId = employee2.Id };
+                ctx.Pettys.Add(petty);
+                ctx.SaveChanges();
+
+                var emp = ctx.Employees.Single(x => x.Id == employee1.Id);
+                emp.Name = $"test1-updated";
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(4, events.Count);
+            Assert.AreEqual(1, events[0].Entries.Count);
+            Assert.AreEqual(id, events[0].Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual("tenant", events[0].Entries[0].ColumnValues["Name"]);
+            Assert.AreEqual(id, events[0].Entries[0].PrimaryKey["Id"]);
+
+            Assert.AreEqual(2, events[1].Entries.Count);
+            Assert.AreEqual(id+1, events[1].Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual("test1", events[1].Entries[0].ColumnValues["Name"]);
+            Assert.AreEqual(id, events[1].Entries[0].ColumnValues["TenantId"]);
+            Assert.AreEqual(2, events[1].Entries[0].PrimaryKey.Count);
+            Assert.AreEqual(id+1, events[1].Entries[0].PrimaryKey["Id"]);
+            Assert.AreEqual(id, events[1].Entries[0].PrimaryKey["TenantId"]);
+
+            Assert.AreEqual(id + 2, events[1].Entries[1].ColumnValues["Id"]);
+            Assert.AreEqual("test2", events[1].Entries[1].ColumnValues["Name"]);
+            Assert.AreEqual(id, events[1].Entries[1].ColumnValues["TenantId"]);
+            Assert.AreEqual(2, events[1].Entries[1].PrimaryKey.Count);
+            Assert.AreEqual(id + 2, events[1].Entries[1].PrimaryKey["Id"]);
+            Assert.AreEqual(id, events[1].Entries[1].PrimaryKey["TenantId"]);
+
+            Assert.AreEqual(1, events[2].Entries.Count);
+            Assert.AreEqual(id + 3, events[2].Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual(id + 1, events[2].Entries[0].ColumnValues["EmployeeId"]);
+            Assert.AreEqual(id, events[2].Entries[0].ColumnValues["TenantId"]);
+            Assert.AreEqual(id + 2, events[2].Entries[0].ColumnValues["TrusteeId"]);
+            Assert.AreEqual(id + 3, events[2].Entries[0].PrimaryKey["Id"]);
+
+            Assert.AreEqual(1, events[3].Entries.Count);
+            Assert.AreEqual(1, events[3].Entries[0].Changes.Count);
+            Assert.AreEqual("Name", events[3].Entries[0].Changes[0].ColumnName);
+            Assert.AreEqual("test1", events[3].Entries[0].Changes[0].OriginalValue);
+            Assert.AreEqual("test1-updated", events[3].Entries[0].Changes[0].NewValue);
+
+        }
+
+        [Test]
         public void Test_EF_MapMultipleTypesToSameAuditType()
         {
             var guid = Guid.NewGuid().ToString();
