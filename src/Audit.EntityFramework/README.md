@@ -521,7 +521,7 @@ Audit.Core.Configuration.Setup()
                 audit.AuditAction = entry.Action;
                 audit.AuditUsername = Environment.UserName;
             }))
-	.IgnoreMatchedProperties());
+	.IgnoreMatchedProperties(true));
 ```
 
 Another example for all entities mapping to a single audit log table that stores the changes in a JSON column:
@@ -537,7 +537,7 @@ Audit.Core.Configuration.Setup()
             entity.AuditDate = DateTime.Now;
             entity.AuditUser = Environment.UserName;
         })
-	.IgnoreMatchedProperties());
+	.IgnoreMatchedProperties(true));
 ```
 
-> Note the use of `.IgnoreMatchedProperties()` to avoid the library trying to set properties automatically by matching names between the audited entities and the type `AuditLog`.
+> Note the use of `.IgnoreMatchedProperties(true)` to avoid the library trying to set properties automatically by matching names between the audited entities and the type `AuditLog`.
