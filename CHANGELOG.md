@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [13.3.0] - 2018-11-16
+### Modified
+- Audit.Core: Adding support to Xamarin/Mono. Fix incompatible calls to `System.Runtime.InteropServices.Marshal`. (#180)
+
 ## [13.2.2] - 2018-11-15
 ### Modified
 - Audit.EntityFramework.Core: Fix bug when auditing tables with composite multiple froeign keys related to the same column (#178).

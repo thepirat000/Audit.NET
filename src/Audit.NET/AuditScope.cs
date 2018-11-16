@@ -367,6 +367,11 @@ namespace Audit.Core
         private static Exception GetCurrentException()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
+            if (PlatformHelper.IsRunningOnMono())
+            {
+                // Mono doesn't implement Marshal.GetExceptionCode() (https://github.com/mono/mono/blob/master/mcs/class/corlib/System.Runtime.InteropServices/Marshal.cs#L521)
+                return null;
+            }
             if (Marshal.GetExceptionCode() != 0)
             {
                 return Marshal.GetExceptionForHR(Marshal.GetExceptionCode());
