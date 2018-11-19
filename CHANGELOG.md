@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [14.0.0] - 2018-11-18
+## [14.0.0] - 2018-11-19
 ### Modified
 - Audit.Core: UTC standarization for dates: changing missing dates to be UTC (Event.StartDate, Event.EndDate).
 - Audit.Core: Added `Configuration.Setup().Use()` shortcut method for `UseCustomProvider()` and `UseDynamicProvider()`.
