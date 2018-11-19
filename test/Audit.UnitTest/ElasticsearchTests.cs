@@ -127,7 +127,7 @@ namespace Audit.UnitTest
 #pragma warning restore CS0618 // Type or member is obsolete
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(ela)
+                .Use(ela)
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnStartReplaceOnEnd)
                 .ResetActions();
 

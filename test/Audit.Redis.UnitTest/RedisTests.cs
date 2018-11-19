@@ -638,7 +638,7 @@ namespace Audit.IntegrationTest
                     .Key(ev => key)
                     .Score(ev => 1));
 
-            Configuration.Setup().UseCustomProvider(dp);
+            Configuration.Setup().Use(dp);
 
             using (var scope = AuditScope.Create(new AuditScopeOptions() { DataProvider = dp }))
             {

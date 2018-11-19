@@ -49,7 +49,7 @@ namespace Audit.Core
             }
             _event = options.AuditEvent ?? new AuditEvent();
             _event.Environment = environment;
-            _event.StartDate = DateTime.Now;
+            _event.StartDate = DateTime.UtcNow;
             _event.EventType = options.EventType;
             _event.CustomFields = new Dictionary<string, object>();
 
@@ -356,7 +356,7 @@ namespace Audit.Core
         {
             var exception = GetCurrentException();
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
-            _event.EndDate = DateTime.Now;
+            _event.EndDate = DateTime.UtcNow;
             _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
             if (_targetGetter != null)
             {

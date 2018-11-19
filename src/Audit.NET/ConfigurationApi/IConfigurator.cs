@@ -61,5 +61,15 @@ namespace Audit.Core.ConfigurationApi
         /// Use a custom provider for the event output.
         /// </summary>
         ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider);
+
+        /// <summary>
+        /// Shortcut for UseDynamicProvider, to use a dynamic custom provider for the event output.
+        /// </summary>
+        ICreationPolicyConfigurator Use(Action<IDynamicDataProviderConfigurator> config);
+
+        /// <summary>
+        /// Shortcut for UseCustomProvider, to use a custom provider instance for the event output.
+        /// </summary>
+        ICreationPolicyConfigurator Use(AuditDataProvider provider);
     }
 }

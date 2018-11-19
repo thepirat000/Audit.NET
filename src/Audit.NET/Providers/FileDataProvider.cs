@@ -168,7 +168,7 @@ namespace Audit.Core.Providers
             }
             else
             {
-                fileName += $"{DateTime.Now:yyyyMMddHHmmss}_{HiResDateTime.UtcNowTicks}.json";
+                fileName += $"{DateTime.UtcNow:yyyyMMddHHmmss}_{HiResDateTime.UtcNowTicks}.json";
             }
             string directory;
             if (_directoryPathBuilder != null)

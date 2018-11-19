@@ -18,7 +18,7 @@ namespace Audit.DynamicProxy.UnitTest
             var inserts = new List<AuditEvent>();
             var replaces = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(config => config.OnInsert(ev =>
+                .Use(config => config.OnInsert(ev =>
                 {
                     inserts.Add(JsonConvert.DeserializeObject(ev.ToJson(), ev.GetType()) as AuditEvent);
                 })
@@ -46,7 +46,7 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(config => config.OnInsert(ev =>
+                .Use(config => config.OnInsert(ev =>
                 {
                     logs.Add(ev);
                 }))
@@ -120,7 +120,7 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(config => config.OnInsert(ev =>
+                .Use(config => config.OnInsert(ev =>
                 {
                     logs.Add(ev);
                 }));
@@ -148,7 +148,7 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var logs = new List<string>();
             Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(config => config.OnInsert(ev =>
+                .Use(config => config.OnInsert(ev =>
                 {
                     logs.Add(ev.EventType);
                 }));

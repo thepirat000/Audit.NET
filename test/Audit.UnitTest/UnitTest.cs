@@ -32,7 +32,7 @@ namespace Audit.UnitTest
             var listEv = new List<AuditEvent>();
             var listJson = new List<string>();
             Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(x => x
+                .Use(x => x
                     .OnInsertAndReplace(ev =>
                     {
                         listEv.Add(ev);
@@ -75,7 +75,7 @@ namespace Audit.UnitTest
             var list = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
                 .AuditDisabled(true)
-                .UseDynamicProvider(x => x
+                .Use(x => x
                     .OnInsertAndReplace(ev =>
                     {
                         list.Add(ev);

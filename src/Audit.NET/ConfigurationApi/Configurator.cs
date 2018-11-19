@@ -17,7 +17,14 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = dataProvider;
             return new CreationPolicyConfigurator();
         }
-
+        public ICreationPolicyConfigurator Use(Action<IDynamicDataProviderConfigurator> config)
+        {
+            return UseDynamicProvider(config);
+        }
+        public ICreationPolicyConfigurator Use(AuditDataProvider provider)
+        {
+            return UseCustomProvider(provider);
+        }
         public ICreationPolicyConfigurator UseDynamicProvider(Action<IDynamicDataProviderConfigurator> config)
         {
             var dataProvider = new DynamicDataProvider();
