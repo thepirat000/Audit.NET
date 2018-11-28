@@ -532,7 +532,7 @@ Audit.Core.Configuration.Setup()
         .AuditTypeMapper(t => typeof(AuditLog))  
         .AuditEntityAction<AuditLog>((ev, entry, entity) =>
         {
-            entity.AuditData = JsonConvert.SerializeObject(entry);
+            entity.AuditData = entry.ToJson();
             entity.EntityType = entry.EntityType.Name;
             entity.AuditDate = DateTime.Now;
             entity.AuditUser = Environment.UserName;
