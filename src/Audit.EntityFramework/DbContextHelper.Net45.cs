@@ -131,10 +131,9 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the name of the table/entity.
         /// </summary>
-        private string GetEntityName(DbContext dbContext, object entity)
+        private EntityName GetEntityName(DbContext dbContext, object entity)
         {
-            var entityType = entity.GetType();
-            return EntityKeyHelper.Instance.GetTableName(entityType, dbContext) ?? entityType.Name;
+            return EntityKeyHelper.Instance.GetTableName(entity.GetType(), dbContext);
         }
 
         /// <summary>
@@ -202,6 +201,7 @@ namespace Audit.EntityFramework
             {
                 var entity = entry.Entity;
                 var validationResults = entry.GetValidationResult();
+                var entityName = GetEntityName(dbContext, entity);
                 efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults.IsValid,
@@ -210,7 +210,8 @@ namespace Audit.EntityFramework
                     Entry = entry,
                     Action = GetStateName(entry.State),
                     Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
-                    Table = GetEntityName(dbContext, entity),
+                    Table = entityName.Table,
+                    Schema = entityName.Schema,
                     ColumnValues = GetColumnValues(context, entry)
                 });
             }
@@ -233,6 +234,8 @@ namespace Audit.EntityFramework
                 {
                     var pk1 = EntityKeyHelper.Instance.GetPrimaryKeyValues(e1, dbContext);
                     var pk2 = EntityKeyHelper.Instance.GetPrimaryKeyValues(e2, dbContext);
+                    var e1Name = GetEntityName(dbContext, e1);
+                    var e2Name = GetEntityName(dbContext, e2);
                     result.Add(new AssociationEntry()
                     {
                         Action = association.State == EntityState.Added ? "Insert" : "Delete",
@@ -242,14 +245,16 @@ namespace Audit.EntityFramework
                             new AssociationEntryRecord()
                             {
                                 InternalEntity = e1,
-                                Table = GetEntityName(dbContext, e1),
+                                Table = e1Name.Table,
+                                Schema = e1Name.Schema,
                                 Entity = includeEntityObjects ? e1 : null,
                                 PrimaryKey = pk1
                             },
                             new AssociationEntryRecord()
                             {
                                 InternalEntity = e2,
-                                Table = GetEntityName(dbContext, e2),
+                                Table = e2Name.Table,
+                                Schema = e2Name.Schema,
                                 Entity = includeEntityObjects ? e2 : null,
                                 PrimaryKey = pk2
                             }

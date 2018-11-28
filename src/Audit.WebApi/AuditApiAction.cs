@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Audit.Core;
 using Newtonsoft.Json;
 
 namespace Audit.WebApi
 {
-    public class AuditApiAction
+    public class AuditApiAction : IAuditOutput
     {
         [JsonProperty(Order = -1, NullValueHandling = NullValueHandling.Ignore)]
         public string TraceId { get; set; }
@@ -39,9 +40,26 @@ namespace Audit.WebApi
         public IDictionary<string, string> ModelStateErrors { get; set; }
         [JsonProperty(Order = 999, NullValueHandling = NullValueHandling.Ignore)]
         public string Exception { get; set; }
+        [JsonExtensionData]
+        public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
 #if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
         [JsonIgnore]
         internal bool IsMiddleware { get; set; }
 #endif
+        /// <summary>
+        /// Serializes this Audit Action as a JSON string
+        /// </summary>
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, Core.Configuration.JsonSettings);
+        }
+        /// <summary>
+        /// Parses an Audit Action from its JSON string representation.
+        /// </summary>
+        /// <param name="json">JSON string with the Entity Audit Action representation.</param>
+        public static AuditApiAction FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<AuditApiAction>(json, Core.Configuration.JsonSettings);
+        }
     }
 }

@@ -137,15 +137,20 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the name of the entity.
         /// </summary>
-        private static string GetEntityName(DbContext dbContext, EntityEntry entry)
+        private static EntityName GetEntityName(DbContext dbContext, EntityEntry entry)
         {
+            var result = new EntityName();
             var definingType = GetDefiningType(dbContext, entry);
             if (definingType == null)
             {
-                return null;
+                return result;
             }
-            return definingType.Relational().TableName ?? definingType.Name;
+            var relational = definingType.Relational();
+            result.Table = relational.TableName ?? definingType.Name;
+            result.Schema = relational.Schema;
+            return result;
         }
+
 
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
@@ -221,6 +226,7 @@ namespace Audit.EntityFramework
             {
                 var entity = entry.Entity;
                 var validationResults = DbContextHelper.GetValidationResults(entity);
+                var entityName = GetEntityName(dbContext, entry);
                 efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults == null,
@@ -229,7 +235,8 @@ namespace Audit.EntityFramework
                     Entry = entry,
                     Action = DbContextHelper.GetStateName(entry.State),
                     Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
-                    Table = GetEntityName(dbContext, entry),
+                    Table = entityName.Table,
+                    Schema = entityName.Schema,
                     ColumnValues = GetColumnValues(context, entry)
                 });
             }

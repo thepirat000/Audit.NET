@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.0.1] - 2018-11-??
+### Added
+- Audit.EntityFramework and Audit.EntityFramework.Core: Added Schema property on entries to complement table name (#182).
+Added optional Custom Fields to Entity Framework Event and Event.Entries.
+
 ## [14.0.0] - 2018-11-18
 ### Modified
 - Audit.Core: UTC standarization for dates: changing missing dates to be UTC (Event.StartDate, Event.EndDate).

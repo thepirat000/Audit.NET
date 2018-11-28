@@ -40,6 +40,61 @@ namespace Audit.EntityFramework.UnitTest
                 .ForAnyContext().Reset();
         }
 
+        [Test]
+        public void Test_EF_CustomFields()
+        {
+            var guid = Guid.NewGuid().ToString().Substring(0, 6);
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsEntities>(x => x.
+                    IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.Core.Configuration.AddOnCreatedAction(scope =>
+            {
+                var efEvent = scope.GetEntityFrameworkEvent();
+                efEvent.CustomFields["Additional Field On event"] = new { x = 1, y = "one" };
+                efEvent.Entries[0].CustomFields["Additional Field On entry"] = new { x = 2, y = "two" };
+            });
+
+            using (var ctx = new BlogsEntities())
+            {
+                var blog = new Blog()
+                {
+                    Title = guid
+                };
+                ctx.Blogs.Add(blog);
+                ctx.SaveChanges();
+            }
+
+            
+            var ev2 = AuditEvent.FromJson<AuditEventEntityFramework>(evs[0].ToJson());
+            var sub1 = EntityFrameworkEvent.FromJson(evs[0].GetEntityFrameworkEvent().ToJson());
+            var sub2 = EventEntry.FromJson(evs[0].GetEntityFrameworkEvent().Entries[0].ToJson());
+
+            var settings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, NullValueHandling = NullValueHandling.Ignore };
+            Assert.AreEqual(JsonConvert.SerializeObject(evs[0].GetEntityFrameworkEvent(), settings), JsonConvert.SerializeObject(sub1, settings));
+
+            Assert.AreEqual(1, evs.Count);
+
+            Assert.AreEqual(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"], evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual(guid, evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Title"]);
+            Assert.AreEqual("Blogs", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.AreEqual("dbo", evs[0].GetEntityFrameworkEvent().Entries[0].Schema.ToLower());
+            Assert.AreEqual(1, (evs[0].GetEntityFrameworkEvent().CustomFields["Additional Field On event"] as dynamic).x);
+            Assert.AreEqual("two", (evs[0].GetEntityFrameworkEvent().Entries[0].CustomFields["Additional Field On entry"] as dynamic).y);
+            Assert.AreEqual("one", (evs[0].GetEntityFrameworkEvent().CustomFields["Additional Field On event"] as dynamic).y);
+            Assert.AreEqual(2, (evs[0].GetEntityFrameworkEvent().Entries[0].CustomFields["Additional Field On entry"] as dynamic).x);
+            Assert.IsNotNull(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"]);
+            Assert.IsNotNull(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"]);
+        }
 
         [Test]
         public void Test_EF_Override_Func()

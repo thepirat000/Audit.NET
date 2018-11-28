@@ -1,11 +1,14 @@
+using Audit.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
 namespace Audit.EntityFramework
 {
-    public class EventEntry
+    public class EventEntry : IAuditOutput
     {
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)]
+        public string Schema { get; set; }
         [JsonProperty(Order = 10)]
         public string Table { get; set; }
         [JsonProperty(Order = 25)]
@@ -28,6 +31,25 @@ namespace Audit.EntityFramework
         /// </summary>
         [JsonIgnore]
         public Type EntityType { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Serializes this Event Entry as a JSON string
+        /// </summary>
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, Core.Configuration.JsonSettings);
+        }
+        /// <summary>
+        /// Parses an Event Entry from its JSON string representation.
+        /// </summary>
+        /// <param name="json">JSON string with the Event Entry representation.</param>
+        public static EventEntry FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<EventEntry>(json, Core.Configuration.JsonSettings);
+        }
 
         [JsonIgnore]
 #if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461

@@ -41,6 +41,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         string AuditUser { get; set; }
         string Exception { get; set; }
     }
+    [Table("Blogs", Schema="dbo")]
     public class Blog : BaseEntity
     {
         [Key]
@@ -50,6 +51,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
     }
+    [Table("Posts", Schema = "dbo")]
     public class Post : BaseEntity
     {
         [Key]
@@ -61,7 +63,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public int BlogId { get; set; }
         public Blog Blog { get; set; }
     }
-
+    [Table("PostsAudits", Schema = "dbo")]
     public class PostAudit : IAuditEntity
     {
         public int PostId { get; set; }
@@ -77,24 +79,23 @@ namespace Audit.EntityFramework.Core.UnitTest
         public string AuditUser { get; set; }
         public string Exception { get; set; }
     }
+    [Table("BlogsAudits", Schema = "dbo")]
     public class BlogAudit : IAuditEntity
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public int BlogAuditId { get; set; }
         public int BlogId { get; set; }
         public string Title { get; set; }
         public string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
-
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        [Column("BlogAuditId")]
-        public int BlogAuditId { get; set; }
         public string AuditAction { get; set; }
         public DateTime AuditDate { get; set; }
         public string AuditUser { get; set; }
         public string Exception { get; set; }
 
     }
-
+    [Table("CommonAudits", Schema = "dbo")]
     public class CommonAudit : IAuditEntity
     {
         [Key]

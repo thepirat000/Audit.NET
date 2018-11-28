@@ -8,6 +8,8 @@ namespace Audit.EntityFramework
 {
     public class AssociationEntryRecord
     {
+        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)]
+        public string Schema { get; set; }
         [JsonProperty(Order = 10)]
         public string Table { get; set; }
         [JsonProperty(Order = 20, NullValueHandling = NullValueHandling.Ignore)]

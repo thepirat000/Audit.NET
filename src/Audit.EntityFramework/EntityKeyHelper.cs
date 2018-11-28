@@ -1,4 +1,5 @@
 ﻿#if NET45
+using Audit.EntityFramework;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ public sealed class EntityKeyHelper
     //Type -> ForeignKeyNames
     private readonly ConcurrentDictionary<Type, string[]> _foreignKeyNamesCache = new ConcurrentDictionary<Type, string[]>();
     //Type -> TableName
-    private readonly ConcurrentDictionary<Type, string> _tableNamesCache = new ConcurrentDictionary<Type, string>();
+    private readonly ConcurrentDictionary<Type, EntityName> _tableNamesCache = new ConcurrentDictionary<Type, EntityName>();
     //Type -> PropertyName -> ColumnName
     private readonly ConcurrentDictionary<Type, Dictionary<string, string>> _columnNamesCache = new ConcurrentDictionary<Type, Dictionary<string, string>>();
 
@@ -187,10 +188,10 @@ public sealed class EntityKeyHelper
     /// </summary>
     /// <param name="type">The entity type (or proxy).</param>
     /// <param name="context">The db context.</param>
-    public string GetTableName(Type type, DbContext context)
+    public EntityName GetTableName(Type type, DbContext context)
     {
         type = GetObjectEntityType(type);
-        string name;
+        EntityName name;
         if (_tableNamesCache.TryGetValue(type, out name))
         {
             return name;
@@ -202,9 +203,14 @@ public sealed class EntityKeyHelper
         var table = mappingFragment.StoreEntitySet;
 
         // Return the table name from the storage entity set
-        var tableName = (string)table.MetadataProperties["Table"].Value ?? table.Name;
-        _tableNamesCache[type] = tableName;
-        return tableName;
+        name = new EntityName()
+        {
+            Table = (string)table.MetadataProperties["Table"].Value ?? table.Name ?? type.Name,
+            Schema = table.Schema
+        };
+
+        _tableNamesCache[type] = name;
+        return name;
     }
 
     /// <summary>
