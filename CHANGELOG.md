@@ -3,11 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [14.0.1] - 2018-11-??
+## [14.0.1] - 2018-11-28
 ### Added
 - Audit.EntityFramework and Audit.EntityFramework.Core: Added Schema property on entries to complement table name (#182).
 Added optional Custom Fields to Entity Framework Event and Event.Entries.
-- Audit.NET.MySql: Changed target frameworks to netstandard1.3, netstandard2.0 and net45. Upgrade MySqlConnector nuget to 0.47.1.
+- Audit.NET.MySql: Changed target frameworks to match those on MySqlConnector nuget version 0.47.1.
 
 ## [14.0.0] - 2018-11-19
 ### Modified
