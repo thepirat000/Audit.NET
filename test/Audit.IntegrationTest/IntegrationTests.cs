@@ -694,7 +694,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
             }
 
-#if NET451 || NETCOREAPP2_0
+#if NET451 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             public void TestEventLog()
             {
