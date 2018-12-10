@@ -130,9 +130,6 @@ public async Task SaveOrderAsync(Order order)
     {
         // async scope creation
         auditScope = await AuditScope.CreateAsync("order", () => order);
-                
-        // async manual saving
-        await auditScope.SaveAsync(); 
     }
     finally
     {
