@@ -11,14 +11,24 @@ namespace Audit.WebApi.ConfigurationApi
     public interface IAuditApiGlobalConfigurator
     {
         /// <summary>
-        /// Specifies whether the HTTP headers should be included on the audit output.
+        /// Specifies whether the HTTP Response headers should be included on the audit output.
         /// </summary>
-        /// <param name="include">True to include the HTTP headers, false otherwise</param>
+        /// <param name="include">True to include the HTTP Response headers, false otherwise</param>
+        IAuditApiGlobalConfigurator IncludeResponseHeaders(bool include = true);
+        /// <summary>
+        /// Specifies a predicate to determine whether the HTTP Response headers should be included on the audit output.
+        /// </summary>
+        /// <param name="includePredicate">A function of the executing context to determine whether the HTTP Response headers should be included on the audit output</param>
+        IAuditApiGlobalConfigurator IncludeResponseHeaders(Func<ActionExecutedContext, bool> includePredicate);
+        /// <summary>
+        /// Specifies whether the HTTP Request headers should be included on the audit output.
+        /// </summary>
+        /// <param name="include">True to include the HTTP Request headers, false otherwise</param>
         IAuditApiGlobalConfigurator IncludeHeaders(bool include = true);
         /// <summary>
-        /// Specifies a predicate to determine whether the HTTP headers should be included on the audit output.
+        /// Specifies a predicate to determine whether the HTTP Request headers should be included on the audit output.
         /// </summary>
-        /// <param name="includePredicate">A function of the executing context to determine whether the HTTP headers should be included on the audit output</param>
+        /// <param name="includePredicate">A function of the executing context to determine whether the HTTP Request headers should be included on the audit output</param>
         IAuditApiGlobalConfigurator IncludeHeaders(Func<ActionExecutingContext, bool> includePredicate);
         /// <summary>
         /// Specifies whether the request body should be included on the audit output.

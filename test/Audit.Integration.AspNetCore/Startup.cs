@@ -32,16 +32,18 @@ namespace Audit.Integration.AspNetCore
                 options.ValueCountLimit = 2;
             });
 
-            services.AddMvc(mvc =>
+            services.AddMvc((Action<Microsoft.AspNetCore.Mvc.MvcOptions>)(mvc =>
             {
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "MoreValues" ||
-                        (d.ControllerName == "Values" && (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix"))))
+                    .LogActionIf(d => d.ControllerName == "MoreValues" 
+                        || (d.ControllerName == "Values" && 
+                                (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix") || d.ActionName == "TestResponseHeadersGlobalFilter")))
                     .WithEventType("{verb}.{controller}.{action}")
                     .IncludeHeaders()
+                    .IncludeResponseHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
                     .IncludeRequestBody()));
-            });
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +63,7 @@ namespace Audit.Integration.AspNetCore
                 .IncludeRequestBody(true)
                 .IncludeResponseBody(ctx => !ctx.Request.QueryString.HasValue || !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))
                 .IncludeHeaders(true)
+                .IncludeResponseHeaders()
                 .WithEventType("{verb}.{url}")
                 .FilterByRequest(r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));
 

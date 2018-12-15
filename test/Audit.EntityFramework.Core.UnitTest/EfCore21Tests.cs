@@ -7,9 +7,11 @@ using System.Transactions;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
+
     [TestFixture(Category = "EF")]
     public class EfCore21Tests
     {

@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Collections.Concurrent;
+using System.Collections.Specialized;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -91,6 +92,7 @@ namespace Audit.WebApi.UnitTest
             var httpResponse = new Mock<HttpResponseBase>();
 
             httpResponse.Setup(c => c.StatusCode).Returns(200);
+            httpResponse.Setup(c => c.Headers).Returns(new NameValueCollection() { {"header-one", "1" }, { "header-two", "2" } });
             var itemsDict = new Dictionary<object, object>();
             var httpContext = new Mock<HttpContextBase>();
             httpContext.SetupGet(c => c.Request).Returns(request.Object);
@@ -126,6 +128,7 @@ namespace Audit.WebApi.UnitTest
                 IncludeModelState = true,
                 IncludeResponseBody = true,
                 IncludeRequestBody = true,
+                IncludeResponseHeaders = true,
                 EventTypeName = "TestEvent"
             };
 
@@ -145,7 +148,10 @@ namespace Audit.WebApi.UnitTest
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
-            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Headers.Add("header-one", "1");
+            response.Headers.Add("header-two", "2");
+            var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = response };
             var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
@@ -167,10 +173,11 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
             Assert.AreEqual(123, ((dynamic)action.RequestBody).Length);
             Assert.AreEqual("application/json", ((dynamic)action.RequestBody).Type);
-        }
+            Assert.AreEqual(2, action.ResponseHeaders.Count);
+            Assert.AreEqual("1", action.ResponseHeaders["header-one"]);
+            Assert.AreEqual("2", action.ResponseHeaders["header-two"]);
 
-        
-        // TODO: FIX the following tests:
+        }
 
 
         [Test]

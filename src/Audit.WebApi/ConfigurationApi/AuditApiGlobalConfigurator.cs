@@ -17,7 +17,8 @@ namespace Audit.WebApi.ConfigurationApi
     public class AuditApiGlobalConfigurator : IAuditApiGlobalConfigurator
     {
         internal Func<ActionExecutingContext, bool> _logDisabledBuilder;
-        internal Func<ActionExecutingContext, bool> _includeHeadersBuilder;
+        internal Func<ActionExecutingContext, bool> _includeRequestHeadersBuilder;
+        internal Func<ActionExecutedContext, bool> _includeResponseHeadersBuilder;
         internal Func<ActionExecutedContext, bool> _includeModelStateBuilder;
         internal Func<ActionExecutingContext, bool> _includeRequestBodyBuilder;
         internal Func<ActionExecutedContext, bool> _includeResponseBodyBuilder;
@@ -41,13 +42,25 @@ namespace Audit.WebApi.ConfigurationApi
 
         public IAuditApiGlobalConfigurator IncludeHeaders(bool include = true)
         {
-            _includeHeadersBuilder = _ => include;
+            _includeRequestHeadersBuilder = _ => include;
             return this;
         }
 
         public IAuditApiGlobalConfigurator IncludeHeaders(Func<ActionExecutingContext, bool> includeBuilder)
         {
-            _includeHeadersBuilder = includeBuilder;
+            _includeRequestHeadersBuilder = includeBuilder;
+            return this;
+        }
+
+        public IAuditApiGlobalConfigurator IncludeResponseHeaders(bool include = true)
+        {
+            _includeResponseHeadersBuilder = _ => include;
+            return this;
+        }
+
+        public IAuditApiGlobalConfigurator IncludeResponseHeaders(Func<ActionExecutedContext, bool> includeBuilder)
+        {
+            _includeResponseHeadersBuilder = includeBuilder;
             return this;
         }
 

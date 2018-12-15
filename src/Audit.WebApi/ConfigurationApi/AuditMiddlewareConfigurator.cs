@@ -7,20 +7,33 @@ namespace Audit.WebApi.ConfigurationApi
     public class AuditMiddlewareConfigurator : IAuditMiddlewareConfigurator
     {
         internal Func<HttpRequest, bool> _requestFilter;
-        internal Func<HttpContext, bool> _includeHeadersBuilder;
+        internal Func<HttpContext, bool> _includeRequestHeadersBuilder;
+        internal Func<HttpContext, bool> _includeResponseHeadersBuilder;
         internal Func<HttpContext, bool> _includeRequestBodyBuilder;
         internal Func<HttpContext, bool> _includeResponseBodyBuilder;
         internal Func<HttpContext, string> _eventTypeNameBuilder;
 
         public IAuditMiddlewareConfigurator IncludeHeaders(bool include = true)
         {
-            _includeHeadersBuilder = _ => include;
+            _includeRequestHeadersBuilder = _ => include;
             return this;
         }
 
         public IAuditMiddlewareConfigurator IncludeHeaders(Func<HttpContext, bool> includePredicate)
         {
-            _includeHeadersBuilder = includePredicate;
+            _includeRequestHeadersBuilder = includePredicate;
+            return this;
+        }
+
+        public IAuditMiddlewareConfigurator IncludeResponseHeaders(bool include = true)
+        {
+            _includeResponseHeadersBuilder = _ => include;
+            return this;
+        }
+
+        public IAuditMiddlewareConfigurator IncludeResponseHeaders(Func<HttpContext, bool> includePredicate)
+        {
+            _includeResponseHeadersBuilder = includePredicate;
             return this;
         }
 

@@ -85,6 +85,32 @@ namespace Audit.Integration.AspNetCore.Controllers
             return Ok("hi");
         }
 
+        
+        [AuditIgnore] // ignored here but will be picked up by the middleware
+        [HttpPost("TestResponseHeaders")]
+        public async Task<IActionResult> TestResponseHeaders(string id)
+        {
+            await Task.Delay(0);
+            HttpContext.Response.Headers.Add("some-header", id);
+            return Ok();
+        }
+
+        [HttpPost("TestResponseHeadersGlobalFilter")]
+        public async Task<IActionResult> TestResponseHeadersGlobalFilter(string id)
+        {
+            await Task.Delay(0);
+            HttpContext.Response.Headers.Add("some-header-global", id);
+            return Ok();
+        }
+
+        [AuditApi(IncludeResponseHeaders = true)]
+        [HttpPost("TestResponseHeadersAttribute")]
+        public async Task<IActionResult> TestResponseHeadersAttribute(string id)
+        {
+            await Task.Delay(0);
+            HttpContext.Response.Headers.Add("some-header-attr", id);
+            return Ok();
+        }
 
         [AuditApi(EventTypeName = "api/values", IncludeHeaders = true, IncludeResponseBody = true, IncludeResponseBodyFor = new[] { HttpStatusCode.BadRequest }, IncludeRequestBody = true, IncludeModelState = true)]
         [HttpGet("hi/{id}")]
@@ -116,6 +142,7 @@ namespace Audit.Integration.AspNetCore.Controllers
         [AuditApi(EventTypeName = "api/values/post", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
         public IActionResult Post([FromBody]Request request)
         {
+            HttpContext.Response.Headers.Add("some-header-ignored", "123");
             return Ok(request.Value);
         }
 

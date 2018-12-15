@@ -60,7 +60,7 @@ public class UsersController : ApiController
     }
 
     [AuditApi(EventTypeName = "GetUser", 
-        IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        IncludeHeaders = true, IncludeResponseHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
     public IHttpActionResult Get(string id)
     {
      //...
@@ -143,6 +143,7 @@ public class Startup
             .FilterByRequest(rq => !rq.Path.Value.EndsWith("favicon.ico"))
             .WithEventType("{verb}:{url}")
             .IncludeHeaders()
+            .IncludeResponseHeaders()
             .IncludeRequestBody()
             .IncludeResponseBody());
 
@@ -175,6 +176,7 @@ The `AuditApiAttribute` can be configured with the following properties:
   - \{action}: replaced with the action method name.
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not. Default is false.
+- **IncludeResponseHeaders**: Boolean to indicate whether to include the Http Response Headers or not. Default is false.
 - **IncludeRequestBody**: Boolean to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody**: Boolean to indicate whether to include response body or not. Default is false.
 - **IncludeResponseBodyFor**: Alternative to _IncludeResponseBody_, to allow conditionally including the response body on the log, when certain Http Status Codes are returned.
@@ -190,6 +192,7 @@ The `AuditApiGlobalFilter` can be configured with the following methods:
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
   - \{url}: replaced with the request URL.
 - **IncludeHeaders()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
+- **IncludeResponseHeaders()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include the Http Response Headers or not. Default is false.
 - **IncludeRequestBody()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include response body or not. Default is false.
 - **IncludeModelState()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include the Model State info or not. Default is false.
@@ -218,6 +221,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 - **FilterByRequest()**: A function of the `HttpRequest` to determine whether the request should be logged or not, by default all requests are logged.
 - **IncludeHeaders()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
+- **IncludeResponseHeaders()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include the Http Response Headers or not. Default is false.
 - **IncludeRequestBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include response body or not. Default is false.
 - **WithEventType()**: A string (or a function of the HTTP context that returns a string) that identifies the event type. Can contain the following placeholders (default is "{verb} {url}"): 
@@ -273,7 +277,8 @@ The following table describes the Audit.WebApi output fields:
 | **ResponseStatus** | string | Response status description |
 | **RequestBody** | [BodyContent](#bodycontent) | The request body (optional) |
 | **ResponseBody** | [BodyContent](#bodycontent) | The response body (optional) |
-| **Headers** | Object | HTTP Headers (optional) |
+| **Headers** | Object | HTTP Request Headers (optional) |
+| **ResponseHeaders** | Object | HTTP Response Headers (optional) |
 | **ModelStateValid** | boolean | Boolean to indicate if the model is valid |
 | **ModelStateErrors** | string | Error description when the model is invalid |
 | **Exception** | string | The exception thrown details (if any) |

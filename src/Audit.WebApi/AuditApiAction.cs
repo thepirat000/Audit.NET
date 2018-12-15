@@ -34,6 +34,8 @@ namespace Audit.WebApi
         public BodyContent ResponseBody { get; set; }
         [JsonProperty(Order = 45, NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, string> Headers { get; set; }
+        [JsonProperty(Order = 47, NullValueHandling = NullValueHandling.Ignore)]
+        public IDictionary<string, string> ResponseHeaders { get; set; }
         [JsonProperty(Order = 50, NullValueHandling = NullValueHandling.Ignore)]
         public bool? ModelStateValid { get; set; }
         [JsonProperty(Order = 55, NullValueHandling = NullValueHandling.Ignore)]

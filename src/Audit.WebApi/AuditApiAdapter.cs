@@ -79,7 +79,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs after the action method is invoked.
         /// </summary>
-        public async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext, IContextWrapper contextWrapper, bool includeModelState, bool includeResponseBody)
+        public async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext, IContextWrapper contextWrapper, bool includeModelState, bool includeResponseBody, bool includeResponseHeaders)
         {
             var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiHelper.AuditApiActionKey);
             var auditScope = contextWrapper.Get<AuditScope>(AuditApiHelper.AuditApiScopeKey);
@@ -107,6 +107,10 @@ namespace Audit.WebApi
                 {
                     auditAction.ResponseStatusCode = 500;
                     auditAction.ResponseStatus = "Internal Server Error";
+                }
+                if (includeResponseHeaders)
+                {
+                    auditAction.ResponseHeaders = ToDictionary(actionExecutedContext.Response.Headers);
                 }
                 // Replace the Action field and save
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
@@ -156,7 +160,7 @@ namespace Audit.WebApi
             return args;
         }
 
-        private static IDictionary<string, string> ToDictionary(HttpRequestHeaders col)
+        private static IDictionary<string, string> ToDictionary(HttpHeaders col)
         {
             if (col == null)
             {

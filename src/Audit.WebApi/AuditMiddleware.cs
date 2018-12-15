@@ -31,7 +31,8 @@ namespace Audit.WebApi
                 await _next.Invoke(context);
                 return;
             }
-            var includeHeaders = _config._includeHeadersBuilder != null ? _config._includeHeadersBuilder.Invoke(context) : false;
+            var includeHeaders = _config._includeRequestHeadersBuilder != null ? _config._includeRequestHeadersBuilder.Invoke(context) : false;
+            var includeResponseHeaders = _config._includeResponseHeadersBuilder != null ? _config._includeResponseHeadersBuilder.Invoke(context) : false;
             var includeRequest = _config._includeRequestBodyBuilder != null ? _config._includeRequestBodyBuilder.Invoke(context) : false;
             var eventTypeName = _config._eventTypeNameBuilder?.Invoke(context);
             var includeResponse = _config._includeResponseBodyBuilder != null ? _config._includeResponseBodyBuilder.Invoke(context) : false;
@@ -51,18 +52,18 @@ namespace Audit.WebApi
                 using (var responseBody = new MemoryStream())
                 {
                     context.Response.Body = responseBody;
-                    await InvokeNextAsync(context, true);
+                    await InvokeNextAsync(context, true, includeResponseHeaders);
                     responseBody.Seek(0L, SeekOrigin.Begin);
                     await responseBody.CopyToAsync(originalBody);
                 }
             }
             else
             {
-                await InvokeNextAsync(context, false);
+                await InvokeNextAsync(context, false, includeResponseHeaders);
             }
         }
 
-        private async Task InvokeNextAsync(HttpContext context, bool includeResponseBody)
+        private async Task InvokeNextAsync(HttpContext context, bool includeResponseBody, bool includeResponseHeaders)
         {
             Exception exception = null;
             try
@@ -76,7 +77,7 @@ namespace Audit.WebApi
             }
             finally
             {
-                await AfterInvoke(context, includeResponseBody, exception);
+                await AfterInvoke(context, includeResponseBody, includeResponseHeaders, exception);
             }
         }
 
@@ -114,7 +115,7 @@ namespace Audit.WebApi
             context.Items[AuditApiHelper.AuditApiScopeKey] = auditScope;
         }
 
-        private async Task AfterInvoke(HttpContext context, bool includeResponseBody, Exception exception)
+        private async Task AfterInvoke(HttpContext context, bool includeResponseBody, bool includeResponseHeaders, Exception exception)
         {
             var auditAction = context.Items[AuditApiHelper.AuditApiActionKey] as AuditApiAction;
             var auditScope = context.Items[AuditApiHelper.AuditApiScopeKey] as AuditScope;
@@ -141,6 +142,10 @@ namespace Audit.WebApi
                             Value = AuditApiHelper.GetResponseBody(context)
                         };
                     }
+                }
+                if (includeResponseHeaders)
+                {
+                    auditAction.ResponseHeaders = AuditApiHelper.ToDictionary(context.Response.Headers);
                 }
                 // Replace the Action field and save
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;

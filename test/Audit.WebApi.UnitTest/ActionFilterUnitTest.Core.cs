@@ -89,6 +89,8 @@ namespace Audit.WebApi.UnitTest
 
             var httpResponse = new Mock<HttpResponse>();
             httpResponse.SetupGet(c => c.StatusCode).Returns(200);
+            httpResponse.Setup(c => c.Headers).Returns(new HeaderDictionary(new Dictionary<string, StringValues> { {"header-one", "1" }, { "header-two", "2" } }));
+
             var itemsDict = new Dictionary<object, object>();
             var httpContext = new Mock<HttpContext>();
             httpContext.SetupGet(c => c.Request).Returns(request.Object);
@@ -127,6 +129,7 @@ namespace Audit.WebApi.UnitTest
                 IncludeModelState = true,
                 IncludeResponseBody = true,
                 IncludeRequestBody = true,
+                IncludeResponseHeaders = true,
                 EventTypeName = "TestEvent"
             };
 
@@ -147,6 +150,9 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("values", action.ControllerName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
             Assert.AreEqual("this is the result", action.ResponseBody.Value);
+            Assert.AreEqual(2, action.ResponseHeaders.Count);
+            Assert.AreEqual("1", action.ResponseHeaders["header-one"]);
+            Assert.AreEqual("2", action.ResponseHeaders["header-two"]);
             Assert.AreEqual(123, action.RequestBody.Length);
             Assert.AreEqual("application/json", action.RequestBody.Type);
         }

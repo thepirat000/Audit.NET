@@ -26,6 +26,91 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("[\"value1\",\"value2\"]", s);
         }
 
+        public async Task Test_WebApi_ResponseHeaders_Attribute()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            var url = $"http://localhost:{_port}/api/values/TestResponseHeadersAttribute?id=test";
+            var client = new HttpClient();
+            var res = await client.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            var action = insertEvs[0].GetWebApiAuditAction();
+            Assert.IsFalse(action.IsMiddleware);
+            Assert.AreEqual("POST", action.HttpMethod);
+            Assert.IsTrue(action.Headers == null || action.Headers.Count == 0);
+            Assert.IsTrue(action.ResponseHeaders.Count > 0);
+            Assert.AreEqual("test", action.ResponseHeaders["some-header-attr"]);
+            Assert.AreEqual(url, action.RequestUrl);
+        }
+
+        public async Task Test_WebApi_ResponseHeaders_GlobalFilter()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            var url = $"http://localhost:{_port}/api/values/TestResponseHeadersGlobalFilter?id=test";
+            var client = new HttpClient();
+            var res = await client.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            var action = insertEvs[0].GetWebApiAuditAction();
+            Assert.IsFalse(action.IsMiddleware);
+            Assert.AreEqual("POST", action.HttpMethod);
+            Assert.IsTrue(action.Headers.Count > 0);
+            Assert.IsTrue(action.ResponseHeaders.Count > 0);
+            Assert.AreEqual("test", action.ResponseHeaders["some-header-global"]);
+            Assert.AreEqual(url, action.RequestUrl);
+        }
+
+
+
+        public async Task Test_WebApi_ResponseHeaders_Middleware()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            var url = $"http://localhost:{_port}/api/values/TestResponseHeaders?id=test&middleware=yes";
+            var client = new HttpClient();
+            var res = await client.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            var action = insertEvs[0].GetWebApiAuditAction();
+            Assert.IsTrue(action.IsMiddleware);
+            Assert.AreEqual("POST", action.HttpMethod);
+            Assert.IsNull(action.ActionName);
+            Assert.IsNull(action.ControllerName);
+            Assert.IsTrue(action.Headers.Count > 0);
+            Assert.IsTrue(action.ResponseHeaders.Count > 0);
+            Assert.AreEqual("test", action.ResponseHeaders["some-header"]);
+            Assert.AreEqual(url, action.RequestUrl);
+        }
+
         public async Task Test_WebApi_Middleware_Mix_Filter()
         {
             // test using both mw and af
@@ -407,6 +492,8 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("{\"value\": \"abc\"}", insertEvs[0].RequestBody.Value);
             Assert.AreEqual(null, insertEvs[0].ResponseBody);
             Assert.AreEqual("abc", replaceEvs[0].ResponseBody.Value);
+            Assert.IsNull(insertEvs[0].ResponseHeaders);
+            Assert.IsNull(replaceEvs[0].ResponseHeaders);
         }
 
         public async Task Test_WebApi_Exception_Async()

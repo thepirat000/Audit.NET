@@ -74,11 +74,14 @@ CREATE TABLE [Child]
 	Constraint FK_Child_Parent Foreign Key ([ParentId]) References Parent(Id)
 )
 
+use master
+GO
+drop database blogs
+GO
+create database blogs
+GO
 use Blogs
-
-Drop Table Posts 
-
-Drop Table Blogs
+GO
 
 Create table Blogs
 (
@@ -99,9 +102,6 @@ Create table Posts
 )
 GO
 
-Drop Proc Insert_Blog
-GO
-
 Create Proc Insert_Blog
 (
 	@Title nvarchar(max),
@@ -112,9 +112,6 @@ Begin
 	insert into blogs (Title, BloggerName)
 	values (@Title, @Name)
 End
-GO
-
-Drop Proc Update_Blog
 GO
 
 Create Proc Update_Blog
@@ -131,6 +128,32 @@ Begin
 End
 GO
 
+Create table dbo.BlogsAudits
+(
+	BlogAuditId int identity(1,1) not null primary key,
+	BlogId int not null,
+	Title nvarchar(max),
+	BloggerName nvarchar(max),
+	AuditAction nvarchar(max),
+	AuditDate datetime,
+	AuditUser nvarchar(max),
+	Exception nvarchar(max)
+)
+
+
+Create table dbo.PostsAudits
+(
+	PostAuditId int identity(1,1) not null primary key,
+	Title nvarchar(max),
+	DateCreated datetime not null,
+	Content nvarchar(max),
+	PostId int not null,
+	BlogId int not null,
+	AuditAction nvarchar(max),
+	AuditDate datetime,
+	AuditUser nvarchar(max),
+	Exception nvarchar(max)
+)
 
 
 insert into blogs (Title, BloggerName)

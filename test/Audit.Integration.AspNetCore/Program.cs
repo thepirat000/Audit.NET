@@ -43,6 +43,19 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_WebApi_ResponseHeaders_Attribute");
+                await webApiTests.Test_WebApi_ResponseHeaders_Attribute();
+                Console.WriteLine("PASSED - Test_WebApi_ResponseHeaders_Attribute");
+
+                Console.WriteLine("START - Test_WebApi_ResponseHeaders_GlobalFilter");
+                await webApiTests.Test_WebApi_ResponseHeaders_GlobalFilter();
+                Console.WriteLine("PASSED - Test_WebApi_ResponseHeaders_GlobalFilter");
+
+                Console.WriteLine("START - Test_WebApi_ResponseHeaders_Middleware");
+                await webApiTests.Test_WebApi_ResponseHeaders_Middleware();
+                Console.WriteLine("PASSED - Test_WebApi_ResponseHeaders_Middleware");
+                
+
                 Console.WriteLine("START - Test_WebApi_Post_Async");
                 await webApiTests.Test_WebApi_Post_Async();
                 Console.WriteLine("PASSED - Test_WebApi_Post_Async");

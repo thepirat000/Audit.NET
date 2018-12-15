@@ -26,7 +26,8 @@ namespace Audit.WebApi
         private AuditApiAdapter _adapter = new AuditApiAdapter();
 
         protected Func<ActionExecutingContext, bool> _logDisabledBuilder;
-        protected Func<ActionExecutingContext, bool> _includeHeadersBuilder;
+        protected Func<ActionExecutingContext, bool> _includeRequestHeadersBuilder;
+        protected Func<ActionExecutedContext, bool> _includeResponseHeadersBuilder;
         protected Func<ActionExecutedContext, bool> _includeModelStateBuilder;
         protected Func<ActionExecutingContext, bool> _includeRequestBodyBuilder;
         protected Func<ActionExecutedContext, bool> _includeResponseBodyBuilder;
@@ -50,7 +51,8 @@ namespace Audit.WebApi
             config.Invoke(cfg);
             _logDisabledBuilder = cfg._config._logDisabledBuilder;
             _includeModelStateBuilder = cfg._config._includeModelStateBuilder;
-            _includeHeadersBuilder = cfg._config._includeHeadersBuilder;
+            _includeRequestHeadersBuilder = cfg._config._includeRequestHeadersBuilder;
+            _includeResponseHeadersBuilder = cfg._config._includeResponseHeadersBuilder;
             _includeRequestBodyBuilder = cfg._config._includeRequestBodyBuilder;
             _includeResponseBodyBuilder = cfg._config._includeResponseBodyBuilder;
             _eventTypeNameBuilder = cfg._config._eventTypeNameBuilder;
@@ -60,9 +62,13 @@ namespace Audit.WebApi
 #endif
         }
 
-        protected bool IncludeHeaders(ActionExecutingContext actionContext)
+        protected bool IncludeRequestHeaders(ActionExecutingContext actionContext)
         {
-            return _includeHeadersBuilder != null ? _includeHeadersBuilder.Invoke(actionContext) : false;
+            return _includeRequestHeadersBuilder != null ? _includeRequestHeadersBuilder.Invoke(actionContext) : false;
+        }
+        protected bool IncludeResponseHeaders(ActionExecutedContext actionContext)
+        {
+            return _includeResponseHeadersBuilder != null ? _includeResponseHeadersBuilder.Invoke(actionContext) : false;
         }
         protected bool IncludeModelState(ActionExecutedContext context)
         {
@@ -97,9 +103,9 @@ namespace Audit.WebApi
                 await next.Invoke();
                 return;
             }
-            await _adapter.BeforeExecutingAsync(context, IncludeHeaders(context), IncludeRequestBody(context), _serializeActionParameters, EventTypeName(context));
+            await _adapter.BeforeExecutingAsync(context, IncludeRequestHeaders(context), IncludeRequestBody(context), _serializeActionParameters, EventTypeName(context));
             var actionExecutedContext = await next.Invoke();
-            await _adapter.AfterExecutedAsync(actionExecutedContext, IncludeModelState(actionExecutedContext), IncludeResponseBody(actionExecutedContext));
+            await _adapter.AfterExecutedAsync(actionExecutedContext, IncludeModelState(actionExecutedContext), IncludeResponseBody(actionExecutedContext), IncludeResponseHeaders(actionExecutedContext));
         }
 #else
         public override async Task OnActionExecutingAsync(ActionExecutingContext actionContext, CancellationToken cancellationToken)
@@ -110,7 +116,7 @@ namespace Audit.WebApi
             {
                 return;
             }
-            await _adapter.BeforeExecutingAsync(actionContext, ContextWrapper(actionContext.Request), IncludeHeaders(actionContext), 
+            await _adapter.BeforeExecutingAsync(actionContext, ContextWrapper(actionContext.Request), IncludeRequestHeaders(actionContext), 
                 IncludeRequestBody(actionContext), _serializeActionParameters, EventTypeName(actionContext));
         }
 
@@ -123,7 +129,7 @@ namespace Audit.WebApi
                 return;
             }
             await _adapter.AfterExecutedAsync(actionExecutedContext, ContextWrapper(actionExecutedContext.Request), 
-                IncludeModelState(actionExecutedContext), IncludeResponseBody(actionExecutedContext));
+                IncludeModelState(actionExecutedContext), IncludeResponseBody(actionExecutedContext), IncludeResponseHeaders(actionExecutedContext));
         }
 #endif
 

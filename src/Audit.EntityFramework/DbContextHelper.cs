@@ -225,12 +225,12 @@ namespace Audit.EntityFramework
         {
             if (!EntitiesIncludeIgnoreAttrCache.ContainsKey(type))
             {
-                var includeAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIncludeAttribute));
+                var includeAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIncludeAttribute), true);
                 if (includeAttr != null)
                 {
                     EntitiesIncludeIgnoreAttrCache[type] = true; // Type Included by IncludeAttribute
                 }
-                else if (type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute)) != null)
+                else if (type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute), true) != null)
                 {
                     EntitiesIncludeIgnoreAttrCache[type] = false; // Type Ignored by IgnoreAttribute
                 }
@@ -249,7 +249,7 @@ namespace Audit.EntityFramework
                 var ignoredProps = new HashSet<string>();
                 foreach(var prop in type.GetTypeInfo().GetProperties())
                 {
-                    var ignoreAttr = prop.GetCustomAttribute(typeof(AuditIgnoreAttribute));
+                    var ignoreAttr = prop.GetCustomAttribute(typeof(AuditIgnoreAttribute), true);
                     if (ignoreAttr != null)
                     {
                         ignoredProps.Add(prop.Name);
@@ -274,7 +274,7 @@ namespace Audit.EntityFramework
                 var overrideProps = new Dictionary<string, AuditOverrideAttribute>();
                 foreach (var prop in type.GetTypeInfo().GetProperties())
                 {
-                    var overrideAttr = prop.GetCustomAttribute<AuditOverrideAttribute>();
+                    var overrideAttr = prop.GetCustomAttribute<AuditOverrideAttribute>(true);
                     if (overrideAttr != null)
                     {
                         overrideProps[prop.Name] = overrideAttr;
