@@ -5,7 +5,7 @@
 
 [![Gitter](https://badges.gitter.im/Audit-NET/Lobby.svg)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)     
 [![issues-open](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)
-[![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)
+[![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)     
 [![backers](https://opencollective.com/auditnet/tiers/backer/badge.svg?label=backer&color=brightgreen)](https://opencollective.com/auditnet)
 
 
