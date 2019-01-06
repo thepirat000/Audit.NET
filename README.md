@@ -9,7 +9,7 @@
 [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)
 
 
-An extensible framework to audit executing operations in .NET including support for .NET Framework ≥ 4.5 and NetCore ≥ 1.0 (NetStandard 1.3).
+An extensible framework to audit executing operations in .NET including support for .NET Framework ≥ 4.5 and NetCore ≥ 1.0
 
 Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
