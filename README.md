@@ -701,8 +701,4 @@ If you like this project please contribute in any of the following ways:
     </a>
   </p>
 - Buy me a coffee via [ko-fi](https://www.ko-fi.com/X8X3OBB5):
-<br/><a href='https://ko-fi.com/X8X3OBB5' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-
-
-
-
+  [![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/X8X3OBB5)
