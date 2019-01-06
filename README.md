@@ -702,4 +702,4 @@ If you like this project please contribute in any of the following ways:
     </a>
   </p>
 - Buy me a coffee via [ko-fi](https://www.ko-fi.com/X8X3OBB5):
-  [![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/X8X3OBB5)
+  <br/>[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/X8X3OBB5)
