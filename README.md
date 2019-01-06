@@ -1,5 +1,6 @@
 # Audit.NET
 
+<sub>Quick navigation links:</sub><br/>
 **[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [DATA PROVIDERS](#data-providers) | [CREATION POLICY](#event-creation-policy) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
 
 
