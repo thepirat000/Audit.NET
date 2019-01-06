@@ -689,7 +689,7 @@ If you like this project please contribute in any of the following ways:
 - Request a new feature or expose any bug you found by creating a [new issue](https://github.com/thepirat000/Audit.NET/issues/new).
 - Ask any questions about the library on [StackOverflow](http://stackoverflow.com/questions/ask?tags=Audit.NET).
 - Subscribe to and use the [Gitter Audit.NET channel](https://gitter.im/Audit-NET/Lobby).
-- Support the project by becoming a Backer:
+- Support the project by [becoming a Backer](https://opencollective.com/auditnet):
 [![Backer](https://opencollective.com/auditnet/tiers/backer.svg?avatarHeight=36&width=600)](https://opencollective.com/auditnet)     
 - Spread the word by blogging about it, or sharing it on social networks:
   <p class="share-buttons">
