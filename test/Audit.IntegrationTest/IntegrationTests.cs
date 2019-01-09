@@ -822,7 +822,7 @@ namespace Audit.IntegrationTest
 
             public void SetElasticsearchSettings()
             {
-                var uri = new Uri("http://localhost:9200");
+                var uri = new Uri(AzureSettings.ElasticSearchUrl);
                 var ec = new Nest.ElasticClient(uri);
                 ec.DeleteIndex(Nest.Indices.AllIndices, x => x.Index("auditevent"));
 
