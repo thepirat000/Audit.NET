@@ -1,5 +1,6 @@
 # Audit.NET
 
+<sub>Quick navigation links:</sub><br/>
 **[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [DATA PROVIDERS](#data-providers) | [CREATION POLICY](#event-creation-policy) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
 
 
@@ -9,7 +10,7 @@
 [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET/.svg)](https://github.com/thepirat000/Audit.NET/issues)
 
 
-An extensible framework to audit executing operations in .NET including support for .NET Framework ≥ 4.5 and NetCore ≥ 1.0 (NetStandard 1.3).
+An extensible framework to audit executing operations in .NET including support for .NET Framework ≥ 4.5 and NetCore ≥ 1.0
 
 Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
@@ -689,7 +690,7 @@ If you like this project please contribute in any of the following ways:
 - Request a new feature or expose any bug you found by creating a [new issue](https://github.com/thepirat000/Audit.NET/issues/new).
 - Ask any questions about the library on [StackOverflow](http://stackoverflow.com/questions/ask?tags=Audit.NET).
 - Subscribe to and use the [Gitter Audit.NET channel](https://gitter.im/Audit-NET/Lobby).
-- Support the project by becoming a Backer:
+- Support the project by [becoming a Backer](https://opencollective.com/auditnet):
 [![Backer](https://opencollective.com/auditnet/tiers/backer.svg?avatarHeight=36&width=600)](https://opencollective.com/auditnet)     
 - Spread the word by blogging about it, or sharing it on social networks:
   <p class="share-buttons">
@@ -700,7 +701,5 @@ If you like this project please contribute in any of the following ways:
       <img width="24" height="24" alt="Tweet this package" src="https://nuget.org/Content/gallery/img/twitter.svg" />
     </a>
   </p>
-
-
-
-
+- Buy me a coffee via [ko-fi](https://www.ko-fi.com/X8X3OBB5):
+  <br/>[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/X8X3OBB5)
