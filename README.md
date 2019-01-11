@@ -51,7 +51,6 @@ order.OrderItems = null;
 order = Db.OrderUpdate(order);
 ```
 
-
 To audit this operation, you can surround the code with a `using` block that creates an `AuditScope`, indicating a target object to track:
 
 ```c#
@@ -83,6 +82,8 @@ using (var scope = AuditScope.Create(options))
     // ...
 }
 ```
+
+> When using the [extensions](#extensions) that logs interactions with different systems, like [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), etc. you don't need to explicitly create the `AuditScope` or `AuditEvent`, they are created internally by the extension.
 
 ### Simple logging
 
