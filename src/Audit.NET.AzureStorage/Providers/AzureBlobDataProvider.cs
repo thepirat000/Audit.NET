@@ -1,4 +1,5 @@
-﻿using Audit.Core;
+﻿using Audit.AzureTableStorage.ConfigurationApi;
+using Audit.Core;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
@@ -38,6 +39,23 @@ namespace Audit.AzureTableStorage.Providers
         /// Sets the Azure Storage connection string
         /// </summary>
         public string ConnectionString { set { ConnectionStringBuilder = _ => value; } }
+
+        public AzureBlobDataProvider()
+        {
+
+        }
+
+        public AzureBlobDataProvider(Action<IAzureBlobProviderConfigurator> config)
+        {
+            var azConfig = new AzureBlobProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(azConfig);
+                BlobNameBuilder = azConfig._blobNameBuilder;
+                ContainerNameBuilder = azConfig._containerNameBuilder;
+                ConnectionStringBuilder = azConfig._connectionStringBuilder;
+            }
+        }
 
         #region Overrides
         public override object InsertEvent(AuditEvent auditEvent)

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.0.3] - 2019-01-21
+### Added
+- Audit.AzureStorage: Added constructor overloads to `AzureTableDataProvider` and `AzureBlobDataProvider` that accepts a fluent configuration. Useful for custom providers inheriting from those classes.
+
 ## [14.0.2] - 2018-12-15
 ### Added
 - Audit.WebApi and Audit.WebApi.Core: Added Response Headers to the event output (optional by `IncludeResponseHeaders` configuration, default is _false_). 

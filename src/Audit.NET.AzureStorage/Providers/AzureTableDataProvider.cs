@@ -40,6 +40,23 @@ namespace Audit.AzureTableStorage.Providers
         /// </summary>
         public string ConnectionString { set { ConnectionStringBuilder = _ => value; } }
 
+        public AzureTableDataProvider()
+        {
+
+        }
+
+        public AzureTableDataProvider(Action<IAzureTableProviderConfigurator> config)
+        {
+            var azConfig = new AzureTableProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(azConfig);
+                TableNameBuilder = azConfig._tableNameBuilder;
+                TableEntityMapper = azConfig._tableEntityBuilder;
+                ConnectionStringBuilder = azConfig._connectionStringBuilder;
+            }
+        }
+
         #region Overrides
 
         public override object InsertEvent(AuditEvent auditEvent)
