@@ -82,7 +82,7 @@ Audit.Core.Configuration.Setup()
     .UseAzureTableStorage(_ => _
         .ConnectionString("DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key")
         .TableName("Events")
-        .EntityMapper(e => new AuditEventTableEntity(ev)));
+        .EntityMapper(ev => new AuditEventTableEntity(ev)));
 ```
 
 You can set the entity mapper to return any class implementing [`ITableEntity`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.windowsazure.storage.table.itableentity?view=azure-dotnet), as the provided default [`AuditEventTableEntity`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage/ConfigurationApi/AuditEventTableEntity.cs).
