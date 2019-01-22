@@ -94,7 +94,7 @@ Audit.Core.Configuration.Setup()
         .ConnectionString("DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key")
         .TableName("Events")
         .EntityBuilder(e => e
-            .PartitionKey($"Events{ev.StartDate:yyyyMM}")
+            .PartitionKey(ev => $"Events{ev.StartDate:yyyyMM}")
             .RowKey(ev => Guid.NewGuid().ToString())
             .Columns(c => c.FromObject(ev => new { Date = ev.StartDate, AuditEventJson = ev.ToJson() }))));
 ```
