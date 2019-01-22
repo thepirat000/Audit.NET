@@ -106,7 +106,7 @@ Mandatory:
 
 Optional:
 - **TableName**: The table name to use. By default, "event" is used as the table name.
-- **EntityMapper**: A function that defined a mapping from an Audit Event to a Table Entity. 
+- **EntityMapper**: A function that defines a mapping from an Audit Event to a Table Entity. 
 - **EntityBuilder**: An alternative way to dynamically specify the table entity mapping for audit events:
   - _PartitionKey_: A function of the audit event that returns the partition key to use.
   - _RowKey_: A function of the audit event that returns the row key to use.
