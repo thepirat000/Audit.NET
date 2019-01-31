@@ -53,6 +53,11 @@ namespace Audit.EntityFramework.CodeFirst.UnitTest
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            modelBuilder.Conventions.Remove<PluralizingEntitySetNameConvention>();
+            modelBuilder.Entity<Blog>()
+                .MapToStoredProcedures();
+            modelBuilder.Entity<Post>()
+                .MapToStoredProcedures();
         }
     }
 

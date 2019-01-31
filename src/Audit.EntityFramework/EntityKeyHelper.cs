@@ -109,7 +109,7 @@ public sealed class EntityKeyHelper
         var mapping = entitySetMappings.SingleOrDefault(x => x.EntitySet.Name == entitySet.Name);
         if (mapping != null)
         {
-            return mapping.EntityTypeMappings.Single().Fragments.Single();
+            return mapping.EntityTypeMappings.Single(m => m.Fragments.Count > 0).Fragments.Single();
         }
         else
         {

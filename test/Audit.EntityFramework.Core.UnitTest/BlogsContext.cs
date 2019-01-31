@@ -8,7 +8,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 {
     public class BlogsContext : AuditDbContext
     {
-        public const string CnnString = "data source=localhost;initial catalog=Blogs;integrated security=true;";
+        public const string CnnString = "data source=localhost;initial catalog=Blogs3;integrated security=true;";
 
         public override bool AuditDisabled { get; set; }
 

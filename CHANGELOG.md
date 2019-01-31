@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.0.4] - 2019-01-31
+### Modified
+- Audit.EntityFramework: Fixed #198, adding validation to avoid exception when multiple mapping fragments are found.
+
 ## [14.0.3] - 2019-01-21
 ### Added
 - Audit.AzureStorage: Added constructor overloads to `AzureTableDataProvider` and `AzureBlobDataProvider` that accepts a fluent configuration. Useful for custom providers inheriting from those classes.
