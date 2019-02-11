@@ -134,7 +134,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
             }
 
-#if NET451
+#if NET452
             [Test]
             public void Test_StrongName_PublicToken()
             {
@@ -206,6 +206,24 @@ namespace Audit.IntegrationTest
             public async Task TestAzureBlobAsync()
             {
                 SetAzureBlobSettings();
+                await TestUpdateAsync();
+            }
+
+            [Test]
+            [Category("AzureBlob")]
+            public void TestAzureBlob_ActiveDirectory()
+            {
+                SetAzureBlobSettings_ActiveDirectory();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("AzureBlob")]
+            public async Task TestAzureBlobAsync_ActiveDirectory()
+            {
+                SetAzureBlobSettings_ActiveDirectory();
                 await TestUpdateAsync();
             }
 
@@ -694,7 +712,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
             }
 
-#if NET451 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET452 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             public void TestEventLog()
             {
@@ -747,6 +765,19 @@ namespace Audit.IntegrationTest
                         .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
+
+            public void SetAzureBlobSettings_ActiveDirectory()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseAzureBlobStorage(config => config
+                        .AzureActiveDirectory(adConfig => adConfig
+                            .AccountName(AzureSettings.BlobAccountName)
+                            .TenantId(AzureSettings.BlobTenantId))
+                        .ContainerNameBuilder(ev => $"events{DateTime.Today:yyyyMMdd}")
+                        .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+            }
+
 
             public void SetAzureTableSettings()
             {

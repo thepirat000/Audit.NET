@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>14.0.4</VersionPrefix>
+    <VersionPrefix>14.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -24,6 +24,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="..\Audit.EntityFramework\**\*.cs" Exclude="..\Audit.EntityFramework\obj\**\*.*;..\**\AssemblyInfo.cs" />
   </ItemGroup>

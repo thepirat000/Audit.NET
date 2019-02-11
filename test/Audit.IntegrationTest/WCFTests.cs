@@ -1,4 +1,4 @@
-﻿#if NET451
+﻿#if NET452
 using Audit.Core;
 using Audit.WCF;
 using Moq;

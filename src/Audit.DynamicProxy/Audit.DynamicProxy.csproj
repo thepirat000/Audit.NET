@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate Audit Logs by intercepting operation calls on any class without changing its code.</Description>
-    <Copyright>Copyright 2016</Copyright>
+    <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.DynamicProxy</AssemblyTitle>
-    <VersionPrefix>14.0.4</VersionPrefix>
+    <VersionPrefix>14.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -24,6 +24,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.3.0" />
   </ItemGroup>

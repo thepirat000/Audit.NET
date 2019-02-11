@@ -38,7 +38,7 @@ namespace Audit.Core
         /// <param name="connectionStringBuilder">A builder that returns a connection string for an event.</param>
         /// <param name="containerNameBuilder">A builder that returns a container name for an event.</param>
         /// <param name="blobNameBuilder">A builder that returns a unique name for the blob (can contain folders).</param>
-        public static ICreationPolicyConfigurator UseAzureBlobStorage(this IConfigurator configurator, Func<AuditEvent, string> connectionStringBuilder = null,
+        private static ICreationPolicyConfigurator UseAzureBlobStorage(this IConfigurator configurator, Func<AuditEvent, string> connectionStringBuilder = null,
             Func<AuditEvent, string> containerNameBuilder = null, Func<AuditEvent, string> blobNameBuilder = null)
         {
             Configuration.DataProvider = new AzureBlobDataProvider()
@@ -58,7 +58,28 @@ namespace Audit.Core
         {
             var blobConfig = new AzureBlobProviderConfigurator();
             config.Invoke(blobConfig);
-            return UseAzureBlobStorage(configurator, blobConfig._connectionStringBuilder, blobConfig._containerNameBuilder, blobConfig._blobNameBuilder);
+
+            if (blobConfig._eventConfig._useActiveDirectory)
+            {
+                Configuration.DataProvider = new AzureBlobDataProvider()
+                {
+                    ConnectionStringBuilder = blobConfig._eventConfig._activeDirectoryConfiguration._authConnectionStringBuilder,
+                    ContainerNameBuilder = blobConfig._eventConfig._containerNameBuilder,
+                    BlobNameBuilder = blobConfig._eventConfig._blobNameBuilder,
+                    ResourceUrl = blobConfig._eventConfig._activeDirectoryConfiguration._resourceUrl,
+                    TenantIdBuilder = blobConfig._eventConfig._activeDirectoryConfiguration._tenantIdBuilder,
+                    UseActiveDirectory = true,
+                    AccountNameBuilder = blobConfig._eventConfig._activeDirectoryConfiguration._accountNameBuilder,
+                    EndpointSuffix = blobConfig._eventConfig._activeDirectoryConfiguration._endpointSuffix,
+                    UseHttps = blobConfig._eventConfig._activeDirectoryConfiguration._useHttps
+                };
+                return new CreationPolicyConfigurator();
+
+            }
+            else
+            {
+                return UseAzureBlobStorage(configurator, blobConfig._eventConfig._connectionStringBuilder, blobConfig._eventConfig._containerNameBuilder, blobConfig._eventConfig._blobNameBuilder);
+            }
         }
     }
 }

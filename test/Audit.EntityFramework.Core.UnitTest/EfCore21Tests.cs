@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
-
     [TestFixture(Category = "EF")]
     public class EfCore21Tests
     {

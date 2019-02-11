@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into a MongoDB database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MongoDB</AssemblyTitle>
-    <VersionPrefix>14.0.4</VersionPrefix>
+    <VersionPrefix>14.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -20,6 +20,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>

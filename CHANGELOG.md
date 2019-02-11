@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.1.0] - 2019-02-11
+### Added
+- Audit.NET.AzureStorage: Added Azure Active Directory Authentication support via Access Token for the BLOB storage Data Provider.
+
 ## [14.0.4] - 2019-01-31
 ### Modified
 - Audit.EntityFramework: Fixed #198, adding validation to avoid exception when multiple mapping fragments are found.

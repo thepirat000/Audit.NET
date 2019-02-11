@@ -33,4 +33,10 @@
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.DiagnosticAdapter">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.diagnosticadapter\2.1.0\lib\netcoreapp2.0\Microsoft.Extensions.DiagnosticAdapter.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

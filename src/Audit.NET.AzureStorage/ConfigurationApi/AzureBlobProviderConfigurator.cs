@@ -5,38 +5,38 @@ namespace Audit.AzureTableStorage.ConfigurationApi
 {
     public class AzureBlobProviderConfigurator : IAzureBlobProviderConfigurator
     {
-        internal Func<AuditEvent, string> _blobNameBuilder = null;
-        internal Func<AuditEvent, string> _containerNameBuilder = null;
-        internal Func<AuditEvent, string> _connectionStringBuilder = null;
+        internal AzureBlobProviderEventConfigurator _eventConfig;
 
-        public IAzureBlobProviderConfigurator ConnectionString(string connectionString)
+        public IAzureBlobProviderEventConfigurator ConnectionString(string connectionString)
         {
-            _connectionStringBuilder = ev => connectionString;
-            return this;
+            _eventConfig = new AzureBlobProviderEventConfigurator
+            {
+                _useActiveDirectory = false,
+                _connectionStringBuilder = ev => connectionString
+            };
+            return _eventConfig;
         }
 
-        public IAzureBlobProviderConfigurator ContainerName(string containerName)
+        public IAzureBlobProviderEventConfigurator ConnectionStringBuilder(Func<AuditEvent, string> connectionStringBuilder)
         {
-            _containerNameBuilder = ev => containerName;
-            return this;
+            _eventConfig = new AzureBlobProviderEventConfigurator
+            {
+                _useActiveDirectory = false,
+                _connectionStringBuilder = connectionStringBuilder
+            };
+            return _eventConfig;
         }
 
-        public IAzureBlobProviderConfigurator ConnectionStringBuilder(Func<AuditEvent, string> connectionStringBuilder)
+        public IAzureBlobProviderEventConfigurator AzureActiveDirectory(Action<IAzureActiveDirectoryConfigurator> configuration)
         {
-            _connectionStringBuilder = connectionStringBuilder;
-            return this;
-        }
-
-        public IAzureBlobProviderConfigurator BlobNameBuilder(Func<AuditEvent, string> blobNamebuilder)
-        {
-            _blobNameBuilder = blobNamebuilder;
-            return this;
-        }
-
-        public IAzureBlobProviderConfigurator ContainerNameBuilder(Func<AuditEvent, string> containerNameBuilder)
-        {
-            _containerNameBuilder = containerNameBuilder;
-            return this;
+            var adConfig = new AzureActiveDirectoryConfigurator();
+            configuration.Invoke(adConfig);
+            _eventConfig = new AzureBlobProviderEventConfigurator
+            {
+                _useActiveDirectory = true,
+                _activeDirectoryConfiguration = adConfig
+            };
+            return _eventConfig;
         }
     }
 }

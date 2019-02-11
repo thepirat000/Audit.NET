@@ -6,5 +6,7 @@
         public const string AzureDocDbUrl = "https://XXXXX.documents.azure.com:443/";
         public const string AzureDocDbAuthKey = "XXXXXXX";
         public const string ElasticSearchUrl = "http://localhost:9200";
+        public const string BlobTenantId = "XXXXXXX";
+        public const string BlobAccountName = "XXXXXXX";
     }
 }

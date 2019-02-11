@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for AspNet Core MVC Controller actions.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.Mvc.Core</AssemblyTitle>
-    <VersionPrefix>14.0.4</VersionPrefix>
+    <VersionPrefix>14.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net451</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
@@ -24,6 +24,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="..\Audit.Mvc\**\*.cs" Exclude="..\Audit.Mvc\obj\**\*.*;..\**\AssemblyInfo.cs" />
   </ItemGroup>
