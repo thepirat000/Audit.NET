@@ -43,7 +43,7 @@ Using Azure Active Directory (authentication token):
 ```c#
 Audit.Core.Configuration.Setup()
     .UseAzureBlobStorage(config => config
-        .UseAzureActiveDirectory(adConfig => adConfig
+        .AzureActiveDirectory(adConfig => adConfig
             .AccountName("your account")
             .TenantId("your tenant ID"))
         .ContainerName("event")
