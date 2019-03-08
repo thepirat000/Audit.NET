@@ -32,7 +32,7 @@ public sealed class EntityKeyHelper
     //Type -> TableName
     private readonly ConcurrentDictionary<Type, EntityName> _tableNamesCache = new ConcurrentDictionary<Type, EntityName>();
     //Type -> PropertyName -> ColumnName
-    private readonly ConcurrentDictionary<Type, Dictionary<string, string>> _columnNamesCache = new ConcurrentDictionary<Type, Dictionary<string, string>>();
+    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _columnNamesCache = new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
 
     private EntityKeyHelper() { }
 
@@ -250,8 +250,7 @@ public sealed class EntityKeyHelper
         }
         if (!_columnNamesCache.ContainsKey(type))
         {
-            _columnNamesCache[type] =
-                new Dictionary<string, string>(); // Not thread-safe, but not dangerous since at most it will lost some cached values
+            _columnNamesCache[type] = new ConcurrentDictionary<string, string>();
         }
         _columnNamesCache[type][propertyName] = columnName;
         return columnName;

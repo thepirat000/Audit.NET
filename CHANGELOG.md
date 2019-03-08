@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.1.1] - 2019-03-07
+### Modified
+- Audit.EntityFramework: Fix race condition on EntityKeyHelper when obtaining the column names (#208)
+
 ## [14.1.0] - 2019-02-11
 ### Added
 - Audit.NET.AzureStorage: Added Azure Active Directory Authentication support via Access Token for the BLOB storage Data Provider.

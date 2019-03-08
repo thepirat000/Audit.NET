@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from file system events using a FileSystemWatcher</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.FileSystem</AssemblyTitle>
-    <VersionPrefix>14.1.0</VersionPrefix>
+    <VersionPrefix>14.1.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -22,6 +22,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
