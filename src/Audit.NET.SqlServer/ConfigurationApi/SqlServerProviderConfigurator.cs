@@ -14,6 +14,7 @@ namespace Audit.SqlServer.Configuration
         internal Func<AuditEvent, string> _idColumnNameBuilder = ev => "Id";
         internal Func<AuditEvent, string> _jsonColumnNameBuilder = ev => "Data";
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
+        internal List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         public ISqlServerProviderConfigurator ConnectionString(string connectionString)
         {
@@ -84,6 +85,12 @@ namespace Audit.SqlServer.Configuration
         public ISqlServerProviderConfigurator Schema(Func<AuditEvent, string> schemaBuilder)
         {
             _schemaBuilder = schemaBuilder;
+            return this;
+        }
+
+        public ISqlServerProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value)
+        {
+            _customColumns.Add(new CustomColumn(columnName, value));
             return this;
         }
     }

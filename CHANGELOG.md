@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.1.2] - 2019-03-16
+### Added
+- Audit.NET.SqlServer: Adding ability to configure extra columns on the audit SQL table with `CustomColumn` fluent API.
+
+
 ## [14.1.1] - 2019-03-07
 ### Modified
 - Audit.EntityFramework: Fix race condition on EntityKeyHelper when obtaining the column names (#208)

@@ -4,12 +4,15 @@ using Audit.Core;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Generic;
+using System.Text;
 #if NETSTANDARD1_3 || NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore;
 #endif
 
 namespace Audit.SqlServer.Providers
 {
+
     /// <summary>
     /// SQL Server data access
     /// </summary>
@@ -71,6 +74,10 @@ namespace Audit.SqlServer.Providers
         /// The Schema Name to use (NULL to ignore)
         /// </summary>
         public string Schema { set { SchemaBuilder = _ => value; } }
+        /// <summary>
+        /// A collection of custom columns to be added when saving the audit event 
+        /// </summary>
+        public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
 
         public SqlDataProvider()
         {
@@ -93,15 +100,15 @@ namespace Audit.SqlServer.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var json = new SqlParameter("json", auditEvent.ToJson());
+            var parameters = GetParametersForInsert(auditEvent);
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, json);
+                var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
                 return result.FirstOrDefault();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
-                var result = ctx.FakeIdSet.FromSql(cmdText, json);
+                var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
                 return result.FirstOrDefault().Id;
 #endif
             }
@@ -109,15 +116,15 @@ namespace Audit.SqlServer.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
-            var json = new SqlParameter("json", auditEvent.ToJson());
+            var parameters = GetParametersForInsert(auditEvent);
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, json);
+                var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
                 return await result.FirstOrDefaultAsync();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
-                var result = ctx.FakeIdSet.FromSql(cmdText, json);
+                var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
                 return (await result.FirstOrDefaultAsync()).Id;
 #endif
             }
@@ -125,24 +132,24 @@ namespace Audit.SqlServer.Providers
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            var json = auditEvent.ToJson();
+            var parameters = GetParametersForReplace(eventId, auditEvent);
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
-                ctx.Database.ExecuteSqlCommand(cmdText, new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
+                ctx.Database.ExecuteSqlCommand(cmdText, parameters);
             }
         }
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
-            var json = auditEvent.ToJson();
+            var parameters = GetParametersForReplace(eventId, auditEvent);
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
 #if NETSTANDARD1_3
-                await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
+                await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), parameters);
 #else
-                await ctx.Database.ExecuteSqlCommandAsync(cmdText, new SqlParameter("@json", json), new SqlParameter("@eventId", eventId));
+                await ctx.Database.ExecuteSqlCommandAsync(cmdText, parameters);
 #endif
             }
         }
@@ -154,10 +161,10 @@ namespace Audit.SqlServer.Providers
             {
                 var cmdText = GetSelectCommandText(null);
 #if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("eventId", eventId));
+                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("@eventId", eventId));
                 var json = result.FirstOrDefault();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
-                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("eventId", eventId));
+                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
                 var json = result.FirstOrDefault()?.Id;
 #endif
                 if (json != null)
@@ -174,10 +181,10 @@ namespace Audit.SqlServer.Providers
             {
                 var cmdText = GetSelectCommandText(null);
 #if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("eventId", eventId));
+                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("@eventId", eventId));
                 var json = await result.FirstOrDefaultAsync();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
-                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("eventId", eventId));
+                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
                 var json = (await result.FirstOrDefaultAsync())?.Id;
 #endif
                 if (json != null)
@@ -197,18 +204,98 @@ namespace Audit.SqlServer.Providers
 
         private string GetInsertCommandText(AuditEvent auditEvent)
         {
-            return string.Format("INSERT INTO {0} ([{1}]) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES (@json)", 
-                GetFullTableName(auditEvent), 
-                JsonColumnNameBuilder.Invoke(auditEvent), 
-                IdColumnNameBuilder.Invoke(auditEvent)); 
+            return string.Format("INSERT INTO {0} ({1}) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES ({3})", 
+                GetFullTableName(auditEvent),
+                GetColumnsForInsert(auditEvent), 
+                IdColumnNameBuilder.Invoke(auditEvent),
+                GetValuesForInsert(auditEvent)); 
+        }
+
+        private string GetColumnsForInsert(AuditEvent auditEvent)
+        {
+            var jsonColumnName = JsonColumnNameBuilder.Invoke(auditEvent);
+            var sb = new StringBuilder();
+            sb.Append($"[{jsonColumnName}]");
+            if (CustomColumns != null)
+            {
+                foreach (var column in CustomColumns)
+                {
+                    sb.Append($", [{column.Name}]");
+                }
+            }
+            return sb.ToString();
+        }
+
+        private string GetValuesForInsert(AuditEvent auditEvent)
+        {
+            if (CustomColumns == null || !CustomColumns.Any())
+            {
+                return "@json";
+            }
+            var sb = new StringBuilder("@json");
+            for(int i = 0; i < CustomColumns.Count; i++)
+            {
+                sb.Append($", @c{i}");
+            }
+            return sb.ToString();
+        }
+
+        private SqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
+            if (CustomColumns != null && CustomColumns.Any())
+            {
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                }
+            }
+            return parameters.ToArray();
+        }
+
+        private SqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
+        {
+            var parameters = new List<SqlParameter>();
+            parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
+            parameters.Add(new SqlParameter("@eventId", eventId));
+            if (CustomColumns != null && CustomColumns.Any())
+            {
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                }
+            }
+            return parameters.ToArray();
         }
 
         private string GetReplaceCommandText(AuditEvent auditEvent)
         {
-            var ludScript = LastUpdatedDateColumnNameBuilder != null ? string.Format(", [{0}] = GETUTCDATE()", LastUpdatedDateColumnNameBuilder.Invoke(auditEvent)) : string.Empty;
-            var cmdText = string.Format("UPDATE {0} SET [{1}] = @json{2} WHERE [{3}] = @eventId",
-                GetFullTableName(auditEvent), JsonColumnNameBuilder.Invoke(auditEvent), ludScript, IdColumnNameBuilder.Invoke(auditEvent));
+            var cmdText = string.Format("UPDATE {0} SET {1} WHERE [{2}] = @eventId",
+                GetFullTableName(auditEvent), 
+                GetSetForUpdate(auditEvent), 
+                IdColumnNameBuilder.Invoke(auditEvent));
             return cmdText;
+        }
+
+        private string GetSetForUpdate(AuditEvent auditEvent)
+        {
+            var jsonColumnName = JsonColumnNameBuilder.Invoke(auditEvent);
+            var ludColumn = LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
+            var sb = new StringBuilder();
+            sb.Append($"[{jsonColumnName}] = @json");
+            if (ludColumn != null)
+            {
+                sb.Append($", [{ludColumn}] = GETUTCDATE()");
+            }
+            if (CustomColumns != null && CustomColumns.Any())
+            {
+                for(int i = 0; i < CustomColumns.Count; i++)
+                {
+                    sb.Append($", [{CustomColumns[i].Name}] = @c{i}");
+                }
+            }
+            return sb.ToString();
         }
 
         private string GetSelectCommandText(AuditEvent auditEvent)

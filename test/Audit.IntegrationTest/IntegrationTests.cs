@@ -799,7 +799,9 @@ namespace Audit.IntegrationTest
                         .TableName(ev => "Event")
                         .IdColumnName(ev => "EventId")
                         .JsonColumnName(ev => "Data")
-                        .LastUpdatedColumnName("LastUpdatedDate"))
+                        .LastUpdatedColumnName("LastUpdatedDate")
+                        .CustomColumn("EventType", ev => ev.EventType)
+                        .CustomColumn("SomeDate", _ => DateTime.UtcNow))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

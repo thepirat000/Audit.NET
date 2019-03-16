@@ -29,8 +29,12 @@ Audit.Core.Configuration.DataProvider = new SqlDataProvider()
     Schema = "dbo",
     TableName = "Event",
     IdColumnName = "EventId",
-    JsonColumnName = "Data",
-    LastUpdatedDateColumnName = "LastUpdatedDate"
+    JsonColumnName = "JsonData",
+    LastUpdatedDateColumnName = "LastUpdatedDate",
+    CustomColumns = new List<CustomColumn>()
+    {
+        new CustomColumn("EventType", ev => ev.EventType)
+    }
 };
 ```
 
@@ -39,11 +43,13 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 Audit.Core.Configuration.Setup()
     .UseSqlServer(config => config
         .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
-	.Schema("dbo")
+        .Schema("dbo")
         .TableName("Event")
         .IdColumnName("EventId")
-        .JsonColumnName("Data")
-        .LastUpdatedColumnName("LastUpdatedDate"));
+        .JsonColumnName("JsonData")
+        .LastUpdatedColumnName("LastUpdatedDate")
+        .CustomColumn("EventType", ev => ev.EventType)        
+        .CustomColumn("User", ev => ev.Environment.UserName));
 ```
 
 You can provide any of the settings as a function of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage), 
@@ -61,13 +67,13 @@ Audit.Core.Configuration.Setup()
 
 Mandatory:
 - **ConnectionString**: The SQL Server connection string.
-- **TableName**: The events table name.
-- **JsonColumnName**: The column name of the event table where the JSON will be stored.
+- **Schema**: The SQL schema for the table. (optional)
+- **TableName**: The audit events table name.
 - **IdColumnName**: The column name of the event identifier (the primary key).
+- **JsonColumnName**: The column name of the event table where the JSON will be stored.
+- **LastUpdatedDateColumnName**: The datetime column name to update when replacing events. (optional)
+- **CustomColumn**: Additional columns to store information from the audit event. (optional)
 
-Optional:
-- **Schema**: The SQL schema to use.
-- **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
 
 ## Query events
 
@@ -87,11 +93,12 @@ For example:
 ```SQL
 CREATE TABLE [Event]
 (
-	[EventId] BIGINT IDENTITY(1,1) NOT NULL,
-	[InsertedDate] DATETIME NOT NULL DEFAULT(GETUTCDATE()),
-	[LastUpdatedDate] DATETIME NULL,
-	[Data] NVARCHAR(MAX) NOT NULL,
-	CONSTRAINT PK_Event PRIMARY KEY (EventId)
+    [EventId] BIGINT IDENTITY(1,1) NOT NULL,
+    [InsertedDate] DATETIME NOT NULL DEFAULT(GETUTCDATE()),
+    [LastUpdatedDate] DATETIME NULL,
+    [JsonData] NVARCHAR(MAX) NOT NULL,
+    [EventType] NVARCHAR(100) NOT NULL,
+    CONSTRAINT PK_Event PRIMARY KEY (EventId)
 )
 GO
 ```
@@ -102,15 +109,14 @@ If you use Azure SQL Server or Sql Server 2016, you can create indexes on the JS
 CREATE VIEW dbo.[v_Event] WITH SCHEMABINDING
 AS
 SELECT EventId, 
-	InsertedDate,
-	CAST(JSON_VALUE(Data, '$.EventType') AS NVARCHAR(255)) AS [EventType],
-	CAST(JSON_VALUE(Data, '$.ReferenceId') AS NVARCHAR(255)) AS [ReferenceId],
-	CAST(JSON_VALUE(Data, '$.Environment.UserName') AS NVARCHAR(50)) AS [UserName],
-	JSON_VALUE(Data, '$.Target.Type') As [TargetType],
-	COALESCE(JSON_VALUE(Data, '$.Target.Old'), JSON_QUERY(Data, '$.Target.Old')) AS [TargetOld],
-	COALESCE(JSON_VALUE(Data, '$.Target.New'), JSON_QUERY(Data, '$.Target.New')) AS [TargetNew],
-	JSON_QUERY(Data, '$.Comments') AS [Comments],
-	[Data] As [Data]
+    InsertedDate,
+    CAST(JSON_VALUE(Data, '$.EventType') AS NVARCHAR(255)) AS [EventType],
+    CAST(JSON_VALUE(Data, '$.ReferenceId') AS NVARCHAR(255)) AS [ReferenceId],
+    JSON_VALUE(Data, '$.Target.Type') As [TargetType],
+    COALESCE(JSON_VALUE(Data, '$.Target.Old'), JSON_QUERY(Data, '$.Target.Old')) AS [TargetOld],
+    COALESCE(JSON_VALUE(Data, '$.Target.New'), JSON_QUERY(Data, '$.Target.New')) AS [TargetNew],
+    JSON_QUERY(Data, '$.Comments') AS [Comments],
+    [Data] As [Data]
 FROM dbo.[Event]
 GO
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -12,8 +13,18 @@ namespace Audit.EntityFramework.Core.UnitTest
 
         public override bool AuditDisabled { get; set; }
 
+        private readonly ILoggerFactory _loggerFactory;
+
+        public BlogsContext() { }
+
+        public BlogsContext(ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.UseLoggerFactory(_loggerFactory);
             optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
         }

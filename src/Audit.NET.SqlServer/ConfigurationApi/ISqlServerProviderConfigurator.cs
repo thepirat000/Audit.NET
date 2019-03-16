@@ -64,6 +64,12 @@ namespace Audit.SqlServer.Configuration
         /// <param name="lastUpdatedColumnNameBuilder">The last udpated date column name as a function of the audit event, or NULL to ignore.</param>
         ISqlServerProviderConfigurator LastUpdatedColumnName(Func<AuditEvent, string> lastUpdatedColumnNameBuilder);
         /// <summary>
+        /// Specifies an extra custom column on the audit log table and the value as a function of the audit event 
+        /// </summary>
+        /// <param name="columnName">The column name</param>
+        /// <param name="value">A function of the audit event that returns the value to insert/update on this column</param>
+        ISqlServerProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value);
+        /// <summary>
         /// Specifies the SQL schema where to store the events as a function of the audit event
         /// </summary>
         /// <param name="schemaBuilder">The Schema name as a function of the audit event.</param>
