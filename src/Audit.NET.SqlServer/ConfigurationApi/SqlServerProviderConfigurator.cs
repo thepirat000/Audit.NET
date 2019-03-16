@@ -12,7 +12,7 @@ namespace Audit.SqlServer.Configuration
         internal Func<AuditEvent, string> _schemaBuilder = null;
         internal Func<AuditEvent, string> _tableNameBuilder = ev => "Event";
         internal Func<AuditEvent, string> _idColumnNameBuilder = ev => "Id";
-        internal Func<AuditEvent, string> _jsonColumnNameBuilder = ev => "Data";
+        internal Func<AuditEvent, string> _jsonColumnNameBuilder;
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
 

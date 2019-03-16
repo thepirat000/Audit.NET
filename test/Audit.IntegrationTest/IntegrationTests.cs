@@ -125,10 +125,12 @@ namespace Audit.IntegrationTest
                     .JsonColumnName("json")
                     .LastUpdatedColumnName("last")
                     .Schema(ev => "schema")
-                    .TableName("table"));
+                    .TableName("table")
+                    .CustomColumn("EventType", ev => ev.EventType));
                 Assert.AreEqual("cnnString", x.ConnectionStringBuilder.Invoke(null));
                 Assert.AreEqual("evType", x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }));
                 Assert.AreEqual("json", x.JsonColumnNameBuilder.Invoke(null));
+                Assert.IsTrue(x.CustomColumns.Any(cc => cc.Name == "EventType" && (string)cc.Value.Invoke(new AuditEvent() { EventType = "pepe" }) == "pepe"));
                 Assert.AreEqual("last", x.LastUpdatedDateColumnNameBuilder.Invoke(null));
                 Assert.AreEqual("schema", x.SchemaBuilder.Invoke(null));
                 Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));

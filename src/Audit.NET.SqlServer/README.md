@@ -70,7 +70,7 @@ Mandatory:
 - **Schema**: The SQL schema for the table. (optional)
 - **TableName**: The audit events table name.
 - **IdColumnName**: The column name of the event identifier (the primary key).
-- **JsonColumnName**: The column name of the event table where the JSON will be stored.
+- **JsonColumnName**: The column name of the event table where the audit event JSON will be stored. (optional)
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events. (optional)
 - **CustomColumn**: Additional columns to store information from the audit event. (optional)
 

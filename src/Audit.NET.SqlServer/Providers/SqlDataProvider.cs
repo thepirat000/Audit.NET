@@ -45,7 +45,7 @@ namespace Audit.SqlServer.Providers
         /// <summary>
         /// The Column Name that stores the JSON
         /// </summary>
-        public Func<AuditEvent, string> JsonColumnNameBuilder { get; set; } = ev => "Data";
+        public Func<AuditEvent, string> JsonColumnNameBuilder { get; set; }
         /// <summary>
         /// The Column Name that stores the JSON
         /// </summary>
@@ -95,6 +95,7 @@ namespace Audit.SqlServer.Providers
                 LastUpdatedDateColumnNameBuilder = sqlConfig._lastUpdatedColumnNameBuilder;
                 SchemaBuilder = sqlConfig._schemaBuilder;
                 TableNameBuilder = sqlConfig._tableNameBuilder;
+                CustomColumns = sqlConfig._customColumns;
             }
         }
 
@@ -156,7 +157,10 @@ namespace Audit.SqlServer.Providers
 
         public override T GetEvent<T>(object eventId)
         {
-            
+            if (JsonColumnNameBuilder == null)
+            {
+                return null;
+            }
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(null)))
             {
                 var cmdText = GetSelectCommandText(null);
@@ -177,6 +181,10 @@ namespace Audit.SqlServer.Providers
 
         public override async Task<T> GetEventAsync<T>(object eventId)
         {
+            if (JsonColumnNameBuilder == null)
+            {
+                return null;
+            }
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(null)))
             {
                 var cmdText = GetSelectCommandText(null);
@@ -213,38 +221,47 @@ namespace Audit.SqlServer.Providers
 
         private string GetColumnsForInsert(AuditEvent auditEvent)
         {
-            var jsonColumnName = JsonColumnNameBuilder.Invoke(auditEvent);
-            var sb = new StringBuilder();
-            sb.Append($"[{jsonColumnName}]");
+            var columns = new List<string>();
+            var jsonColumnName = JsonColumnNameBuilder?.Invoke(auditEvent);
+            if (jsonColumnName != null)
+            {
+                columns.Add(jsonColumnName);
+            }
             if (CustomColumns != null)
             {
                 foreach (var column in CustomColumns)
                 {
-                    sb.Append($", [{column.Name}]");
+                    columns.Add(column.Name);
                 }
             }
-            return sb.ToString();
+            return string.Join(", ", columns.Select(c => $"[{c}]"));
         }
 
         private string GetValuesForInsert(AuditEvent auditEvent)
         {
-            if (CustomColumns == null || !CustomColumns.Any())
+            var values = new List<string>();
+            if (JsonColumnNameBuilder != null)
             {
-                return "@json";
+                values.Add("@json");
             }
-            var sb = new StringBuilder("@json");
-            for(int i = 0; i < CustomColumns.Count; i++)
+            if (CustomColumns != null)
             {
-                sb.Append($", @c{i}");
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    values.Add($"@c{i}");
+                }
             }
-            return sb.ToString();
+            return string.Join(", ", values);
         }
 
         private SqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
-            if (CustomColumns != null && CustomColumns.Any())
+            if (JsonColumnNameBuilder != null)
+            {
+                parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
+            }
+            if (CustomColumns != null)
             {
                 for (int i = 0; i < CustomColumns.Count; i++)
                 {
@@ -257,9 +274,12 @@ namespace Audit.SqlServer.Providers
         private SqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
         {
             var parameters = new List<SqlParameter>();
-            parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
+            if (JsonColumnNameBuilder != null)
+            {
+                parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
+            }
             parameters.Add(new SqlParameter("@eventId", eventId));
-            if (CustomColumns != null && CustomColumns.Any())
+            if (CustomColumns != null)
             {
                 for (int i = 0; i < CustomColumns.Count; i++)
                 {
@@ -280,22 +300,25 @@ namespace Audit.SqlServer.Providers
 
         private string GetSetForUpdate(AuditEvent auditEvent)
         {
-            var jsonColumnName = JsonColumnNameBuilder.Invoke(auditEvent);
+            var jsonColumnName = JsonColumnNameBuilder?.Invoke(auditEvent);
             var ludColumn = LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
-            var sb = new StringBuilder();
-            sb.Append($"[{jsonColumnName}] = @json");
+            var sets = new List<string>();
+            if (jsonColumnName != null)
+            {
+                sets.Add($"[{jsonColumnName}] = @json");
+            }
             if (ludColumn != null)
             {
-                sb.Append($", [{ludColumn}] = GETUTCDATE()");
+                sets.Add($"[{ludColumn}] = GETUTCDATE()");
             }
             if (CustomColumns != null && CustomColumns.Any())
             {
                 for(int i = 0; i < CustomColumns.Count; i++)
                 {
-                    sb.Append($", [{CustomColumns[i].Name}] = @c{i}");
+                    sets.Add($"[{CustomColumns[i].Name}] = @c{i}");
                 }
             }
-            return sb.ToString();
+            return string.Join(", ", sets);
         }
 
         private string GetSelectCommandText(AuditEvent auditEvent)
