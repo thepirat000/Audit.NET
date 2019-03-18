@@ -65,7 +65,6 @@ Audit.Core.Configuration.Setup()
 
 ### Provider Options
 
-Mandatory:
 - **ConnectionString**: The SQL Server connection string.
 - **Schema**: The SQL schema for the table. (optional)
 - **TableName**: The audit events table name.
@@ -110,13 +109,13 @@ CREATE VIEW dbo.[v_Event] WITH SCHEMABINDING
 AS
 SELECT EventId, 
     InsertedDate,
-    CAST(JSON_VALUE(Data, '$.EventType') AS NVARCHAR(255)) AS [EventType],
-    CAST(JSON_VALUE(Data, '$.ReferenceId') AS NVARCHAR(255)) AS [ReferenceId],
-    JSON_VALUE(Data, '$.Target.Type') As [TargetType],
-    COALESCE(JSON_VALUE(Data, '$.Target.Old'), JSON_QUERY(Data, '$.Target.Old')) AS [TargetOld],
-    COALESCE(JSON_VALUE(Data, '$.Target.New'), JSON_QUERY(Data, '$.Target.New')) AS [TargetNew],
-    JSON_QUERY(Data, '$.Comments') AS [Comments],
-    [Data] As [Data]
+    CAST(JSON_VALUE(JsonData, '$.EventType') AS NVARCHAR(255)) AS [EventType],
+    CAST(JSON_VALUE(JsonData, '$.ReferenceId') AS NVARCHAR(255)) AS [ReferenceId],
+    JSON_VALUE(JsonData, '$.Target.Type') As [TargetType],
+    COALESCE(JSON_VALUE(JsonData, '$.Target.Old'), JSON_QUERY(JsonData, '$.Target.Old')) AS [TargetOld],
+    COALESCE(JSON_VALUE(JsonData, '$.Target.New'), JSON_QUERY(JsonData, '$.Target.New')) AS [TargetNew],
+    JSON_QUERY(JsonData, '$.Comments') AS [Comments],
+    [JsonData]
 FROM dbo.[Event]
 GO
 
