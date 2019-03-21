@@ -537,6 +537,7 @@ Audit.Core.Configuration.Setup()
             entity.EntityType = entry.EntityType.Name;
             entity.AuditDate = DateTime.Now;
             entity.AuditUser = Environment.UserName;
+	    entity.TablePk = entry.PrimaryKey.First().Value.ToString();
         })
 	.IgnoreMatchedProperties(true));
 ```
