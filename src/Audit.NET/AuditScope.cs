@@ -196,10 +196,31 @@ namespace Audit.Core
         private bool _disposed;
         private bool _ended;
         private readonly AuditDataProvider _dataProvider;
-        private readonly Func<object> _targetGetter;
+        private Func<object> _targetGetter;
 #endregion
 
 #region Public Methods
+        /// <summary>
+        /// Replaces the target object getter whose old/new value will be stored on the AuditEvent.Target property
+        /// </summary>
+        /// <param name="targetGetter">A function that returns the target</param>
+        public void SetTargetGetter(Func<object> targetGetter)
+        {
+            _targetGetter = targetGetter;
+            if (_targetGetter != null)
+            {
+                var targetValue = targetGetter.Invoke();
+                _event.Target = new AuditTarget
+                {
+                    SerializedOld = _dataProvider.Serialize(targetValue),
+                    Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
+                };
+            }
+            else
+            {
+                _event.Target = null;
+            }
+        }
         /// <summary>
         /// Add a textual comment to the event
         /// </summary>

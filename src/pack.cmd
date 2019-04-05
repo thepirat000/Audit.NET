@@ -57,3 +57,5 @@ dotnet pack "Audit.NET.Elasticsearch/"
 dotnet pack "Audit.NET.EventLog.Core/"
 dotnet pack "Audit.NET.DynamoDB/"
 
+ECHO.
+ECHO ADD TAG NOW !

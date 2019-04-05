@@ -14,6 +14,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Audit.EntityFramework.ConfigurationApi;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 
 namespace Audit.UnitTest
 {
@@ -24,6 +25,83 @@ namespace Audit.UnitTest
         {
             Audit.Core.Configuration.AuditDisabled = false;
             Audit.Core.Configuration.ResetCustomActions();
+        }
+
+        [Test]
+        public void Test_AuditScope_SetTargetGetter()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var obj = new SomeClass() { Id = 1, Name = "Test" };
+
+            using (var scope = AuditScope.Create("Test", () => new { ShouldNotUseThisObject = true }))
+            {
+                scope.SetTargetGetter(() => obj);
+                obj.Id = 2;
+                obj.Name = "NewTest";
+            }
+            obj.Id = 3;
+            obj.Name = "X";
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual("SomeClass", evs[0].Target.Type);
+            Assert.AreEqual(1, (evs[0].Target.SerializedOld as JObject).ToObject<SomeClass>().Id);
+            Assert.AreEqual("Test", (evs[0].Target.SerializedOld as JObject).ToObject<SomeClass>().Name);
+            Assert.AreEqual(2, (evs[0].Target.SerializedNew as JObject).ToObject<SomeClass>().Id);
+            Assert.AreEqual("NewTest", (evs[0].Target.SerializedNew as JObject).ToObject<SomeClass>().Name);
+        }
+
+        [Test]
+        public void Test_AuditScope_SetTargetGetter_ReturnsNull()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            using (var scope = AuditScope.Create("Test", () => new { ShouldNotUseThisObject = true }))
+            {
+                scope.SetTargetGetter(() => null);
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual("Object", evs[0].Target.Type);
+            Assert.IsNull(evs[0].Target.SerializedOld);
+            Assert.IsNull(evs[0].Target.SerializedNew);
+        }
+
+        [Test]
+        public void Test_AuditScope_SetTargetGetter_IsNull()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            using (var scope = AuditScope.Create("Test", () => new { ShouldNotUseThisObject = true }))
+            {
+                scope.SetTargetGetter(null);
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.IsNull(evs[0].Target);
         }
 
         [Test]
@@ -752,6 +830,11 @@ namespace Audit.UnitTest
             public override string AuditEventType { get { return base.AuditEventType; } }
             public override bool IncludeEntityObjects { get { return base.IncludeEntityObjects; } }
             public override AuditOptionMode Mode { get { return base.Mode; } }
+        }
+        public class SomeClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
         }
     }
 }
