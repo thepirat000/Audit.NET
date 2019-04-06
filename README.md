@@ -8,8 +8,6 @@
 [![issues-open](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET.svg)](https://github.com/thepirat000/Audit.NET/issues)
 [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET.svg)](https://github.com/thepirat000/Audit.NET/issues)
 
-![GitHub issues](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET.svg)
-
 An extensible framework to audit executing operations in .NET and .NET Core.
 
 Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
