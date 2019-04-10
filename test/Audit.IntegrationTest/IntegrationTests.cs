@@ -106,13 +106,20 @@ namespace Audit.IntegrationTest
                     .IdColumnName("id")
                     .LastUpdatedColumnName("lud")
                     .Schema("sc")
-                    .TableName("t"));
+                    .TableName("t")
+                    .CustomColumn("c1", ev => 1)
+                    .CustomColumn("c2", ev => 2));
                 Assert.AreEqual("c", x.ConnectionString);
                 Assert.AreEqual("dc", x.DataColumnName);
                 Assert.AreEqual("id", x.IdColumnName);
                 Assert.AreEqual("lud", x.LastUpdatedDateColumnName);
                 Assert.AreEqual("sc", x.Schema);
                 Assert.AreEqual("t", x.TableName);
+                Assert.AreEqual(2, x.CustomColumns.Count);
+                Assert.AreEqual("c1", x.CustomColumns[0].Name);
+                Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
+                Assert.AreEqual("c2", x.CustomColumns[1].Name);
+                Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
             }
 
             [Test]
@@ -813,10 +820,12 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UsePostgreSql(config => config
                         .ConnectionString("Server=localhost;Port=5432;User Id=fede;Password=fede;Database=postgres;")
-                        .TableName("eventb")
+                        .TableName("event")
                         .IdColumnName("id")
                         .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)
-                        .LastUpdatedColumnName("updated_date"))
+                        .LastUpdatedColumnName("updated_date")
+                        .CustomColumn("event type", ev => ev.EventType)
+                        .CustomColumn("some_date", ev => DateTime.UtcNow))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

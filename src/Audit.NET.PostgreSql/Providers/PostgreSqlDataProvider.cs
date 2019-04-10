@@ -1,8 +1,10 @@
 ﻿using Audit.Core;
+using Audit.NET.PostgreSql;
 using Newtonsoft.Json;
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Audit.PostgreSql.Providers
@@ -18,6 +20,7 @@ namespace Audit.PostgreSql.Providers
     /// - IdColumnName: Column name with the primary key (default is 'id')
     /// - LastUpdatedDateColumnName: datetime column to update when replacing events (NULL to ignore)
     /// - DataType: Data type to cast when storing the data. (JSON, JSONB). (default is 'JSON')
+    /// - CustomColumns: A collection of custom columns to be added when saving the audit event 
     /// </remarks>
     public class PostgreSqlDataProvider : AuditDataProvider
     {
@@ -28,6 +31,7 @@ namespace Audit.PostgreSql.Providers
         private string _dataColumnName = "data";
         private string _lastUpdatedDateColumnName = null;
         private string _dataType = "JSON";
+        private List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         /// <summary>
         /// The connection string
@@ -92,6 +96,15 @@ namespace Audit.PostgreSql.Providers
             set { _schema = value; }
         }
 
+        /// <summary>
+        /// A collection of custom columns to be added when saving the audit event 
+        /// </summary>
+        public List<CustomColumn> CustomColumns
+        {
+            get => _customColumns;
+            set => _customColumns = value;
+        }
+
         public PostgreSqlDataProvider()
         {
         }
@@ -109,6 +122,7 @@ namespace Audit.PostgreSql.Providers
                 _lastUpdatedDateColumnName = pgConfig._lastUpdatedColumnName;
                 _schema = pgConfig._schema;
                 _tableName = pgConfig._tableName;
+                _customColumns = pgConfig._customColumns;
             }
         }
 
@@ -233,33 +247,63 @@ namespace Audit.PostgreSql.Providers
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
-            var schema = GetSchema();
-            var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
-            cmd.CommandText = $@"insert into {schema}""{_tableName}"" (""{_dataColumnName}"") values ({data}) RETURNING (""{_idColumnName}"")";
-            var parameter = cmd.CreateParameter();
-            parameter.ParameterName = "data";
-            parameter.Value = auditEvent.ToJson();
-            cmd.Parameters.Add(parameter);
+            cmd.CommandText = GetInsertCommandText(auditEvent);
+            cmd.Parameters.AddRange(GetParametersForInsert(auditEvent));
             return cmd;
+        }
+
+        private string GetInsertCommandText(AuditEvent auditEvent)
+        {
+            return string.Format("insert into {0} ({1}) values ({2}) RETURNING ({3})",
+                GetFullTableName(auditEvent),
+                GetColumnsForInsert(auditEvent),
+                GetValuesForInsert(auditEvent),
+                _idColumnName);
+        }
+
+        private string GetFullTableName(AuditEvent auditEvent)
+        {
+            return string.Format($@"{GetSchema()}""{_tableName}""");
         }
 
         private NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
-            var schema = GetSchema();
-            var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
-            var ludScript = string.IsNullOrWhiteSpace(_lastUpdatedDateColumnName) ? "" : $@", ""{_lastUpdatedDateColumnName}"" = CURRENT_TIMESTAMP";
-            cmd.CommandText = $@"update {schema}""{_tableName}"" SET ""{_dataColumnName}"" = {data}{ludScript} WHERE ""{_idColumnName}"" = @id";
-            var dataParameter = cmd.CreateParameter();
-            dataParameter.ParameterName = "data";
-            dataParameter.Value = auditEvent.ToJson();
-            cmd.Parameters.Add(dataParameter);
-            var idParameter = cmd.CreateParameter();
-            idParameter.ParameterName = "id";
-            idParameter.Value = eventId;
-            cmd.Parameters.Add(idParameter);
+            cmd.CommandText = GetReplaceCommandText(auditEvent);
+            cmd.Parameters.AddRange(GetParametersForReplace(eventId, auditEvent));
             return cmd;
+        }
+
+        private string GetReplaceCommandText(AuditEvent auditEvent)
+        {
+            return string.Format(@"update {0} SET {1} WHERE ""{2}"" = @id",
+                GetFullTableName(auditEvent),
+                GetSetForUpdate(auditEvent),
+                _idColumnName);
+        }
+
+        private object GetSetForUpdate(AuditEvent auditEvent)
+        {
+            var ludScript = string.IsNullOrWhiteSpace(_lastUpdatedDateColumnName) ? null : $@"""{_lastUpdatedDateColumnName}"" = CURRENT_TIMESTAMP";
+            var sets = new List<string>();
+            if (_dataColumnName != null)
+            {
+                var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
+                sets.Add($@"""{_dataColumnName}"" = {data}");
+            }
+            if (ludScript != null)
+            {
+                sets.Add(ludScript);
+            }
+            if (CustomColumns != null && CustomColumns.Any())
+            {
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    sets.Add($@"""{CustomColumns[i].Name}"" = @c{i}");
+                }
+            }
+            return string.Join(", ", sets);
         }
 
         private NpgsqlCommand GetSelectCommand(NpgsqlConnection cnn, object eventId)
@@ -279,5 +323,76 @@ namespace Audit.PostgreSql.Providers
         {
             return string.IsNullOrWhiteSpace(_schema) ? "" : (@"""" + _schema + @""".");
         }
+
+        private string GetColumnsForInsert(AuditEvent auditEvent)
+        {
+            var columns = new List<string>();
+            if (_dataColumnName != null)
+            {
+                columns.Add(_dataColumnName);
+            }
+            if (CustomColumns != null)
+            {
+                foreach (var column in CustomColumns)
+                {
+                    columns.Add(column.Name);
+                }
+            }
+            return string.Join(", ", columns.Select(c => $@"""{c}"""));
+        }
+
+        private string GetValuesForInsert(AuditEvent auditEvent)
+        {
+            var values = new List<string>();
+            if (_dataColumnName != null)
+            {
+                var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
+                values.Add(data);
+            }
+            if (CustomColumns != null)
+            {
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    values.Add($"@c{i}");
+                }
+            }
+            return string.Join(", ", values);
+        }
+
+        private NpgsqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
+        {
+            var parameters = new List<NpgsqlParameter>();
+            if (_dataColumnName != null)
+            {
+                parameters.Add(new NpgsqlParameter("data", auditEvent.ToJson()));
+            }
+            if (CustomColumns != null)
+            {
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    parameters.Add(new NpgsqlParameter($"c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                }
+            }
+            return parameters.ToArray();
+        }
+
+        private NpgsqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
+        {
+            var parameters = new List<NpgsqlParameter>();
+            if (_dataColumnName != null)
+            {
+                parameters.Add(new NpgsqlParameter("data", auditEvent.ToJson()));
+            }
+            parameters.Add(new NpgsqlParameter("id", eventId));
+            if (CustomColumns != null)
+            {
+                for (int i = 0; i < CustomColumns.Count; i++)
+                {
+                    parameters.Add(new NpgsqlParameter($"c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                }
+            }
+            return parameters.ToArray();
+        }
     }
+
 }

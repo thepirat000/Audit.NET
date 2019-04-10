@@ -30,7 +30,12 @@ Audit.Core.Configuration.DataProvider = new PostgreSqlDataProvider()
     IdColumnName = "id",
     DataColumnName = "data",
     DataType = "JSONB",
-    LastUpdatedDateColumnName = "updated_date"
+    LastUpdatedDateColumnName = "updated_date",
+    CustomColumns = new List<CustomColumn>()
+    {
+        new CustomColumn("event_type", ev => ev.EventType),
+        new CustomColumn("user", ev => ev.Environment.UserName),
+    }
 };
 ```
 
@@ -42,7 +47,9 @@ Audit.Core.Configuration.Setup()
         .TableName("event")
         .IdColumnName("id")
         .DataColumn("data", DataType.JSONB)
-        .LastUpdatedColumnName("updated_date"));
+        .LastUpdatedColumnName("updated_date")
+        .CustomColumn("event_type", ev => ev.EventType)
+        .CustomColumn("user", ev => ev.Environment.UserName));
 ```
 
 ### Provider Options
@@ -57,6 +64,7 @@ Optional:
 - **Schema**: The PostgreSQL schema to use.
 - **DataType**: The type of the data column that stores the events. Can be JSON, JSONP or STRING. (Default is JSON).
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
+- **CustomColumn**: Additional columns to store information from the audit event. (optional)
 
 ## Table constraints
 
@@ -68,10 +76,12 @@ For example:
 ```SQL
 CREATE TABLE public.event
 (
-    id integer NOT NULL DEFAULT nextval('event_id_seq'::regclass),
+    id bigserial NOT NULL,
     inserted_date timestamp without time zone NOT NULL DEFAULT now(),
     updated_date timestamp without time zone NOT NULL DEFAULT now(),
     data jsonb NOT NULL,
+    event_type varchar(50),
+    user varchar(50) NULL,
     CONSTRAINT event_pkey PRIMARY KEY (id)
 )
 WITH (

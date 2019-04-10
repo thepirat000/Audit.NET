@@ -23,6 +23,8 @@ namespace Audit.SqlServer.Providers
     /// - JsonColumnName: Column name where the JSON will be stored (default is 'Data')
     /// - IdColumnName: Column name with the primary key (default is 'EventId')
     /// - LastUpdatedDateColumnName: datetime column to update when replacing events (NULL to ignore)
+    /// - Schema: The Schema Name to use 
+    /// - CustomColumns: A collection of custom columns to be added when saving the audit event 
     /// </remarks>
     public class SqlDataProvider : AuditDataProvider
     {

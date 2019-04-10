@@ -1,4 +1,7 @@
-﻿namespace Audit.PostgreSql.Configuration
+﻿using Audit.Core;
+using System;
+
+namespace Audit.PostgreSql.Configuration
 {
     /// <summary>
     /// Provides a configuration for the PostgreSQL Server DB data provider
@@ -36,5 +39,12 @@
         /// </summary>
         /// <param name="schema">The Schema name.</param>
         IPostgreSqlProviderConfigurator Schema(string schema);
+        /// <summary>
+        /// Specifies an extra custom column on the audit log table and the value as a function of the audit event 
+        /// </summary>
+        /// <param name="columnName">The column name</param>
+        /// <param name="value">A function of the audit event that returns the value to insert/update on this column</param>
+        IPostgreSqlProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value);
+
     }
 }

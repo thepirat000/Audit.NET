@@ -1,4 +1,6 @@
-﻿using Audit.PostgreSql.Configuration;
+﻿using Audit.Core;
+using Audit.NET.PostgreSql;
+using Audit.PostgreSql.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ namespace Audit.PostgreSql.Configuration
         internal string _dataColumnName = "data";
         internal DataType _dataColumnType = DataType.JSON;
         internal string _lastUpdatedColumnName = null;
+        internal List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         public IPostgreSqlProviderConfigurator ConnectionString(string connectionString)
         {
@@ -50,6 +53,12 @@ namespace Audit.PostgreSql.Configuration
         public IPostgreSqlProviderConfigurator Schema(string schema)
         {
             _schema = schema;
+            return this;
+        }
+
+        public IPostgreSqlProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value)
+        {
+            _customColumns.Add(new CustomColumn(columnName, value));
             return this;
         }
     }

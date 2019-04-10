@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.2.2] - 2019-04-10
+### Added
+- Audit.NET.PostgreSql: Adding ability to configure extra columns on the audit SQL table with `CustomColumn` fluent API.
+
 ## [14.2.1] - 2019-04-05
 ### Added
 - Audit.NET: Adding ability to re-assign the AuditEvent's Target object after the scope is created.
