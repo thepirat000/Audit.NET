@@ -26,6 +26,28 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("[\"value1\",\"value2\"]", s);
         }
 
+        public async Task Test_WebApi_TestFromServiceIgnore()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    insertEvs.Add(ev);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/Values/TestFromServiceIgnore?t=test";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(1, insertEvs.Count);
+            var action = insertEvs[0].GetWebApiAuditAction();
+            Assert.AreEqual(1, action.ActionParameters.Count);
+            Assert.AreEqual("test", action.ActionParameters["t"]);
+            Assert.AreEqual("TestFromServiceIgnore", action.ActionName);
+        }
+
         public async Task Test_WebApi_ResponseHeaders_Attribute()
         {
             var insertEvs = new List<AuditEvent>();

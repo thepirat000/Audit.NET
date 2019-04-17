@@ -10,24 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Audit.Integration.AspNetCore.Controllers
 {
-    [AuditApi(EventTypeName = "FromControllerAttribute", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
-    [Route("api/[controller]")]
-    public class MoreValuesController : Controller
-    {
-        [HttpGet]
-        [AuditApi(EventTypeName = "FromActionAttribute", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2", "value3" };
-        }
-
-    }
-
-    public class Request
-    {
-        public string Value { get; set; }
-    }
-
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -38,6 +20,12 @@ namespace Audit.Integration.AspNetCore.Controllers
             return new string[] { "value1", "value2" };
         }
 
+        [HttpGet("TestFromServiceIgnore")]
+        [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        public IActionResult TestFromServiceIgnore([FromServices] IServiceProvider provider, string t)
+        {
+            return Ok(t);
+        }
 
         [HttpPost("FileUpload")]
         [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]

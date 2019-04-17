@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.2.3] - 2019-04-17
+### Modified
+- Audit.WebApi and Audit.WebApi.Core: Ignoring action parameters marked with `[FromServicesAttribute]` (#213).
+
 ## [14.2.2] - 2019-04-10
 ### Added
 - Audit.NET.PostgreSql: Adding ability to configure extra columns on the audit SQL table with `CustomColumn` fluent API.

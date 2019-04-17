@@ -15,16 +15,6 @@ namespace Audit.Integration.AspNetCore
     {
         static void Main(string[] args)
         {
-
-            /*Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
-                {
-                    var x = ev.GetWebApiAuditAction();
-                }));
-
-            BuildWebHost(args).RunAsync().GetAwaiter().GetResult();
-            return;*/
-
             MainAsync(args).GetAwaiter().GetResult();
         }
 
@@ -42,6 +32,10 @@ namespace Audit.Integration.AspNetCore
                 Console.WriteLine("START - TestInitialize");
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
+
+                Console.WriteLine("START - Test_WebApi_TestFromServiceIgnore");
+                await webApiTests.Test_WebApi_TestFromServiceIgnore();
+                Console.WriteLine("PASSED - Test_WebApi_TestFromServiceIgnore");
 
                 Console.WriteLine("START - Test_WebApi_ResponseHeaders_Attribute");
                 await webApiTests.Test_WebApi_ResponseHeaders_Attribute();
