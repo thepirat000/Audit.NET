@@ -12,7 +12,6 @@
 <sup>- &nbsp;</sup> 
 <sup>Donate</sup>
 [![backers](https://opencollective.com/auditnet/tiers/backer/badge.svg?label=backer&color=brightgreen)](https://opencollective.com/auditnet) 
-<sup>&nbsp; - &nbsp;</sup> 
 
 An extensible framework to audit executing operations in .NET and .NET Core.
 
