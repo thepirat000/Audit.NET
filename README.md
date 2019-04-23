@@ -3,14 +3,14 @@
 <sub>Quick navigation</sub><br/>
 **[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [DATA PROVIDERS](#data-providers) | [CREATION POLICY](#event-creation-policy) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
 
-<sup>Issues</sup>
+<sup>issues</sup>
 [![issues-open](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET.svg?label=open)](https://github.com/thepirat000/Audit.NET/issues)
 [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET.svg?label=closed)](https://github.com/thepirat000/Audit.NET/issues)
 <sup>-</sup> 
-<sup>Chat support</sup> [![Gitter](https://img.shields.io/gitter/room/Audit.NET/Lobby.svg?label=english)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
+<sup>chat support</sup> [![Gitter](https://img.shields.io/gitter/room/Audit.NET/Lobby.svg?label=english)](https://gitter.im/Audit-NET/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 [![Gitter](https://img.shields.io/gitter/room/Audit.NET/Audit.NET-Spanish.svg?label=español)](https://gitter.im/Audit-NET/Audit.NET-Spanish?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 <sup>-</sup> 
-<sup>Donate</sup>
+<sup>donate</sup>
 [![backers](https://opencollective.com/auditnet/tiers/backer/badge.svg?label=backer&color=brightgreen)](https://opencollective.com/auditnet) 
 
 An extensible framework to audit executing operations in .NET and .NET Core.
