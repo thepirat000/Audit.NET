@@ -110,6 +110,7 @@ The following settings can be configured per DbContext or globally:
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the context name). Can contain the following placeholders: 
    - \{context}: replaced with the Db Context type name.
    - \{database}: replaced with the database name.
+- **IncludeIndependantAssociations**: Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations (Only for EF <=5, since EF Core does not support many-to-many relations without a join entity. Check [this](https://github.com/aspnet/EntityFrameworkCore/issues/1368)).
 
 The following settings can be configured per entity type:
 
@@ -287,6 +288,7 @@ The following tables describes the Audit.EntityFramework output fields:
 | **TransactionId** | string | Unique identifier for the DB transaction used on the audited operation (if any). To group events that are part of the same transaction. |
 | **AmbientTransactionId** | string | Unique identifier for the ambient transaction used on the audited operation (if any). To group events that are part of the same ambient transaction. |
 | **Entries** | Array of [EventEntry](#evententry) | Array with information about the entities affected by the audited operation |
+| **Associations** | Array of [AssociationEntry](#associationentry) | Association changes, many-to-many relations without a join table with changes (only for EF <=5, not available on EF Core) |
 | **Result** | integer | Result of the SaveChanges call. Is the number of objects affected by the operation. |
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
