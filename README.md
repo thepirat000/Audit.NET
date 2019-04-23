@@ -3,7 +3,7 @@
 <sub>Quick navigation</sub><br/>
 **[USAGE](#usage) | [OUTPUT](#output) | [CUSTOMIZATION](#custom-fields-and-comments) | [DATA PROVIDERS](#data-providers) | [CREATION POLICY](#event-creation-policy) | [CONFIGURATION](#configuration) | [EXTENSIONS](#extensions)**
 
-<sup>Issues</sup>
+> <sup>Issues</sup>
 [![issues-open](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET.svg?label=open)](https://github.com/thepirat000/Audit.NET/issues)
 [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET.svg?label=closed)](https://github.com/thepirat000/Audit.NET/issues)
 <sup>-</sup> 
