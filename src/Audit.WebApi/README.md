@@ -400,6 +400,12 @@ You can optionally include Entity Framework Core by adding the `-E` parameter
 dotnet new webapiaudit -E
 ```
 
+Also you can include a Swagger endpoint by adding the `-S` parameter
+
+```sh
+dotnet new webapiaudit -S
+```
+
 To get help about the options:
 
 ```
