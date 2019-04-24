@@ -27,6 +27,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             optionsBuilder.UseLoggerFactory(_loggerFactory);
             optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.UseLazyLoadingProxies();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,57 +54,61 @@ namespace Audit.EntityFramework.Core.UnitTest
         string Exception { get; set; }
     }
     [Table("Blogs", Schema="dbo")]
+    [AuditInclude]
     public class Blog : BaseEntity
     {
         [Key]
         public override int Id { get; set; }
         [MaxLength(25)]
-        public string Title { get; set; }
-        public string BloggerName { get; set; }
+        public virtual string Title { get; set; }
+        public virtual string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
     }
     [Table("Posts", Schema = "dbo")]
+    [AuditInclude]
     public class Post : BaseEntity
     {
         [Key]
         public override int Id { get; set; }
         [MaxLength(20)]
-        public string Title { get; set; }
-        public DateTime DateCreated { get; set; }
-        public string Content { get; set; }
-        public int BlogId { get; set; }
-        public Blog Blog { get; set; }
+        public virtual string Title { get; set; }
+        public virtual DateTime DateCreated { get; set; }
+        public virtual string Content { get; set; }
+        public virtual int BlogId { get; set; }
+        public virtual Blog Blog { get; set; }
     }
     [Table("PostsAudits", Schema = "dbo")]
+    [AuditInclude]
     public class PostAudit : IAuditEntity
     {
-        public int PostId { get; set; }
-        public string Title { get; set; }
-        public DateTime DateCreated { get; set; }
-        public string Content { get; set; }
-        public int BlogId { get; set; }
+        public virtual int PostId { get; set; }
+        public virtual string Title { get; set; }
+        public virtual DateTime DateCreated { get; set; }
+        public virtual string Content { get; set; }
+        public virtual int BlogId { get; set; }
 
         [Key]
-        public int PostAuditId { get; set; }
-        public string AuditAction { get; set; }
-        public DateTime AuditDate { get; set; }
-        public string AuditUser { get; set; }
-        public string Exception { get; set; }
+        public virtual int PostAuditId { get; set; }
+        public virtual string AuditAction { get; set; }
+        public virtual DateTime AuditDate { get; set; }
+        public virtual string AuditUser { get; set; }
+        public virtual string Exception { get; set; }
     }
     [Table("BlogsAudits", Schema = "dbo")]
+    [AuditInclude]
     public class BlogAudit : IAuditEntity
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public int BlogAuditId { get; set; }
-        public int BlogId { get; set; }
-        public string Title { get; set; }
-        public string BloggerName { get; set; }
+        public virtual int BlogAuditId { get; set; }
+        public virtual int BlogId { get; set; }
+        public virtual string Title { get; set; }
+        public virtual string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
-        public string AuditAction { get; set; }
-        public DateTime AuditDate { get; set; }
-        public string AuditUser { get; set; }
-        public string Exception { get; set; }
+        public virtual string AuditAction { get; set; }
+        public virtual DateTime AuditDate { get; set; }
+        public virtual string AuditUser { get; set; }
+        public virtual string Exception { get; set; }
 
     }
     [Table("CommonAudits", Schema = "dbo")]
@@ -112,16 +117,16 @@ namespace Audit.EntityFramework.Core.UnitTest
         [Key]
         public int CommonAuditId { get; set; }
 
-        public string EntityType { get; set; }
-        public int EntityId { get; set; }
-        public string Title { get; set; }
-        public string Group { get; set; }
+        public virtual string EntityType { get; set; }
+        public virtual int EntityId { get; set; }
+        public virtual string Title { get; set; }
+        public virtual string Group { get; set; }
 
 
-        public string AuditAction { get; set; }
-        public DateTime AuditDate { get; set; }
-        public string AuditUser { get; set; }
-        public string Exception { get; set; }
+        public virtual string AuditAction { get; set; }
+        public virtual DateTime AuditDate { get; set; }
+        public virtual string AuditUser { get; set; }
+        public virtual string Exception { get; set; }
 
     }
 }

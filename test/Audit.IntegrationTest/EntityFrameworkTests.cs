@@ -83,6 +83,43 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(title + "X", entries[0].Changes[0].OriginalValue);
         }
 
+#if NETCOREAPP1_0 || NETCOREAPP2_0 || NETCOREAPP2_1
+        [Test]
+        public void Test_EF_ProxiedLazyLoading()
+        {
+            var list = new List<AuditEventEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+                {
+                    list.Add(ev as AuditEventEntityFramework);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>(config => config
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyBaseContext>(config => config
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
+
+            var title = Guid.NewGuid().ToString().Substring(0, 25);
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = ctx.Blogs.FirstOrDefault();
+                blog.Title = title;
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(1, list.Count);
+            var entries = list[0].EntityFrameworkEvent.Entries;
+            Assert.IsTrue(entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Update", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual(title, entries[0].ColumnValues["Title"]);
+        }
+#endif
+
         [Test]
         public void Test_EF_IgnoreOverride_CheckCrossContexts()
         {
@@ -113,7 +150,7 @@ namespace Audit.IntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, list.Count);
+             Assert.AreEqual(1, list.Count);
             var entries = list[0].EntityFrameworkEvent.Entries;
             Assert.AreEqual(1, entries.Count);
             Assert.AreEqual("Insert", entries[0].Action);

@@ -233,6 +233,114 @@ namespace Audit.IntegrationTest
             }
         }
 
+
+        [Test]
+        public void Test_EFDataProvider_ProxiedLazyLoading()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+            {
+                evs.Add(scope.Event);
+            });
+                
+            var dp = new EntityFrameworkDataProvider();
+            dp.AuditTypeMapper = t =>
+            {
+                if (t == typeof(Order))
+                    return typeof(OrderAudit);
+                if (t == typeof(Orderline))
+                    return typeof(OrderlineAudit);
+                return null;
+            };
+
+            dp.AuditEntityAction = (ev, entry, obj) =>
+            {
+                var ab = obj as AuditBase;
+                if (ab != null)
+                {
+                    ab.AuditDate = DateTime.UtcNow;
+                    ab.UserName = ev.Environment.UserName;
+                    ab.AuditStatus = entry.Action;
+                }
+                return true;
+            };
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(dp);
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = ctx.Order.FirstOrDefault();
+                o.Number = id;
+                ctx.SaveChanges();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var orderAudits = ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToList();
+                Assert.AreEqual(1, orderAudits.Count);
+                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
+                Assert.AreEqual(id, orderAudits[0].Number);
+            }
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.IsTrue(evs[0].GetEntityFrameworkEvent().Entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_ProxiedLazyLoading_Async()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+            {
+                evs.Add(scope.Event);
+            });
+
+            var dp = new EntityFrameworkDataProvider();
+            dp.AuditTypeMapper = t =>
+            {
+                if (t == typeof(Order))
+                    return typeof(OrderAudit);
+                if (t == typeof(Orderline))
+                    return typeof(OrderlineAudit);
+                return null;
+            };
+
+            dp.AuditEntityAction = (ev, entry, obj) =>
+            {
+                var ab = obj as AuditBase;
+                if (ab != null)
+                {
+                    ab.AuditDate = DateTime.UtcNow;
+                    ab.UserName = ev.Environment.UserName;
+                    ab.AuditStatus = entry.Action;
+                }
+                return true;
+            };
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(dp);
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = await ctx.Order.FirstOrDefaultAsync();
+                o.Number = id;
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var orderAudits = await ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToListAsync();
+                Assert.AreEqual(1, orderAudits.Count);
+                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
+                Assert.AreEqual(id, orderAudits[0].Number);
+            }
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.IsTrue(evs[0].GetEntityFrameworkEvent().Entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
+        }
+
+
         [Test]
         public void Test_EFDataProvider()
         {
@@ -868,6 +976,12 @@ SET IDENTITY_INSERT Posts OFF
 
     public class MyTransactionalContext : MyBaseContext
     {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseLazyLoadingProxies();
+        }
+
         public override void OnScopeCreated(AuditScope auditScope)
         {
             Database.BeginTransaction();
@@ -919,37 +1033,37 @@ SET IDENTITY_INSERT Posts OFF
     public class Blog : BaseEntity
     {
         public override int Id { get; set; }
-        public string Title { get; set; }
-        public string BloggerName { get; set; }
+        public virtual string Title { get; set; }
+        public virtual string BloggerName { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
     }
     public class Post : BaseEntity
     {
         public override int Id { get; set; }
         [MaxLength(20)]
-        public string Title { get; set; }
-        public DateTime DateCreated { get; set; }
-        public string Content { get; set; }
-        public int BlogId { get; set; }
-        public Blog Blog { get; set; }
+        public virtual string Title { get; set; }
+        public virtual DateTime DateCreated { get; set; }
+        public virtual string Content { get; set; }
+        public virtual int BlogId { get; set; }
+        public virtual Blog Blog { get; set; }
     }
 
 
     public class Order
     {
-        public long Id { get; set; }
-        public string Number { get; set; }
-        public string Status { get; set; }
+        public virtual long Id { get; set; }
+        public virtual string Number { get; set; }
+        public virtual string Status { get; set; }
         public virtual ICollection<Orderline> OrderLines { get; set; }
     }
     public class Orderline
     {
-        public long Id { get; set; }
-        public string Product { get; set; }
-        public int Quantity { get; set; }
+        public virtual long Id { get; set; }
+        public virtual string Product { get; set; }
+        public virtual int Quantity { get; set; }
 
-        public long OrderId { get; set; }
-        public Order Order { get; set; }
+        public virtual long OrderId { get; set; }
+        public virtual Order Order { get; set; }
     }
 
     public abstract class AuditBase
@@ -961,16 +1075,16 @@ SET IDENTITY_INSERT Posts OFF
 
     public class OrderAudit : AuditBase
     {
-        public long Id { get; set; }
-        public string Number { get; set; }
-        public string Status { get; set; }
+        public virtual long Id { get; set; }
+        public virtual string Number { get; set; }
+        public virtual string Status { get; set; }
     }
     public class OrderlineAudit : AuditBase
     {
-        public long Id { get; set; }
-        public string Product { get; set; }
-        public int Quantity { get; set; }
-        public long OrderId { get; set; }
+        public virtual long Id { get; set; }
+        public virtual string Product { get; set; }
+        public virtual int Quantity { get; set; }
+        public virtual long OrderId { get; set; }
     }
 
     public class AuditedContextNoAuditTables : AuditDbContext
@@ -997,6 +1111,7 @@ SET IDENTITY_INSERT Posts OFF
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("data source=localhost;initial catalog=Audit;integrated security=true;");
+            optionsBuilder.UseLazyLoadingProxies();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

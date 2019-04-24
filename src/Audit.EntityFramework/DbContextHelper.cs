@@ -197,12 +197,18 @@ namespace Audit.EntityFramework
         }
 
         // Determines whether to include the entity on the audit log or not
-        private bool IncludeEntity(IAuditDbContext context, Type type, AuditOptionMode mode)
+        private bool IncludeEntity(IAuditDbContext context, object entity, AuditOptionMode mode)
         {
+            var type = entity.GetType();
 #if NET45
             type = ObjectContext.GetObjectType(type);
+#else
+            if (type.FullName.StartsWith("Castle.Proxies."))
+            {
+                type = type.GetTypeInfo().BaseType;
+            }
 #endif
-            bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false=ignored null=unknown
+            bool ? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false=ignored null=unknown
             if (result == null)
             {
                 // No static attributes, check the filters
@@ -387,7 +393,7 @@ namespace Audit.EntityFramework
             return context.DbContext.ChangeTracker.Entries()
                 .Where(x => x.State != EntityState.Unchanged
                          && x.State != EntityState.Detached
-                         && IncludeEntity(context, x.Entity.GetType(), context.Mode))
+                         && IncludeEntity(context, x.Entity, context.Mode))
                 .ToList();
         }
 

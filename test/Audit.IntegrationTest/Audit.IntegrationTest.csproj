@@ -65,6 +65,18 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp2.1'">
     <ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.4" />
+  </ItemGroup>  
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies">
+      <Version>2.1.1</Version>
+    </PackageReference>
+  </ItemGroup>  
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies">
+      <Version>2.1.1</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

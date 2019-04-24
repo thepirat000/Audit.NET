@@ -175,7 +175,6 @@ namespace Audit.EntityFramework
                 //Filter ownership relations as they are not foreign keys
                 foreignKeys = foreignKeys.Where(fk => !fk.IsOwnership);
 #endif
-                object entity = entry.Entity;
                 foreach (var fk in foreignKeys)
                 {
                     foreach (var prop in fk.Properties)

@@ -72,16 +72,7 @@ namespace Audit.EntityFramework.Providers
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach(var entry in efEvent.EntityFrameworkEvent.Entries)
             {
-                Type type;
-#if NETSTANDARD2_0
-                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
-                type = definingType?.ClrType;
-#elif NETSTANDARD1_5 || NET461
-                IEntityType definingType = localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
-                type = definingType?.ClrType;
-#else
-                type = ObjectContext.GetObjectType(entry.Entry.Entity.GetType());
-#endif
+                var type = GetEntityType(entry, localDbContext);
                 if (type != null)
                 {
                     entry.EntityType = type;
@@ -127,16 +118,7 @@ namespace Audit.EntityFramework.Providers
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
             {
-                Type type;
-#if NETSTANDARD2_0
-                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
-                type = definingType?.ClrType;
-#elif NETSTANDARD1_5 || NET461
-                IEntityType definingType = localDbContext.Model.FindEntityType(entry.Entry.Entity.GetType());
-                type = definingType?.ClrType;
-#else
-                type = ObjectContext.GetObjectType(entry.Entry.Entity.GetType());
-#endif
+                var type = GetEntityType(entry, localDbContext);
                 if (type != null)
                 {
                     entry.EntityType = type;
@@ -168,6 +150,26 @@ namespace Audit.EntityFramework.Providers
                 }
             }
             return null;
+        }
+
+        private Type GetEntityType(EventEntry entry, DbContext localDbContext)
+        {
+            var entryType = entry.Entry.Entity.GetType();
+            if (entryType.FullName.StartsWith("Castle.Proxies."))
+            {
+                entryType = entryType.GetTypeInfo().BaseType;
+            }
+            Type type;
+#if NETSTANDARD2_0
+                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entryType);
+                type = definingType?.ClrType;
+#elif NETSTANDARD1_5 || NET461
+            IEntityType definingType = localDbContext.Model.FindEntityType(entryType);
+            type = definingType?.ClrType;
+#else
+            type = ObjectContext.GetObjectType(entryType);
+#endif
+            return type;
         }
 
         private object CreateAuditEntity(Type definingType, Type auditType, EventEntry entry)
