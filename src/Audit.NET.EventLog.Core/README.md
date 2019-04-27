@@ -1,7 +1,7 @@
 # Audit.NET.EventLog.Core
 **Windows Event Log provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
-Store the audit events on Windows Event Log when targeting .NET Standard 2.0.
+Store the audit events on Windows Event Log when targeting .NET Standard >= 2.0.
 
 ## Install
 
