@@ -217,8 +217,8 @@ namespace Audit.EntityFramework
                 Entries = new List<EventEntry>(),
                 Database = dbConnection?.Database,
                 ConnectionId = clientConnectionId,
-                AmbientTransactionId = GetAmbientTransactionId(),
-                TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId),
+                AmbientTransactionId = !context.ExcludeTransactionId ? GetAmbientTransactionId() : null,
+                TransactionId = !context.ExcludeTransactionId ? GetCurrentTransactionId(dbContext, clientConnectionId) : null,
                 DbContext = dbContext
             };
             foreach (var entry in modifiedEntries)

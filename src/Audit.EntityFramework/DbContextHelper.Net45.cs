@@ -187,7 +187,7 @@ namespace Audit.EntityFramework
                 Entries = new List<EventEntry>(),
                 Database = dbContext.Database.Connection.Database,
                 ConnectionId = clientConnectionId,
-                TransactionId = GetCurrentTransactionId(dbContext, clientConnectionId),
+                TransactionId = !context.ExcludeTransactionId ? GetCurrentTransactionId(dbContext, clientConnectionId) : null,
                 DbContext = dbContext,
                 Associations = context.IncludeIndependantAssociations ? GetAssociationEntries(context, context.IncludeEntityObjects) : null
             };

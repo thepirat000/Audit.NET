@@ -83,6 +83,7 @@ namespace Audit.EntityFramework
         {
             _helper.SetConfig(this);
         }
+
 #region Properties
         /// <summary>
         /// To indicate the event type to use on the audit event. (Default is the context name). 
@@ -119,6 +120,11 @@ namespace Audit.EntityFramework
         /// Optional custom fields added to the audit event
         /// </summary>
         public Dictionary<string, object> ExtraFields { get; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// To indicate if the Transaction Id retrieval should be ignored. If set to <c>true</c> the Transations Id will not be included on the output.
+        /// </summary>
+        public bool ExcludeTransactionId { get; set; }
 
         public DbContext DbContext { get { return this; } }
 #if NET45

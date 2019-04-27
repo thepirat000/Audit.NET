@@ -111,6 +111,7 @@ The following settings can be configured per DbContext or globally:
    - \{context}: replaced with the Db Context type name.
    - \{database}: replaced with the database name.
 - **IncludeIndependantAssociations**: Value to indicate if the Independant Associations should be included. Default is false. (Only for EF <=5, since EF Core does not support many-to-many relations without a join entity. Check [this](https://github.com/aspnet/EntityFrameworkCore/issues/1368)).
+- **ExcludeTransactionId**: Value to indicate if the Transaction IDs should be excluded from the output and not be retrieved (default is false to include the Transation IDs).
 
 The following settings can be configured per entity type:
 

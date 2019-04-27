@@ -28,6 +28,94 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
+        public void Test_EF_TransactionId()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(ev);
+                }));
+
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            using (var context = new BlogsContext())
+            {
+                using (var tran = context.Database.BeginTransaction())
+                {
+                    var blog = context.Blogs.First();
+                    blog.Title = id;
+                    context.SaveChanges();
+                    tran.Commit();
+                }
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(evs[0].GetEntityFrameworkEvent().TransactionId));
+        }
+
+        [Test]
+        public void Test_EF_TransactionId_Exclude_ByContext()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(ev);
+                }));
+
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            using (var context = new BlogsContext())
+            {
+                context.ExcludeTransactionId = true;
+                using (var tran = context.Database.BeginTransaction())
+                {
+                    var blog = context.Blogs.First();
+                    blog.Title = id;
+                    context.SaveChanges();
+                    tran.Commit();
+                }
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.IsNull(evs[0].GetEntityFrameworkEvent().TransactionId);
+            Assert.IsNull(evs[0].GetEntityFrameworkEvent().AmbientTransactionId);
+        }
+
+        [Test]
+        public void Test_EF_TransactionId_Exclude_ByConfig()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(_ => _.ExcludeTransactionId(true));
+
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(ev);
+                }));
+
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+
+            using (var context = new BlogsContext())
+            {
+                using (var tran = context.Database.BeginTransaction())
+                {
+                    var blog = context.Blogs.First();
+                    blog.Title = id;
+                    context.SaveChanges();
+                    tran.Commit();
+                }
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.IsNull(evs[0].GetEntityFrameworkEvent().TransactionId);
+            Assert.IsNull(evs[0].GetEntityFrameworkEvent().AmbientTransactionId);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>().Reset();
+        }
+
+        [Test]
         public void Test_ProxiedLazyLoading()
         {
             var guid = Guid.NewGuid().ToString().Substring(0, 6);

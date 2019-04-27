@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.3.1] - 2019-04-??
+### Modified
+- Audit.EntityFramework and Audit.EntityFramework.Core: Adding `ExcludeTransactionId` setting to allow avoiding the retrieval of the contextual transaction id for the audit events.
+
 ## [14.3.0] - 2019-04-24
 ### Modified
 - Audit.EntityFramework and Audit.EntityFramework.Core: Fix compatibility issue with EF Core's Proxied Lazy Loading (Microsoft.EntityFrameworkCore.Proxies) (#214).

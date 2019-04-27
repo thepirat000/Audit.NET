@@ -26,6 +26,7 @@ namespace Audit.EntityFramework
         Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
         void OnScopeSaving(AuditScope auditScope);
         void OnScopeCreated(AuditScope auditScope);
+        bool ExcludeTransactionId { get; set; }
 #if NET45
         bool IncludeIndependantAssociations { get; set; }
 #endif

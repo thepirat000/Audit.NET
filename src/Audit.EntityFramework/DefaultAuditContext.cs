@@ -27,6 +27,7 @@ namespace Audit.EntityFramework
         public virtual AuditDataProvider AuditDataProvider { get; set; }
         public virtual void OnScopeCreated(AuditScope auditScope) { }
         public virtual void OnScopeSaving(AuditScope auditScope) { }
+        public bool ExcludeTransactionId { get; set; }
 #if NET45
         public virtual bool IncludeIndependantAssociations { get; set; }
 #endif

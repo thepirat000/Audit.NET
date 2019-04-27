@@ -30,6 +30,11 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="config">The configuration.</param>
         IContextSettingsConfigurator<T> ForEntity<TEntity>(Action<IContextEntitySetting<TEntity>> config);
+        /// <summary>
+        /// Value to indicate if the Transaction Id retrieval should be ignored.
+        /// </summary>
+        /// <param name="exclude">if set to <c>true</c> the Transation Id will not be included on the output.</param>
+        IContextSettingsConfigurator<T> ExcludeTransactionId(bool exclude = true);
 #if NET45
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.

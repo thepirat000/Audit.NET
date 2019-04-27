@@ -178,6 +178,11 @@ namespace Audit.EntityFramework
         public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
 
         /// <summary>
+        /// To indicate if the Transaction Id retrieval should be ignored. If set to <c>true</c> the Transations Id will not be included on the output.
+        /// </summary>
+        public bool ExcludeTransactionId { get; set; }
+
+        /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.
         /// </summary>

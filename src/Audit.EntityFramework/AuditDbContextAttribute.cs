@@ -10,6 +10,21 @@ namespace Audit.EntityFramework
     public sealed class AuditDbContextAttribute : Attribute
     {
         internal EfSettings InternalConfig = new EfSettings();
+
+        /// <summary>
+        /// To indicate if the Transaction Id retrieval should be ignored. If set to <c>true</c> the Transations Id will not be included on the output.
+        /// </summary>
+        public bool ExcludeTransactionId
+        {
+            get
+            {
+                return InternalConfig.ExcludeTransactionId.HasValue && InternalConfig.ExcludeTransactionId.Value;
+            }
+            set
+            {
+                InternalConfig.ExcludeTransactionId = value;
+            }
+        }
 #if NET45
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
