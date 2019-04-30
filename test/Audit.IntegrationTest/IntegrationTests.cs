@@ -143,6 +143,70 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
             }
 
+            [Test]
+            [Category("EF")]
+            public void Test_EfDataProvider_FluentApi()
+            {
+                var ctx = new OtherContextFromDbContext();
+                var x = new EntityFramework.Providers.EntityFrameworkDataProvider(_ => _
+                    .UseDbContext(ev => ctx)
+                    .AuditTypeExplicitMapper(cfg => cfg
+                        .Map<Blog, AuditBlog>()
+                        .Map<Post, AuditPost>())
+                    .IgnoreMatchedProperties(true));
+
+
+                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
+                Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog)));
+                Assert.AreEqual(typeof(AuditPost), x.AuditTypeMapper.Invoke(typeof(Post)));
+                Assert.AreEqual(null, x.AuditTypeMapper.Invoke(typeof(AuditBlog)));
+            }
+
+            [Test]
+            [Category("EF")]
+            public void Test_EfDataProvider_FluentApi2()
+            {
+                var ctx = new OtherContextFromDbContext();
+                var x = new EntityFramework.Providers.EntityFrameworkDataProvider(_ => _
+                    .UseDbContext(ev => ctx)
+                    .AuditTypeMapper(t => typeof(AuditBlog))
+                    .AuditEntityAction((ev, ent, obj) =>
+                    {
+                        return ((dynamic)obj).Id == 1;
+                    })
+                    .IgnoreMatchedProperties(true));
+
+
+                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
+                Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog)));
+                Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Post)));
+                Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EntityFramework.EventEntry(), new { Id = 1 }));
+            }
+
+            [Test]
+            [Category("EF")]
+            public void Test_EfDataProvider_FluentApi3()
+            {
+                var ctx = new OtherContextFromDbContext();
+                var x = new EntityFramework.Providers.EntityFrameworkDataProvider(_ => _
+                    .UseDbContext(ev => ctx)
+                    .AuditTypeNameMapper(s => "Audit" + s)
+                    .AuditEntityAction((ev, ent, obj) =>
+                    {
+                        return ((dynamic)obj).Id == 1;
+                    })
+                    .IgnoreMatchedProperties(true));
+
+
+                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
+                Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog)));
+                Assert.AreEqual(typeof(AuditPost), x.AuditTypeMapper.Invoke(typeof(Post)));
+                Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EntityFramework.EventEntry(), new { Id = 1 }));
+            }
+
 #if NET452
             [Test]
             public void Test_StrongName_PublicToken()

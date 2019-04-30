@@ -188,6 +188,51 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
+        public void Test_EFDataProvider_AuditEntityDisabled_CtorFluent()
+        {
+            var dp = new EntityFrameworkDataProvider(_ => _
+                .AuditTypeMapper(t =>
+                {
+                    if (t == typeof(Order))
+                        return typeof(OrderAudit);
+                    if (t == typeof(Orderline))
+                        return typeof(OrderlineAudit);
+                    return null;
+                })
+                .AuditEntityAction((ev, entry, obj) =>
+                {
+                    // return false to avoid saving
+                    return false;
+                }));
+
+            Audit.Core.Configuration.Setup()
+                .UseCustomProvider(dp);
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending",
+                    OrderLines = new Collection<Orderline>()
+                    {
+                        new Orderline() { Product = "p1: " + id, Quantity = 2 },
+                        new Orderline() { Product = "p2: " + id, Quantity = 3 }
+                    }
+                };
+                ctx.Add(o);
+                ctx.SaveChanges();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = ctx.Order.Single(a => a.Number.Equals(id));
+                var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
+                Assert.AreEqual(0, orderlineAudits.Count);
+            }
+        }
+
+        [Test]
         public async Task Test_EFDataProvider_AuditEntityDisabledAsync()
         {
             var dp = new EntityFrameworkDataProvider();

@@ -29,6 +29,24 @@ namespace Audit.EntityFramework.Providers
         private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
 
+        public EntityFrameworkDataProvider()
+        {
+
+        }
+
+        public EntityFrameworkDataProvider(Action<ConfigurationApi.IEntityFrameworkProviderConfigurator> config)
+        {
+            var efConfig = new ConfigurationApi.EntityFrameworkProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(efConfig);
+                _auditEntityAction = efConfig._auditEntityAction;
+                _auditTypeMapper = efConfig._auditTypeMapper;
+                _dbContextBuilder = efConfig._dbContextBuilder;
+                _ignoreMatchedProperties = efConfig._ignoreMatchedProperties;
+            }
+        }
+
         public Func<Type, Type> AuditTypeMapper
         {
             get { return _auditTypeMapper; }
