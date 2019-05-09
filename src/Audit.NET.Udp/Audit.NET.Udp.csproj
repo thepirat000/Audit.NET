@@ -4,7 +4,7 @@
     <Description>Send Audit.NET Trail Logs as connectionless UDP datagrams to a remote host or a multicast group</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.Udp</AssemblyTitle>
-    <VersionPrefix>14.3.2</VersionPrefix>
+    <VersionPrefix>14.3.3</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -28,6 +28,10 @@
 
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
   
   <ItemGroup>

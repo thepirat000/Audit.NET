@@ -31,7 +31,7 @@ namespace Audit.DynamoDB.Configuration
         /// <summary>
         /// Use the given client builder
         /// </summary>
-        /// <param name="dynamoDbClient">A function that returns the DynamoDB client instance to use</param>
+        /// <param name="dynamoDbClientBuilder">A function that returns the DynamoDB client instance to use</param>
         IDynamoProviderTableConfigurator WithClient(Func<IAmazonDynamoDB> dynamoDbClientBuilder);
     }
 

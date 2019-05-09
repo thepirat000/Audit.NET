@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from file system events using a FileSystemWatcher</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.FileSystem</AssemblyTitle>
-    <VersionPrefix>14.3.2</VersionPrefix>
+    <VersionPrefix>14.3.3</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -32,6 +32,10 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
     <PackageReference Include="System.IO.FileSystem.Watcher" Version="4.3.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
   <ItemGroup>

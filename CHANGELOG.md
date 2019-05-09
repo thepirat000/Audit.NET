@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.3.3] - 2019-05-19
+### Modified
+- Upgrade newtonsoft.json references to latest version (12.0.2)
+
 ## [14.3.2] - 2019-04-30
 ### Modified
 - Audit.EntityFramework and Audit.EntityFramework.Core: Adding constructor to the EF Data Provider that allows fluent API configuration.

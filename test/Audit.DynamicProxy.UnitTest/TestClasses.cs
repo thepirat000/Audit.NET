@@ -166,6 +166,9 @@ namespace Audit.DynamicProxy.UnitTest
                 Thread.Sleep(100);
                 ct.ThrowIfCancellationRequested();
             }
+#pragma warning disable CS0162 // Unreachable code detected
+            await Task.Delay(1);
+#pragma warning restore CS0162 // Unreachable code detected
             return "impossible";
         }
 

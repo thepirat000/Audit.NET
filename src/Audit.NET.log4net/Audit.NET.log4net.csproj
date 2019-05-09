@@ -4,7 +4,7 @@
     <Description>Log Audit.NET Audit Trail using Apache log4net™</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.log4net</AssemblyTitle>
-    <VersionPrefix>14.3.2</VersionPrefix>
+    <VersionPrefix>14.3.3</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
 </Project>

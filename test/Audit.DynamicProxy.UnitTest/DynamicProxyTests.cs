@@ -116,7 +116,7 @@ namespace Audit.DynamicProxy.UnitTest
         }
 
         [Test]
-        public async Task Test_Out_Ref_Ignore()
+        public void Test_Out_Ref_Ignore()
         {
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
@@ -179,7 +179,7 @@ namespace Audit.DynamicProxy.UnitTest
             Assert.AreEqual(guid.ToUpper(), str);
             Assert.AreEqual("test", x.GetSomePropValue());
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            provider.Verify(p => p.InsertEvent(It.Is<AuditEvent>(ev => ev.GetAuditInterceptEvent().Arguments[0].Value == guid)), Times.Once);
+            provider.Verify(p => p.InsertEvent(It.Is<AuditEvent>(ev => (string)ev.GetAuditInterceptEvent().Arguments[0].Value == guid)), Times.Once);
         }
 
         [Test]
