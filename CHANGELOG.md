@@ -3,7 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [14.3.3] - 2019-05-19
+## [14.3.4] - 2019-05-13
+### Added
+- Audit.Mvc and Audit.Mvc.Core: Added `AuditIngoreAttribute` to allow ignoring controllers, actions and/or parameters on the MVC audit output.
+
+## [14.3.3] - 2019-05-09
 ### Modified
 - Upgrade newtonsoft.json references to latest version (12.0.2)
 

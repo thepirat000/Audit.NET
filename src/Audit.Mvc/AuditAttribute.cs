@@ -55,8 +55,9 @@ namespace Audit.Mvc
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (Configuration.AuditDisabled)
+            if (Configuration.AuditDisabled || IsActionIgnored(filterContext.ActionDescriptor))
             {
+                base.OnActionExecuting(filterContext);
                 return;
             }
             var request = filterContext.HttpContext.Request;
@@ -77,7 +78,7 @@ namespace Audit.Mvc
                 HttpMethod = request.HttpMethod,
                 ActionName = filterContext.ActionDescriptor?.ActionName,
                 ControllerName = filterContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = GetActionParameters(filterContext.ActionParameters),
+                ActionParameters = GetActionParameters(filterContext),
                 TraceId = null
             };
             var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
@@ -104,6 +105,7 @@ namespace Audit.Mvc
         {
             if (Configuration.AuditDisabled)
             {
+                base.OnActionExecuted(filterContext);
                 return;
             }
             var auditAction = filterContext.HttpContext.Items[AuditActionKey] as AuditAction;
@@ -128,6 +130,7 @@ namespace Audit.Mvc
         {
             if (Configuration.AuditDisabled)
             {
+                base.OnResultExecuted(filterContext);
                 return;
             }
             var auditAction = filterContext.HttpContext.Items[AuditActionKey] as AuditAction;
@@ -157,13 +160,33 @@ namespace Audit.Mvc
             base.OnResultExecuted(filterContext);
         }
 
-        private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)
+        private bool IsActionIgnored(ActionDescriptor actionDescriptor)
         {
+            if (actionDescriptor == null)
+            {
+                return false;
+            }
+            var controllerIgnored = actionDescriptor.ControllerDescriptor.ControllerType
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
+
+            if (controllerIgnored)
+            {
+                return true;
+            }
+            return actionDescriptor.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
+        }
+
+        private IDictionary<string, object> GetActionParameters(ActionExecutingContext context)
+        {
+            var actionArguments = context.ActionDescriptor.GetParameters()
+                .Where(pd => context.ActionParameters.ContainsKey(pd.ParameterName)
+                             && !pd.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any())
+                .ToDictionary(k => k.ParameterName, v => context.ActionParameters[v.ParameterName]);
             if (SerializeActionParameters)
             {
                 return AuditHelper.SerializeParameters(actionArguments);
             }
-            return actionArguments.ToDictionary(k => k.Key, v => v.Value);
+            return actionArguments;
         }
 
         private static IDictionary<string, string> ToDictionary(NameValueCollection col)

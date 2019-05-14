@@ -110,6 +110,10 @@ namespace Audit.Integration.AspNetCore
                 await mvcTests.Test_Mvc_HappyPath_Async();
                 Console.WriteLine("PASSED - Test_Mvc_HappyPath_Async");
 
+                Console.WriteLine("START - Test_Mvc_Ignore");
+                await mvcTests.Test_Mvc_Ignore();
+                Console.WriteLine("PASSED - Test_Mvc_Ignore");
+
                 Console.WriteLine("START - Test_WebApi_HappyPath_Async");
                 await webApiTests.Test_WebApi_HappyPath_Async();
                 Console.WriteLine("PASSED - Test_WebApi_HappyPath_Async");

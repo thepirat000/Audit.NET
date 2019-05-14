@@ -17,6 +17,28 @@ namespace Audit.Integration.AspNetCore
             _port = port;
         }
 
+        public async Task Test_Mvc_Ignore()
+        {
+            var insertEvs = new List<AuditAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    insertEvs.Add(ev.GetMvcAuditAction());
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            var c = new HttpClient();
+            var s1 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreme");
+            var s2 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreparam?id=123&secret=pass");
+
+            Assert.IsNotEmpty(s1);
+            Assert.IsNotEmpty(s2);
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(1, insertEvs[0].ActionParameters.Count);
+            Assert.AreEqual(123, insertEvs[0].ActionParameters["id"]);
+        }
+
         public async Task Test_Mvc_HappyPath_Async()
         {
             var insertEvs = new List<AuditAction>();

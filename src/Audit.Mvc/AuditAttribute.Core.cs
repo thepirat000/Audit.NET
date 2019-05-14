@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Audit.Core.Extensions;
 using System.IO;
 using System.Text;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 
 namespace Audit.Mvc
 {
@@ -75,7 +76,7 @@ namespace Audit.Mvc
                 Headers = IncludeHeaders ? ToDictionary(httpContext.Request.Headers) : null,
                 ActionName = actionDescriptior?.ActionName ?? actionDescriptior?.DisplayName,
                 ControllerName = actionDescriptior?.ControllerName,
-                ActionParameters = GetActionParameters(filterContext.ActionArguments),
+                ActionParameters = GetActionParameters(filterContext),
                 RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = IncludeRequestBody ? GetRequestBody(filterContext) : null },
                 TraceId = httpContext.TraceIdentifier
             };
@@ -126,8 +127,7 @@ namespace Audit.Mvc
             }
         }
 
-
-        public async Task AfterResultAsync(ResultExecutedContext filterContext)
+        private async Task AfterResultAsync(ResultExecutedContext filterContext)
         {
             var httpContext = filterContext.HttpContext;
             var auditAction = httpContext.Items[AuditActionKey] as AuditAction;
@@ -160,7 +160,7 @@ namespace Audit.Mvc
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (Configuration.AuditDisabled)
+            if (Configuration.AuditDisabled || IsActionIgnored(context.ActionDescriptor))
             {
                 await next.Invoke();
                 return;
@@ -172,7 +172,7 @@ namespace Audit.Mvc
 
         public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
-            if (Configuration.AuditDisabled)
+            if (Configuration.AuditDisabled || IsActionIgnored(context.ActionDescriptor))
             {
                 await next.Invoke();
                 return;
@@ -181,13 +181,21 @@ namespace Audit.Mvc
             await AfterResultAsync(resultExecutionContext);
         }
 
-        private IDictionary<string, object> GetActionParameters(IDictionary<string, object> actionArguments)
+        private IDictionary<string, object> GetActionParameters(ActionExecutingContext context)
         {
+            var actionArguments = (context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo.GetParameters()
+                .Where(pi => context.ActionArguments.ContainsKey(pi.Name)
+#if NETSTANDARD1_6
+                && !pi.CustomAttributes.Any(ca => ca.AttributeType == typeof(AuditIgnoreAttribute)))
+#else
+                && !pi.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any())
+#endif
+                .ToDictionary(k => k.Name, v => context.ActionArguments[v.Name]);
             if (SerializeActionParameters)
             {
                 return AuditHelper.SerializeParameters(actionArguments);
             }
-            return actionArguments.ToDictionary(k => k.Key, v => v.Value);
+            return actionArguments;
         }
 
         private static IDictionary<string, string> ToDictionary(IEnumerable<KeyValuePair<string, StringValues>> col)
@@ -301,6 +309,33 @@ namespace Audit.Mvc
 #endif
             return result.ToString();
         }
+
+        private bool IsActionIgnored(ActionDescriptor actionDescriptor)
+        {
+            if (actionDescriptor == null)
+            {
+                return false;
+            }
+
+            var controllerIgnored = (actionDescriptor as ControllerActionDescriptor).ControllerTypeInfo
+#if NETSTANDARD1_6
+                .CustomAttributes.Any(ca => ca.AttributeType == typeof(AuditIgnoreAttribute));
+#else
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
+#endif
+            if (controllerIgnored)
+            {
+                return true;
+            }
+            var methodIgnored = (actionDescriptor as ControllerActionDescriptor).MethodInfo
+#if NETSTANDARD1_6
+                .CustomAttributes.Any(ca => ca.AttributeType == typeof(AuditIgnoreAttribute));
+#else
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
+#endif
+            return methodIgnored;
+        }
+
 
         internal static AuditScope GetCurrentScope(HttpContext httpContext)
         {

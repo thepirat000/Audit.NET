@@ -13,8 +13,34 @@ namespace Audit.Integration.AspNetCore.Controllers
         public string Title { get; set; }
     }
 
+    public class UploadModel
+    {
+        public string ImageCaption { set; get; }
+        public string ImageDescription { set; get; }
+        public IFormFile MyImage { set; get; }
+    }
+
     public class MvcController : Controller
     {
+        [HttpGet]
+        [Route("mvc/ignoreme")]
+        [Audit(IncludeHeaders = true, IncludeModel = true)]
+        [AuditIgnore]
+        public async Task<ActionResult> IgnoreMe()
+        {
+            await Task.Delay(1);
+            return View("Index", new TestModelClass());
+        }
+
+        [HttpGet]
+        [Route("mvc/ignoreparam")]
+        [Audit(IncludeHeaders = true, IncludeModel = true)]
+        public async Task<ActionResult> IgnoreParam(int id, [AuditIgnore]string secret)
+        {
+            await Task.Delay(1);
+            return View("Index", new TestModelClass());
+        }
+
         // GET: test/abc
         [Audit(IncludeHeaders = true, IncludeModel = true)]
         [Route("test/{title}")]

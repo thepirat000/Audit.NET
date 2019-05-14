@@ -91,6 +91,32 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
+## Audit Ignore attribute
+To selectively exclude certain controllers, action methods or action parameters, you can decorate them with `AuditIgnore` attribute. 
+
+For example:
+
+```c#
+[Audit(IncludeHeaders = true, IncludeModel = true)]
+public class AccountController : Controller
+{
+    [HttpGet]
+    [AuditIgnore]
+    public IEnumerable<string> GetAccounts()
+    {
+        // this action will not be audited
+    }
+
+    [HttpPost]
+    public IEnumerable<string> PostAccount(string user, [AuditIgnore]string password)
+    {
+        // password argument will not be audited
+    }
+
+    // ...
+}
+```
+
 
 ## Output details
 

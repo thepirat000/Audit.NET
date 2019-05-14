@@ -96,6 +96,10 @@ echo continue...
 
 cd ..
 
+ECHO.
+ECHO --- PRESS ENTER TO STOP THE SERVICES (or CTRL+C to cancel)
+pause>nul
+
 net stop mssqlserver
 net stop mysql57
 net stop postgresql-x64-9.6
