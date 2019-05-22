@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.4.0] - 2019-05-21
+### Added
+- Audit.HttpClient: New extension library to audit client calls to REST services when using `HttpClient`.
+
 ## [14.3.4] - 2019-05-13
 ### Added
 - Audit.Mvc and Audit.Mvc.Core: Added `AuditIngoreAttribute` to allow ignoring controllers, actions and/or parameters on the MVC audit output.

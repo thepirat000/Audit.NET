@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.FileSystem\Audit.FileSystem.csproj" />
+    <ProjectReference Include="..\..\src\Audit.HttpClient\Audit.HttpClient.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.log4net\Audit.NET.log4net.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
@@ -34,6 +35,7 @@
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
     <PackageReference Include="Moq" Version="4.7.99" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
