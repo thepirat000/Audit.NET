@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.EntityFramework.Identity.Core</PackageId>
     <PackageTags>Audit;Trail;Log;EntityFramework;Core;AspNet;Identity</PackageTags>
-    <PackageIconUrl>http://i.imgur.com/T3NcXaZ.png</PackageIconUrl>
+    <PackageIconUrl>https://i.imgur.com/wdVHFoc.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.EntityFramework</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>

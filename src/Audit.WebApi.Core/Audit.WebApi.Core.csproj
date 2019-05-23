@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate detailed Audit Logs for AspNet Core Web API Controller calls.</Description>
@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.WebApi.Core</PackageId>
     <PackageTags>Audit;Trail;Log;WebApi</PackageTags>
-    <PackageIconUrl>http://i.imgur.com/GkqLSk8.png</PackageIconUrl>
+    <PackageIconUrl>https://i.imgur.com/9go2b0f.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.WebApi</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>

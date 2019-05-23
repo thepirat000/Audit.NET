@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate detailed Audit Logs for AspNet Core MVC Controller actions.</Description>
@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.Mvc.Core</PackageId>
     <PackageTags>Audit;Trail;Log;MVC;ActionFilter</PackageTags>
-    <PackageIconUrl>http://i.imgur.com/5YjHlfd.png</PackageIconUrl>
+    <PackageIconUrl>https://i.imgur.com/ap6CeoG.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.Mvc</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
