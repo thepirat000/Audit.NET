@@ -75,7 +75,7 @@ The `AuditHttpClientHandler` class allows to configure the following settings:
 
 - **RequestFilter / FilterByRequest**: Set a filter function to determine which events to log depending on the request message. By default all events are logged.
 - **ResponseFilter / FilterByResponse**: Set a filter function to determine which events to log depending on the response message. By default all events are logged.
-- **EventType**: A string that identifies the event type. Default is "\{verb}.\{url}". It can contain the following placeholders: 
+- **EventType**: A string that identifies the event type. Default is "\{verb} \{url}". It can contain the following placeholders: 
   - \{verb}: Replaced by the Http Verb (GET, POST, ...)
   - \{url}: Replaced by the request URL
 - **IncludeRequestHeaders**: Specifies whether the HTTP Request headers should be included on the audit output. Default is false.
