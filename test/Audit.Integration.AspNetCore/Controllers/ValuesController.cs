@@ -15,6 +15,7 @@ namespace Audit.Integration.AspNetCore.Controllers
     {
         // GET api/values
         [HttpGet]
+        [AuditIgnore]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
@@ -73,7 +74,14 @@ namespace Audit.Integration.AspNetCore.Controllers
             return Ok("hi");
         }
 
-        
+        [HttpPost("TestNormal")]
+        public async Task<IActionResult> TestNormal()
+        {
+            await Task.Delay(0);
+            return Ok("hi");
+        }
+
+
         [AuditIgnore] // ignored here but will be picked up by the middleware
         [HttpPost("TestResponseHeaders")]
         public async Task<IActionResult> TestResponseHeaders(string id)

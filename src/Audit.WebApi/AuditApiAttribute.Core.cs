@@ -72,7 +72,7 @@ namespace Audit.WebApi
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (Configuration.AuditDisabled || _adapter.IsActionIgnored(context))
+            if (Configuration.AuditDisabled || _adapter.ActionIgnored(context))
             {
                 await next.Invoke();
                 return;

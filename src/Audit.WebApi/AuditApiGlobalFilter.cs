@@ -98,7 +98,7 @@ namespace Audit.WebApi
         {
             if (Configuration.AuditDisabled 
                 || (_logDisabledBuilder != null && _logDisabledBuilder.Invoke(context))
-                || _adapter.IsActionIgnored(context))
+                || _adapter.ActionIgnored(context))
             {
                 await next.Invoke();
                 return;

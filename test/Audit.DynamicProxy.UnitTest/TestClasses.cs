@@ -57,9 +57,18 @@ namespace Audit.DynamicProxy.UnitTest
     {
         public virtual string SomeProperty { get; set; }
         public virtual event EventHandler SomeEvent;
+
+        public void JustToAvoidWarning()
+        {
+            if (SomeEvent != null)
+            {
+                SomeEvent = null;
+            }
+        }
+
         public virtual T GenericReturn<T>(T value)
         {
-            return default(T);
+            return default;
         }
 
         public virtual string ReturnString(string text)
@@ -89,6 +98,14 @@ namespace Audit.DynamicProxy.UnitTest
     public class InterceptMe : InterceptMeBase
     {
         public override event EventHandler SomeEvent;
+
+        public void JustToAvoidWarning2()
+        {
+            if (SomeEvent != null)
+            {
+                SomeEvent = null;
+            }
+        }
 
         public InterceptMe()
         {
@@ -134,29 +151,23 @@ namespace Audit.DynamicProxy.UnitTest
 
         public override async Task<string> AsyncFunctionAsync(string parameter)
         {
-            var scopeBefore = AuditProxy.CurrentScope;
             System.Diagnostics.Trace.WriteLine("AsyncFunctionAsync - Before await.");
             await Task.Delay(int.Parse(parameter)/2);
             await Task.Delay(int.Parse(parameter)/2);
             System.Diagnostics.Trace.WriteLine("AsyncFunctionAsync - After await.");
-            var scopeAfter = AuditProxy.CurrentScope;
             return "ok";
         }
 
         public override async Task AsyncMethodAsync(string parameter)
         {
-            var scopeBefore = AuditProxy.CurrentScope;
             System.Diagnostics.Trace.WriteLine("AsyncMethodAsync - Before await.");
             await Task.Delay(int.Parse(parameter));
             System.Diagnostics.Trace.WriteLine("AsyncMethodAsync - After await.");
-            var scopeAfter = AuditProxy.CurrentScope;
         }
 
         public override async void AsyncReturningVoidAsync(string parameter)
         {
-            var scopeBefore = AuditProxy.CurrentScope;
             await Task.Delay(int.Parse(parameter));
-            var scopeAfter = AuditProxy.CurrentScope;
         }
 
         public override async Task<string> AsyncMethodAsyncWithCancellation(CancellationToken ct)
@@ -168,8 +179,8 @@ namespace Audit.DynamicProxy.UnitTest
             }
 #pragma warning disable CS0162 // Unreachable code detected
             await Task.Delay(1);
-#pragma warning restore CS0162 // Unreachable code detected
             return "impossible";
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public override void OutParam(string s, out int i, Func<int> ignoreMe)

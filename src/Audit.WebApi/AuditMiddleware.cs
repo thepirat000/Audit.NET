@@ -16,7 +16,7 @@ namespace Audit.WebApi
     {
         private readonly RequestDelegate _next;
 
-        private ConfigurationApi.AuditMiddlewareConfigurator _config;
+        private readonly ConfigurationApi.AuditMiddlewareConfigurator _config;
 
         public AuditMiddleware(RequestDelegate next, ConfigurationApi.AuditMiddlewareConfigurator config)
         {
@@ -72,7 +72,9 @@ namespace Audit.WebApi
             }
             catch (Exception ex)
             {
+#pragma warning disable IDE0059 // Value assigned to symbol is never used
                 exception = ex;
+#pragma warning restore IDE0059 // Value assigned to symbol is never used
                 throw;
             }
             finally
@@ -117,9 +119,11 @@ namespace Audit.WebApi
 
         private async Task AfterInvoke(HttpContext context, bool includeResponseBody, bool includeResponseHeaders, Exception exception)
         {
+#pragma warning disable IDE0019 // Use pattern matching
             var auditAction = context.Items[AuditApiHelper.AuditApiActionKey] as AuditApiAction;
             var auditScope = context.Items[AuditApiHelper.AuditApiScopeKey] as AuditScope;
-           
+#pragma warning restore IDE0019 // Use pattern matching
+
             if (auditAction != null && auditScope != null)
             {
                 if (exception != null)

@@ -39,6 +39,26 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(123, insertEvs[0].ActionParameters["id"]);
         }
 
+        public async Task Test_Mvc_AuditIgnoreAttribute_Middleware_Async()
+        {
+            // Action ignored via AuditIgnoreAttribute and handled by Middleware and GlobalFilter
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var c = new HttpClient();
+            var s1 = await c.GetStringAsync($"http://localhost:{_port}/mvc/details/5?middleware=1");
+
+            Assert.IsNotEmpty(s1);
+            Assert.AreEqual(0, insertEvs.Count);
+        }
+
         public async Task Test_Mvc_HappyPath_Async()
         {
             var insertEvs = new List<AuditAction>();

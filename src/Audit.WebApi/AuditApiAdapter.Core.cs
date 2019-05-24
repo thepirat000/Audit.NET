@@ -20,28 +20,42 @@ using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Audit.WebApi
 {
-    internal class AuditApiAdapter
+    /// <summary>
+    /// Adapter for the action filters, only to be used for low-level customization
+    /// </summary>
+    public class AuditApiAdapter
     {
-        public bool IsActionIgnored(ActionExecutingContext actionContext)
+        /// <summary>
+        /// Determines if a Web API action is ignored by attributes, and if it is ignored, discards the current audit scope.
+        /// </summary>
+        public bool ActionIgnored(ActionExecutingContext actionContext)
         {
+            bool ignored = false;
             var actionDescriptor = actionContext?.ActionDescriptor as ControllerActionDescriptor;
             var controllerIgnored = actionDescriptor?.MethodInfo?.DeclaringType.GetTypeInfo().GetCustomAttribute<AuditIgnoreAttribute>(true);
             if (controllerIgnored != null)
             {
-                return true;
+                ignored = true;
             }
-            var actionIgnored = actionDescriptor?.MethodInfo?.GetCustomAttribute<AuditIgnoreAttribute>(true);
-            if (actionIgnored != null)
+            else
             {
-                return true;
+                var actionIgnored = actionDescriptor?.MethodInfo?.GetCustomAttribute<AuditIgnoreAttribute>(true);
+                if (actionIgnored != null)
+                {
+                    ignored = true;
+                }
             }
-            return false;
+            if (ignored)
+            {
+                DiscardCurrentScope(actionContext.HttpContext);
+            }
+            return ignored;
         }
 
         /// <summary>
         /// Occurs before the action method is invoked.
         /// </summary>
-        public async Task BeforeExecutingAsync(ActionExecutingContext actionContext,
+        internal async Task BeforeExecutingAsync(ActionExecutingContext actionContext,
             bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName)
         {
             var httpContext = actionContext.HttpContext;
@@ -108,7 +122,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs after the action method is invoked.
         /// </summary>
-        public async Task AfterExecutedAsync(ActionExecutedContext context, bool includeModelState, bool includeResponseBody, bool includeResponseHeaders)
+        internal async Task AfterExecutedAsync(ActionExecutedContext context, bool includeModelState, bool includeResponseBody, bool includeResponseHeaders)
         {
             var httpContext = context.HttpContext;
             var auditAction = httpContext.Items[AuditApiHelper.AuditApiActionKey] as AuditApiAction;
@@ -237,6 +251,16 @@ namespace Audit.WebApi
         internal static AuditScope GetCurrentScope(HttpContext httpContext)
         {
             return httpContext.Items[AuditApiHelper.AuditApiScopeKey] as AuditScope;
+        }
+
+        internal static void DiscardCurrentScope(HttpContext httpContext)
+        {
+            var scope = GetCurrentScope(httpContext);
+            if (scope != null)
+            {
+                scope.Discard();
+                httpContext.Items[AuditApiHelper.AuditApiScopeKey] = null;
+            }
         }
 
     }

@@ -122,6 +122,19 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.Test_WebApi_Exception_Async();
                 Console.WriteLine("PASSED - Test_WebApi_Exception_Async");
 
+                Console.WriteLine("START - Test_Mvc_AuditIgnoreAttribute_Mix_Middleware_Async");
+                await mvcTests.Test_Mvc_AuditIgnoreAttribute_Middleware_Async();
+                Console.WriteLine("PASSED - Test_Mvc_AuditIgnoreAttribute_Mix_Middleware_Async");
+
+                Console.WriteLine("START - Test_WebApi_AuditIgnoreAttribute_Mix_Middleware_Async");
+                await webApiTests.Test_WebApi_AuditIgnoreAttribute_Mix_Middleware_Async();
+                Console.WriteLine("PASSED - Test_WebApi_AuditIgnoreAttribute_Mix_Middleware_Async");
+
+                Console.WriteLine("START - Test_WebApi_AuditIgnoreAttribute_Middleware_AuditIgnoreFilter_Async");
+                await webApiTests.Test_WebApi_AuditIgnoreAttribute_Middleware_AuditIgnoreFilter_Async();
+                Console.WriteLine("PASSED - Test_WebApi_AuditIgnoreAttribute_Middleware_AuditIgnoreFilter_Async");
+                
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("\nALL TESTS PASSED");
             }

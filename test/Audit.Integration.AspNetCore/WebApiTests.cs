@@ -269,7 +269,7 @@ namespace Audit.Integration.AspNetCore
                 }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
-            var url = $"http://localhost:{_port}/api/values/TestIgnoreAction?middleware=123&noresponsebody=1";
+            var url = $"http://localhost:{_port}/api/values/TestNormal?middleware=123&noresponsebody=1";
             var client = new HttpClient();
             var rqBody = "{\"value\": \"def\"}";
             var res = await client.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "application/json"));
@@ -328,7 +328,7 @@ namespace Audit.Integration.AspNetCore
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             
-            var url = $"http://localhost:{_port}/api/values/TestIgnoreAction?middleware=123";
+            var url = $"http://localhost:{_port}/api/values/TestNormal?middleware=123";
             var client = new HttpClient();
             var res = await client.PostAsync(url, new StringContent("{\"value\": \"def\"}", Encoding.UTF8, "application/json"));
 
@@ -366,6 +366,51 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
             Assert.AreEqual(0, insertEvs.Count);
         }
+
+
+        public async Task Test_WebApi_AuditIgnoreAttribute_Mix_Middleware_Async()
+        {
+            // Action ignored via AuditIgnoreAttribute, but handled by both ActionFilter and Middleware
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/values/TestIgnoreAction?middleware=1";
+            var client = new HttpClient();
+            var req = new HttpRequestMessage(HttpMethod.Post, url);
+            var res = await client.SendAsync(req);
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(0, insertEvs.Count);
+        }
+
+        public async Task Test_WebApi_AuditIgnoreAttribute_Middleware_AuditIgnoreFilter_Async()
+        {
+            // Action ignored via AuditIgnoreAttribute, but handled by Middleware (using the AuditIgnoreActionFilter)
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/values?middleware=1&ignorefilter=1";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+            Assert.AreEqual(0, insertEvs.Count);
+        }
+
 
         public async Task Test_WebApi_AuditIgnoreAttribute_Param_Async()
         {

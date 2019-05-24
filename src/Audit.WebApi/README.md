@@ -44,7 +44,9 @@ The audit can be enabled in different ways:
 
 1. **Local Action Filter**: Decorating the controllers/actions to be audited with `AuditApi` action filter attribute. 
 2. **Global Action Filter**: Adding the `AuditApiGlobalFilter` action filter as a global filter. This method allows more dynamic configuration of the audit settings.
-3. **Middleware** (only for Asp.Net Core): Adding the `AuditMiddleware` to the pipeline. This method allow to audit request that doesn't get to the action filter.
+3. **Middleware** (Asp.Net Core): Adding the `AuditMiddleware` to the pipeline. This method allow to audit request that doesn't get to the action filter.
+4. **Middleware + Action Filters** (Asp.Net Core): Adding the **Audit Middleware** together with the **Global Action Filter** (or **Local Action Filters**). 
+This is the recommended approach.
 
 #### 1- Local Action Filter
 
@@ -155,12 +157,28 @@ public class Startup
 > Note you should call `UseAuditMiddleware()` before `UseMvc()`, otherwise the middleware will 
 > not be able to process MVC actions.
 
-You can mix the **Audit Middleware** together with the **Action Filters**, or use one or the other. Take into account that:
+If you _only_ configure the middleware (no audit action filters) but want to ignore actions via `[AuditIgnoreAttribute]`, you **must** 
+add an action filter to discard the `AuditScope`. This is needed because the middleware cannot inspect the 
+MVC action attributes. You can use the `AuditIgnoreActionFilter` for this purpose, adding it to the MVC pipeline like this:
 
-- Middleware logs any request regardless if an action is reached or not.
-- Action Filter includes specific MVC context info, like controller name, action name, action arguments and model state.
-- Only one Audit Event is generated per request, even if an action is processed by the Middleware and/or multiple Action Filters.
-- The `AuditIgnore` atribute only applies for the Action Filter. It has no effect on the requests logged by the Middleware.
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMvc(mvc =>
+    {
+        mvc.Filters.Add(new AuditIgnoreActionFilter());
+    });
+}
+```
+
+#### 4- Middleware + Action Filters
+
+You can mix the **Audit Middleware** together with the **Global Action Filter** (and/or **Local Action Filters**). Take into account that:
+
+- Middleware will log any request regardless if an MVC action is reached or not.
+- If an action is reached, the Action Filter will include specific MVC context info to the Audit Event.
+- Only one Audit Event is generated per request, regardless of an action being processed by the Middleware and multiple Action Filters.
+- The `AuditIgnore` atribute is handled by the Action Filters, there is no need to add the `AuditIgnoreActionFilter` to the MVC filters when using a mixed approach.
 
 ## Configuration
 

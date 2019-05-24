@@ -55,9 +55,12 @@ namespace Audit.Integration.AspNetCore.Controllers
         }
 
         // GET: Mvc/Details/5
+        [Audit.WebApi.AuditIgnore]
+        [HttpGet]
+        [Route("mvc/details/{id}")]
         public ActionResult Details(int id)
         {
-            return View();
+            return View("Index", new TestModelClass() { Title = id.ToString() });
         }
 
         // GET: Mvc/Create

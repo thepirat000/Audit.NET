@@ -32,10 +32,12 @@ namespace Audit.Integration.AspNetCore
                 options.ValueCountLimit = 2;
             });
 
-            services.AddMvc((Action<Microsoft.AspNetCore.Mvc.MvcOptions>)(mvc =>
+            services.AddMvc(mvc =>
             {
+                mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                     .LogActionIf(d => d.ControllerName == "MoreValues" 
+                        || (d.ControllerName == "Mvc" && d.ActionName == "Details")
                         || (d.ControllerName == "Values" && 
                                 (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix") || d.ActionName == "TestResponseHeadersGlobalFilter")))
                     .WithEventType("{verb}.{controller}.{action}")
@@ -43,7 +45,7 @@ namespace Audit.Integration.AspNetCore
                     .IncludeResponseHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
                     .IncludeRequestBody()));
-            }));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -68,16 +68,23 @@ namespace Audit.WebApi
         {
             return AuditApiAdapter.GetCurrentScope(httpContext);
         }
+        /// <summary>
+        /// Discards the Audit Scope related to the current context, if any.
+        /// </summary>
+        public static void DiscardCurrentAuditScope(this HttpContext httpContext)
+        {
+            AuditApiAdapter.DiscardCurrentScope(httpContext);
+        }
 #elif NET45
         /// <summary>
         /// Gets the current Audit Scope.
         /// </summary>
-        /// <param name="httpContext">The http context to get the scope from.</param>
+        /// <param name="httpRequest">The http request to get the scope from.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
         /// <param name="contextWrapper">The context wrapper instance to use to provide the context. Default is NULL to use the default ContextWrapper.</param>
-        public static AuditScope GetCurrentAuditScope(this HttpRequestMessage httpContext, IContextWrapper contextWrapper = null)
+        public static AuditScope GetCurrentAuditScope(this HttpRequestMessage httpRequest, IContextWrapper contextWrapper = null)
         {
-            return AuditApiAdapter.GetCurrentScope(httpContext, contextWrapper);
+            return AuditApiAdapter.GetCurrentScope(httpRequest, contextWrapper);
         }
 #endif
     }

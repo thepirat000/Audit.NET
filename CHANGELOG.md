@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.5.0] - 2019-05-24
+### Modified
+- Audit.WebApi / Audit.WebApi.Core: Allowing the use of `[AuditIgnoreAttribute]` on controllers/action methods when using the Middleware or a mixed approach (Middleware+ActionFilter). (#218)
+
 ## [14.4.0] - 2019-05-21
 ### Added
 - Audit.HttpClient: New extension library to audit client calls to REST services when using `HttpClient`.
