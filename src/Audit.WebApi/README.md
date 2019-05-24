@@ -227,7 +227,7 @@ the request body since, by default, it's a forwand-only stream that can be read 
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
     app.Use(async (context, next) => {  // <----
-        context.Request.EnableRewind();
+        context.Request.EnableBuffering(); // or .EnableRewind();
         await next();
     });
     
