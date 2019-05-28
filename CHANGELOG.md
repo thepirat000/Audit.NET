@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.5.1] - 2019-05-28
+### Modified
+- Audit.EntityFramework: Update Microsoft.EntityFrameworkCore to 2.2.4. Fixed issue with non-concurrent collections in concurrent integration
+
 ## [14.5.0] - 2019-05-24
 ### Modified
 - Audit.WebApi / Audit.WebApi.Core: Allowing the use of `[AuditIgnoreAttribute]` on controllers/action methods when using the Middleware or a mixed approach (Middleware+ActionFilter). (#218)
