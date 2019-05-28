@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture(Category = "EF")]
-    public class EfCore21InMemoryTests
+    public class EfCore22InMemoryTests
     {
         [SetUp]
         public void Setup()
