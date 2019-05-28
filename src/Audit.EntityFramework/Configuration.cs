@@ -1,6 +1,6 @@
 ﻿using Audit.EntityFramework.ConfigurationApi;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace Audit.EntityFramework
@@ -10,7 +10,7 @@ namespace Audit.EntityFramework
     /// </summary>
     public static class Configuration
     {
-        private static Dictionary<Type, EfSettings> _currentConfig = new Dictionary<Type, EfSettings>();
+        private static ConcurrentDictionary<Type, EfSettings> _currentConfig = new ConcurrentDictionary<Type, EfSettings>();
 
         /// <summary>
         /// Configure Audit EF Settings by using a Fluent Configuration API.
@@ -89,7 +89,7 @@ namespace Audit.EntityFramework
         internal static void Reset<T>()
             where T : IAuditDbContext
         {
-            _currentConfig.Remove(typeof(T));
+            _currentConfig.TryRemove(typeof(T), out _);
         }
 
         internal static EfSettings EnsureConfigFor<T>()
