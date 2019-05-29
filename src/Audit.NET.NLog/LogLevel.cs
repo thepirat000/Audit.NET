@@ -1,6 +1,5 @@
 ﻿namespace Audit.NLog
 {
-
     public enum LogLevel
     {
         Debug = 0,
