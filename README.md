@@ -682,6 +682,7 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md)** | Store the audit events using Apache log4net™.
 <img src="https://i.imgur.com/PbeWVKz.png" alt="icon" width="80"/> | **[Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md)** | Store the audit events in Elasticsearch indices.
 <img src="https://i.imgur.com/kIGe4Z5.png" alt="icon" width="80"/> | **[Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md)** | Store the audit events in Amazon DynamoDB tables.
+<img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md)** | Store the audit events using NLog™.
 
 # Change Log
 
