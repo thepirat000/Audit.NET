@@ -27,6 +27,7 @@ del "Audit.NET.Elasticsearch\bin\debug\*.symbols.nupkg"
 del "Audit.NET.EventLog.Core\bin\debug\*.symbols.nupkg"
 del "Audit.NET.DynamoDB\bin\debug\*.symbols.nupkg"
 del "Audit.HttpClient\bin\debug\*.symbols.nupkg"
+del "Audit.NET.NLog\bin\debug\*.symbols.nupkg"
 
 nuget push "audit.net\bin\debug\*.nupkg" -source %1
 nuget push "audit.mvc\bin\debug\*.nupkg" -source %1
@@ -54,4 +55,4 @@ nuget push "Audit.NET.Elasticsearch\bin\debug\*.nupkg" -source %1
 nuget push "Audit.NET.EventLog.Core\bin\debug\*.nupkg" -source %1
 nuget push "Audit.NET.DynamoDB\bin\debug\*.nupkg" -source %1
 nuget push "Audit.HttpClient\bin\debug\*.nupkg" -source %1
-
+nuget push "Audit.NET.NLog\bin\debug\*.nupkg" -source %1

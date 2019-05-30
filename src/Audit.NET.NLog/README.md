@@ -45,6 +45,6 @@ Audit.Core.Configuration.Setup()
 ```
 
 ## Settings
-- `Logger` Indicates the NLog [ILogger](https://github.com/nlog/nlog/wiki/Tutorial) logger instance to use. Default is obtained by using the audit event type `LogManager.GetLogger(auditEvent.GetType())`.
-- `LogLevel` Indicates the log level to use (debug, info, warn, error or fatal). Default is _Info_ unless there is an exception, in which case it logs as _Error_.
-- `Message` Indicates the textual message to log. Default is the AuditEvent JSON including the EventId as a custom field.
+- `Logger`: Indicates the NLog [ILogger](https://github.com/nlog/nlog/wiki/Tutorial) logger instance to use. Default is obtained by using the audit event type `LogManager.GetLogger(auditEvent.GetType())`.
+- `LogLevel`: Indicates the log level to use (debug, info, warn, error or fatal). Default is _Info_ unless there is an exception, in which case it logs as _Error_.
+- `Message`: Indicates the textual message to log. Default is the AuditEvent JSON including the EventId as a custom field.

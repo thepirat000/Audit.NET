@@ -10,17 +10,17 @@ namespace Audit.NLog.Configuration
     public interface INLogConfigurator
     {
         /// <summary>
-        /// Sets the NLog logger (ILogger) to use as a function of the audit event.
+        /// Sets the NLog logger (ILogger) to use as a function of the audit event. Default is LogManager.GetLogger(auditEvent.GetType()).
         /// </summary>
-        /// <param name="loggerBuilder">A way to obtain the NLog ILogger instance. Default is LogManager.GetLogger(auditEvent.GetType()).</param>
+        /// <param name="loggerBuilder">A way to obtain the NLog ILogger instance.</param>
         INLogConfigurator Logger(Func<AuditEvent, ILogger> loggerBuilder);
         /// <summary>
-        /// Sets a NLog logger (ILogger) to use for all the audit events.
+        /// Sets a NLog logger (ILogger) to use for all the audit events.  Default is LogManager.GetLogger(auditEvent.GetType()).
         /// </summary>
-        /// <param name="logger">The NLog ILogger instance.</param>
+        /// <param name="logger">The NLog ILogger instance. </param>
         INLogConfigurator Logger(ILogger logger);
         /// <summary>
-        /// Sets the NLog log level to use as a function of the audit event.
+        /// Sets the NLog log level to use as a function of the audit event. 
         /// </summary>
         /// <param name="logLevelBuilder">A way to obtain the log level for the audit events.</param>
         INLogConfigurator LogLevel(Func<AuditEvent, LogLevel> logLevelBuilder);

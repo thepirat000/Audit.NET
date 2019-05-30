@@ -10,7 +10,7 @@ namespace Audit.NLog.Providers
     /// <remarks>
     /// Settings:
     ///     Logger/LoggerBuilder: A way to obtain the NLog ILog instance. Default is LogManager.GetLogger(auditEvent.GetType()).
-    ///     LogLevel/LogLevelBuilder: A way to obtain the log level for the audit events.
+    ///     LogLevel/LogLevelBuilder: A way to obtain the log level for the audit events. Default is Error for exceptions and Info for anything else.
     ///     LogBodyBuilder: A way to obtain the object to be logged. Default is the AuditEvent JSON including the EventId as a custom field.
     /// </remarks>
     public class NLogDataProvider : AuditDataProvider
@@ -54,8 +54,9 @@ namespace Audit.NLog.Providers
 
         private ILogger GetLogger(AuditEvent auditEvent)
         {
-            return LoggerBuilder == null ? LogManager.GetLogger(auditEvent.GetType().ToString()) : LoggerBuilder.Invoke(auditEvent);
+            return LoggerBuilder?.Invoke(auditEvent) ?? LogManager.GetLogger(auditEvent.GetType().FullName);
         }
+
         private LogLevel GetLogLevel(AuditEvent auditEvent)
         {
             return LogLevelBuilder?.Invoke(auditEvent) ?? (auditEvent.Environment.Exception != null ? LogLevel.Error : LogLevel.Info);
@@ -98,29 +99,6 @@ namespace Audit.NLog.Providers
                     logger.Info(value);
                     break;
             }
-            //switch (level.Ordinal)
-            //{
-            //    case 0:
-            //        logger.Trace(value);
-            //        break;
-            //    case 1:
-            //        logger.Debug(value);
-            //        break;
-            //    case 2:
-            //        logger.Info(value);
-            //        break;
-            //    case 3:
-            //        logger.Warn(value);
-            //        break;
-            //    case 4:
-            //        logger.Error(value);
-            //        break;
-            //    case 5:
-            //        logger.Fatal(value);
-            //        break;
-            //    default:
-            //        break;
-            //}
         }
 
         /// <summary>

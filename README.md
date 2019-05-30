@@ -485,6 +485,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [EntityFrameworkDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/Providers/EntityFrameworkDataProvider.cs) | [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md#entity-framework-data-provider) | Store EntityFramework audit events in the same EF context. | `.UseEntityFramework()`
 [ElasticsearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/Providers/ElasticsearchDataProvider.cs) | [Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md) | Store audit events in Elasticsearch indices. | `.UseElasticsearch()`
 [DynamoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/Providers/DynamoDataProvider.cs) | [Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md) | Store audit events in [Amazon DynamoDB™](https://aws.amazon.com/dynamodb/) tables. | `.UseDynamoDB()`
+[NLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/Providers/NLogDataProvider.cs) | [Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md) | Store the audit events using [NLog](https://nlog-project.org/). | `.UseNLog()`
 
 ## Event Creation Policy
 

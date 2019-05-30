@@ -27,6 +27,7 @@ del "Audit.NET.Elasticsearch\bin\debug\*.nupkg"
 del "Audit.NET.EventLog.Core\bin\debug\*.nupkg"
 del "Audit.NET.DynamoDB\bin\debug\*.nupkg"
 del "Audit.HttpClient\bin\debug\*.nupkg"
+del "Audit.NET.NLog\bin\debug\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -58,6 +59,7 @@ dotnet pack "Audit.NET.Elasticsearch/"
 dotnet pack "Audit.NET.EventLog.Core/"
 dotnet pack "Audit.NET.DynamoDB/"
 dotnet pack "Audit.HttpClient/"
+dotnet pack "Audit.NET.NLog/"
 
 ECHO.
 ECHO ADD TAG NOW !

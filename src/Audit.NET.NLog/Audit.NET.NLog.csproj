@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Description>Log Audit.NET Audit Trail using NLog™</Description>
+    <Description>Log Audit.NET Audit Trail NLog™</Description>
     <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.NLog</AssemblyTitle>
-    <VersionPrefix>14.5.1</VersionPrefix>
+    <VersionPrefix>14.5.2</VersionPrefix>
     <Authors>Dominick Marciano</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Audit.NET.NLog</PackageId>
     <PackageTags>Audit;Trail;Log;NLog</PackageTags>
-    <PackageIconUrl>https://i.imgur.com/qxbK98k.png</PackageIconUrl>
+    <PackageIconUrl>https://i.imgur.com/aZ5EZ8Y.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.NLog</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
