@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.5.3] - 2019-06-05
+### Modified
+- Audit.NET.SqlServer: Update Microsoft.EntityFrameworkCore reference and remove SqlServer.Design reference for netstandard2.0. (#225)
+
 ## [14.5.2] - 2019-05-30
 ### Added
 - Audit.NET.NLog: New extension library to store the audit events using NLog™.

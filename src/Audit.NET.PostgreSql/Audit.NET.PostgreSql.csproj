@@ -3,7 +3,7 @@
     <Description>Store Audit.NET Trail Logs into a PostgreSQL database</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.PostgreSql</AssemblyTitle>
-    <VersionPrefix>14.5.2</VersionPrefix>
+    <VersionPrefix>14.5.3</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
