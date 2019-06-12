@@ -453,5 +453,5 @@ If you like this project please contribute in any of the following ways:
       <img width="24" height="24" alt="Tweet this package" src="https://nuget.org/Content/gallery/img/twitter.svg" />
     </a>
   </p>
-- Make a donation via PayPal:
+- Make a donation via PayPal 
 [![paypal](https://img.shields.io/badge/donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=thepirat000%40hotmail.com&currency_code=USD&source=url)
