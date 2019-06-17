@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Audit.WebApi.Template</id>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <description>Audited Web API</description>
     <authors>Federico Colombo</authors>
     <packageTypes>

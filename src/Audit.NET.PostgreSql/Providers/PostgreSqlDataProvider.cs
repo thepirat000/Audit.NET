@@ -254,7 +254,7 @@ namespace Audit.PostgreSql.Providers
 
         private string GetInsertCommandText(AuditEvent auditEvent)
         {
-            return string.Format("insert into {0} ({1}) values ({2}) RETURNING ({3})",
+            return string.Format(@"insert into {0} ({1}) values ({2}) RETURNING (""{3}"")",
                 GetFullTableName(auditEvent),
                 GetColumnsForInsert(auditEvent),
                 GetValuesForInsert(auditEvent),

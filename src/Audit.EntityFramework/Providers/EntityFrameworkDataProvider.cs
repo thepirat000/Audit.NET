@@ -81,8 +81,7 @@ namespace Audit.EntityFramework.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             bool save = false;
-            var efEvent = auditEvent as AuditEventEntityFramework;
-            if (efEvent == null)
+            if (!(auditEvent is AuditEventEntityFramework efEvent))
             {
                 return null;
             }
@@ -127,8 +126,7 @@ namespace Audit.EntityFramework.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             bool save = false;
-            var efEvent = auditEvent as AuditEventEntityFramework;
-            if (efEvent == null)
+            if (!(auditEvent is AuditEventEntityFramework efEvent))
             {
                 return null;
             }
