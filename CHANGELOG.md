@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.5.5] - 2019-07-01
+### Modified
+- Audit.NET: Added `ISystemClock` interface to allow testing code that depends on `DateTime.UtcNow`, such as event start-date, end-date and duration. Added `Audit.Core.Configuration.SystemClock` static configuration  property.
+
 ## [14.5.4] - 2019-06-17
 ### Modified
 - Audit.NET.PostgreSql: Fix IdColumnName missing quotes (#226)

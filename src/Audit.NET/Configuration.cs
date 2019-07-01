@@ -13,6 +13,10 @@ namespace Audit.Core
     public static class Configuration
     {
         /// <summary>
+        /// Gets or Sets the System Clock implementation. By default DateTime.UtcNow is used to get the current date and time.
+        /// </summary>
+        public static ISystemClock SystemClock { get; set; }
+        /// <summary>
         /// Gets or Sets the Default creation policy.
         /// </summary>
         public static EventCreationPolicy CreationPolicy { get; set; }
@@ -43,6 +47,7 @@ namespace Audit.Core
                 NullValueHandling = NullValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
+            SystemClock = new DefaultSystemClock();
             ResetCustomActions();
         }
 

@@ -60,7 +60,6 @@ namespace Audit.Integration.AspNetCore
                 context.Request.EnableRewind();
                 await next();
             });
-
             app.UseAuditMiddleware(_ => _
                 .IncludeRequestBody(true)
                 .IncludeResponseBody(ctx => !ctx.Request.QueryString.HasValue || !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))

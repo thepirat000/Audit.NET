@@ -30,7 +30,7 @@ namespace Audit.EntityFramework
         private static readonly ConcurrentDictionary<Type, Dictionary<string, AuditOverrideAttribute>> PropertiesOverrideAttrCache = new ConcurrentDictionary<Type, Dictionary<string, AuditOverrideAttribute>>();
 
         // AuditDbContext Attribute cache
-        private static ConcurrentDictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
+        private static readonly ConcurrentDictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
 
         /// <summary>
         /// Sets the configuration values from attribute, local and global

@@ -49,7 +49,7 @@ namespace Audit.Core
             }
             _event = options.AuditEvent ?? new AuditEvent();
             _event.Environment = environment;
-            _event.StartDate = DateTime.UtcNow;
+            _event.StartDate = Configuration.SystemClock.UtcNow.DateTime;
             _event.EventType = options.EventType;
             _event.CustomFields = new Dictionary<string, object>();
 
@@ -190,7 +190,7 @@ namespace Audit.Core
 
 #region Private fields
         private SaveMode _saveMode;
-        private EventCreationPolicy _creationPolicy;
+        private readonly EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
         private object _eventId;
         private bool _disposed;
@@ -377,7 +377,7 @@ namespace Audit.Core
         {
             var exception = GetCurrentException();
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
-            _event.EndDate = DateTime.UtcNow;
+            _event.EndDate = Configuration.SystemClock.UtcNow.DateTime;
             _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
             if (_targetGetter != null)
             {

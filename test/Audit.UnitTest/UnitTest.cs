@@ -28,6 +28,31 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_AuditScope_CustomSystemClock()
+        {
+            Audit.Core.Configuration.SystemClock = new MyClock();
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            using (var scope = AuditScope.Create("Test_AuditScope_CustomSystemClock", () => new { someProp = true }))
+            {
+                scope.SetCustomField("test", 123);
+            }
+            Audit.Core.Configuration.SystemClock = new DefaultSystemClock();
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(10000, evs[0].Duration);
+            Assert.AreEqual(new DateTime(2020, 1, 1, 0, 0, 0), evs[0].StartDate);
+            Assert.AreEqual(new DateTime(2020, 1, 1, 0, 0, 10), evs[0].EndDate);
+        }
+
+        [Test]
         public void Test_AuditScope_SetTargetGetter()
         {
             var evs = new List<AuditEvent>();
