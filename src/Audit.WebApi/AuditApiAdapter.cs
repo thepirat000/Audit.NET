@@ -94,13 +94,38 @@ namespace Audit.WebApi
                     auditAction.ResponseStatusCode = (int)actionExecutedContext.Response.StatusCode;
                     if (includeResponseBody)
                     {
-                        var objContent = actionExecutedContext.Response.Content as ObjectContent;
-                        auditAction.ResponseBody = new BodyContent
+                        if (actionExecutedContext.Response.Content is ObjectContent objContent)
                         {
-                            Type = objContent != null ? objContent.ObjectType.Name : actionExecutedContext.Response.Content?.Headers?.ContentType.ToString(),
-                            Length = actionExecutedContext.Response.Content?.Headers.ContentLength,
-                            Value = objContent != null ? objContent.Value : actionExecutedContext.Response.Content?.ReadAsStringAsync().Result
-                        };
+                            auditAction.ResponseBody = new BodyContent
+                            {
+                                Type = objContent.ObjectType.Name,
+                                Length = objContent.Headers?.ContentLength,
+                                Value = objContent.Value
+                            };
+                        }
+                        else if (actionExecutedContext.Response.Content != null)
+                        {
+                            var httpContent = actionExecutedContext.Response.Content;
+                            auditAction.ResponseBody = new BodyContent
+                            {
+                                Value = httpContent.ReadAsStringAsync().Result
+                            };
+
+                            if (httpContent.Headers != null)
+                            {
+                                auditAction.ResponseBody.Type = httpContent.Headers.ContentType.ToString();
+                                auditAction.ResponseBody.Length = httpContent.Headers.ContentLength;
+                            }
+                        }
+                        else
+                        {
+                            auditAction.ResponseBody = new BodyContent();
+                        }
+                    }
+
+                    if (includeResponseHeaders)
+                    {
+                        auditAction.ResponseHeaders = ToDictionary(actionExecutedContext.Response.Headers);
                     }
                 }
                 else
@@ -108,10 +133,7 @@ namespace Audit.WebApi
                     auditAction.ResponseStatusCode = 500;
                     auditAction.ResponseStatus = "Internal Server Error";
                 }
-                if (includeResponseHeaders)
-                {
-                    auditAction.ResponseHeaders = ToDictionary(actionExecutedContext.Response.Headers);
-                }
+
                 // Replace the Action field and save
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
                 await auditScope.SaveAsync();

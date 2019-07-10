@@ -143,16 +143,18 @@ namespace Audit.WebApi
                         var bodyType = context.Result.GetType().GetFullTypeName();
                         auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = GetResponseBody(context.Result) };
                     }
+
+                    if (includeResponseHeaders)
+                    {
+                        auditAction.ResponseHeaders = AuditApiHelper.ToDictionary(httpContext.Response.Headers);
+                    }
                 }
                 else
                 {
                     auditAction.ResponseStatusCode = 500;
                     auditAction.ResponseStatus = "Internal Server Error";
                 }
-                if (includeResponseHeaders)
-                {
-                    auditAction.ResponseHeaders = AuditApiHelper.ToDictionary(httpContext.Response.Headers);
-                }
+                
                 // Replace the Action field 
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
                 // Save, if action was not created by middleware
