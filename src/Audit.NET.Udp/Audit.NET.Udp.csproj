@@ -4,7 +4,7 @@
     <Description>Send Audit.NET Trail Logs as connectionless UDP datagrams to a remote host or a multicast group</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.Udp</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PackageId>Audit.NET.Udp</PackageId>
     <PackageTags>Audit;Trail;Log;UDP</PackageTags>
     <PackageIconUrl>https://i.imgur.com/FItQD9n.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>

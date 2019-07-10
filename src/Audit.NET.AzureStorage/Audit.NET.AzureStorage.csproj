@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Logs into an Azure Blob Storage</Description>
     <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.AzureStorage</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.4;net452</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PackageId>Audit.NET.AzureStorage</PackageId>
     <PackageTags>Audit;Trail;Log;Azure;Blob;BlobStorage</PackageTags>
     <PackageIconUrl>http://i.imgur.com/ouaw5CX.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.4' ">$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.4' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>

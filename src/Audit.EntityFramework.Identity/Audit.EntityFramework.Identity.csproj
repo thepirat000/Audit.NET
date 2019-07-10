@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PackageId>Audit.EntityFramework.Identity</PackageId>
     <PackageTags>Audit;Trail;Log;EntityFramework;AspNet;Identity</PackageTags>
     <PackageIconUrl>https://i.imgur.com/wdVHFoc.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.EntityFramework</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.5' ">1.6.1</NetStandardImplicitPackageVersion>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>

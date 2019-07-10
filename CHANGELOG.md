@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.5.6] - 2019-07-09
+### Modified
+- All: Changed nuget package <ProjectUrl> to point to the base Audit.NET repository, so it can be uploaded to GitHub packages
+- Audit.WebApi: Fix null reference exception when response is null and response headers are included (#229)
+
 ## [14.5.5] - 2019-07-01
 ### Modified
 - Audit.NET: Added `ISystemClock` interface to allow testing code that depends on `DateTime.UtcNow`, such as event start-date, end-date and duration. Added `Audit.Core.Configuration.SystemClock` static configuration  property.

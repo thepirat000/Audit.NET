@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs in a Redis database as a strings, lists, hashes, sortedsets or pubsub</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.Redis</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PackageId>Audit.NET.Redis</PackageId>
     <PackageTags>Audit;Trail;Log;Redis</PackageTags>
     <PackageIconUrl>http://i.imgur.com/abs6duI.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Redis</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.5' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

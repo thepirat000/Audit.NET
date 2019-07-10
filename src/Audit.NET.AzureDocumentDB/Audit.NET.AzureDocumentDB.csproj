@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into an Azure Document DB database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.AzureDocumentDB</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>net45;netstandard1.6;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PackageId>Audit.NET.AzureDocumentDB</PackageId>
     <PackageTags>Audit;Trail;Log;Azure;DocumentDB</PackageTags>
     <PackageIconUrl>http://i.imgur.com/yeBZZiP.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureDocumentDB</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

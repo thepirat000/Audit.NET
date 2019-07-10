@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for AspNet Core Web API Controller calls.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.WebApi.Core</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net451</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
@@ -17,7 +17,7 @@
     <PackageId>Audit.WebApi.Core</PackageId>
     <PackageTags>Audit;Trail;Log;WebApi</PackageTags>
     <PackageIconUrl>https://i.imgur.com/9go2b0f.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.WebApi</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into a MongoDB database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MongoDB</AssemblyTitle>
-    <VersionPrefix>14.5.5</VersionPrefix>
+    <VersionPrefix>14.5.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -13,7 +13,7 @@
     <PackageId>Audit.NET.MongoDB</PackageId>
     <PackageTags>Audit;Trail;Log;MongoDB</PackageTags>
     <PackageIconUrl>http://i.imgur.com/1nMVLQo.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.5' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
