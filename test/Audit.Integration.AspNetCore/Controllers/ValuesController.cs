@@ -7,9 +7,12 @@ using System.Threading.Tasks;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Audit.Integration.AspNetCore.Controllers
 {
+
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -50,6 +53,19 @@ namespace Audit.Integration.AspNetCore.Controllers
         {
             await Task.Delay(0);
             return Ok(request.Value);
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if ((context.ActionDescriptor as ControllerActionDescriptor).ActionName == "GlobalAudit")
+            {
+                var scope = this.GetCurrentAuditScope();
+                if (scope != null)
+                {
+                    scope.Event.CustomFields["ScopeExists"] = true;
+                }
+            }
+            base.OnActionExecuting(context);
         }
 
         [HttpPost("TestForm")]

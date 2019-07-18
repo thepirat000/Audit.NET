@@ -39,9 +39,12 @@ namespace Audit.WebApi
 
         private AuditApiGlobalFilter()
         {
+#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+            this.Order = int.MinValue;
+#endif
         }
 
-        public AuditApiGlobalFilter(Action<IAuditApiGlobalActionsSelector> config)
+        public AuditApiGlobalFilter(Action<IAuditApiGlobalActionsSelector> config) : this()
         {
             if (config == null)
             {

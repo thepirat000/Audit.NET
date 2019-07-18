@@ -70,6 +70,11 @@ namespace Audit.WebApi
         /// </summary>
         public bool SerializeActionParameters { get; set; }
 
+        public AuditApiAttribute()
+        {
+            this.Order = int.MinValue;
+        }
+
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (Configuration.AuditDisabled || _adapter.ActionIgnored(context))

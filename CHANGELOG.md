@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.5.7] - 2019-07-18
+### Modified
+- Audit.WebApi and Audit.WebApi.Core: Changed the default order on `AuditApiAttribute` and `AuditApiGlobalFilter` to be `int.MinValue` instead of `0`. 
+This allows using `this.GetCurrentAuditScope()` on Controller overrides `OnActionExecutionAsync` and `OnActionExecuting` (#230)
+
 ## [14.5.6] - 2019-07-09
 ### Modified
 - All: Changed nuget package <ProjectUrl> to point to the base Audit.NET repository, so it can be uploaded to GitHub packages

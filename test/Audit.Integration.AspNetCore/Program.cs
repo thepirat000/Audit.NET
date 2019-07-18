@@ -23,7 +23,7 @@ namespace Audit.Integration.AspNetCore
             var ct = new CancellationTokenSource();
             var pc = Console.ForegroundColor;
             var runner = BuildWebHost(args).RunAsync(ct.Token);
-
+            
             var webApiTests = new WebApiTests(27050);
             var mvcTests = new MvcTests(27050);
 
@@ -32,6 +32,14 @@ namespace Audit.Integration.AspNetCore
                 Console.WriteLine("START - TestInitialize");
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
+
+                Console.WriteLine("START - Test_WebApi_AuditApiGlobalAttributeOrder");
+                await webApiTests.Test_WebApi_AuditApiGlobalAttributeOrder();
+                Console.WriteLine("PASSED - Test_WebApi_AuditApiGlobalAttributeOrder");
+
+                Console.WriteLine("START - Test_WebApi_AuditApiAttributeOrder");
+                await webApiTests.Test_WebApi_AuditApiAttributeOrder();
+                Console.WriteLine("PASSED - Test_WebApi_AuditApiAttributeOrder");
 
                 Console.WriteLine("START - Test_WebApi_TestFromServiceIgnore");
                 await webApiTests.Test_WebApi_TestFromServiceIgnore();

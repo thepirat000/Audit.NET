@@ -26,6 +26,44 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("[\"value1\",\"value2\"]", s);
         }
 
+        public async Task Test_WebApi_AuditApiAttributeOrder()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    insertEvs.Add(ev);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/My";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
+            Assert.AreEqual(true, insertEvs[0].CustomFields["ScopeExists"]);
+        }
+
+        public async Task Test_WebApi_AuditApiGlobalAttributeOrder()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    insertEvs.Add(ev);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/values/GlobalAudit";
+            var client = new HttpClient();
+            var res = await client.PostAsync(url, new StringContent("{\"value\": \"def\"}", Encoding.UTF8, "application/json"));
+
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
+            Assert.AreEqual(true, insertEvs[0].CustomFields["ScopeExists"]);
+        }
+
         public async Task Test_WebApi_TestFromServiceIgnore()
         {
             var insertEvs = new List<AuditEvent>();
