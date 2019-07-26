@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using Audit.EntityFramework.ConfigurationApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -48,7 +48,11 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetColumnName(IProperty prop)
         {
+#if NETSTANDARD2_1
+            return prop.GetColumnName();
+#else
             return prop.Relational().ColumnName ?? prop.Name;
+#endif
         }
 
         /// <summary>
@@ -145,16 +149,21 @@ namespace Audit.EntityFramework
             {
                 return result;
             }
+#if NETSTANDARD2_1
+            result.Table = definingType.GetTableName();
+            result.Schema = definingType.GetSchema();
+#else
             var relational = definingType.Relational();
             result.Table = relational.TableName ?? definingType.Name;
             result.Schema = relational.Schema;
+#endif
             return result;
         }
 
 
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
-#if NETSTANDARD2_0 || NET461
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
             IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
 #else
             IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
@@ -171,7 +180,7 @@ namespace Audit.EntityFramework
             var foreignKeys = entry.Metadata.GetForeignKeys();
             if (foreignKeys != null)
             {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETSTANDARD2_1
                 //Filter ownership relations as they are not foreign keys
                 foreignKeys = foreignKeys.Where(fk => !fk.IsOwnership);
 #endif
@@ -225,6 +234,7 @@ namespace Audit.EntityFramework
             {
                 var entity = entry.Entity;
                 var validationResults = DbContextHelper.GetValidationResults(entity);
+
                 var entityName = GetEntityName(dbContext, entry);
                 efEvent.Entries.Add(new EventEntry()
                 {
@@ -244,7 +254,7 @@ namespace Audit.EntityFramework
 
         private string GetAmbientTransactionId()
         {
-#if NETSTANDARD2_0 || NET461
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
             var tranInfo = System.Transactions.Transaction.Current?.TransactionInformation;
             if (tranInfo != null)
             {

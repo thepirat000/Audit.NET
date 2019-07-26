@@ -3,7 +3,7 @@ using Audit.Core;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 #elif NET45
@@ -176,8 +176,8 @@ namespace Audit.EntityFramework.Providers
                 entryType = entryType.GetTypeInfo().BaseType;
             }
             Type type;
-#if NETSTANDARD2_0
-                IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entryType);
+#if NETSTANDARD2_0 || NETSTANDARD2_1
+            IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entryType);
                 type = definingType?.ClrType;
 #elif NETSTANDARD1_5 || NET461
             IEntityType definingType = localDbContext.Model.FindEntityType(entryType);

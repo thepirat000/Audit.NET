@@ -52,7 +52,7 @@ namespace Audit.EntityFramework
         }
 
         [JsonIgnore]
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
         internal Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry Entry { get; set; }
         /// <summary>
         /// Returns the EntityEntry associated to this audit event entry

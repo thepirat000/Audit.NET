@@ -448,6 +448,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 
         }
 
+#if NETCOREAPP2_1
         [Test]
         public void Test_EFTransactionScope()
         {
@@ -497,5 +498,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsTrue(list[0].AmbientTransactionId.Length > 2);
             Assert.AreEqual(list[0].AmbientTransactionId, list[1].AmbientTransactionId);
         }
+#endif
+
     }
 }

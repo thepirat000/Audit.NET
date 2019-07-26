@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Audit.Core;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using Microsoft.EntityFrameworkCore;
 #elif NET45
 using System.Data.Entity;

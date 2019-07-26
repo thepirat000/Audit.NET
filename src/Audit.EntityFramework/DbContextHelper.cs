@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 #elif NET45
@@ -385,7 +385,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the modified entries to process.
         /// </summary>
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
         public List<EntityEntry> GetModifiedEntries(IAuditDbContext context)
 #elif NET45
         public List<DbEntityEntry> GetModifiedEntries(IAuditDbContext context)
@@ -420,7 +420,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-#if NETSTANDARD1_5 || NETSTANDARD2_0
+#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1
             try
             {
                 var connId = ((connection as dynamic).ClientConnectionId) as Guid?;
