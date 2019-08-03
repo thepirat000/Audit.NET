@@ -1,12 +1,16 @@
 using System;
 using System.Linq;
 using Audit.Core;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
-#if NETSTANDARD1_3 || NETSTANDARD2_0
+#if NETSTANDARD2_1
+using Microsoft.Data.SqlClient;
+#else
+using System.Data.SqlClient;
+#endif
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
 using Microsoft.EntityFrameworkCore;
 #endif
 
@@ -109,10 +113,13 @@ namespace Audit.SqlServer.Providers
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
                 var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
-                return result.FirstOrDefault();
+                return result.ToList().FirstOrDefault();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
                 var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
-                return result.FirstOrDefault().Id;
+                return result.ToList().FirstOrDefault()?.Id;
+#elif NETSTANDARD2_1
+                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
+                return result.ToList().FirstOrDefault()?.Id;
 #endif
             }
         }
@@ -125,10 +132,13 @@ namespace Audit.SqlServer.Providers
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
                 var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
-                return await result.FirstOrDefaultAsync();
-#elif NETSTANDARD1_3 || NETSTANDARD2_0
+                return (await result.ToListAsync()).FirstOrDefault();
+#elif NETSTANDARD1_3 || NETSTANDARD2_0 
                 var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
-                return (await result.FirstOrDefaultAsync()).Id;
+                return (await result.ToListAsync()).FirstOrDefault()?.Id;
+#elif NETSTANDARD2_1
+                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
+                return (await result.ToListAsync()).FirstOrDefault()?.Id;
 #endif
             }
         }
@@ -139,7 +149,11 @@ namespace Audit.SqlServer.Providers
             using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
+#if NETSTANDARD2_1
+                ctx.Database.ExecuteSqlRaw(cmdText, parameters);
+#else
                 ctx.Database.ExecuteSqlCommand(cmdText, parameters);
+#endif
             }
         }
 
@@ -151,6 +165,8 @@ namespace Audit.SqlServer.Providers
                 var cmdText = GetReplaceCommandText(auditEvent);
 #if NETSTANDARD1_3
                 await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), parameters);
+#elif NETSTANDARD2_1
+                await ctx.Database.ExecuteSqlRawAsync(cmdText, default(CancellationToken), parameters);
 #else
                 await ctx.Database.ExecuteSqlCommandAsync(cmdText, parameters);
 #endif
@@ -171,6 +187,9 @@ namespace Audit.SqlServer.Providers
                 var json = result.FirstOrDefault();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
                 var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
+                var json = result.FirstOrDefault()?.Id;
+#elif NETSTANDARD2_1
+                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
                 var json = result.FirstOrDefault()?.Id;
 #endif
                 if (json != null)
@@ -195,6 +214,9 @@ namespace Audit.SqlServer.Providers
                 var json = await result.FirstOrDefaultAsync();
 #elif NETSTANDARD1_3 || NETSTANDARD2_0
                 var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
+                var json = (await result.FirstOrDefaultAsync())?.Id;
+#elif NETSTANDARD2_1
+                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
                 var json = (await result.FirstOrDefaultAsync())?.Id;
 #endif
                 if (json != null)

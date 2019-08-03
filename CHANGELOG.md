@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.6.1] - 2019-08-03
+### Modified
+- Audit.SqlServer: Adding NET Core 3 preview support (#234)
+
 ## [14.6.0] - 2019-07-26
 ### Modified
 - Audit.EntityFramework.Core: Adding EF Core 3 support (#231)
