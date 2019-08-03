@@ -13,7 +13,7 @@ namespace Audit.EntityFramework.ConfigurationApi
     public class EntityFrameworkProviderConfigurator : IEntityFrameworkProviderConfigurator, IEntityFrameworkProviderConfiguratorAction, IEntityFrameworkProviderConfiguratorExtra
     {
         internal bool _ignoreMatchedProperties = false;
-        internal Func<Type, Type> _auditTypeMapper;
+        internal Func<Type, EventEntry, Type> _auditTypeMapper;
         internal Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
 
@@ -31,13 +31,13 @@ namespace Audit.EntityFramework.ConfigurationApi
 
         public IEntityFrameworkProviderConfiguratorAction AuditTypeMapper(Func<Type, Type> mapper)
         {
-            _auditTypeMapper = mapper;
+            _auditTypeMapper = (t, e) => mapper.Invoke(t);
             return this;
         }
 
         public IEntityFrameworkProviderConfiguratorAction AuditTypeNameMapper(Func<string, string> mapper)
         {
-            _auditTypeMapper = t =>
+            _auditTypeMapper = (t, e) =>
             {
                 var mappedTypeName = mapper.Invoke(t.Name);
                 Type mappedType = null;

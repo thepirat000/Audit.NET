@@ -395,6 +395,68 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
+        [Test]
+        public void Test_EF_MapOneTypeToMultipleAuditTypes()
+        {
+            var guid = Guid.NewGuid().ToString();
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(_ => _
+                    .UseDbContext<BlogsContext>()
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Blog>(mapper: entry => entry.Action == "Update" ? typeof(BlogAudit) : typeof(CommonAudit), 
+                        entityAction: (ev, entry, entity) =>
+                        {
+                            if (entry.Action == "Update")
+                            {
+                                Assert.AreEqual(typeof(BlogAudit), entity.GetType());
+                                var ba = entity as BlogAudit;
+                                ba.BlogId = (int)entry.PrimaryKey.First().Value;
+                            }
+                            else
+                            {
+                                Assert.AreEqual(typeof(CommonAudit), entity.GetType());
+                                var ca = entity as CommonAudit;
+                                ca.Group = guid;
+                                ca.EntityType = entry.EntityType.Name;
+                                ca.EntityId = (int)entry.PrimaryKey.First().Value;
+                            }
+                        })
+                        .Map<Post, PostAudit>((post, postAudit) =>
+                        {
+                            postAudit.PostId = post.Id;
+                        })
+                        .AuditEntityAction<IAuditEntity>((ev, entry, entity) =>
+                        {
+                            entity.AuditAction = entry.Action;
+                            entity.AuditDate = DateTime.Now;
+                            entity.AuditUser = Environment.UserName;
+                            entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
+                        })));
+
+            using (var context = new BlogsContext())
+            {
+                context.Blogs.Add(new Blog { BloggerName = guid, Title = "TestBlog" });
+                context.SaveChanges(); // CommonAudit
+
+                var blog = context.Blogs.First(b => b.BloggerName == guid);
+                var newTitle = guid.Substring(0, 10);
+                blog.Title = newTitle;
+                context.SaveChanges(); // BlogAudit
+
+                var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
+                var blogaudits = context.BlogsAudits.Where(x => x.Title == newTitle).ToList();
+
+                Assert.IsNotNull(blogaudits);
+                Assert.AreEqual(1, blogaudits.Count);
+                Assert.AreEqual(blog.Id, blogaudits[0].BlogId);
+                Assert.AreEqual(1, audits.Count);
+                Assert.AreEqual("Blog", audits[0].EntityType);
+                Assert.AreEqual(blog.Id, audits[0].EntityId);
+                Assert.AreEqual("TestBlog", audits[0].Title);
+                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
+            }
+        }
 
         [Test]
         public void Test_EFFailureLogging()

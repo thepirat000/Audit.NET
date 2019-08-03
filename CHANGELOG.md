@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.6.2] - 2019-08-03
+### Modified
+- Audit.EntityFramework: EntityFramework Data Provider support to map a single entity to multiple audit entities.
+
 ## [14.6.1] - 2019-08-03
 ### Modified
 - Audit.SqlServer: Adding NET Core 3 preview support (#234)

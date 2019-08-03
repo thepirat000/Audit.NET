@@ -63,6 +63,39 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
+        public IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper, Func<AuditEvent, EventEntry, object, bool> entityAction)
+        {
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
+            {
+                TargetTypeMapper = mapper,
+                Action = entityAction
+            };
+            return this;
+        }
+
+        public IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper, Action<AuditEvent, EventEntry, object> entityAction)
+        {
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
+            {
+                TargetTypeMapper = mapper,
+                Action = (ev, entry, entity) =>
+                {
+                    entityAction.Invoke(ev, entry, entity);
+                    return true;
+                }
+            };
+            return this;
+        }
+
+        public IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper)
+        {
+            _mapping[typeof(TSourceEntity)] = new MappingInfo()
+            {
+                TargetTypeMapper = mapper
+            };
+            return this;
+        }
+
         public void AuditEntityAction(Action<AuditEvent, EventEntry, object> entityAction)
         {
             _commonAction = (ev, ent, auditEntity) =>
@@ -91,13 +124,12 @@ namespace Audit.EntityFramework.ConfigurationApi
             _commonAction = (ev, ent, auditEntity) => entityAction.Invoke(ev, ent, (T)auditEntity);
         }
 
-        internal Func<Type, Type> GetMapper()
+        internal Func<Type, EventEntry, Type> GetMapper()
         {
-            return t =>
+            return (t, e) =>
             {
-                MappingInfo map = null;
-                _mapping.TryGetValue(t, out map);
-                return map?.TargetType;
+                _mapping.TryGetValue(t, out MappingInfo map);
+                return map?.TargetTypeMapper?.Invoke(e);
             };
         }
 

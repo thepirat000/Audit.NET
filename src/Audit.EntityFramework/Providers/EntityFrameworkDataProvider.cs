@@ -25,7 +25,7 @@ namespace Audit.EntityFramework.Providers
     public class EntityFrameworkDataProvider : AuditDataProvider
     {
         private bool _ignoreMatchedProperties;
-        private Func<Type, Type> _auditTypeMapper;
+        private Func<Type, EventEntry, Type> _auditTypeMapper;
         private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
 
@@ -47,7 +47,7 @@ namespace Audit.EntityFramework.Providers
             }
         }
 
-        public Func<Type, Type> AuditTypeMapper
+        public Func<Type, EventEntry, Type> AuditTypeMapper
         {
             get { return _auditTypeMapper; }
             set { _auditTypeMapper = value; }
@@ -93,7 +93,7 @@ namespace Audit.EntityFramework.Providers
                 if (type != null)
                 {
                     entry.EntityType = type;
-                    var mappedType = _auditTypeMapper?.Invoke(type);
+                    var mappedType = _auditTypeMapper?.Invoke(type, entry);
                     if (mappedType != null)
                     {
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);
@@ -138,7 +138,7 @@ namespace Audit.EntityFramework.Providers
                 if (type != null)
                 {
                     entry.EntityType = type;
-                    var mappedType = _auditTypeMapper?.Invoke(type);
+                    var mappedType = _auditTypeMapper?.Invoke(type, entry);
                     if (mappedType != null)
                     {
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);

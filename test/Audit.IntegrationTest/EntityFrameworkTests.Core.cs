@@ -145,7 +145,7 @@ namespace Audit.IntegrationTest
         public void Test_EFDataProvider_AuditEntityDisabled()
         {
             var dp = new EntityFrameworkDataProvider();
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);
@@ -236,7 +236,7 @@ namespace Audit.IntegrationTest
         public async Task Test_EFDataProvider_AuditEntityDisabledAsync()
         {
             var dp = new EntityFrameworkDataProvider();
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);
@@ -289,7 +289,7 @@ namespace Audit.IntegrationTest
             });
                 
             var dp = new EntityFrameworkDataProvider();
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);
@@ -342,7 +342,7 @@ namespace Audit.IntegrationTest
             });
 
             var dp = new EntityFrameworkDataProvider();
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);
@@ -390,7 +390,7 @@ namespace Audit.IntegrationTest
         public void Test_EFDataProvider()
         {
             var dp = new EntityFrameworkDataProvider();
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);
@@ -488,7 +488,7 @@ namespace Audit.IntegrationTest
 
             dp.DbContextBuilder = ev => new AuditInDifferentContext();
 
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);
@@ -685,7 +685,7 @@ namespace Audit.IntegrationTest
         {
             var dp = new EntityFrameworkDataProvider();
 
-            dp.AuditTypeMapper = t =>
+            dp.AuditTypeMapper = (t, e) =>
             {
                 if (t == typeof(Order))
                     return typeof(OrderAudit);

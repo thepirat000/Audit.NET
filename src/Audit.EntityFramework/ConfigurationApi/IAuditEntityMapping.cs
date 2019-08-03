@@ -48,6 +48,30 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <typeparam name="TSourceEntity">The entity type to be audited</typeparam>
         /// <typeparam name="TAuditEntity">The entity type that holds the audit of the type audited</typeparam>
         IAuditEntityMapping Map<TSourceEntity, TAuditEntity>();
+
+        /// <summary>
+        /// Maps the entity type specified on <typeparamref name="TSourceEntity"/> to the audit entity returned on first parameter />
+        /// </summary>
+        /// <param name="mapper">The mapper function that takes the event entry information and returns the audit entity type</param>
+        /// <param name="entityAction">An action to perform on the audit entity before saving it. Return true to include the entity, or false otherwise.</param>
+        /// <typeparam name="TSourceEntity">The entity type to be audited</typeparam>
+        IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper, Func<AuditEvent, EventEntry, object, bool> entityAction);
+
+        /// <summary>
+        /// Maps the entity type specified on <typeparamref name="TSourceEntity"/> to the audit entity returned on first parameter />
+        /// </summary>
+        /// <param name="mapper">The mapper function that takes the event entry information and returns the audit entity type</param>
+        /// <param name="entityAction">An action to perform on the audit entity before saving it</param>
+        /// <typeparam name="TSourceEntity">The entity type to be audited</typeparam>
+        IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper, Action<AuditEvent, EventEntry, object> entityAction);
+
+        /// <summary>
+        /// Maps the entity type specified on <typeparamref name="TSourceEntity"/> to the audit entity returned on first parameter />
+        /// </summary>
+        /// <param name="mapper">The mapper function that takes the event entry information and returns the audit entity type</param>
+        /// <typeparam name="TSourceEntity">The entity type to be audited</typeparam>
+        IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper);
+
         /// <summary>
         /// Defines a common action to perform to all the audit entities before saving. 
         /// </summary>

@@ -546,6 +546,37 @@ Audit.Core.Configuration.Setup()
 
 > Note the use of `.IgnoreMatchedProperties(true)` to avoid the library trying to set properties automatically by matching names between the audited entities and the type `AuditLog`.
 
+#### Map an entity type to multiple audit types, depending on the modified entry:
+
+When you want to save audit logs to different tables for the same entity, for example, 
+if you have different audit tables per operation:
+
+```c#
+Audit.Core.Configuration.Setup() 
+    .UseEntityFramework(ef => ef.AuditTypeExplicitMapper(m => m
+        .Map<Blog>(
+            mapper: entry => entry.Action == "Update" ? typeof(Audit_Updates_Blog) : typeof(Audit_Blog), 
+            entityAction: (ev, entry, entity) =>
+            {
+                if (entity is Audit_Updates_Blog upd)
+                {
+                    // action for updates
+                }
+                else if (entity is Audit_Blog etc)
+                {
+                    // action for insert/delete
+                }
+            })
+        .AuditEntityAction<IAuditLog>((evt, entry, auditEntity) =>
+        {
+            // common action...
+        })));
+```
+
+> - Updates to `Blog` table -> Audit to `Audit_Updates_Blog` table
+> - Any other operation on `Blog` table -> Audit to `Audit_Blog` table
+
+
 # Contribute
 
 If you like this project please contribute in any of the following ways:
