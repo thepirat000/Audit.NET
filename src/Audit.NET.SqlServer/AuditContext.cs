@@ -6,9 +6,13 @@
     internal class AuditContext : DbContext
     {
 
-        public AuditContext(string connectionString)
+        public AuditContext(string connectionString, bool setNullInitializer)
             : base(connectionString)
         {
+            if (setNullInitializer)
+            {
+                Database.SetInitializer<AuditContext>(null);
+            }
         }
     }
 #elif NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1

@@ -133,7 +133,11 @@ namespace Audit.IntegrationTest
                     .LastUpdatedColumnName("last")
                     .Schema(ev => "schema")
                     .TableName("table")
-                    .CustomColumn("EventType", ev => ev.EventType));
+                    .CustomColumn("EventType", ev => ev.EventType)
+#if NET452
+                    .SetDatabaseInitializerNull()
+#endif
+                    );
                 Assert.AreEqual("cnnString", x.ConnectionStringBuilder.Invoke(null));
                 Assert.AreEqual("evType", x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }));
                 Assert.AreEqual("json", x.JsonColumnNameBuilder.Invoke(null));
@@ -141,6 +145,9 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("last", x.LastUpdatedDateColumnNameBuilder.Invoke(null));
                 Assert.AreEqual("schema", x.SchemaBuilder.Invoke(null));
                 Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
+#if NET452
+                Assert.AreEqual(true, x.SetDatabaseInitializerNull);
+#endif
             }
 
             [Test]
@@ -895,7 +902,11 @@ namespace Audit.IntegrationTest
                         .JsonColumnName(ev => "Data")
                         .LastUpdatedColumnName("LastUpdatedDate")
                         .CustomColumn("EventType", ev => ev.EventType)
-                        .CustomColumn("SomeDate", _ => DateTime.UtcNow))
+                        .CustomColumn("SomeDate", _ => DateTime.UtcNow)
+#if NET452
+                        .SetDatabaseInitializerNull()
+#endif
+                        )
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

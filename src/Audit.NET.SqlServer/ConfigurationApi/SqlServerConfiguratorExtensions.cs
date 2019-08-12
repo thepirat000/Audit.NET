@@ -24,7 +24,10 @@ namespace Audit.Core
                 JsonColumnNameBuilder = sqlDbConfig._jsonColumnNameBuilder,
                 LastUpdatedDateColumnNameBuilder = sqlDbConfig._lastUpdatedColumnNameBuilder,
                 SchemaBuilder = sqlDbConfig._schemaBuilder,
-                CustomColumns = sqlDbConfig._customColumns
+                CustomColumns = sqlDbConfig._customColumns,
+#if NET45
+                SetDatabaseInitializerNull = sqlDbConfig._setDatabaseInitializerNull
+#endif
             };
             return new CreationPolicyConfigurator();
         }

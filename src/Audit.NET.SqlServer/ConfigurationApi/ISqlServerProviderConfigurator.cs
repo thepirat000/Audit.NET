@@ -8,6 +8,12 @@ namespace Audit.SqlServer.Configuration
     /// </summary>
     public interface ISqlServerProviderConfigurator
     {
+#if NET45
+        /// <summary>
+        /// To set the database initializer to NULL on the internal DbContext 
+        /// </summary>
+        ISqlServerProviderConfigurator SetDatabaseInitializerNull(bool initializeToNull = true);
+#endif
         /// <summary>
         /// Specifies the Sql Server connection string.
         /// </summary>

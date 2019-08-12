@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.6.3] - 2019-08-12
+### Modified
+- Audit.SqlServer: Adding boolean configuration value (SetDatabaseInitializerNull) to specify if the initializer should be set to NULL on the constructor of the internal DbContext. Only for .NET Framework (#237)
+
 ## [14.6.2] - 2019-08-03
 ### Modified
 - Audit.EntityFramework: EntityFramework Data Provider support to map a single entity to multiple audit entities.

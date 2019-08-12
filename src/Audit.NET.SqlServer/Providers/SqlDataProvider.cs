@@ -32,6 +32,12 @@ namespace Audit.SqlServer.Providers
     /// </remarks>
     public class SqlDataProvider : AuditDataProvider
     {
+#if NET45
+        /// <summary>
+        /// True to set the database initializer to NULL on the internal DbContext 
+        /// </summary>
+        public bool SetDatabaseInitializerNull { get; set; }
+#endif
         /// <summary>
         /// The SQL connection string builder
         /// </summary>
@@ -102,13 +108,16 @@ namespace Audit.SqlServer.Providers
                 SchemaBuilder = sqlConfig._schemaBuilder;
                 TableNameBuilder = sqlConfig._tableNameBuilder;
                 CustomColumns = sqlConfig._customColumns;
+#if NET45
+                SetDatabaseInitializerNull = sqlConfig._setDatabaseInitializerNull;
+#endif
             }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var parameters = GetParametersForInsert(auditEvent);
-            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
+            using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
@@ -127,7 +136,7 @@ namespace Audit.SqlServer.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var parameters = GetParametersForInsert(auditEvent);
-            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
+            using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
@@ -146,7 +155,7 @@ namespace Audit.SqlServer.Providers
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
-            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
+            using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
 #if NETSTANDARD2_1
@@ -160,7 +169,7 @@ namespace Audit.SqlServer.Providers
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
-            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent)))
+            using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
 #if NETSTANDARD1_3
@@ -179,7 +188,7 @@ namespace Audit.SqlServer.Providers
             {
                 return null;
             }
-            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(null)))
+            using (var ctx = CreateContext(null))
             {
                 var cmdText = GetSelectCommandText(null);
 #if NET45
@@ -206,7 +215,7 @@ namespace Audit.SqlServer.Providers
             {
                 return null;
             }
-            using (var ctx = new AuditContext(ConnectionStringBuilder?.Invoke(null)))
+            using (var ctx = CreateContext(null))
             {
                 var cmdText = GetSelectCommandText(null);
 #if NET45
@@ -353,5 +362,15 @@ namespace Audit.SqlServer.Providers
                 IdColumnNameBuilder.Invoke(auditEvent));
             return cmdText;
         }
+
+        private AuditContext CreateContext(AuditEvent auditEvent)
+        {
+#if NET45
+            return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), SetDatabaseInitializerNull);
+#else
+            return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent));
+#endif
+        }
+
     }
 }

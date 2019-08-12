@@ -15,6 +15,14 @@ namespace Audit.SqlServer.Configuration
         internal Func<AuditEvent, string> _jsonColumnNameBuilder;
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
+#if NET45
+        internal bool _setDatabaseInitializerNull = false;
+        public ISqlServerProviderConfigurator SetDatabaseInitializerNull(bool initializeToNull = true)
+        {
+            _setDatabaseInitializerNull = initializeToNull;
+            return this;
+        }
+#endif
 
         public ISqlServerProviderConfigurator ConnectionString(string connectionString)
         {

@@ -72,7 +72,7 @@ Audit.Core.Configuration.Setup()
 - **JsonColumnName**: The column name of the event table where the audit event JSON will be stored. (optional)
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events. (optional)
 - **CustomColumn**: Additional columns to store information from the audit event. (optional)
-
+- **SetDatabaseInitializerNull**: To set the database initializer to NULL on the internal DbContext. (optional, only for .NET Framework)
 
 ## Query events
 
