@@ -218,10 +218,9 @@ The `AuditApiGlobalFilter` can be configured with the following methods:
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
 
 ### NOTE
-When **IncludeRequestBody** is set to true (or when using **IncludeRequestBodyFor**/**ExcludeRequestBodyFor**)
-and you are not using a `[FromBody]` parameter (i.e. reading the request body directly from the Request), 
-make sure you enable rewind on the request body stream, otherwise the controller won't be able to read
-the request body since, by default, it's a forwand-only stream that can be read only once. You can enable rewind on your startup logic with the following code:
+When **IncludeRequestBody** is set to true (or when using **IncludeRequestBodyFor**/**ExcludeRequestBodyFor**), 
+you must enable rewind on the request body stream, otherwise the controller won't be able to read
+the request body since by default, it's a forwand-only stream that can be read only once. You can enable rewind on your startup logic with the following code:
 
 ```c#
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
