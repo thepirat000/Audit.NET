@@ -26,6 +26,11 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <param name="include">if set to <c>true</c> the serialized entities will be included.</param>
         IContextSettingsConfigurator<T> IncludeEntityObjects(bool include = true);
         /// <summary>
+        /// Sets the indicator to avoid and exclude entity validations from the audit output.
+        /// </summary>
+        /// <param name="exclude">if set to <c>true</c> the entity validations will not be executed and excluded from the audit output.</param>
+        IContextSettingsConfigurator<T> ExcludeValidationResults(bool exclude = true);
+        /// <summary>
         /// Sets the configuration for a specific entity (table)
         /// </summary>
         /// <param name="config">The configuration.</param>

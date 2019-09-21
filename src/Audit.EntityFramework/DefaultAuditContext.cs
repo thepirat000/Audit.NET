@@ -21,6 +21,7 @@ namespace Audit.EntityFramework
         public virtual string AuditEventType { get; set; }
         public virtual bool AuditDisabled { get; set; }
         public virtual bool IncludeEntityObjects { get; set; }
+        public virtual bool ExcludeValidationResults { get; set; }
         public virtual AuditOptionMode Mode { get; set; }
         public virtual Dictionary<string, object> ExtraFields { get; set; }
         public virtual Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }

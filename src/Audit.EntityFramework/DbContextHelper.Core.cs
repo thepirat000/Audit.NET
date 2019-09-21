@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
@@ -233,7 +234,7 @@ namespace Audit.EntityFramework
             foreach (var entry in modifiedEntries)
             {
                 var entity = entry.Entity;
-                var validationResults = DbContextHelper.GetValidationResults(entity);
+                var validationResults = context.ExcludeValidationResults ? null : DbContextHelper.GetValidationResults(entity);
 
                 var entityName = GetEntityName(dbContext, entry);
                 efEvent.Entries.Add(new EventEntry()

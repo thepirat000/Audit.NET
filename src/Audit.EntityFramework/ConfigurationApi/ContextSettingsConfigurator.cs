@@ -22,6 +22,13 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.SetIncludeEntityObjects<T>(include);
             return this;
         }
+        
+        public IContextSettingsConfigurator<T> ExcludeValidationResults(bool exclude = true)
+        {
+            Configuration.SetExcludeValidationResults<T>(exclude);
+            return this;
+        }
+
         public IContextSettingsConfigurator<T> ExcludeTransactionId(bool exclude = true)
         {
             Configuration.SetExcludeTransactionId<T>(exclude);

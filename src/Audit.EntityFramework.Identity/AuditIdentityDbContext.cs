@@ -148,6 +148,11 @@ namespace Audit.EntityFramework
         public bool IncludeEntityObjects { get; set; }
 
         /// <summary>
+        /// To indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
+        /// </summary>
+        public bool ExcludeValidationResults { get; set; }
+
+        /// <summary>
         /// To indicate the audit operation mode. (Default is OptOut). 
         ///  - OptOut: All the entities are tracked by default, except those decorated with the AuditIgnore attribute. 
         ///  - OptIn: No entity is tracked by default, except those decorated with the AuditInclude attribute.

@@ -56,6 +56,19 @@ namespace Audit.EntityFramework
                 InternalConfig.IncludeEntityObjects = value;
             }
         }
+
+        public bool ExcludeValidationResults
+        {
+            get
+            {
+                return InternalConfig.ExcludeValidationResults.HasValue && InternalConfig.ExcludeValidationResults.Value;
+            }
+            set
+            {
+                InternalConfig.ExcludeValidationResults = value;
+            }
+        }
+
         /// <summary>
         /// To indicate the audit operation mode. (Default if OptOut). 
         ///  - OptOut: All the entities are tracked by default, except those decorated with the AuditIgnore attribute. 

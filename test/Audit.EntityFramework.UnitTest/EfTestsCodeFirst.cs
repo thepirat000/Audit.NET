@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Audit.EntityFramework.CodeFirst.UnitTest
     {
         [Key]
         public int Id { get; set; }
+        [MaxLength(8)]
         public string Title { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
     }
@@ -70,12 +72,85 @@ namespace Audit.EntityFramework.CodeFirst.UnitTest
         {
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogContext>().Reset();
-
+            Audit.Core.Configuration.AuditDisabled = true;
+            var title = Guid.NewGuid().ToString().Substring(0, 8);
             using (var ctx = new BlogContext())
             {
                 ctx.Database.CreateIfNotExists();
+                ctx.Blogs.Add(new Blog { Title = title });
+                ctx.SaveChanges();
             }
+            Audit.Core.Configuration.AuditDisabled = false;
         }
+
+        [Test]
+        public void Test_EF_EntityValidation()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(ev);
+                }));
+            var longString = "LONG STRING____________________________";
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            using (var context = new BlogContext())
+            {
+                var blog = context.Blogs.First();
+                blog.Title = longString;
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    var validations = ex.EntityValidationErrors.ToList();
+                    Assert.AreEqual(1, validations.Count);
+                    Assert.AreEqual(longString, ((dynamic)validations[0].Entry.Entity).Title);
+                }
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.AreEqual(false, evs[0].GetEntityFrameworkEvent().Entries[0].Valid);
+            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries[0].ValidationResults.Count);
+            Assert.IsTrue(evs[0].GetEntityFrameworkEvent().Entries[0].ValidationResults[0].ToLower().Contains("maximum"));
+        }
+
+        [Test]
+        public void Test_EF_EntityValidation_Excluded()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(ev);
+                }));
+            var longString = "LONG STRING____________________________";
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            using (var context = new BlogContext())
+            {
+                context.ExcludeValidationResults = true;
+                var blog = context.Blogs.First();
+                blog.Title = longString;
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    var validations = ex.EntityValidationErrors.ToList();
+                    Assert.AreEqual(1, validations.Count);
+                    Assert.AreEqual(longString, ((dynamic)validations[0].Entry.Entity).Title);
+                }
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.AreEqual(true, evs[0].GetEntityFrameworkEvent().Entries[0].Valid);
+            Assert.IsNull(evs[0].GetEntityFrameworkEvent().Entries[0].ValidationResults);
+        }
+
 
         [Test]
         public void Test_EF_TransactionId()
@@ -169,7 +244,7 @@ namespace Audit.EntityFramework.CodeFirst.UnitTest
         public void Test_EF_MapMultipleTypesToSameAuditType()
         {
             var guid = Guid.NewGuid().ToString();
-            var title = Guid.NewGuid().ToString();
+            var title = Guid.NewGuid().ToString().Substring(0, 8);
 
             var list = new List<AuditEventEntityFramework>();
             Audit.Core.Configuration.Setup()

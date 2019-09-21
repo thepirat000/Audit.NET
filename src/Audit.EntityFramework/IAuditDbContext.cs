@@ -19,6 +19,7 @@ namespace Audit.EntityFramework
         string AuditEventType { get; set; }
         bool AuditDisabled { get; set; }
         bool IncludeEntityObjects { get; set; }
+        bool ExcludeValidationResults { get; set; }
         AuditOptionMode Mode { get; set; }
         AuditDataProvider AuditDataProvider { get; set; }
         Dictionary<string, object> ExtraFields { get; }

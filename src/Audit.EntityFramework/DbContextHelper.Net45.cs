@@ -200,12 +200,12 @@ namespace Audit.EntityFramework
             foreach (var entry in modifiedEntries)
             {
                 var entity = entry.Entity;
-                var validationResults = entry.GetValidationResult();
+                var validationResults = context.ExcludeValidationResults ? null : entry.GetValidationResult();
                 var entityName = GetEntityName(dbContext, entity);
                 efEvent.Entries.Add(new EventEntry()
                 {
-                    Valid = validationResults.IsValid,
-                    ValidationResults = validationResults.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
+                    Valid = validationResults?.IsValid ?? true,
+                    ValidationResults = validationResults?.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
                     Entity = context.IncludeEntityObjects ? entity : null,
                     Entry = entry,
                     Action = GetStateName(entry.State),

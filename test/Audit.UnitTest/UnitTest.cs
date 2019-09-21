@@ -514,7 +514,7 @@ namespace Audit.UnitTest
                 .ForContext<MyContext>(x => x.AuditEventType("ForContext"))
                 .UseOptIn();
             EntityFramework.Configuration.Setup()
-                .ForAnyContext(x => x.AuditEventType("ForAnyContext").IncludeEntityObjects(true))
+                .ForAnyContext(x => x.AuditEventType("ForAnyContext").IncludeEntityObjects(true).ExcludeValidationResults(true))
                 .UseOptOut();
 
             var ctx = new MyContext();
@@ -522,6 +522,7 @@ namespace Audit.UnitTest
 
             Assert.AreEqual("FromAttr", ctx.AuditEventType);
             Assert.AreEqual(true, ctx.IncludeEntityObjects);
+            Assert.AreEqual(true, ctx.ExcludeValidationResults);
             Assert.AreEqual(AuditOptionMode.OptIn, ctx.Mode);
 
             Assert.AreEqual("ForAnyContext", ctx2.AuditEventType);

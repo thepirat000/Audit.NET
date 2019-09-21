@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.6.4] - 2019-09-21
+### Modified
+- Audit.EntityFramework: Adding ExcludeValidationResults setting to allow excluding entity validations on the audit output.
+
 ## [14.6.3] - 2019-08-12
 ### Modified
 - Audit.SqlServer: Adding boolean configuration value (SetDatabaseInitializerNull) to specify if the initializer should be set to NULL on the constructor of the internal DbContext. Only for .NET Framework (#237)
