@@ -53,6 +53,8 @@ This is the recommended approach.
 Decorate your controller with `AuditApiAttribute`: 
 
 ```c#
+using Audit.WebApi;
+
 public class UsersController : ApiController
 {
     [AuditApi]
@@ -72,6 +74,8 @@ public class UsersController : ApiController
 
 You can also decorate the controller class with the `AuditApi` attribute so it will apply to all the actions, for example:
 ```c#
+using Audit.WebApi;
+
 [AuditApi(EventTypeName = "{controller}/{action} ({verb})", IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
 public class UsersController : ApiController
 {
@@ -90,6 +94,8 @@ public class UsersController : ApiController
 You can also add the `AuditApiAttribute` as a global filter, for example for Asp.NET Core:
 
 ```c#
+using Audit.WebApi;
+
 public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
@@ -111,6 +117,8 @@ This method allows to dynamically change the audit settings as functions of the 
 > Note this action filter cannot be used to statically decorate the controllers.
 
 ```c#
+using Audit.WebApi;
+
 public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
@@ -123,7 +131,7 @@ public class Startup
                 .IncludeHeaders(ctx => !ctx.ModelState.IsValid)
                 .IncludeRequestBody()
                 .IncludeModelState()
-                .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)));
+                .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200));
         });
     }
 
@@ -137,6 +145,8 @@ to be able to log requests that doesn't get into an action filter (i.e. request 
 On your startup `Configure` method, call the `UseAuditMiddleware()` extension method:
 
 ```c#
+using Audit.WebApi;
+
 public class Startup
 {
     public void Configure(IApplicationBuilder app)
