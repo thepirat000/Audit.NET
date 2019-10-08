@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [14.6.6] - 2019-10-08
 ### Modified
 - Audit.NET.Elasticsearch: Updating for Elasticsearch 7 support. NEST library updated to latest release 7.3.1. (#248).
+- Audit.NET.EntityFrameworkCore: Updating Microsoft.EntityFramework.Core library to 3.0.0.
 
 ## [14.6.5] - 2019-09-26
 ### Modified
