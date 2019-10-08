@@ -32,20 +32,11 @@ namespace Audit.Elasticsearch.Providers
         public Func<AuditEvent, IndexName> IndexBuilder { get; set; }
 
         /// <summary>
-        /// The Elasticsearch type name to use when saving an audit event. NULL (or Func that returns NULL) to use the index name.
-        /// </summary>
-        /// <remarks>
-        /// https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html
-        /// </remarks>
-        [Obsolete("Mapping types will be completely removed in Elasticsearch 7.0.0.")]
-        public Func<AuditEvent, TypeName> TypeNameBuilder { get; set; }
-
-        /// <summary>
         /// The Elasticsearch document id to use when savint an audit event
         /// </summary>
         public Func<AuditEvent, Id> IdBuilder { get; set; }
 
-        internal ElasticsearchDataProvider(IElasticClient client)
+        public ElasticsearchDataProvider(IElasticClient client)
         {
             _client = new Lazy<IElasticClient>(() => client);
         }
@@ -71,9 +62,6 @@ namespace Audit.Elasticsearch.Providers
                 ConnectionSettings = elConfig._connectionSettings;
                 IdBuilder = elConfig._idBuilder;
                 IndexBuilder = elConfig._indexBuilder;
-#pragma warning disable CS0618 // Type or member is obsolete
-                TypeNameBuilder = elConfig._typeNameBuilder;
-#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -89,13 +77,11 @@ namespace Audit.Elasticsearch.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-#pragma warning disable CS0618 // Type or member is obsolete
-            var createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), TypeNameBuilder?.Invoke(auditEvent), id);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
             var response = _client.Value.Create(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
-                return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index, Type = response.Type };
+                return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
             }
             if (response.OriginalException != null)
             {
@@ -107,13 +93,11 @@ namespace Audit.Elasticsearch.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-#pragma warning disable CS0618 // Type or member is obsolete
-            var createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), TypeNameBuilder?.Invoke(auditEvent), id);
-#pragma warning restore CS0618 // Type or member is obsolete
+            ICreateRequest<AuditEvent> createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
             var response = await _client.Value.CreateAsync(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
-                return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index, Type = response.Type };
+                return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
             }
             if (response.OriginalException != null)
             {
@@ -125,7 +109,7 @@ namespace Audit.Elasticsearch.Providers
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var el = eventId as ElasticsearchAuditEventId;
-            var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Type, el.Id);
+            var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
             var response = _client.Value.Index(indexRequest);
             if (response.OriginalException != null)
             {
@@ -136,7 +120,7 @@ namespace Audit.Elasticsearch.Providers
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
             var el = eventId as ElasticsearchAuditEventId;
-            var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Type, el.Id);
+            var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
             var response = await _client.Value.IndexAsync(indexRequest);
             if (response.OriginalException != null)
             {
@@ -152,8 +136,8 @@ namespace Audit.Elasticsearch.Providers
 
         public T GetEvent<T>(ElasticsearchAuditEventId eventId) where T : AuditEvent
         {
-            var request = new GetRequest(eventId.Index, eventId.Type, eventId.Id);
-            var response = _client.Value.Get(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index).Type(eventId.Type));
+            var request = new GetRequest(eventId.Index, eventId.Id);
+            var response = _client.Value.Get(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
             if (response.IsValid && response.Found)
             {
                 return response.Source;
@@ -173,8 +157,8 @@ namespace Audit.Elasticsearch.Providers
 
         public async Task<T> GetEventAsync<T>(ElasticsearchAuditEventId eventId) where T : AuditEvent
         {
-            var request = new GetRequest(eventId.Index, eventId.Type, eventId.Id);
-            var response = await _client.Value.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index).Type(eventId.Type));
+            var request = new GetRequest(eventId.Index, eventId.Id);
+            var response = await _client.Value.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
             if (response.IsValid && response.Found)
             {
                 return response.Source;

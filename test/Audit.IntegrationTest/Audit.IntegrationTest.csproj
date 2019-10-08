@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp2.0;net452;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp2.0;net461;netcoreapp2.1</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.IntegrationTest</AssemblyName>
     <PackageId>Audit.IntegrationTest</PackageId>
@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.NET.DynamoDB\Audit.NET.DynamoDB.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />
@@ -31,6 +30,10 @@
     <ProjectReference Include="..\..\src\Audit.NET.Redis\Audit.NET.Redis.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureDocumentDB\Audit.NET.AzureDocumentDB.csproj" />
   </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
+    <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0-preview-20180610-02" />
@@ -43,14 +46,14 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>  
   
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' and '$(TargetFramework)' != 'net461'">
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.13.1" />
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Identity.Core\Audit.EntityFramework.Identity.Core.csproj" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.0" />
   </ItemGroup>  
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' or '$(TargetFramework)' == 'net461' ">
     <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Identity\Audit.EntityFramework.Identity.csproj" />
     <ProjectReference Include="..\..\src\Audit.WCF\Audit.WCF.csproj" />

@@ -8,7 +8,6 @@ namespace Audit.Elasticsearch.Providers
     public class ElasticsearchAuditEventId
     {
         public IndexName Index { get; set; }
-        public TypeName Type { get; set; }
         public Id Id { get; set; }
     }
 }

@@ -52,21 +52,5 @@ namespace Audit.Elasticsearch.Configuration
         /// </summary>
         /// <param name="idBuilder">The builder to get the id to use for an audit event. NULL to use a server generated id.</param>
         IElasticsearchProviderConfigurator Id(Func<AuditEvent, Id> idBuilder);
-
-        /// <summary>
-        /// Specifies the Elasticsearch document type to use for an audit event.
-        /// NOTE: Mapping types will be completely removed in Elasticsearch 7.0.0.
-        /// </summary>
-        /// <param name="typeNameBuilder">The builder to get the type to use for an audit event.</param>
-        [Obsolete("Mapping types will be completely removed in Elasticsearch 7.0.0.")]
-        IElasticsearchProviderConfigurator Type(Func<AuditEvent, TypeName> typeNameBuilder);
-
-        /// <summary>
-        /// Specifies the Elasticsearch document type to use for an audit event.
-        /// NOTE: Mapping types will be completely removed in Elasticsearch 7.0.0.
-        /// </summary>
-        /// <param name="typeName">The type to use for the audit events.</param>
-        [Obsolete("Mapping types will be completely removed in Elasticsearch 7.0.0.")]
-        IElasticsearchProviderConfigurator Type(string typeName);
     }
 }

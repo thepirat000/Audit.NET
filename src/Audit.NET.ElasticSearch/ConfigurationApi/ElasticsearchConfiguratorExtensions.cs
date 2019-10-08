@@ -15,18 +15,14 @@ namespace Audit.Core
         /// <param name="settings">The Elasticsearch connection settings</param>
         /// <param name="idBuilder">The builder to get the id to use for an audit event. NULL to use a server generated id</param>
         /// <param name="indexBuilder">The builder to get the index to use for an audit event. NULL to use the default index name</param>
-        /// <param name="typeNameBuilder">The builder to get the type to use for an audit event</param>
         public static ICreationPolicyConfigurator UseElasticsearch(this IConfigurator configurator, AuditConnectionSettings settings,
-            Func<AuditEvent, Id> idBuilder = null, Func<AuditEvent, IndexName> indexBuilder = null, Func<AuditEvent, TypeName> typeNameBuilder = null)
+            Func<AuditEvent, Id> idBuilder = null, Func<AuditEvent, IndexName> indexBuilder = null)
         {
             Configuration.DataProvider = new ElasticsearchDataProvider()
             {
                 ConnectionSettings = settings,
                 IdBuilder = idBuilder,
-                IndexBuilder = indexBuilder,
-#pragma warning disable 618
-                TypeNameBuilder = typeNameBuilder
-#pragma warning restore 618
+                IndexBuilder = indexBuilder
             };
             return new CreationPolicyConfigurator();
         }
@@ -44,10 +40,7 @@ namespace Audit.Core
             {
                 ConnectionSettings = elasDbConfig._connectionSettings,
                 IdBuilder = elasDbConfig._idBuilder,
-                IndexBuilder = elasDbConfig._indexBuilder,
-#pragma warning disable 618
-                TypeNameBuilder = elasDbConfig._typeNameBuilder
-#pragma warning restore 618
+                IndexBuilder = elasDbConfig._indexBuilder
             };
             return new CreationPolicyConfigurator();
         }

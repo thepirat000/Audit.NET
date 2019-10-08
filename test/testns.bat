@@ -1,11 +1,11 @@
 @echo off
-start "" /D D:\DynamoDB "D:\DynamoDB\run.bat"
+start "" /D D:\redis "c:\redis\redis-server.exe"
+start "" /D D:\Elasticsearch\bin "D:\Elasticsearch\bin\elasticsearch.bat"
 start "" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 start "" /D c:\redis "c:\redis\redis-server.exe"
 net start mysql57
 net start mssqlserver
 net start postgresql-x64-9.6
-net start elasticsearch
 
 cd ..
 dotnet restore
@@ -107,6 +107,6 @@ pause>nul
 net stop mssqlserver
 net stop mysql57
 net stop postgresql-x64-9.6
-net stop elasticsearch
+taskkill /f /im java.exe
 taskkill /f /im mongod.exe
 taskkill /f /im redis-server.exe

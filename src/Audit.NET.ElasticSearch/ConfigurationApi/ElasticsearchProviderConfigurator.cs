@@ -9,7 +9,6 @@ namespace Audit.Elasticsearch.Configuration
     {
         internal IConnectionSettingsValues _connectionSettings;
         internal Func<Core.AuditEvent, IndexName> _indexBuilder;
-        internal Func<Core.AuditEvent, TypeName> _typeNameBuilder;
         internal Func<Core.AuditEvent, Id> _idBuilder;
 
         public IElasticsearchProviderConfigurator ConnectionSettings(AuditConnectionSettings connectionSettings)
@@ -54,16 +53,5 @@ namespace Audit.Elasticsearch.Configuration
             return this;
         }
 
-        public IElasticsearchProviderConfigurator Type(Func<Core.AuditEvent, TypeName> typeNameBuilder)
-        {
-            _typeNameBuilder = typeNameBuilder;
-            return this;
-        }
-
-        public IElasticsearchProviderConfigurator Type(string typeName)
-        {
-            _typeNameBuilder = ev => typeName;
-            return this;
-        }
     }
 }

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.6.6] - 2019-10-08
+### Modified
+- Audit.NET.Elasticsearch: Updating for Elasticsearch 7 support. NEST library updated to latest release 7.3.1. (#248).
+
 ## [14.6.5] - 2019-09-26
 ### Modified
 - Audit.NET.MongoDB: Updating MongoDB.Driver library to latest release (2.9.1). This fixes problem when using mongo DB data provider in Net Core 3.0 (#246).

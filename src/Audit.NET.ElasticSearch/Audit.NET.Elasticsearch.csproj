@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Store Audit.NET Trail Logs into Elasticsearch database</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.Elasticsearch</AssemblyTitle>
-    <VersionPrefix>14.6.5</VersionPrefix>
+    <VersionPrefix>14.6.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -18,7 +18,6 @@
     <PackageTags>Audit;Trail;Log;Elasticsearch</PackageTags>
     <PackageIconUrl>https://i.imgur.com/PbeWVKz.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -28,10 +27,10 @@
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
   </ItemGroup>
-  
+    
   <ItemGroup>
-    <PackageReference Include="NEST" Version="6.0.2" />
-    <PackageReference Include="NEST.jsonnetserializer" Version="6.0.2" />
+    <PackageReference Include="NEST" Version="7.3.1" />
+    <PackageReference Include="NEST.jsonnetserializer" Version="7.3.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 

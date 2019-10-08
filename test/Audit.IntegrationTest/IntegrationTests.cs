@@ -45,27 +45,21 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("px", x.FilenamePrefix);
                 Assert.AreEqual(DefaultValueHandling.Populate, x.JsonSettings.DefaultValueHandling);
             }
-
+#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
             [Test]
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
             {
-#pragma warning disable CS0618 // Type or member is obsolete
                 var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
                     .ConnectionSettings(new Elasticsearch.Providers.AuditConnectionSettings(new Uri("http://server/")))
                     .Id(ev => "id")
-                    .Index("ix")
-                    .Type(ev => Nest.TypeName.From<int>()));
-#pragma warning restore CS0618 // Type or member is obsolete
+                    .Index("ix"));
 
                 Assert.AreEqual("http://server/", (x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()));
                 Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
                 Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
-#pragma warning disable CS0618 // Type or member is obsolete
-                Assert.AreEqual(Nest.TypeName.From<int>(), x.TypeNameBuilder.Invoke(null));
-#pragma warning restore CS0618 // Type or member is obsolete
             }
-
+#endif
             [Test]
             [Category("Mongo")]
             public void Test_MongoDataProvider_FluentApi()
@@ -134,7 +128,7 @@ namespace Audit.IntegrationTest
                     .Schema(ev => "schema")
                     .TableName("table")
                     .CustomColumn("EventType", ev => ev.EventType)
-#if NET452
+#if NET452 || NET461
                     .SetDatabaseInitializerNull()
 #endif
                     );
@@ -145,7 +139,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("last", x.LastUpdatedDateColumnNameBuilder.Invoke(null));
                 Assert.AreEqual("schema", x.SchemaBuilder.Invoke(null));
                 Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
-#if NET452
+#if NET452 || NET461
                 Assert.AreEqual(true, x.SetDatabaseInitializerNull);
 #endif
             }
@@ -235,7 +229,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(null, x.AuditTypeMapper.Invoke(typeof(AuditBlog), null));
             }
 
-#if NET452
+#if NET452 || NET461
             [Test]
             public void Test_StrongName_PublicToken()
             {
@@ -554,6 +548,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
+#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
             [Test]
             [Category("Elasticsearch")]
             public void TestElasticsearch()
@@ -571,6 +566,7 @@ namespace Audit.IntegrationTest
                 SetElasticsearchSettings();
                 await TestUpdateAsync();
             }
+#endif
 
             [Test]
             [Category("Dynamo")]
@@ -813,7 +809,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
             }
 
-#if NET452 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             public void TestEventLog()
             {
@@ -903,7 +899,7 @@ namespace Audit.IntegrationTest
                         .LastUpdatedColumnName("LastUpdatedDate")
                         .CustomColumn("EventType", ev => ev.EventType)
                         .CustomColumn("SomeDate", _ => DateTime.UtcNow)
-#if NET452
+#if NET452 || NET461
                         .SetDatabaseInitializerNull()
 #endif
                         )
@@ -959,12 +955,12 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-
+#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
             public void SetElasticsearchSettings()
             {
                 var uri = new Uri(AzureSettings.ElasticSearchUrl);
                 var ec = new Nest.ElasticClient(uri);
-                ec.DeleteIndex(Nest.Indices.AllIndices, x => x.Index("auditevent"));
+                ec.Indices.Delete(Nest.Indices.AllIndices, x => x.Index("auditevent"));
 
                 Audit.Core.Configuration.Setup()
                     .UseElasticsearch(config => config
@@ -974,7 +970,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-
+#endif
             public void SetDynamoSettings()
             {
                 var url = "http://localhost:8000";

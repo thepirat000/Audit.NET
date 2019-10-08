@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if NET452 || NET461
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
@@ -569,7 +569,7 @@ SET IDENTITY_INSERT Posts OFF
     }
 
 
-    #region ManyToManyTest
+#region ManyToManyTest
     public class EventAvailabilityResponse
     {
         public EventAvailabilityResponse()
@@ -645,6 +645,6 @@ SET IDENTITY_INSERT Posts OFF
         public DbSet<EventAvailabilityResponse> EventAvailabilityResponse { get; set; }
         public DbSet<Event> Event { get; set; }
     }
-    #endregion
+#endregion
 }
 #endif
