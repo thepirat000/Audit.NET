@@ -24,7 +24,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         public Func<Type, bool> IncludedTypesFilter { get; set; }
         public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
         public bool? ExcludeTransactionId { get; set; }
-#if NET45
+#if EF_FULL
         public bool? IncludeIndependantAssociations { get; set; }
 #endif
     }

@@ -54,8 +54,8 @@ namespace Audit.EntityFramework
         {
             EnsureConfigFor<T>().ExcludeTransactionId = exclude;
         }
-        
-#if NET45
+
+#if EF_FULL
         internal static void SetIncludeIndependantAssociations<T>(bool include)
             where T : IAuditDbContext
         {

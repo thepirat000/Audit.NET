@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if EF_FULL
 using System;
 using System.Collections.Generic;
 using System.Text;

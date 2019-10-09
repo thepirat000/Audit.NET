@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Store Audit.NET Trail Logs into a PostgreSQL database</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.PostgreSql</AssemblyTitle>
-    <VersionPrefix>14.6.6</VersionPrefix>
+    <VersionPrefix>14.7.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

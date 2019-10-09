@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Store Audit.NET Trail Logs into a MongoDB database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MongoDB</AssemblyTitle>
-    <VersionPrefix>14.6.6</VersionPrefix>
+    <VersionPrefix>14.7.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net452</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>

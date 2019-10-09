@@ -40,7 +40,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="exclude">if set to <c>true</c> the Transation Id will not be included on the output.</param>
         IContextSettingsConfigurator<T> ExcludeTransactionId(bool exclude = true);
-#if NET45
+#if EF_FULL
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
         /// </summary>

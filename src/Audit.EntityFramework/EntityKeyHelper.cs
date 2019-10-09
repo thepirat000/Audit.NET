@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if EF_FULL
 using Audit.EntityFramework;
 using System;
 using System.Collections.Concurrent;

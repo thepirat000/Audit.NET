@@ -1,7 +1,7 @@
-﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+﻿#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-#elif NET45
+#else
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Core.Objects;
@@ -52,7 +52,7 @@ namespace Audit.EntityFramework
             context.AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
             context.EntitySettings = MergeEntitySettings(attrConfig?.EntitySettings, localConfig?.EntitySettings, globalConfig?.EntitySettings);
             context.ExcludeTransactionId = attrConfig?.ExcludeTransactionId ?? localConfig?.ExcludeTransactionId ?? globalConfig?.ExcludeTransactionId ?? false;
-#if NET45
+#if EF_FULL
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
         }
@@ -171,7 +171,7 @@ namespace Audit.EntityFramework
                 var fks = GetForeignKeys(context.DbContext, entry);
                 foreach (var fk in fks)
                 {
-#if NET45
+#if EF_FULL
                     // When deleting an entity, sometimes the foreign keys are set to NULL by EF. This only happens on EF6.
                     if (fk.Value == null)
                     {
@@ -184,7 +184,7 @@ namespace Audit.EntityFramework
                     }
                 }
             }
-#if NET45
+#if EF_FULL
             if (efEvent.Associations != null)
             {
                 foreach (var association in efEvent.Associations)
@@ -202,7 +202,7 @@ namespace Audit.EntityFramework
         private bool IncludeEntity(IAuditDbContext context, object entity, AuditOptionMode mode)
         {
             var type = entity.GetType();
-#if NET45
+#if EF_FULL
             type = ObjectContext.GetObjectType(type);
 #else
             if (type.FullName.StartsWith("Castle.Proxies."))
@@ -386,9 +386,9 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the modified entries to process.
         /// </summary>
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
         public List<EntityEntry> GetModifiedEntries(IAuditDbContext context)
-#elif NET45
+#else
         public List<DbEntityEntry> GetModifiedEntries(IAuditDbContext context)
 #endif
         {
@@ -421,7 +421,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1)
             try
             {
                 var connId = ((connection as dynamic).ClientConnectionId) as Guid?;

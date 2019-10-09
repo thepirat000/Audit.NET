@@ -16,22 +16,37 @@ To install the package run the following command on the Package Manager Console:
 PM> Install-Package Audit.EntityFramework
 ```
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
-[![NuGet Count](https://img.shields.io/nuget/dt/Audit.EntityFramework.svg)](https://www.nuget.org/packages/Audit.EntityFramework/)
-
-## Notes 
-
-If you target the full .NET framework but want to use EntityFrameworkCore (EF >= 7), you should install the `Audit.EntityFramework.Core` package instead:
+Or, if you use EntityFramework core: 
 
 ```
 PM> Install-Package Audit.EntityFramework.Core
 ```
 
-If you want to audit [ASP.NET Identity entities](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx), you must also install the `Audit.EntityFramework.Identity` library:
+Or, if you want to audit [ASP.NET Identity entities](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx), you must also install the `Audit.EntityFramework.Identity` library:
 
 ```
 PM> Install-Package Audit.EntityFramework.Identity
 ```
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat)](https://www.nuget.org/packages/Audit.EntityFramework/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.EntityFramework.svg)](https://www.nuget.org/packages/Audit.EntityFramework/)
+
+## EF library version 
+
+The following table shows the entity framework package version used for each .NET framework and audit library:
+
+| <sub>Target</sub> \ <sup>Library</sup> | `Audit.EntityFramework` | `Audit.EntityFramework.Core` | 
+| ------------ | ---------------- |  -------------- |
+| **≥ .NET 4.5** | EntityFramework 6.1.3 | x |
+| **≥ .NET 4.6.1** | EntityFramework 6.1.3 | Microsoft.EntityFrameworkCore 2.2.4 |
+| **≥ .NET Standard 1.5** | Microsoft.EntityFrameworkCore 1.1.2 | Microsoft.EntityFrameworkCore 1.1.2 |
+| **≥ .NET Standard 2.0** | Microsoft.EntityFrameworkCore 2.2.4 | Microsoft.EntityFrameworkCore 2.2.4 |
+| **≥ .NET Standard 2.1** | EntityFramework 6.3.0 | Microsoft.EntityFrameworkCore 3.0.0 |
+
+Examples:
+
+- Your app targets the full .NET framework but want to use EntityFramework Core, you must install the `Audit.EntityFramework.Core` package.
+- Your app targets .NET standard 2.1 and want to use EntityFramework 6.1.3, you must install `Audit.EntityFramework` package.
 
 ## Usage
 Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 

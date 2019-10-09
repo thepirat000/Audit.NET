@@ -3,10 +3,10 @@ using Audit.Core;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-#elif NET45
+#else
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 #endif
@@ -99,7 +99,7 @@ namespace Audit.EntityFramework.Providers
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);
                         if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
                         {
-#if NET45
+#if EF_FULL
                             auditDbContext.Set(mappedType).Add(auditEntity);
 #else
                             auditDbContext.Add(auditEntity);
@@ -144,7 +144,7 @@ namespace Audit.EntityFramework.Providers
                         var auditEntity = CreateAuditEntity(type, mappedType, entry);
                         if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
                         {
-#if NET45
+#if EF_FULL
                             auditDbContext.Set(mappedType).Add(auditEntity);
 #else
                             await auditDbContext.AddAsync(auditEntity);
@@ -176,7 +176,7 @@ namespace Audit.EntityFramework.Providers
                 entryType = entryType.GetTypeInfo().BaseType;
             }
             Type type;
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if EF_CORE && (NETSTANDARD2_0 || NETSTANDARD2_1)
             IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entryType);
                 type = definingType?.ClrType;
 #elif NETSTANDARD1_5 || NET461

@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if EF_FULL
 using Audit.EntityFramework.ConfigurationApi;
 using System;
 using System.Collections.Generic;
@@ -267,4 +267,3 @@ namespace Audit.EntityFramework
     }
 }
 #endif
-      

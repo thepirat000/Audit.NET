@@ -25,7 +25,7 @@ namespace Audit.EntityFramework
                 InternalConfig.ExcludeTransactionId = value;
             }
         }
-#if NET45
+#if EF_FULL
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
         /// </summary>

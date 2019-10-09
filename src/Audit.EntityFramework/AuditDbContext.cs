@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
 using Audit.EntityFramework.ConfigurationApi;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
-#elif NET45
+#else
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
@@ -23,7 +23,7 @@ namespace Audit.EntityFramework
     {
         private DbContextHelper _helper = new DbContextHelper();
 
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>
@@ -32,7 +32,7 @@ namespace Audit.EntityFramework
         {
             _helper.SetConfig(this);
         }
-#elif NET45
+#else
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>
@@ -132,7 +132,7 @@ namespace Audit.EntityFramework
         public bool ExcludeTransactionId { get; set; }
 
         public DbContext DbContext { get { return this; } }
-#if NET45
+#if EF_FULL
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
         /// </summary>
@@ -189,7 +189,7 @@ namespace Audit.EntityFramework
         {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
         }
-#if NET45
+#if EF_FULL
         /// <summary>
         /// Saves the changes asynchronously.
         /// </summary>

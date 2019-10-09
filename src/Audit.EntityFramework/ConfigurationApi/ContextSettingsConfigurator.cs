@@ -35,7 +35,7 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
-#if NET45
+#if EF_FULL
         public IContextSettingsConfigurator<T> IncludeIndependantAssociations(bool include = true)
         {
             Configuration.SetIncludeIndependantAssociations<T>(include);

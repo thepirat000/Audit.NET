@@ -3,9 +3,9 @@ using Audit.Core.ConfigurationApi;
 using Audit.EntityFramework.Providers;
 using Audit.EntityFramework;
 using Audit.EntityFramework.ConfigurationApi;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
-#elif NET45
+#else
 using System.Data.Entity;
 #endif
 

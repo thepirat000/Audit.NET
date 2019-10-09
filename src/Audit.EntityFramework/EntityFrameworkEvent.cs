@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Audit.Core;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
-#elif NET45
+#else
 using System.Data.Entity;
 #endif
 namespace Audit.EntityFramework
@@ -20,7 +20,7 @@ namespace Audit.EntityFramework
         public string TransactionId { get; set; }
         [JsonProperty(Order = 10)]
         public List<EventEntry> Entries { get; set; }
-#if NET45
+#if EF_FULL
         [JsonProperty(Order = 15, NullValueHandling = NullValueHandling.Ignore)]
         public List<AssociationEntry> Associations { get; set; }
 #endif

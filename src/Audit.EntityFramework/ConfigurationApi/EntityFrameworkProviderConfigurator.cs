@@ -1,9 +1,9 @@
 ﻿using System;
 using Audit.Core;
 using System.Reflection;
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
-#elif NET45
+#else
 using System.Data.Entity;
 #endif
 
