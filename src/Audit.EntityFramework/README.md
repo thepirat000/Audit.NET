@@ -35,7 +35,7 @@ PM> Install-Package Audit.EntityFramework.Identity
 
 The following table shows the entity framework package version used for each .NET framework and audit library:
 
-| <sub>Target</sub> \ <sup>Library</sup> | `Audit.EntityFramework` | `Audit.EntityFramework.Core` | 
+| <sub>Target</sub> \ <sup>Library</sup> | `Audit.EntityFramework` / `Audit.EntityFramework.Identity` | `Audit.EntityFramework.Core` / `Audit.EntityFramework.Identity.Core` | 
 | ------------ | ---------------- |  -------------- |
 | **≥ .NET 4.5** | EntityFramework 6.1.3 | x |
 | **≥ .NET 4.6.1** | EntityFramework 6.1.3 | Microsoft.EntityFrameworkCore 2.2.4 |
