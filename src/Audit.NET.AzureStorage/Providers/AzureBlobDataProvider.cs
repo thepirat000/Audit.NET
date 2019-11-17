@@ -6,6 +6,7 @@ using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -38,7 +39,7 @@ namespace Audit.AzureTableStorage.Providers
         /// </summary>
         public bool UseHttps { get; set; } = true;
 
-        private static readonly IDictionary<string, CloudBlobContainer> ContainerCache = new Dictionary<string, CloudBlobContainer>();
+        private static readonly IDictionary<string, CloudBlobContainer> ContainerCache = new ConcurrentDictionary<string, CloudBlobContainer>();
 
         /// <summary>
         /// Gets or sets a function that returns a unique name for the blob (can contain folders).
