@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.8.0] - 2019-11-20
+### Modified
+- Audit.EntityFramework: Fix 'Property set method not found.' for get-only properties on audit entities (#256)
+- Audit.NET.AzureStorage: Fixed issue with non-concurrent collections (#223, #255)
+
 ## [14.7.0] - 2019-10-09
 ### Modified
 - Audit.EntityFramework: Adding support for Net Standard >= 2.1 to point to the EntityFramework 6.3.0 library. (#249)

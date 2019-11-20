@@ -4,7 +4,7 @@
     <Description>Log Audit.NET Audit Trail using Apache log4net™</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.log4net</AssemblyTitle>
-    <VersionPrefix>14.7.0</VersionPrefix>
+    <VersionPrefix>14.8.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -23,6 +23,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

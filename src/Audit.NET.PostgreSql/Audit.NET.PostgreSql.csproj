@@ -3,7 +3,7 @@
     <Description>Store Audit.NET Trail Logs into a PostgreSQL database</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.PostgreSql</AssemblyTitle>
-    <VersionPrefix>14.7.0</VersionPrefix>
+    <VersionPrefix>14.8.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -23,6 +23,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

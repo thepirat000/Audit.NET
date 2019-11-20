@@ -3,7 +3,7 @@
     <Description>Generate Audit Logs for ASP.NET SignalR invokations</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.SignalR</AssemblyTitle>
-    <VersionPrefix>14.7.0</VersionPrefix>
+    <VersionPrefix>14.8.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFramework>net45</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -21,6 +21,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
