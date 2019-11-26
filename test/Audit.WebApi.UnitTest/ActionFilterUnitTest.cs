@@ -177,6 +177,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("1", action.ResponseHeaders["header-one"]);
             Assert.AreEqual("2", action.ResponseHeaders["header-two"]);
 
+            Assert.AreEqual(actionContext.ActionDescriptor.ActionName, action.GetHttpActionContext().ActionDescriptor.ActionName);
         }
 
 
@@ -263,6 +264,7 @@ namespace Audit.WebApi.UnitTest
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual(actionDescriptor.MethodInfo.Name, action.ActionName);
             Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.AreEqual(actionContext.ActionDescriptor.ActionName, action.HttpActionContext.ActionDescriptor.ActionName);
         }
 
         [Test]

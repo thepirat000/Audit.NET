@@ -95,7 +95,8 @@ namespace Audit.WebApi
                     IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                     HttpMethod = httpContext.Request.Method,
                     FormVariables = AuditApiHelper.GetFormVariables(httpContext),
-                    TraceId = httpContext.TraceIdentifier
+                    TraceId = httpContext.TraceIdentifier,
+                    ActionExecutingContext = actionContext
                 };
             }
             action.RequestUrl = httpContext.Request.GetDisplayUrl();
@@ -117,7 +118,6 @@ namespace Audit.WebApi
             }
             return action;
         }
-
 
         /// <summary>
         /// Occurs after the action method is invoked.

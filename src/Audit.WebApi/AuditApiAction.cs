@@ -1,6 +1,11 @@
 ﻿using System.Collections.Generic;
 using Audit.Core;
 using Newtonsoft.Json;
+#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+using Microsoft.AspNetCore.Mvc.Filters;
+#else
+using System.Web.Http.Controllers;
+#endif
 
 namespace Audit.WebApi
 {
@@ -47,6 +52,26 @@ namespace Audit.WebApi
 #if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
         [JsonIgnore]
         internal bool IsMiddleware { get; set; }
+
+        [JsonIgnore]
+        internal ActionExecutingContext ActionExecutingContext { get; set; }
+        /// <summary>
+        /// Gets the ActionExecutingContext related to this event
+        /// </summary>
+        public ActionExecutingContext GetActionExecutingContext()
+        {
+            return ActionExecutingContext;
+        }
+#else
+        [JsonIgnore]
+        internal HttpActionContext HttpActionContext { get; set; }
+        /// <summary>
+        /// Gets the HttpActionContext related to this event
+        /// </summary>
+        public HttpActionContext GetHttpActionContext()
+        {
+            return HttpActionContext;
+        }
 #endif
         /// <summary>
         /// Serializes this Audit Action as a JSON string

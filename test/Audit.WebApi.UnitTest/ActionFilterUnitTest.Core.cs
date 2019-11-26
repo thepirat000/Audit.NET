@@ -145,6 +145,9 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            Assert.IsNotNull(action.ActionExecutingContext);
+            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName, (action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ActionName);
+            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName, (action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ControllerName);
             Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
             Assert.AreEqual("application/json", action.Headers["content-type"]);
             Assert.AreEqual("values", action.ControllerName);
@@ -210,6 +213,9 @@ namespace Audit.WebApi.UnitTest
 
             //Assert
             Assert.AreEqual("this is the result", action.ResponseBody.Value);
+
+            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName, (action.GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName);
+            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName, (action.GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ControllerName);
         }
 
         [Test]

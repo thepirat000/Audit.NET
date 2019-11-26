@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.WebApi;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -62,6 +63,8 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(1, insertEvs.Count);
             Assert.IsNotNull(await res.Content.ReadAsStringAsync());
             Assert.AreEqual(true, insertEvs[0].CustomFields["ScopeExists"]);
+            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext());
+            Assert.AreEqual("GlobalAudit", (insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName);
         }
 
         public async Task Test_WebApi_TestFromServiceIgnore()
@@ -111,6 +114,8 @@ namespace Audit.Integration.AspNetCore
             Assert.IsTrue(action.ResponseHeaders.Count > 0);
             Assert.AreEqual("test", action.ResponseHeaders["some-header-attr"]);
             Assert.AreEqual(url, action.RequestUrl);
+            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext());
+            Assert.AreEqual("TestResponseHeadersAttribute", (insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName);
         }
 
         public async Task Test_WebApi_ResponseHeaders_GlobalFilter()
