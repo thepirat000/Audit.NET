@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [14.9.0] - 2019-11-29
+### Modified
+- Audit.WebApi / Audit.WebApi.Core: Removing unneeded references (Microsoft.AspNetCore.Identity and Microsoft.Extensions.PlatformAbstractions) (#258)
+
 ## [14.8.1] - 2019-11-26
 ### Modified
 - Audit.WebApi / Audit.WebApi.Core: Adding execution context getter to AuditApiAction (#257)

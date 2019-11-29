@@ -1,4 +1,12 @@
 @echo off
+
+title Audit.NET Unit Tests Runner
+
+echo Disabling GitHub nuget source to avoid conflicts
+nuget sources disable -name GitHub
+echo.
+
+
 start "" /D D:\redis "c:\redis\redis-server.exe"
 start "" /D D:\Elasticsearch\bin "D:\Elasticsearch\bin\elasticsearch.bat"
 start "" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"

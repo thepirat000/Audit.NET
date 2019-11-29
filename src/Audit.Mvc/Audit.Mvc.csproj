@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for MVC Controller actions.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.Mvc</AssemblyTitle>
-    <VersionPrefix>14.8.1</VersionPrefix>
+    <VersionPrefix>14.9.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net45</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">

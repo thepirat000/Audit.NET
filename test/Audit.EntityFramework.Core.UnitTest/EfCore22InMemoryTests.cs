@@ -39,11 +39,12 @@ namespace Audit.EntityFramework.Core.UnitTest
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_test")
                 .Options;
+            var id = new Random().Next();
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var user = new User()
                 {
-                    Id = 1,
+                    Id = id,
                     Name = "fede",
                     Password = "142857",
                     Token = "aaabbb"
@@ -53,7 +54,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
                 Audit.Core.Configuration.AuditDisabled = false;
 
-                var usr = ctx.Users.First();
+                var usr = ctx.Users.First(u => u.Id == id);
                 usr.Password = "1234";
                 usr.Token = "xxxaaa";
                 ctx.SaveChanges();
