@@ -81,7 +81,6 @@ namespace Audit.DynamicProxy.UnitTest
                 await audited.AsyncMethodAsyncWithCancellation(source.Token);
             });
             
-
             Assert.AreEqual(6, logs.Count);
 
 
