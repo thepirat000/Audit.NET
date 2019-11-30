@@ -101,7 +101,7 @@ namespace Audit.WebApi
                 {
                     Type = context.Request.ContentType,
                     Length = context.Request.ContentLength,
-                    Value = includeRequestBody ? AuditApiHelper.GetRequestBody(context) : null
+                    Value = includeRequestBody ? await AuditApiHelper.GetRequestBody(context) : null
                 },
                 TraceId = context.TraceIdentifier
             };
@@ -143,7 +143,7 @@ namespace Audit.WebApi
                         {
                             Type = context.Response.ContentType,
                             Length = context.Response.ContentLength,
-                            Value = AuditApiHelper.GetResponseBody(context)
+                            Value = await AuditApiHelper.GetResponseBody(context)
                         };
                     }
                 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 #endif
 using Audit.Core;
 using Newtonsoft.Json;
@@ -86,7 +87,7 @@ namespace Audit.WebApi
             return ToDictionary(formCollection);
         }
 
-        internal static string GetRequestBody(HttpContext httpContext)
+        internal static async Task<string> GetRequestBody(HttpContext httpContext)
         {
             var body = httpContext.Request.Body;
             if (body != null && body.CanRead)
@@ -97,7 +98,7 @@ namespace Audit.WebApi
                     {
                         body.Seek(0, SeekOrigin.Begin);
                     }
-                    body.CopyTo(stream);
+                    await body.CopyToAsync(stream);
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);
@@ -108,7 +109,7 @@ namespace Audit.WebApi
             return null;
         }
 
-        internal static string GetResponseBody(HttpContext httpContext)
+        internal static async Task<string> GetResponseBody(HttpContext httpContext)
         {
             var body = httpContext.Response.Body;
             if (body != null && body.CanRead)
@@ -119,7 +120,7 @@ namespace Audit.WebApi
                     {
                         body.Seek(0, SeekOrigin.Begin);
                     }
-                    body.CopyTo(stream);
+                    await body.CopyToAsync(stream);
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);
