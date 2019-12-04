@@ -345,13 +345,13 @@ by creating a class that inherits from `AuditDataProvider` and overrides its met
 
 If your data provider will support asynchronous operations, you must also implement the following methods:
 
-- `InsertEventAsync`: Asynchoronous implementation of the InsertEvent method. 
-- `ReplaceEventAsync`: Asynchoronous implementation of the ReplaceEvent method.
+- `InsertEventAsync`: Asynchronous implementation of the InsertEvent method. 
+- `ReplaceEventAsync`: Asynchronous implementation of the ReplaceEvent method.
 
 Also, if your data provider will support event retrieval, you should implement the methods:
 
 - `GetEvent`: Retrieves an event by id. 
-- `GetEventAsync`: Asynchoronous implementation of the GetEvent method. 
+- `GetEventAsync`: Asynchronous implementation of the GetEvent method. 
 
 
 For example:
