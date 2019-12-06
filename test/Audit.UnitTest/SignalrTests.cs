@@ -39,7 +39,6 @@ namespace Audit.UnitTest
             };
 
             SimulateConnectReconnectDisconnect(module);
-
             Assert.AreEqual(0, evs.Count);
         }
 
