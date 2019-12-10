@@ -240,7 +240,7 @@ namespace Audit.UnitTest
             {
                 tasks.Add(Task.Factory.StartNew(async () =>
                 {
-                    await AuditScope.CreateAndSaveAsync("LoginSuccess", new { username = "federico", id = i });
+                    await AuditScope.LogAsync("LoginSuccess", new { username = "federico", id = i });
                     Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, ev =>
                     {
                         //do nothing, just bother
@@ -289,7 +289,7 @@ namespace Audit.UnitTest
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            await AuditScope.CreateAndSaveAsync(eventType, new { ExtraField = "extra value" });
+            await AuditScope.LogAsync(eventType, new { ExtraField = "extra value" });
 
             await AuditScope.CreateAndSaveAsync(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);

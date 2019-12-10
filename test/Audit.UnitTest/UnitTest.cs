@@ -460,7 +460,7 @@ namespace Audit.UnitTest
             {
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
-                    AuditScope.CreateAndSave("LoginSuccess", new { username = "federico", id = i });
+                    AuditScope.Log("LoginSuccess", new { username = "federico", id = i });
                     Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, ev =>
                     {
                         //do nothing, just bother
@@ -569,7 +569,7 @@ namespace Audit.UnitTest
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            AuditScope.CreateAndSave(eventType, new { ExtraField = "extra value" });
+            AuditScope.Log(eventType, new { ExtraField = "extra value" });
 
             AuditScope.CreateAndSave(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);

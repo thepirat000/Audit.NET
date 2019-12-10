@@ -18,7 +18,21 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static void CreateAndSave(string eventType, object extraFields, AuditDataProvider dataProvider = null)
         {
-            new AuditScope(new AuditScopeOptions(eventType, null, extraFields, dataProvider, null, true)).Start();
+            using (var scope = new AuditScope(new AuditScopeOptions(eventType, null, extraFields, dataProvider, null, true)))
+            {
+                scope.Start();
+            }
+        }
+
+        /// <summary>
+        /// Creates an audit scope with the given extra fields, and saves it right away using the globally configured data provider. Shortcut for CreateAndSave().
+        /// </summary>
+        /// <param name="eventType">Type of the event.</param>
+        /// <param name="extraFields">An anonymous object that can contain additional fields to be merged into the audit event.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static void Log(string eventType, object extraFields)
+        {
+            CreateAndSave(eventType, extraFields, null);
         }
 
         /// <summary>
@@ -91,7 +105,22 @@ namespace Audit.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static async Task CreateAndSaveAsync(string eventType, object extraFields, AuditDataProvider dataProvider = null)
         {
-            await new AuditScope(new AuditScopeOptions(eventType, null, extraFields, dataProvider, null, true)).StartAsync();
+            using (var scope = new AuditScope(new AuditScopeOptions(eventType, null, extraFields, dataProvider, null, true)))
+            {
+                await scope.StartAsync();
+            }
+        }
+
+        /// <summary>
+        /// Creates an audit scope with the given extra fields, and saves it right away using the globally configured data provider. Shortcut for CreateAndSaveAsync().
+        /// </summary>
+        /// <param name="eventType">Type of the event.</param>
+        /// <param name="extraFields">An anonymous object that can contain additional fields to be merged into the audit event.</param>
+        /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static async Task LogAsync(string eventType, object extraFields, AuditDataProvider dataProvider = null)
+        {
+            await CreateAndSaveAsync(eventType, extraFields, null);
         }
 
         /// <summary>

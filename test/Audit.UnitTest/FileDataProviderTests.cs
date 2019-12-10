@@ -57,7 +57,7 @@ namespace Audit.UnitTest
 
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
-            AuditScope.CreateAndSave(guid, loop);
+            AuditScope.Log(guid, loop);
 
             var ev = fdp.GetEvent(Path.Combine(_directory, guid));
 
