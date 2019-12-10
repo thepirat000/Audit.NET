@@ -84,10 +84,10 @@ using (var scope = AuditScope.Create(options))
 
 ### Simple logging
 
-If you are not tracking an object, nor the duration of an event, you can use the `CreateAndSave` shortcut method that logs an event immediately. 
+If you are not tracking an object, nor the duration of an event, you can use the `Log` shortcut method that logs an event immediately. 
 For example:
 ```c#
-AuditScope.CreateAndSave("Event Type", new { ExtraField = "extra value" });
+AuditScope.Log("Event Type", new { ExtraField = "extra value" });
 ```
 
 ### Manual Saving
