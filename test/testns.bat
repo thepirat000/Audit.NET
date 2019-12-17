@@ -8,7 +8,7 @@ echo.
 
 
 start "" /D D:\redis "c:\redis\redis-server.exe"
-start "" /D D:\Elasticsearch\bin "D:\Elasticsearch\bin\elasticsearch.bat"
+start "" /D D:\Elasticsearch\elasticsearch-7.5.0\bin "D:\Elasticsearch\elasticsearch-7.5.0\bin\elasticsearch.bat"
 start "" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 start "" /D c:\redis "c:\redis\redis-server.exe"
 net start mysql57

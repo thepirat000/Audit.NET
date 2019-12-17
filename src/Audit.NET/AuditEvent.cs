@@ -32,25 +32,23 @@ namespace Audit.Core
         /// <summary>
         /// The tracked target.
         /// </summary>
-        [JsonProperty("Target", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public AuditTarget Target { get; set; }
 
         /// <summary>
         /// Comments.
         /// </summary>
-        [JsonProperty("Comments", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<string> Comments { get; set; }
 
         /// <summary>
         /// The date then the event started
         /// </summary>
-        [JsonProperty("StartDate")]
         public DateTime StartDate { get; set; }
 
         /// <summary>
         /// The date then the event finished
         /// </summary>
-        [JsonProperty("EndDate")]
         public DateTime? EndDate { get; set; }
 
         ///<summary>

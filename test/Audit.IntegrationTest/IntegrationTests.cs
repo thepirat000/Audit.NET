@@ -632,13 +632,13 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
                 if (dpType != "ElasticsearchDataProvider")
                 {
-                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
-                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.Old).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.New).Order.Status);
                 }
                 else
                 {
-                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedOld.ToString()).Order.Status);
-                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedNew.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.Old.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.New.ToString()).Order.Status);
                 }
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 
@@ -727,13 +727,13 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
                 if (dpType != "ElasticsearchDataProvider")
                 {
-                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.SerializedOld).Order.Status);
-                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.SerializedNew).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.Old).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.New).Order.Status);
                 }
                 else
                 {
-                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedOld.ToString()).Order.Status);
-                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.SerializedNew.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.Old.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.New.ToString()).Order.Status);
                 }
                 Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
 

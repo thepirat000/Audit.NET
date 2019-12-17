@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.0.0] - 2019-12-16
+### Modified
+- Audit.NET: Renaming properties `SerializedOld` and `SerializedNew` to be `Old` and `New` respectively on `AuditTarget` class. (#261)
+
 ## [14.9.1] - 2019-11-30
 ### Modified
 - Audit.WebApi / Audit.WebApi.Core: Changing body request/response read to be asynchronous. Avoiding exception when used on asp.net core 3 (System.InvalidOperationException: Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead) (#259)

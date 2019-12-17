@@ -77,10 +77,10 @@ namespace Audit.UnitTest
 
             Assert.AreEqual(1, evs.Count);
             Assert.AreEqual("SomeClass", evs[0].Target.Type);
-            Assert.AreEqual(1, (evs[0].Target.SerializedOld as JObject).ToObject<SomeClass>().Id);
-            Assert.AreEqual("Test", (evs[0].Target.SerializedOld as JObject).ToObject<SomeClass>().Name);
-            Assert.AreEqual(2, (evs[0].Target.SerializedNew as JObject).ToObject<SomeClass>().Id);
-            Assert.AreEqual("NewTest", (evs[0].Target.SerializedNew as JObject).ToObject<SomeClass>().Name);
+            Assert.AreEqual(1, (evs[0].Target.Old as JObject).ToObject<SomeClass>().Id);
+            Assert.AreEqual("Test", (evs[0].Target.Old as JObject).ToObject<SomeClass>().Name);
+            Assert.AreEqual(2, (evs[0].Target.New as JObject).ToObject<SomeClass>().Id);
+            Assert.AreEqual("NewTest", (evs[0].Target.New as JObject).ToObject<SomeClass>().Name);
         }
 
         [Test]
@@ -103,8 +103,8 @@ namespace Audit.UnitTest
 
             Assert.AreEqual(1, evs.Count);
             Assert.AreEqual("Object", evs[0].Target.Type);
-            Assert.IsNull(evs[0].Target.SerializedOld);
-            Assert.IsNull(evs[0].Target.SerializedNew);
+            Assert.IsNull(evs[0].Target.Old);
+            Assert.IsNull(evs[0].Target.New);
         }
 
         [Test]
@@ -303,8 +303,8 @@ namespace Audit.UnitTest
             Assert.AreEqual(1, fileCount);
             Assert.AreEqual(JsonConvert.SerializeObject(ev), JsonConvert.SerializeObject(fileFromProvider));
             Assert.AreEqual("evt", ev.EventType);
-            Assert.AreEqual("start", ev.Target.SerializedOld);
-            Assert.AreEqual("end", ev.Target.SerializedNew);
+            Assert.AreEqual("start", ev.Target.Old);
+            Assert.AreEqual("end", ev.Target.New);
             Assert.AreEqual("1", ev.CustomFields["X"].ToString());
         }
 
@@ -747,7 +747,7 @@ namespace Audit.UnitTest
             }
             Assert.AreEqual(eventType, ev.EventType);
             Assert.True(ev.Comments.Contains("test"));
-            Assert.Null(ev.Target.SerializedNew);
+            Assert.Null(ev.Target.New);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
         }
 

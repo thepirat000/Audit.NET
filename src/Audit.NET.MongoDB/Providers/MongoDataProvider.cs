@@ -86,8 +86,6 @@ namespace Audit.MongoDB.Providers
             BsonClassMap.RegisterClassMap<AuditTarget>(cm =>
             {
                 cm.AutoMap();
-                cm.MapProperty(x => x.SerializedOld).SetElementName("Old");
-                cm.MapProperty(x => x.SerializedNew).SetElementName("New");
             });
 
             BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
