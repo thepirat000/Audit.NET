@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [15.0.0] - 2019-12-16
 ### Modified
 - Audit.NET: Renaming properties `SerializedOld` and `SerializedNew` to be `Old` and `New` respectively on `AuditTarget` class. (#261)
+- Audit.EntityFramework / Audit.EntityFramework.Core: Adding net472 as target to allow targeting EF CORE 3 from the full .NET Framework. (#263)
 
 ## [14.9.1] - 2019-11-30
 ### Modified

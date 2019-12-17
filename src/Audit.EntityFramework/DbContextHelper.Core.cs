@@ -49,7 +49,7 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetColumnName(IProperty prop)
         {
-#if NETSTANDARD2_1
+#if EF_CORE_3
             return prop.GetColumnName();
 #else
             return prop.Relational().ColumnName ?? prop.Name;
@@ -150,7 +150,7 @@ namespace Audit.EntityFramework
             {
                 return result;
             }
-#if NETSTANDARD2_1
+#if EF_CORE_3
             result.Table = definingType.GetTableName();
             result.Schema = definingType.GetSchema();
 #else
@@ -164,7 +164,7 @@ namespace Audit.EntityFramework
 
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE_2 || EF_CORE_3
             IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
 #else
             IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
@@ -181,7 +181,7 @@ namespace Audit.EntityFramework
             var foreignKeys = entry.Metadata.GetForeignKeys();
             if (foreignKeys != null)
             {
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if EF_CORE_2 || EF_CORE_3
                 //Filter ownership relations as they are not foreign keys
                 foreignKeys = foreignKeys.Where(fk => !fk.IsOwnership);
 #endif
@@ -255,7 +255,7 @@ namespace Audit.EntityFramework
 
         private string GetAmbientTransactionId()
         {
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if EF_CORE_2 || EF_CORE_3
             var tranInfo = System.Transactions.Transaction.Current?.TransactionInformation;
             if (tranInfo != null)
             {

@@ -421,7 +421,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-#if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1)
+#if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET472)
             try
             {
                 var connId = ((connection as dynamic).ClientConnectionId) as Guid?;
