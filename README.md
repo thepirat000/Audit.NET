@@ -29,7 +29,7 @@ PM> Install-Package Audit.NET
 ```
 
 ## Changelog
-Check the [CHANELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md) file.
+Check the [CHANGELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md) file.
 
 ## Usage
 
@@ -60,9 +60,9 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
-> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing to detect exceptions and calculate the duration by implicitly saving the event on disposal. 
+> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing the detection of exceptions and calculating the duration by implicitly saving the event on disposal. 
 
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library inspect the value at the beggining and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
+The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library to inspect the value at the beginning and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 There is also a unified overload of the `Create` method that accepts an instance of [`AuditScopeOptions`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeOptions.cs). Use this class to configure any of the available options for the scope:
 
