@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.0.1] - 2020-01-10
+### Modified
+- Audit.NET.AzureStorage: Change table mapping cache dictionary to be a ConcurrentDictionary (#268)
+
 ## [15.0.0] - 2019-12-16
 ### Modified
 - Audit.NET: Renaming properties `SerializedOld` and `SerializedNew` to be `Old` and `New` respectively on `AuditTarget` class. (#261)

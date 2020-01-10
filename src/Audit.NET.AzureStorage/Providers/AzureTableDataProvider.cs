@@ -3,6 +3,7 @@ using Audit.Core;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace Audit.AzureTableStorage.Providers
     /// </summary>
     public class AzureTableDataProvider : AuditDataProvider
     {
-        private static readonly IDictionary<string, CloudTable> TableCache = new Dictionary<string, CloudTable>();
+        private static readonly IDictionary<string, CloudTable> TableCache = new ConcurrentDictionary<string, CloudTable>();
 
         /// <summary>
         /// Gets or sets a function that returns a table name for the event.

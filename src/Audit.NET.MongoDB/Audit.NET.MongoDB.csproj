@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into a MongoDB database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MongoDB</AssemblyTitle>
-    <VersionPrefix>15.0.0</VersionPrefix>
+    <VersionPrefix>15.0.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net452</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
