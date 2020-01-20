@@ -16,12 +16,12 @@ namespace Audit.Core
         /// <summary>
         /// Store the audits logs in the same EntityFramework model as the audited entities.
         /// </summary>
-        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper = null, Action<AuditEvent, EventEntry, object> auditEntityAction = null, bool ignoreMatchedProperties = false)
+        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Action<AuditEvent, EventEntry, object> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc)
         {
             var efdp = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
-                IgnoreMatchedProperties = ignoreMatchedProperties
+                IgnoreMatchedPropertiesFunc = ignoreMatchedPropertiesFunc
             };
             if (auditEntityAction != null)
             {
@@ -35,13 +35,13 @@ namespace Audit.Core
             return new CreationPolicyConfigurator();
         }
 
-        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper = null, Func<AuditEvent, EventEntry, object, bool> auditEntityAction = null, bool ignoreMatchedProperties = false,
-            Func<AuditEventEntityFramework, DbContext> dbContextBuilder = null)
+        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Func<AuditEvent, EventEntry, object, bool> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
+            Func<AuditEventEntityFramework, DbContext> dbContextBuilder)
         {
             var efdp = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
-                IgnoreMatchedProperties = ignoreMatchedProperties,
+                IgnoreMatchedPropertiesFunc = ignoreMatchedPropertiesFunc,
                 AuditEntityAction = auditEntityAction,
                 DbContextBuilder = dbContextBuilder
             };
@@ -58,7 +58,7 @@ namespace Audit.Core
         {
             var efConfig = new EntityFrameworkProviderConfigurator();
             config.Invoke(efConfig);
-            return UseEntityFramework(configurator, efConfig._auditTypeMapper, efConfig._auditEntityAction, efConfig._ignoreMatchedProperties, efConfig._dbContextBuilder);
+            return UseEntityFramework(configurator, efConfig._auditTypeMapper, efConfig._auditEntityAction, efConfig._ignoreMatchedPropertiesFunc, efConfig._dbContextBuilder);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Audit.EntityFramework.ConfigurationApi
 {
     public class EntityFrameworkProviderConfigurator : IEntityFrameworkProviderConfigurator, IEntityFrameworkProviderConfiguratorAction, IEntityFrameworkProviderConfiguratorExtra
     {
-        internal bool _ignoreMatchedProperties = false;
+        internal Func<Type, bool> _ignoreMatchedPropertiesFunc = t => false;
         internal Func<Type, EventEntry, Type> _auditTypeMapper;
         internal Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
@@ -105,7 +105,12 @@ namespace Audit.EntityFramework.ConfigurationApi
 
         public void IgnoreMatchedProperties(bool ignore = true)
         {
-            _ignoreMatchedProperties = ignore;
+            _ignoreMatchedPropertiesFunc = _ => ignore;
+        }
+
+        public void IgnoreMatchedProperties(Func<Type, bool> ignoreFunc)
+        {
+            _ignoreMatchedPropertiesFunc = ignoreFunc;
         }
     }
 }

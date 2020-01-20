@@ -407,6 +407,7 @@ Optional:
 - **UseDbContext**: A function that returns the DbContext to use for storing the audit events, by default it will use the same context being audited. 
 - **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties like user name or the audit date. It can also be used to filter out audit entities. Make this function return a boolean value to indicate whether to include the entity on the output log. 
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is false).
+- **IgnoreMatchedPropertiesFunc**: Allows to selectively ignore property matching on certain types. It's a function that receives the audit entity type and returns a boolean to indicate if the property matching must be ignored for that type.
 
 ### EF Provider configuration examples
 

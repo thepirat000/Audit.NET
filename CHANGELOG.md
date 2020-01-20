@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.0.2] - 2020-01-20
+### Modified
+- Audit.EntityFramework: EntityFrameworkProvider add the possibility to configure the property matching by type, object-wide. (#269)
+
 ## [15.0.1] - 2020-01-10
 ### Modified
 - Audit.NET.AzureStorage: Change table mapping cache dictionary to be a ConcurrentDictionary (#268)

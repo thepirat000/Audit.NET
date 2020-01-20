@@ -44,7 +44,6 @@ namespace Audit.IntegrationTest
                 .ForAnyContext().Reset();
         }
 
-
         [Test]
         public void Test_EF_OwnedEntities()
         {

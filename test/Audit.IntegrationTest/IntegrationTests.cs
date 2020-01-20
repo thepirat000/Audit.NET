@@ -3,22 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Audit.Core;
 using Audit.Core.Providers;
-using Audit.Core.ConfigurationApi;
 using Audit.Udp.Providers;
 using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;
-using Newtonsoft.Json.Linq;
-using Audit.MongoDB.ConfigurationApi;
-using Audit.AzureTableStorage.ConfigurationApi;
 using System.Threading.Tasks;
-using Audit.AzureTableStorage.Providers;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NUnit.Framework;
-using Audit.AzureDocumentDB.Providers;
-using Audit.AzureDocumentDB.ConfigurationApi;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Audit.DynamoDB.Providers;
@@ -154,10 +146,10 @@ namespace Audit.IntegrationTest
                     .AuditTypeExplicitMapper(cfg => cfg
                         .Map<Blog, AuditBlog>()
                         .Map<Post, AuditPost>())
-                    .IgnoreMatchedProperties(true));
+                    .IgnoreMatchedProperties(t => t == typeof(string)));
 
-
-                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(typeof(string)));
+                Assert.AreEqual(false, x.IgnoreMatchedPropertiesFunc(typeof(int)));
                 Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog), null));
                 Assert.AreEqual(typeof(AuditPost), x.AuditTypeMapper.Invoke(typeof(Post), null));
@@ -179,7 +171,7 @@ namespace Audit.IntegrationTest
                     .IgnoreMatchedProperties(true));
 
 
-                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(null));
                 Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog), null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Post), null));
@@ -201,7 +193,7 @@ namespace Audit.IntegrationTest
                     .IgnoreMatchedProperties(true));
 
 
-                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(null));
                 Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog), null));
                 Assert.AreEqual(typeof(AuditPost), x.AuditTypeMapper.Invoke(typeof(Post), null));
@@ -220,8 +212,7 @@ namespace Audit.IntegrationTest
                         .Map<Post, AuditPost>())
                     .IgnoreMatchedProperties(true));
 
-
-                Assert.AreEqual(true, x.IgnoreMatchedProperties);
+                Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(null));
                 Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
                 Assert.AreEqual(typeof(AuditPost), x.AuditTypeMapper.Invoke(typeof(Blog), new EntityFramework.EventEntry() { Action = "Update" }));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog), new EntityFramework.EventEntry() { Action = "Insert" }));

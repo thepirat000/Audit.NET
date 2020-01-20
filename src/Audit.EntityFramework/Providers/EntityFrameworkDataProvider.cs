@@ -24,7 +24,7 @@ namespace Audit.EntityFramework.Providers
     /// </remarks>
     public class EntityFrameworkDataProvider : AuditDataProvider
     {
-        private bool _ignoreMatchedProperties;
+        private Func<Type, bool> _ignoreMatchedPropertiesFunc;
         private Func<Type, EventEntry, Type> _auditTypeMapper;
         private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
@@ -43,7 +43,7 @@ namespace Audit.EntityFramework.Providers
                 _auditEntityAction = efConfig._auditEntityAction;
                 _auditTypeMapper = efConfig._auditTypeMapper;
                 _dbContextBuilder = efConfig._dbContextBuilder;
-                _ignoreMatchedProperties = efConfig._ignoreMatchedProperties;
+                _ignoreMatchedPropertiesFunc = efConfig._ignoreMatchedPropertiesFunc;
             }
         }
 
@@ -62,11 +62,11 @@ namespace Audit.EntityFramework.Providers
             get { return _auditEntityAction; }
             set { _auditEntityAction = value; }
         }
-
-        public bool IgnoreMatchedProperties
+                
+        public Func<Type, bool> IgnoreMatchedPropertiesFunc
         {
-            get { return _ignoreMatchedProperties; }
-            set { _ignoreMatchedProperties = value; }
+            get { return _ignoreMatchedPropertiesFunc; }
+            set { _ignoreMatchedPropertiesFunc = value; }
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace Audit.EntityFramework.Providers
         {
             var entity = entry.Entry.Entity;
             var auditEntity = Activator.CreateInstance(auditType);
-            if (!_ignoreMatchedProperties)
+            if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
                 var auditFields = auditType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     .Where(p => p.GetSetMethod() != null)
