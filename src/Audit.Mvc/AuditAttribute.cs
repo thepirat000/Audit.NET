@@ -122,6 +122,11 @@ namespace Audit.Mvc
             {
                 // Replace the Action field
                 (auditScope.Event as AuditEventMvcAction).Action = auditAction;
+                if (auditAction?.Exception != null)
+                {
+                    // An exception was thrown, save the event since OnResultExecuted will not be triggered.
+                    auditScope.Save();
+                }
             }
             base.OnActionExecuted(filterContext);
         }

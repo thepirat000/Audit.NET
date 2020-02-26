@@ -119,11 +119,11 @@ namespace Audit.Mvc
             {
                 // Replace the Action field
                 (auditScope.Event as AuditEventMvcAction).Action = auditAction;
-            }
-            if (auditAction?.Exception != null)
-            {
-                // An exception was thrown, save the event since OnResultExecutionAsync will not be triggered.
-                await auditScope.SaveAsync();
+                if (auditAction?.Exception != null)
+                {
+                    // An exception was thrown, save the event since OnResultExecutionAsync will not be triggered.
+                    await auditScope.SaveAsync();
+                }
             }
         }
 
