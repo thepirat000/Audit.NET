@@ -107,7 +107,7 @@ public sealed class EntityKeyHelper
 
         // Find the mapping between conceptual and storage model for this entity set
         var mapping = entitySetMappings.SingleOrDefault(x => x.EntitySet.Name == entitySet.Name);
-        if (mapping != null)
+        if (mapping != null && mapping.EntityTypeMappings.Count(m => m.Fragments.Count > 0) == 1)
         {
             return mapping.EntityTypeMappings.Single(m => m.Fragments.Count > 0).Fragments.Single();
         }

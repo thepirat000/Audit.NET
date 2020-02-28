@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.0.4] - 2020-02-28
+### Modified
+- Audit.EntityFramework: Fix audit error when auditing multiple types inheriting from the same entity/table (#273)
+
 ## [15.0.3] - 2020-02-26
 ### Modified
 - Audit.Mvc: Fix audit event saving when an exception occurs on the action method being audited (ASP.NET) (#274)
