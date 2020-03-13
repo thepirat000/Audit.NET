@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -16,6 +17,78 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
             new BlogsMemoryContext().Database.EnsureCreated();
+        }
+
+        [Test]
+        public async Task Test_EF_SaveChangesAsyncOverride()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+            var id = new Random().Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "fede",
+                    Password = "142857",
+                    Token = "aaabbb"
+                };
+                ctx.Users.Add(user);
+                await ctx.SaveChangesAsync();
+            }
+
+            Assert.AreEqual(1, evs.Count);
+        }
+
+        [Test]
+        public async Task Test_EF_SaveChangesAsyncAcceptChangesOverride()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+            var id = new Random().Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "fede",
+                    Password = "142857",
+                    Token = "aaabbb"
+                };
+                ctx.Users.Add(user);
+                await ctx.SaveChangesAsync(true);
+            }
+
+            Assert.AreEqual(1, evs.Count);
         }
 
         [Test]
@@ -52,7 +125,42 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
 
             Assert.AreEqual(1, evs.Count);
+        }
 
+        [Test]
+        public void Test_EF_SaveChangesOverride()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(ev);
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+            var id = new Random().Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "fede",
+                    Password = "142857",
+                    Token = "aaabbb"
+                };
+                ctx.Users.Add(user);
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(1, evs.Count);
         }
 
         [Test]
