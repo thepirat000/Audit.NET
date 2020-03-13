@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
@@ -21,7 +20,7 @@ namespace Audit.EntityFramework
     /// </summary>
     public abstract partial class AuditDbContext : DbContext, IAuditDbContext, IAuditBypass
     {
-        private DbContextHelper _helper = new DbContextHelper();
+        private readonly DbContextHelper _helper = new DbContextHelper();
 
 #if EF_CORE
         /// <summary>
@@ -84,7 +83,7 @@ namespace Audit.EntityFramework
             _helper.SetConfig(this);
         }
 
-#region Properties
+        #region Properties
         /// <summary>
         /// To indicate the event type to use on the audit event. (Default is the context name). 
         /// Can contain the following placeholders: 
@@ -173,38 +172,35 @@ namespace Audit.EntityFramework
             ExtraFields[fieldName] = value;
         }
 
-        /// <summary>
-        /// Saves the changes synchronously.
-        /// </summary>
-        public override int SaveChanges()
+#if EF_FULL
+          public override int SaveChanges()
         {
             return _helper.SaveChanges(this, () => base.SaveChanges());
         }
 
-        /// <summary>
-        /// Saves the changes asynchronously.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
+            return _helper.SaveChangesAsync(this,()=>base.SaveChangesAsync(cancellationToken));
         }
-#if EF_FULL
-        /// <summary>
-        /// Saves the changes asynchronously.
-        /// </summary>
-        public override async Task<int> SaveChangesAsync()
+      
+#else
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            return await SaveChangesAsync(default(CancellationToken));
+            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
         }
 #endif
         int IAuditBypass.SaveChangesBypassAudit()
         {
             return base.SaveChanges();
         }
-        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
         {
-            return await base.SaveChangesAsync();
+            return base.SaveChangesAsync();
         }
         #endregion
     }
