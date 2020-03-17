@@ -11,7 +11,10 @@ namespace Audit.EntityFramework.Full.UnitTest
         public BlogContext() : base("data source=localhost;initial catalog=Blogs2;integrated security=true;")
         {
         }
+        public BlogContext(string connectionString) : base(connectionString)
+        {
 
+        }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Blog> Blogs { get; set; }
 
