@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.0.5] - 2020-03-20
+### Modified
+- Audit.EntityFramework: Fix EF events not being audited when calling EF Core's `SaveChangesAsync(bool acceptAllChangesOnSuccess,CancellationToken cancellationToken = default)` overload on the AuditDbContext. (#277)
+
 ## [15.0.4] - 2020-02-28
 ### Modified
 - Audit.EntityFramework: Fix audit error when auditing multiple types inheriting from the same entity/table (#273)

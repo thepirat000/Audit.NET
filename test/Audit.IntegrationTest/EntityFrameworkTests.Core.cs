@@ -1202,20 +1202,21 @@ SET IDENTITY_INSERT Posts OFF
         public virtual long OrderId { get; set; }
         public virtual Order Order { get; set; }
     }
-
+    //[AuditIgnore]
     public abstract class AuditBase
     {
         public DateTime AuditDate { get; set; }
         public string AuditStatus { get; set; }
         public string UserName { get; set; }
     }
-
+    //[AuditIgnore]
     public class OrderAudit : AuditBase
     {
         public virtual long Id { get; set; }
         public virtual string Number { get; set; }
         public virtual string Status { get; set; }
     }
+    //[AuditIgnore]
     public class OrderlineAudit : AuditBase
     {
         public virtual long Id { get; set; }
@@ -1267,6 +1268,7 @@ SET IDENTITY_INSERT Posts OFF
         public string Bar { get; set; }
         public string Car { get; set; }
     }
+    [AuditIgnore]
     public class FooAudit
     {
         public int Id { get; set; }

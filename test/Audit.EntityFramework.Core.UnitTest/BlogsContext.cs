@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
+    [AuditDbContext(Mode = AuditOptionMode.OptIn)]
     public class BlogsContext : AuditDbContext
     {
         public const string CnnString = "data source=localhost;initial catalog=Blogs3;integrated security=true;";

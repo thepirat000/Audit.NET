@@ -173,27 +173,14 @@ namespace Audit.EntityFramework
         }
 
 #if EF_FULL
-          public override int SaveChanges()
+        public override int SaveChanges()
         {
             return _helper.SaveChanges(this, () => base.SaveChanges());
         }
-
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return _helper.SaveChangesAsync(this,()=>base.SaveChangesAsync(cancellationToken));
+            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
         }
-      
-#else
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
-        }
-
-        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-        {
-            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
-        }
-#endif
         int IAuditBypass.SaveChangesBypassAudit()
         {
             return base.SaveChanges();
@@ -202,6 +189,24 @@ namespace Audit.EntityFramework
         {
             return base.SaveChangesAsync();
         }
+#else
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
+        }
+        int IAuditBypass.SaveChangesBypassAudit()
+        {
+            return base.SaveChanges(true);
+        }
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        {
+            return base.SaveChangesAsync(true, default);
+        }
+#endif
         #endregion
     }
 }

@@ -11,6 +11,8 @@ namespace Audit.EntityFramework.Core.UnitTest
     [TestFixture(Category = "EF")]
     public class EfCore22InMemoryTests
     {
+        private static readonly Random Rnd = new Random();
+
         [SetUp]
         public void Setup()
         {
@@ -38,7 +40,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_test")
                 .Options;
-            var id = new Random().Next();
+            var id = Rnd.Next();
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var user = new User()
@@ -50,9 +52,12 @@ namespace Audit.EntityFramework.Core.UnitTest
                 };
                 ctx.Users.Add(user);
                 await ctx.SaveChangesAsync();
+
+                ctx.Users.Remove(user);
+                await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(2, evs.Count);
         }
 
         [Test]
@@ -74,7 +79,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_test")
                 .Options;
-            var id = new Random().Next();
+            var id = Rnd.Next();
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var user = new User()
@@ -86,9 +91,12 @@ namespace Audit.EntityFramework.Core.UnitTest
                 };
                 ctx.Users.Add(user);
                 await ctx.SaveChangesAsync(true);
+
+                ctx.Users.Remove(user);
+                await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(2, evs.Count);
         }
 
         [Test]
@@ -110,7 +118,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_test")
                 .Options;
-            var id = new Random().Next();
+            var id = Rnd.Next();
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var user = new User()
@@ -122,9 +130,12 @@ namespace Audit.EntityFramework.Core.UnitTest
                 };
                 ctx.Users.Add(user);
                 ctx.SaveChanges(true);
+
+                ctx.Users.Remove(user);
+                ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(2, evs.Count);
         }
 
         [Test]
@@ -146,7 +157,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_test")
                 .Options;
-            var id = new Random().Next();
+            var id = Rnd.Next();
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var user = new User()
@@ -158,9 +169,12 @@ namespace Audit.EntityFramework.Core.UnitTest
                 };
                 ctx.Users.Add(user);
                 ctx.SaveChanges();
+
+                ctx.Users.Remove(user);
+                ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(2, evs.Count);
         }
 
         [Test]
@@ -183,7 +197,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_test")
                 .Options;
-            var id = new Random().Next();
+            var id = Rnd.Next();
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var user = new User()
@@ -203,9 +217,11 @@ namespace Audit.EntityFramework.Core.UnitTest
                 usr.Token = "xxxaaa";
                 ctx.SaveChanges();
 
+                ctx.Users.Remove(user);
+                ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(2, evs.Count);
             Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
             var entry = evs[0].GetEntityFrameworkEvent().Entries[0];
             Assert.AreEqual(1, entry.Changes.Count);
