@@ -128,7 +128,7 @@ await client.CreateTableAsync(new CreateTableRequest()
     AttributeDefinitions = new List<AttributeDefinition>()
     {
         new AttributeDefinition("EventId", ScalarAttributeType.S),
-        new AttributeDefinition("EventType", ScalarAttributeType.N)
+        new AttributeDefinition("EventType", ScalarAttributeType.S)
     },
     ProvisionedThroughput = new ProvisionedThroughput(1, 1)
 });
