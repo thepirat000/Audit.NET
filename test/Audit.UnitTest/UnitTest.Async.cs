@@ -434,6 +434,20 @@ namespace Audit.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
+#if NETCOREAPP3_0
+        [Test]
+        public async Task Test_Dispose_Async()
+        {
+            var provider = new Mock<AuditDataProvider>();
+
+            await using (var scope = await AuditScope.CreateAsync(null, null, EventCreationPolicy.InsertOnEnd, dataProvider: provider.Object))
+            {               
+            }
+
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+        }
+#endif
+
         [Test]
         public async Task TestDiscard_Async()
         {
