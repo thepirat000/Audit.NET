@@ -252,6 +252,11 @@ namespace Audit.WebApi
 
         internal static AuditScope GetCurrentScope(HttpContext httpContext)
         {
+            if (httpContext == null)
+            {
+                return AuditScopeFactory.CreateNoOp();
+            }
+
             return httpContext.Items[AuditApiHelper.AuditApiScopeKey] as AuditScope;
         }
 
