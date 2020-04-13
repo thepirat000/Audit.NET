@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [15.1.0] - 2020-04-13
 ### Modified
+- Audit.WebApi: Use GetCurrentAuditScope when an HttpContext is missing (#285)
 - Audit.WebApi: Package reference `Microsoft.AspNetCore.Mvc` downgrade for to version 2.1.0 for compatibility with older net core 2.1 framework (#284)
 
 ## [15.0.5] - 2020-03-20
