@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.1.0] - 2020-04-13
+### Modified
+- Audit.WebApi: Package reference `Microsoft.AspNetCore.Mvc` downgrade for to version 2.1.0 for compatibility with older net core 2.1 framework (#284)
+
 ## [15.0.5] - 2020-03-20
 ### Modified
 - Audit.EntityFramework: Fix EF events not being audited when calling EF Core's `SaveChangesAsync(bool acceptAllChangesOnSuccess,CancellationToken cancellationToken = default)` overload on the AuditDbContext. (#277)
