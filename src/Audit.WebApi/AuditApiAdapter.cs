@@ -213,6 +213,11 @@ namespace Audit.WebApi
 
         internal static AuditScope GetCurrentScope(HttpRequestMessage request, IContextWrapper contextWrapper)
         {
+            if (request == null)
+            {
+                return AuditScopeFactory.CreateNoOp();
+            }
+
             var ctx = contextWrapper ?? new ContextWrapper(request);
             return ctx.Get<AuditScope>(AuditApiHelper.AuditApiScopeKey);
         }
