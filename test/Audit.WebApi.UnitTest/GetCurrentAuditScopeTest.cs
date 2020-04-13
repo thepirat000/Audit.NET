@@ -1,6 +1,8 @@
 ﻿#if NET45
+using Audit.Core;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Web.Http;
 
 namespace Audit.WebApi.UnitTest
@@ -20,8 +22,10 @@ namespace Audit.WebApi.UnitTest
         [Test]
         public void Test_CallingAnAction_ShouldNotThrow()
         {
-            var sut = new TestController();
+            var evs = new List<AuditEvent>();
+            Configuration.Setup().UseDynamicProvider(_ => _.OnInsertAndReplace(ev => evs.Add(ev)));
 
+            var sut = new TestController();
             Action act = () => sut.TestAction();
 
             Assert.DoesNotThrow(new TestDelegate(act));

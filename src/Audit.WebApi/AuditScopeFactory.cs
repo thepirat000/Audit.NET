@@ -12,7 +12,7 @@ namespace Audit.WebApi
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static AuditScope CreateNoOp() => AuditScope.Create(new AuditScopeOptions
         {
-            DataProvider = new DynamicDataProvider()
+            DataProvider = new NullDataProvider()
         });
     }
 }
