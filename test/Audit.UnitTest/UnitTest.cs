@@ -729,6 +729,18 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_Dispose()
+        {
+            var provider = new Mock<AuditDataProvider>();
+
+            using (var scope = AuditScope.Create(null, null, EventCreationPolicy.InsertOnEnd, provider.Object))
+            {
+            }
+
+            provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
+        }
+
+        [Test]
         public void TestDiscard()
         {
             var provider = new Mock<AuditDataProvider>();
