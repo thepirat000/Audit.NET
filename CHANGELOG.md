@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.1.1] - 2020-05-04
+### Modified
+- Audit.EntityFramework: Fix Stack Overflow problem when entity has validation errors. Only for the .NET framework EF. (#294)
+
 ## [15.1.0] - 2020-04-13
 ### Modified
 - Audit.WebApi: Use GetCurrentAuditScope when an HttpContext is missing (#285)

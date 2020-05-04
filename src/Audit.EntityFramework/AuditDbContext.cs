@@ -187,7 +187,7 @@ namespace Audit.EntityFramework
         }
         Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
         {
-            return base.SaveChangesAsync();
+            return base.SaveChangesAsync(CancellationToken.None);
         }
 #else
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
