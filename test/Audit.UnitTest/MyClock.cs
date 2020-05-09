@@ -5,8 +5,8 @@ namespace Audit.UnitTest
 {
     public class MyClock : ISystemClock
     {
-        public DateTimeOffset _start = new DateTime(2020, 1, 1);
-        public DateTimeOffset UtcNow
+        public DateTime _start = new DateTime(2020, 1, 1);
+        public DateTime UtcNow
         {
             get
             {

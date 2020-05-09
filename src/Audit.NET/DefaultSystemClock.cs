@@ -7,6 +7,6 @@ namespace Audit.Core
     /// </summary>
     public class DefaultSystemClock : ISystemClock
     {
-        public virtual DateTimeOffset UtcNow => DateTime.UtcNow;
+        public virtual DateTime UtcNow => DateTime.UtcNow;
     }
 }

@@ -10,7 +10,7 @@ namespace Audit.Core
         /// <summary>
         /// Retrieves the current system time in UTC.
         /// </summary>
-        DateTimeOffset UtcNow
+        DateTime UtcNow
         {
             get;
         }
