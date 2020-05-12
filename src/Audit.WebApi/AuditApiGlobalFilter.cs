@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -39,7 +39,7 @@ namespace Audit.WebApi
 
         private AuditApiGlobalFilter()
         {
-#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
             this.Order = int.MinValue;
 #endif
         }
@@ -96,7 +96,7 @@ namespace Audit.WebApi
         }
 #endif
 
-#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (Configuration.AuditDisabled 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451;net45;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451;net45;net461;netcoreapp3.1</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.WebApi.UnitTest</AssemblyName>
@@ -47,7 +47,14 @@
     <ProjectReference Include="..\..\src\Audit.WebApi.Core\Audit.WebApi.Core.csproj" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <ProjectReference Include="..\..\src\Audit.WebApi.Core\Audit.WebApi.Core.csproj" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">

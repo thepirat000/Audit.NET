@@ -7,11 +7,14 @@ using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace Audit.Integration.AspNetCore
 {
@@ -27,6 +30,7 @@ namespace Audit.Integration.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
             services.Configure<FormOptions>(options =>
             {
                 options.ValueCountLimit = 2;
@@ -34,6 +38,7 @@ namespace Audit.Integration.AspNetCore
 
             services.AddMvc(mvc =>
             {
+                mvc.EnableEndpointRouting = false;
                 mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                     .LogActionIf(d => d.ControllerName == "MoreValues"
@@ -49,7 +54,7 @@ namespace Audit.Integration.AspNetCore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -57,7 +62,7 @@ namespace Audit.Integration.AspNetCore
             }
             
             app.Use(async (context, next) => {
-                context.Request.EnableRewind();
+                context.Request.EnableBuffering();
                 await next();
             });
             app.UseAuditMiddleware(_ => _

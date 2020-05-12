@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using Audit.Core;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;

@@ -52,7 +52,7 @@ namespace Audit.WebApi
             return dict.Count > 0 ? dict : null;
         }
 
-#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
         internal static IDictionary<string, string> ToDictionary(IEnumerable<KeyValuePair<string, StringValues>> col)
         {
             if (col == null)

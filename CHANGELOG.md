@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.2.1] - 2020-05-12
+### Modified
+- Audit.Mvc and Audit.WebApi: MissingMethodException Method not found: 'AuditScope.DisposeAsync()' when referencing Audit.Mvc from an ASP.NET core 3.1 application. (#296)
+
 ## [15.2.0] - 2020-05-09
 ### Modified
 - Audit.NET: Modified `ISystemClock` interface to return a DataTime instead of DateTimeOffset so the DateKind is preserved (#287)

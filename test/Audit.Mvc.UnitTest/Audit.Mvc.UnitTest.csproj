@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451;net45;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451;net45;net461;netcoreapp3.1</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.Mvc.UnitTest</AssemblyName>
@@ -17,7 +17,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <DebugType Condition=" '$(TargetFramework)' != 'netcoreapp1.0' And '$(TargetFramework)' != 'netcoreapp2.0'">Full</DebugType>
+    <DebugType Condition=" '$(TargetFramework)' != 'netcoreapp1.0' And '$(TargetFramework)' != 'netcoreapp2.0' And '$(TargetFramework)' != 'netcoreapp3.0'">Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +40,16 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <ProjectReference Include="..\..\src\Audit.Mvc.Core\Audit.Mvc.Core.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="moq" Version="4.7.99" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     <ProjectReference Include="..\..\src\Audit.Mvc.Core\Audit.Mvc.Core.csproj" />

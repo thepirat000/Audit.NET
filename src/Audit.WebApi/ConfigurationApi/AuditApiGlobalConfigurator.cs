@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
