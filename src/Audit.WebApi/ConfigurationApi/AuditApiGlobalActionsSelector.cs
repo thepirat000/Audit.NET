@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
 using Microsoft.AspNetCore.Mvc.Controllers;
 #else
 using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;
@@ -25,7 +25,7 @@ namespace Audit.WebApi.ConfigurationApi
             return _config;
         }
 
-#if NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
         public IAuditApiGlobalConfigurator LogRequestIf(Func<Microsoft.AspNetCore.Http.HttpRequest, bool> requestSelector)
         {
             _config._logDisabledBuilder = ctx =>
