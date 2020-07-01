@@ -140,8 +140,7 @@ public async Task SaveOrderAsync(Order order)
 }
 ```
 
-> Note: Inside async methods, if you create the scope within a `using` statement, the event saving
-could take place when the scope is disposed, but [the `Dispose` method is synchronous](https://github.com/dotnet/roslyn/issues/114). As a workaround you can explicitly call the `DisposeAsync()` method, or use combination of `SaveAsync()` and `Discard()`.
+> Note: On older .NET framework versions [the `Dispose` method was always synchronous](https://github.com/dotnet/roslyn/issues/114), so if your audit code is on async methods and you created the scope within a `using` statement, you should explicitly call the `DisposeAsync()` method. For .NET Core starting on version 3.0 and C# 8, you can simply use the `await using` statement, since the `AuditScope` implements the [`IAsyncDisposable` interface](https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable).
 
 ## Output
 
