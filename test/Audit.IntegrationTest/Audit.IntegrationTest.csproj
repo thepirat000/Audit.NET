@@ -82,4 +82,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
+    <ProjectReference Include="..\..\src\Audit.NET.AmazonQLDB\Audit.NET.AmazonQLDB.csproj" />
+  </ItemGroup>
+
 </Project>
