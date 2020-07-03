@@ -18,5 +18,10 @@ For example:
  - Audit.WebApi: 13.0.0
  - Audit.EntityFramework: 13.0.0
 
+**Target .NET framework:**
+For example:
+ - .NET Standard 2.1
+ - .NET Framework 4.6.2
+
 **Additional context**
 Add any other context about the problem here.
