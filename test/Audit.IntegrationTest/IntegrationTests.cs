@@ -558,6 +558,25 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
+#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+            [Test]
+            [Category("AmazonQLDB")]
+            public void TestAmazonQLDB()
+            {
+                SetAmazonQLDBSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("AmazonQLDB")]
+            public async Task TestAmazonQLDBAsync()
+            {
+                SetAmazonQLDBSettings();
+                await TestUpdateAsync();
+            }
+#endif
 
             [Test]
             [Category("Dynamo")]
@@ -962,6 +981,25 @@ namespace Audit.IntegrationTest
                     .ResetActions();
             }
 #endif
+
+#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+            public void SetAmazonQLDBSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseAmazonQldb(config =>
+                    {
+                        config
+                            .UseLedger("AuditEvent")
+                            .UseMaxConcurrentTransactions(5)
+                            .And
+                            .Table(ev => ev.EventType)
+                            .SetAttribute("Source", ev => "Production");
+                    })
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+
+            }
+#endif
             public void SetDynamoSettings()
             {
                 var url = "http://localhost:8000";
@@ -1072,6 +1110,5 @@ namespace Audit.IntegrationTest
             public int Id { get; set; }
             public Loop Inner { get; set; }
         }
-
     }
 }
