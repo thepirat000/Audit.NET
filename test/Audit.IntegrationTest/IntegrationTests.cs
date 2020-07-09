@@ -37,7 +37,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("px", x.FilenamePrefix);
                 Assert.AreEqual(DefaultValueHandling.Populate, x.JsonSettings.DefaultValueHandling);
             }
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
@@ -539,7 +539,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             [Category("Elasticsearch")]
             public void TestElasticsearch()
@@ -558,7 +558,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             [Category("AmazonQLDB")]
             public void TestAmazonQLDB()
@@ -965,7 +965,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             public void SetElasticsearchSettings()
             {
                 var uri = new Uri(AzureSettings.ElasticSearchUrl);
@@ -982,17 +982,17 @@ namespace Audit.IntegrationTest
             }
 #endif
 
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             public void SetAmazonQLDBSettings()
             {
                 Audit.Core.Configuration.Setup()
                     .UseAmazonQldb(config =>
                     {
                         config
-                            .UseLedger("AuditEvent")
+                            .UseLedger("audit-ledger")
                             .UseMaxConcurrentTransactions(5)
                             .And
-                            .Table(ev => ev.EventType)
+                            .Table(ev => ev.EventType.Replace(":", ""))
                             .SetAttribute("Source", ev => "Production");
                     })
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)

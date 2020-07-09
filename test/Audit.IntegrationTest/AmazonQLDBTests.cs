@@ -17,7 +17,7 @@ namespace Audit.IntegrationTest
             {
                 QldbDriver = new Lazy<IQldbDriver>(() => QldbDriver.Builder()
                     .WithQLDBSessionConfig(new AmazonQLDBSessionConfig())
-                    .WithLedger("AuditEvent")
+                    .WithLedger("audit-ledger")
                     .WithRetryLogging()
                     .WithMaxConcurrentTransactions(2)
                     .Build()),
@@ -39,7 +39,7 @@ namespace Audit.IntegrationTest
 
             var sb = "init";
 
-            using (var scope = AuditScope.Create("eventType", () => sb, new { MyCustomField = "value" }))
+            using (var scope = AuditScope.Create("test_table", () => sb, new { MyCustomField = "value" }))
             {
                 sb += "-end";
             }
