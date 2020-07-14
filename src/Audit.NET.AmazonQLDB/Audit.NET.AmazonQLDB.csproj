@@ -1,24 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-    <Description>Store Audit.NET Trail Logs into Amazon DynamoDB</Description>
-    <Copyright>Copyright 2018</Copyright>
-    <AssemblyTitle>Audit.DynamoDB</AssemblyTitle>
+    <Description>Store Audit.NET Trail Logs into Amazon QLDB</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <AssemblyTitle>Audit.AmazonQLDB</AssemblyTitle>
     <VersionPrefix>15.2.3</VersionPrefix>
-    <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+    <Authors>Adrian Iftode;Federico Colombo</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.NET.DynamoDB</AssemblyName>
+    <AssemblyName>Audit.NET.AmazonQLDB</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.NET.DynamoDB</PackageId>
-    <PackageTags>Audit;Trail;Log;DynamoDB</PackageTags>
+    <PackageId>Audit.NET.AmazonQLDB</PackageId>
+    <PackageTags>Audit;Trail;Log;AmazonQLDB</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -31,14 +30,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.13" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Amazon.QLDB.Driver" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+    <None Include="images\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

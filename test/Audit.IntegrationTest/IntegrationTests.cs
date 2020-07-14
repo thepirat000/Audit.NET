@@ -37,7 +37,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("px", x.FilenamePrefix);
                 Assert.AreEqual(DefaultValueHandling.Populate, x.JsonSettings.DefaultValueHandling);
             }
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
@@ -539,7 +539,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             [Category("Elasticsearch")]
             public void TestElasticsearch()
@@ -555,6 +555,25 @@ namespace Audit.IntegrationTest
             public async Task TestElasticsearchAsync()
             {
                 SetElasticsearchSettings();
+                await TestUpdateAsync();
+            }
+#endif
+#if NETCOREAPP2_0 || NETCOREAPP2_1
+            [Test]
+            [Category("AmazonQLDB")]
+            public void TestAmazonQLDB()
+            {
+                SetAmazonQLDBSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("AmazonQLDB")]
+            public async Task TestAmazonQLDBAsync()
+            {
+                SetAmazonQLDBSettings();
                 await TestUpdateAsync();
             }
 #endif
@@ -889,7 +908,6 @@ namespace Audit.IntegrationTest
                         .JsonColumnName(ev => "Data")
                         .LastUpdatedColumnName("LastUpdatedDate")
                         .CustomColumn("EventType", ev => ev.EventType)
-                        .CustomColumn("SomeDate", _ => DateTime.UtcNow)
 #if NET452 || NET461
                         .SetDatabaseInitializerNull()
 #endif
@@ -946,7 +964,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#if NET461 || NETCOREAPP2_0 || NETCORECAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
             public void SetElasticsearchSettings()
             {
                 var uri = new Uri(AzureSettings.ElasticSearchUrl);
@@ -960,6 +978,25 @@ namespace Audit.IntegrationTest
                         .Id(ev => Guid.NewGuid()))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
+            }
+#endif
+
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+            public void SetAmazonQLDBSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseAmazonQldb(config =>
+                    {
+                        config
+                            .UseLedger("audit-ledger")
+                            .UseMaxConcurrentTransactions(5)
+                            .And
+                            .Table(ev => ev.EventType.Replace(":", ""))
+                            .SetAttribute("Source", ev => "Production");
+                    })
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+
             }
 #endif
             public void SetDynamoSettings()
@@ -1072,6 +1109,5 @@ namespace Audit.IntegrationTest
             public int Id { get; set; }
             public Loop Inner { get; set; }
         }
-
     }
 }

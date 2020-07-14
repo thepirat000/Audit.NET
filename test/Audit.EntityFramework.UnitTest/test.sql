@@ -1,5 +1,6 @@
 ﻿--create database Blogs
 --create database ParentChild
+Create Database [Audit]
 Use [Audit]
 
 drop table [OrderLineAudit]
@@ -52,10 +53,11 @@ Create table [OrderLineAudit]
 
 
 create database ParentChild
-
+GO
 use ParentChild
-
+GO
 drop table child; drop table parent;
+GO
 
 CREATE TABLE [Parent]
 (
@@ -82,11 +84,10 @@ create database blogs
 GO
 use Blogs
 GO
-
 Create table Blogs
 (
 	Id int identity(1,1) not null primary key,
-	Title nvarchar(25),
+	Title nvarchar(max),
 	BloggerName nvarchar(max)
 )
 
