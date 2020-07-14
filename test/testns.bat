@@ -7,11 +7,10 @@ nuget sources disable -name GitHub
 echo.
 
 
-start "" /D D:\redis "c:\redis\redis-server.exe"
-start "" /D D:\Elasticsearch\elasticsearch-7.5.0\bin "D:\Elasticsearch\elasticsearch-7.5.0\bin\elasticsearch.bat"
-start "" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
-start "" /D c:\redis "c:\redis\redis-server.exe"
-net start mysql57
+start "REDIS" /D D:\redis "D:\redis\redis-server.exe"
+start "ELASTIC" /D D:\Elasticsearch\elasticsearch-7.5.0\bin "D:\Elasticsearch\elasticsearch-7.5.0\bin\elasticsearch.bat"
+start "MONGO" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
+net start mysql80
 net start mssqlserver
 net start postgresql-x64-9.6
 
@@ -63,11 +62,11 @@ cd ..
 
 cd Audit.EntityFramework.UnitTest
 echo ---------------------------------------------- RUNNING EF FULL UNIT TESTS (7/16) ----------------------------------------------
-IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" (
+IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" (
 	echo The file does not exist
         exit /B 1
 )
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe"
 ..\..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb
 ..\..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql
 ..\..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Stress
@@ -111,7 +110,7 @@ ECHO --- PRESS ENTER TO STOP THE SERVICES (or CTRL+C to cancel)
 pause>nul
 
 net stop mssqlserver
-net stop mysql57
+net stop mysql80
 net stop postgresql-x64-9.6
 taskkill /f /im java.exe
 taskkill /f /im mongod.exe

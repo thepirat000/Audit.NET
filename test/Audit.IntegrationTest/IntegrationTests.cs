@@ -558,7 +558,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP2_1
             [Test]
             [Category("AmazonQLDB")]
             public void TestAmazonQLDB()
@@ -908,7 +908,6 @@ namespace Audit.IntegrationTest
                         .JsonColumnName(ev => "Data")
                         .LastUpdatedColumnName("LastUpdatedDate")
                         .CustomColumn("EventType", ev => ev.EventType)
-                        .CustomColumn("SomeDate", _ => DateTime.UtcNow)
 #if NET452 || NET461
                         .SetDatabaseInitializerNull()
 #endif
