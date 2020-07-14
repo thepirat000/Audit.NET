@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.2.3] - 2020-07-13
+### Added
+- Audit.NET.AmazonQLDB: Adding new data provider for Amazon QLDB.
+
 ## [15.2.2] - 2020-05-19
 ### Modified
 - Audit.Mvc and Audit.WebApi: Remove [obsolete package references](https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-3.1&tabs=visual-studio#remove-obsolete-package-references) for netcoreapp >= 3.0 (Microsofot.AspNetCore.*) (#297)
