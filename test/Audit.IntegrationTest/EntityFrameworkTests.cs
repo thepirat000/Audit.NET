@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-#if NETCOREAPP1_0 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP3_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -83,7 +83,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(title + "X", entries[0].Changes[0].OriginalValue);
         }
 
-#if NETCOREAPP1_0 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP3_0
         [Test]
         public void Test_EF_ProxiedLazyLoading()
         {
@@ -401,7 +401,7 @@ namespace Audit.IntegrationTest
 #endif
         }
 
-#if NETCOREAPP1_0 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP3_0
         private IDbContextTransaction GetCurrentTran(DbContext context)
         {
             var dbtxmgr = context.GetInfrastructure().GetService<IDbContextTransactionManager>();

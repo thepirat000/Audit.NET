@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if EF_FULL
 using System.Data.Entity.Infrastructure;
 using System.Data.Common;
 using Microsoft.AspNet.Identity.EntityFramework;

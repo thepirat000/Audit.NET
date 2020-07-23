@@ -37,7 +37,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("px", x.FilenamePrefix);
                 Assert.AreEqual(DefaultValueHandling.Populate, x.JsonSettings.DefaultValueHandling);
             }
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
             [Test]
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
@@ -539,7 +539,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
             [Test]
             [Category("Elasticsearch")]
             public void TestElasticsearch()
@@ -558,7 +558,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP3_0
             [Test]
             [Category("AmazonQLDB")]
             public void TestAmazonQLDB()
@@ -819,7 +819,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
             }
 
-#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
             [Test]
             public void TestEventLog()
             {
@@ -964,7 +964,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
             public void SetElasticsearchSettings()
             {
                 var uri = new Uri(AzureSettings.ElasticSearchUrl);
@@ -981,7 +981,7 @@ namespace Audit.IntegrationTest
             }
 #endif
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP2_1
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
             public void SetAmazonQLDBSettings()
             {
                 Audit.Core.Configuration.Setup()

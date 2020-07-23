@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [15.2.4] - 2020-07-22
+### Modified
+- Audit.EntityFramework.Core: Changing version for Microsoft.EntityFrameworkCore reference when targeting .NET Standard 2.0 or 2.1 (now referencing Microsoft.EntityFrameworkCore 3.1.0) (#310)
+
 ## [15.2.3] - 2020-07-13
 ### Added
 - Audit.NET.AmazonQLDB: Adding new data provider for Amazon QLDB.

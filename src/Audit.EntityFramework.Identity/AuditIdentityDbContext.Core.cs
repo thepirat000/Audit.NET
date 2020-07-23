@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
-
+﻿#if EF_CORE
 using System;
 using Microsoft.EntityFrameworkCore;
 #if NETSTANDARD1_5

@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using Audit.Core;
 using System.Threading;
 using Audit.EntityFramework.ConfigurationApi;
-#if NETSTANDARD1_5
+#if EF_CORE && NETSTANDARD1_5
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-#elif NETSTANDARD2_0 || NET461
+#elif EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-#else
+#elif EF_FULL
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Common;
 using System.Data.Entity;
@@ -23,7 +23,7 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+#if EF_CORE
     public abstract partial class AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
         : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IAuditDbContext, IAuditBypass
 #if NETSTANDARD1_5
@@ -39,7 +39,7 @@ namespace Audit.EntityFramework
         where TUserLogin : IdentityUserLogin<TKey>
         where TRoleClaim : IdentityRoleClaim<TKey>
         where TUserToken : IdentityUserToken<TKey>
-#elif NET45
+#else
     public abstract partial class AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>
         : IdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>, IAuditDbContext, IAuditBypass
         where TUser : IdentityUser<TKey, TUserLogin, TUserRole, TUserClaim>
@@ -58,7 +58,7 @@ namespace Audit.EntityFramework
         {
             _helper.SetConfig(this);
         }
-#if NETSTANDARD1_5 || NETSTANDARD2_0 || NET461
+#if EF_CORE
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
@@ -67,7 +67,7 @@ namespace Audit.EntityFramework
         {
             _helper.SetConfig(this);
         }
-#elif NET45
+#else
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
@@ -164,7 +164,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool ExcludeTransactionId { get; set; }
 
-#if NET45
+#if EF_FULL
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
         /// </summary>
