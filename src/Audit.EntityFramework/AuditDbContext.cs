@@ -173,6 +173,7 @@ namespace Audit.EntityFramework
         }
 
 #if EF_FULL
+        // TODO: I didn't change anything, because there is an issue and the tests should be fixed before.
         public override int SaveChanges()
         {
             return _helper.SaveChanges(this, () => base.SaveChanges());
@@ -192,19 +193,25 @@ namespace Audit.EntityFramework
 #else
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+            var saveChanges = _helper.SaveChanges(
+                this,
+                () => -1);
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
-        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
+            var saveChanges = await _helper.SaveChangesAsync(
+                this,
+                () => Task.FromResult(-1));
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
         int IAuditBypass.SaveChangesBypassAudit()
         {
-            return base.SaveChanges(true);
+            return -1;
         }
         Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
         {
-            return base.SaveChangesAsync(true, default);
+            return Task.FromResult(-1);
         }
 #endif
         #endregion
