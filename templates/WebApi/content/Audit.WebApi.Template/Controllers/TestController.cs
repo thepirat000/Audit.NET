@@ -11,11 +11,11 @@ namespace Audit.WebApi.Template.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public TestController(IServiceProvider serviceProvider)
         {
-            _hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
+            _hostingEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
         }
         [HttpGet()]
         public IActionResult Test()

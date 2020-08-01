@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.Extensions.Hosting;
 #if (EnableEntityFramework)
 using Microsoft.EntityFrameworkCore;
 using Audit.WebApi.Template.Providers.Database;
@@ -14,6 +14,7 @@ using Audit.WebApi.Template.Providers.Database;
 #if (Swagger)
 using System.IO;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 #endif
 
 namespace Audit.WebApi.Template
@@ -22,7 +23,7 @@ namespace Audit.WebApi.Template
     {
         public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -40,7 +41,7 @@ namespace Audit.WebApi.Template
 #if (Swagger)
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
                     Title = "Audit.WebApi.Template API",
@@ -50,17 +51,19 @@ namespace Audit.WebApi.Template
                 var xmlPath = Path.Combine(basePath, "Audit.WebApi.Template.xml");
                 c.IncludeXmlComments(xmlPath);
                 c.DescribeAllParametersInCamelCase();
-                c.DescribeStringEnumsInCamelCase();
             });
 #endif
             services
                 .ConfigureAudit()
-                .AddMvc(_ => _.AddAudit())
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .AddMvc(options => 
+                { 
+                    options.AddAudit();
+                    options.EnableEndpointRouting = false;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IHttpContextAccessor contextAccessor)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpContextAccessor contextAccessor)
         {
             if (env.IsDevelopment())
             {
@@ -75,7 +78,7 @@ namespace Audit.WebApi.Template
             });
 #endif
             app.Use(async (context, next) => {
-                context.Request.EnableRewind();
+                context.Request.EnableBuffering();
                 await next();
             });
 
