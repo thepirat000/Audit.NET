@@ -17,6 +17,39 @@ namespace Audit.UnitTest
     public class UnitTestAsync
     {
         [Test]
+        public async Task Test_AuditScope_Log_Async()
+        {
+            Audit.Core.Configuration.SystemClock = new MyClock();
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x.OnInsertAndReplace(ev => { evs.Add(ev); }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+            await AuditScope.LogAsync("test", new { field1 = "one" });
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual("test", evs[0].EventType);
+            Assert.AreEqual("one", evs[0].CustomFields["field1"]);
+        }
+
+        [Test]
+        public async Task Test_AuditScope_CallingMethod_Async()
+        {
+            Audit.Core.Configuration.SystemClock = new MyClock();
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x.OnInsertAndReplace(ev => { evs.Add(ev); }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+            using (var scope = await AuditScope.CreateAsync("test", () => "target"))
+            {
+            }
+            using (var scope = await new AuditScopeFactory().CreateAsync("test", () => "target"))
+            {
+            }
+
+            Assert.AreEqual(2, evs.Count);
+        }
+
+        [Test]
         public async Task Test_DynamicAsyncProvider_Async()
         {
             var insertEvs = new List<AuditEvent>();
@@ -37,7 +70,7 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var target = "x1";
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions(){ TargetGetter = () => target }))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(){ TargetGetter = () => target }))
             {
                 target = "x2";
                 await scope.SaveAsync();
@@ -68,7 +101,7 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var target = "start";
-            using (var scope = await AuditScope.CreateAsync("evt", () => target, new { X = 1 }))
+            using (var scope = await new AuditScopeFactory().CreateAsync("evt", () => target, new { X = 1 }, null, null))
             {
                 target = "end";
                 await scope.DisposeAsync();
@@ -103,7 +136,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { IsCreateAndSave = true }))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { IsCreateAndSave = true }))
             {
                 await scope.SaveAsync();
             }
@@ -127,7 +160,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { }))
             {
                 await scope.SaveAsync();
             }
@@ -153,7 +186,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { }))
             {
                 await scope.SaveAsync();
             }
@@ -179,7 +212,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { }))
             {
                 await scope.SaveAsync();
             }
@@ -204,7 +237,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { }))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { }))
             {
                 await scope.SaveAsync();
             }
@@ -236,17 +269,18 @@ namespace Audit.UnitTest
                 }));
 
             var tasks = new List<Task>();
+            var factory = new AuditScopeFactory();
             for (int i = 0; i < MAX; i++)
             {
                 tasks.Add(Task.Factory.StartNew(async () =>
                 {
-                    await AuditScope.LogAsync("LoginSuccess", new { username = "federico", id = i });
+                    await factory.LogAsync("LoginSuccess", new { username = "federico", id = i });
                     Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, ev =>
                     {
                         //do nothing, just bother
                         var d = ev.Event.Duration * 1234567;
                     });
-                    await AuditScope.CreateAndSaveAsync("LoginFailed", new { username = "adriano", id = i * -1 });
+                    await factory.CreateAsync(new AuditScopeOptions("LoginFailed", extraFields: new { username = "adriano", id = i * -1 }, isCreateAndSave: true));
                 }));
             }
             await Task.WhenAll(tasks.ToArray());
@@ -268,7 +302,7 @@ namespace Audit.UnitTest
                     .OnReplace((obj, ev) => onReplaceCount++)
                     .OnInsertAndReplace(ev => onInsertOrReplaceCount++));
 
-            var scope = await AuditScope.CreateAsync("et1", null, EventCreationPolicy.Manual);
+            var scope = await new AuditScopeFactory().CreateAsync("et1", null, EventCreationPolicy.Manual, null);
             await scope.SaveAsync();
             scope.SetCustomField("field", "value");
             Assert.AreEqual(1, onInsertCount);
@@ -289,9 +323,9 @@ namespace Audit.UnitTest
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            await AuditScope.LogAsync(eventType, new { ExtraField = "extra value" });
+            await new AuditScopeFactory().LogAsync(eventType, new { ExtraField = "extra value" });
 
-            await AuditScope.CreateAndSaveAsync(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
+            await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(eventType, extraFields: new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, dataProvider: provider.Object, isCreateAndSave: true));
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
@@ -320,7 +354,7 @@ namespace Audit.UnitTest
             });
 
             AuditEvent ev;
-            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
+            using (var scope = await new AuditScopeFactory().CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
             {
                 ev = scope.Event;
             }
@@ -346,7 +380,7 @@ namespace Audit.UnitTest
                 scope.Comment(comment);
             });
             AuditEvent ev;
-            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = await new AuditScopeFactory().CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
                 await scope.SaveAsync();
@@ -368,7 +402,7 @@ namespace Audit.UnitTest
                 scope.Discard();
             });
             AuditEvent ev;
-            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = await new AuditScopeFactory().CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
                 await scope.SaveAsync();
@@ -397,7 +431,7 @@ namespace Audit.UnitTest
                 scope.SetCustomField(key2, "test");
             });
             AuditEvent ev;
-            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = await new AuditScopeFactory().CreateAsync(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
             }
@@ -419,7 +453,7 @@ namespace Audit.UnitTest
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
-            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnEnd))
+            using (var scope = await new AuditScopeFactory().CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnEnd, null))
             {
                 ev = scope.Event;
                 scope.Comment("test");
@@ -434,13 +468,13 @@ namespace Audit.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0
         [Test]
         public async Task Test_Dispose_Async()
         {
             var provider = new Mock<AuditDataProvider>();
 
-            await using (var scope = await AuditScope.CreateAsync(null, null, EventCreationPolicy.InsertOnEnd, dataProvider: provider.Object))
+            await using (var scope = await new AuditScopeFactory().CreateAsync(null, null, EventCreationPolicy.InsertOnEnd, dataProvider: provider.Object))
             {               
             }
 
@@ -457,7 +491,7 @@ namespace Audit.UnitTest
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
-            using (var scope = await AuditScope.CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnEnd))
+            using (var scope = await new AuditScopeFactory().CreateAsync(eventType, () => target, EventCreationPolicy.InsertOnEnd, null))
             {
                 ev = scope.Event;
                 scope.Comment("test");
@@ -477,7 +511,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd))
+            using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd, null))
             {
                 scope.Comment("test");
                 await scope.SaveAsync(); // this should do nothing because of the creation policy (this is no more true, since v 4.6.2)
@@ -494,7 +528,7 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd))
+            using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
             {
                 scope.Comment("test");
                 await scope.DisposeAsync();
@@ -510,7 +544,7 @@ namespace Audit.UnitTest
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd))
+            using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd, null))
             {
                 scope.Comment("test");
             }
@@ -526,14 +560,14 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual))
+            using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
             {
                 scope.Comment("test");
             }
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
 
-            using (var scope = await AuditScope.CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual))
+            using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
             {
                 scope.Comment("test");
                 await scope.SaveAsync();
@@ -548,7 +582,7 @@ namespace Audit.UnitTest
         public async Task Test_ExtraFields_Async()
         {
             Core.Configuration.DataProvider = new FileDataProvider();
-            var scope = await AuditScope.CreateAsync("SomeEvent", null, new { @class = "class value", DATA = 123 }, EventCreationPolicy.Manual);
+            var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent", null, new { @class = "class value", DATA = 123 }, null, EventCreationPolicy.Manual));
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
@@ -563,9 +597,9 @@ namespace Audit.UnitTest
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            var scope1 = await AuditScope.CreateAsync("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, EventCreationPolicy.Manual);
+            var scope1 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, null, EventCreationPolicy.Manual));
             await scope1.SaveAsync();
-            var scope2 = await AuditScope.CreateAsync("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, EventCreationPolicy.Manual);
+            var scope2 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, null, EventCreationPolicy.Manual));
             await scope2.SaveAsync();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);

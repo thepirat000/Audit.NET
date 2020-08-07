@@ -141,8 +141,8 @@ namespace Audit.FileSystem
                 FileSystemEvent = fsEvent
             };
             var eventType = (_options.EventTypeName ?? "[{type}] {name}").Replace("{name}", fsEvent.Name).Replace("{path}", fsEvent.FullPath).Replace("{type}", e.ChangeType.ToString());
-
-            using (var auditScope = AuditScope.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = fsAuditEvent, DataProvider = _options.AuditDataProvider, CreationPolicy = _options.CreationPolicy }))
+            var factory = _options.AuditScopeFactory ?? Configuration.AuditScopeFactory;
+            using (var auditScope = factory.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = fsAuditEvent, DataProvider = _options.AuditDataProvider, CreationPolicy = _options.CreationPolicy }))
             {
                 if (type != FileSystemEventType.Delete)
                 {

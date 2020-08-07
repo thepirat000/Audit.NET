@@ -77,5 +77,9 @@ namespace Audit.FileSystem
         /// Gets or sets the event creation policy to use. By default it will use the global Configuration.CreationPolicy.
         /// </summary>
         public EventCreationPolicy? CreationPolicy { get; set; }
+        /// <summary>
+        /// Gets or sets a custom audit scope factory. By default it will use the general `AuditScopeFactory`.
+        /// </summary>
+        public IAuditScopeFactory AuditScopeFactory { get; set; }
     }
 }

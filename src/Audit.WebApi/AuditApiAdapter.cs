@@ -13,6 +13,8 @@ using System.Net.Http.Headers;
 using System.Collections.Specialized;
 using System.Reflection;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Audit.Core.Providers;
 
 namespace Audit.WebApi
 {
@@ -211,15 +213,21 @@ namespace Audit.WebApi
             return dict;
         }
 
-        internal static AuditScope GetCurrentScope(HttpRequestMessage request, IContextWrapper contextWrapper)
+        internal static IAuditScope GetCurrentScope(HttpRequestMessage request, IContextWrapper contextWrapper)
         {
             if (request == null)
             {
-                return AuditScopeFactory.CreateNoOp();
+                return CreateNoOpAuditScope();
             }
 
             var ctx = contextWrapper ?? new ContextWrapper(request);
             return ctx.Get<AuditScope>(AuditApiHelper.AuditApiScopeKey);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IAuditScope CreateNoOpAuditScope()
+        {
+            return new AuditScopeFactory().Create(new AuditScopeOptions { DataProvider = new NullDataProvider() });
         }
     }
 }

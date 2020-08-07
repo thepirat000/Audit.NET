@@ -41,7 +41,7 @@ namespace Audit.IntegrationTest
             var sb = "init";
             
 
-            using (var scope = AuditScope.Create("eventType", () => sb, new { MyCustomField = "value" }))
+            using (var scope = new AuditScopeFactory().Create("eventType", () => sb, new { MyCustomField = "value" }, null, null))
             {
                 sb += "-end";
             }
@@ -75,7 +75,7 @@ namespace Audit.IntegrationTest
             var sb = "init";
 
 
-            using (var scope = await AuditScope.CreateAsync("eventType", () => sb, new { MyCustomField = "value" }))
+            using (var scope = await new AuditScopeFactory().CreateAsync("eventType", () => sb, new { MyCustomField = "value" }, null, null))
             {
                 sb += "-end";
             }

@@ -68,6 +68,7 @@ By default content is not included.
 - **InternalBufferSize**: Gets or sets the size (in bytes) of the [internal buffer](https://docs.microsoft.com/en-us/dotnet/api/system.io.filesystemwatcher.internalbuffersize?view=netstandard-2.0#System_IO_FileSystemWatcher_InternalBufferSize).
 - **AuditDataProvider**: To indicate the Audit Data Provider to use. Default is NULL to use the [globally configured data provider](https://github.com/thepirat000/Audit.NET#data-provider).
 - **CreationPolicy**: To indicate the event creation policy to use. Default is NULL to use the [globally configured creation policy](https://github.com/thepirat000/Audit.NET#creation-policy). 
+- **AuditScopeFactory**: Allows to set a specific audit scope factory. By default the general [`AuditScopeFactory`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeFactory.cs) is used. 
 
 ## Output
 

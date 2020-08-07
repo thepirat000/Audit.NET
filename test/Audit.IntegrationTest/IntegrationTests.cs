@@ -331,7 +331,7 @@ namespace Audit.IntegrationTest
                 {
                     var eventType = "event" + rnd.Next(1, 4); //1..3
                     var x = "start";
-                    using (var s = AuditScope.Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd))
+                    using (var s = new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
                     {
                         x = "end";
                     }
@@ -378,7 +378,7 @@ namespace Audit.IntegrationTest
                 {
                     var eventType = "AuditEvents";
                     var x = "start";
-                    using (var s = AuditScope.Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd))
+                    using (var s = new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
                     {
                         x = "end";
                     }
@@ -501,7 +501,7 @@ namespace Audit.IntegrationTest
                     evId = s.EventId;
                 });
                 var now = DateTime.UtcNow;
-                using (var s = AuditScope.Create("test", null, new { someDate = now }))
+                using (var s = new AuditScopeFactory().Create("test", null, new { someDate = now }, null, null))
                 {
                 }
                 Audit.Core.Configuration.ResetCustomActions();
@@ -795,7 +795,7 @@ namespace Audit.IntegrationTest
             {
                 var ev = (AuditEvent)null;
                 CustomerOrder order = null;
-                using (var audit = AuditScope.Create("Order:Create", () => new TestStruct() { Id = 123, Order = order }))
+                using (var audit = new AuditScopeFactory().Create("Order:Create", () => new TestStruct() { Id = 123, Order = order }))
                 {
                     ev = audit.Event;
                     order = DbCreateOrder();
@@ -810,7 +810,7 @@ namespace Audit.IntegrationTest
                 IntegrationTests.CustomerOrder order = DbCreateOrder();
                 var ev = (AuditEvent)null;
                 var orderId = order.OrderId;
-                using (var audit = AuditScope.Create("Order:Delete", () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }))
+                using (var audit = new AuditScopeFactory().Create("Order:Delete", () => new TestStruct() { Id = 123, Order = order }, new { ReferenceId = order.OrderId }, null, null))
                 {
                     ev = audit.Event;
                     DbDeteleOrder(order.OrderId);

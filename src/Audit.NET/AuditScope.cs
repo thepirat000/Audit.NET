@@ -12,16 +12,13 @@ namespace Audit.Core
     /// <summary>
     /// Makes a code block auditable.
     /// </summary>
-    public partial class AuditScope : IDisposable
-#if NETSTANDARD2_1
-        , IAsyncDisposable
-#endif
+    public partial class AuditScope : IAuditScope
     {
         private readonly AuditScopeOptions _options;
-#region Constructors
+        #region Constructors
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private AuditScope(AuditScopeOptions options)
+        internal AuditScope(AuditScopeOptions options)
         {
             _options = options;
             _creationPolicy = options.CreationPolicy ?? Configuration.CreationPolicy;
@@ -32,7 +29,7 @@ namespace Audit.Core
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
             MethodBase callingMethod = options.CallingMethod;
-#if NET45 || NETSTANDARD2_0
+#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
@@ -132,9 +129,9 @@ namespace Audit.Core
             }
             return this;
         }
-#endregion
+        #endregion
 
-#region Public Properties
+        #region Public Properties
         /// <summary>
         /// The current save mode. Useful on custom actions to determine the saving trigger.
         /// </summary>
@@ -189,9 +186,9 @@ namespace Audit.Core
                 return _creationPolicy;
             }
         }
-#endregion
+        #endregion
 
-#region Private fields
+        #region Private fields
         private SaveMode _saveMode;
         private readonly EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
@@ -200,9 +197,9 @@ namespace Audit.Core
         private bool _ended;
         private readonly AuditDataProvider _dataProvider;
         private Func<object> _targetGetter;
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
         /// <summary>
         /// Replaces the target object getter whose old/new value will be stored on the AuditEvent.Target property
         /// </summary>
@@ -229,7 +226,7 @@ namespace Audit.Core
         /// </summary>
         public void Comment(string text)
         {
-            Comment(text, new object[0]); 
+            Comment(text, new object[0]);
         }
 
         /// <summary>
@@ -273,7 +270,7 @@ namespace Audit.Core
         /// Async version of the dispose method
         /// </summary>
         /// <returns></returns>
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1
         public async ValueTask DisposeAsync()
 #else
         public async Task DisposeAsync()
@@ -367,9 +364,9 @@ namespace Audit.Core
             EndEvent();
             await SaveEventAsync();
         }
-#endregion
+        #endregion
 
-#region Private Methods
+        #region Private Methods
 
         private bool IsEndedOrDisabled()
         {
@@ -392,7 +389,7 @@ namespace Audit.Core
             }
         }
 
-        private static Exception GetCurrentException()
+        private Exception GetCurrentException()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
             if (PlatformHelper.IsRunningOnMono())
@@ -425,7 +422,7 @@ namespace Audit.Core
         {
             if (IsEndedOrDisabled())
             {
-                return; 
+                return;
             }
             // Execute custom on event saving actions
             Configuration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
@@ -468,6 +465,6 @@ namespace Audit.Core
             // Execute custom after saving actions
             Configuration.InvokeScopeCustomActions(ActionType.OnEventSaved, this);
         }
-#endregion
+        #endregion
     }
 }

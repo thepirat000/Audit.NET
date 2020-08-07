@@ -8,7 +8,7 @@ namespace Audit.EntityFramework
         /// Gets the Entity Framework Event portion of the Audit Event on the given scope.
         /// </summary>
         /// <param name="auditScope">The audit scope.</param>
-        public static EntityFrameworkEvent GetEntityFrameworkEvent(this AuditScope auditScope)
+        public static EntityFrameworkEvent GetEntityFrameworkEvent(this IAuditScope auditScope)
         {
             return auditScope?.Event.GetEntityFrameworkEvent();
         }

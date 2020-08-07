@@ -119,6 +119,11 @@ namespace Audit.EntityFramework
         public AuditDataProvider AuditDataProvider { get; set; }
 
         /// <summary>
+        /// To indicate a custom audit scope factory. (Default is NULL to use the Audit.Core.Configuration.DefaultAuditScopeFactory). 
+        /// </summary>
+        public IAuditScopeFactory AuditScopeFactory { get; set; }
+
+        /// <summary>
         /// Indicates if the Audit is disabled.
         /// Default is false.
         /// </summary>
@@ -180,7 +185,7 @@ namespace Audit.EntityFramework
         /// Override to specify custom logic.
         /// </summary>
         /// <param name="auditScope">The audit scope.</param>
-        public virtual void OnScopeCreated(AuditScope auditScope)
+        public virtual void OnScopeCreated(IAuditScope auditScope)
         {
         }
 
@@ -189,7 +194,7 @@ namespace Audit.EntityFramework
         /// Override to specify custom logic.
         /// </summary>
         /// <param name="auditScope">The audit scope.</param>
-        public virtual void OnScopeSaving(AuditScope auditScope)
+        public virtual void OnScopeSaving(IAuditScope auditScope)
         {
         }
 

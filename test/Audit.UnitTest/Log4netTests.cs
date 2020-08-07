@@ -33,7 +33,7 @@ namespace Audit.UnitTest
 
             _adapter.Clear();
 
-            using (var s = AuditScope.Create(new AuditScopeOptions()
+            using (var s = new AuditScopeFactory().Create(new AuditScopeOptions()
             {
                 CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd,
                 EventType = "Test_log4net_InsertOnStartReplaceOnEnd"
@@ -59,7 +59,7 @@ namespace Audit.UnitTest
 
             _adapter.Clear();
 
-            using (var s = AuditScope.Create(new AuditScopeOptions()
+            using (var s = new AuditScopeFactory().Create(new AuditScopeOptions()
             {
                 CreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 EventType = "Test_log4net_InsertOnStartInsertOnEnd",

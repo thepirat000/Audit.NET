@@ -22,11 +22,12 @@ namespace Audit.EntityFramework
         bool ExcludeValidationResults { get; set; }
         AuditOptionMode Mode { get; set; }
         AuditDataProvider AuditDataProvider { get; set; }
+        IAuditScopeFactory AuditScopeFactory { get; set; }
         Dictionary<string, object> ExtraFields { get; }
         DbContext DbContext { get; }
         Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
-        void OnScopeSaving(AuditScope auditScope);
-        void OnScopeCreated(AuditScope auditScope);
+        void OnScopeSaving(IAuditScope auditScope);
+        void OnScopeCreated(IAuditScope auditScope);
         bool ExcludeTransactionId { get; set; }
 #if EF_FULL
         bool IncludeIndependantAssociations { get; set; }

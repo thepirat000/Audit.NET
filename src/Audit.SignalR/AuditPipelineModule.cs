@@ -24,6 +24,7 @@ namespace Audit.SignalR
         public Func<SignalrEventError, bool> ErrorEventsFilter { get; set; }
 
         public AuditDataProvider AuditDataProvider { get; set; }
+        public IAuditScopeFactory AuditScopeFactory { get; set; }
         public EventCreationPolicy? CreationPolicy { get; set; }
         public string AuditEventType { get; set; }
         public bool AuditDisabled { get; set; }
@@ -33,7 +34,7 @@ namespace Audit.SignalR
         public AuditPipelineModule() { }
 
         public AuditPipelineModule(AuditDataProvider dataProvider = null, EventCreationPolicy? creationPolicy = null,
-            string auditEventType = null, bool includeHeaders = false, bool includeQueryString = false, bool auditDisabled = false)
+            string auditEventType = null, bool includeHeaders = false, bool includeQueryString = false, bool auditDisabled = false, IAuditScopeFactory auditScopeFactory = null)
         {
             AuditDataProvider = dataProvider;
             CreationPolicy = creationPolicy;
@@ -41,6 +42,7 @@ namespace Audit.SignalR
             AuditDisabled = auditDisabled;
             IncludeHeaders = includeHeaders;
             IncludeQueryString = includeQueryString;
+            AuditScopeFactory = auditScopeFactory;
         }
 
         private bool AuditEventEnabled(SignalrEventBase @event)
@@ -286,13 +288,14 @@ namespace Audit.SignalR
             }
         }
         
-        private AuditScope CreateAuditScope(SignalrEventBase signalrEvent)
+        private IAuditScope CreateAuditScope(SignalrEventBase signalrEvent)
         {
             var auditEvent = new AuditEventSignalr()
             {
                 Event = signalrEvent
             };
-            var scope = AuditScope.Create(new AuditScopeOptions()
+            var factory = AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var scope = factory.Create(new AuditScopeOptions()
             {
                 EventType = (AuditEventType ?? "{event}").Replace("{event}", signalrEvent.EventType.ToString()),
                 AuditEvent = auditEvent,

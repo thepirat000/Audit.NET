@@ -39,7 +39,7 @@ namespace Audit.IntegrationTest
 
             var sb = "init";
 
-            using (var scope = AuditScope.Create("test_table", () => sb, new { MyCustomField = "value" }))
+            using (var scope = new AuditScopeFactory().Create("test_table", () => sb, new { MyCustomField = "value" }, null, null))
             {
                 sb += "-end";
             }

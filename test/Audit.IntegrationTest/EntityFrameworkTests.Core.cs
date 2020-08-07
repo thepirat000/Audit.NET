@@ -1122,11 +1122,11 @@ SET IDENTITY_INSERT Posts OFF
             optionsBuilder.UseLazyLoadingProxies();
         }
 
-        public override void OnScopeCreated(AuditScope auditScope)
+        public override void OnScopeCreated(IAuditScope auditScope)
         {
             Database.BeginTransaction();
         }
-        public override void OnScopeSaving(AuditScope auditScope)
+        public override void OnScopeSaving(IAuditScope auditScope)
         {
             if (auditScope.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
                 && auditScope.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].ToString() == "ROLLBACK")

@@ -161,7 +161,29 @@ namespace Audit.UnitTest
             Assert.IsTrue(evs[0].GetSignalrEvent<SignalrEventError>().Exception.Contains("SomeParameter"));
         }
 
+        [Test]
+        public void Test_Signalr_CustomAuditScopeFactory()
+        {
+            var evs = new List<AuditEvent>();
+            Configuration.DataProvider = null;
+            
+            var dp = new DynamicDataProvider();
+            dp.AttachOnInsertAndReplace(ev => { evs.Add(ev); });
 
+            var factory = new Mock<IAuditScopeFactory>();
+            factory.Setup(_ => _.Create(It.IsAny<AuditScopeOptions>()))
+                .Returns(new AuditScope(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventSignalr() }));
+
+            var module = new TestAuditPipelineModule()
+            {
+                AuditScopeFactory = factory.Object
+            };
+
+            SimulateIncomingError(module, new ArgumentNullException("SomeParameter", "message"), "cnn-Error", "err", new object[] { 0 });
+            Task.Delay(50).Wait();
+
+            Assert.AreEqual(1, evs.Count);
+        }
 
         [Test]
         public void Test_Signalr_Stress()

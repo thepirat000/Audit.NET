@@ -451,11 +451,11 @@ SET IDENTITY_INSERT Posts OFF
 
     public class MyTransactionalContext : MyBaseContext
     {
-        public override void OnScopeCreated(AuditScope auditScope)
+        public override void OnScopeCreated(IAuditScope auditScope)
         {
             Database.BeginTransaction();
         }
-        public override void OnScopeSaving(AuditScope auditScope)
+        public override void OnScopeSaving(IAuditScope auditScope)
         {
             if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
                 && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].Equals("ROLLBACK"))
