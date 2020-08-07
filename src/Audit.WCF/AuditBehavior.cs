@@ -17,11 +17,11 @@ namespace Audit.WCF
         /// Gets the current audit scope for the running thread.
         /// Get this property from an audited WCF method to get the current audit scope.
         /// </summary>
-        public static AuditScope CurrentAuditScope
+        public static IAuditScope CurrentAuditScope
         {
             get
             {
-                return CallContext.LogicalGetData(WcfContextScopeKey) as AuditScope;
+                return CallContext.LogicalGetData(WcfContextScopeKey) as IAuditScope;
             }
             internal set
             {

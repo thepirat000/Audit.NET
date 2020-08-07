@@ -30,7 +30,7 @@ namespace Audit.UnitTest
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
             Task.Delay(1000).Wait();
-            using (var scope = AuditScope.Create("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd, p))
+            using (var scope = new AuditScopeFactory().Create("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd, p))
             {
                 Task.Delay(100).Wait();
             }
@@ -64,7 +64,7 @@ namespace Audit.UnitTest
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
             await Task.Delay(1000);
-            using (var scope = await AuditScope.CreateAsync("Test_UdpDataProvider_BasicTest", null, EventCreationPolicy.InsertOnStartReplaceOnEnd))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("Test_UdpDataProvider_BasicTest", null, null, null, EventCreationPolicy.InsertOnStartReplaceOnEnd)))
             {
                 Task.Delay(100).Wait();
                 await scope.SaveAsync();
@@ -126,7 +126,7 @@ namespace Audit.UnitTest
                 int a = i;
                 tasks.Add(new Task(() =>
                 {
-                    using (var scope = AuditScope.Create("Test_UdpDataProvider_MultiThread_" + a, null, EventCreationPolicy.InsertOnEnd, p))
+                    using (var scope = new AuditScopeFactory().Create("Test_UdpDataProvider_MultiThread_" + a, null, EventCreationPolicy.InsertOnEnd, p))
                     {
                     }
                 }));
@@ -164,7 +164,7 @@ namespace Audit.UnitTest
             Task.Delay(1000).Wait();
 
             var target = Enumerable.Range(1, 10000).Select(_ => (byte)255).ToArray();
-            using (var scope = AuditScope.Create("Test_UdpDataProvider_BigPacket", () => target, EventCreationPolicy.InsertOnEnd, p))
+            using (var scope = new AuditScopeFactory().Create("Test_UdpDataProvider_BigPacket", () => target, EventCreationPolicy.InsertOnEnd, p))
             {
             }
 
@@ -182,7 +182,7 @@ namespace Audit.UnitTest
             var target = Enumerable.Range(1, 66000).Select(_ => (byte)255).ToArray();
             Assert.Throws<SocketException>(() =>
             {
-                using (var scope = AuditScope.Create("Test_UdpDataProvider_BigPacket", () => target, EventCreationPolicy.InsertOnEnd, p))
+                using (var scope = new AuditScopeFactory().Create("Test_UdpDataProvider_BigPacket", () => target, EventCreationPolicy.InsertOnEnd, p))
                 {
                 }
             });

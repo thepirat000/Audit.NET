@@ -28,6 +28,43 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_AuditScope_Log()
+        {
+            Audit.Core.Configuration.SystemClock = new MyClock();
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x.OnInsertAndReplace(ev => { evs.Add(ev); }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+            AuditScope.Log("test", new { field1 = "one" });
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual("test", evs[0].EventType);
+            Assert.AreEqual("one", evs[0].CustomFields["field1"]);
+            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_Log"));
+        }
+
+        [Test]
+        public void Test_AuditScope_CallingMethod()
+        {
+            Audit.Core.Configuration.SystemClock = new MyClock();
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(x => x.OnInsertAndReplace(ev => { evs.Add(ev); }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+            using (var scope = AuditScope.Create("test", () => "target"))
+            {
+            }
+            using (var scope = new AuditScopeFactory().Create("test", () => "target"))
+            {
+            }
+
+            Assert.AreEqual(2, evs.Count);
+            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"));
+            Assert.IsTrue(evs[1].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"));
+        }
+
+
+        [Test]
         public void Test_AuditScope_CustomSystemClock()
         {
             Audit.Core.Configuration.SystemClock = new MyClock();
@@ -40,7 +77,7 @@ namespace Audit.UnitTest
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
-            using (var scope = AuditScope.Create("Test_AuditScope_CustomSystemClock", () => new { someProp = true }))
+            using (var scope = new AuditScopeFactory().Create("Test_AuditScope_CustomSystemClock", () => new { someProp = true }))
             {
                 scope.SetCustomField("test", 123);
             }
@@ -66,7 +103,7 @@ namespace Audit.UnitTest
 
             var obj = new SomeClass() { Id = 1, Name = "Test" };
 
-            using (var scope = AuditScope.Create("Test", () => new { ShouldNotUseThisObject = true }))
+            using (var scope = new AuditScopeFactory().Create("Test", () => new { ShouldNotUseThisObject = true }))
             {
                 scope.SetTargetGetter(() => obj);
                 obj.Id = 2;
@@ -96,7 +133,7 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
 
-            using (var scope = AuditScope.Create("Test", () => new { ShouldNotUseThisObject = true }))
+            using (var scope = new AuditScopeFactory().Create("Test", () => new { ShouldNotUseThisObject = true }))
             {
                 scope.SetTargetGetter(() => null);
             }
@@ -120,7 +157,7 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
 
-            using (var scope = AuditScope.Create("Test", () => new { ShouldNotUseThisObject = true }))
+            using (var scope = new AuditScopeFactory().Create("Test", () => new { ShouldNotUseThisObject = true }))
             {
                 scope.SetTargetGetter(null);
             }
@@ -149,7 +186,7 @@ namespace Audit.UnitTest
             };
 
             Audit.Core.Configuration.JsonSettings = jSettings;
-            using (var scope = AuditScope.Create("TEST", null, null))
+            using (var scope = new AuditScopeFactory().Create("TEST", null, null, null, null))
             {
             }
             
@@ -185,7 +222,7 @@ namespace Audit.UnitTest
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
-            using (var scope = AuditScope.Create("", null, null))
+            using (var scope = new AuditScopeFactory().Create("", null, null, null, null))
             {
                 scope.Save();
                 scope.SaveAsync().Wait();
@@ -210,7 +247,7 @@ namespace Audit.UnitTest
                     Audit.Core.Configuration.AuditDisabled = true;
                 }));
 
-            using (var scope = AuditScope.Create("", null, null))
+            using (var scope = new AuditScopeFactory().Create("", null, null, null, null))
             {
                 scope.Save();
                 scope.SaveAsync().Wait();
@@ -290,7 +327,7 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var target = "start";
-            using (var scope = AuditScope.Create("evt", () => target, new {X = 1}))
+            using (var scope = new AuditScopeFactory().Create("evt", () => target, new {X = 1}, null, null))
             {
                 target = "end";
             }
@@ -323,7 +360,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { IsCreateAndSave = true }))
+            using (var scope = new AuditScopeFactory().Create(new AuditScopeOptions() { IsCreateAndSave = true }))
             {
                 scope.Save();
             }
@@ -347,7 +384,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = new AuditScopeFactory().Create(new AuditScopeOptions() { }))
             {
                 scope.Save();
             }
@@ -373,7 +410,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = new AuditScopeFactory().Create(new AuditScopeOptions() { }))
             {
                 scope.Save();
             }
@@ -399,7 +436,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = new AuditScopeFactory().Create(new AuditScopeOptions() { }))
             {
                 scope.Save();
             }
@@ -424,7 +461,7 @@ namespace Audit.UnitTest
                         modes.Add(scope.SaveMode);
                     }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { }))
+            using (var scope = new AuditScopeFactory().Create(new AuditScopeOptions() { }))
             {
                 scope.Save();
             }
@@ -456,17 +493,18 @@ namespace Audit.UnitTest
                 }));
 
             var tasks = new List<Task>();
+            var factory = new AuditScopeFactory();
             for (int i = 0; i < MAX; i++)
             {
                 tasks.Add(Task.Factory.StartNew(() =>
                 {
-                    AuditScope.Log("LoginSuccess", new { username = "federico", id = i });
+                    factory.Log("LoginSuccess", new { username = "federico", id = i });
                     Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, ev =>
                     {
                         //do nothing, just bother
                         var d = ev.Event.Duration * 1234567;
                     });
-                    AuditScope.CreateAndSave("LoginFailed", new { username = "adriano", id = i * -1 });
+                    factory.Create(new AuditScopeOptions("LoginFailed", null, new { username = "adriano", id = i * -1 }, null, null, true));
                 }));
             }
             Task.WaitAll(tasks.ToArray());
@@ -487,7 +525,7 @@ namespace Audit.UnitTest
                     .OnReplace((obj, ev) => onReplaceCount++)
                     .OnInsertAndReplace(ev => onInsertOrReplaceCount++));
 
-            var scope = AuditScope.Create("et1", null, EventCreationPolicy.Manual);
+            var scope = new AuditScopeFactory().Create("et1", null, EventCreationPolicy.Manual, null);
             scope.Save();
             scope.SetCustomField("field", "value");
             Assert.AreEqual(1, onInsertCount);
@@ -537,7 +575,7 @@ namespace Audit.UnitTest
                 .UseFileLogProvider(config => config.Directory(@"C:\").FilenamePrefix("prefix"))
                 .WithCreationPolicy(EventCreationPolicy.Manual)
                 .WithAction(action => action.OnScopeCreated(s => x++));
-            var scope = AuditScope.Create("test", null);
+            var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
             Assert.AreEqual(typeof(FileDataProvider), Core.Configuration.DataProvider.GetType());
             Assert.AreEqual("prefix", (Core.Configuration.DataProvider as FileDataProvider).FilenamePrefix);
@@ -553,7 +591,7 @@ namespace Audit.UnitTest
             Core.Configuration.Setup()
                 .UseEventLogProvider(config => config.LogName("LogName").SourcePath("SourcePath").MachineName("MachineName"))
                 .WithCreationPolicy(EventCreationPolicy.Manual);
-            var scope = AuditScope.Create("test", null);
+            var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
             Assert.AreEqual(typeof(EventLogDataProvider), Core.Configuration.DataProvider.GetType());
             Assert.AreEqual("LogName", (Core.Configuration.DataProvider as EventLogDataProvider).LogName);
@@ -569,9 +607,9 @@ namespace Audit.UnitTest
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            AuditScope.Log(eventType, new { ExtraField = "extra value" });
+            new AuditScopeFactory().Log(eventType, new { ExtraField = "extra value" });
 
-            AuditScope.CreateAndSave(eventType, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object);
+            new AuditScopeFactory().Create(new AuditScopeOptions(eventType, null, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object, null, true));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
 
@@ -599,7 +637,7 @@ namespace Audit.UnitTest
             });
 
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
+            using (var scope = new AuditScopeFactory().Create(eventType, () => target, EventCreationPolicy.InsertOnStartInsertOnEnd, provider.Object))
             {
                 ev = scope.Event;
             }
@@ -623,7 +661,7 @@ namespace Audit.UnitTest
                 scope.Comment(comment);
             });
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = new AuditScopeFactory().Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
                 scope.Save();
@@ -666,7 +704,7 @@ namespace Audit.UnitTest
                 scope.Discard();
             });
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = new AuditScopeFactory().Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
                 scope.Save();
@@ -694,7 +732,7 @@ namespace Audit.UnitTest
                 scope.SetCustomField(key2, "test");
             });
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
+            using (var scope = new AuditScopeFactory().Create(eventType, () => target, EventCreationPolicy.Manual, provider.Object))
             {
                 ev = scope.Event;
             }
@@ -714,7 +752,7 @@ namespace Audit.UnitTest
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnEnd))
+            using (var scope = new AuditScopeFactory().Create(eventType, () => target, EventCreationPolicy.InsertOnEnd, null))
             {
                 ev = scope.Event;
                 scope.Comment("test");
@@ -733,7 +771,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
 
-            using (var scope = AuditScope.Create(null, null, EventCreationPolicy.InsertOnEnd, provider.Object))
+            using (var scope = new AuditScopeFactory().Create(null, null, EventCreationPolicy.InsertOnEnd, provider.Object))
             {
             }
 
@@ -749,7 +787,7 @@ namespace Audit.UnitTest
             var target = "initial";
             var eventType = "SomeEvent";
             AuditEvent ev;
-            using (var scope = AuditScope.Create(eventType, () => target, EventCreationPolicy.InsertOnEnd))
+            using (var scope = new AuditScopeFactory().Create(eventType, () => target, EventCreationPolicy.InsertOnEnd, null))
             {
                 ev = scope.Event;
                 scope.Comment("test");
@@ -768,7 +806,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd))
+            using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd, null))
             {
                 scope.Comment("test");
                 scope.Save(); // this should do nothing because of the creation policy (this is no more true, since v 4.6.2)
@@ -783,7 +821,7 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd))
+            using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
             {
                 scope.Comment("test");
             }
@@ -797,7 +835,7 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd))
+            using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd, null))
             {
                 scope.Comment("test");
             }
@@ -811,13 +849,13 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.Manual))
+            using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
             {
                 scope.Comment("test");
             }
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
 
-            using (var scope = AuditScope.Create("SomeEvent", () => "target", EventCreationPolicy.Manual))
+            using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
             {
                 scope.Comment("test");
                 scope.Save();
@@ -832,7 +870,7 @@ namespace Audit.UnitTest
         public void Test_ExtraFields()
         {
             Core.Configuration.DataProvider = new FileDataProvider();
-            var scope = AuditScope.Create("SomeEvent", null, new { @class = "class value", DATA = 123 }, EventCreationPolicy.Manual);
+            var scope = new AuditScopeFactory().Create(new AuditScopeOptions("SomeEvent", null, new { @class = "class value", DATA = 123 }, null, EventCreationPolicy.Manual));
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
@@ -846,9 +884,9 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
-            var scope1 = AuditScope.Create("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, EventCreationPolicy.Manual);
+            var scope1 = new AuditScopeFactory().Create(new AuditScopeOptions("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, null, EventCreationPolicy.Manual));
             scope1.Save();
-            var scope2 = AuditScope.Create("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, EventCreationPolicy.Manual);
+            var scope2 = new AuditScopeFactory().Create(new AuditScopeOptions("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, null, EventCreationPolicy.Manual));
             scope2.Save();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);

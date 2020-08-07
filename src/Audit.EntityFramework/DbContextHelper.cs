@@ -133,7 +133,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Saves the scope.
         /// </summary>
-        public void SaveScope(IAuditDbContext context, AuditScope scope, EntityFrameworkEvent @event)
+        public void SaveScope(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event)
         {
             UpdateAuditEvent(@event, context);
             (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
@@ -144,7 +144,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Saves the scope asynchronously.
         /// </summary>
-        public async Task SaveScopeAsync(IAuditDbContext context, AuditScope scope, EntityFrameworkEvent @event)
+        public async Task SaveScopeAsync(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event)
         {
             UpdateAuditEvent(@event, context);
             (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
@@ -339,7 +339,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Creates the Audit scope.
         /// </summary>
-        public AuditScope CreateAuditScope(IAuditDbContext context, EntityFrameworkEvent efEvent)
+        public IAuditScope CreateAuditScope(IAuditDbContext context, EntityFrameworkEvent efEvent)
         {
             var typeName = context.GetType().Name;
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
@@ -347,7 +347,16 @@ namespace Audit.EntityFramework
             {
                 EntityFrameworkEvent = efEvent
             };
-            var scope = AuditScope.Create(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 3);
+            var factory = context.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var options = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                CreationPolicy = EventCreationPolicy.Manual,
+                DataProvider = context.AuditDataProvider,
+                AuditEvent = auditEfEvent,
+                SkipExtraFrames = 3
+            };
+            var scope = factory.Create(options);
             if (context.ExtraFields != null)
             {
                 foreach (var field in context.ExtraFields)
@@ -362,7 +371,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Creates the Audit scope asynchronously.
         /// </summary>
-        public async Task<AuditScope> CreateAuditScopeAsync(IAuditDbContext context, EntityFrameworkEvent efEvent)
+        public async Task<IAuditScope> CreateAuditScopeAsync(IAuditDbContext context, EntityFrameworkEvent efEvent)
         {
             var typeName = context.GetType().Name;
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
@@ -370,7 +379,16 @@ namespace Audit.EntityFramework
             {
                 EntityFrameworkEvent = efEvent
             };
-            var scope = await AuditScope.CreateAsync(eventType, null, null, EventCreationPolicy.Manual, context.AuditDataProvider, auditEfEvent, 3);
+            var factory = context.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var options = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                CreationPolicy = EventCreationPolicy.Manual,
+                DataProvider = context.AuditDataProvider,
+                AuditEvent = auditEfEvent,
+                SkipExtraFrames = 3
+            };
+            var scope = await factory.CreateAsync(options);
             if (context.ExtraFields != null)
             {
                 foreach (var field in context.ExtraFields)

@@ -41,7 +41,7 @@ namespace Audit.WebApi
         /// </summary>
         /// <param name="apiController">The API controller.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
-        public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.ControllerBase apiController)
+        public static IAuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.ControllerBase apiController)
         {
             return AuditApiAdapter.GetCurrentScope(apiController.HttpContext);
         }
@@ -52,7 +52,7 @@ namespace Audit.WebApi
         /// <param name="apiController">The API controller.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
         /// <param name="contextWrapper">The context wrapper instance to use to provide the context. Default is NULL to use the default ContextWrapper.</param>
-        public static AuditScope GetCurrentAuditScope(this System.Web.Http.ApiController apiController, IContextWrapper contextWrapper = null)
+        public static IAuditScope GetCurrentAuditScope(this System.Web.Http.ApiController apiController, IContextWrapper contextWrapper = null)
         {
             return AuditApiAdapter.GetCurrentScope(apiController.Request, contextWrapper);
         }
@@ -64,7 +64,7 @@ namespace Audit.WebApi
         /// </summary>
         /// <param name="httpContext">The http context to get the scope from.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
-        public static AuditScope GetCurrentAuditScope(this HttpContext httpContext)
+        public static IAuditScope GetCurrentAuditScope(this HttpContext httpContext)
         {
             return AuditApiAdapter.GetCurrentScope(httpContext);
         }
@@ -82,7 +82,7 @@ namespace Audit.WebApi
         /// <param name="httpRequest">The http request to get the scope from.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
         /// <param name="contextWrapper">The context wrapper instance to use to provide the context. Default is NULL to use the default ContextWrapper.</param>
-        public static AuditScope GetCurrentAuditScope(this HttpRequestMessage httpRequest, IContextWrapper contextWrapper = null)
+        public static IAuditScope GetCurrentAuditScope(this HttpRequestMessage httpRequest, IContextWrapper contextWrapper = null)
         {
             return AuditApiAdapter.GetCurrentScope(httpRequest, contextWrapper);
         }

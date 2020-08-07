@@ -57,7 +57,7 @@ namespace Audit.UnitTest
 
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
-            AuditScope.Log(guid, loop);
+            new AuditScopeFactory().Log(guid, loop);
 
             var ev = fdp.GetEvent(Path.Combine(_directory, guid));
 
@@ -82,7 +82,7 @@ namespace Audit.UnitTest
 
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
-            await AuditScope.CreateAndSaveAsync(guid, loop);
+            await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(guid, extraFields: loop, isCreateAndSave: true));
 
             var ev = await fdp.GetEventAsync(Path.Combine(_directory, guid));
 
@@ -113,7 +113,7 @@ namespace Audit.UnitTest
             var guid = "x" + Guid.NewGuid().ToString();
             try
             {
-                AuditScope.CreateAndSave(guid, loop);
+                new AuditScopeFactory().Create(new AuditScopeOptions(guid, extraFields: loop, isCreateAndSave: true));
                 Assert.Fail("Should not get here. JsonSettings not respected?");
             }
             catch (JsonSerializationException ex)
@@ -142,7 +142,7 @@ namespace Audit.UnitTest
             var guid = "x" + Guid.NewGuid().ToString();
             try
             {
-                await AuditScope.CreateAndSaveAsync(guid, loop);
+                await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(guid, extraFields: loop, isCreateAndSave: true));
                 Assert.Fail("Should not get here. JsonSettings not respected?");
             }
             catch (JsonSerializationException ex)

@@ -17,6 +17,8 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Extensions;
+using System.Runtime.CompilerServices;
+using Audit.Core.Providers;
 
 namespace Audit.WebApi
 {
@@ -250,11 +252,11 @@ namespace Audit.WebApi
             return args;
         }
 
-        internal static AuditScope GetCurrentScope(HttpContext httpContext)
+        internal static IAuditScope GetCurrentScope(HttpContext httpContext)
         {
             if (httpContext == null)
             {
-                return AuditScopeFactory.CreateNoOp();
+                return CreateNoOpAuditScope();
             }
 
             return httpContext.Items[AuditApiHelper.AuditApiScopeKey] as AuditScope;
@@ -270,6 +272,11 @@ namespace Audit.WebApi
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IAuditScope CreateNoOpAuditScope()
+        {
+            return new AuditScopeFactory().Create(new AuditScopeOptions { DataProvider = new NullDataProvider() });
+        }
     }
 }
 #endif

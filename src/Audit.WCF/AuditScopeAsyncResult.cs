@@ -17,7 +17,7 @@ namespace Audit.WCF
         }
 
         internal AuditScopeState AuditScopeState => _auditScopeState;
-        internal AuditScope AuditScope => _auditScopeState.AuditScope;
+        internal IAuditScope AuditScope => _auditScopeState.AuditScope;
         public bool IsCompleted => _originalResult.IsCompleted;
         public WaitHandle AsyncWaitHandle => _originalResult.AsyncWaitHandle;
         public object AsyncState => _auditScopeState.OriginalUserState;

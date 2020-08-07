@@ -36,7 +36,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Intercept an asynchronous operation that returns a Task.
         /// </summary>
-        private static async Task InterceptAsync(Task task, IInvocation invocation, InterceptEvent intEvent, AuditScope scope)
+        private static async Task InterceptAsync(Task task, IInvocation invocation, InterceptEvent intEvent, IAuditScope scope)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Intercept an asynchronous operation that returns a Task Of[T].
         /// </summary>
-        private static async Task<T> InterceptAsync<T>(Task<T> task, IInvocation invocation, InterceptEvent intEvent, AuditScope scope)
+        private static async Task<T> InterceptAsync<T>(Task<T> task, IInvocation invocation, InterceptEvent intEvent, IAuditScope scope)
         {
             T result;
             try
@@ -72,7 +72,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Ends the event for asynchronous interceptions.
         /// </summary>
-        private static void EndAsyncAuditInterceptEvent(Task task, IInvocation invocation, InterceptEvent intEvent, AuditScope scope, object result)
+        private static void EndAsyncAuditInterceptEvent(Task task, IInvocation invocation, InterceptEvent intEvent, IAuditScope scope, object result)
         {
             intEvent.AsyncStatus = task.Status.ToString();
             if (task.Status == TaskStatus.Faulted)
@@ -220,7 +220,8 @@ namespace Audit.DynamicProxy
                 DataProvider = Settings.AuditDataProvider,
                 AuditEvent = auditEventIntercept
             };
-            var scope = AuditScope.Create(scopeOptions);
+            var auditScopeFactory = Settings.AuditScopeFactory ?? Configuration.AuditScopeFactory;
+            var scope = auditScopeFactory.Create(scopeOptions);
             AuditProxy.CurrentScope = scope;
             // Call the intercepted method (sync part)
             try
@@ -239,7 +240,7 @@ namespace Audit.DynamicProxy
             {
                 if (typeof(Task).IsAssignableFrom(returnType))
                 {
-                    invocation.ReturnValue = InterceptAsync((dynamic) invocation.ReturnValue, invocation, intEvent, scope);
+                    invocation.ReturnValue = InterceptAsync((dynamic)invocation.ReturnValue, invocation, intEvent, scope);
                     return;
                 }
             }

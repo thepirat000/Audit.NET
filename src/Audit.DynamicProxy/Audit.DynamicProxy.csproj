@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs by intercepting operation calls on any class without changing its code.</Description>
     <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.DynamicProxy</AssemblyTitle>
-    <VersionPrefix>15.3.0</VersionPrefix>
+    <VersionPrefix>16.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -31,7 +31,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.3.0" />
+    <PackageReference Include="Castle.Core" Version="4.4.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 

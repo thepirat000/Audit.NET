@@ -91,5 +91,9 @@ namespace Audit.Http.ConfigurationApi
         /// Specifies the audit data provider to use. Default is NULL to use the globally configured data provider.
         /// </summary>
         IAuditClientHandlerConfigurator AuditDataProvider(AuditDataProvider auditDataProvider);
+        /// <summary>
+        /// Specifies the Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
+        /// </summary>
+        IAuditClientHandlerConfigurator AuditScopeFactory(IAuditScopeFactory auditScopeFactory);
     }
 }

@@ -16,6 +16,13 @@ namespace Audit.Http.ConfigurationApi
         internal Func<HttpRequestMessage, string> _eventTypeName;
         internal EventCreationPolicy? _eventCreationPolicy;
         internal AuditDataProvider _auditDataProvider;
+        internal IAuditScopeFactory _auditScopeFactory;
+
+        public IAuditClientHandlerConfigurator AuditScopeFactory(IAuditScopeFactory auditScopeFactory)
+        {
+            _auditScopeFactory = auditScopeFactory;
+            return this;
+        }
 
         public IAuditClientHandlerConfigurator CreationPolicy(EventCreationPolicy eventCreationPolicy)
         {

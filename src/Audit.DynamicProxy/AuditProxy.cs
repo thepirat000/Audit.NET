@@ -14,7 +14,7 @@ namespace Audit.DynamicProxy
     {
         private static readonly ProxyGenerator Generator = new ProxyGenerator();
         [ThreadStatic]
-        private static AuditScope _currentScope;
+        private static IAuditScope _currentScope;
 
         /// <summary>
         /// Gets the scope for the current running thread. Get this property value from the audited methods to customize the Audit.
@@ -22,7 +22,7 @@ namespace Audit.DynamicProxy
         /// Calling this property from a different thread will return NULL or an unexpected value.
         /// </summary>
         /// <value>The current scope related to the running thread, or NULL.</value>
-        public static AuditScope CurrentScope
+        public static IAuditScope CurrentScope
         {
             get => _currentScope;
             internal set => _currentScope = value;

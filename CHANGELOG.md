@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.0.0] - 2020-08-06
+### Modified
+- Audit.NET: Moving the AuditScope creation to an `AuditScopeFactory` implementing an interface `IAuditScopeFactory`. 
+Also added `IAuditScope` interface for unit testing 
+
 ## [15.2.4] - 2020-07-22
 ### Modified
 - Audit.EntityFramework.Core: Changing version for Microsoft.EntityFrameworkCore reference when targeting .NET Standard 2.0 or 2.1 (now referencing Microsoft.EntityFrameworkCore 3.1.0) (#310)

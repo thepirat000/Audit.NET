@@ -1,5 +1,8 @@
-﻿using Audit.Http;
+﻿using Audit.Core;
+using Audit.Core.Providers;
+using Audit.Http;
 using Audit.Http.ConfigurationApi;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -375,7 +378,7 @@ namespace Audit.UnitTest
                     actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
                 }));
 
-            
+
             var url = "http://google.com/?q=test";
             using (var cli = new HttpClient(new AuditHttpClientHandler() { RequestFilter = _ => false }))
             {
@@ -385,6 +388,30 @@ namespace Audit.UnitTest
             Assert.AreEqual(0, actions.Count);
         }
 
-    }
+        [Test]
+        public async Task Test_HttpAction_CustomAuditScopeFactory()
+        {
+            var actions = new List<HttpAction>();
+            Audit.Core.Configuration.DataProvider = null;
 
+            var dp = new DynamicDataProvider();
+            dp.AttachOnInsertAndReplace(ev =>
+            {
+                actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+            });
+
+            var factory = new Mock<IAuditScopeFactory>();
+            factory.Setup(_ => _.Create(It.IsAny<AuditScopeOptions>()))
+                .Returns(new AuditScope(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventHttpClient() }));
+            var url = "http://google.com/?q=test";
+            using (var cli = new HttpClient(new AuditHttpClientHandler() { RequestFilter = _ => true, AuditScopeFactory = factory.Object }))
+            {
+                await cli.GetAsync(url);
+            }
+
+            Assert.AreEqual(1, actions.Count);
+            Assert.AreEqual(url, actions[0].Url);
+            Assert.AreEqual("GET", actions[0].Method);
+        }
+    }
 }

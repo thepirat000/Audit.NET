@@ -26,8 +26,9 @@ namespace Audit.EntityFramework
         public virtual Dictionary<string, object> ExtraFields { get; set; }
         public virtual Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
         public virtual AuditDataProvider AuditDataProvider { get; set; }
-        public virtual void OnScopeCreated(AuditScope auditScope) { }
-        public virtual void OnScopeSaving(AuditScope auditScope) { }
+        public virtual IAuditScopeFactory AuditScopeFactory { get; set; }
+        public virtual void OnScopeCreated(IAuditScope auditScope) { }
+        public virtual void OnScopeSaving(IAuditScope auditScope) { }
         public bool ExcludeTransactionId { get; set; }
 #if EF_FULL
         public virtual bool IncludeIndependantAssociations { get; set; }

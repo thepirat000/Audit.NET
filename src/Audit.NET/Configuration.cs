@@ -25,6 +25,20 @@ namespace Audit.Core
         /// </summary>
         public static AuditDataProvider DataProvider { get; set; }
         /// <summary>
+        /// Gets or Sets the Default audit scope factory.
+        /// </summary>
+        public static IAuditScopeFactory AuditScopeFactory
+        {
+            get
+            {
+                return _auditScopeFactory;
+            }
+            set
+            {
+                _auditScopeFactory = value ?? new AuditScopeFactory();
+            }
+        }
+        /// <summary>
         /// Global switch to disable audit logging. Default is false.
         /// </summary>
         public static bool AuditDisabled { get; set; }
@@ -36,6 +50,8 @@ namespace Audit.Core
         internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
 
         internal static object Locker = new object();
+
+        private static IAuditScopeFactory _auditScopeFactory;
 
         static Configuration()
         {
@@ -49,6 +65,7 @@ namespace Audit.Core
             };
             SystemClock = new DefaultSystemClock();
             ResetCustomActions();
+            _auditScopeFactory = new AuditScopeFactory();
         }
 
         /// <summary>

@@ -60,6 +60,10 @@ namespace Audit.Http
         /// Specifies the audit data provider to use. Default is NULL to use the globally configured data provider.
         /// </summary>
         public AuditDataProvider AuditDataProvider { set => _config._auditDataProvider = value; }
+        /// <summary>
+        /// Specifies the Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
+        /// </summary>
+        public IAuditScopeFactory AuditScopeFactory { set => _config._auditScopeFactory = value; }
 
         public AuditHttpClientHandler()
         {
@@ -101,7 +105,8 @@ namespace Audit.Http
                 DataProvider = _config._auditDataProvider
             };
             HttpResponseMessage response;
-            var scope = AuditScope.Create(options);
+            var auditScopeFactory = _config._auditScopeFactory ?? Configuration.AuditScopeFactory;
+            var scope = auditScopeFactory.Create(options);
             try
             {
                 response = await base.SendAsync(request, cancellationToken);
@@ -127,7 +132,7 @@ namespace Audit.Http
             return response;
         }
 
-        private async Task SaveDispose(AuditScope scope)
+        private async Task SaveDispose(IAuditScope scope)
         {
             if (scope.EventCreationPolicy == Core.EventCreationPolicy.Manual)
             {

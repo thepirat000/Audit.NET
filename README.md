@@ -37,8 +37,17 @@ The **Audit Scope** is the central object of this framework. It encapsulates an 
 The **Audit Event** is an extensible information container of an audited operation. 
 See the [audit scope statechart](#auditscope-statechart).
 
-Create an Audit Scope by calling the static `AuditScope.Create` method.
- 
+To create a new Audit Scope, call the `Create`/`CreateAsync` method on `AuditScopeFactory`.
+
+```c#
+var scope = new AuditScopeFactory().Create(new AuditScopeOptions(...)));
+```
+
+Or use the static shortcuts `AuditScope.Create`/`AuditScope.CreateAsync`:
+```c#
+var scope = AuditScope.Create(new AuditScopeOptions(...)));
+```
+
 Suppose you have the following code to _cancel an order_ that you want to audit:
 
 ```c#
@@ -62,25 +71,24 @@ using (AuditScope.Create("Order:Update", () => order))
 
 > It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing the detection of exceptions and calculating the duration by implicitly saving the event on disposal. 
 
-The first parameter of the `Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library to inspect the value at the beginning and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
-
-There is also a unified overload of the `Create` method that accepts an instance of [`AuditScopeOptions`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeOptions.cs). Use this class to configure any of the available options for the scope:
-
-```c#
-var options = new AuditScopeOptions()
-{
-    EventType = "MyEvent",
-    CreationPolicy = EventCreationPolicy.Manual,
-    ExtraFields = new { Action = this.Action },
-    AuditEvent = new MyCustomAuditEvent()
-};
-using (var scope = AuditScope.Create(options))
-{
-    // ...
-}
-```
+The first parameter of the `AuditScope.Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library to inspect the value at the beginning and at the disposal of the scope. It is not mandatory to supply a target object, pass `null` when you don't want to track a specific object.
 
 > When using the [extensions](#extensions) that logs interactions with different systems, like [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), etc. you don't need to explicitly create the `AuditScope` or `AuditEvent`, they are created internally by the extension.
+
+#### AuditScopeOptions fields
+
+Option field | Type | Description 
+------------ | ---------------- | ---------------- 
+EventType | `string` | A string representing the type of the event
+TargetGetter | `Func<object>` | Target object getter (a func that returns the object to track)
+ExtraFields | `obejct` | Anonymous object that contains additional fields to be merged into the audit event
+DataProvider | `AuditDataProvider` | The [data provider](#data-providers) to use. Defaults to the DataProvider configured on `Audit.Core.Configuration.DataProvider`
+CreationPolicy | `EventCreationPolicy` | The [creation policy](#creation-policy) to use. Default is `InsertOnEnd` 
+IsCreateAndSave | `bool` | Value indicating whether this scope should be immediately ended and saved after creation. Default is false
+AuditEvent | `AuditEvent` | Custom initial audit event to use. By default it will create a new instance of basic `AuditEvent`
+SkipExtraFrames | `int` | Value used to indicate how many frames in the stack should be skipped to determine the calling method. Default is 0
+CallingMethod | `MethodBase` | Specific calling method to store on the event. Default is to use the calling stack to determine the calling method.
+
 
 ### Simple logging
 
@@ -104,7 +112,12 @@ public class SomethingThatStartsAndEnds
     public void Start()
     {
         // Create a manual scope
-        auditScope = AuditScope.Create("MyEvent", () => Status, EventCreationPolicy.Manual);
+        auditScope = AuditScope.Create(new AuditScopeOptions()
+        {
+            EventType = "MyEvent",
+            TargetGetter = () => this.Status,
+            CreationPolicy = EventCreationPolicy.Manual
+        });
     }
 
     public void End()
@@ -130,7 +143,7 @@ public async Task SaveOrderAsync(Order order)
     try
     {
         // async scope creation
-        auditScope = await AuditScope.CreateAsync("order", () => order);
+        auditScope = await AuditScope.CreateAsync(new AuditScopeOptions("order", () => order));
     }
     finally
     {
@@ -230,7 +243,7 @@ For example:
 
 ```c#
 Order order = Db.GetOrder(orderId);
-using (var audit = AuditScope.Create("Order:Update", () => order))
+using (var audit = AuditScope.Create(new AuditScopeOptions("Order:Update", () => order)))
 {
     audit.SetCustomField("ReferenceId", orderId);
     order.Status = -1;
@@ -242,7 +255,7 @@ using (var audit = AuditScope.Create("Order:Update", () => order))
 You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
 
 ```c#
-using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+using (var audit = AuditScope.Create(new AuditScopeOptions("Order:Update", () => order, new { ReferenceId = orderId })))
 {
     order.Status = -1;
     order = Db.OrderUpdate(order);
@@ -252,7 +265,7 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 
 You can also access the Custom Fields directly from `Event.CustomFields` property of the scope. For example:
 ```c#
-using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+using (var audit = AuditScope.Create(new AuditScopeOptions("Order:Update", () => order, new { ReferenceId = orderId })))
 {
     audit.Event.CustomFields["ReferenceId"] = orderId;
 }
@@ -317,7 +330,7 @@ The `AuditScope` object has a `Discard()` method to allow the user to discard an
 For example, if you want to avoid saving the audit event under certain condition:
 
 ```c#
-using (var scope = AuditScope.Create("SomeEvent", () => someTarget))
+using (var scope = AuditScope.Create(new AuditScopeOptions("SomeEvent", () => someTarget)))
 {
     try
     {
@@ -409,15 +422,9 @@ Audit.Core.Configuration.Setup()
 
 See [Configuration section](#configuration) for more information.
 
-You can also set the data provider per-scope, by using an appropriate overload of the `AuditScope.Create` method. For example:
+You can also set the data provider per-scope. For example:
 ```c#
-AuditScope.Create("Order:Update", () => order, EventCreationPolicy.Manual, new MyCustomDataProvider());
-```
-
-Or:
-
-```c#
-AuditScope.Create(new AuditScopeOptions { DataProvider = new MyCustomDataProvider() });
+AuditScope.Create(new AuditScopeOptions { DataProvider = new MyCustomDataProvider(), ... });
 ```
 
 

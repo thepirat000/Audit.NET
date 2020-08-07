@@ -30,7 +30,7 @@ namespace Audit.UnitTest
 
             _adapter.Logs.Clear();
 
-            using (var s = AuditScope.Create(new AuditScopeOptions()
+            using (var s = new AuditScopeFactory().Create(new AuditScopeOptions()
             {
                 CreationPolicy = EventCreationPolicy.InsertOnEnd,
                 EventType = nameof(Test_NLog_InsertOnEnd),
@@ -58,7 +58,7 @@ namespace Audit.UnitTest
 
             _adapter.Logs.Clear();
 
-            using (var s = AuditScope.Create(new AuditScopeOptions()
+            using (var s = new AuditScopeFactory().Create(new AuditScopeOptions()
             {
                 CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd,
                 EventType = nameof(Test_NLog_InsertOnStartReplaceOnEnd)
@@ -84,7 +84,7 @@ namespace Audit.UnitTest
 
             _adapter.Logs.Clear();
 
-            using (var s = AuditScope.Create(new AuditScopeOptions()
+            using (var s = new AuditScopeFactory().Create(new AuditScopeOptions()
             {
                 CreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 EventType = nameof(Test_NLog_InsertOnStartInsertOnEnd),
