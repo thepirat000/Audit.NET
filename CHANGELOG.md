@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [16.0.0] - 2020-08-06
 ### Modified
 - Audit.NET: Moving the AuditScope creation to an `AuditScopeFactory` implementing an interface `IAuditScopeFactory`. 
-Also added `IAuditScope` interface for unit testing 
+Also added `IAuditScope` interface for unit testing. (#315, #319)
+- Audit.NET: Enable disposable async for netstandard2.0 (#318)
 
 ## [15.2.4] - 2020-07-22
 ### Modified

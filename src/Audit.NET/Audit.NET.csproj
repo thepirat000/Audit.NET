@@ -43,6 +43,9 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.0.0" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="images\icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>

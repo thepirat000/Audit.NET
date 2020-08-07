@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Audit.Core
 {
     public interface IAuditScope : IDisposable
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1
         , IAsyncDisposable
 #endif
     {
@@ -17,7 +17,7 @@ namespace Audit.Core
         void Comment(string text);
         void Comment(string format, params object[] args);
         void Discard();
-#if !NETSTANDARD2_1
+#if NET45 || NETSTANDARD1_3
         Task DisposeAsync();
 #endif
         void Save();
