@@ -52,6 +52,7 @@ namespace Audit.EntityFramework
             context.AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
             context.EntitySettings = MergeEntitySettings(attrConfig?.EntitySettings, localConfig?.EntitySettings, globalConfig?.EntitySettings);
             context.ExcludeTransactionId = attrConfig?.ExcludeTransactionId ?? localConfig?.ExcludeTransactionId ?? globalConfig?.ExcludeTransactionId ?? false;
+            context.EarlySavingAudit = attrConfig?.EarlySavingAudit ?? localConfig?.EarlySavingAudit ?? globalConfig?.EarlySavingAudit ?? false;
 #if EF_FULL
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
@@ -473,6 +474,10 @@ namespace Audit.EntityFramework
                 return await baseSaveChanges();
             }
             var scope = await CreateAuditScopeAsync(context, efEvent);
+            if (context.EarlySavingAudit)
+            {
+                await SaveScopeAsync(context, scope, efEvent);
+            }
             try
             {
                 efEvent.Result = await baseSaveChanges();
@@ -504,6 +509,10 @@ namespace Audit.EntityFramework
                 return baseSaveChanges();
             }
             var scope = CreateAuditScope(context, efEvent);
+            if (context.EarlySavingAudit)
+            {
+                SaveScope(context, scope, efEvent);
+            }
             try
             {
                 efEvent.Result = baseSaveChanges();

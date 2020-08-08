@@ -34,7 +34,12 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.SetExcludeTransactionId<T>(exclude);
             return this;
         }
-
+        
+        public IContextSettingsConfigurator<T> EarlySavingAudit(bool earlySaving = true)
+        {
+            Configuration.SetEarlySavingAudit<T>(earlySaving);
+            return this;
+        }
 #if EF_FULL
         public IContextSettingsConfigurator<T> IncludeIndependantAssociations(bool include = true)
         {

@@ -169,6 +169,11 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool ExcludeTransactionId { get; set; }
 
+        /// <summary>
+        /// To indicate if the audit event should be saved before the entity saving operation takes place. 
+        /// Default is false to save the audit event after the entity saving operation completes or fails.
+        /// </summary>
+        public bool EarlySavingAudit { get; set; }
 #if EF_FULL
         /// <summary>
         /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.

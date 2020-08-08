@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.0.1] - 2020-08-07
+### Modified
+- Audit.EntityFramework: Enhance CLR entity type resolve in EF Core (#320)
+- Audit.EntityFramework: Adding boolean `EarlySavingAudit` setting to AuditDbContext to allow the audit event to be saved **before** the entity saving operation takes place. Related to #316.
+- Audit.NET.ElasticSearch: Upgrade NEST reference to version 7.8.2 to  fix exception *Could not load type Elasticsearch.Net.IInternalSerializerWithFormatter from assembly Elasticsearch.Net* (#313)
+
 ## [16.0.0] - 2020-08-06
 ### Modified
 - Audit.NET: Moving the AuditScope creation to an `AuditScopeFactory` implementing an interface `IAuditScopeFactory`. 

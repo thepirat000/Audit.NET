@@ -506,8 +506,59 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.AreEqual(longText, audits[1].Title);
                 Assert.IsTrue(audits[1].Exception.Length > 5);
             }
+        }
 
+        [Test]
+        public void Test_EF_MapProxyTypes()
+        {
+            var guid = Guid.NewGuid().ToString();
 
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(_ => _
+                    .UseDbContext<BlogsContext>()
+                    .AuditTypeMapper(t => typeof(CommonAudit))
+                    .AuditEntityAction<CommonAudit>((ev, entry, entity) =>
+                    {
+                        entity.AuditAction = JsonConvert.SerializeObject(entry, Audit.Core.Configuration.JsonSettings);
+                        entity.Group = guid;
+                        entity.EntityId = (int)entry.PrimaryKey.First().Value;
+                        entity.EntityType = entry.EntityType.Name;
+                        entity.AuditDate = DateTime.Now;
+                        entity.AuditUser = Environment.UserName;
+                        entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
+                    }));
+
+            using (var context = new BlogsContext())
+            {
+                context.Blogs.Add(new Blog { BloggerName = guid, Title = "TestBlog" });
+                context.SaveChanges();
+
+                var blog = context.Blogs.First(b => b.BloggerName == guid);
+
+                context.Posts.Add(new ProxyPost() { BlogId = blog.Id, Blog = blog, Title = "TestPost", Content = guid });
+                context.SaveChanges();
+
+                var post = context.Posts.First(b => b.Content == guid);
+
+                var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
+
+                Assert.AreEqual(2, audits.Count);
+                Assert.AreEqual("Blog", audits[0].EntityType);
+                Assert.AreEqual(blog.Id, audits[0].EntityId);
+                Assert.AreEqual(blog.Title, audits[0].Title);
+
+                Assert.AreEqual("Post", audits[1].EntityType);
+                Assert.AreEqual(post.Id, audits[1].EntityId);
+                Assert.AreEqual($"F:TestPost", audits[1].Title);
+
+                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
+                Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
+            }
+        }
+
+        public class ProxyPost : Post 
+        {
+           public override string Title { get => base.Title; set => base.Title = $"F:{value}"; }
         }
 
     }

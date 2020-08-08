@@ -165,7 +165,7 @@ namespace Audit.EntityFramework.Providers
                     await auditDbContext.SaveChangesAsync();
                 }
             }
-            return null;
+            return auditEvent;
         }
 
         private Type GetEntityType(EventEntry entry, DbContext localDbContext)
@@ -177,8 +177,8 @@ namespace Audit.EntityFramework.Providers
             }
             Type type;
 #if EF_CORE && (NETSTANDARD2_0 || NETSTANDARD2_1 || NET472)
-            IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entryType);
-                type = definingType?.ClrType;
+            IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindRuntimeEntityType(entryType);
+            type = definingType?.ClrType;
 #elif NETSTANDARD1_5 || NET461
             IEntityType definingType = localDbContext.Model.FindEntityType(entryType);
             type = definingType?.ClrType;
@@ -206,6 +206,20 @@ namespace Audit.EntityFramework.Providers
                 }
             }
             return auditEntity;
+        }
+
+        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        {
+            return;
+        }
+
+        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+#if NET45
+            return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
     }
 }

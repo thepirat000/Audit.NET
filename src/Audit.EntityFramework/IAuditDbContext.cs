@@ -29,6 +29,7 @@ namespace Audit.EntityFramework
         void OnScopeSaving(IAuditScope auditScope);
         void OnScopeCreated(IAuditScope auditScope);
         bool ExcludeTransactionId { get; set; }
+        bool EarlySavingAudit { get; set; }
 #if EF_FULL
         bool IncludeIndependantAssociations { get; set; }
 #endif

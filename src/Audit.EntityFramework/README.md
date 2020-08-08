@@ -129,6 +129,8 @@ The following settings can be configured per DbContext or globally:
 - **IncludeIndependantAssociations**: Value to indicate if the Independant Associations should be included. Default is false. (Only for EF <=6.2, since EF Core does not support many-to-many relations without a join entity. Check [this](https://github.com/aspnet/EntityFrameworkCore/issues/1368)).
 - **ExcludeTransactionId**: Value to indicate if the Transaction IDs should be excluded from the output and not be retrieved (default is false to include the Transaction IDs).
 - **ExcludeValidationResults**: Value to indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
+- **EarlySavingAudit**: Value to indicate if the audit event should be saved *before* the entity saving operation takes place. (Default is false to save the audit event after the entity saving operation completes or fails)
+
 
 The following settings can be configured per entity type:
 
