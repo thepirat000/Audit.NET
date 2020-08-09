@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Audit.EntityFramework.ConfigurationApi;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace Audit.UnitTest
 {
@@ -25,6 +26,75 @@ namespace Audit.UnitTest
         {
             Audit.Core.Configuration.AuditDisabled = false;
             Audit.Core.Configuration.ResetCustomActions();
+        }
+
+        [Test]
+        public void Test_DynamicDataProvider_FluentApi()
+        {
+            int ins = 0;
+            int upd = 0;
+            var dyn = new DynamicDataProvider(_ => _
+                .OnInsert(ev => ins++)
+                .OnReplace((id, ev) => upd++));
+
+            using (var scope = AuditScope.Create(_ => _
+                .CreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                .DataProvider(dyn)))
+            {
+            }
+
+            Assert.AreEqual(1, ins);
+            Assert.AreEqual(1, upd);
+        }
+
+        [Test]
+        public void Test_AuditScope_Factory_FluentApi()
+        {
+            var scope = new AuditScopeFactory().Create(_ => _
+                 .EventType("event type")
+                 .ExtraFields(new { f = 1 })
+                 .CreationPolicy(EventCreationPolicy.Manual)
+                 .AuditEvent(new AuditEventEntityFramework())
+                 .DataProvider(new DynamicDataProvider())
+                 .IsCreateAndSave(true)
+                 .SkipExtraFrames(1)
+                 .Target(() => 1)
+                 .CallingMethod(MethodBase.GetCurrentMethod()));
+
+            Assert.AreEqual("event type", scope.EventType);
+            Assert.AreEqual("event type", scope.Event.EventType);
+            Assert.IsTrue(scope.Event.CustomFields.ContainsKey("f"));
+            Assert.AreEqual(EventCreationPolicy.Manual, scope.EventCreationPolicy);
+            Assert.AreEqual(typeof(AuditEventEntityFramework), scope.Event.GetType());
+            Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
+            Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
+            Assert.AreEqual("1", scope.Event.Target.Old.ToString());
+            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(MethodBase.GetCurrentMethod().Name));
+        }
+
+        [Test]
+        public void Test_AuditScope_Create_FluentApi()
+        {
+            var scope = AuditScope.Create(_ => _
+                .EventType("event type")
+                .ExtraFields(new { f = 1 })
+                .CreationPolicy(EventCreationPolicy.Manual)
+                .AuditEvent(new AuditEventEntityFramework())
+                .DataProvider(new DynamicDataProvider())
+                .IsCreateAndSave(true)
+                .SkipExtraFrames(1)
+                .Target(() => 1)
+                .CallingMethod(MethodBase.GetCurrentMethod()));
+
+            Assert.AreEqual("event type", scope.EventType);
+            Assert.AreEqual("event type", scope.Event.EventType);
+            Assert.IsTrue(scope.Event.CustomFields.ContainsKey("f"));
+            Assert.AreEqual(EventCreationPolicy.Manual, scope.EventCreationPolicy);
+            Assert.AreEqual(typeof(AuditEventEntityFramework), scope.Event.GetType());
+            Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
+            Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
+            Assert.AreEqual("1", scope.Event.Target.Old.ToString());
+            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(MethodBase.GetCurrentMethod().Name));
         }
 
         [Test]

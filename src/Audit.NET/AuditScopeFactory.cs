@@ -31,6 +31,26 @@ namespace Audit.Core
         #endregion
 
         /// <summary>
+        /// Creates an audit scope with the given creation options as a Fluent API.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public IAuditScope Create(Action<IAuditScopeOptionsConfigurator> config)
+        {
+            var options = new AuditScopeOptions(config);
+            return new AuditScope(options).Start();
+        }
+
+        /// <summary>
+        /// Creates an audit scope with the given creation options as a Fluent API.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config)
+        {
+            var options = new AuditScopeOptions(config);
+            return await new AuditScope(options).StartAsync();
+        }
+
+        /// <summary>
         /// Creates an audit scope with the given extra fields, and saves it right away using the globally configured data provider. Shortcut for CreateAndSave().
         /// </summary>
         /// <param name="eventType">Type of the event.</param>

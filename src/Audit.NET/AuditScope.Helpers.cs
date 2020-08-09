@@ -21,6 +21,22 @@ namespace Audit.Core
             return await new AuditScope(options).StartAsync();
         }
         /// <summary>
+        /// Creates an audit scope with the given creation options as a Fluent API.
+        /// </summary>
+        public static IAuditScope Create(Action<IAuditScopeOptionsConfigurator> config)
+        {
+            var options = new AuditScopeOptions(config);
+            return new AuditScope(options).Start();
+        }
+        /// <summary>
+        /// Creates an audit scope with the given creation options as a Fluent API.
+        /// </summary>
+        public static async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config)
+        {
+            var options = new AuditScopeOptions(config);
+            return await new AuditScope(options).StartAsync();
+        }
+        /// <summary>
         /// Shortcut to create an audit scope with the given Event type and Target.
         /// </summary>
         /// <param name="eventType">A string representing the type of the event.</param>

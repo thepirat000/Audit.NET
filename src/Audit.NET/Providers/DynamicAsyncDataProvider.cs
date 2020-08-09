@@ -12,6 +12,22 @@ namespace Audit.Core.Providers
         private List<Func<AuditEvent, Task<object>>> _onInsert = new List<Func<AuditEvent, Task<object>>>();
         private List<Func<object, AuditEvent, Task>> _onReplace = new List<Func<object, AuditEvent, Task>>();
 
+        public DynamicAsyncDataProvider()
+        {
+        }
+
+        public DynamicAsyncDataProvider(Action<ConfigurationApi.IDynamicAsyncDataProviderConfigurator> config)
+        {
+            var dataProvider = new DynamicAsyncDataProvider();
+            var dynConfig = new ConfigurationApi.DynamicAsyncDataProviderConfigurator(dataProvider);
+            if (config != null)
+            {
+                config.Invoke(dynConfig);
+                _onInsert = dynConfig._dynamicAsyncDataProvider._onInsert;
+                _onReplace = dynConfig._dynamicAsyncDataProvider._onReplace;
+            }
+        }
+
         /// <summary>
         /// Attaches a function to be executed by the InsertEvent method.
         /// </summary>

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.0.2] - 2020-08-09
+### Added
+- Audit.NET: Adding fluent API for AuditScope creation.
+
 ## [16.0.1] - 2020-08-07
 ### Modified
 - Audit.EntityFramework: Enhance CLR entity type resolve in EF Core (#320)

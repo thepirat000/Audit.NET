@@ -67,9 +67,18 @@ There are several ways to create an Audit Scope:
     });
     ```
 
-#### AuditScopeOptions properties
+- Using the provided fluent API, for example:
 
-Option field | Type | Description 
+    ```c#
+    var scope = AuditScope.Create(_ => _
+        .EventType("Order:Update")
+        .ExtraFields(new { MyProperty = "value" })
+        .Target(() => order));
+    ```
+
+#### AuditScope options
+
+Option | Type | Description 
 ------------ | ---------------- | ---------------- 
 EventType | `string` | A string representing the type of the event
 TargetGetter | `Func<object>` | Target object getter (a func that returns the object to track)

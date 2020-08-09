@@ -33,7 +33,7 @@ namespace Audit.Core
         /// </summary>
         public bool IsCreateAndSave { get; set; }
         /// <summary>
-        /// Gets or sets the initialized audit event to use, or NULL to create a new instance of AuditEvent
+        /// Gets or sets the initial audit event to use, or NULL to create a new instance of AuditEvent
         /// </summary>
         public AuditEvent AuditEvent { get; set; }
         /// <summary>
@@ -81,8 +81,29 @@ namespace Audit.Core
         /// Initializes a new instance of the <see cref="AuditScopeOptions"/> class.
         /// </summary>
         public AuditScopeOptions()
-            : this(null)
+            : this(null, null, null, null, null)
         {
+        }
+
+        public AuditScopeOptions(Action<IAuditScopeOptionsConfigurator> config)
+            : this(null, null, null, null, null)
+        {
+            if (config != null)
+            {
+                var scopeConfig = new AuditScopeOptionsConfigurator();
+                config.Invoke(scopeConfig);
+
+                EventType = scopeConfig._options.EventType;
+                TargetGetter = scopeConfig._options.TargetGetter;
+                ExtraFields = scopeConfig._options.ExtraFields;
+                CreationPolicy = scopeConfig._options.CreationPolicy;
+                DataProvider = scopeConfig._options.DataProvider;
+                IsCreateAndSave = scopeConfig._options.IsCreateAndSave;
+                AuditEvent = scopeConfig._options.AuditEvent;
+                SkipExtraFrames = scopeConfig._options.SkipExtraFrames;
+                CallingMethod = scopeConfig._options.CallingMethod;
+            }
+
         }
     }
 }
