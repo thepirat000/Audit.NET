@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.0.3] - 2020-08-15
+### Modified
+- Audit.EntityFramework: Fix bug for ColumnValues and Changes when the entity property is a Complex Type (#321).
+
 ## [16.0.2] - 2020-08-09
 ### Added
 - Audit.NET: Adding fluent API for AuditScope creation.

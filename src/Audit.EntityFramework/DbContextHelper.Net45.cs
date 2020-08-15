@@ -32,11 +32,14 @@ namespace Audit.EntityFramework
                     if (IncludeProperty(context, entry, prop.Name))
                     {
                         var colName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), prop.Name, dbContext);
+
+                        var origValue = prop.OriginalValue;
+                        var currValue = prop.CurrentValue;
                         result.Add(new EventEntryChange()
                         {
                             ColumnName = colName,
-                            NewValue = HasPropertyValue(context, entry, prop.Name, entry.CurrentValues[propName], out object currValue) ? currValue : entry.CurrentValues[propName],
-                            OriginalValue = HasPropertyValue(context, entry, prop.Name, entry.OriginalValues[propName], out object origValue) ? origValue : entry.OriginalValues[propName]
+                            NewValue = HasPropertyValue(context, entry, prop.Name, currValue, out object outputNewValue) ? outputNewValue : currValue,
+                            OriginalValue = HasPropertyValue(context, entry, prop.Name, origValue, out object outputOriValue) ? outputOriValue : origValue
                         });
                     }
                 }
@@ -60,8 +63,8 @@ namespace Audit.EntityFramework
                 {
                     var colName = EntityKeyHelper.Instance.GetColumnName(entry.Entity.GetType(), propName, dbContext);
                     object value = entry.State != EntityState.Deleted
-                        ? entry.CurrentValues[propName]
-                        : entry.OriginalValues[propName];
+                        ? entry.Property(propName).CurrentValue
+                        : entry.Property(propName).OriginalValue;
                     if (HasPropertyValue(context, entry, propName, value, out object overrideValue))
                     {
                         value = overrideValue;
