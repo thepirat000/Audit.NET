@@ -162,7 +162,7 @@ namespace Audit.WebApi
                 // Save, if action was not created by middleware
                 if (!auditAction.IsMiddleware)
                 {
-                    await auditScope.SaveAsync();
+                    await auditScope.DisposeAsync();
                 }
             }
         }

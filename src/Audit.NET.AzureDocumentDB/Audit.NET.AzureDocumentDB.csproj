@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into an Azure Document DB database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.AzureDocumentDB</AssemblyTitle>
-    <VersionPrefix>16.0.3</VersionPrefix>
+    <VersionPrefix>16.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>net45;netstandard1.6;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

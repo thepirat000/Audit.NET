@@ -33,6 +33,22 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd");
+                await webApiTests.Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd();
+                Console.WriteLine("PASSED - Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd");
+
+                Console.WriteLine("START - Test_WebApi_CreationPolicy_InsertOnEnd");
+                await webApiTests.Test_WebApi_CreationPolicy_InsertOnEnd();
+                Console.WriteLine("PASSED - Test_WebApi_CreationPolicy_InsertOnEnd");
+
+                Console.WriteLine("START - Test_WebApi_CreationPolicy_InsertOnStartReplaceOnEnd");
+                await webApiTests.Test_WebApi_CreationPolicy_InsertOnStartReplaceOnEnd();
+                Console.WriteLine("PASSED - Test_WebApi_CreationPolicy_InsertOnStartReplaceOnEnd");
+
+                Console.WriteLine("START - Test_WebApi_CreationPolicy_Manual");
+                await webApiTests.Test_WebApi_CreationPolicy_Manual();
+                Console.WriteLine("PASSED - Test_WebApi_CreationPolicy_Manual");
+
                 Console.WriteLine("START - Test_WebApi_AuditApiGlobalAttributeOrder");
                 await webApiTests.Test_WebApi_AuditApiGlobalAttributeOrder();
                 Console.WriteLine("PASSED - Test_WebApi_AuditApiGlobalAttributeOrder");

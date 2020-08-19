@@ -27,6 +27,102 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("[\"value1\",\"value2\"]", s);
         }
 
+        public async Task Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd()
+        {
+            var insertEvs = new List<AuditEventWebApi>();
+            var updatedEvs = new List<AuditEventWebApi>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                })
+                .OnReplace((id, ev) => {
+                    updatedEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/My";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(2, insertEvs.Count);
+            Assert.AreEqual(0, updatedEvs.Count);
+            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
+            Assert.IsNull(insertEvs[0].Action.ResponseStatus);
+            Assert.AreEqual("OK", insertEvs[1].Action.ResponseStatus);
+        }
+
+        public async Task Test_WebApi_CreationPolicy_InsertOnEnd()
+        {
+            var insertEvs = new List<AuditEventWebApi>();
+            var updatedEvs = new List<AuditEventWebApi>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                })
+                .OnReplace((id, ev) => {
+                    updatedEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"http://localhost:{_port}/api/My";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(0, updatedEvs.Count);
+            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
+            Assert.AreEqual("OK", insertEvs[0].Action.ResponseStatus);
+        }
+
+        public async Task Test_WebApi_CreationPolicy_InsertOnStartReplaceOnEnd()
+        {
+            var insertEvs = new List<AuditEventWebApi>();
+            var updatedEvs = new List<AuditEventWebApi>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                })
+                .OnReplace((id, ev) => {
+                    updatedEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var url = $"http://localhost:{_port}/api/My";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(1, updatedEvs.Count);
+            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
+            Assert.IsNull(insertEvs[0].Action.ResponseStatus);
+            Assert.AreEqual("OK", updatedEvs[0].Action.ResponseStatus);
+        }
+
+        public async Task Test_WebApi_CreationPolicy_Manual()
+        {
+            var insertEvs = new List<AuditEventWebApi>();
+            var updatedEvs = new List<AuditEventWebApi>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    insertEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                })
+                .OnReplace((id, ev) => {
+                    updatedEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.Manual);
+
+            var url = $"http://localhost:{_port}/api/My";
+            var client = new HttpClient();
+            var res = await client.GetAsync(url);
+
+            Assert.AreEqual(0, insertEvs.Count);
+            Assert.AreEqual(0, updatedEvs.Count);
+        }
+
         public async Task Test_WebApi_AuditApiAttributeOrder()
         {
             var insertEvs = new List<AuditEvent>();
