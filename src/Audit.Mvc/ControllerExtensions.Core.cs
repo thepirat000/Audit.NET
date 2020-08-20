@@ -10,7 +10,7 @@ namespace Audit.Mvc
         /// </summary>
         /// <param name="controller">The MVC controller.</param>
         /// <returns>The current Audit Scope or NULL.</returns>
-        public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.Controller controller)
+        public static AuditScope GetCurrentAuditScope(this Microsoft.AspNetCore.Mvc.ControllerBase controller)
         {
             return AuditAttribute.GetCurrentScope(controller.HttpContext);
         }
