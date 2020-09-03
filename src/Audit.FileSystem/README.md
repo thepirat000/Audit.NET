@@ -44,7 +44,13 @@ var fsMon = new Audit.FileSystem.FileSystemMonitor(new FileSystemMonitorOptions(
 });
 ```
 
-## Settings
+## Configuration
+
+### Output
+
+The audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
+
+### Settings
 
 The `FileSystemMonitorOptions` class include the following settings:
 
