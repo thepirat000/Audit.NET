@@ -95,6 +95,22 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+Alternatively, if you want to setup the audit on a particular page and/or don't want to add the filter as a global filter, 
+you can override the `OnPageHandlerExecutionAsync` on your page model and manually call the same method
+on an `AuditPageFilter` instance:
+
+```c#
+public class YourPageModel : PageModel
+{
+    private readonly AuditPageFilter _pageFilter = new AuditPageFilter() { IncludeHeaders = true };
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        await _pageFilter.OnPageHandlerExecutionAsync(context, next);
+    }
+    // ...
+}
+```
 
 ## Configuration
 
