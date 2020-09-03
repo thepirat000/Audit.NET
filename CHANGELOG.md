@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.1.1] - 2020-09-02
+### Modified
+- Audit.MVC / Audit.MVC.Core: Adding support for auditing Razor Pages (#329)
+- Audit.MVC: Including minor fix from PR #327 (`GetCurrentAuditScope` extension method)
+
 ## [16.1.0] - 2020-08-19
 ### Modified
 - Audit.WebApi / Audit.WebApi.Core: Fix for respecting creation policy on Audit WebApi Attribute and Middleware (#325).

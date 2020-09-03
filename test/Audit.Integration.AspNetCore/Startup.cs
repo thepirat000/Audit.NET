@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using Audit.Mvc;
 
 namespace Audit.Integration.AspNetCore
 {
@@ -51,7 +52,20 @@ namespace Audit.Integration.AspNetCore
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
                     .IncludeRequestBody()));
             });
+
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.AddFolderApplicationModelConvention("/PageTest", model => model.Filters.Add(new AuditPageFilter()
+                {
+                    IncludeHeaders = true,
+                    IncludeModel = true,
+                    IncludeRequestBody = true,
+                    IncludeResponseBody = true,
+                    EventTypeName = "{verb}:{path}"
+                }));
+            });
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -65,6 +79,14 @@ namespace Audit.Integration.AspNetCore
                 context.Request.EnableBuffering();
                 await next();
             });
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+            });
+
             app.UseAuditMiddleware(_ => _
                 .IncludeRequestBody(true)
                 .IncludeResponseBody(ctx => !ctx.Request.QueryString.HasValue || !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))
@@ -74,6 +96,7 @@ namespace Audit.Integration.AspNetCore
                 .FilterByRequest(r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));
 
             app.UseMvc();
+
         }
     }
 }

@@ -4,7 +4,8 @@
 
 Generate Audit Trails for MVC actions. Supporting AspNetCore Mvc.
 
-Audit.Mvc provides the infrastructure to log interactions with MVC applications. It can record action methods calls with caller info and arguments.
+Audit.Mvc provides the infrastructure to log interactions with MVC applications. 
+It can record action methods calls to controllers and razor pages.
 
 ## Install
 
@@ -33,7 +34,9 @@ since both assumes AspNet Core.
 
 ## Usage
 
-Decorate with an `AuditAttribute` the MVC Actions/Controllers you want to audit.
+### MVC Controllers
+
+Decorate the MVC Actions or Controllers you want to audit with `[Audit]` action filter.
 
 For example:
 
@@ -56,6 +59,43 @@ public class HomeController : Controller
 }
 ```
 
+> The `[Audit]` attribute cannot be used on razor pages,
+because [action filters are not supported on razor pages](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-3.1#filter-types).
+
+### Razor pages
+
+To audit razor pages, include the `AuditPageFilter` on the filters collection on your startup code, for example:
+
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddRazorPages()
+        .AddMvcOptions(options =>
+        {
+            options.Filters.Add(new AuditPageFilter()
+            {
+                IncludeHeaders = true
+            });
+        });
+}
+```
+
+Or you can apply the filter only to certain pages, for example for pages under `/Movies` path:
+
+```c#
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddRazorPages(options =>
+    {
+        options.Conventions.AddFolderApplicationModelConvention("/Movies", model => model.Filters.Add(new AuditPageFilter()
+        {
+            IncludeResponseBody = true
+        }));
+    });
+}
+```
+
+
 ## Configuration
 
 ### Output
@@ -66,9 +106,11 @@ The MVC audit events are stored using a _Data Provider_. You can use one of the 
 
 The `AuditAttribute` can be configured with the following properties:
 - **EventType**: A string that identifies the event type. Can contain the following placeholders: 
-  - \{controller}: replaced with the controller name.
-  - \{action}: replaced with the action method name.
+  - \{controller}: replaced with the controller name (only for MVC).
+  - \{action}: replaced with the action method name (or the display name for razor pages).
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
+  - \{area}: replaced with the area name (only for razor pages).
+  - \{path}: replaced with the view path (only for razor pages).
 - **IncludeHeaders**: Boolean to indicate whether to include the Http Request Headers or not.
 - **IncludeModel**: Boolean to indicate whether to include the View Model or not.
 - **IncludeRequestBody**: Boolean to indicate whether to include or exclude the request body from the logs. Default is false. (Check following note)
@@ -84,8 +126,8 @@ the request body more than once (by default it's a forwand-only stream that can 
 ```c#
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
-    app.Use(async (context, next) => { 
-        context.Request.EnableRewind();
+    app.Use(async (context, next) => {
+        context.Request.EnableBuffering();
         await next();
     });
 }
@@ -117,6 +159,24 @@ public class AccountController : Controller
 }
 ```
 
+You can also decorate the razor pages classes, methods or arguments to be ignored on the audits:
+
+```c#
+public class IndexModel : PageModel
+{
+    [AuditIgnore]
+    public void OnGet(string user)
+    {
+        // this action will not be audited
+    }
+
+    public async Task<IActionResult> OnPostAsync([AuditIgnore]string password)
+    {
+        // password argument will not be audited
+    }
+}
+```
+
 
 ## Output details
 
@@ -128,8 +188,8 @@ The following table describes the Audit.Mvc output fields:
 | ------------ | ---------------- |  -------------- |
 | **TraceId** | string | A unique identifier per request |
 | **HttpMethod** | string | HTTP method (GET, POST, etc) |
-| **ControllerName** | string | The controller name |
-| **ActionName** | string | The action name |
+| **ControllerName** | string | The controller name (or the area name for razor pages) |
+| **ActionName** | string | The action name (or the display name for razor pages) |
 | **ViewName** | string | The view name (if any) |
 | **ViewPath** | string | View physical path (if any) |
 | **FormVariables** | Object | Form-data input variables passed to the action |

@@ -1,3 +1,6 @@
+#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0
+using Microsoft.AspNetCore.Mvc.Filters;
+#endif
 using System.Collections.Generic;
 using Audit.Core;
 using Newtonsoft.Json;
@@ -50,6 +53,19 @@ namespace Audit.Mvc
         public string Exception { get; set; }
         [JsonExtensionData]
         public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
+
+#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0
+        //
+        [JsonIgnore]
+        internal PageHandlerExecutingContext PageHandlerExecutingContext { get; set; }
+        /// <summary>
+        /// Gets the ActionExecutingContext related to this event
+        /// </summary>
+        public PageHandlerExecutingContext GetPageHandlerExecutingContext()
+        {
+            return PageHandlerExecutingContext;
+        }
+#endif
 
         /// <summary>
         /// Serializes this Audit Action as a JSON string

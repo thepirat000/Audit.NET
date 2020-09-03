@@ -33,6 +33,18 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_MvcRazorPages_HappyPath");
+                await mvcTests.Test_MvcRazorPages_HappyPath();
+                Console.WriteLine("PASSED - Test_MvcRazorPages_HappyPath");
+
+                Console.WriteLine("START - Test_MvcRazorPages_404");
+                await mvcTests.Test_MvcRazorPages_404();
+                Console.WriteLine("PASSED - Test_MvcRazorPages_404");
+
+                Console.WriteLine("START - Test_MvcRazorPages_Exception");
+                await mvcTests.Test_MvcRazorPages_Exception();
+                Console.WriteLine("PASSED - Test_MvcRazorPages_Exception");
+
                 Console.WriteLine("START - Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd");
                 await webApiTests.Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd();
                 Console.WriteLine("PASSED - Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd");
