@@ -1,44 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <Description>Store Audit.NET Trail Logs into Elasticsearch database</Description>
-    <Copyright>Copyright 2018</Copyright>
-    <AssemblyTitle>Audit.Elasticsearch</AssemblyTitle>
+    <Description>Send Audit.NET Trail Logs to an Apache Kafka server</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <AssemblyTitle>Audit.Kafka</AssemblyTitle>
     <VersionPrefix>16.1.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.NET.Elasticsearch</AssemblyName>
+    <AssemblyName>Audit.NET.Kafka</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.NET.Elasticsearch</PackageId>
-    <PackageTags>Audit;Trail;Log;Elasticsearch</PackageTags>
+    <PackageId>Audit.NET.Kafka</PackageId>
+    <PackageTags>Audit;Trail;Log;Kafka</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+	  <RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+	  <RootNamespace>Audit.Kafka</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
   </ItemGroup>
-    
-  <ItemGroup>
-    <PackageReference Include="NEST" Version="7.8.2" />
-    <PackageReference Include="NEST.jsonnetserializer" Version="7.8.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+    <None Include="images\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="1.5.1" />
   </ItemGroup>
 </Project>

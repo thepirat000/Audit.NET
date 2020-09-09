@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\src\Audit.FileSystem\Audit.FileSystem.csproj" />
     <ProjectReference Include="..\..\src\Audit.HttpClient\Audit.HttpClient.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.Kafka\Audit.NET.Kafka.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.log4net\Audit.NET.log4net.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.NLog\Audit.NET.NLog.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />

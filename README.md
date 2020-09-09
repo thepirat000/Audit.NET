@@ -13,9 +13,25 @@ Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence f
 
 With Audit.NET you can generate tracking information about operations being executed. It gathers environmental information such as the caller user id, machine name, method name, exceptions, including execution time and duration, and exposing an extensible mechanism to enrich the logs and handle the audit output.
 
-[**Output extensions**](#storage-providers) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), [Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), [PostgreSQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md), [MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md), [AzureBlob](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md), [DocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md), [Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md), [Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md), [DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), [UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md) and more. 
+[**Output extensions**](#storage-providers) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
+[Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
+[MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), 
+[PostgreSQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md), 
+[MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md), 
+[AzureBlob](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md), 
+[DocumentDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureDocumentDB/README.md), 
+[Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md), 
+[Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md), 
+[DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), 
+[UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md) and more. 
 
-[**Interaction extensions**](#extensions) to audit different systems are provided, such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), [WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), [File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), [SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md) and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
+[**Interaction extensions**](#extensions) to audit different systems are provided, such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), 
+[MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), 
+[WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), 
+[WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
+[File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
+[SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md) 
+and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
 ## [NuGet](https://www.nuget.org/packages/Audit.NET/)
 
@@ -512,6 +528,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [DynamoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/Providers/DynamoDataProvider.cs) | [Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md) | Store audit events in [Amazon DynamoDB™](https://aws.amazon.com/dynamodb/) tables. | `.UseDynamoDB()`
 [NLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/Providers/NLogDataProvider.cs) | [Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md) | Store the audit events using [NLog](https://nlog-project.org/). | `.UseNLog()`
 [AmazonQldbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/Providers/AmazonQldbDataProvider.cs) | [Audit.NET.AmazonQLDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/README.md) | Store the audit events using [Amazon QLDB](https://aws.amazon.com/es/qldb/). | `.UseAmazonQldb()`
+[KafkaDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/Providers/KafkaDataProvider.cs) | [Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md) | Stream the audit events to [Apache Kafka](https://kafka.apache.org/) topics. | `.UseKafka()` / `.UseKafka<TKey>()`
 
 ## Event Creation Policy
 

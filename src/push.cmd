@@ -29,6 +29,7 @@ del "Audit.NET.DynamoDB\bin\debug\*.symbols.nupkg"
 del "Audit.HttpClient\bin\debug\*.symbols.nupkg"
 del "Audit.NET.NLog\bin\debug\*.symbols.nupkg"
 del "Audit.NET.AmazonQLDB\bin\debug\*.symbols.nupkg"
+del "Audit.NET.Kafka\bin\debug\*.symbols.nupkg"
 
 nuget push "audit.net\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.mvc\bin\debug\*.nupkg" -NoSymbols -source %1
@@ -58,3 +59,4 @@ nuget push "Audit.NET.DynamoDB\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.HttpClient\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.NLog\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AmazonQLDB\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.Kafka\bin\debug\*.nupkg" -NoSymbols -source %1

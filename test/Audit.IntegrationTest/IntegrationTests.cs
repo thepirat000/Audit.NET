@@ -15,6 +15,8 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Audit.DynamoDB.Providers;
 using Amazon.DynamoDBv2.DocumentModel;
+using Audit.Kafka.Providers;
+using Confluent.Kafka;
 
 namespace Audit.IntegrationTest
 {
@@ -24,6 +26,21 @@ namespace Audit.IntegrationTest
         [TestFixture]
         public class AuditTests
         {
+            [Test]
+            [Category("Kafka")]
+            public void Test_KafkaDataProvider_FluentApi()
+            {
+                var x = new KafkaDataProvider<string>(_ => _
+                    .ProducerConfig(new ProducerConfig())
+                    .Topic("audit-topic")
+                    .Partition(0)
+                    .KeySelector(ev => "key"));
+
+                Assert.AreEqual("audit-topic", x.TopicSelector.Invoke(null));
+                Assert.AreEqual(0, x.PartitionSelector.Invoke(null));
+                Assert.AreEqual("key", x.KeySelector.Invoke(null));
+            }
+
             [Test]
             public void Test_FileDataProvider_FluentApi()
             {

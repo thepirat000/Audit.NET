@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.1.2] - 2020-09-09
+### Added
+- Audit.NET.Kafka: New Apache Kafka data provider (#331)
+### Modified
+- Audit.WebApi: Restore original body for upstream pipelines (#333)
+
 ## [16.1.1] - 2020-09-02
 ### Modified
 - Audit.MVC / Audit.MVC.Core: Adding support for auditing Razor Pages (#329)

@@ -29,6 +29,7 @@ del "Audit.NET.DynamoDB\bin\debug\*.nupkg"
 del "Audit.HttpClient\bin\debug\*.nupkg"
 del "Audit.NET.NLog\bin\debug\*.nupkg"
 del "Audit.NET.AmazonQLDB\bin\debug\*.nupkg"
+del "Audit.NET.Kafka\bin\debug\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -62,6 +63,7 @@ dotnet pack "Audit.NET.DynamoDB/"
 dotnet pack "Audit.HttpClient/"
 dotnet pack "Audit.NET.NLog/"
 dotnet pack "Audit.NET.AmazonQLDB/"
+dotnet pack "Audit.NET.Kafka/"
 
 ECHO.
 ECHO ADD TAG NOW !
