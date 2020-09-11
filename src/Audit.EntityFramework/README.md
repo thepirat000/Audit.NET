@@ -257,12 +257,12 @@ public class MyDbContext : AuditDbContext
         AuditDataProvider = new NullDataProvider();
     }
     
-    public override void OnScopeCreated(AuditScope auditScope)
+    public override void OnScopeCreated(IAuditScope auditScope)
     {
         Database.BeginTransaction();
     }
 
-    public override void OnScopeSaving(AuditScope auditScope)
+    public override void OnScopeSaving(IAuditScope auditScope)
     {
         try 
         {
