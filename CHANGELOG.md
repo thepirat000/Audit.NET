@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.1.2] - 2020-09-13
+### Modified
+- Audit.AmazonQLDB: Update Amazon.QLDB.Driver to 1.0.1 as it supports .NET Framework 4.6.1 now (#334)
+
 ## [16.1.2] - 2020-09-09
 ### Added
 - Audit.NET.Kafka: New Apache Kafka data provider (#331)

@@ -100,7 +100,7 @@ cd ..
 cd Audit.IntegrationTest
 echo ---------------------------------------------- RUNNING GENERAL INTEGRATION TEST (10) ----------------------------------------------
 TITLE RUNNING GENERAL INTEGRATION TEST (10)
-dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF&TestCategory!=Elasticsearch&TestCategory!=Dynamo&TestCategory!=PostgreSQL"
+dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF&TestCategory!=Elasticsearch&TestCategory!=Dynamo&TestCategory!=PostgreSQL&TestCategory!=Kafka"
 echo ---------------------------------------------- RUNNING Kafka INTEGRATION TEST (11) ----------------------------------------------
 TITLE RUNNING Kafka INTEGRATION TEST (11)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Kafka"
