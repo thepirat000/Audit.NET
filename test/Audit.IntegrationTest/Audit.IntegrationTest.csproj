@@ -48,7 +48,6 @@
   </ItemGroup>  
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'net452' and '$(TargetFramework)' != 'net461'">
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.13.1" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.0" />
   </ItemGroup>  
 
