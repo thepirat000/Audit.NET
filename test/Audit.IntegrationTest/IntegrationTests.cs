@@ -17,6 +17,8 @@ using Audit.DynamoDB.Providers;
 using Amazon.DynamoDBv2.DocumentModel;
 using Audit.Kafka.Providers;
 using Confluent.Kafka;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 
 namespace Audit.IntegrationTest
 {
@@ -26,6 +28,35 @@ namespace Audit.IntegrationTest
         [TestFixture]
         public class AuditTests
         {
+            [Test]
+            [Category("Mongo")]
+            public void Test_Mongo_ObjectId()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseMongoDB(config => config
+                        .ConnectionString("mongodb://localhost:27017")
+                        .Database("Audit")
+                        .Collection("Event")
+                        .SerializeAsBson())
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+
+                var up = new UserProfiles()
+                {
+                    UserName = "user1"
+                };
+                
+                var scope = AuditScope.Create("test", () => up);
+                object eventId = scope.EventId;
+                up.UserName = "user2";
+                scope.Dispose();
+
+                var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
+
+                Assert.AreEqual("user1", (eventRead.Target.Old as BsonDocument)["UserName"].ToString());
+                Assert.AreEqual("user2", (eventRead.Target.New as BsonDocument)["UserName"].ToString());
+            }
+
             [Test]
             [Category("Kafka")]
             public void Test_KafkaDataProvider_FluentApi()
@@ -77,11 +108,13 @@ namespace Audit.IntegrationTest
                     .ConnectionString("c")
                     .Collection("col")
                     .CustomSerializerSettings(new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate })
-                    .Database("db"));
+                    .Database("db")
+                    .SerializeAsBson(true));
                 Assert.AreEqual("c", x.ConnectionString);
                 Assert.AreEqual("col", x.Collection);
                 Assert.AreEqual(DefaultValueHandling.IgnoreAndPopulate, x.JsonSerializerSettings.DefaultValueHandling);
                 Assert.AreEqual("db", x.Database);
+                Assert.AreEqual(true, x.SerializeAsBson);
             }
 
             [Test]

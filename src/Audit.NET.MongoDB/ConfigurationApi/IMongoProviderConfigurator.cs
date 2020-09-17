@@ -29,5 +29,10 @@ namespace Audit.MongoDB.ConfigurationApi
         /// </summary>
         /// <param name="jsonSerializerSettings">The serializer settings.</param>
         IMongoProviderConfigurator CustomSerializerSettings(JsonSerializerSettings jsonSerializerSettings);
+        /// <summary>
+        /// Specifies whether the target object and extra fields should be serialized as Bson. Default is Json.
+        /// </summary>
+        /// <param name="value">The setting value.</param>
+        IMongoProviderConfigurator SerializeAsBson(bool value = true);
     }
 }

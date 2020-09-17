@@ -45,6 +45,7 @@ Mandatory:
 - **ConnectionString**: The [Mongo DB connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
 - **Database**: The audit Mongo Database name.
 - **Collection**: The events Mongo Collection name.
+- **SerializeAsBson**: A value indicating whether the target object and extra fields should be serialized as Bson. Default is false to serialize as Json.
 
 ## Output sample
 

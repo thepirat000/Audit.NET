@@ -3,7 +3,7 @@
     <Description>Send Audit.NET Trail Logs to an Apache Kafka server</Description>
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.Kafka</AssemblyTitle>
-    <VersionPrefix>16.1.3</VersionPrefix>
+    <VersionPrefix>16.1.4</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

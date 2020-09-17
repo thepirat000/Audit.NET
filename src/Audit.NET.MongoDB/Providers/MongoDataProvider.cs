@@ -54,6 +54,13 @@ namespace Audit.MongoDB.Providers
         public bool IgnoreElementNames { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the target object and extra fields should be serialized as Bson.
+        /// Default is false to serialize using Newtonsoft.Json
+        /// </summary>
+        /// <value><c>true</c> if should serialize as Bson; or <c>false</c> to serialize as Json.</value>
+        public bool SerializeAsBson { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the default JsonSerializerSettings.
         /// </summary>
         public JsonSerializerSettings JsonSerializerSettings { get; set; } = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new List<JsonConverter>() { new JavaScriptDateTimeConverter() } };
@@ -72,6 +79,7 @@ namespace Audit.MongoDB.Providers
                 ConnectionString = mongoConfig._connectionString;
                 Database = mongoConfig._database;
                 JsonSerializerSettings = mongoConfig._jsonSerializerSettings;
+                SerializeAsBson = mongoConfig._serializeAsBson;
             }
         }
 
@@ -133,7 +141,15 @@ namespace Audit.MongoDB.Providers
 
         private BsonDocument ParseBson(AuditEvent auditEvent)
         {
-            return BsonDocument.Parse(JsonConvert.SerializeObject(auditEvent, JsonSerializerSettings));
+            if (SerializeAsBson)
+            {
+                return auditEvent.ToBsonDocument();
+            }
+            else
+            {
+                return BsonDocument.Parse(JsonConvert.SerializeObject(auditEvent, JsonSerializerSettings));
+            }
+            
         }
 
         /// <summary>
@@ -186,10 +202,21 @@ namespace Audit.MongoDB.Providers
             {
                 return null;
             }
-            return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSerializerSettings), value.GetType(), JsonSerializerSettings);
+            if (SerializeAsBson)
+            {
+                if (value is BsonDocument)
+                {
+                    return value;
+                }
+                return value.ToBsonDocument(typeof(object));
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSerializerSettings), value.GetType(), JsonSerializerSettings);
+            }
         }
 
-        private void TestConnection()
+        public void TestConnection()
         {
             var db = GetDatabase();
             var test = db.RunCommand((Command<BsonDocument>)"{ping:1}");
