@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.NET.DynamoDB\Audit.NET.DynamoDB.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Kafka\Audit.NET.Kafka.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.MongoDB\Audit.NET.MongoDB.csproj" />
@@ -34,6 +33,7 @@
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
     <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
+    <ProjectReference Include="..\..\src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>

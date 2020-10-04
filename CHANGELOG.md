@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.1.5] - 2020-10-04
+### Modified
+- Audit.PostgreSql: Upgrade npgsql driver to latest version and allowing dynamic configuration of the postgreSQL data provider settings (#340)
+
 ## [16.1.4] - 2020-09-17
 ### Modified
 - Audit.MongoDB: Adding `SerializeAsBson` setting to allow overriding the serialization method for the target object from JSON to BSON. 

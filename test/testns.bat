@@ -12,7 +12,7 @@ start "ELASTIC" /D D:\Elasticsearch\elasticsearch-7.5.0\bin "D:\Elasticsearch\el
 start "MONGO" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 net start mysql80
 net start mssqlserver
-net start postgresql-x64-9.6
+net start postgresql-x64-13
 
 cd ..
 dotnet restore
@@ -136,7 +136,7 @@ pause>nul
 
 net stop mssqlserver
 net stop mysql80
-net stop postgresql-x64-9.6
+net stop postgresql-x64-13
 taskkill /f /im java.exe
 taskkill /f /im mongod.exe
 taskkill /f /im redis-server.exe

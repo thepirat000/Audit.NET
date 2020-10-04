@@ -5,6 +5,7 @@
     updated_date timestamp without time zone NOT NULL DEFAULT now(),
     data jsonb NOT NULL,
     event_type varchar(50) NULL,
+    some_date timestamp without time zone NULL,
     "user" varchar(50) NULL,
     CONSTRAINT event_pkey PRIMARY KEY (id)
 )

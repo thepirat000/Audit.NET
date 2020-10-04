@@ -19,13 +19,13 @@ namespace Audit.Core
 
             Configuration.DataProvider = new PostgreSqlDataProvider()
             {
-                ConnectionString = pgDbConfig._connectionString,
-                TableName = pgDbConfig._tableName,
-                IdColumnName = pgDbConfig._idColumnName,
-                DataColumnName = pgDbConfig._dataColumnName,
+                ConnectionStringBuilder = pgDbConfig._connectionStringBuilder,
+                TableNameBuilder = pgDbConfig._tableNameBuilder,
+                IdColumnNameBuilder = pgDbConfig._idColumnNameBuilder,
+                DataColumnNameBuilder = pgDbConfig._dataColumnNameBuilder,
                 DataType = pgDbConfig._dataColumnType == DataType.String ? null : pgDbConfig._dataColumnType.ToString(),
-                LastUpdatedDateColumnName = pgDbConfig._lastUpdatedColumnName,
-                Schema = pgDbConfig._schema,
+                LastUpdatedDateColumnNameBuilder = pgDbConfig._lastUpdatedColumnNameBuilder,
+                SchemaBuilder = pgDbConfig._schemaBuilder,
                 CustomColumns = pgDbConfig._customColumns
             };
             return new CreationPolicyConfigurator();

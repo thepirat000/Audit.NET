@@ -99,6 +99,92 @@ namespace Audit.IntegrationTest
                 Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
                 Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
             }
+
+            [Test]
+            [Category("PostgreSQL")]
+            public void Test_PostgreDataProvider_FluentApi()
+            {
+                var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                    .ConnectionString("c")
+                    .DataColumn("dc")
+                    .IdColumnName("id")
+                    .LastUpdatedColumnName("lud")
+                    .Schema("sc")
+                    .TableName("t")
+                    .CustomColumn("c1", ev => 1)
+                    .CustomColumn("c2", ev => 2));
+                Assert.AreEqual("c", x.ConnectionStringBuilder(null));
+                Assert.AreEqual("dc", x.DataColumnNameBuilder(null));
+                Assert.AreEqual("id", x.IdColumnNameBuilder(null));
+                Assert.AreEqual("lud", x.LastUpdatedDateColumnNameBuilder(null));
+                Assert.AreEqual("sc", x.SchemaBuilder(null));
+                Assert.AreEqual("t", x.TableNameBuilder(null));
+                Assert.AreEqual(2, x.CustomColumns.Count);
+                Assert.AreEqual("c1", x.CustomColumns[0].Name);
+                Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
+                Assert.AreEqual("c2", x.CustomColumns[1].Name);
+                Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
+            }
+
+            [Test]
+            [Category("PostgreSQL")]
+            public void Test_PostgreDataProvider_FluentApiBuilder()
+            {
+                var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                    .ConnectionString(ev => "c")
+                    .DataColumn(ev => "dc")
+                    .IdColumnName(ev => "id")
+                    .LastUpdatedColumnName(ev => "lud")
+                    .Schema(ev => "sc")
+                    .TableName(ev => "t")
+                    .CustomColumn("c1", ev => 1)
+                    .CustomColumn("c2", ev => 2));
+                Assert.AreEqual("c", x.ConnectionStringBuilder(null));
+                Assert.AreEqual("dc", x.DataColumnNameBuilder(null));
+                Assert.AreEqual("id", x.IdColumnNameBuilder(null));
+                Assert.AreEqual("lud", x.LastUpdatedDateColumnNameBuilder(null));
+                Assert.AreEqual("sc", x.SchemaBuilder(null));
+                Assert.AreEqual("t", x.TableNameBuilder(null));
+                Assert.AreEqual(2, x.CustomColumns.Count);
+                Assert.AreEqual("c1", x.CustomColumns[0].Name);
+                Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
+                Assert.AreEqual("c2", x.CustomColumns[1].Name);
+                Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
+            }
+
+                        [Test]
+            [Category("PostgreSQL")]
+            public void PostgreSql()
+            {
+                SetPostgreSqlSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("PostgreSQL")]
+            public async Task PostgreSqlAsync()
+            {
+                SetPostgreSqlSettings();
+                await TestUpdateAsync();
+            }
+
+            public void SetPostgreSqlSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UsePostgreSql(config => config
+                        .ConnectionString(_ => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;")
+                        .TableName("event")
+                        .IdColumnName(_ => "id")
+                        .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)
+                        .LastUpdatedColumnName("updated_date")
+                        .CustomColumn("event_type", ev => ev.EventType)
+                        .CustomColumn("some_date", ev => DateTime.UtcNow))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+            }
+
 #endif
             [Test]
             [Category("Mongo")]
@@ -130,32 +216,6 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("id", x.IdColumnName);
                 Assert.AreEqual("j", x.JsonColumnName);
                 Assert.AreEqual("t", x.TableName);
-            }
-
-            [Test]
-            [Category("PostgreSQL")]
-            public void Test_PostgreDataProvider_FluentApi()
-            {
-                var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
-                    .ConnectionString("c")
-                    .DataColumn("dc")
-                    .IdColumnName("id")
-                    .LastUpdatedColumnName("lud")
-                    .Schema("sc")
-                    .TableName("t")
-                    .CustomColumn("c1", ev => 1)
-                    .CustomColumn("c2", ev => 2));
-                Assert.AreEqual("c", x.ConnectionString);
-                Assert.AreEqual("dc", x.DataColumnName);
-                Assert.AreEqual("id", x.IdColumnName);
-                Assert.AreEqual("lud", x.LastUpdatedDateColumnName);
-                Assert.AreEqual("sc", x.Schema);
-                Assert.AreEqual("t", x.TableName);
-                Assert.AreEqual(2, x.CustomColumns.Count);
-                Assert.AreEqual("c1", x.CustomColumns[0].Name);
-                Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
-                Assert.AreEqual("c2", x.CustomColumns[1].Name);
-                Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
             }
 
             [Test]
@@ -490,24 +550,6 @@ namespace Audit.IntegrationTest
             public async Task TestSqlAsync()
             {
                 SetSqlSettings();
-                await TestUpdateAsync();
-            }
-
-            [Test]
-            [Category("PostgreSQL")]
-            public void PostgreSql()
-            {
-                SetPostgreSqlSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            [Test]
-            [Category("PostgreSQL")]
-            public async Task PostgreSqlAsync()
-            {
-                SetPostgreSqlSettings();
                 await TestUpdateAsync();
             }
 
@@ -962,21 +1004,6 @@ namespace Audit.IntegrationTest
                         .SetDatabaseInitializerNull()
 #endif
                         )
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
-
-            public void SetPostgreSqlSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UsePostgreSql(config => config
-                        .ConnectionString("Server=localhost;Port=5432;User Id=fede;Password=fede;Database=postgres;")
-                        .TableName("event")
-                        .IdColumnName("id")
-                        .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)
-                        .LastUpdatedColumnName("updated_date")
-                        .CustomColumn("event type", ev => ev.EventType)
-                        .CustomColumn("some_date", ev => DateTime.UtcNow))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

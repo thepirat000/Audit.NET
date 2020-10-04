@@ -10,49 +10,88 @@ namespace Audit.PostgreSql.Configuration
 {
     public class PostgreSqlProviderConfigurator : IPostgreSqlProviderConfigurator
     {
-        internal string _connectionString = "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
-        internal string _schema = null;
-        internal string _tableName = "event";
-        internal string _idColumnName = "id";
-        internal string _dataColumnName = "data";
+        internal Func<AuditEvent, string> _connectionStringBuilder = _ => "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        internal Func<AuditEvent, string> _schemaBuilder = _ => null;
+        internal Func<AuditEvent, string> _tableNameBuilder = _ => "event";
+        internal Func<AuditEvent, string> _idColumnNameBuilder = _ => "id";
+        internal Func<AuditEvent, string> _dataColumnNameBuilder = _ => "data";
+        internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = _ => null;
+
         internal DataType _dataColumnType = DataType.JSON;
-        internal string _lastUpdatedColumnName = null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         public IPostgreSqlProviderConfigurator ConnectionString(string connectionString)
         {
-            _connectionString = connectionString;
+            _connectionStringBuilder = _ => connectionString;
+            return this;
+        }
+
+        public IPostgreSqlProviderConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder)
+        {
+            _connectionStringBuilder = connectionStringBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator TableName(string tableName)
         {
-            _tableName = tableName;
+            _tableNameBuilder = _ => tableName;
+            return this;
+        }
+
+        public IPostgreSqlProviderConfigurator TableName(Func<AuditEvent, string> tableNameBuilder)
+        {
+            _tableNameBuilder = tableNameBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator IdColumnName(string idColumnName)
         {
-            _idColumnName = idColumnName;
+            _idColumnNameBuilder = _ => idColumnName;
             return this;
         }
 
+        public IPostgreSqlProviderConfigurator IdColumnName(Func<AuditEvent, string> idColumnNameBuilder)
+        {
+            _idColumnNameBuilder = idColumnNameBuilder;
+            return this;
+        }
+
+
         public IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON)
         {
-            _dataColumnName = dataColumnName;
+            _dataColumnNameBuilder = _ => dataColumnName;
+            _dataColumnType = dataColumnType;
+            return this;
+        }
+
+        public IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON)
+        {
+            _dataColumnNameBuilder = dataColumnNameBuilder;
             _dataColumnType = dataColumnType;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator LastUpdatedColumnName(string lastUpdatedColumnName)
         {
-            _lastUpdatedColumnName = lastUpdatedColumnName;
+            _lastUpdatedColumnNameBuilder = _ => lastUpdatedColumnName;
+            return this;
+        }
+
+        public IPostgreSqlProviderConfigurator LastUpdatedColumnName(Func<AuditEvent, string> lastUpdatedColumnNameBuilder)
+        {
+            _lastUpdatedColumnNameBuilder = lastUpdatedColumnNameBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator Schema(string schema)
         {
-            _schema = schema;
+            _schemaBuilder = _ => schema;
+            return this;
+        }
+
+        public IPostgreSqlProviderConfigurator Schema(Func<AuditEvent, string> schemaBuilder)
+        {
+            _schemaBuilder = schemaBuilder;
             return this;
         }
 

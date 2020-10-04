@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into a MySQL database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MySql</AssemblyTitle>
-    <VersionPrefix>16.1.4</VersionPrefix>
+    <VersionPrefix>16.1.5</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;netstandard2.0;netcoreapp2.1;net45;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

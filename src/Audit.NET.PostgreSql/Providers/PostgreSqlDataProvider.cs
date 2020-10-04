@@ -2,6 +2,7 @@
 using Audit.NET.PostgreSql;
 using Newtonsoft.Json;
 using Npgsql;
+using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,40 +25,58 @@ namespace Audit.PostgreSql.Providers
     /// </remarks>
     public class PostgreSqlDataProvider : AuditDataProvider
     {
-        private string _connectionString;
-        private string _schema = null;
-        private string _tableName = "event";
-        private string _idColumnName = "id";
-        private string _dataColumnName = "data";
-        private string _lastUpdatedDateColumnName = null;
         private string _dataType = "JSON";
         private List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         /// <summary>
-        /// The connection string
+        /// Gets or sets the connection string builder.
+        /// </summary>
+        public Func<AuditEvent, string> ConnectionStringBuilder { get; set; } = _ => "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        /// <summary>
+        /// Gets or sets the schema builder.
+        /// </summary>
+        public Func<AuditEvent, string> SchemaBuilder { get; set; } = _ => null;
+        /// <summary>
+        /// Gets or sets the table name builder.
+        /// </summary>
+        public Func<AuditEvent, string> TableNameBuilder { get; set; } = _ => "event";
+        /// <summary>
+        /// Gets or sets the identifier column name builder.
+        /// </summary>
+        public Func<AuditEvent, string> IdColumnNameBuilder { get; set; } = _ => "id";
+        /// <summary>
+        /// Gets or sets the data column name builder.
+        /// </summary>
+        /// <value>The data column name builder.</value>
+        public Func<AuditEvent, string> DataColumnNameBuilder { get; set; } = _ => "data";
+        /// <summary>
+        /// Gets or sets the last updated date column name builder.
+        /// </summary>
+        /// <value>The last updated date column name builder.</value>
+        public Func<AuditEvent, string> LastUpdatedDateColumnNameBuilder { get; set; } = _ => null;
+
+        /// <summary>
+        /// Sets a static connection string
         /// </summary>
         public string ConnectionString
         {
-            get { return _connectionString; }
-            set { _connectionString = value; }
+            set { ConnectionStringBuilder = _ => value; }
         }
 
         /// <summary>
-        /// The events Table Name
+        /// Sets the events Table Name
         /// </summary>
         public string TableName
         {
-            get { return _tableName; }
-            set { _tableName = value; }
+            set { TableNameBuilder = _ => value; }
         }
 
         /// <summary>
-        /// The Column Name that stores the data
+        /// Set the Column Name that stores the data
         /// </summary>
         public string DataColumnName
         {
-            get { return _dataColumnName; }
-            set { _dataColumnName = value; }
+            set { DataColumnNameBuilder = _ => value; }
         }
 
         /// <summary>
@@ -70,30 +89,27 @@ namespace Audit.PostgreSql.Providers
         }
 
         /// <summary>
-        /// The Column Name that stores the Last Updated Date (NULL to ignore)
+        /// Sets the Column Name that stores the Last Updated Date (NULL to ignore)
         /// </summary>
         public string LastUpdatedDateColumnName
         {
-            get { return _lastUpdatedDateColumnName; }
-            set { _lastUpdatedDateColumnName = value; }
+            set { LastUpdatedDateColumnNameBuilder = _ => value; }
         }
 
         /// <summary>
-        /// The Column Name that is the primary ley
+        /// Sets the Column Name that is the primary ley
         /// </summary>
         public string IdColumnName
         {
-            get { return _idColumnName; }
-            set { _idColumnName = value; }
+            set { IdColumnNameBuilder = _ => value; }
         }
 
         /// <summary>
-        /// The Schema Name to use (NULL to ignore)
+        /// Sets the Schema Name to use (NULL to ignore)
         /// </summary>
         public string Schema
         {
-            get { return _schema; }
-            set { _schema = value; }
+            set { SchemaBuilder = _ => value; }
         }
 
         /// <summary>
@@ -115,20 +131,20 @@ namespace Audit.PostgreSql.Providers
             if (config != null)
             {
                 config.Invoke(pgConfig);
-                _connectionString = pgConfig._connectionString;
-                _dataColumnName = pgConfig._dataColumnName;
+                ConnectionStringBuilder = pgConfig._connectionStringBuilder;
+                DataColumnNameBuilder = pgConfig._dataColumnNameBuilder;
                 _dataType = pgConfig._dataColumnType.ToString();
-                _idColumnName = pgConfig._idColumnName;
-                _lastUpdatedDateColumnName = pgConfig._lastUpdatedColumnName;
-                _schema = pgConfig._schema;
-                _tableName = pgConfig._tableName;
-                _customColumns = pgConfig._customColumns;
+                IdColumnNameBuilder = pgConfig._idColumnNameBuilder;
+                LastUpdatedDateColumnNameBuilder = pgConfig._lastUpdatedColumnNameBuilder;
+                SchemaBuilder = pgConfig._schemaBuilder;
+                TableNameBuilder = pgConfig._tableNameBuilder;
+                CustomColumns = pgConfig._customColumns;
             }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
             {
                 var cmd = GetInsertCommand(cnn, auditEvent);
                 var id = cmd.ExecuteScalar();
@@ -138,7 +154,7 @@ namespace Audit.PostgreSql.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
             {
                 var cmd = GetInsertCommand(cnn, auditEvent);
                 var id = await cmd.ExecuteScalarAsync();
@@ -148,7 +164,7 @@ namespace Audit.PostgreSql.Providers
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
             {
                 var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
                 cmd.ExecuteNonQuery();
@@ -157,7 +173,7 @@ namespace Audit.PostgreSql.Providers
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
             {
                 var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
                 await cmd.ExecuteNonQueryAsync();
@@ -166,7 +182,7 @@ namespace Audit.PostgreSql.Providers
 
         public override T GetEvent<T>(object eventId)
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 var cmd = GetSelectCommand(cnn, eventId);
                 using (var reader = cmd.ExecuteReader())
@@ -184,7 +200,7 @@ namespace Audit.PostgreSql.Providers
 
         public override async Task<T> GetEventAsync<T>(object eventId)
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 var cmd = GetSelectCommand(cnn, eventId);
                 using (var reader = await cmd.ExecuteReaderAsync())
@@ -227,13 +243,13 @@ namespace Audit.PostgreSql.Providers
         /// </remarks>
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
         {
-            using (var cnn = new NpgsqlConnection(_connectionString))
+            using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 cnn.Open();
                 var cmd = cnn.CreateCommand();
-                var schema = GetSchema();
+                var schema = GetSchema(null);
                 var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
-                cmd.CommandText = $@"SELECT ""{_dataColumnName}"" FROM {schema}""{_tableName}"" {where}";
+                cmd.CommandText = $@"SELECT ""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" {where}";
                 var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -258,12 +274,12 @@ namespace Audit.PostgreSql.Providers
                 GetFullTableName(auditEvent),
                 GetColumnsForInsert(auditEvent),
                 GetValuesForInsert(auditEvent),
-                _idColumnName);
+                GetIdColumnName(auditEvent));
         }
 
         private string GetFullTableName(AuditEvent auditEvent)
         {
-            return string.Format($@"{GetSchema()}""{_tableName}""");
+            return string.Format($@"{GetSchema(auditEvent)}""{GetTableName(auditEvent)}""");
         }
 
         private NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
@@ -280,17 +296,18 @@ namespace Audit.PostgreSql.Providers
             return string.Format(@"update {0} SET {1} WHERE ""{2}"" = @id",
                 GetFullTableName(auditEvent),
                 GetSetForUpdate(auditEvent),
-                _idColumnName);
+                GetIdColumnName(auditEvent));
         }
 
         private object GetSetForUpdate(AuditEvent auditEvent)
         {
-            var ludScript = string.IsNullOrWhiteSpace(_lastUpdatedDateColumnName) ? null : $@"""{_lastUpdatedDateColumnName}"" = CURRENT_TIMESTAMP";
+            var ludColName = GetLastUpdatedDateColumnName(auditEvent);
+            var ludScript = string.IsNullOrWhiteSpace(ludColName) ? null : $@"""{ludColName}"" = CURRENT_TIMESTAMP";
             var sets = new List<string>();
-            if (_dataColumnName != null)
+            if (GetDataColumnName(auditEvent) != null)
             {
                 var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
-                sets.Add($@"""{_dataColumnName}"" = {data}");
+                sets.Add($@"""{GetDataColumnName(auditEvent)}"" = {data}");
             }
             if (ludScript != null)
             {
@@ -310,8 +327,8 @@ namespace Audit.PostgreSql.Providers
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
-            var schema = GetSchema();
-            cmd.CommandText = $@"select ""{_dataColumnName}"" from {schema}""{_tableName}"" WHERE ""{_idColumnName}"" = @id";
+            var schema = GetSchema(null);
+            cmd.CommandText = $@"select ""{GetDataColumnName(null)}"" from {schema}""{GetTableName(null)}"" WHERE ""{GetIdColumnName(null)}"" = @id";
             var idParameter = cmd.CreateParameter();
             idParameter.ParameterName = "id";
             idParameter.Value = eventId;
@@ -319,17 +336,13 @@ namespace Audit.PostgreSql.Providers
             return cmd;
         }
 
-        private string GetSchema()
-        {
-            return string.IsNullOrWhiteSpace(_schema) ? "" : (@"""" + _schema + @""".");
-        }
-
         private string GetColumnsForInsert(AuditEvent auditEvent)
         {
             var columns = new List<string>();
-            if (_dataColumnName != null)
+            var dataColumnName = GetDataColumnName(auditEvent);
+            if (dataColumnName != null)
             {
-                columns.Add(_dataColumnName);
+                columns.Add(dataColumnName);
             }
             if (CustomColumns != null)
             {
@@ -344,7 +357,7 @@ namespace Audit.PostgreSql.Providers
         private string GetValuesForInsert(AuditEvent auditEvent)
         {
             var values = new List<string>();
-            if (_dataColumnName != null)
+            if (GetDataColumnName(auditEvent) != null)
             {
                 var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
                 values.Add(data);
@@ -362,7 +375,7 @@ namespace Audit.PostgreSql.Providers
         private NpgsqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
         {
             var parameters = new List<NpgsqlParameter>();
-            if (_dataColumnName != null)
+            if (GetDataColumnName(auditEvent) != null)
             {
                 parameters.Add(new NpgsqlParameter("data", auditEvent.ToJson()));
             }
@@ -379,7 +392,7 @@ namespace Audit.PostgreSql.Providers
         private NpgsqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
         {
             var parameters = new List<NpgsqlParameter>();
-            if (_dataColumnName != null)
+            if (GetDataColumnName(auditEvent) != null)
             {
                 parameters.Add(new NpgsqlParameter("data", auditEvent.ToJson()));
             }
@@ -392,6 +405,38 @@ namespace Audit.PostgreSql.Providers
                 }
             }
             return parameters.ToArray();
+        }
+
+
+        private string GetConnectionString(AuditEvent auditEvent)
+        {
+            return ConnectionStringBuilder?.Invoke(auditEvent);
+        }
+
+        private string GetSchema(AuditEvent auditEvent)
+        {
+            var schema = SchemaBuilder?.Invoke(auditEvent);
+            return string.IsNullOrWhiteSpace(schema) ? "" : (@"""" + schema + @""".");
+        }
+
+        private string GetTableName(AuditEvent auditEvent)
+        {
+            return TableNameBuilder?.Invoke(auditEvent);
+        }
+
+        private string GetIdColumnName(AuditEvent auditEvent)
+        {
+            return IdColumnNameBuilder?.Invoke(auditEvent);
+        }
+
+        private string GetDataColumnName(AuditEvent auditEvent)
+        {
+            return DataColumnNameBuilder?.Invoke(auditEvent);
+        }
+
+        private string GetLastUpdatedDateColumnName(AuditEvent auditEvent)
+        {
+            return LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
         }
     }
 
