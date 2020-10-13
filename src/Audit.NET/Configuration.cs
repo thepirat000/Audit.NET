@@ -25,6 +25,10 @@ namespace Audit.Core
         /// </summary>
         public static AuditDataProvider DataProvider { get; set; }
         /// <summary>
+        /// Gets or Sets a value that indicates if the logged Type Names should include the namespace. Default is false.
+        /// </summary>
+        public static bool IncludeTypeNamespaces { get; set; }
+        /// <summary>
         /// Gets or Sets the Default audit scope factory.
         /// </summary>
         public static IAuditScopeFactory AuditScopeFactory

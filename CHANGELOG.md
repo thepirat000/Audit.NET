@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.2.0] - 2020-10-13
+### Modified
+- Audit.NET (Core): New optional global cofiguration to include the namespaces on the type names logged (#343)
+
 ## [16.1.5] - 2020-10-04
 ### Modified
 - Audit.PostgreSql: Upgrade npgsql driver to latest version and allowing dynamic configuration of the postgreSQL data provider settings (#340)

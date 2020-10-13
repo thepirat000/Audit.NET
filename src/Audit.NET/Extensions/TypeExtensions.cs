@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Audit.Core.Extensions
 {
@@ -10,6 +11,9 @@ namespace Audit.Core.Extensions
     /// </summary>
     public static class TypeExtensions
     {
+        private static readonly Regex AnonymousTypeRegex = new Regex(@"<>f__AnonymousType\d*<");
+        private const string AnonymousReplacementString = "AnonymousType<";
+
         /// <summary>
         /// Gets the complete type name, including pretty printing for generic types.
         /// </summary>
@@ -22,12 +26,13 @@ namespace Audit.Core.Extensions
             }
             var typeInfo = type.GetTypeInfo();
             var genericTypes = type.GenericTypeArguments;
+            var name = Configuration.IncludeTypeNamespaces ? type.FullName : type.Name;
             if (!typeInfo.IsGenericType)
             {
-                return type.Name;
+                return name;
             }
             var sb = new StringBuilder();
-            sb.Append(type.Name.Substring(0, type.Name.LastIndexOf("`")));
+            sb.Append(name.Substring(0, name.IndexOf("`")));
 
             sb.Append(genericTypes.Aggregate("<",
                 delegate (string aggregate, Type t)
@@ -36,7 +41,7 @@ namespace Audit.Core.Extensions
                 }
                 ));
             sb.Append(">");
-            return sb.ToString();
+            return AnonymousTypeRegex.Replace(sb.ToString(), AnonymousReplacementString);
         }
     }
 }

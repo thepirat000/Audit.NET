@@ -16,6 +16,7 @@ using Audit.EntityFramework.ConfigurationApi;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using System.Data;
 
 namespace Audit.UnitTest
 {
@@ -610,9 +611,25 @@ namespace Audit.UnitTest
         [Test]
         public void Test_TypeExtension()
         {
+            Core.Configuration.IncludeTypeNamespaces = false;
             var s = new List<Dictionary<HashSet<string>, KeyValuePair<int, decimal>>>();
             var fullname = s.GetType().GetFullTypeName();
             Assert.AreEqual("List<Dictionary<HashSet<String>,KeyValuePair<Int32,Decimal>>>", fullname);
+            Core.Configuration.IncludeTypeNamespaces = true;
+            fullname = s.GetType().GetFullTypeName();
+            Assert.AreEqual("System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.Collections.Generic.HashSet<System.String>,System.Collections.Generic.KeyValuePair<System.Int32,System.Decimal>>>", fullname);
+            Core.Configuration.IncludeTypeNamespaces = false;
+            fullname = typeof(AuditEvent).GetFullTypeName();
+            Assert.AreEqual("AuditEvent", fullname);
+            Core.Configuration.IncludeTypeNamespaces = true;
+            fullname = typeof(AuditEvent).GetFullTypeName();
+            Assert.AreEqual("Audit.Core.AuditEvent", fullname);
+            Core.Configuration.IncludeTypeNamespaces = false;
+            var anon1 = (new { anon = true, str = "", inti = 1, otro = new { boo = true, str = "sdhdh" } }).GetType().GetFullTypeName();
+            Core.Configuration.IncludeTypeNamespaces = true;
+            var anon2 = (new { anon = true, str = "", inti = 1, otro = new { boo = true, str = "sdhdh" } }).GetType().GetFullTypeName();
+            Assert.AreEqual("AnonymousType<Boolean,String,Int32,AnonymousType<Boolean,String>>", anon1);
+            Assert.AreEqual("AnonymousType<System.Boolean,System.String,System.Int32,AnonymousType<System.Boolean,System.String>>", anon2);
         }
 
         [Test]
