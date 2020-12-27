@@ -98,7 +98,7 @@ Option | Type | Description
 ------------ | ---------------- | ---------------- 
 EventType | `string` | A string representing the type of the event
 TargetGetter | `Func<object>` | Target object getter (a func that returns the object to track)
-ExtraFields | `obejct` | Anonymous object that contains additional fields to be merged into the audit event
+ExtraFields | `object` | Anonymous object that contains additional fields to be merged into the audit event
 DataProvider | `AuditDataProvider` | The [data provider](#data-providers) to use. Defaults to the DataProvider configured on `Audit.Core.Configuration.DataProvider`
 CreationPolicy | `EventCreationPolicy` | The [creation policy](#creation-policy) to use. Default is `InsertOnEnd` 
 IsCreateAndSave | `bool` | Value indicating whether this scope should be immediately ended and saved after creation. Default is false
