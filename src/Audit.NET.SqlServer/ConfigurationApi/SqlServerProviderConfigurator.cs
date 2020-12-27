@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
+using Microsoft.EntityFrameworkCore;
+#endif
 
 namespace Audit.SqlServer.Configuration
 {
@@ -15,6 +18,9 @@ namespace Audit.SqlServer.Configuration
         internal Func<AuditEvent, string> _jsonColumnNameBuilder;
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
+        internal Func<AuditEvent, DbContextOptions> _dbContextOptionsBuilder = null;
+#endif
 #if NET45
         internal bool _setDatabaseInitializerNull = false;
         public ISqlServerProviderConfigurator SetDatabaseInitializerNull(bool initializeToNull = true)
@@ -101,5 +107,17 @@ namespace Audit.SqlServer.Configuration
             _customColumns.Add(new CustomColumn(columnName, value));
             return this;
         }
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
+        public ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder)
+        {
+            _dbContextOptionsBuilder = dbContextOptionsBuilder;
+            return this;
+        }
+        public ISqlServerProviderConfigurator DbContextOptions(DbContextOptions dbContextOptions)
+        {
+            _dbContextOptionsBuilder = ev => dbContextOptions;
+            return this;
+        }
+#endif
     }
 }

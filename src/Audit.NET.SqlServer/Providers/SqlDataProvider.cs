@@ -90,7 +90,12 @@ namespace Audit.SqlServer.Providers
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
         public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
-
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
+        /// <summary>
+        /// The DbContext options builder, to provide custom database options for the DbContext
+        /// </summary>
+        public Func<AuditEvent, DbContextOptions> DbContextOptionsBuilder { get; set; } = null;
+#endif
         public SqlDataProvider()
         {
         }
@@ -110,6 +115,8 @@ namespace Audit.SqlServer.Providers
                 CustomColumns = sqlConfig._customColumns;
 #if NET45
                 SetDatabaseInitializerNull = sqlConfig._setDatabaseInitializerNull;
+#else
+                DbContextOptionsBuilder = sqlConfig._dbContextOptionsBuilder;
 #endif
             }
         }
@@ -368,7 +375,14 @@ namespace Audit.SqlServer.Providers
 #if NET45
             return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), SetDatabaseInitializerNull);
 #else
-            return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent));
+            if (DbContextOptionsBuilder != null)
+            {
+                return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), DbContextOptionsBuilder.Invoke(auditEvent));
+            }
+            else
+            {
+                return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent));
+            }
 #endif
         }
 

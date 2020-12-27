@@ -73,6 +73,7 @@ Audit.Core.Configuration.Setup()
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events. (optional)
 - **CustomColumn**: Additional columns to store information from the audit event. (optional)
 - **SetDatabaseInitializerNull**: To set the database initializer to NULL on the internal DbContext. (optional, only for .NET Framework)
+- **DbContextOptions**: To set custom options for the internal EntityFramework DbContext (optional, only for .NET Core)
 
 ## Query events
 

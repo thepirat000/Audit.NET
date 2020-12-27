@@ -27,6 +27,8 @@ namespace Audit.Core
                 CustomColumns = sqlDbConfig._customColumns,
 #if NET45
                 SetDatabaseInitializerNull = sqlDbConfig._setDatabaseInitializerNull
+#else
+                DbContextOptionsBuilder = sqlDbConfig._dbContextOptionsBuilder
 #endif
             };
             return new CreationPolicyConfigurator();

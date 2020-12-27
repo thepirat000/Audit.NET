@@ -1,5 +1,8 @@
 ﻿using System;
 using Audit.Core;
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
+using Microsoft.EntityFrameworkCore;
+#endif
 
 namespace Audit.SqlServer.Configuration
 {
@@ -13,6 +16,17 @@ namespace Audit.SqlServer.Configuration
         /// To set the database initializer to NULL on the internal DbContext 
         /// </summary>
         ISqlServerProviderConfigurator SetDatabaseInitializerNull(bool initializeToNull = true);
+#else
+        /// <summary>
+        /// Specifies the DB context options as a function of the audit event.
+        /// </summary>
+        /// <param name="dbContextOptionsBuilder">The DB context options as a function of the audit event.</param>
+        ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder);
+        /// <summary>
+        /// Specifies the DB context options.
+        /// </summary>
+        /// <param name="dbContextOptions">The DB context options as a function of the audit event.</param>
+        ISqlServerProviderConfigurator DbContextOptions(DbContextOptions dbContextOptions);
 #endif
         /// <summary>
         /// Specifies the Sql Server connection string.

@@ -19,6 +19,12 @@ using Audit.Kafka.Providers;
 using Confluent.Kafka;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+#if NETCOREAPP3_0
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Data.Common;
+using System.Threading;
+#endif
 
 namespace Audit.IntegrationTest
 {
@@ -152,7 +158,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
             }
 
-                        [Test]
+            [Test]
             [Category("PostgreSQL")]
             public void PostgreSql()
             {
@@ -245,6 +251,29 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(true, x.SetDatabaseInitializerNull);
 #endif
             }
+
+#if NETCOREAPP3_0
+            [Test]
+            [Category("SQL")]
+            public void Test_Sql_DbContextOptions()
+            {
+                TestInterceptor.Count = 0;
+                var sqlProvider = new SqlDataProvider(config => config
+                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+                        .DbContextOptions(new DbContextOptionsBuilder().AddInterceptors(new TestInterceptor()).Options)
+                        .TableName(ev => "Event")
+                        .IdColumnName(ev => "EventId")
+                        .JsonColumnName(ev => "Data")
+                        .LastUpdatedColumnName("LastUpdatedDate")
+                        .CustomColumn("EventType", ev => ev.EventType));
+
+                using (var scope = AuditScope.Create(new AuditScopeOptions() { DataProvider = sqlProvider, EventType = "TestInterceptor", CreationPolicy = EventCreationPolicy.InsertOnEnd }))
+                {
+                }
+
+                Assert.AreEqual(1, TestInterceptor.Count);
+            }
+#endif
 
             [Test]
             [Category("EF")]
@@ -1186,5 +1215,26 @@ namespace Audit.IntegrationTest
             public int Id { get; set; }
             public Loop Inner { get; set; }
         }
+
+#if NETCOREAPP3_0
+        public class TestInterceptor : DbConnectionInterceptor
+        {
+            public static int Count { get; set; }
+            public TestInterceptor() : base()
+            {
+            }
+            public override async Task<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
+            {
+                await Task.Delay(0);
+                Count++;
+                return result;
+            }
+            public override InterceptionResult ConnectionOpening(DbConnection connection, ConnectionEventData eventData, InterceptionResult result)
+            {
+                Count++;
+                return result;
+            }
+        }
+#endif
     }
 }

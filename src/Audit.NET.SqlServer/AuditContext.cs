@@ -5,7 +5,6 @@
 
     internal class AuditContext : DbContext
     {
-
         public AuditContext(string connectionString, bool setNullInitializer)
             : base(connectionString)
         {
@@ -30,13 +29,20 @@
     {
         public DbSet<DynamicIdModel> FakeIdSet { get; set; }
         public string _connectionString;
+        public AuditContext(string connectionString, DbContextOptions options) : base(options)
+        {
+            _connectionString = connectionString;
+        }
         public AuditContext(string connectionString)
         {
             _connectionString = connectionString;
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            if (_connectionString != null)
+            {
+                optionsBuilder.UseSqlServer(_connectionString);
+            }
         }
     }
 #endif

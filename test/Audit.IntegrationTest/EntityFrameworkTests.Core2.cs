@@ -2,7 +2,9 @@
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +13,10 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
@@ -234,3 +239,5 @@ namespace Audit.IntegrationTest
 
 }
 #endif
+
+
