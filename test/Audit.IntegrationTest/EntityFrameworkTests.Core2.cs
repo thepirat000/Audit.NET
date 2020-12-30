@@ -33,12 +33,12 @@ namespace Audit.IntegrationTest
                         CREATE TABLE [Child] ( Id BIGINT IDENTITY(1,1) NOT NULL, [Name] nvarchar(Max) NOT NULL, [Period_Start] datetime NOT NULL, [Period_End] datetime NOT NULL, [ParentId] bigint NOT NULL, CONSTRAINT PK_Child PRIMARY KEY (Id), Constraint FK_Child_Parent Foreign Key ([ParentId]) References Parent(Id));";
             using (var ctx = new MyAuditedVerboseContext())
             {
-                ctx.Database.ExecuteSqlCommand(sql1);
+                ctx.Database.ExecuteSqlRaw(sql1);
             }
             var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true;";
             using (var ctx = new ApplicationDbContext(SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options))
             {
-                ctx.Database.ExecuteSqlCommand(sql2);
+                ctx.Database.ExecuteSqlRaw(sql2);
             }
         }
 

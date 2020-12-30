@@ -1223,7 +1223,7 @@ namespace Audit.IntegrationTest
             public TestInterceptor() : base()
             {
             }
-            public override async Task<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
+            public override async ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
             {
                 await Task.Delay(0);
                 Count++;

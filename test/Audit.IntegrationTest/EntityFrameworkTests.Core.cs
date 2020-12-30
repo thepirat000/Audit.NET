@@ -34,7 +34,7 @@ namespace Audit.IntegrationTest
                         create table posts ( Id int identity(1,1) not null primary key, Title nvarchar(max), DateCreated datetime, Content nvarchar(max), BlogId int not null constraint FK_P_B foreign key references Blogs (id) );";
             using (var ctx = new MyAuditedVerboseContext())
             {
-                ctx.Database.ExecuteSqlCommand(sql);
+                ctx.Database.ExecuteSqlRaw(sql);
             }
         }
 
@@ -942,7 +942,7 @@ namespace Audit.IntegrationTest
             using (var ctx = new MyAuditedVerboseContext())
             {
                 ctx.Database.EnsureCreated();
-                ctx.Database.ExecuteSqlCommand(@"
+                ctx.Database.ExecuteSqlRaw(@"
 --delete from AuditPosts
 --delete from AuditBlogs
 delete from Posts
@@ -1007,7 +1007,7 @@ SET IDENTITY_INSERT Posts OFF
             using (var ctx = new MyAuditedVerboseContext())
             {
                 ctx.Database.EnsureCreated();
-                ctx.Database.ExecuteSqlCommand(@"
+                ctx.Database.ExecuteSqlRaw(@"
 --delete from AuditPosts
 --delete from AuditBlogs
 delete from Posts

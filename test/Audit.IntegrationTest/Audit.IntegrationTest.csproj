@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <!--<TargetFrameworks>net452;netcoreapp2.0;net461;netcoreapp3.0</TargetFrameworks>-->
-    <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp2.0;net461;netcoreapp3.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.IntegrationTest</AssemblyName>
     <PackageId>Audit.IntegrationTest</PackageId>
@@ -72,11 +71,12 @@
   </ItemGroup>  
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-	<ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
+    <ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Identity.Core\Audit.EntityFramework.Identity.Core.csproj" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.0" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.1" />
   </ItemGroup>  
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
