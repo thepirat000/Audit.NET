@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Audit.SqlServer.Configuration
 {
+    [CLSCompliant(false)]
     public class SqlServerProviderConfigurator : ISqlServerProviderConfigurator
     {
         internal Func<AuditEvent, string> _connectionStringBuilder = ev => "data source=localhost;initial catalog=Audit;integrated security=true;";

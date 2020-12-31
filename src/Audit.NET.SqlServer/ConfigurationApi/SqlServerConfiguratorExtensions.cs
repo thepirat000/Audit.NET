@@ -12,6 +12,7 @@ namespace Audit.Core
         /// </summary>
         /// <param name="config">The Sql Server provider configuration.</param>
         /// <param name="configurator">The Audit.NET configurator object.</param>
+        [CLSCompliant(false)]
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, Action<ISqlServerProviderConfigurator> config)
         {
             var sqlDbConfig = new SqlServerProviderConfigurator();

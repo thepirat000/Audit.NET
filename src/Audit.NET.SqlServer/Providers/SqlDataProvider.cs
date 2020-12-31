@@ -94,12 +94,14 @@ namespace Audit.SqlServer.Providers
         /// <summary>
         /// The DbContext options builder, to provide custom database options for the DbContext
         /// </summary>
+        [CLSCompliant(false)]
         public Func<AuditEvent, DbContextOptions> DbContextOptionsBuilder { get; set; } = null;
 #endif
         public SqlDataProvider()
         {
         }
 
+        [CLSCompliant(false)]
         public SqlDataProvider(Action<Configuration.ISqlServerProviderConfigurator> config)
         {
             var sqlConfig = new Configuration.SqlServerProviderConfigurator();

@@ -9,6 +9,7 @@ namespace Audit.SqlServer.Configuration
     /// <summary>
     /// Provides a configuration for the Sql Server DB data provider
     /// </summary>
+    [CLSCompliant(false)]
     public interface ISqlServerProviderConfigurator
     {
 #if NET45

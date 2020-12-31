@@ -50,6 +50,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,10 +58,5 @@
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.Extensions.DiagnosticAdapter">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.diagnosticadapter\2.1.0\lib\netcoreapp2.0\Microsoft.Extensions.DiagnosticAdapter.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 </Project>
