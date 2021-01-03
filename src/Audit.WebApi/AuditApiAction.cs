@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Audit.Core;
 using Newtonsoft.Json;
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
 using System.Web.Http.Controllers;
@@ -49,7 +49,7 @@ namespace Audit.WebApi
         public string Exception { get; set; }
         [JsonExtensionData]
         public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         [JsonIgnore]
         internal bool IsMiddleware { get; set; }
 

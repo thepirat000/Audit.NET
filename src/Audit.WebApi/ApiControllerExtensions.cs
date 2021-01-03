@@ -1,9 +1,9 @@
 using System;
 using Audit.Core;
 using Audit.WebApi.ConfigurationApi;
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
 using Microsoft.AspNetCore.Http;
-#elif NET45
+#else
 using System.Web;
 using System.Net.Http;
 #endif
@@ -13,7 +13,7 @@ namespace Audit.WebApi
 {
     public static class ApiControllerExtensions
     {
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         /// <summary>
         /// Adds a global Audit Filter to the MVC filter chain. Use this method to add AuditApiGlobalFilter as a global filter.
         /// </summary>
@@ -35,7 +35,7 @@ namespace Audit.WebApi
         }
 #endif
 
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         /// <summary>
         /// Gets the current Audit Scope.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Audit.WebApi
         {
             return AuditApiAdapter.GetCurrentScope(apiController.HttpContext);
         }
-#elif NET45
+#else
         /// <summary>
         /// Gets the current Audit Scope.
         /// </summary>
@@ -58,7 +58,7 @@ namespace Audit.WebApi
         }
 #endif
 
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         /// <summary>
         /// Gets the current Audit Scope.
         /// </summary>
@@ -75,7 +75,7 @@ namespace Audit.WebApi
         {
             AuditApiAdapter.DiscardCurrentScope(httpContext);
         }
-#elif NET45
+#else
         /// <summary>
         /// Gets the current Audit Scope.
         /// </summary>

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.3.2] - 2021-01-02
+### Modified
+- Audit.NET: Adding net461 as base target framework for supporting `IAsyncDisposable` for .NET Framework >= 4.6.1 (#354)
+
 ## [16.3.1] - 2020-12-31
 ### Modified
 - Audit.SqlServer: Adding support for Microsoft.EntityFrameworkCore 5.0.1 (#353)

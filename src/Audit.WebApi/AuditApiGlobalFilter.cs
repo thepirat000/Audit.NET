@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if ASP_CORE
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -32,14 +32,14 @@ namespace Audit.WebApi
         protected Func<ActionExecutingContext, bool> _includeRequestBodyBuilder;
         protected Func<ActionExecutedContext, bool> _includeResponseBodyBuilder;
         protected Func<ActionExecutingContext, string> _eventTypeNameBuilder;
-#if NET45
+#if ASP_NET
         protected Func<HttpRequestMessage, IContextWrapper> _contextWrapperBuilder;
 #endif
         protected bool _serializeActionParameters;
 
         private AuditApiGlobalFilter()
         {
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
             this.Order = int.MinValue;
 #endif
         }
@@ -60,7 +60,7 @@ namespace Audit.WebApi
             _includeResponseBodyBuilder = cfg._config._includeResponseBodyBuilder;
             _eventTypeNameBuilder = cfg._config._eventTypeNameBuilder;
             _serializeActionParameters = cfg._config._serializeActionParameters;
-#if NET45
+#if ASP_NET
             _contextWrapperBuilder = cfg._config._contextWrapperBuilder;
 #endif
         }
@@ -89,14 +89,14 @@ namespace Audit.WebApi
         {
             return _eventTypeNameBuilder?.Invoke(actionContext);
         }
-#if NET45
+#if ASP_NET
         protected IContextWrapper ContextWrapper(HttpRequestMessage request)
         {
             return _contextWrapperBuilder != null ? _contextWrapperBuilder.Invoke(request) : new ContextWrapper(request);
         }
 #endif
 
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (Configuration.AuditDisabled 

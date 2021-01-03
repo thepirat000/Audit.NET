@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if ASP_CORE
 using Microsoft.AspNetCore.Mvc.Controllers;
 #else
 using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;
@@ -20,7 +20,7 @@ namespace Audit.WebApi.ConfigurationApi
         /// </summary>
         /// <param name="requestPredicate">A function of the current HTTP request that returns true for the request to be audited, or false otherwise</param>
         /// <returns></returns>
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         IAuditApiGlobalConfigurator LogRequestIf(Func<Microsoft.AspNetCore.Http.HttpRequest, bool> requestPredicate);
 #else
         IAuditApiGlobalConfigurator LogRequestIf(Func<System.Net.Http.HttpRequestMessage, bool> requestPredicate);

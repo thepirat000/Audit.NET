@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if ASP_NET
 using System;
 using Audit.Core;
 using System.Threading.Tasks;

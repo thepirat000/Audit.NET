@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if ASP_CORE
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
@@ -23,7 +23,7 @@ namespace Audit.WebApi.ConfigurationApi
         internal Func<ActionExecutingContext, bool> _includeRequestBodyBuilder;
         internal Func<ActionExecutedContext, bool> _includeResponseBodyBuilder;
         internal Func<ActionExecutingContext, string> _eventTypeNameBuilder;
-#if NET45
+#if ASP_NET
         internal Func<HttpRequestMessage, IContextWrapper> _contextWrapperBuilder;
 #endif
         internal bool _serializeActionParameters;

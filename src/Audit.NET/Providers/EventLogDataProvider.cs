@@ -1,4 +1,4 @@
-﻿#if NET45 || EVENTLOG_CORE
+﻿#if NET45 || EVENTLOG_CORE || NET461
 using System;
 using System.Diagnostics;
 

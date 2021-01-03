@@ -21,7 +21,8 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="context">The audit db context.</param>
         /// <param name="entry">The entry.</param>
-        private List<EventEntryChange> GetChanges(IAuditDbContext context, EntityEntry entry)
+        /// <param name="entityName">The entity name.</param>
+        private List<EventEntryChange> GetChanges(IAuditDbContext context, EntityEntry entry, EntityName entityName)
         {
             var result = new List<EventEntryChange>();
             var props = entry.Metadata.GetProperties();
@@ -34,7 +35,7 @@ namespace Audit.EntityFramework
                     {
                         result.Add(new EventEntryChange()
                         {
-                            ColumnName = GetColumnName(prop),
+                            ColumnName = GetColumnName(prop, entityName),
                             NewValue = HasPropertyValue(context, entry, prop.Name, propEntry.CurrentValue, out object currValue) ? currValue : propEntry.CurrentValue,
                             OriginalValue = HasPropertyValue(context, entry, prop.Name, propEntry.OriginalValue, out object origValue) ? origValue : propEntry.OriginalValue
                         });
@@ -47,9 +48,11 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the name of the column.
         /// </summary>
-        private static string GetColumnName(IProperty prop)
+        private static string GetColumnName(IProperty prop, EntityName entityName)
         {
-#if EF_CORE_3
+#if NETSTANDARD2_1
+            return prop.GetColumnName(StoreObjectIdentifier.Table(entityName.Table, entityName.Schema));
+#elif EF_CORE_3
             return prop.GetColumnName();
 #else
             return prop.Relational().ColumnName ?? prop.Name;
@@ -59,9 +62,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the column values for an insert/delete operation.
         /// </summary>
-        /// <param name="context">The audit Db Context.</param>
-        /// <param name="entry">The entity entry.</param>
-        private Dictionary<string, object> GetColumnValues(IAuditDbContext context, EntityEntry entry)
+        private Dictionary<string, object> GetColumnValues(IAuditDbContext context, EntityEntry entry, EntityName entityName)
         {
             var dbContext = context.DbContext;
             var result = new Dictionary<string, object>();
@@ -76,7 +77,7 @@ namespace Audit.EntityFramework
                     {
                         value = overrideValue;
                     }
-                    result.Add(GetColumnName(prop), value);
+                    result.Add(GetColumnName(prop, entityName), value);
                 }
             }
             return result;
@@ -175,7 +176,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the foreign key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, EntityEntry entry)
+        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, EntityEntry entry, EntityName entityName)
         {
             var result = new Dictionary<string, object>();
             var foreignKeys = entry.Metadata.GetForeignKeys();
@@ -189,7 +190,7 @@ namespace Audit.EntityFramework
                 {
                     foreach (var prop in fk.Properties)
                     {
-                        result[GetColumnName(prop)] = entry.Property(prop.Name).CurrentValue;
+                        result[GetColumnName(prop, entityName)] = entry.Property(prop.Name).CurrentValue;
                     }
                 }
             }
@@ -199,12 +200,12 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, EntityEntry entry)
+        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, EntityEntry entry, EntityName entityName)
         {
             var result = new Dictionary<string, object>();
             foreach(var prop in entry.Properties.Where(p => p.Metadata.IsPrimaryKey()))
             {
-                result.Add(GetColumnName(prop.Metadata), prop.CurrentValue); 
+                result.Add(GetColumnName(prop.Metadata, entityName), prop.CurrentValue); 
             }
             return result;
         }
@@ -244,10 +245,10 @@ namespace Audit.EntityFramework
                     Entity = context.IncludeEntityObjects ? entity : null,
                     Entry = entry,
                     Action = DbContextHelper.GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
+                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry, entityName) : null,
                     Table = entityName.Table,
                     Schema = entityName.Schema,
-                    ColumnValues = GetColumnValues(context, entry)
+                    ColumnValues = GetColumnValues(context, entry, entityName)
                 });
             }
             return efEvent;

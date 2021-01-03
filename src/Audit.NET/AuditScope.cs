@@ -29,7 +29,7 @@ namespace Audit.Core
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
             MethodBase callingMethod = options.CallingMethod;
-#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
@@ -270,7 +270,7 @@ namespace Audit.Core
         /// Async version of the dispose method
         /// </summary>
         /// <returns></returns>
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
         public async ValueTask DisposeAsync()
 #else
         public async Task DisposeAsync()

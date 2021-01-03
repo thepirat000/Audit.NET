@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if ASP_CORE
 using Audit.Core;
 using Microsoft.AspNetCore.Mvc.Filters;
 

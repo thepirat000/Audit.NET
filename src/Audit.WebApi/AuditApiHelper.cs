@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if ASP_NET
 using System.Web.Http.ModelBinding;
 #else
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -52,7 +52,7 @@ namespace Audit.WebApi
             return dict.Count > 0 ? dict : null;
         }
 
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+#if ASP_CORE
         internal static IDictionary<string, string> ToDictionary(IEnumerable<KeyValuePair<string, StringValues>> col)
         {
             if (col == null)

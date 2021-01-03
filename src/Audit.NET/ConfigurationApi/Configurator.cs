@@ -52,7 +52,7 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
-#if NET45
+#if NET45 || NET461
         public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".", Func<AuditEvent, string> messageBuilder = null)
         {
             Configuration.DataProvider = new EventLogDataProvider()

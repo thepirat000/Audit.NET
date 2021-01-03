@@ -159,7 +159,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the primary key values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, DbEntityEntry entry)
+        private static Dictionary<string, object> GetPrimaryKey(DbContext dbContext, DbEntityEntry entry, EntityName entityName)
         {
             return EntityKeyHelper.Instance.GetPrimaryKeyValues(entry.Entity, dbContext);
         }
@@ -167,7 +167,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the foreign keys values for an entity
         /// </summary>
-        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, DbEntityEntry entry)
+        private static Dictionary<string, object> GetForeignKeys(DbContext dbContext, DbEntityEntry entry, EntityName entityName)
         {
             return EntityKeyHelper.Instance.GetForeignKeysValues(entry.Entity, dbContext);
         }

@@ -4,9 +4,9 @@
     <Description>Generate detailed Audit Logs for Web API Controller calls.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.WebApi</AssemblyTitle>
-    <VersionPrefix>16.3.1</VersionPrefix>
+    <VersionPrefix>16.3.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net45;netstandard2.1;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;net45;netstandard2.1;netcoreapp3.0;net461</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -61,7 +61,21 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.6" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  
   <ItemGroup>
     <None Include="images\icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net461' ">
+    <DefineConstants>$(DefineConstants);ASP_NET</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <DefineConstants>$(DefineConstants);ASP_CORE</DefineConstants>
+  </PropertyGroup>
 </Project>
