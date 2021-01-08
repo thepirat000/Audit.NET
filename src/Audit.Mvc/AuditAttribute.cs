@@ -215,7 +215,7 @@ namespace Audit.Mvc
                 using (var stream = new MemoryStream())
                 {
                     context.Request.InputStream.Seek(0, SeekOrigin.Begin);
-                    context.Request.InputStream.CopyTo(stream);
+                    context.Request.InputStream.CopyToAsync(stream).GetAwaiter().GetResult();
                     var body = Encoding.UTF8.GetString(stream.ToArray());
                     return new BodyContent
                     {

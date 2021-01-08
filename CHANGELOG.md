@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.3.3] - 2021-01-08
+### Modified
+- Audit.Mvc / Audit.Mvc.Core: Changing body request read to be asynchronous. Avoiding exception when used on asp.net core 3 (System.InvalidOperationException: Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead) (#259)
+
 ## [16.3.2] - 2021-01-02
 ### Modified
 - Audit.NET: Adding net461 as base target framework for supporting `IAsyncDisposable` for .NET Framework >= 4.6.1 (#354)

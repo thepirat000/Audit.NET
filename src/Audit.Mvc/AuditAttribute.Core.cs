@@ -77,7 +77,7 @@ namespace Audit.Mvc
                 ActionName = actionDescriptior?.ActionName ?? actionDescriptior?.DisplayName,
                 ControllerName = actionDescriptior?.ControllerName,
                 ActionParameters = GetActionParameters(filterContext),
-                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = IncludeRequestBody ? GetRequestBody(filterContext) : null },
+                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = IncludeRequestBody ? await GetRequestBody(filterContext) : null },
                 TraceId = httpContext.TraceIdentifier
             };
 
@@ -225,7 +225,7 @@ namespace Audit.Mvc
             return dict.Count > 0 ? dict : null;
         }
 
-        private string GetRequestBody(ActionExecutingContext actionContext)
+        private async Task<string> GetRequestBody(ActionExecutingContext actionContext)
         {
             var body = actionContext.HttpContext.Request.Body;
             if (body != null && body.CanRead)
@@ -236,7 +236,7 @@ namespace Audit.Mvc
                     {
                         body.Seek(0, SeekOrigin.Begin);
                     }
-                    body.CopyTo(stream);
+                    await body.CopyToAsync(stream);
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);
