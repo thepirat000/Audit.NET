@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
@@ -10,7 +10,7 @@
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.EntityFramework.Core</AssemblyName>
+    <AssemblyName>Audit.EntityFramework.Core.v3</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
