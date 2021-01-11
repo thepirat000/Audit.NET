@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2020</Copyright>
-    <AssemblyTitle>Audit.EntityFramework.Identity.Core</AssemblyTitle>
-    <VersionPrefix>16.3.4</VersionPrefix>
+    <AssemblyTitle>Audit.EntityFramework.Identity.Core.v3</AssemblyTitle>
+    <VersionPrefix>16.3.5</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.EntityFramework.Identity.Core</AssemblyName>
+    <AssemblyName>Audit.EntityFramework.Identity.Core.v3</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>

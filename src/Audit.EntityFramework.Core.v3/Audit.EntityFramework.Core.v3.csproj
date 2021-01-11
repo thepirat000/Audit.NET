@@ -3,8 +3,8 @@
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2020</Copyright>
-    <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>16.3.4</VersionPrefix>
+    <AssemblyTitle>Audit.EntityFramework.Core.v3</AssemblyTitle>
+    <VersionPrefix>16.3.5</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>
@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.EntityFramework.Core</PackageId>
+    <PackageId>Audit.EntityFramework.Core.v3</PackageId>
     <PackageTags>Audit;Trail;Log;EntityFramework;Core</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
