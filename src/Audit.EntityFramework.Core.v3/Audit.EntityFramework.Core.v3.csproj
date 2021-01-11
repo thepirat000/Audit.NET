@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core.v3</AssemblyTitle>
-    <VersionPrefix>16.3.5</VersionPrefix>
+    <VersionPrefix>16.4.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>

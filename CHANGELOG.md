@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [16.3.4] - 2021-01-10
+## [16.4.0] - 2021-01-10
 ### Added
 - Adding new packages `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` for backward compatibility to be used when targeting EntityFramework Core 3 on .NET standard >= 2.0 (#355)
 

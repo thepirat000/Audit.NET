@@ -5,7 +5,7 @@
     <Description>Log Audit.NET Audit Trail NLog™</Description>
     <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.NLog</AssemblyTitle>
-    <VersionPrefix>16.3.5</VersionPrefix>
+    <VersionPrefix>16.4.0</VersionPrefix>
     <Authors>Dominick Marciano</Authors>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

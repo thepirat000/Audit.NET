@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>16.3.5</VersionPrefix>
+    <VersionPrefix>16.4.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
