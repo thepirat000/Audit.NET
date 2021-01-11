@@ -12,8 +12,10 @@ del "audit.net.sqlserver\bin\debug\*.symbols.nupkg"
 del "audit.net.mysql\bin\debug\*.symbols.nupkg"
 del "audit.entityframework\bin\debug\*.symbols.nupkg"
 del "audit.entityframework.core\bin\debug\*.symbols.nupkg"
+del "audit.entityframework.core.v3\bin\debug\*.symbols.nupkg"
 del "audit.entityframework.identity\bin\debug\*.symbols.nupkg"
 del "audit.entityframework.identity.core\bin\debug\*.symbols.nupkg"
+del "audit.entityframework.identity.core.v3\bin\debug\*.symbols.nupkg"
 del "audit.Wcf\bin\debug\*.symbols.nupkg"
 del "audit.net.azurestorage\bin\debug\*.symbols.nupkg"
 del "audit.dynamicproxy\bin\debug\*.symbols.nupkg"
@@ -42,8 +44,10 @@ nuget push "audit.net.sqlserver\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.net.mysql\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework.Core\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "audit.EntityFramework.Core.v3\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework.Identity\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework.Identity.Core\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "audit.EntityFramework.Identity.Core.v3\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.Wcf\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureStorage\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.DynamicProxy\bin\debug\*.nupkg" -NoSymbols -source %1

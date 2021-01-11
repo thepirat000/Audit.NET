@@ -1,29 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Description>Log Audit.NET Audit Trail NLog™</Description>
-    <Copyright>Copyright 2019</Copyright>
-    <AssemblyTitle>Audit.NLog</AssemblyTitle>
+    <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <AssemblyTitle>Audit.EntityFramework.Identity.Core</AssemblyTitle>
     <VersionPrefix>16.3.4</VersionPrefix>
-    <Authors>Dominick Marciano</Authors>
-    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+    <Authors>Federico Colombo</Authors>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.NET.NLog</AssemblyName>
+    <AssemblyName>Audit.EntityFramework.Identity.Core</AssemblyName>
     <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.NET.NLog</PackageId>
-    <PackageTags>Audit;Trail;Log;NLog</PackageTags>
+    <PackageId>Audit.EntityFramework.Identity.Core</PackageId>
+    <PackageTags>Audit;Trail;Log;EntityFramework;Core;AspNet;Identity</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
   </PropertyGroup>
@@ -33,13 +30,32 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Compile Include="..\Audit.EntityFramework.Identity\**\*.cs" Exclude="..\Audit.EntityFramework.Identity\obj\**\*.*;..\**\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ConfigurationApi\**" />
+    <EmbeddedResource Remove="ConfigurationApi\**" />
+    <None Remove="ConfigurationApi\**" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);EF_CORE;EF_CORE_3</DefineConstants>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="NLog" Version="4.6.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.0" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="images\icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>

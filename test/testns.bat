@@ -68,8 +68,16 @@ dotnet test --logger:"console;verbosity=normal"
 echo Running...
 cd ..
 
+cd Audit.EntityFramework.Core.v3.UnitTest
+echo ---------------------------------------------- RUNNING EF CORE UNIT TESTS V3 (7) ----------------------------------------------
+TITLE RUNNING EF CORE UNIT TESTS V3 (6)
+dotnet test --logger:"console;verbosity=normal"
+
+echo Running...
+cd ..
+
 cd Audit.EntityFramework.UnitTest
-echo ---------------------------------------------- RUNNING EF FULL UNIT TESTS (7) ----------------------------------------------
+echo ---------------------------------------------- RUNNING EF FULL UNIT TESTS (8) ----------------------------------------------
 TITLE RUNNING EF FULL UNIT TESTS (7)
 IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" (
 	echo The file does not exist
@@ -84,14 +92,14 @@ echo Running...
 cd ..
 
 cd Audit.EntityFramework.Full.UnitTest
-echo ---------------------------------------------- RUNNING EF FULL UNIT TESTS (8) ----------------------------------------------
+echo ---------------------------------------------- RUNNING EF FULL UNIT TESTS (9) ----------------------------------------------
 TITLE RUNNING EF FULL UNIT TESTS (8)
 dotnet test --logger:"console;verbosity=normal"
 echo Running...
 cd ..
 
 cd Audit.Redis.UnitTest
-echo ---------------------------------------------- RUNNING REDIS UNIT TESTS (9) ----------------------------------------------
+echo ---------------------------------------------- RUNNING REDIS UNIT TESTS (10) ----------------------------------------------
 TITLE RUNNING REDIS UNIT TESTS (9)
 dotnet test --logger:"console;verbosity=normal"
 
@@ -99,31 +107,31 @@ echo Running...
 cd ..
 
 cd Audit.IntegrationTest
-echo ---------------------------------------------- RUNNING GENERAL INTEGRATION TEST (10) ----------------------------------------------
+echo ---------------------------------------------- RUNNING GENERAL INTEGRATION TEST (11) ----------------------------------------------
 TITLE RUNNING GENERAL INTEGRATION TEST (10)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=WCF&TestCategory!=Elasticsearch&TestCategory!=Dynamo&TestCategory!=PostgreSQL&TestCategory!=Kafka"
-echo ---------------------------------------------- RUNNING Kafka INTEGRATION TEST (11) ----------------------------------------------
+echo ---------------------------------------------- RUNNING Kafka INTEGRATION TEST (12) ----------------------------------------------
 TITLE RUNNING Kafka INTEGRATION TEST (11)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Kafka"
-echo ---------------------------------------------- RUNNING PostgreSQL INTEGRATION TEST (12) ----------------------------------------------
+echo ---------------------------------------------- RUNNING PostgreSQL INTEGRATION TEST (13) ----------------------------------------------
 TITLE RUNNING PostgreSQL INTEGRATION TEST (12)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=PostgreSQL"
-echo ---------------------------------------------- RUNNING Azure Cosmos DB INTEGRATION TEST (13) ----------------------------------------------
+echo ---------------------------------------------- RUNNING Azure Cosmos DB INTEGRATION TEST (14) ----------------------------------------------
 TITLE Azure Cosmos DB INTEGRATION TEST (13)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=AzureDocDb"
-echo ---------------------------------------------- RUNNING Azure BLOB INTEGRATION TEST (14) ----------------------------------------------
+echo ---------------------------------------------- RUNNING Azure BLOB INTEGRATION TEST (15) ----------------------------------------------
 TITLE RUNNING Azure BLOB INTEGRATION TEST (14)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=AzureBlob"
-echo ---------------------------------------------- RUNNING WCF SYNC INTEGRATION TEST (15) ----------------------------------------------
+echo ---------------------------------------------- RUNNING WCF SYNC INTEGRATION TEST (16) ----------------------------------------------
 TITLE RUNNING WCF SYNC INTEGRATION TEST (15)
 dotnet test --logger:"console;verbosity=normal" -f net452 --filter "TestCategory=WCF&TestCategory!=Async"
-echo ---------------------------------------------- RUNNING WCF ASYNC INTEGRATION TEST (16) ----------------------------------------------
+echo ---------------------------------------------- RUNNING WCF ASYNC INTEGRATION TEST (17) ----------------------------------------------
 TITLE RUNNING WCF ASYNC INTEGRATION TEST (16)
 dotnet test --logger:"console;verbosity=normal" -f net452 --filter "TestCategory=WCF&TestCategory=Async"
-echo ---------------------------------------------- RUNNING ELASTICSEARCH INTEGRATION TEST (17) ----------------------------------------------
+echo ---------------------------------------------- RUNNING ELASTICSEARCH INTEGRATION TEST (18) ----------------------------------------------
 TITLE RUNNING ELASTICSEARCH INTEGRATION TEST (17)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Elasticsearch"
-echo ---------------------------------------------- RUNNING DYNAMO DB INTEGRATION TEST (18) ----------------------------------------------
+echo ---------------------------------------------- RUNNING DYNAMO DB INTEGRATION TEST (19) ----------------------------------------------
 TITLE RUNNING DYNAMO DB INTEGRATION TEST (18)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Dynamo"
 

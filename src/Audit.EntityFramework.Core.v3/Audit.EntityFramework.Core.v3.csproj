@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
-    <Copyright>Copyright 2016</Copyright>
+    <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
     <VersionPrefix>16.3.4</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472</TargetFrameworks>
-    <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Audit.EntityFramework.Core</AssemblyName>
@@ -24,16 +24,6 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <DefineConstants>$(DefineConstants);EF_CORE_1</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <DefineConstants>$(DefineConstants);EF_CORE_2</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net472' ">
-    <DefineConstants>$(DefineConstants);EF_CORE_3</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,37 +48,10 @@
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
   
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.4" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Transactions" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Transactions" />
   </ItemGroup>
   
   <ItemGroup>
