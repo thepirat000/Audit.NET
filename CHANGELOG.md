@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.4.1] - 2021-01-21
+### Modified
+- Audit.EntityFramework.Core: Fixed problem with Many-To-Many relationships without join entity for EntityFramework Core 5 (#360)
+
 ## [16.4.0] - 2021-01-10
 ### Added
 - Adding new packages `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` for backward compatibility to be used when targeting EntityFramework Core 3 on .NET standard >= 2.0 (#355)

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
     <TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net472</TargetFrameworks>
-    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+    <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <AssemblyName>Audit.EntityFramework.Core.UnitTest</AssemblyName>
     <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
@@ -17,6 +17,13 @@
     <DebugType>Full</DebugType>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'netstandard2.1' ">
+    <DefineConstants>$(DefineConstants);EF_CORE_3</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <DefineConstants>$(DefineConstants);EF_CORE_5</DefineConstants>
+  </PropertyGroup>
+    
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <PackageReference Include="microsoft.entityframeworkcore" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.1" />

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture(Category = "EF")]
-    public class EfCore22InMemoryTests
+    public class EfCoreInMemoryTests
     {
         private static readonly Random Rnd = new Random();
 
@@ -20,6 +20,43 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForAnyContext().Reset();
             new BlogsMemoryContext().Database.EnsureCreated();
         }
+
+#if EF_CORE_5
+        [Test]
+        public void Test_ManyToMany_EFCore5()
+        {
+            using PersonsContext context = new PersonsContext();
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            context.Departments.Add(new Department() { Id = 1, Name = "Development" });
+            context.Departments.Add(new Department() { Id = 2, Name = "Research" });
+
+            context.SaveChanges();
+
+            context.Persons.Add(new Person() { Id = 1, Name = "Alice", Departments = context.Departments.ToList() });
+            context.Persons.Add(new Person() { Id = 2, Name = "Bob", Departments = context.Departments.ToList() });
+
+            // ArgumentNullException will be thrown here: Value cannot be null. (Parameter 'name')
+            context.SaveChanges();
+
+            Assert.AreEqual(2, evs.Count);
+            Assert.AreEqual(6, evs[1].Entries.Count); // 2 inserts to Person + 4 inserts to PersonDepartment
+            Assert.IsTrue(evs[1].Entries.All(e => e.Action == "Insert"));
+            Assert.AreEqual(2, evs[1].Entries.Count(e => e.Table == "Persons"));
+            Assert.AreEqual(4, evs[1].Entries.Count(e => e.Table == "DepartmentPerson"));
+            Assert.IsTrue(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.ColumnValues.ContainsKey("DepartmentsId")));
+            Assert.IsTrue(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.ColumnValues.ContainsKey("PersonsId")));
+            Assert.IsTrue(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.PrimaryKey.Count == 2));
+        }
+#endif
 
         [Test]
         public async Task Test_EF_SaveChangesAsyncOverride()

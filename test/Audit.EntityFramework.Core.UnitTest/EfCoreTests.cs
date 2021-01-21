@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture(Category = "EF")]
-    public class EfCore22Tests
+    public class EfCoreTests
     {
         [OneTimeSetUp]
         public void Init()

@@ -50,7 +50,7 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetColumnName(IProperty prop, EntityName entityName)
         {
-#if NETSTANDARD2_1
+#if EF_CORE_5
             return prop.GetColumnName(StoreObjectIdentifier.Table(entityName.Table, entityName.Schema));
 #elif EF_CORE_3
             return prop.GetColumnName();
@@ -151,7 +151,7 @@ namespace Audit.EntityFramework
             {
                 return result;
             }
-#if EF_CORE_3
+#if EF_CORE_3 || EF_CORE_5
             result.Table = definingType.GetTableName();
             result.Schema = definingType.GetSchema();
 #else
@@ -165,7 +165,9 @@ namespace Audit.EntityFramework
 
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
-#if EF_CORE_2 || EF_CORE_3
+#if EF_CORE_3 || EF_CORE_5
+            IEntityType definingType = dbContext.Model.FindEntityType(entry.Metadata.Name);
+#elif EF_CORE_2 
             IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
 #else
             IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
@@ -182,7 +184,7 @@ namespace Audit.EntityFramework
             var foreignKeys = entry.Metadata.GetForeignKeys();
             if (foreignKeys != null)
             {
-#if EF_CORE_2 || EF_CORE_3
+#if EF_CORE_2 || EF_CORE_3 || EF_CORE_5
                 //Filter ownership relations as they are not foreign keys
                 foreignKeys = foreignKeys.Where(fk => !fk.IsOwnership);
 #endif
@@ -256,7 +258,7 @@ namespace Audit.EntityFramework
 
         private string GetAmbientTransactionId()
         {
-#if EF_CORE_2 || EF_CORE_3
+#if EF_CORE_2 || EF_CORE_3 || EF_CORE_5
             var tranInfo = System.Transactions.Transaction.Current?.TransactionInformation;
             if (tranInfo != null)
             {
