@@ -22,10 +22,11 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
 #if EF_CORE_5
+
         [Test]
-        public void Test_ManyToMany_EFCore5()
+        public void Test_OwnedEntity_EFCore5()
         {
-            using PersonsContext context = new PersonsContext();
+            using var context = new Context_OwnedEntity();
             var evs = new List<EntityFrameworkEvent>();
             Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
@@ -36,15 +37,54 @@ namespace Audit.EntityFramework.Core.UnitTest
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            context.Departments.Add(new Department() { Id = 1, Name = "Development" });
-            context.Departments.Add(new Department() { Id = 2, Name = "Research" });
+            context.Departments.Add(new Context_OwnedEntity.Department()
+            {
+                Id = 1,
+                Name = "Development",
+                Address = new Context_OwnedEntity.Address { City = "Vienna", Street = "Street" },
+            });
 
             context.SaveChanges();
 
-            context.Persons.Add(new Person() { Id = 1, Name = "Alice", Departments = context.Departments.ToList() });
-            context.Persons.Add(new Person() { Id = 2, Name = "Bob", Departments = context.Departments.ToList() });
+            Assert.AreEqual(1, evs.Count);
 
-            // ArgumentNullException will be thrown here: Value cannot be null. (Parameter 'name')
+            Assert.AreEqual(2, evs[0].Entries.Count);
+            
+            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
+            Assert.AreEqual("Insert", evs[0].Entries[1].Action);
+
+            Assert.AreEqual(1, evs[0].Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+
+            Assert.AreEqual("Vienna", evs[0].Entries[1].ColumnValues["Address_City"]);
+            Assert.AreEqual("Street", evs[0].Entries[1].ColumnValues["Address_Street"]);
+            
+            Assert.AreEqual(1, ((dynamic)evs[0].Entries[0].Entity).Id);
+            Assert.AreEqual("Vienna", ((dynamic)evs[0].Entries[0].Entity).Address.City);
+        }
+
+        [Test]
+        public void Test_ManyToMany_EFCore5()
+        {
+            using var context = new Context_ManyToMany();
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            context.Departments.Add(new Context_ManyToMany.Department() { Id = 1, Name = "Development" });
+            context.Departments.Add(new Context_ManyToMany.Department() { Id = 2, Name = "Research" });
+
+            context.SaveChanges();
+
+            context.Persons.Add(new Context_ManyToMany.Person() { Id = 1, Name = "Alice", Departments = context.Departments.ToList() });
+            context.Persons.Add(new Context_ManyToMany.Person() { Id = 2, Name = "Bob", Departments = context.Departments.ToList() });
+
             context.SaveChanges();
 
             Assert.AreEqual(2, evs.Count);

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.4.2] - 2021-01-22
+### Modified
+- Audit.EntityFramework.Core: Fixed problem with Owned Entities relationships for EntityFramework Core 5 (#360)
+
 ## [16.4.1] - 2021-01-21
 ### Modified
 - Audit.EntityFramework.Core: Fixed problem with Many-To-Many relationships without join entity for EntityFramework Core 5 (#360)

@@ -166,7 +166,7 @@ namespace Audit.EntityFramework
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
 #if EF_CORE_3 || EF_CORE_5
-            IEntityType definingType = dbContext.Model.FindEntityType(entry.Metadata.Name);
+            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.Name);
 #elif EF_CORE_2 
             IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
 #else
