@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.4.3] - 2021-01-27
+### Modified
+- Audit.EntityFramework.Identity.Core.v3: Fixed reference to Audit.EntityFramework.Core.v3 (#355)
+
 ## [16.4.2] - 2021-01-22
 ### Modified
 - Audit.EntityFramework.Core: Fixed problem with Owned Entities relationships for EntityFramework Core 5 (#360)
