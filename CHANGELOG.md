@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.4.4] - 2021-02-03
+### Modified
+- Audit.NET.SqlServer: Fixed null values on custom columns (#357)
+
 ## [16.4.3] - 2021-01-27
 ### Modified
 - Audit.EntityFramework.Identity.Core.v3: Fixed reference to Audit.EntityFramework.Core.v3 (#355)

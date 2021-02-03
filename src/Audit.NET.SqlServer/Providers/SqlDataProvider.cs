@@ -307,7 +307,7 @@ namespace Audit.SqlServer.Providers
             {
                 for (int i = 0; i < CustomColumns.Count; i++)
                 {
-                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent) ?? DBNull.Value));
                 }
             }
             return parameters.ToArray();
@@ -325,7 +325,7 @@ namespace Audit.SqlServer.Providers
             {
                 for (int i = 0; i < CustomColumns.Count; i++)
                 {
-                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent) ?? DBNull.Value));
                 }
             }
             return parameters.ToArray();
