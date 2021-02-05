@@ -3,8 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [16.4.4] - 2021-02-03
+## [16.4.4] - 2021-02-04
 ### Modified
+- Audit.NET: Fix AuditScope creation when creating from an existing AuditEvent that has pre-assigned CustomFields (#364)
+- Audit.EntityFramework: Set the event custom fields before the AuditScope creation so they are available from OnScopeCreated event (#364)
 - Audit.NET.SqlServer: Fixed null values on custom columns (#357)
 
 ## [16.4.3] - 2021-01-27

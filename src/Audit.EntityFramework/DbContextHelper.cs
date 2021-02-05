@@ -349,6 +349,10 @@ namespace Audit.EntityFramework
             {
                 EntityFrameworkEvent = efEvent
             };
+            if (context.ExtraFields != null && context.ExtraFields.Count > 0)
+            {
+                auditEfEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+            }
             var factory = context.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
             var options = new AuditScopeOptions()
             {
@@ -359,13 +363,6 @@ namespace Audit.EntityFramework
                 SkipExtraFrames = 3
             };
             var scope = factory.Create(options);
-            if (context.ExtraFields != null)
-            {
-                foreach (var field in context.ExtraFields)
-                {
-                    scope.SetCustomField(field.Key, field.Value);
-                }
-            }
             context.OnScopeCreated(scope);
             return scope;
         }
@@ -381,6 +378,10 @@ namespace Audit.EntityFramework
             {
                 EntityFrameworkEvent = efEvent
             };
+            if (context.ExtraFields != null && context.ExtraFields.Count > 0)
+            {
+                auditEfEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+            }
             var factory = context.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
             var options = new AuditScopeOptions()
             {
@@ -391,13 +392,6 @@ namespace Audit.EntityFramework
                 SkipExtraFrames = 3
             };
             var scope = await factory.CreateAsync(options);
-            if (context.ExtraFields != null)
-            {
-                foreach (var field in context.ExtraFields)
-                {
-                    scope.SetCustomField(field.Key, field.Value);
-                }
-            }
             context.OnScopeCreated(scope);
             return scope;
         }

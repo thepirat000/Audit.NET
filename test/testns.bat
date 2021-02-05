@@ -6,14 +6,7 @@ echo Disabling GitHub nuget source to avoid conflicts
 nuget sources disable -name GitHub
 echo.
 
-start "KAFKA" /D D:\kafka "D:\kafka\start-server-reset.cmd"
-start "REDIS" /D D:\redis "D:\redis\redis-server.exe"
-start "ELASTIC" /D D:\Elasticsearch\elasticsearch-7.5.0\bin "D:\Elasticsearch\elasticsearch-7.5.0\bin\elasticsearch.bat"
-start "MONGO" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
-start "DYNAMO" /D D:\DynamoDb "D:\DynamoDb\Run.bat"
-net start mysql80
-net start mssqlserver
-net start postgresql-x64-13
+start-services
 
 cd ..
 dotnet restore
@@ -143,12 +136,7 @@ ECHO.
 ECHO --- PRESS ENTER TO STOP THE SERVICES (or CTRL+C to cancel)
 pause>nul
 
-net stop mssqlserver
-net stop mysql80
-net stop postgresql-x64-13
-taskkill /f /im java.exe
-taskkill /f /im mongod.exe
-taskkill /f /im redis-server.exe
+stop-services
 
 echo Enabling GitHub nuget source
 nuget sources enable -name GitHub

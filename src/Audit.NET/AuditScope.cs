@@ -50,9 +50,14 @@ namespace Audit.Core
             _event = options.AuditEvent ?? new AuditEvent();
             _event.Environment = environment;
             _event.StartDate = Configuration.SystemClock.UtcNow;
-            _event.EventType = options.EventType;
-            _event.CustomFields = new Dictionary<string, object>();
-
+            if (options.EventType != null)
+            {
+                _event.EventType = options.EventType;
+            }
+            if (_event.CustomFields == null)
+            {
+                _event.CustomFields = new Dictionary<string, object>();
+            }
             if (options.TargetGetter != null)
             {
                 var targetValue = options.TargetGetter.Invoke();

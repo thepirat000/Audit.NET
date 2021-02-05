@@ -66,7 +66,7 @@ namespace Audit.Core
             AuditEvent auditEvent = null,
             int skipExtraFrames = 0)
         {
-            EventType = eventType ?? "Default";
+            EventType = eventType;
             TargetGetter = targetGetter;
             ExtraFields = extraFields;
             CreationPolicy = creationPolicy ?? Configuration.CreationPolicy;

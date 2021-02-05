@@ -21,6 +21,54 @@ namespace Audit.EntityFramework.Core.UnitTest
             new BlogsMemoryContext().Database.EnsureCreated();
         }
 
+        [Test]
+        public async Task Test_EF_CustomFields_OnScopeCreated()
+        {
+            var evs = new List<AuditEventEntityFramework>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        // Do nothing, will include the events on OnScopeCreated   
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(_ => _.OnScopeCreated(scope =>
+                {
+                    evs.Add(AuditEvent.FromJson<AuditEventEntityFramework>(scope.Event.ToJson()));
+                }));
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+            var id = Rnd.Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "fede",
+                    Password = "12345",
+                    Token = "Test123"
+                };
+                ctx.Users.Add(user);
+                ctx.AddAuditCustomField("TestCustomField", 1L);
+                await ctx.SaveChangesAsync();
+                ctx.Users.Remove(user);
+                ctx.AddAuditCustomField("TestCustomField", 2L);
+                await ctx.SaveChangesAsync();
+            }
+
+            Assert.AreEqual(2, evs.Count);
+            Assert.IsTrue(evs[0].CustomFields.ContainsKey("TestCustomField"));
+            Assert.AreEqual(1L, evs[0].CustomFields["TestCustomField"]);
+            Assert.AreEqual(2L, evs[1].CustomFields["TestCustomField"]);
+        }
+
+
 #if EF_CORE_5
 
         [Test]

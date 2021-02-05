@@ -18,6 +18,95 @@ namespace Audit.UnitTest
     public class UnitTestAsync
     {
         [Test]
+        public async Task Test_AuditScopeCreation_WithExistingAuditEvent_WithCustomFields_Async()
+        {
+            var evs_onScopeCreated = new List<AuditEvent>();
+            var evs_Provider = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs_Provider.Add(AuditEvent.FromJson(ev.ToJson()));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(_ => _.OnScopeCreated(scope =>
+                {
+                    evs_onScopeCreated.Add(AuditEvent.FromJson(scope.Event.ToJson()));
+                }));
+
+            var auditEvent = new AuditEvent()
+            {
+                EventType = "test",
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"FromCustomField", 1 }
+                }
+            };
+            var options = new AuditScopeOptions()
+            {
+                AuditEvent = auditEvent,
+                ExtraFields = new { FromAnon = 2 }
+            };
+            using(var scope = await AuditScope.CreateAsync(options))
+            {
+                scope.SetCustomField("FromScope", 3);
+            }
+
+            Assert.AreEqual(1, evs_onScopeCreated.Count);
+            Assert.AreEqual(2, evs_onScopeCreated[0].CustomFields.Count);
+            Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromCustomField"));
+            Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromAnon"));
+            Assert.AreEqual(1, evs_onScopeCreated[0].CustomFields["FromCustomField"]);
+            Assert.AreEqual(2, evs_onScopeCreated[0].CustomFields["FromAnon"]);
+
+            Assert.AreEqual(1, evs_Provider.Count);
+            Assert.AreEqual(3, evs_Provider[0].CustomFields.Count);
+            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromCustomField"));
+            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromAnon"));
+            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromScope"));
+            Assert.AreEqual(1, evs_Provider[0].CustomFields["FromCustomField"]);
+            Assert.AreEqual(2, evs_Provider[0].CustomFields["FromAnon"]);
+            Assert.AreEqual(3, evs_Provider[0].CustomFields["FromScope"]);
+        }
+
+        [Test]
+        public async Task Test_AuditScopeCreation_WithExistingAuditEvent_WithEventType_Async()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseDynamicProvider(x => x
+                    .OnInsertAndReplace(ev =>
+                    {
+                        evs.Add(AuditEvent.FromJson(ev.ToJson()));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var auditEvent = new AuditEvent()
+            {
+                EventType = "test"
+            };
+            var options = new AuditScopeOptions()
+            {
+                EventType = null, // NULL means do not override eventtype
+                AuditEvent = auditEvent
+            };
+            // scope with pre-assigned event type
+            using (var scope = await AuditScope.CreateAsync(options))
+            {
+            }
+            // scope with event type to override
+            options.EventType = "override";
+            using (var scope = await AuditScope.CreateAsync(options))
+            {
+            }
+            Assert.AreEqual(2, evs.Count);
+            Assert.AreEqual("test", evs[0].EventType);
+            Assert.AreEqual("override", evs[1].EventType);
+        }
+
+        [Test]
         public async Task Test_AsyncDynamicDataProvider_FluentApi_Async()
         {
             int ins = 0;
