@@ -131,19 +131,23 @@ namespace Audit.Core.Providers
 
         private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent)
         {
-            using (FileStream file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, true))
+            var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
+#if NETSTANDARD1_3
+            using (FileStream stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+            using (StreamWriter sw = new StreamWriter(stream))
             {
-                var jObject = JObject.FromObject(auditEvent, JsonSerializer.Create(JsonSettings));
-                using (var sw = new StreamWriter(file))
-                {
-                    using (var jw = new JsonTextWriter(sw))
-                    {
-                        await jObject.WriteToAsync(jw);
-                    }
-                }
+                await sw.WriteAsync(json);
             }
+#elif NETSTANDARD2_0 || NET45 || NET461
+            using (var file = new StreamWriter(fullPath))
+            {
+                await file.WriteAsync(json);
+            }
+#else
+            await File.WriteAllTextAsync(fullPath, json);
+#endif
         }
-
+        
         private async Task<T> GetFromFileAsync<T>(string fullPath) where T : AuditEvent
         {
             using (FileStream file = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))

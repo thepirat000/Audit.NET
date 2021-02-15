@@ -128,7 +128,7 @@ namespace Audit.UnitTest
         [Test]
         public async Task Test_AuditScope_Factory_FluentApi_Async()
         {
-            var thisMethod = MethodBase.GetCurrentMethod();
+            var someMethod = typeof(UnitTestAsync).GetTypeInfo().GetMethods().First();
             var scope = await new AuditScopeFactory().CreateAsync(_ => _
                  .EventType("event type")
                  .ExtraFields(new { f = 1 })
@@ -138,7 +138,7 @@ namespace Audit.UnitTest
                  .IsCreateAndSave(true)
                  .SkipExtraFrames(1)
                  .Target(() => 1)
-                 .CallingMethod(thisMethod));
+                 .CallingMethod(someMethod));
 
             Assert.AreEqual("event type", scope.EventType);
             Assert.AreEqual("event type", scope.Event.EventType);
@@ -148,13 +148,13 @@ namespace Audit.UnitTest
             Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
             Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
             Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(thisMethod.Name));
+            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(someMethod.Name));
         }
 
         [Test]
         public async Task Test_AuditScope_Create_FluentApi_Async()
         {
-            var thisMethod = MethodBase.GetCurrentMethod();
+            var someMethod = typeof(UnitTestAsync).GetTypeInfo().GetMethods().First();
             var scope = await AuditScope.CreateAsync(_ => _
                  .EventType("event type")
                  .ExtraFields(new { f = 1 })
@@ -164,7 +164,7 @@ namespace Audit.UnitTest
                  .IsCreateAndSave(true)
                  .SkipExtraFrames(1)
                  .Target(() => 1)
-                 .CallingMethod(thisMethod));
+                 .CallingMethod(someMethod));
 
             Assert.AreEqual("event type", scope.EventType);
             Assert.AreEqual("event type", scope.Event.EventType);
@@ -174,7 +174,7 @@ namespace Audit.UnitTest
             Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
             Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
             Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(thisMethod.Name));
+            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(someMethod.Name));
         }
 
         [Test]

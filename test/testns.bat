@@ -6,7 +6,7 @@ echo Disabling GitHub nuget source to avoid conflicts
 nuget sources disable -name GitHub
 echo.
 
-start-services
+call start-services
 
 cd ..
 dotnet restore
@@ -136,7 +136,7 @@ ECHO.
 ECHO --- PRESS ENTER TO STOP THE SERVICES (or CTRL+C to cancel)
 pause>nul
 
-stop-services
+call stop-services
 
 echo Enabling GitHub nuget source
 nuget sources enable -name GitHub

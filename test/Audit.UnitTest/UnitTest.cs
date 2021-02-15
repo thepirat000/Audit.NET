@@ -140,6 +140,8 @@ namespace Audit.UnitTest
         [Test]
         public void Test_AuditScope_Factory_FluentApi()
         {
+            var mb = typeof(UnitTest).GetTypeInfo().GetMethods().First();
+
             var scope = new AuditScopeFactory().Create(_ => _
                  .EventType("event type")
                  .ExtraFields(new { f = 1 })
@@ -149,7 +151,7 @@ namespace Audit.UnitTest
                  .IsCreateAndSave(true)
                  .SkipExtraFrames(1)
                  .Target(() => 1)
-                 .CallingMethod(MethodBase.GetCurrentMethod()));
+                 .CallingMethod(mb));
 
             Assert.AreEqual("event type", scope.EventType);
             Assert.AreEqual("event type", scope.Event.EventType);
@@ -159,12 +161,14 @@ namespace Audit.UnitTest
             Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
             Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
             Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(MethodBase.GetCurrentMethod().Name));
+            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(mb.Name));
         }
 
         [Test]
         public void Test_AuditScope_Create_FluentApi()
         {
+            var mb = typeof(UnitTest).GetTypeInfo().GetMethods().First();
+
             var scope = AuditScope.Create(_ => _
                 .EventType("event type")
                 .ExtraFields(new { f = 1 })
@@ -174,7 +178,7 @@ namespace Audit.UnitTest
                 .IsCreateAndSave(true)
                 .SkipExtraFrames(1)
                 .Target(() => 1)
-                .CallingMethod(MethodBase.GetCurrentMethod()));
+                .CallingMethod(mb));
 
             Assert.AreEqual("event type", scope.EventType);
             Assert.AreEqual("event type", scope.Event.EventType);
@@ -184,7 +188,7 @@ namespace Audit.UnitTest
             Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
             Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
             Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(MethodBase.GetCurrentMethod().Name));
+            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(mb.Name));
         }
 
         [Test]
@@ -200,9 +204,12 @@ namespace Audit.UnitTest
             Assert.AreEqual(1, evs.Count);
             Assert.AreEqual("test", evs[0].EventType);
             Assert.AreEqual("one", evs[0].CustomFields["field1"]);
+#if !NETCOREAPP1_0
             Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_Log"));
+#endif
         }
 
+#if !NETCOREAPP1_0
         [Test]
         public void Test_AuditScope_CallingMethod()
         {
@@ -222,7 +229,7 @@ namespace Audit.UnitTest
             Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"));
             Assert.IsTrue(evs[1].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"));
         }
-
+#endif
 
         [Test]
         public void Test_AuditScope_CustomSystemClock()

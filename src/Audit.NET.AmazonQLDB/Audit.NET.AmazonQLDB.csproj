@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into Amazon QLDB</Description>
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.AmazonQLDB</AssemblyTitle>
-    <VersionPrefix>16.4.4</VersionPrefix>
+    <VersionPrefix>16.4.5</VersionPrefix>
     <Authors>Adrian Iftode;Federico Colombo</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

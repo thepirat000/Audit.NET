@@ -94,6 +94,48 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_FileDataProvider_Indent()
+        {
+            var loop = new Loop() { Id = 1 };
+
+            var fdp = new FileDataProvider()
+            {
+                DirectoryPath = _directory,
+                FilenameBuilder = x => x.EventType
+            };
+
+            Configuration.DataProvider = fdp;
+            var guid = "x" + Guid.NewGuid().ToString();
+            new AuditScopeFactory().Log(guid, loop);
+
+            var fileContents = File.ReadAllText(Path.Combine(_directory, guid));
+
+            Assert.IsNotNull(fileContents);
+            Assert.IsTrue(fileContents.StartsWith("{\r\n"));
+        }
+
+        [Test]
+        public async Task Test_FileDataProvider_IndentAsync()
+        {
+            var loop = new Loop() { Id = 1 };
+
+            var fdp = new FileDataProvider()
+            {
+                DirectoryPath = _directory,
+                FilenameBuilder = x => x.EventType
+            };
+
+            Configuration.DataProvider = fdp;
+            var guid = "x" + Guid.NewGuid().ToString();
+            await new AuditScopeFactory().LogAsync(guid, loop);
+
+            var fileContents = File.ReadAllText(Path.Combine(_directory, guid));
+
+            Assert.IsNotNull(fileContents);
+            Assert.IsTrue(fileContents.StartsWith("{\r\n"));
+        }
+
+        [Test]
         public void Test_FileDataProvider_Error()
         {
             var loop = new Loop() { Id = 1 };

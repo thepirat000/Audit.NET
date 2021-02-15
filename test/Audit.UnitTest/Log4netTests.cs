@@ -6,6 +6,7 @@ using log4net.Config;
 using log4net.Core;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Reflection;
 
 namespace Audit.UnitTest
 {
@@ -19,7 +20,7 @@ namespace Audit.UnitTest
         {
             _adapter = new MemoryAppender();
             var repository =
-                (global::log4net.Repository.Hierarchy.Hierarchy) LogManager.GetRepository(typeof(AuditEvent).Assembly);
+                (global::log4net.Repository.Hierarchy.Hierarchy) LogManager.GetRepository(typeof(AuditEvent).GetTypeInfo().Assembly);
             repository.Root.AddAppender(_adapter);
             BasicConfigurator.Configure(repository);
         }

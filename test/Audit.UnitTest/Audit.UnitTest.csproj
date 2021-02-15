@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;netcoreapp1.0;net461</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -22,7 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.FileSystem\Audit.FileSystem.csproj" />
     <ProjectReference Include="..\..\src\Audit.HttpClient\Audit.HttpClient.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Kafka\Audit.NET.Kafka.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.log4net\Audit.NET.log4net.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.NLog\Audit.NET.NLog.csproj" />
@@ -30,7 +29,9 @@
     <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />
     <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
   </ItemGroup>
-
+  <ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp1.0' ">
+    <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="4.6.4" />
     <PackageReference Include="log4net" Version="2.0.10" />
@@ -50,14 +51,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="System.Runtime" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.1.2" />
+    <ProjectReference Include="..\..\src\Audit.SignalR\Audit.SignalR.csproj" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.1.2" />
-    <ProjectReference Include="..\..\src\Audit.SignalR\Audit.SignalR.csproj" />
-  </ItemGroup>
-
 
 </Project>

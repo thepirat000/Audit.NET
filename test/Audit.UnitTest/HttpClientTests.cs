@@ -290,7 +290,9 @@ namespace Audit.UnitTest
 
             Assert.AreEqual("POST", actions[0].Method);
             Assert.IsTrue(actions[0].Exception.Contains("HttpRequestException"));
+#if !NETCOREAPP1_0
             Assert.IsTrue(evs[0].Environment.Exception.Length > 0);
+#endif
             Assert.IsNotNull(actions[0].Request);
             Assert.IsNotNull(actions[0].Request.Content);
             Assert.AreEqual("string content", actions[0].Request.Content.Body.ToString());

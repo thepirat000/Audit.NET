@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.4.5] - 2021-02-14
+### Modified
+- Audit.NET: Fix FileDataProvider SaveAsync method which was not respecting the JsonSerializerSetttings (#369)
+
 ## [16.4.4] - 2021-02-04
 ### Modified
 - Audit.NET: Fix AuditScope creation when creating from an existing AuditEvent that has pre-assigned CustomFields (#364)

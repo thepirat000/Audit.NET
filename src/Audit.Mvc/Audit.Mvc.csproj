@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for MVC Controller actions.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.Mvc</AssemblyTitle>
-    <VersionPrefix>16.4.4</VersionPrefix>
+    <VersionPrefix>16.4.5</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net45;netstandard2.1;netcoreapp3.0</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
