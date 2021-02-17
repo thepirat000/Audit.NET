@@ -18,7 +18,7 @@ namespace Audit.Core
         void Comment(string format, params object[] args);
         void Discard();
 #if NET45 || NETSTANDARD1_3
-        Task DisposeAsync();
+        ValueTask DisposeAsync();
 #endif
         void Save();
         Task SaveAsync();

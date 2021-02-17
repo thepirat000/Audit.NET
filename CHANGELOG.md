@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.0] - 2021-02-17
+### Modified
+- Audit.NET: Fix AuditScope DisposeAsync return value discrepancy when targeting net472 (#371)
+
 ## [16.4.5] - 2021-02-14
 ### Modified
 - Audit.NET: Fix FileDataProvider SaveAsync method which was not respecting the JsonSerializerSetttings (#369)

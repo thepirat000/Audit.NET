@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity.Core.v3</AssemblyTitle>
-    <VersionPrefix>16.4.5</VersionPrefix>
+    <VersionPrefix>16.5.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
