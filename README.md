@@ -575,7 +575,7 @@ Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 > If you don't specify a Data Provider, a default `FileDataProvider` will be used to write the events as .json files into the current working directory.
 
 ### Creation Policy
-To change the default creation policy, set the static property `SetCreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
+To change the default creation policy, set the static property `CreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
  
 For example, to set the default creation policy to Manual:
 ```c#
