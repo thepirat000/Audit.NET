@@ -318,6 +318,7 @@ The following tables describes the Audit.EntityFramework output fields:
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Table** | string | Name of the affected table |
+| **Name** | string | The entity friendly name (only for EF Core ≥ 3) |
 | **Action** | string | Action type (Insert, Update or Delete) |
 | **PrimaryKey** | Object | Object with the affected entity's primary key value(s) |
 | **ColumnValues** | Object | Object with the affected entity's column values  |
