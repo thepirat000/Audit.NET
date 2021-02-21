@@ -11,6 +11,8 @@ namespace Audit.EntityFramework
         public string Schema { get; set; }
         [JsonProperty(Order = 10)]
         public string Table { get; set; }
+        [JsonProperty(Order = 15, NullValueHandling = NullValueHandling.Ignore)]
+        public string Name { get; set; }
         [JsonProperty(Order = 25)]
         public IDictionary<string, object> PrimaryKey { get; set; }
         [JsonProperty(Order = 20)]

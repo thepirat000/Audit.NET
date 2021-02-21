@@ -27,6 +27,46 @@ namespace Audit.EntityFramework.Core.UnitTest
             new BlogsContext().Database.EnsureCreated();
         }
 
+#if EF_CORE_3 || EF_CORE_5
+        [Test]
+        public void Test_EF_Core_OwnedSingleMultiple()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup().UseDynamicProvider(_ => _.OnInsert(ev =>
+            {
+                evs.Add(ev.GetEntityFrameworkEvent());
+            }));
+
+            using (var context = new OwnedSingleMultiple_Context())
+            {
+
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                context.Departments.Add(new OwnedSingleMultiple_Context.Department()
+                {
+                    Name = "deparment test",
+                    Address = new OwnedSingleMultiple_Context.Address { City = "Vienna1", Street = "First Street" },
+                });
+
+				context.Persons.Add(new OwnedSingleMultiple_Context.Person()
+				{
+					Name = "person test",
+					Addresses = new List<OwnedSingleMultiple_Context.Address> { new OwnedSingleMultiple_Context.Address { City = "Vienna2", Street = "First Street" } },
+				});
+
+                context.SaveChanges();
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(4, evs[0].Entries.Count); 
+            Assert.AreEqual("deparment test", evs[0].Entries.First(e => e.Table == "Department" && e.ColumnValues.ContainsKey("Name")).ColumnValues["Name"]);
+            Assert.AreEqual("person test", evs[0].Entries.First(e => e.Table == "Person" && e.ColumnValues.ContainsKey("Name")).ColumnValues["Name"]);
+            Assert.AreEqual("Vienna1", evs[0].Entries.First(e => e.Table == "Department" && e.ColumnValues.ContainsKey("Address_City")).ColumnValues["Address_City"]);
+            Assert.AreEqual("Vienna2", evs[0].Entries.First(e => e.Table == "Person_Addresses" && e.ColumnValues.ContainsKey("City")).ColumnValues["City"]);
+        }
+#endif
+
         [Test]
         public void Test_EF_TransactionId()
         {

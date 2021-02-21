@@ -166,8 +166,8 @@ namespace Audit.EntityFramework
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
         {
 #if EF_CORE_3 || EF_CORE_5
-            IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.Name);
-#elif EF_CORE_2 
+            IEntityType definingType = entry.Metadata.FindOwnership()?.DeclaringEntityType ?? entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.Name);
+#elif EF_CORE_2
             IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
 #else
             IEntityType definingType = dbContext.Model.FindEntityType(entry.Entity.GetType());
@@ -250,6 +250,9 @@ namespace Audit.EntityFramework
                     Changes = entry.State == EntityState.Modified ? GetChanges(context, entry, entityName) : null,
                     Table = entityName.Table,
                     Schema = entityName.Schema,
+#if EF_CORE_3 || EF_CORE_5
+                    Name = entry.Metadata.DisplayName(),
+#endif
                     ColumnValues = GetColumnValues(context, entry, entityName)
                 });
             }

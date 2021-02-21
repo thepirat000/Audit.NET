@@ -1,10 +1,10 @@
-﻿#if EF_CORE_5
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
+#if EF_CORE_5
     [AuditDbContext(IncludeEntityObjects = true)]
     public class Context_OwnedEntity : AuditDbContext
     {
@@ -80,5 +80,47 @@ namespace Audit.EntityFramework.Core.UnitTest
             modelBuilder.Entity<Person>().HasMany<Department>(x => x.Departments).WithMany(x => x.Persons);
         }
     }
-}
 #endif
+
+#if EF_CORE_3 || EF_CORE_5
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class OwnedSingleMultiple_Context : AuditDbContext
+    {
+        public class Department
+        {
+            public Address Address { get; set; }
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+        public class Person
+        {
+            public List<Address> Addresses { get; set; }
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class Address
+        {
+            public string City { get; set; }
+            public string Street { get; set; }
+        }
+
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Person> Persons { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+            //.UseSqlServer("data source=localhost;initial catalog=OwnedSingleMultiple;integrated security=true;");
+            .UseInMemoryDatabase("testing-db");
+            //.UseLazyLoadingProxies();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>().OwnsMany(x => x.Addresses);
+            modelBuilder.Entity<Department>().OwnsOne(x => x.Address);
+        }
+    }
+#endif
+}
