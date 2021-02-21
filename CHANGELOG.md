@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.1] - 2021-02-21
+### Modified
+- Audit.EntityFramework.Core: Fix EF Core when using multiple owned entities (#373)
+
 ## [16.5.0] - 2021-02-17
 ### Modified
 - Audit.NET: Fix AuditScope DisposeAsync return value discrepancy when targeting net472 (#371)
@@ -232,7 +236,7 @@ This allows using `this.GetCurrentAuditScope()` on Controller overrides `OnActio
 
 ## [14.5.2] - 2019-05-30
 ### Added
-- Audit.NET.NLog: New extension library to store the audit events using NLog™.
+- Audit.NET.NLog: New extension library to store the audit events using NLogÂ™.
 
 ## [14.5.1] - 2019-05-28
 ### Modified
