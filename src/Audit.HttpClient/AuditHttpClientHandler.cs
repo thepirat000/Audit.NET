@@ -14,7 +14,7 @@ namespace Audit.Http
     /// <summary>
     /// Handler to intercept calls to an HttpClient and generate audit logs
     /// </summary>
-    public class AuditHttpClientHandler : HttpClientHandler
+    public class AuditHttpClientHandler : DelegatingHandler
     {
         private ConfigurationApi.AuditClientHandlerConfigurator _config = new ConfigurationApi.AuditClientHandlerConfigurator();
         /// <summary>
@@ -65,12 +65,38 @@ namespace Audit.Http
         /// </summary>
         public IAuditScopeFactory AuditScopeFactory { set => _config._auditScopeFactory = value; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditHttpClientHandler"/> class with a default HttpClientHandler as the Inner Handler.
+        /// </summary>
         public AuditHttpClientHandler()
+            : base(new HttpClientHandler())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditHttpClientHandler"/> class with a default HttpClientHandler as the Inner Handler.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
         public AuditHttpClientHandler(Action<ConfigurationApi.IAuditClientHandlerConfigurator> config)
+            : base(new HttpClientHandler())
         {
+            if (config != null)
+            {
+                config.Invoke(_config);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditHttpClientHandler"/> class with the given Inner Handler.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="innerHandler">The Inner Handler.</param>
+        public AuditHttpClientHandler(Action<ConfigurationApi.IAuditClientHandlerConfigurator> config, HttpMessageHandler innerHandler)
+        {
+            if (innerHandler != null)
+            {
+                InnerHandler = innerHandler;
+            }
             if (config != null)
             {
                 config.Invoke(_config);

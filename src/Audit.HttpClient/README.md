@@ -22,46 +22,53 @@ PM> Install-Package Audit.HttpClient
 
 ## Usage
 
-To enable the audit log for an instance of a `HttpClient`, you have to set an `AuditHttpClientHandler` as the message handler when creating the `HttpClient`. 
-This can be done by using the convenient factory provided by `ClientFactory.Create` method.
+To enable the audit log for `HttpClient`, you have to set an `AuditHttpClientHandler` as a message handler for the `HttpClient` instance being audited. 
 
-This will return an _audit-enabled_ instance of `HttpClient`. Each method call on the `HttpClient` instance will generate an Audit Event. 
-For example:
+This can be done in different ways:
+
+- Call the factory provided by `Audit.Http.ClientFactory.Create()` method to get a new _audit-enabled_ instance of `HttpClient`:
+
+```c#
+var httpClient = Audit.Http.ClientFactory.Create(_ => _
+    .IncludeRequestBody()
+    .IncludeResponseHeaders()
+    .FilterByRequest(req => req.Method.Method == "GET"));
+```
+
+> The `ClientFactory.Create` method is just a shortcut to create a new `HttpClient` with a custom `AuditHttpClientHandler` as its message handler.
+
+- If you use `HttpClientFactory` for depencency injection, you can add the message handler with the extension method `AddAuditHttpMessageHandler()` on your startup:
 
 ```c#
 using Audit.Http;
 
-// Create an HttpClient that logs the GET calls
-private HttpClient _httpClient = ClientFactory.Create(_ => _
-    .IncludeRequestBody()
-    .IncludeResponseHeaders()
-    .FilterByRequest(req => req.Method.Method == "GET"));
-
-// Use the HttpClient as you normally do
-await _httpClient.PostAsync(url, content);
-// ...
-await _httpClient.GetAsync(url);
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddHttpClient("GitHub", c =>
+        {
+            c.BaseAddress = new Uri("https://api.github.com/");
+        })
+        .AddAuditHandler(audit => audit
+            .IncludeRequestBody()
+            .IncludeResponseHeaders());
+    }
+}
 ```
 
-The `ClientFactory.Create` method is just a shortcut to create a new `HttpClient` with a custom `AuditHttpClientHandler` as its message handler.
+> Note: `AddAuditHandler(config)` is a shortcut for `AddHttpMessageHandler(() => new AuditHttpClientHandler(config))`
 
-You can create the `HttpClient` in some other ways, for example:
+- You can also create an audited `HttpClient` passing the handler to its constructor: 
 
 ```c#
-private HttpClient _httpClient = new HttpClient(new AuditHttpClientHandler(_ => _
+var httpClient = new HttpClient(new AuditHttpClientHandler(_ => _
     .IncludeRequestBody()
     .IncludeResponseHeaders());
 ```
 
-Or just:
+Each method call on the audited `HttpClient` instances will generate an Audit Event. 
 
-```c#
-private HttpClient _httpClient = new HttpClient(new AuditHttpClientHandler()
-{
-    IncludeRequestBody = true,
-    IncludeResponseHeaders = true
-});
-```
 
 ## Configuration
 

@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs by intercepting operation calls on any class without changing its code.</Description>
     <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.DynamicProxy</AssemblyTitle>
-    <VersionPrefix>16.5.1</VersionPrefix>
+    <VersionPrefix>16.5.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;net45;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

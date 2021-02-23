@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.2] - 2021-02-23
+### Modified
+- Audit.HttpClient: Allow injection of audited HttpClients through HttpClientFactory (#374)
+
 ## [16.5.1] - 2021-02-21
 ### Modified
 - Audit.EntityFramework.Core: Fix EF Core when using multiple owned entities (#373)

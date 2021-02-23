@@ -39,6 +39,33 @@ namespace Audit.UnitTest
             .IncludeContentHeaders()
             .EventType("test");
 
+
+        [Test]
+        public void Test_Handler_Constructor_Parameterless()
+        {
+            var handler = new AuditHttpClientHandler();
+            Assert.IsNotNull(handler.InnerHandler);
+        }
+
+        [Test]
+        public void Test_Handler_Constructor_Config()
+        {
+            var handler = new AuditHttpClientHandler(_ => _.IncludeResponseBody());
+            Assert.IsNotNull(handler.InnerHandler);
+        }
+
+        [Test]
+        public void Test_Handler_Constructor_Config_Inner()
+        {
+            var inner = new HttpClientHandler();
+            inner.Properties["x"] = 123;
+            var handler = new AuditHttpClientHandler(_ => _.IncludeResponseBody(), inner);
+            var handlerNullInner = new AuditHttpClientHandler(_ => _.IncludeResponseBody(), null);
+            Assert.IsNotNull(handler.InnerHandler);
+            Assert.IsNull(handlerNullInner.InnerHandler);
+            Assert.AreEqual(123, (handler.InnerHandler as HttpClientHandler).Properties["x"]);
+        }
+
         [Test]
         public async Task Test_HttpAction_InsertOnStartInsertOnEnd()
         {
