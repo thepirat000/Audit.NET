@@ -37,7 +37,7 @@ var httpClient = Audit.Http.ClientFactory.Create(_ => _
 
 > The `ClientFactory.Create` method is just a shortcut to create a new `HttpClient` with a custom `AuditHttpClientHandler` as its message handler.
 
-- If you use `HttpClientFactory` for depencency injection, you can add the message handler with the extension method `AddAuditHttpMessageHandler()` on your startup:
+- If you use ASP .NET dependency injection / `HttpClientFactory`, you can add the message handler with the extension method `AddAuditHandler()` on your startup:
 
 ```c#
 using Audit.Http;
