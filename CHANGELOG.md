@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.3] - 2021-02-26
+### Modified
+- Audit.Mvc / Audit.WebApi: Allow the use of AuditIgnore attribute on the return of the MVC actions `[return:AuditIgnore]` (#375)
+
 ## [16.5.2] - 2021-02-23
 ### Modified
 - Audit.HttpClient: Allow injection of audited HttpClients through HttpClientFactory (#374)

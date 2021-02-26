@@ -97,6 +97,22 @@ namespace Audit.Integration.AspNetCore.Controllers
             return Ok("hi");
         }
 
+        [HttpPost("TestIgnoreResponse")]
+        [return:AuditIgnore]
+        public async Task<IActionResult> TestIgnoreResponse([FromBody] Request request)
+        {
+            await Task.Delay(0);
+            return Ok("hi");
+        }
+
+        [HttpPost("TestIgnoreResponseFilter")]
+        [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
+        [return: AuditIgnore]
+        public async Task<IActionResult> TestIgnoreResponseFilter([FromBody] Request request)
+        {
+            await Task.Delay(0);
+            return Ok("hi from filter");
+        }
 
         [AuditIgnore] // ignored here but will be picked up by the middleware
         [HttpPost("TestResponseHeaders")]

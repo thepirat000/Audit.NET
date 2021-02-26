@@ -169,6 +169,48 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNull(insertEvs[0].Action.Exception);
         }
 
+        public async Task Test_MvcRazorPages_IgnoreResponse()
+        {
+            var insertEvs = new List<AuditEventMvcAction>();
+            var replaceEvs = new List<AuditEventMvcAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(0);
+                    insertEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                    return Guid.NewGuid();
+                })
+                    .OnReplace(async (id, ev) =>
+                    {
+                        await Task.Delay(0);
+                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var customer = new Customer()
+            {
+                Id = 123,
+                Name = "test"
+            };
+
+            var client = new HttpClient();
+
+            //PUT
+            client.Dispose();
+            var json = JsonConvert.SerializeObject(customer);
+            client = new HttpClient();
+            var result = await client.PutAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
+
+            var returnedCustomer = JsonConvert.DeserializeObject<Customer>(await result.Content.ReadAsStringAsync());
+            Assert.AreEqual(customer.Name, returnedCustomer.Name);
+            Assert.AreEqual(customer.Id, returnedCustomer.Id);
+
+            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(0, replaceEvs.Count);
+            Assert.AreEqual("JsonResult", insertEvs[0].Action.ResponseBody.Type);
+            Assert.IsNull(insertEvs[0].Action.ResponseBody.Value);
+        }
+
         public async Task Test_Mvc_Ignore()
         {
             var insertEvs = new List<AuditAction>();
@@ -183,12 +225,17 @@ namespace Audit.Integration.AspNetCore
             var c = new HttpClient();
             var s1 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreme");
             var s2 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreparam?id=123&secret=pass");
+            var s3 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreresponse?id=123&secret=pass");
 
             Assert.IsNotEmpty(s1);
             Assert.IsNotEmpty(s2);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.AreEqual(2, insertEvs.Count);
             Assert.AreEqual(1, insertEvs[0].ActionParameters.Count);
             Assert.AreEqual(123, insertEvs[0].ActionParameters["id"]);
+            Assert.IsNotNull(insertEvs[0].ResponseBody.Value);
+
+            Assert.IsNotNull(s3);
+            Assert.IsNull(insertEvs[1].ResponseBody.Value);
         }
 
         public async Task Test_Mvc_AuditIgnoreAttribute_Middleware_Async()

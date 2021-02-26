@@ -40,6 +40,12 @@ namespace Audit.Integration.AspNetCore.Pages.Test
             return new JsonResult(customer);
         }
 
+        [return: AuditIgnore]
+        public async Task<IActionResult> OnPutAsync([FromBody] Customer customer)
+        {
+            await Task.Delay(0);
+            return new JsonResult(customer);
+        }
     }
 
     public class Customer

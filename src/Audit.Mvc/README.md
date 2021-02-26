@@ -150,7 +150,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 ```
 
 ## Audit Ignore attribute
-To selectively exclude certain controllers, action methods or action parameters, you can decorate them with `AuditIgnore` attribute. 
+To selectively exclude certain controllers, action methods, action parameters or return values, you can decorate them with `AuditIgnore` attribute. 
 
 For example:
 
@@ -171,7 +171,12 @@ public class AccountController : Controller
         // password argument will not be audited
     }
 
-    // ...
+    [HttpGet]
+    [return:AuditIgnore]
+    public IEnumerable<string> GetSecrets(string user)
+    {
+        // the response body of this action will not be audited
+    }
 }
 ```
 
@@ -180,8 +185,14 @@ You can also decorate the razor pages classes, methods or arguments to be ignore
 ```c#
 public class IndexModel : PageModel
 {
+    [return:AuditIgnore]
+    public IActionResult OnGet(string user)
+    {
+        // the response of this action will not be audited
+    }
+
     [AuditIgnore]
-    public void OnGet(string user)
+    public void OnDelete(string user)
     {
         // this action will not be audited
     }
@@ -192,7 +203,6 @@ public class IndexModel : PageModel
     }
 }
 ```
-
 
 ## Output details
 

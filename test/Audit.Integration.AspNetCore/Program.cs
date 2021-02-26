@@ -33,6 +33,10 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_MvcRazorPages_IgnoreResponse");
+                await mvcTests.Test_MvcRazorPages_IgnoreResponse();
+                Console.WriteLine("PASSED - Test_MvcRazorPages_IgnoreResponse");
+
                 Console.WriteLine("START - Test_MvcRazorPages_HappyPath");
                 await mvcTests.Test_MvcRazorPages_HappyPath();
                 Console.WriteLine("PASSED - Test_MvcRazorPages_HappyPath");
@@ -44,6 +48,15 @@ namespace Audit.Integration.AspNetCore
                 Console.WriteLine("START - Test_MvcRazorPages_Exception");
                 await mvcTests.Test_MvcRazorPages_Exception();
                 Console.WriteLine("PASSED - Test_MvcRazorPages_Exception");
+
+
+                Console.WriteLine("START - Test_WebApi_GlobalFilter_IgnoreResponse");
+                await webApiTests.Test_WebApi_GlobalFilter_IgnoreResponse();
+                Console.WriteLine("PASSED - Test_WebApi_GlobalFilter_IgnoreResponse");
+                
+                Console.WriteLine("START - Test_WebApi_Middleware_IgnoreResponse");
+                await webApiTests.Test_WebApi_Mix_IgnoreResponse();
+                Console.WriteLine("PASSED - Test_WebApi_Middleware_IgnoreResponse");
 
                 Console.WriteLine("START - Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd");
                 await webApiTests.Test_WebApi_CreationPolicy_InsertOnStartInsertOnEnd();

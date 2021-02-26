@@ -55,7 +55,6 @@ namespace Audit.Mvc
         public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
 
 #if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0
-        //
         [JsonIgnore]
         internal PageHandlerExecutingContext PageHandlerExecutingContext { get; set; }
         /// <summary>

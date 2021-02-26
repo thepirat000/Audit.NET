@@ -42,7 +42,7 @@ namespace Audit.WebApi
         public async Task BeforeExecutingAsync(HttpActionContext actionContext, IContextWrapper contextWrapper, bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName)
         {
             var request = actionContext.Request;
-            
+
             var auditAction = new AuditApiAction
             {
                 UserName = actionContext.RequestContext?.Principal?.Identity?.Name,
@@ -97,13 +97,14 @@ namespace Audit.WebApi
                     auditAction.ResponseStatusCode = (int)actionExecutedContext.Response.StatusCode;
                     if (includeResponseBody)
                     {
+                        bool ignoreValue = IsResponseExplicitlyIgnored(actionExecutedContext);
                         if (actionExecutedContext.Response.Content is ObjectContent objContent)
                         {
                             auditAction.ResponseBody = new BodyContent
                             {
                                 Type = objContent.ObjectType.Name,
                                 Length = objContent.Headers?.ContentLength,
-                                Value = objContent.Value
+                                Value = ignoreValue ? null : objContent.Value
                             };
                         }
                         else if (actionExecutedContext.Response.Content != null)
@@ -111,7 +112,7 @@ namespace Audit.WebApi
                             var httpContent = actionExecutedContext.Response.Content;
                             auditAction.ResponseBody = new BodyContent
                             {
-                                Value = httpContent.ReadAsStringAsync().Result
+                                Value = ignoreValue ? null : httpContent.ReadAsStringAsync().Result
                             };
 
                             if (httpContent.Headers != null)
@@ -143,6 +144,14 @@ namespace Audit.WebApi
             }
         }
 
+        private bool IsResponseExplicitlyIgnored(HttpActionExecutedContext context)
+        {
+            return (context.ActionContext.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
+                .ReturnTypeCustomAttributes
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true)
+                .Any() == true;
+        }
+
         protected virtual BodyContent GetRequestBody(IContextWrapper contextWrapper)
         {
             var context = contextWrapper.GetHttpContext();
@@ -170,7 +179,7 @@ namespace Audit.WebApi
             var parameters = actionDescriptor.GetParameters();
             if (parameters != null)
             {
-                foreach(var param in parameters)
+                foreach (var param in parameters)
                 {
                     if (param.GetCustomAttributes<AuditIgnoreAttribute>().Any())
                     {

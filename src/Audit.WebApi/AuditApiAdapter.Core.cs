@@ -143,7 +143,7 @@ namespace Audit.WebApi
                     if (includeResponseBody)
                     {
                         var bodyType = context.Result.GetType().GetFullTypeName();
-                        auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = GetResponseBody(context.Result) };
+                        auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = GetResponseBody(context.ActionDescriptor, context.Result) };
                     }
 
                     if (includeResponseHeaders)
@@ -167,8 +167,15 @@ namespace Audit.WebApi
             }
         }
 
-        private object GetResponseBody(IActionResult result)
+        private object GetResponseBody(ActionDescriptor descriptor, IActionResult result)
         {
+            if ((descriptor as ControllerActionDescriptor)?.MethodInfo
+                .ReturnTypeCustomAttributes
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true)
+                .Any() == true)
+            {
+                return null;
+            }
             if (result is ObjectResult or)
             {
                 return or.Value;

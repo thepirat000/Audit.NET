@@ -34,8 +34,18 @@ namespace Audit.Integration.AspNetCore.Controllers
 
         [HttpGet]
         [Route("mvc/ignoreparam")]
-        [Audit(IncludeHeaders = true, IncludeModel = true)]
+        [Audit(IncludeHeaders = true, IncludeModel = true, IncludeResponseBody = true)]
         public async Task<ActionResult> IgnoreParam(int id, [AuditIgnore]string secret)
+        {
+            await Task.Delay(1);
+            return View("Index", new TestModelClass());
+        }
+
+        [HttpGet]
+        [Route("mvc/ignoreresponse")]
+        [Audit(IncludeHeaders = true, IncludeModel = true, IncludeResponseBody = true)]
+        [return:AuditIgnore]
+        public async Task<ActionResult> IgnoreResponse(int id, string secret)
         {
             await Task.Delay(1);
             return View("Index", new TestModelClass());

@@ -110,7 +110,7 @@ namespace Audit.Mvc
                 var bodyType = filterContext.Result?.GetType().GetFullTypeName();
                 if (bodyType != null)
                 {
-                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(filterContext.Result) : null };
+                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(filterContext.ActionDescriptor, filterContext.Result) : null };
                 }
             }
 
@@ -142,7 +142,7 @@ namespace Audit.Mvc
                 var bodyType = filterContext.Result?.GetType().GetFullTypeName();
                 if (bodyType != null)
                 {
-                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(filterContext.Result) : null };
+                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(filterContext.ActionDescriptor, filterContext.Result) : null };
                 }
             }
             var auditScope = httpContext.Items[AuditScopeKey] as AuditScope;
@@ -247,8 +247,15 @@ namespace Audit.Mvc
             return null;
         }
 
-        private object GetResponseBody(IActionResult result)
+        private object GetResponseBody(ActionDescriptor descriptor, IActionResult result)
         {
+            if ((descriptor as ControllerActionDescriptor)?.MethodInfo
+                .ReturnTypeCustomAttributes
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true)
+                .Any() == true)
+            {
+                return null;
+            }
             if (result is ObjectResult or)
             {
                 return or.Value;

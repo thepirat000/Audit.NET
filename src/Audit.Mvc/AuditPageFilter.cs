@@ -137,9 +137,10 @@ namespace Audit.Mvc
                         : httpContext.Response.StatusCode;
 
                 var bodyType = context.Result?.GetType().GetFullTypeName();
+                var method = auditAction.PageHandlerExecutingContext?.HandlerMethod?.MethodInfo;
                 if (bodyType != null)
                 {
-                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(context.Result) : null };
+                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(method, context.Result) : null };
                 }
             }
 
@@ -192,8 +193,14 @@ namespace Audit.Mvc
             return model;
         }
 
-        private object GetResponseBody(IActionResult result)
+        private object GetResponseBody(MethodInfo method, IActionResult result)
         {
+            if (method?.ReturnTypeCustomAttributes
+                .GetCustomAttributes(typeof(AuditIgnoreAttribute), true)
+                .Any() == true)
+            {
+                return null;
+            }
             if (result is PageResult pr)
             {
                 return pr.Page?.BodyContent;

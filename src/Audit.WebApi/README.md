@@ -257,7 +257,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 
 ## Audit Ignore attribute
-To selectively exclude certain controllers, actions or action parameters, you can decorate them with `AuditIgnore` attribute. 
+To selectively exclude certain controllers, actions, action parameters or action responses, you can decorate them with `AuditIgnore` attribute. 
 
 For example:
 
@@ -279,7 +279,13 @@ public class AccountController : Controller
         // password argument will not be audited
     }
 
-    // ...
+    [HttpGet]
+    [return:AuditIgnore]
+    public IEnumerable<string> GetSecrets()
+    {
+        // the return value of this action will not be audited
+    }
+
 }
 ```
 
