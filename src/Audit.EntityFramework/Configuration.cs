@@ -32,44 +32,37 @@ namespace Audit.EntityFramework
         }
 
         internal static void SetAuditEventType<T>(string eventType)
-            
         {
             EnsureConfigFor<T>().AuditEventType = eventType;
         }
 
         internal static void SetIncludeEntityObjects<T>(bool include)
-            
         {
             EnsureConfigFor<T>().IncludeEntityObjects = include;
         }
 
         internal static void SetExcludeValidationResults<T>(bool exclude)
-            
         {
             EnsureConfigFor<T>().ExcludeValidationResults = exclude;
         }
 
         internal static void SetExcludeTransactionId<T>(bool exclude)
-            
         {
             EnsureConfigFor<T>().ExcludeTransactionId = exclude;
         }
 
         internal static void SetEarlySavingAudit<T>(bool earlySaving)
-            
         {
             EnsureConfigFor<T>().EarlySavingAudit = earlySaving;
         }
 
 #if EF_FULL
         internal static void SetIncludeIndependantAssociations<T>(bool include)
-            
         {
             EnsureConfigFor<T>().IncludeIndependantAssociations = include;
         }
 #endif
         internal static void SetMode<T>(AuditOptionMode mode)
-            
         {
             EnsureConfigFor<T>().Mode = mode;
         }
@@ -95,7 +88,6 @@ namespace Audit.EntityFramework
         }
 
         internal static void Reset<T>()
-            
         {
             _currentConfig.TryRemove(typeof(T), out _);
         }
