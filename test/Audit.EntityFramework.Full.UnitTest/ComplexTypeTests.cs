@@ -24,6 +24,12 @@ namespace Audit.EntityFramework.Full.UnitTest
                 .UseDynamicProvider(config =>
                     config.OnInsert(ev => evs.Add(ev.GetEntityFrameworkEvent())));
 
+            // Reset previous config
+            Audit.EntityFramework.Configuration.Setup()
+                .ForAnyContext().Reset();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<WorkContext>().Reset();
+
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext(_ => _.IncludeEntityObjects());
 

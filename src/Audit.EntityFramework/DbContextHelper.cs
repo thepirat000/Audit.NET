@@ -37,7 +37,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public void SetConfig(IAuditDbContext context)
         {
-            var type = context.GetType();
+            var type = context.DbContext.GetType();
             if (!_auditAttributeCache.ContainsKey(type))
             {
                 _auditAttributeCache[type] = type.GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute;

@@ -21,7 +21,7 @@ namespace Audit.EntityFramework
         }
         
         internal static void SetContextEntitySetting<T, TEntity>(Action<IContextEntitySetting<TEntity>> config)
-            where T : IAuditDbContext
+            
         {
             var entitySettings = new ContextEntitySetting<TEntity>();
             config.Invoke(entitySettings);
@@ -32,80 +32,75 @@ namespace Audit.EntityFramework
         }
 
         internal static void SetAuditEventType<T>(string eventType)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().AuditEventType = eventType;
         }
 
         internal static void SetIncludeEntityObjects<T>(bool include)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().IncludeEntityObjects = include;
         }
 
         internal static void SetExcludeValidationResults<T>(bool exclude)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().ExcludeValidationResults = exclude;
         }
 
         internal static void SetExcludeTransactionId<T>(bool exclude)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().ExcludeTransactionId = exclude;
         }
 
         internal static void SetEarlySavingAudit<T>(bool earlySaving)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().EarlySavingAudit = earlySaving;
         }
 
 #if EF_FULL
         internal static void SetIncludeIndependantAssociations<T>(bool include)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().IncludeIndependantAssociations = include;
         }
 #endif
         internal static void SetMode<T>(AuditOptionMode mode)
-            where T : IAuditDbContext
+            
         {
             EnsureConfigFor<T>().Mode = mode;
         }
 
         internal static void IncludeEntity<TContext>(Type entityType)
-            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IncludedTypes.Add(entityType);
         }
 
         internal static void IgnoreEntity<TContext>(Type entityType)
-            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IgnoredTypes.Add(entityType);
         }
 
         internal static void IgnoredEntitiesFilter<TContext>(Func<Type, bool> predicate)
-            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IgnoredTypesFilter = predicate;
         }
 
         internal static void IncludedEntitiesFilter<TContext>(Func<Type, bool> predicate)
-            where TContext : IAuditDbContext
         {
             EnsureConfigFor<TContext>().IncludedTypesFilter = predicate;
         }
 
         internal static void Reset<T>()
-            where T : IAuditDbContext
+            
         {
             _currentConfig.TryRemove(typeof(T), out _);
         }
 
         internal static EfSettings EnsureConfigFor<T>()
-            where T : IAuditDbContext
         {
             var t = typeof(T);
             EfSettings config;
@@ -118,7 +113,6 @@ namespace Audit.EntityFramework
         }
 
         internal static EfEntitySettings EnsureConfigForEntity<T, TEntity>()
-            where T : IAuditDbContext
         {
             var tEntity = typeof(TEntity);
             var efSettings = EnsureConfigFor<T>();

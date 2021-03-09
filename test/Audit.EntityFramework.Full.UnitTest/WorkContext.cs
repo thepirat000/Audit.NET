@@ -16,7 +16,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;
             helper.SetConfig(auditDbContext);
-            
+
 
             Database.SetInitializer(new MyInitializer());
         }
@@ -66,4 +66,5 @@ namespace Audit.EntityFramework.Full.UnitTest
         public string Street { get; set; }
         public string City { get; set; }
     }
+
 }

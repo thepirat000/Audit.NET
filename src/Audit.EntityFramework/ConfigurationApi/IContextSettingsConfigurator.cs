@@ -9,7 +9,6 @@ namespace Audit.EntityFramework.ConfigurationApi
     /// </summary>
     /// <typeparam name="T">The AuditDbContext specific type</typeparam>
     public interface IContextSettingsConfigurator<T>
-        where T : IAuditDbContext
     {
         /// <summary>
         /// Sets the audit event type to use.

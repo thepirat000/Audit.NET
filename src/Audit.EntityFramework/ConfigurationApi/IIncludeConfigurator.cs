@@ -7,7 +7,6 @@ namespace Audit.EntityFramework.ConfigurationApi
     /// </summary>
     /// <typeparam name="T">The AuditDbContext type</typeparam>
     public interface IIncludeConfigurator<T>
-        where T : IAuditDbContext
     {
         /// <summary>
         /// Includes the given entity type.

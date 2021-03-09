@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.4] - 2021-03-09
+### Modified
+- Audit.EntityFramework / Audit.EntityFramework.Core: Removing type constraint for EF configuration `ForContext<T>` to allow multiple DbContext to be audited without 
+inheriting from `AuditDbContext` and allowing fluent configuration for each context separately (#207)
+
 ## [16.5.3] - 2021-02-26
 ### Modified
 - Audit.Mvc / Audit.WebApi: Allow the use of AuditIgnore attribute on the return of the MVC actions `[return:AuditIgnore]` (#375)

@@ -3,7 +3,6 @@ using System;
 namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ExcludeConfigurator<T> : IExcludeConfigurator<T>
-        where T : IAuditDbContext
     {
         public IExcludeConfigurator<T> Ignore(Type entityType)
         {
