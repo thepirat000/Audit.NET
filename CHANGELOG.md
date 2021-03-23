@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.5] - 2021-03-22
+- Audit.NET.AzureStorage: Call TableOperation.InsertOrMerge to avoid EntityAlreadyExists Conflict (409) exception
+- Audit.EntityFramework / Audit.EntityFramework.Core: Explicit mapper enhancements for Entity Framework Data Provider. 
+Allow mapping from entries not mapped to a type (i.e. implicitly created join tables) (#381)
+
 ## [16.5.4] - 2021-03-09
 ### Modified
 - Audit.EntityFramework / Audit.EntityFramework.Core: Removing type constraint for EF configuration `ForContext<T>` to allow multiple DbContext to be audited without 

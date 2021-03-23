@@ -27,6 +27,107 @@ namespace Audit.EntityFramework.Core.UnitTest
             new BlogsContext().Database.EnsureCreated();
         }
 
+#if EF_CORE_5
+        [Test]
+        public void Test_EF_Core_ManyToMany_NoJoinEntity()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup().UseDynamicProvider(_ => _.OnInsert(ev =>
+            {
+                evs.Add(ev.GetEntityFrameworkEvent());
+            }));
+            using (var context = new ManyToManyContext())
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                var tag1 = new ManyToManyContext.Tag() { Id = 101, Text = "tag 1" };
+                var tag2 = new ManyToManyContext.Tag() { Id = 102, Text = "tag 2" };
+                var post = new ManyToManyContext.Post()
+                {
+                    Id = 10,
+                    Name = "test",
+                    Tags = new List<ManyToManyContext.Tag>() { tag1, tag2 }
+                };
+                context.Posts.Add(post);
+                context.SaveChanges();
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(5, evs[0].Entries.Count);
+            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "Tags" && e.Action == "Insert" && e.ColumnValues["Text"]?.ToString() == "tag 1"));
+            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "Tags" && e.Action == "Insert" && e.ColumnValues["Text"]?.ToString() == "tag 2"));
+            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "Posts" && e.Action == "Insert" && e.ColumnValues["Name"]?.ToString() == "test"));
+            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "PostTag" && e.Action == "Insert" && e.ColumnValues["PostsId"]?.ToString() == "10" && e.ColumnValues["TagsId"]?.ToString() == "101"));
+            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "PostTag" && e.Action == "Insert" && e.ColumnValues["PostsId"]?.ToString() == "10" && e.ColumnValues["TagsId"]?.ToString() == "102"));
+        }
+
+        [Test]
+        public void Test_EF_Core_ManyToMany_NoJoinEntity_EFProvider()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(_ => _
+                    .AuditTypeExplicitMapper(map => map
+                        .Map<ManyToManyContext.Post, ManyToManyContext.Audit_Post>((post, auditPost) =>
+                        {
+                            auditPost.PostId = post.Id;
+                            auditPost.Name = post.Name;
+                        })
+                        .Map<ManyToManyContext.Tag, ManyToManyContext.Audit_Tag>((tag, auditTag) =>
+                        {
+                            auditTag.TagId = tag.Id;
+                            auditTag.Text = tag.Text;
+                        })
+                        .MapTable("PostTag", (EventEntry ent, ManyToManyContext.Audit_PostTag auditPostTag) =>
+                        {
+                            auditPostTag.Extra = "extra";
+                        })
+                        .AuditEntityAction((ev, ent, obj) =>
+                        {
+                            ((dynamic)obj).Action = ent.Action;
+                        }))
+                    .IgnoreMatchedProperties(t => !(t == typeof(ManyToManyContext.Audit_PostTag))));
+
+
+
+            using (var context = new ManyToManyContext())
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                // Add Post 10 related to tag 101 and 102
+                var tag1 = new ManyToManyContext.Tag() { Id = 101, Text = "tag 1" };
+                var tag2 = new ManyToManyContext.Tag() { Id = 102, Text = "tag 2" };
+                var post = new ManyToManyContext.Post()
+                {
+                    Id = 10,
+                    Name = "test",
+                    Tags = new List<ManyToManyContext.Tag>() { tag1, tag2 }
+                };
+                context.Posts.Add(post);
+                context.SaveChanges();
+
+                // Remove Post 10 relation with tag 101
+                post = context.Posts.Include(p => p.Tags).FirstOrDefault(p => p.Id == 10);
+                post.Tags.Remove(post.Tags.First(t => t.Id == 101));
+                context.SaveChanges();
+            }
+
+            // Assert
+            using (var context = new ManyToManyContext())
+            {
+                Assert.True(context.Audit_Posts.Any(p => p.PostId == 10 && p.Action == "Insert"));
+                Assert.True(context.Audit_Tags.Any(t => t.TagId == 101 && t.Action == "Insert"));
+                Assert.True(context.Audit_Tags.Any(t => t.TagId == 102 && t.Action == "Insert"));
+                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == 10 && pt.Action == "Insert" && pt.Extra == "extra"));
+                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 102 && pt.PostsId == 10 && pt.Action == "Insert" && pt.Extra == "extra"));
+                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == 10 && pt.Action == "Delete" && pt.Extra == "extra"));
+            }
+
+        }
+#endif
+
 #if EF_CORE_3 || EF_CORE_5
         [Test]
         public void Test_EF_Core_OwnedSingleMultiple()

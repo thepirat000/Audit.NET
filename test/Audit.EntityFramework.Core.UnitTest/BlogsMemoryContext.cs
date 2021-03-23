@@ -9,6 +9,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     public class BlogsMemoryContext : AuditDbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<UserAudit> UserAudits { get; set; }
 
         public BlogsMemoryContext()
         { }
@@ -39,4 +40,15 @@ namespace Audit.EntityFramework.Core.UnitTest
         public int Id { get; set; }
         public string Name { get; set; }
     }
+    [AuditIgnore]
+    public class UserAudit 
+    {
+        [Key]
+        public int AuditId { get; set; }
+        public int UserId { get; set; }
+        public string Name { get; set; }
+        public string AuditUser { get; set; }
+        public string Action { get; set; }
+    }
+
 }

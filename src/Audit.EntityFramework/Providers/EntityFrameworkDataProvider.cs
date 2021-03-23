@@ -3,6 +3,8 @@ using Audit.Core;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Audit.EntityFramework.ConfigurationApi;
 #if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -28,10 +30,10 @@ namespace Audit.EntityFramework.Providers
         private Func<Type, EventEntry, Type> _auditTypeMapper;
         private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
+        private Func<EventEntry, Type> _explicitMapper;
 
         public EntityFrameworkDataProvider()
         {
-
         }
 
         public EntityFrameworkDataProvider(Action<ConfigurationApi.IEntityFrameworkProviderConfigurator> config)
@@ -44,6 +46,7 @@ namespace Audit.EntityFramework.Providers
                 _auditTypeMapper = efConfig._auditTypeMapper;
                 _dbContextBuilder = efConfig._dbContextBuilder;
                 _ignoreMatchedPropertiesFunc = efConfig._ignoreMatchedPropertiesFunc;
+                _explicitMapper = efConfig._explicitMapper;
             }
         }
 
@@ -62,7 +65,13 @@ namespace Audit.EntityFramework.Providers
             get { return _auditEntityAction; }
             set { _auditEntityAction = value; }
         }
-                
+
+        public Func<EventEntry, Type> ExplicitMapper
+        {
+            get { return _explicitMapper; }
+            set { _explicitMapper = value; }
+        }
+
         public Func<Type, bool> IgnoreMatchedPropertiesFunc
         {
             get { return _ignoreMatchedPropertiesFunc; }
@@ -89,23 +98,37 @@ namespace Audit.EntityFramework.Providers
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach(var entry in efEvent.EntityFrameworkEvent.Entries)
             {
-                var type = GetEntityType(entry, localDbContext);
-                if (type != null)
+                Type mappedType = _explicitMapper?.Invoke(entry);
+                object auditEntity = null;
+                if (mappedType != null)
                 {
-                    entry.EntityType = type;
-                    var mappedType = _auditTypeMapper?.Invoke(type, entry);
-                    if (mappedType != null)
+                    // Explicit mapping (Table -> Type)
+                    auditEntity = CreateAuditEntityExplicit(mappedType, entry);
+                }
+                else
+                {
+                    // Implicit mapping (Type -> Type)
+                    Type type = GetEntityType(entry, localDbContext);
+                    if (type != null)
                     {
-                        var auditEntity = CreateAuditEntity(type, mappedType, entry);
-                        if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                        entry.EntityType = type;
+                        mappedType = _auditTypeMapper?.Invoke(type, entry);
+                        if (mappedType != null)
                         {
-#if EF_FULL
-                            auditDbContext.Set(mappedType).Add(auditEntity);
-#else
-                            auditDbContext.Add(auditEntity);
-#endif
-                            save = true;
+                            auditEntity = CreateAuditEntity(type, mappedType, entry);
                         }
+                    }
+                }
+                if (auditEntity != null)
+                {
+                    if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                    {
+#if EF_FULL
+                        auditDbContext.Set(mappedType).Add(auditEntity);
+#else
+                        auditDbContext.Add(auditEntity);
+#endif
+                        save = true;
                     }
                 }
             }
@@ -134,25 +157,49 @@ namespace Audit.EntityFramework.Providers
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
             {
-                var type = GetEntityType(entry, localDbContext);
-                if (type != null)
+                Type mappedType = _explicitMapper?.Invoke(entry);
+                object auditEntity = null;
+                if (mappedType != null)
                 {
-                    entry.EntityType = type;
-                    var mappedType = _auditTypeMapper?.Invoke(type, entry);
-                    if (mappedType != null)
+                    // Explicit mapping (Table -> Type)
+                    auditEntity = CreateAuditEntityExplicit(mappedType, entry);
+                }
+                else
+                {
+                    // Implicit mapping (Type -> Type)
+                    Type type = GetEntityType(entry, localDbContext);
+                    if (type != null)
                     {
-                        var auditEntity = CreateAuditEntity(type, mappedType, entry);
-                        if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                        entry.EntityType = type;
+                        mappedType = _auditTypeMapper?.Invoke(type, entry);
+                        if (mappedType != null)
                         {
-#if EF_FULL
-                            auditDbContext.Set(mappedType).Add(auditEntity);
-#else
-                            await auditDbContext.AddAsync(auditEntity);
-#endif
-                            save = true;
+                            auditEntity = CreateAuditEntity(type, mappedType, entry);
                         }
                     }
                 }
+                if (auditEntity != null)
+                {
+                    if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                    {
+#if EF_FULL
+                        auditDbContext.Set(mappedType).Add(auditEntity);
+#else
+                        await auditDbContext.AddAsync(auditEntity);
+#endif
+                        save = true;
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
             }
             if (save)
             {
@@ -203,6 +250,22 @@ namespace Audit.EntityFramework.Providers
                 {
                     var value = field.GetValue(entity);
                     auditFields[field.Name].SetValue(auditEntity, value);
+                }
+            }
+            return auditEntity;
+        }
+
+        private object CreateAuditEntityExplicit(Type auditType, EventEntry entry)
+        {
+            var auditEntity = Activator.CreateInstance(auditType);
+            if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
+            {
+                var auditFields = auditType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.GetSetMethod() != null)
+                    .ToDictionary(k => k.Name);
+                foreach (var field in entry.ColumnValues.Where(cv => auditFields.ContainsKey(cv.Key)))
+                {
+                    auditFields[field.Key].SetValue(auditEntity, field.Value);
                 }
             }
             return auditEntity;

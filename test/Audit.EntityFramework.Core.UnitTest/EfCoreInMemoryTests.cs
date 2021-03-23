@@ -68,6 +68,129 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual(2L, evs[1].CustomFields["TestCustomField"]);
         }
 
+        [Test]
+        public void Test_EF_Provider_ExplicitMapper_MapExplicit()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false)
+                    .ExcludeTransactionId(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .AuditTypeExplicitMapper(config => config
+                        .MapExplicit<UserAudit>(ee => ee.Table == "User", (ee, userAudit) =>
+                        {
+                            userAudit.AuditId = 1;
+                            userAudit.UserId = (int)ee.ColumnValues["Id"];
+                            userAudit.AuditUser = "us";
+                        })
+                        .Map((User user, UserAudit userAudit) =>
+                        {
+                            // Should never get here, since the user table is handled explicitly
+                            userAudit.Action = "Invalid";
+                        })
+                        .AuditEntityAction((ee, ent, obj) =>
+                        {
+                            ((UserAudit)obj).Action = ent.Action;
+                            ((UserAudit)obj).AuditUser += "er";
+                        }))
+                    .IgnoreMatchedProperties(false));
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_user_test")
+                .Options;
+            var id = Rnd.Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "123",
+                    Token = "token"
+                };
+                ctx.Users.Add(user);
+                ctx.SaveChanges();
+            }
+
+            // Assert
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var audit = ctx.UserAudits.Single(u => u.UserId == id);
+                Assert.AreEqual(1, audit.AuditId);
+                Assert.AreEqual("Insert", audit.Action);
+                Assert.AreEqual("user", audit.AuditUser);
+                Assert.AreEqual("test", audit.Name);
+                Assert.AreEqual(id, audit.UserId);
+            }
+        }
+
+
+        [Test]
+        public async Task Test_EF_Provider_ExplicitMapper_MapExplicit_Async()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false)
+                    .ExcludeTransactionId(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .AuditTypeExplicitMapper(config => config
+                        .MapExplicit<UserAudit>(ee => ee.Table == "User", (ee, userAudit) =>
+                        {
+                            userAudit.AuditId = 1;
+                            userAudit.UserId = (int)ee.ColumnValues["Id"];
+                            userAudit.AuditUser = "us";
+                        })
+                        .Map((User user, UserAudit userAudit) =>
+                        {
+                            // Should never get here, since the user table is handled explicitly
+                            userAudit.Action = "Invalid";
+                        })
+                        .AuditEntityAction((ee, ent, obj) =>
+                        {
+                            ((UserAudit)obj).Action = ent.Action;
+                            ((UserAudit)obj).AuditUser += "er";
+                        }))
+                    .IgnoreMatchedProperties(false));
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_user_test")
+                .Options;
+            var id = Rnd.Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                await ctx.Database.EnsureDeletedAsync();
+                await ctx.Database.EnsureCreatedAsync();
+
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "123",
+                    Token = "token"
+                };
+                ctx.Users.Add(user);
+                await ctx.SaveChangesAsync();
+            }
+
+            // Assert
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var audit = ctx.UserAudits.Single(u => u.UserId == id);
+                Assert.AreEqual(1, audit.AuditId);
+                Assert.AreEqual("Insert", audit.Action);
+                Assert.AreEqual("user", audit.AuditUser);
+                Assert.AreEqual("test", audit.Name);
+                Assert.AreEqual(id, audit.UserId);
+            }
+        }
+
 
 #if EF_CORE_5
 

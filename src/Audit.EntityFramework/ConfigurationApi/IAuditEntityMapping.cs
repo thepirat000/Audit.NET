@@ -73,6 +73,26 @@ namespace Audit.EntityFramework.ConfigurationApi
         IAuditEntityMapping Map<TSourceEntity>(Func<EventEntry, Type> mapper);
 
         /// <summary>
+        /// Maps an entry that matches a given <paramref name="predicate"/>, to the given audit type <typeparamref name="TAuditEntity"/> 
+        /// and executes the <paramref name="entityAction"/> on the created audit entity.
+        /// Useful for entities that are not mapped to a type (i.e. implicitly created join tables)
+        /// </summary>
+        /// <param name="predicate">A function to test the Event Entries for a condition. Return true</param>
+        /// <param name="entityAction">An action to perform on the audit entity before saving it</param>
+        /// <typeparam name="TAuditEntity">The entity type that holds the audit of the type audited</typeparam>
+        IAuditEntityMapping MapExplicit<TAuditEntity>(Func<EventEntry, bool> predicate, Action<EventEntry, TAuditEntity> entityAction = null);
+
+        /// <summary>
+        /// Maps the entries from the given table name <paramref name="tableName"/> (case sensitive), to the given audit type <typeparamref name="TAuditEntity"/> 
+        /// and executes the <paramref name="entityAction"/> on the created audit entity.
+        /// Useful for entities that are not mapped to a type (i.e. implicitly created join tables)
+        /// </summary>
+        /// <param name="tableName">The table name</param>
+        /// <param name="entityAction">An action to perform on the audit entity before saving it</param>
+        /// <typeparam name="TAuditEntity">The entity type that holds the audit of the type audited</typeparam>
+        IAuditEntityMapping MapTable<TAuditEntity>(string tableName, Action<EventEntry, TAuditEntity> entityAction = null);
+
+        /// <summary>
         /// Defines a common action to perform to all the audit entities before saving. 
         /// </summary>
         /// <param name="entityAction">A default action to perform on the audit entity before saving it</param>

@@ -1,6 +1,7 @@
 ﻿using System;
 using Audit.Core;
 using System.Reflection;
+using System.Collections.Generic;
 #if EF_CORE
 using Microsoft.EntityFrameworkCore;
 #else
@@ -16,6 +17,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         internal Func<Type, EventEntry, Type> _auditTypeMapper;
         internal Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
         internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
+        internal Func<EventEntry, Type> _explicitMapper;
 
         public IEntityFrameworkProviderConfigurator UseDbContext(Func<AuditEventEntityFramework, DbContext> dbContextBuilder)
         {
@@ -58,6 +60,7 @@ namespace Audit.EntityFramework.ConfigurationApi
             config.Invoke(mapping);
             _auditTypeMapper = mapping.GetMapper();
             _auditEntityAction = mapping.GetAction();
+            _explicitMapper = mapping.GetExplicitMapper();
             return this;
         }
 

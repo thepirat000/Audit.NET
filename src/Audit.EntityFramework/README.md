@@ -127,7 +127,8 @@ The following settings can be configured per DbContext or globally:
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the context name). Can contain the following placeholders: 
    - \{context}: replaced with the Db Context type name.
    - \{database}: replaced with the database name.
-- **IncludeIndependantAssociations**: Value to indicate if the Independant Associations should be included. Default is false. (Only for EF <=6.2, since EF Core does not support many-to-many relations without a join entity. Check [this](https://github.com/aspnet/EntityFrameworkCore/issues/1368)).
+- **IncludeIndependantAssociations**: Value to indicate if the Independant Associations should be included. Default is false. (Only for EF <= 6.2)
+ > Note: EF Core <= 3 does not support many-to-many relations without a join entity, and for EF Core 5 the many-to-many relations are normally included on the audit event entries. 
 - **ExcludeTransactionId**: Value to indicate if the Transaction IDs should be excluded from the output and not be retrieved (default is false to include the Transaction IDs).
 - **ExcludeValidationResults**: Value to indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
 - **EarlySavingAudit**: Value to indicate if the audit event should be saved *before* the entity saving operation takes place. (Default is false to save the audit event after the entity saving operation completes or fails)
@@ -385,7 +386,7 @@ Audit.Core.Configuration.DataProvider = new EntityFrameworkDataProvider()
 };
 ```
 
-Or use the [fluent API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api) `UseEntityFramework` method:
+Or use the [fluent API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api) `UseEntityFramework` method, this is the recommended approach:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
@@ -408,6 +409,7 @@ Mandatory:
 - **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
 
 Optional:
+- **ExplicitMapper**: A function that excplicitly maps an entry to its audited type, useful to configure mapping when no entity type is associated with a table, or to setup complex mapping rules.
 - **UseDbContext**: A function that returns the DbContext to use for storing the audit events, by default it will use the same context being audited. 
 - **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties like user name or the audit date. It can also be used to filter out audit entities. Make this function return a boolean value to indicate whether to include the entity on the output log. 
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is false).
@@ -597,6 +599,43 @@ Audit.Core.Configuration.Setup()
 
 > - Updates to `Blog` table -> Audit to `Audit_Updates_Blog` table
 > - Any other operation on `Blog` table -> Audit to `Audit_Blog` table
+
+
+#### Map Many to Many relations without join entity:
+
+When you want to audit many to many relations which are not mapped to an entity type, i.e. implicitly created join tables.
+You have to use the `AuditTypeExplicitMapper` and set up the mapping of the relation table by using `MapTable` or `MapExplicit` methods.
+
+For example, consider the following model:
+
+![Audit entities Many To Many](https://i.imgur.com/HHRs4aw.png)
+
+There are two entities, `Post` and `Tag` with a Many to Many relation between them (note there is no relation entity). 
+Also you want to audit the `Post` and `Tag` tables to the `Audit_Post` and `Audit_Tag` tables respectively, and
+you want to audit the `PostTag` relation table to an `Audit_PostTag` table.
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(_ => _
+        .AuditTypeExplicitMapper(map => map
+            .Map<Post, Audit_Post>()
+            .Map<Tag, Audit_Tag>()
+            .MapTable<Audit_PostTag>("PostTag", (EventEntry ent, Audit_PostTag auditPostTag) =>
+            {
+                auditPostTag.PostId = ent.ColumnValues["PostsId"];
+                auditPostTag.TagId = ent.ColumnValues["TagsId"];
+            })
+            .AuditEntityAction((ev, entry, auditEntity) =>
+            {
+                ((dynamic)auditEntity).AuditAction = entry.Action;
+                ((dynamic)auditEntity).AuditDate = DateTime.UtcNow;
+            })));
+```
+
+> The first parameter of `MapTable` is the table name to which the mapping will apply. 
+> The generic parameter is the target audit type.
+> You can optionally pass an action to execute on the audit entity as the second parameter. 
+> If property matching is enabled for the target type, the framework will map the Column values to the entity Property values.
 
 
 # Contribute

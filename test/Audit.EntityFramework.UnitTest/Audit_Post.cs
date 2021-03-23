@@ -12,18 +12,12 @@ namespace Audit.EntityFramework.UnitTest
     using System;
     using System.Collections.Generic;
     
-    public partial class Post
+    public partial class Audit_Post
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Post()
-        {
-            this.Tags = new HashSet<Tag>();
-        }
-    
-        public int PostId { get; set; }
+        public int Id { get; set; }
+        public string PostId { get; set; }
         public string Text { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Tag> Tags { get; set; }
+        public string AuditAction { get; set; }
+        public string AuditDate { get; set; }
     }
 }

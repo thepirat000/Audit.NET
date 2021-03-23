@@ -33,6 +33,118 @@ namespace Audit.EntityFramework.Full.UnitTest
         }
 
         [Test]
+        public void Test_EF_Provider_ExplicitMapper_MapExplicit()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogContext>(x => x
+                    .IncludeEntityObjects(false)
+                    .ExcludeTransactionId(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .AuditTypeExplicitMapper(config => config
+                        .MapExplicit<AuditLog>(ee => ee.Table == "Blog", (ee, log) =>
+                        {
+                            log.AuditUsername = "us";
+                            log.TableName = "Blog";
+                            log.TablePK = (int)ee.ColumnValues["Id"];
+                            log.Title = (string)ee.ColumnValues["Title"];
+                            log.AuditDate = DateTime.UtcNow;
+                        })
+                        .Map((Blog blog, AuditLog log) =>
+                        {
+                            // Should never get here, since the Blog table is handled explicitly
+                            log.AuditAction = "Invalid";
+                        })
+                        .AuditEntityAction((ee, ent, obj) =>
+                        {
+                            ((AuditLog)obj).AuditAction = ent.Action;
+                            ((AuditLog)obj).AuditUsername += "er";
+                        }))
+                    .IgnoreMatchedProperties(true));
+            var title = $"T{new Random().Next(10, 10000)}";
+            using (var ctx = new BlogContext())
+            {
+                ctx.Database.CreateIfNotExists();
+
+                var blog = new Blog()
+                {
+                    Title = title,
+                    Posts = null
+                };
+                ctx.Blogs.Add(blog);
+                ctx.SaveChanges();
+            }
+
+            // Assert
+            using (var ctx = new BlogContext())
+            {
+                var audit = ctx.Audits.Single(u => u.Title == title);
+                
+                Assert.AreEqual("Blog", audit.TableName);
+                Assert.AreEqual("Insert", audit.AuditAction);
+                Assert.AreEqual("user", audit.AuditUsername);
+                Assert.AreEqual(title, audit.Title);
+            }
+        }
+
+        [Test]
+        public async Task Test_EF_Provider_ExplicitMapper_MapExplicit_Async()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogContext>(x => x
+                    .IncludeEntityObjects(false)
+                    .ExcludeTransactionId(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .AuditTypeExplicitMapper(config => config
+                        .MapExplicit<AuditLog>(ee => ee.Table == "Blog", (ee, log) =>
+                        {
+                            log.AuditUsername = "us";
+                            log.TableName = "Blog";
+                            log.TablePK = (int)ee.ColumnValues["Id"];
+                            log.Title = (string)ee.ColumnValues["Title"];
+                            log.AuditDate = DateTime.UtcNow;
+                        })
+                        .Map((Blog blog, AuditLog log) =>
+                        {
+                            // Should never get here, since the Blog table is handled explicitly
+                            log.AuditAction = "Invalid";
+                        })
+                        .AuditEntityAction((ee, ent, obj) =>
+                        {
+                            ((AuditLog)obj).AuditAction = ent.Action;
+                            ((AuditLog)obj).AuditUsername += "er";
+                        }))
+                    .IgnoreMatchedProperties(true));
+            var title = $"T{new Random().Next(10, 10000)}";
+            using (var ctx = new BlogContext())
+            {
+                ctx.Database.CreateIfNotExists();
+
+                var blog = new Blog()
+                {
+                    Title = title,
+                    Posts = null
+                };
+                ctx.Blogs.Add(blog);
+                await ctx.SaveChangesAsync();
+            }
+
+            // Assert
+            using (var ctx = new BlogContext())
+            {
+                var audit = await ctx.Audits.SingleAsync(u => u.Title == title);
+
+                Assert.AreEqual("Blog", audit.TableName);
+                Assert.AreEqual("Insert", audit.AuditAction);
+                Assert.AreEqual("user", audit.AuditUsername);
+                Assert.AreEqual(title, audit.Title);
+            }
+        }
+
+        [Test]
         public void Test_EF_EntityValidation()
         {
             var evs = new List<AuditEvent>();
