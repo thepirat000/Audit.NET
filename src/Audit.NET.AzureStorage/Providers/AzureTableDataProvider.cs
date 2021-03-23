@@ -64,7 +64,7 @@ namespace Audit.AzureTableStorage.Providers
         {
             var table = EnsureTable(auditEvent);
             var entity = GetTableEntity(auditEvent);
-            table.ExecuteAsync(TableOperation.Insert(entity)).GetAwaiter().GetResult();
+            table.ExecuteAsync(TableOperation.InsertOrMerge(entity)).GetAwaiter().GetResult();
             return new [] { entity.PartitionKey, entity.RowKey };
         }
 
@@ -72,7 +72,7 @@ namespace Audit.AzureTableStorage.Providers
         {
             var table = EnsureTable(auditEvent);
             var entity = GetTableEntity(auditEvent);
-            await table.ExecuteAsync(TableOperation.Insert(entity));
+            await table.ExecuteAsync(TableOperation.InsertOrMerge(entity));
             return new [] { entity.PartitionKey, entity.RowKey };
         }
                 
