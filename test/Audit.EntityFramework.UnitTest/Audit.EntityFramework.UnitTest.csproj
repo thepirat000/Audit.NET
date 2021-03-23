@@ -83,15 +83,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audit_Post.cs">
-      <DependentUpon>ModelIdentity.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Audit_PostTag.cs">
-      <DependentUpon>ModelIdentity.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Audit_Tag.cs">
-      <DependentUpon>ModelIdentity.tt</DependentUpon>
-    </Compile>
     <Compile Include="Blog.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -134,12 +125,9 @@
     </Compile>
     <Compile Include="EfTests.cs" />
     <Compile Include="Post.cs">
-      <DependentUpon>ModelIdentity.tt</DependentUpon>
+      <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tag.cs">
-      <DependentUpon>ModelIdentity.tt</DependentUpon>
-    </Compile>
     <Compile Include="TestInitializerInNoNamespace.cs" />
   </ItemGroup>
   <ItemGroup>

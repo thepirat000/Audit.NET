@@ -6,24 +6,19 @@
 //     Manual changes to this file will be overwritten if the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-
 namespace Audit.EntityFramework.UnitTest
 {
     using System;
     using System.Collections.Generic;
-    
+
     public partial class Post
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Post()
-        {
-            this.Tags = new HashSet<Tag>();
-        }
-    
-        public int PostId { get; set; }
-        public string Text { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Tag> Tags { get; set; }
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public System.DateTime DateCreated { get; set; }
+        public string Content { get; set; }
+        public int BlogId { get; set; }
+
+        public virtual Blog Blog { get; set; }
     }
 }
