@@ -181,6 +181,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var id = Guid.NewGuid().ToString().Substring(0, 8);
             using (var context = new BlogsContext())
             {
+                context.ExcludeTransactionId = false;
                 using (var tran = context.Database.BeginTransaction())
                 {
                     var blog = context.Blogs.First();
