@@ -45,7 +45,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var tag2 = new ManyToManyContext.Tag() { Id = 102, Text = "tag 2" };
                 var post = new ManyToManyContext.Post()
                 {
-                    Id = 10,
+                    Id = "10",
                     Name = "test",
                     Tags = new List<ManyToManyContext.Tag>() { tag1, tag2 }
                 };
@@ -71,7 +71,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .AuditTypeExplicitMapper(map => map
                         .Map<ManyToManyContext.Post, ManyToManyContext.Audit_Post>((post, auditPost) =>
                         {
-                            auditPost.PostId = post.Id;
+                            auditPost.Id = "test";
+                            auditPost.PostId = int.Parse(post.Id);
                             auditPost.Name = post.Name;
                         })
                         .Map<ManyToManyContext.Tag, ManyToManyContext.Audit_Tag>((tag, auditTag) =>
@@ -87,7 +88,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         {
                             ((dynamic)obj).Action = ent.Action;
                         }))
-                    .IgnoreMatchedProperties(t => !(t == typeof(ManyToManyContext.Audit_PostTag))));
+                    .IgnoreMatchedProperties(t => t == typeof(ManyToManyContext.Tag) || t == typeof(ManyToManyContext.Post)));
 
 
 
@@ -101,7 +102,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var tag2 = new ManyToManyContext.Tag() { Id = 102, Text = "tag 2" };
                 var post = new ManyToManyContext.Post()
                 {
-                    Id = 10,
+                    Id = "10",
                     Name = "test",
                     Tags = new List<ManyToManyContext.Tag>() { tag1, tag2 }
                 };
@@ -109,7 +110,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 context.SaveChanges();
 
                 // Remove Post 10 relation with tag 101
-                post = context.Posts.Include(p => p.Tags).FirstOrDefault(p => p.Id == 10);
+                post = context.Posts.Include(p => p.Tags).FirstOrDefault(p => p.Id == "10");
                 post.Tags.Remove(post.Tags.First(t => t.Id == 101));
                 context.SaveChanges();
             }
@@ -120,9 +121,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.True(context.Audit_Posts.Any(p => p.PostId == 10 && p.Action == "Insert"));
                 Assert.True(context.Audit_Tags.Any(t => t.TagId == 101 && t.Action == "Insert"));
                 Assert.True(context.Audit_Tags.Any(t => t.TagId == 102 && t.Action == "Insert"));
-                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == 10 && pt.Action == "Insert" && pt.Extra == "extra"));
-                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 102 && pt.PostsId == 10 && pt.Action == "Insert" && pt.Extra == "extra"));
-                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == 10 && pt.Action == "Delete" && pt.Extra == "extra"));
+                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == "10" && pt.Action == "Insert" && pt.Extra == "extra"));
+                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 102 && pt.PostsId == "10" && pt.Action == "Insert" && pt.Extra == "extra"));
+                Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == "10" && pt.Action == "Delete" && pt.Extra == "extra"));
             }
 
         }

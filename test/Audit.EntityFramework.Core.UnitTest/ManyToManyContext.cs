@@ -8,16 +8,24 @@ namespace Audit.EntityFramework.Core.UnitTest
     public class ManyToManyContext : AuditDbContext
     {
         [AuditIgnore]
-        public class Audit_Post
+        public class Audit_Post : BaseAudit
         {
-            public int Id { get; set; }
+            public new string Id { get; set; }
             public string Action { get; set; }
             public int PostId { get; set; }
             public string Name { get; set; }
         }
+
+        public abstract class BaseAudit
+        {
+            public int Id { get; set; }
+            public string AuditAction { get; set; }
+        }
+
         [AuditIgnore]
         public class Audit_Tag
         {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
             public int Id { get; set; }
             public string Action { get; set; }
             public int TagId { get; set; }
@@ -31,13 +39,13 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             public string Action { get; set; }
             public int TagsId { get; set; }
-            public int PostsId { get; set; }
+            public string PostsId { get; set; }
         }
 
         public class Post
         {
             [DatabaseGenerated(DatabaseGeneratedOption.None)]
-            public int Id { get; set; }
+            public string Id { get; set; }
             public string Name { get; set; }
             public ICollection<Tag> Tags { get; set; }
         }

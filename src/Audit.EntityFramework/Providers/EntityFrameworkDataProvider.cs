@@ -190,16 +190,6 @@ namespace Audit.EntityFramework.Providers
                         save = true;
                     }
                 }
-
-
-
-
-
-
-
-
-
-
             }
             if (save)
             {
@@ -241,15 +231,12 @@ namespace Audit.EntityFramework.Providers
             var auditEntity = Activator.CreateInstance(auditType);
             if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
-                var auditFields = auditType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.GetSetMethod() != null)
-                    .ToDictionary(k => k.Name);
-                var entityFields = definingType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.GetGetMethod() != null);
-                foreach (var field in entityFields.Where(af => auditFields.ContainsKey(af.Name)))
+                var auditFields = GetPropertiesToSet(auditType);
+                var entityFields = GetPropertiesToGet(definingType);
+                foreach (var field in entityFields.Where(af => auditFields.ContainsKey(af.Key)))
                 {
-                    var value = field.GetValue(entity);
-                    auditFields[field.Name].SetValue(auditEntity, value);
+                    var value = field.Value.GetValue(entity);
+                    auditFields[field.Key].SetValue(auditEntity, value);
                 }
             }
             return auditEntity;
@@ -260,15 +247,37 @@ namespace Audit.EntityFramework.Providers
             var auditEntity = Activator.CreateInstance(auditType);
             if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
-                var auditFields = auditType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.GetSetMethod() != null)
-                    .ToDictionary(k => k.Name);
+                var auditFields = GetPropertiesToSet(auditType);
                 foreach (var field in entry.ColumnValues.Where(cv => auditFields.ContainsKey(cv.Key)))
                 {
                     auditFields[field.Key].SetValue(auditEntity, field.Value);
                 }
             }
             return auditEntity;
+        }
+
+        private Dictionary<string, PropertyInfo> GetPropertiesToSet(Type type)
+        {
+            var result = new Dictionary<string, PropertyInfo>();
+            foreach(var prop in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetSetMethod() != null)
+                .OrderBy(p => p.DeclaringType == type ? 1 : 0))
+            {
+                result[prop.Name] = prop;
+            }
+            return result;
+        }
+
+        private Dictionary<string, PropertyInfo> GetPropertiesToGet(Type type)
+        {
+            var result = new Dictionary<string, PropertyInfo>();
+            foreach (var prop in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetGetMethod() != null)
+                .OrderBy(p => p.DeclaringType == type ? 1 : 0))
+            {
+                result[prop.Name] = prop;
+            }
+            return result;
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)

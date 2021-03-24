@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [16.5.6] - Work In Progress
+- Audit.EntityFramework / Audit.EntityFramework.Core: Fix Property Matching error (*An item with the same key has already been added*) when entity objects have hidden base properties (#384)
+ 
 ## [16.5.5] - 2021-03-22
 - Audit.NET.AzureStorage: Call TableOperation.InsertOrMerge to avoid EntityAlreadyExists Conflict (409) exception
 - Audit.EntityFramework / Audit.EntityFramework.Core: Explicit mapper enhancements for Entity Framework Data Provider. 
