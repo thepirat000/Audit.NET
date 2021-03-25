@@ -68,9 +68,9 @@ Optional:
 
 ## Table constraints
 
-- The table should exists. 
-- The table should have a single ID column (Unique or Primary key).
-- The type of the ID column should be convertible to `STRING`.
+- The table must exists. 
+- The table must have a single ID column (Unique or Primary key).
+- The type of the ID column must be convertible to `STRING`.
 
 For example:
 ```SQL
