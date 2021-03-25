@@ -3,7 +3,7 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [16.5.6] - Work In Progress
+## [16.5.6] - 2021-03-24
 - Audit.EntityFramework / Audit.EntityFramework.Core: Fix Property Matching error (*An item with the same key has already been added*) when entity objects have hidden base properties (#384)
  
 ## [16.5.5] - 2021-03-22
