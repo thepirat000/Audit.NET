@@ -21,9 +21,13 @@ namespace Audit.Core
         /// </summary>
         public object ExtraFields { get; set; }
         /// <summary>
+        /// Gets or Sets the data provider builder.
+        /// </summary>
+        public Func<AuditDataProvider> DataProviderFactory { get; set; }
+        /// <summary>
         /// Gets or sets the data provider to use.
         /// </summary>
-        public AuditDataProvider DataProvider { get; set; }
+        public AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
         /// <summary>
         /// Gets or sets the event creation policy to use.
         /// </summary>
@@ -70,7 +74,7 @@ namespace Audit.Core
             TargetGetter = targetGetter;
             ExtraFields = extraFields;
             CreationPolicy = creationPolicy ?? Configuration.CreationPolicy;
-            DataProvider = dataProvider ?? Configuration.DataProvider;
+            DataProviderFactory = dataProvider != null ? () => dataProvider : Configuration.DataProviderFactory;
             IsCreateAndSave = isCreateAndSave;
             AuditEvent = auditEvent;
             SkipExtraFrames = skipExtraFrames;
@@ -97,7 +101,7 @@ namespace Audit.Core
                 TargetGetter = scopeConfig._options.TargetGetter;
                 ExtraFields = scopeConfig._options.ExtraFields;
                 CreationPolicy = scopeConfig._options.CreationPolicy;
-                DataProvider = scopeConfig._options.DataProvider;
+                DataProviderFactory = scopeConfig._options.DataProviderFactory;
                 IsCreateAndSave = scopeConfig._options.IsCreateAndSave;
                 AuditEvent = scopeConfig._options.AuditEvent;
                 SkipExtraFrames = scopeConfig._options.SkipExtraFrames;

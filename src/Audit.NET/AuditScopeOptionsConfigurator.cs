@@ -31,6 +31,12 @@ namespace Audit.Core
             return this;
         }
 
+        public IAuditScopeOptionsConfigurator DataProvider(Func<AuditDataProvider> dataProviderFactory)
+        {
+            _options.DataProviderFactory = dataProviderFactory;
+            return this;
+        }
+
         public IAuditScopeOptionsConfigurator EventType(string eventType)
         {
             _options.EventType = eventType;

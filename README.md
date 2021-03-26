@@ -447,25 +447,47 @@ public class MyCustomDataProvider : AuditDataProvider
 }
 ```
 
-You can set a global data provider assigning the `DataProvider` property on the static `Configuration` object. For example:
+### Data provider selection
+
+The data provider can be set globally for the entire application or per audit scope.
+
+To set the global data provider assign the `DataProvider` property on the static `Audit.Core.Configuration` object. For example:
 
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
 Or using the fluent API `UseCustomProvider` method:
+
 ```c#
 Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
 ```
 
-**NOTE:** If you don't specify a data provider, it will default to a `FileDataProvider` logging events as .json files into the current working directory.
+You can also set the global data provider with a factory method that is called when an Audit Scope is created. For example:
+
+```c#
+Audit.Core.Configuration.DataProviderFactory = () => new LazyDataProvider();
+```
+
+Or using the fluent API `UseFactory`: 
+
+```c#
+Audit.Core.Configuration.Setup()
+	.UseFactory(() => new LazyDataProvider());
+```
+
+**NOTE:** If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
 
 See [Configuration section](#configuration) for more information.
 
-You can also set the data provider per-scope. For example:
+To set the data provider per-scope, use the `AuditScopeOptions` when creating an `AuditScope`. For example:
+
 ```c#
-AuditScope.Create(new AuditScopeOptions { DataProvider = new MyCustomDataProvider(), ... });
+var scope = AuditScope.Create(new AuditScopeOptions 
+{ 
+  DataProvider = new MyCustomDataProvider(), ... }
+);
 ```
 
 

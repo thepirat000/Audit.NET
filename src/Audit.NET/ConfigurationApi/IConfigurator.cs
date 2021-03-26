@@ -21,10 +21,12 @@ namespace Audit.Core.ConfigurationApi
         /// <summary>
         /// Use a dynamic custom provider for the event output.
         /// </summary>
+        /// <param name="config">The fluent configuration of the dynamic provider</param>
         ICreationPolicyConfigurator UseDynamicProvider(Action<IDynamicDataProviderConfigurator> config);
         /// <summary>
         /// Use a dynamic asynchronous custom provider for the event output.
         /// </summary>
+        /// <param name="config">The fluent configuration of the async dynamic provider</param>
         ICreationPolicyConfigurator UseDynamicAsyncProvider(Action<IDynamicAsyncDataProviderConfigurator> config);
         /// <summary>
         /// Store the events in files.
@@ -60,6 +62,7 @@ namespace Audit.Core.ConfigurationApi
         /// <summary>
         /// Use a custom provider for the event output.
         /// </summary>
+        /// <param name="provider">The data provider instance to use</param>
         ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider);
 
         /// <summary>
@@ -68,8 +71,21 @@ namespace Audit.Core.ConfigurationApi
         ICreationPolicyConfigurator Use(Action<IDynamicDataProviderConfigurator> config);
 
         /// <summary>
+        /// Use a custom factory to create the data provider. 
+        /// The factory is called when an AuditScope is created.
+        /// </summary>
+        /// <param name="dataProviderFactory">The data provider factory to use. A delegate that is invoked to instantiate an AuditDataProvider</param>
+        ICreationPolicyConfigurator UseFactory(Func<AuditDataProvider> dataProviderFactory);
+
+        /// <summary>
         /// Shortcut for UseCustomProvider, to use a custom provider instance for the event output.
         /// </summary>
         ICreationPolicyConfigurator Use(AuditDataProvider provider);
+
+        /// <summary>
+        /// Shortcut for UseFactory, to use a custom provider factory for the event output.
+        /// </summary>
+        /// <param name="dataProviderFactory">The data provider factory to use. A delegate that is invoked to instantiate an AuditDataProvider</param>
+        ICreationPolicyConfigurator Use(Func<AuditDataProvider> dataProviderFactory);
     }
 }

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [17.0.0] - 2021-03-26
+- Audit.NET: Allow to set the data provider as a factory instead of passing the instance, so it creation can be delayed (#387)
+
 ## [16.5.6] - 2021-03-24
 - Audit.EntityFramework / Audit.EntityFramework.Core: Fix Property Matching error (*An item with the same key has already been added*) when entity objects have hidden base properties (#384)
  

@@ -21,9 +21,13 @@ namespace Audit.Core
         /// </summary>
         public static EventCreationPolicy CreationPolicy { get; set; }
         /// <summary>
-        /// Gets or Sets the Default data provider.
+        /// Gets or Sets the Default data provider factory.
         /// </summary>
-        public static AuditDataProvider DataProvider { get; set; }
+        public static Func<AuditDataProvider> DataProviderFactory { get; set; }
+        /// <summary>
+        /// Gets or Sets the Default data provider instance.
+        /// </summary>
+        public static AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
         /// <summary>
         /// Gets or Sets a value that indicates if the logged Type Names should include the namespace. Default is false.
         /// </summary>
@@ -51,6 +55,7 @@ namespace Audit.Core
         /// </summary>
         public static JsonSerializerSettings JsonSettings { get; set; }
 
+        // Custom actions
         internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
 
         internal static object Locker = new object();

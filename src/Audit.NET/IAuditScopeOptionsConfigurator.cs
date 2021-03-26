@@ -26,6 +26,10 @@ namespace Audit.Core
         /// </summary>
         IAuditScopeOptionsConfigurator DataProvider(AuditDataProvider dataProvider);
         /// <summary>
+        /// Sets the data provider factory to use within this scope.
+        /// </summary>
+        IAuditScopeOptionsConfigurator DataProvider(Func<AuditDataProvider> dataProviderFactory);
+        /// <summary>
         /// To indicate whether this scope should be immediately saved after creation
         /// </summary>
         IAuditScopeOptionsConfigurator IsCreateAndSave(bool isCreateAndSave = true);
