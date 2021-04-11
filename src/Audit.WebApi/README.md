@@ -425,7 +425,7 @@ You can now create a new project on the current folder by running:
 dotnet new webapiaudit
 ```
 
-This will create a new Asp.NET Core 2.1 project.
+This will create a new Asp.NET Core project.
 
 You can optionally include Entity Framework Core by adding the `-E` parameter
 
