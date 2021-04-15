@@ -14,12 +14,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 #if NETCOREAPP3_0
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 #endif
 using System.Data.SqlClient;
+// see this why https://github.com/dotnet/efcore/issues/18220 and https://github.com/googleapis/google-cloud-dotnet/issues/6315
+using static System.Linq.Queryable;
+using static System.Linq.Enumerable; // You only need this if you're using LINQ to Objects
 
 namespace Audit.IntegrationTest
 {

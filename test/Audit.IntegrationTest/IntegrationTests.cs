@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
 using Audit.Core;
 using Audit.Core.Providers;
-using Audit.Udp.Providers;
+using Audit.DynamoDB.Providers;
+using Audit.Kafka.Providers;
 using Audit.MongoDB.Providers;
 using Audit.SqlServer.Providers;
-using System.Threading.Tasks;
+using Audit.Udp.Providers;
+using Confluent.Kafka;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using NUnit.Framework;
-using Newtonsoft.Json;
-using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
-using Audit.DynamoDB.Providers;
-using Amazon.DynamoDBv2.DocumentModel;
-using Audit.Kafka.Providers;
-using Confluent.Kafka;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using Newtonsoft.Json;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 #if NETCOREAPP3_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -679,7 +678,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NET461 || NETCOREAPP3_0
             [Test]
             [Category("AmazonQLDB")]
             public void TestAmazonQLDB()

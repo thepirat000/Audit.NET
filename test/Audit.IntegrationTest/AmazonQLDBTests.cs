@@ -1,21 +1,21 @@
-﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+﻿#if NET461 || NETCOREAPP3_0
+using Amazon.QLDB.Driver;
+using Amazon.QLDBSession;
+using Audit.Core;
+using Audit.NET.AmazonQLDB.Providers;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Audit.Core;
 using System.Threading.Tasks;
-using Amazon.QLDB.Driver;
-using Amazon.QLDBSession;
-using Audit.NET.AmazonQLDB.Providers;
 
 namespace Audit.IntegrationTest
 {
     public class AmazonQLDBTests
     {
         private AmazonQldbDataProvider GetAmazonQLDBDataProvider(List<AuditEvent> ins, List<AuditEvent> repl) =>
-            new AmazonQldbDataProviderForTest(ins, repl)
+            new AmazonAsyncQldbDataProviderForTest(ins, repl)
             {
-                QldbDriver = new Lazy<IQldbDriver>(() => QldbDriver.Builder()
+                QldbDriver = new Lazy<IAsyncQldbDriver>(() => AsyncQldbDriver.Builder()
                     .WithQLDBSessionConfig(new AmazonQLDBSessionConfig())
                     .WithLedger("audit-ledger")
                     .WithRetryLogging()
@@ -53,32 +53,23 @@ namespace Audit.IntegrationTest
         }
     }
 
-    public class AmazonQldbDataProviderForTest : AmazonQldbDataProvider
+    public class AmazonAsyncQldbDataProviderForTest : AmazonQldbDataProvider
     {
         private List<AuditEvent> _inserted;
         private List<AuditEvent> _replaced;
 
-        public AmazonQldbDataProviderForTest(List<AuditEvent> ins, List<AuditEvent> repl)
+        public AmazonAsyncQldbDataProviderForTest(List<AuditEvent> ins, List<AuditEvent> repl)
         {
             _inserted = ins;
             _replaced = repl;
         }
 
-        public override object InsertEvent(AuditEvent auditEvent)
-        {
-            _inserted.Add(AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.InsertEvent(auditEvent);
-        }
         public override Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             _inserted.Add(AuditEvent.FromJson(auditEvent.ToJson()));
             return base.InsertEventAsync(auditEvent);
         }
-        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
-        {
-            _replaced.Add(AuditEvent.FromJson(auditEvent.ToJson()));
-            base.ReplaceEvent(eventId, auditEvent);
-        }
+
         public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
             _replaced.Add(AuditEvent.FromJson(auditEvent.ToJson()));
