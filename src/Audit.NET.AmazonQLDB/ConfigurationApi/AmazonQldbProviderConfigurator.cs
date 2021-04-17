@@ -1,15 +1,15 @@
-﻿using System;
-using Amazon.QLDB.Driver;
+﻿using Amazon.QLDB.Driver;
 using Amazon.QLDBSession;
 using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace Audit.NET.AmazonQLDB.ConfigurationApi
 {
     public class AmazonQldbProviderConfigurator : IAmazonQldbProviderConfigurator
     {
         internal AmazonQldbProviderTableConfigurator _tableConfigurator = new AmazonQldbProviderTableConfigurator();
-        internal Lazy<IQldbDriver> _driverFactory;
+        internal Lazy<IAsyncQldbDriver> _driverFactory;
         private string _ledger;
         private AWSCredentials _credentials;
         private bool _useRetryLogging;
@@ -61,29 +61,29 @@ namespace Audit.NET.AmazonQLDB.ConfigurationApi
             return this;
         }
 
-        public IAmazonQldbProviderTableConfigurator WithQldbDriver(IQldbDriver driver)
+        public IAmazonQldbProviderTableConfigurator WithQldbDriver(IAsyncQldbDriver driver)
         {
-            _driverFactory = new Lazy<IQldbDriver>(() => driver);
+            _driverFactory = new Lazy<IAsyncQldbDriver>(() => driver);
             return _tableConfigurator;
         }
 
-        public IAmazonQldbProviderTableConfigurator WithQldbDriver(QldbDriver driver)
+        public IAmazonQldbProviderTableConfigurator WithQldbDriver(AsyncQldbDriver driver)
         {
-            _driverFactory = new Lazy<IQldbDriver>(() => driver);
+            _driverFactory = new Lazy<IAsyncQldbDriver>(() => driver);
             return _tableConfigurator;
         }
 
-        public IAmazonQldbProviderTableConfigurator WithQldbDriver(Func<IQldbDriver> driverBuilder)
+        public IAmazonQldbProviderTableConfigurator WithQldbDriver(Func<IAsyncQldbDriver> driverBuilder)
         {
-            _driverFactory = new Lazy<IQldbDriver>(driverBuilder);
+            _driverFactory = new Lazy<IAsyncQldbDriver>(driverBuilder);
             return _tableConfigurator;
         }
 
         private void CreateDriverFactory()
         {
-            _driverFactory = new Lazy<IQldbDriver>(() =>
+            _driverFactory = new Lazy<IAsyncQldbDriver>(() =>
             {
-                var builder = QldbDriver.Builder()
+                var builder = AsyncQldbDriver.Builder()
                     .WithAWSCredentials(_credentials)
                     .WithQLDBSessionConfig(_sessionConfig);
 

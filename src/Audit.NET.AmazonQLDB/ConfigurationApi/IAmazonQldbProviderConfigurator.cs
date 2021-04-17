@@ -1,8 +1,8 @@
-﻿using System;
-using Amazon.QLDB.Driver;
+﻿using Amazon.QLDB.Driver;
 using Amazon.QLDBSession;
 using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace Audit.NET.AmazonQLDB.ConfigurationApi
 {
@@ -55,18 +55,18 @@ namespace Audit.NET.AmazonQLDB.ConfigurationApi
         /// Use the given driver
         /// </summary>
         /// <param name="driver">A Amazon QLDB driver instance</param>
-        IAmazonQldbProviderTableConfigurator WithQldbDriver(IQldbDriver driver);
+        IAmazonQldbProviderTableConfigurator WithQldbDriver(IAsyncQldbDriver driver);
 
         /// <summary>
         /// Use the given driver
         /// </summary>
         /// <param name="driver">A Amazon QLDB driver instance</param>
-        IAmazonQldbProviderTableConfigurator WithQldbDriver(QldbDriver driver);
+        IAmazonQldbProviderTableConfigurator WithQldbDriver(AsyncQldbDriver driver);
 
         /// <summary>
         /// Use the given driver builder
         /// </summary>
         /// <param name="driverBuilder">A function that returns the Amazon QLDB driver instance tu use</param>
-        IAmazonQldbProviderTableConfigurator WithQldbDriver(Func<IQldbDriver> driverBuilder);
+        IAmazonQldbProviderTableConfigurator WithQldbDriver(Func<IAsyncQldbDriver> driverBuilder);
     }
 }

@@ -15,7 +15,7 @@ namespace Audit.Core
         /// <param name="driverFactory">The QLDB driver factory to use</param>
         /// <param name="tableNameBuilder">The table name builder to use</param>
         public static ICreationPolicyConfigurator UseAmazonQldb(this IConfigurator configurator, 
-            Lazy<IQldbDriver> driverFactory, 
+            Lazy<IAsyncQldbDriver> driverFactory, 
             Func<AuditEvent, string> tableNameBuilder)
         {
             Configuration.DataProvider = new AmazonQldbDataProvider
