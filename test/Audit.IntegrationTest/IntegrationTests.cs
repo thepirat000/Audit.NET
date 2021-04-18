@@ -967,7 +967,9 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseAzureDocumentDB(config => config
                         .ConnectionString(ev => AzureSettings.AzureDocDbUrl)
-                        .AuthKey(ev => AzureSettings.AzureDocDbAuthKey))
+                        .AuthKey(ev => AzureSettings.AzureDocDbAuthKey)
+                        .Database("Audit")
+                        .Collection("AuditTest"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
@@ -1051,7 +1053,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseMySql(config => config
-                        .ConnectionString("Server=localhost; Database=events; Uid=admin; Pwd=admin;")
+                        .ConnectionString("Server=localhost; Database=test; Uid=admin; Pwd=admin;")
                         .TableName("event")
                         .IdColumnName("id")
                         .JsonColumnName("data"))

@@ -4,7 +4,7 @@
     <VersionPrefix>3.0.0</VersionPrefix>
     <TargetFrameworks>netcoreapp3.0;net472</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+    <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
     <AssemblyName>Audit.EntityFramework.Full.UnitTest</AssemblyName>
     <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>

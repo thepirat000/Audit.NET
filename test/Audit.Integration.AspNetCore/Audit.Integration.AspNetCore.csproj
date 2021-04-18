@@ -6,6 +6,7 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign>true</PublicSign>
     <StartupObject>Audit.Integration.AspNetCore.Program</StartupObject>
+    <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

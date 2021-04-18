@@ -3,13 +3,20 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [17.0.1] - 2021-04-17
+### Modified
+- Audit.NET.AmazonQLDB: Update QLDB Provider to use Async API (#393)
+
 ## [17.0.0] - 2021-03-26
+### Modified
 - Audit.NET: Allow to set the data provider as a factory instead of passing the instance, so it creation can be delayed (#387)
 
 ## [16.5.6] - 2021-03-24
+### Modified
 - Audit.EntityFramework / Audit.EntityFramework.Core: Fix Property Matching error (*An item with the same key has already been added*) when entity objects have hidden base properties (#384)
  
 ## [16.5.5] - 2021-03-22
+### Modified
 - Audit.NET.AzureStorage: Call TableOperation.InsertOrMerge to avoid EntityAlreadyExists Conflict (409) exception
 - Audit.EntityFramework / Audit.EntityFramework.Core: Explicit mapper enhancements for Entity Framework Data Provider. 
 Allow mapping from entries not mapped to a type (i.e. implicitly created join tables) (#381)

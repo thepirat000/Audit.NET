@@ -3,7 +3,7 @@
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
     <TargetFrameworks>net452;netcoreapp2.0;net461;netcoreapp3.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+    <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
     <AssemblyName>Audit.IntegrationTest</AssemblyName>
     <PackageId>Audit.IntegrationTest</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
