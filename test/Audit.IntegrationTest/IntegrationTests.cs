@@ -364,7 +364,7 @@ namespace Audit.IntegrationTest
             {
                 var expected = "571d6b80b242c87e";
                 ValidateToken(typeof(Audit.Core.AuditEvent), expected);
-                ValidateToken(typeof(Audit.AzureDocumentDB.Providers.AzureDbDataProvider), expected);
+                ValidateToken(typeof(Audit.AzureCosmos.Providers.AzureCosmosDataProvider), expected);
                 ValidateToken(typeof(Audit.DynamicProxy.AuditProxy), expected);
                 ValidateToken(typeof(Audit.EntityFramework.AuditDbContext), expected);
                 ValidateToken(typeof(Audit.Mvc.AuditAttribute), expected);
@@ -965,11 +965,11 @@ namespace Audit.IntegrationTest
             public void SetAzureDocDbSettings()
             {
                 Audit.Core.Configuration.Setup()
-                    .UseAzureDocumentDB(config => config
-                        .ConnectionString(ev => AzureSettings.AzureDocDbUrl)
-                        .AuthKey(ev => AzureSettings.AzureDocDbAuthKey)
+                    .UseAzureCosmos(config => config
+                        .Endpoint(() => AzureSettings.AzureDocDbUrl)
+                        .AuthKey(() => AzureSettings.AzureDocDbAuthKey)
                         .Database("Audit")
-                        .Collection("AuditTest"))
+                        .Container("AuditTest"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
