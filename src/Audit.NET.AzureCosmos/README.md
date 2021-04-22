@@ -48,19 +48,12 @@ Audit.Core.Configuration.Setup()
         .Endpoint("https://mycompany.documents.azure.com:443/")
         .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")
         .Database("Audit")
-        .Container(auditEvent => auditEvent.EventType)
+        .Container("Test")
         .ConnectionPolicy(new ConnectionPolicy
         {
             ConnectionMode = ConnectionMode.Direct,
             ConnectionProtocol = Protocol.Tcp
         }));
-
-Audit.Core.Configuration.Setup()
-    .UseAzureCosmos(config => config
-        .DocumentClient(myClient)
-        .Database("Audit")
-        .CollectionBuilder = auditEvent => auditEvent.EventType.StartsWith("GET") ? "Web" : "Custom"
-);
 ```
 
 ### Provider options
