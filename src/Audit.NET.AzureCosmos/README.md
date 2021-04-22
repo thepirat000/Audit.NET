@@ -29,7 +29,7 @@ Audit.Core.Configuration.DataProvider = new Audit.AzureCosmos.Providers.AzureCos
     Endpoint = "https://mycompany.documents.azure.com:443/",
     AuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==",
     Database = "Audit",
-    ContainerBuilder = auditEvent => auditEvent.EventType,
+    ContainerBuilder = () => context.GetContainer(),
     ConnectionPolicy = new ConnectionPolicy { ConnectionMode = ConnectionMode.Direct, ConnectionProtocol = Protocol.Tcp }
 };
 
