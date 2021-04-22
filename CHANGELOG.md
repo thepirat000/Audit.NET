@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [17.0.2] - 2021-04-21
+### Modified
+- Audit.NET.AzureCosmos: Deprecated `Audit.NET.AzureDocumentDB` package and replaced with new `Audit.NET.AzureCosmos`
+
 ## [17.0.1] - 2021-04-17
 ### Modified
 - Audit.NET.AmazonQLDB: Update QLDB Provider to use Async API (#393)
