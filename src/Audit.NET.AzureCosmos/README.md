@@ -36,7 +36,7 @@ Audit.Core.Configuration.DataProvider = new Audit.AzureCosmos.Providers.AzureCos
 Audit.Core.Configuration.DataProvider = new Audit.AzureCosmos.Providers.AzureCosmosDataProvider()
 {
     DocumentClient = myClient,
-    DatabaseBuilder = "Audit",
+    Database = "Audit",
     Container = "Event"
 };
 ```
