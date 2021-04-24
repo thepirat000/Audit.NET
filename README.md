@@ -733,8 +733,6 @@ The following packages are extensions to log interactions with different systems
 
 Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
 
-<img src="https://i.imgur.com/JPqHE6J.png" alt="Audit.NET Extensions" width="400" />
-
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
 <img src="https://i.imgur.com/yeBZZiP.png" alt="icon" width="80"/> | **[Audit.NET.AzureCosmos](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/README.md)** | Store the events in an **Azure Cosmos DB** container, in JSON format.
