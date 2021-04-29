@@ -425,8 +425,8 @@ namespace Audit.EntityFramework
             var propIntTran = transaction.GetType().GetTypeInfo().GetProperty("InternalTransaction", BindingFlags.NonPublic | BindingFlags.Instance);
             object intTran = propIntTran?.GetValue(transaction);
             var propTranId = intTran?.GetType().GetTypeInfo().GetProperty("TransactionId", BindingFlags.NonPublic | BindingFlags.Instance);
-            var tranId = (int)(long)propTranId?.GetValue(intTran);
-            return string.Format("{0}_{1}", clientConnectionId, tranId);
+            var tranId = propTranId?.GetValue(intTran);
+            return string.Format("{0}_{1}", clientConnectionId, tranId ?? 0);
         }
 
         public string GetClientConnectionId(DbConnection connection)
