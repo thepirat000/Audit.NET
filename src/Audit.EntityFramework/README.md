@@ -374,25 +374,24 @@ To set the EntityFramework data provider globally, set the static `Audit.Core.Co
 ```c#
 Audit.Core.Configuration.DataProvider = new EntityFrameworkDataProvider()
 {
-    AuditTypeMapper = t => t == typeof(Order) ? typeof(Audit_Order) : t == typeof(OrderItem) ? typeof(Audit_OrderItem) : null,
+    AuditTypeMapper = (t, ee) => t == typeof(Order) ? typeof(OrderAudit) : t == typeof(Orderline) ? typeof(OrderlineAudit) : null,
     AuditEntityAction = (evt, entry, auditEntity) =>
     {
         var a = (dynamic)auditEntity;
         a.AuditDate = DateTime.UtcNow;
         a.UserName = evt.Environment.UserName;
         a.AuditAction = entry.Action; // Insert, Update, Delete
-        return true; // return false to ignore the audit
+        return Task.FromResult(true); // return false to ignore the audit
     }
-};
-```
+};```
 
 Or use the [fluent API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api) `UseEntityFramework` method, this is the recommended approach:
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
         .AuditTypeExplicitMapper(m => m
-            .Map<Order, Audit_Order>()
-            .Map<OrderItem, Audit_OrderItem>()
+            .Map<Order, OrderAudit>()
+            .Map<Orderline, OrderlineAudit>()
             .AuditEntityAction<IAudit>((evt, entry, auditEntity) =>
             {
                 auditEntity.AuditDate = DateTime.UtcNow;
@@ -430,7 +429,7 @@ Audit.Core.Configuration.Setup()
         .AuditTypeNameMapper(typeName => "Audit_" + typeName)
         .AuditEntityAction((ev, ent, auditEntity) =>
         {
-        // auditEntity is object
+            // auditEntity is object
 	    ((dynamic)auditEntity).AuditDate = DateTime.UtcNow;
         }));
 ```
@@ -451,16 +450,17 @@ Audit.Core.Configuration.Setup()
 #### Common action:
 
 If your audit log entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
-to configure the action to be performed to each audit trail entity before saving:
+to configure the action to be performed to each audit trail entity before saving. Also this action can be asynchronous, for example:
 
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(x => x
         .AuditTypeNameMapper(typeName => "Audit_" + typeName)
-        .AuditEntityAction<IAudit>((ev, ent, auditEntity) =>
+        .AuditEntityAction<IAudit>(async (ev, ent, auditEntity) =>
         {
             // auditEntity is of IAudit type
             auditEntity.AuditDate = DateTime.UtcNow;
+            auditEntity.SomeValue = await GetValueAsync();
         }));
 ```
 

@@ -304,7 +304,7 @@ namespace Audit.IntegrationTest
                     .AuditTypeMapper(t => typeof(AuditBlog))
                     .AuditEntityAction((ev, ent, obj) =>
                     {
-                        return ((dynamic)obj).Id == 1;
+                        return (bool) (((dynamic)obj).Id == 1);
                     })
                     .IgnoreMatchedProperties(true));
 
@@ -326,7 +326,7 @@ namespace Audit.IntegrationTest
                     .AuditTypeNameMapper(s => "Audit" + s)
                     .AuditEntityAction((ev, ent, obj) =>
                     {
-                        return ((dynamic)obj).Id == 1;
+                        return (bool) (((dynamic)obj).Id == 1);
                     })
                     .IgnoreMatchedProperties(true));
 

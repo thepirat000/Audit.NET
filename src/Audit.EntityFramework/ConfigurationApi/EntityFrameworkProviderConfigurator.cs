@@ -75,9 +75,25 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
+        public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction(Func<AuditEvent, EventEntry, object, Task> asyncAction)
+        {
+            _auditEntityAction = async (ev, ent, obj) =>
+            {
+                await asyncAction.Invoke(ev, ent, obj);
+                return true;
+            };
+            return this;
+        }
+
         public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction(Func<AuditEvent, EventEntry, object, bool> function)
         {
             _auditEntityAction = (ev, ent, obj) => Task.FromResult(function.Invoke(ev, ent, obj));
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction(Func<AuditEvent, EventEntry, object, Task<bool>> asyncFunction)
+        {
+            _auditEntityAction = async (ev, ent, obj) => await asyncFunction.Invoke(ev, ent, obj);
             return this;
         }
 
@@ -94,6 +110,19 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
+        public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, Task> asyncAction)
+        {
+            _auditEntityAction = async (ev, ent, obj) =>
+            {
+                if (obj is T)
+                {
+                    await asyncAction.Invoke(ev, ent, (T)obj);
+                }
+                return true;
+            };
+            return this;
+        }
+
         public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, bool> function)
         {
             _auditEntityAction = (ev, ent, obj) =>
@@ -103,6 +132,19 @@ namespace Audit.EntityFramework.ConfigurationApi
                     return Task.FromResult(function.Invoke(ev, ent, (T)obj));
                 }
                 return Task.FromResult(true);
+            };
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, Task<bool>> asyncFunction)
+        {
+            _auditEntityAction = async (ev, ent, obj) =>
+            {
+                if (obj is T)
+                {
+                    return await asyncFunction.Invoke(ev, ent, (T)obj);
+                }
+                return true;
             };
             return this;
         }
