@@ -46,7 +46,7 @@ namespace Audit.IntegrationTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
         }
-
+                
 #if NETCOREAPP3_0
         [Test]
         public void Test_EFDataProvider_IdentityContext_Error()
@@ -162,7 +162,7 @@ namespace Audit.IntegrationTest
             dp.AuditEntityAction = (ev, entry, obj) =>
             {
                 // return false to avoid saving
-                return false;
+                return Task.FromResult(false);
             };
 
             Audit.Core.Configuration.Setup()
@@ -250,10 +250,10 @@ namespace Audit.IntegrationTest
                 return null;
             };
 
-            dp.AuditEntityAction = (ev, entry, obj) =>
+            dp.AuditEntityAction = async (ev, entry, obj) =>
             {
                 // return false to avoid saving
-                return false;
+                return await Task.FromResult(false);
             };
 
             Audit.Core.Configuration.Setup()
@@ -312,7 +312,7 @@ namespace Audit.IntegrationTest
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action;
                 }
-                return true;
+                return Task.FromResult(true);
             };
 
             Audit.Core.Configuration.Setup()
@@ -356,7 +356,7 @@ namespace Audit.IntegrationTest
                 return null;
             };
 
-            dp.AuditEntityAction = (ev, entry, obj) =>
+            dp.AuditEntityAction = async (ev, entry, obj) =>
             {
                 var ab = obj as AuditBase;
                 if (ab != null)
@@ -365,7 +365,7 @@ namespace Audit.IntegrationTest
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action;
                 }
-                return true;
+                return await Task.FromResult(true);
             };
 
             Audit.Core.Configuration.Setup()
@@ -413,7 +413,7 @@ namespace Audit.IntegrationTest
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action; 
                 }
-                return true;
+                return Task.FromResult(true);
             };
 
             Audit.Core.Configuration.Setup()
@@ -502,7 +502,7 @@ namespace Audit.IntegrationTest
                 return null;
             };
 
-            dp.AuditEntityAction = (ev, entry, obj) =>
+            dp.AuditEntityAction = async (ev, entry, obj) =>
             {
                 var ab = obj as AuditBase;
                 if (ab != null)
@@ -511,7 +511,7 @@ namespace Audit.IntegrationTest
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action;
                 }
-                return true;
+                return await Task.FromResult(true);
             };
 
             Audit.Core.Configuration.Setup()
@@ -618,7 +618,7 @@ namespace Audit.IntegrationTest
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action;
                 }
-                return true;
+                return Task.FromResult(true);
             };
 
             dp.IgnoreMatchedPropertiesFunc = t => t == typeof(OrderAudit);
@@ -799,7 +799,7 @@ namespace Audit.IntegrationTest
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action;
                 }
-                return true;
+                return Task.FromResult(true);
             };
 
             Audit.Core.Configuration.Setup()

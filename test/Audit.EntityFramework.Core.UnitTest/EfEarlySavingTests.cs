@@ -182,6 +182,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         .AuditEntityAction<MessageAudit>((auditEvent, eventEntry, entity) =>
                         {
                             throw new Exception(exceptionMessage);
+                            return Task.FromResult(true);
                         })
                     )
                 );

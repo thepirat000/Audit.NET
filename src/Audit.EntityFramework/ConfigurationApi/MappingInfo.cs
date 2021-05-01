@@ -1,5 +1,6 @@
 ﻿using Audit.Core;
 using System;
+using System.Threading.Tasks;
 
 namespace Audit.EntityFramework.ConfigurationApi
 {
@@ -24,7 +25,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <summary>
         /// The Action to execute for this mapping.
         /// </summary>
-        public Func<AuditEvent, EventEntry, object, bool> Action { get; set; }
+        public Func<AuditEvent, EventEntry, object, Task<bool>> Action { get; set; }
     }
 
 }

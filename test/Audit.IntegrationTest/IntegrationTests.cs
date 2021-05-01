@@ -313,7 +313,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog), null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Post), null));
-                Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EntityFramework.EventEntry(), new { Id = 1 }));
+                Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EntityFramework.EventEntry(), new { Id = 1 }).Result);
             }
 
             [Test]
@@ -335,7 +335,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
                 Assert.AreEqual(typeof(AuditBlog), x.AuditTypeMapper.Invoke(typeof(Blog), null));
                 Assert.AreEqual(typeof(AuditPost), x.AuditTypeMapper.Invoke(typeof(Post), null));
-                Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EntityFramework.EventEntry(), new { Id = 1 }));
+                Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EntityFramework.EventEntry(), new { Id = 1 }).Result);
             }
 
             [Test]

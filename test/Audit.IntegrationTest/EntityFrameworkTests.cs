@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using System.Threading.Tasks;
 #if NETCOREAPP2_0 || NETCOREAPP3_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -81,6 +82,453 @@ namespace Audit.IntegrationTest
             Assert.AreEqual("Title", entries[0].Changes[0].ColumnName);
             Assert.AreEqual("NewTitleX", entries[0].Changes[0].NewValue);
             Assert.AreEqual(title + "X", entries[0].Changes[0].OriginalValue);
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_1()
+        {
+            //AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, Task<bool>> entityAsyncAction);
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>()
+                        .AuditEntityAction<OrderAudit>(async (ev, ent, audEnt) =>
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                            return true;
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_2()
+        {
+            //AuditEntityAction(Func<AuditEvent, EventEntry, object, Task<bool>> entityAsyncAction);
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>()
+                        .AuditEntityAction(async (ev, ent, obj) =>
+                        {
+                            var audEnt = (OrderAudit)obj;
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                            return true;
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_3()
+        {
+            //AuditEntityAction(Func<AuditEvent, EventEntry, object, Task> entityAsyncAction);
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>()
+                        .AuditEntityAction(async (ev, ent, obj) =>
+                        {
+                            var audEnt = (OrderAudit)obj;
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_4()
+        {
+            //AuditEntityAction<T>(Func<AuditEvent, EventEntry, T, Task> entityAsyncAction);
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>()
+                        .AuditEntityAction<OrderAudit>(async (ev, ent, obj) =>
+                        {
+                            var audEnt = (OrderAudit)obj;
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_1()
+        {
+            //Map<TSourceEntity, TAuditEntity>(Func<AuditEvent, EventEntry, TAuditEntity, Task> entityAsyncAction)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>(async (ae, ee, audEnt) => 
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_2()
+        {
+            //Map<TSourceEntity, TAuditEntity>(Func<AuditEvent, EventEntry, TAuditEntity, Task<bool>> entityAsyncAction)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>(async (ae, ee, audEnt) =>
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                            return true;
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_3()
+        {
+            //Map<TSourceEntity, TAuditEntity>(Func<TSourceEntity, TAuditEntity, Task> entityAsyncAction)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>(async (se, audEnt) =>
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_4()
+        {
+            //Map<TSourceEntity, TAuditEntity>(Func<TSourceEntity, TAuditEntity, Task<bool>> entityAsyncAction)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order, OrderAudit>(async (se, audEnt) =>
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                            return true;
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_5()
+        {
+            //Map<TSourceEntity>(Func<EventEntry, Type> mapper, Func<AuditEvent, EventEntry, object, Task<bool>> entityAsyncAction)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order>(ee => typeof(OrderAudit), async (ae, ee, obj) =>
+                        {
+                            var audEnt = (OrderAudit)obj;
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                            return true;
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_6()
+        {
+            //Map<TSourceEntity>(Func<EventEntry, Type> mapper, Func<AuditEvent, EventEntry, object, Task> entityAsyncAction)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .Map<Order>(ee => typeof(OrderAudit), async (ae, ee, obj) =>
+                        {
+                            var audEnt = (OrderAudit)obj;
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_7()
+        {
+            //MapExplicit<TAuditEntity>(Func<EventEntry, bool> predicate, Func<EventEntry, TAuditEntity, Task> entityAsyncAction = null)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .MapExplicit<OrderAudit>(ee => true, async (ee, audEnt) =>
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_AuditEntityAsyncAction_Map_8()
+        {
+            //MapTable<TAuditEntity>(string tableName, Func<EventEntry, TAuditEntity, Task> entityAsyncAction = null)
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config => config
+                    .AuditTypeExplicitMapper(m => m
+                        .MapTable<OrderAudit>("Order", async (ee, audEnt) =>
+                        {
+                            audEnt.AuditDate = DateTime.UtcNow;
+                            await Task.Delay(1000);
+                            audEnt.Status = "FromAction";
+                        }))
+                );
+
+            var id = Guid.NewGuid().ToString();
+            using (var ctx = new AuditPerTableContext())
+            {
+                var o = new Order()
+                {
+                    Number = id,
+                    Status = "Pending"
+                };
+                ctx.Order.Add(o);
+                await ctx.SaveChangesAsync();
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
+                Assert.IsNotNull(order);
+                Assert.AreEqual("FromAction", order.Status);
+            }
         }
 
 #if NETCOREAPP2_0 || NETCOREAPP3_0

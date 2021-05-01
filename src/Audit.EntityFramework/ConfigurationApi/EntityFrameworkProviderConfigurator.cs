@@ -2,6 +2,7 @@
 using Audit.Core;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #if EF_CORE
 using Microsoft.EntityFrameworkCore;
 #else
@@ -15,7 +16,7 @@ namespace Audit.EntityFramework.ConfigurationApi
     {
         internal Func<Type, bool> _ignoreMatchedPropertiesFunc = t => false;
         internal Func<Type, EventEntry, Type> _auditTypeMapper;
-        internal Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
+        internal Func<AuditEvent, EventEntry, object, Task<bool>> _auditEntityAction;
         internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
         internal Func<EventEntry, Type> _explicitMapper;
 
@@ -69,14 +70,14 @@ namespace Audit.EntityFramework.ConfigurationApi
             _auditEntityAction = (ev, ent, obj) =>
             {
                 action.Invoke(ev, ent, obj);
-                return true;
+                return Task.FromResult(true);
             };
             return this;
         }
 
         public IEntityFrameworkProviderConfiguratorExtra AuditEntityAction(Func<AuditEvent, EventEntry, object, bool> function)
         {
-            _auditEntityAction = function;
+            _auditEntityAction = (ev, ent, obj) => Task.FromResult(function.Invoke(ev, ent, obj));
             return this;
         }
 
@@ -88,7 +89,7 @@ namespace Audit.EntityFramework.ConfigurationApi
                 {
                     action.Invoke(ev, ent, (T)obj);
                 }
-                return true;
+                return Task.FromResult(true);
             };
             return this;
         }
@@ -99,9 +100,9 @@ namespace Audit.EntityFramework.ConfigurationApi
             {
                 if (obj is T)
                 {
-                    return function.Invoke(ev, ent, (T)obj);
+                    return Task.FromResult(function.Invoke(ev, ent, (T)obj));
                 }
-                return true;
+                return Task.FromResult(true);
             };
             return this;
         }

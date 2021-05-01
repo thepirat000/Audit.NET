@@ -3,6 +3,7 @@ using Audit.Core.ConfigurationApi;
 using Audit.EntityFramework.Providers;
 using Audit.EntityFramework;
 using Audit.EntityFramework.ConfigurationApi;
+using System.Threading.Tasks;
 #if EF_CORE
 using Microsoft.EntityFrameworkCore;
 #else
@@ -30,14 +31,14 @@ namespace Audit.Core
                 efdp.AuditEntityAction = (auditEvent, entry, auditEntity) =>
                 {
                     auditEntityAction.Invoke(auditEvent, entry, auditEntity);
-                    return true;
+                    return Task.FromResult(true);
                 };
             }
             Configuration.DataProvider = efdp;
             return new CreationPolicyConfigurator();
         }
 
-        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Func<AuditEvent, EventEntry, object, bool> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
+        internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Func<AuditEvent, EventEntry, object, Task<bool>> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
             Func<AuditEventEntityFramework, DbContext> dbContextBuilder, Func<EventEntry, Type> explicitMapper)
         {
             var efdp = new EntityFrameworkDataProvider()

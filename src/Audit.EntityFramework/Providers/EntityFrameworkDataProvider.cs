@@ -28,7 +28,7 @@ namespace Audit.EntityFramework.Providers
     {
         private Func<Type, bool> _ignoreMatchedPropertiesFunc;
         private Func<Type, EventEntry, Type> _auditTypeMapper;
-        private Func<AuditEvent, EventEntry, object, bool> _auditEntityAction;
+        private Func<AuditEvent, EventEntry, object, Task<bool>> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
         private Func<EventEntry, Type> _explicitMapper;
 
@@ -60,7 +60,7 @@ namespace Audit.EntityFramework.Providers
         /// Function to execute on the audited entities before saving them. 
         /// Returns a boolean value indicating whther to include the entity on the logs or not.
         /// </summary>
-        public Func<AuditEvent, EventEntry, object, bool> AuditEntityAction
+        public Func<AuditEvent, EventEntry, object, Task<bool>> AuditEntityAction
         {
             get { return _auditEntityAction; }
             set { _auditEntityAction = value; }
@@ -121,7 +121,7 @@ namespace Audit.EntityFramework.Providers
                 }
                 if (auditEntity != null)
                 {
-                    if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                    if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity).Result)
                     {
 #if EF_FULL
                         auditDbContext.Set(mappedType).Add(auditEntity);
@@ -180,7 +180,7 @@ namespace Audit.EntityFramework.Providers
                 }
                 if (auditEntity != null)
                 {
-                    if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                    if (_auditEntityAction == null || await _auditEntityAction.Invoke(efEvent, entry, auditEntity))
                     {
 #if EF_FULL
                         auditDbContext.Set(mappedType).Add(auditEntity);
