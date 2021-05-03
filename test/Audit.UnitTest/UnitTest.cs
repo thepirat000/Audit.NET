@@ -30,6 +30,85 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void Test_AsyncCustomAction_Fluent()
+        {
+            var evs = new List<AuditEvent>();
+            bool saved = false;
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(AuditEvent.FromJson(ev.ToJson()));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.Manual)
+                .ResetActions()
+                .WithAction(action => action
+                    .OnEventSaved(async scope =>
+                    {
+                        await Task.Delay(500);
+                        saved = true;
+                    }))
+                .WithAction(action => action
+                    .OnEventSaving(async scope =>
+                    {
+                        await Task.Delay(500);
+                        scope.Comment("OnEventSaving");
+                    }))
+                .WithAction(action => action
+                    .OnScopeCreated(async scope =>
+                    {
+                        await Task.Delay(500);
+                        scope.Comment("OnScopeCreated");
+                    }));
+
+            using (var scope = AuditScope.Create("test", null))
+            {
+                scope.Save();
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.IsTrue(evs[0].Comments.Contains("OnScopeCreated"));
+            Assert.IsTrue(evs[0].Comments.Contains("OnEventSaving"));
+            Assert.IsTrue(saved);
+        }
+
+        [Test]
+        public void Test_AsyncCustomAction()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(AuditEvent.FromJson(ev.ToJson()));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+            bool saved = false;
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, async scope =>
+            {
+                await Task.Delay(500);
+                scope.Comment("OnScopeCreated");
+            });
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, async scope =>
+            {
+                await Task.Delay(500);
+                scope.Comment("OnEventSaving");
+            });
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, async scope =>
+            {
+                await Task.Delay(500);
+                saved = true;
+            });
+
+            using (var scope = AuditScope.Create("test", null))
+            {
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.IsTrue(evs[0].Comments.Contains("OnScopeCreated"));
+            Assert.IsTrue(evs[0].Comments.Contains("OnEventSaving"));
+            Assert.IsTrue(saved);
+        }
+
+        [Test]
         public void Test_AuditScopeCreation_WithExistingAuditEvent_WithCustomFields()
         {
             var evs_onScopeCreated = new List<AuditEvent>();

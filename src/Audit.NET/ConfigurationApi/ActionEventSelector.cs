@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -9,13 +10,31 @@ namespace Audit.Core.ConfigurationApi
             Configuration.AddCustomAction(ActionType.OnEventSaved, action);
         }
 
+        public void OnEventSaved(Func<AuditScope, Task> action)
+        {
+            //TODO: FDCG: Pending test
+            Configuration.AddCustomAction(ActionType.OnEventSaved, action);
+        }
+
         public void OnEventSaving(Action<AuditScope> action)
         {
             Configuration.AddCustomAction(ActionType.OnEventSaving, action);
         }
 
+        public void OnEventSaving(Func<AuditScope, Task> action)
+        {
+            //TODO: FDCG: Pending test
+            Configuration.AddCustomAction(ActionType.OnEventSaving, action);
+        }
+
         public void OnScopeCreated(Action<AuditScope> action)
         {
+            Configuration.AddCustomAction(ActionType.OnScopeCreated, action);
+        }
+
+        public void OnScopeCreated(Func<AuditScope, Task> action)
+        {
+            //TODO: FDCG: Pending test
             Configuration.AddCustomAction(ActionType.OnScopeCreated, action);
         }
     }

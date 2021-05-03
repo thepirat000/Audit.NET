@@ -634,6 +634,15 @@ Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
 });
 ```
 
+Custom actions can also be asynchronous, for example:
+```c#
+Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, async scope =>
+{
+    var result = await svcProvider.GetService<InfoService>().GetInfoAsync();
+    scope.SetCustomField("Info", result);
+});
+```
+
 The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnScopeCreated`: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 

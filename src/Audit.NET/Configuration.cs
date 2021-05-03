@@ -4,6 +4,7 @@ using Audit.Core.Providers;
 using Audit.Core.ConfigurationApi;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace Audit.Core
 {
@@ -56,7 +57,7 @@ namespace Audit.Core
         public static JsonSerializerSettings JsonSettings { get; set; }
 
         // Custom actions
-        internal static Dictionary<ActionType, List<Action<AuditScope>>> AuditScopeActions { get; private set; }
+        internal static Dictionary<ActionType, List<Func<AuditScope, Task>>> AuditScopeActions { get; private set; }
 
         internal static object Locker = new object();
 
@@ -94,7 +95,27 @@ namespace Audit.Core
         {
             lock (Locker)
             {
-                AuditScopeActions[when].Add(action);
+                AuditScopeActions[when].Add(scope =>
+                {
+                    action.Invoke(scope);
+                    return Task.Delay(0);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Attaches an asynchronous action to be performed globally on any AuditScope.
+        /// </summary>
+        /// <param name="when">To indicate when the action should be performed.</param>
+        /// <param name="asyncAction">The asynchronous action to perform.</param>
+        public static void AddCustomAction(ActionType when, Func<AuditScope, Task> asyncAction)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[when].Add(async scope =>
+                {
+                    await asyncAction.Invoke(scope);
+                });
             }
         }
 
@@ -106,7 +127,26 @@ namespace Audit.Core
         {
             lock (Locker)
             {
-                AuditScopeActions[ActionType.OnEventSaving].Add(action);
+                AuditScopeActions[ActionType.OnEventSaving].Add(scope =>
+                {
+                    action.Invoke(scope);
+                    return Task.Delay(0);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Attaches a global asynchronous action to be performed on the audit scope before the audit event is saved.
+        /// </summary>
+        /// <param name="asyncAction">The asynchronous action to perform.</param>
+        public static void AddOnSavingAction(Func<AuditScope, Task> asyncAction)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnEventSaving].Add(async scope =>
+                {
+                    await asyncAction.Invoke(scope);
+                });
             }
         }
 
@@ -118,7 +158,26 @@ namespace Audit.Core
         {
             lock (Locker)
             {
-                AuditScopeActions[ActionType.OnScopeCreated].Add(action);
+                AuditScopeActions[ActionType.OnScopeCreated].Add(scope => 
+                {
+                    action.Invoke(scope);
+                    return Task.Delay(0);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Attaches a global asynchronous action to be performed on the audit scope right after it is created and before any saving.
+        /// </summary>
+        /// <param name="asyncAction">The asynchronous action to perform.</param>
+        public static void AddOnCreatedAction(Func<AuditScope, Task> asyncAction)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnScopeCreated].Add(async scope =>
+                {
+                    await asyncAction.Invoke(scope);
+                });
             }
         }
 
@@ -129,11 +188,11 @@ namespace Audit.Core
         {
             lock (Locker)
             {
-                AuditScopeActions = new Dictionary<ActionType, List<Action<AuditScope>>>()
+                AuditScopeActions = new Dictionary<ActionType, List<Func<AuditScope, Task>>>()
                 {
-                    {ActionType.OnScopeCreated, new List<Action<AuditScope>>()},
-                    {ActionType.OnEventSaving, new List<Action<AuditScope>>()},
-                    {ActionType.OnEventSaved, new List<Action<AuditScope>>()}
+                    {ActionType.OnScopeCreated, new List<Func<AuditScope, Task>>()},
+                    {ActionType.OnEventSaving, new List<Func<AuditScope, Task>>()},
+                    {ActionType.OnEventSaved, new List<Func<AuditScope, Task>>()}
                 };
             }
         }
@@ -148,21 +207,38 @@ namespace Audit.Core
                 AuditScopeActions[actionType].Clear();
             }
         }
-        
+
         /// <summary>
-        /// Invokes the scope custom actions.
+        /// Synchronously invokes the scope custom actions.
         /// </summary>
         internal static void InvokeScopeCustomActions(ActionType type, AuditScope auditScope)
         {
-            List<Action<AuditScope>> actions;
+            List<Func<AuditScope, Task>> actions;
             lock (Locker)
             {
                 actions = AuditScopeActions[type].ToList();
             }
             foreach (var action in actions)
             {
-                action.Invoke(auditScope);
+                action.Invoke(auditScope).GetAwaiter().GetResult();
             }
         }
+
+        /// <summary>
+        /// Asynchronously invokes the scope custom actions.
+        /// </summary>
+        internal static async Task InvokeScopeCustomActionsAsync(ActionType type, AuditScope auditScope)
+        {
+            List<Func<AuditScope, Task>> actions;
+            lock (Locker)
+            {
+                actions = AuditScopeActions[type].ToList();
+            }
+            foreach (var action in actions)
+            {
+                await action.Invoke(auditScope);
+            }
+        }
+
     }
 }

@@ -110,7 +110,7 @@ namespace Audit.Core
         {
             _saveMode = SaveMode.InsertOnStart;
             // Execute custom on scope created actions
-            Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeCreated, this);
 
             // Process the event insertion (if applies)
             if (_options.IsCreateAndSave)
@@ -450,7 +450,7 @@ namespace Audit.Core
                 return;
             }
             // Execute custom on event saving actions
-            Configuration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaving, this);
             if (IsEndedOrDisabled())
             {
                 return;
@@ -464,7 +464,7 @@ namespace Audit.Core
                 _eventId = await _dataProvider.InsertEventAsync(_event);
             }
             // Execute custom after saving actions
-            Configuration.InvokeScopeCustomActions(ActionType.OnEventSaved, this);
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaved, this);
         }
         #endregion
     }
