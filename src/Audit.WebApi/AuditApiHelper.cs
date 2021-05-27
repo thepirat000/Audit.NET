@@ -90,19 +90,13 @@ namespace Audit.WebApi
         internal static async Task<string> GetRequestBody(HttpContext httpContext)
         {
             var body = httpContext.Request.Body;
-            if (body != null && body.CanRead)
+            if (body != null && body.CanRead && body.CanSeek)
             {
                 using (var stream = new MemoryStream())
                 {
-                    if (body.CanSeek)
-                    {
-                        body.Seek(0, SeekOrigin.Begin);
-                    }
+                    body.Seek(0, SeekOrigin.Begin);
                     await body.CopyToAsync(stream);
-                    if (body.CanSeek)
-                    {
-                        body.Seek(0, SeekOrigin.Begin);
-                    }
+                    body.Seek(0, SeekOrigin.Begin);
                     return Encoding.UTF8.GetString(stream.ToArray());
                 }
             }
@@ -112,19 +106,13 @@ namespace Audit.WebApi
         internal static async Task<string> GetResponseBody(HttpContext httpContext)
         {
             var body = httpContext.Response.Body;
-            if (body != null && body.CanRead)
+            if (body != null && body.CanRead && body.CanSeek)
             {
                 using (var stream = new MemoryStream())
                 {
-                    if (body.CanSeek)
-                    {
-                        body.Seek(0, SeekOrigin.Begin);
-                    }
+                    body.Seek(0, SeekOrigin.Begin);
                     await body.CopyToAsync(stream);
-                    if (body.CanSeek)
-                    {
-                        body.Seek(0, SeekOrigin.Begin);
-                    }
+                    body.Seek(0, SeekOrigin.Begin);
                     return Encoding.UTF8.GetString(stream.ToArray());
                 }
             }

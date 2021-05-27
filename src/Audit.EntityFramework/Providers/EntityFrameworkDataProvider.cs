@@ -157,6 +157,8 @@ namespace Audit.EntityFramework.Providers
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
             {
+                Type entityType = GetEntityType(entry, localDbContext);
+                entry.EntityType = entityType;
                 Type mappedType = _explicitMapper?.Invoke(entry);
                 object auditEntity = null;
                 if (mappedType != null)
@@ -167,14 +169,13 @@ namespace Audit.EntityFramework.Providers
                 else
                 {
                     // Implicit mapping (Type -> Type)
-                    Type type = GetEntityType(entry, localDbContext);
-                    if (type != null)
+                    if (entityType != null)
                     {
-                        entry.EntityType = type;
-                        mappedType = _auditTypeMapper?.Invoke(type, entry);
+                        entry.EntityType = entityType;
+                        mappedType = _auditTypeMapper?.Invoke(entityType, entry);
                         if (mappedType != null)
                         {
-                            auditEntity = CreateAuditEntity(type, mappedType, entry);
+                            auditEntity = CreateAuditEntity(entityType, mappedType, entry);
                         }
                     }
                 }

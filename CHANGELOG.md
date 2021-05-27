@@ -3,7 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [17.0.4] - 2021-05-??
+## [17.0.5] - 2021-05-27
+### Modified
+- Audit.WebApi: Fix to only read the request body stream when the stream can be seek (CanSeek = true) (#404)
+- Audit.EntityFramework: Fix AuditEvent's entitytype not present for explicit mapping (#408)
+
+## [17.0.4] - 2021-05-15
 ### Modified
 - Audit.NET: Adding support for asynchronous global custom actions
 

@@ -129,6 +129,75 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
+private bool IsCommonEntity(Type type)
+{
+    return type == typeof(OrderMemoryContext.Order) || type == typeof(OrderMemoryContext.Orderline);
+}
+
+        [Test]
+        public async Task Test_MapExplicitAndMultipleActions()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(ef => ef
+                    .AuditTypeExplicitMapper(config => config
+                        .Map<OrderMemoryContext.Order, OrderMemoryContext.OrderAudit>()
+                        .Map<OrderMemoryContext.Orderline, OrderMemoryContext.OrderlineAudit>()
+                        .MapExplicit<OrderMemoryContext.AuditLog>(ee => !IsCommonEntity(ee.GetEntry().Entity.GetType()), (entry, auditLog) =>
+                        {
+                            auditLog.AuditData = entry.ToJson();
+                            auditLog.EntityType = entry.EntityType.Name;
+                            auditLog.AuditDate = DateTime.Now;
+                            auditLog.AuditUser = Environment.UserName;
+                            auditLog.TablePk = entry.PrimaryKey.First().Value.ToString();
+                        })
+                        .AuditEntityAction((evt, entry, entity) =>
+                        {
+                            if (entity is OrderMemoryContext.IAudit auditEntity)
+                            {
+                                auditEntity.AuditDate = DateTime.UtcNow;
+                                auditEntity.UserName = evt.Environment.UserName;
+                                auditEntity.AuditAction = entry.Action;
+                            }                
+                        }))
+                    .IgnoreMatchedProperties(type => type == typeof(OrderMemoryContext.AuditLog)));
+            var id = Rnd.Next();
+
+            var options = new DbContextOptionsBuilder<OrderMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_orders")
+                .Options;
+            using (var ctx = new OrderMemoryContext(options))
+            {
+                await ctx.Database.EnsureDeletedAsync();
+                await ctx.Database.EnsureCreatedAsync();
+
+                ctx.Add(new OrderMemoryContext.Order()
+                {
+                    Id = id,
+                    Name = id.ToString()
+                });
+                await ctx.SaveChangesAsync();
+
+                ctx.Add(new OrderMemoryContext.Product()
+                {
+                    Id = (id + 1),
+                    Name = (id + 1).ToString()
+                });
+                await ctx.SaveChangesAsync();
+
+            }
+
+            using (var ctx = new OrderMemoryContext(options))
+            {
+                var auditLogs = ctx.AuditLogs.Where(l => l.TablePk == (id + 1).ToString()).ToList();
+                var orderAudits = ctx.OrderAudits.Where(l => l.Id == id).ToList();
+
+                Assert.AreEqual(1, auditLogs.Count);
+                Assert.AreEqual(1, orderAudits.Count);
+                Assert.AreEqual(Environment.UserName, orderAudits[0].UserName);
+                Assert.AreEqual(Environment.UserName, auditLogs[0].AuditUser);
+            }
+
+        }
 
         [Test]
         public async Task Test_EF_Provider_ExplicitMapper_MapExplicit_Async()
