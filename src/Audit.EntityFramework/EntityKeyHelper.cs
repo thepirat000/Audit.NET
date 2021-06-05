@@ -109,19 +109,19 @@ public sealed class EntityKeyHelper
         var mapping = entitySetMappings.SingleOrDefault(x => x.EntitySet.Name == entitySet.Name);
         if (mapping != null && mapping.EntityTypeMappings.Count(m => m.Fragments.Count > 0) == 1)
         {
-            return mapping.EntityTypeMappings.Single(m => m.Fragments.Count > 0).Fragments.Single();
+            return mapping.EntityTypeMappings.Single(m => m.Fragments.Count > 0).Fragments.First();
         }
         else
         {
             mapping = entitySetMappings.SingleOrDefault(x => x.EntityTypeMappings.Where(y => y.EntityType != null).Any(y => y.EntityType.Name == entitySet.Name));
             if (mapping != null)
             {
-                return mapping.EntityTypeMappings.Where(x => x.EntityType != null).Single(x => x.EntityType.Name == entityType.Name && x.Fragments.Count > 0).Fragments.Single();
+                return mapping.EntityTypeMappings.Where(x => x.EntityType != null).Single(x => x.EntityType.Name == entityType.Name && x.Fragments.Count > 0).Fragments.First();
             }
             else
             {
                 var entitySetMapping = entitySetMappings.Single(x => x.EntityTypeMappings.Any(y => y.IsOfEntityTypes.Any(z => z.Name == entitySet.Name)));
-                return entitySetMapping.EntityTypeMappings.First(x => x.IsOfEntityTypes.Any(y => y.Name == entitySet.Name)).Fragments.Single();
+                return entitySetMapping.EntityTypeMappings.First(x => x.IsOfEntityTypes.Any(y => y.Name == entitySet.Name)).Fragments.First();
             }
         }
     }

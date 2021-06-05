@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into an Azure Cosmos database</Description>
     <Copyright>Copyright 2021</Copyright>
     <AssemblyTitle>Audit.AzureCosmos</AssemblyTitle>
-    <VersionPrefix>17.0.5</VersionPrefix>
+    <VersionPrefix>17.0.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>net45;netstandard1.6;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
