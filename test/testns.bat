@@ -70,8 +70,8 @@ echo Running...
 cd ..
 
 cd Audit.EntityFramework.UnitTest
-echo ---------------------------------------------- RUNNING EF FULL UNIT TESTS (8) ----------------------------------------------
-TITLE RUNNING EF FULL UNIT TESTS (8)
+echo ---------------------------------------------- RUNNING EF UNIT TESTS (8) ----------------------------------------------
+TITLE RUNNING EF UNIT TESTS (8)
 IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" (
 	echo The file does not exist
         exit /B 1

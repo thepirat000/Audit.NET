@@ -117,6 +117,11 @@ namespace Audit.EntityFramework.Full.UnitTest
                 db.SaveChanges();
             }
 
+            using (var ctx = new ProjectContext("data source=localhost;initial catalog=inheritance_test;integrated security=true;"))
+            {
+                ctx.Database.Delete();
+            }
+
             Assert.AreEqual(1, evs.Count);
             Assert.AreEqual(1, evs[0].EntityFrameworkEvent.Entries.Count);
             Assert.AreEqual("Mapping", evs[0].EntityFrameworkEvent.Entries[0].Table);
@@ -126,6 +131,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             Assert.AreEqual(typeof(ClientMapping), evs[0].EntityFrameworkEvent.Entries[0].Entity.GetType());
             Assert.AreEqual("one", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyOne"]);
             Assert.AreEqual("two", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyTwo"]);
+
         }
 
     }
