@@ -1,7 +1,7 @@
 # Audit.NET.MySql
 **MySQL provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
-Store the audit events in a MySQL Table, in JSON format.
+Store the audit events in a MySQL Table.
 
 ## Install
 
