@@ -51,18 +51,17 @@ Audit.Core.Configuration.Setup()
 
 - **ConnectionString**: The MySQL connection string.
 - **TableName**: The table name that stores the audit events.
-- **JsonColumnName**: The column name of the event table where the event JSON will be stored.
 - **IdColumnName**: The column name of the event identifier (the primary key column name).
+- **JsonColumnName**: The column name of the event table where the event JSON will be stored. (optional)
 - **CustomColumn**: Additional columns to store information from the audit event. (optional)
 
 ## Query events
 
-This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id 
 
 ```c#
 var event = mySqlDataProvider.GetEvent(1000);
 ```
-
 
 ## Table constraints
 
@@ -77,7 +76,7 @@ CREATE TABLE event
 	inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	last_updated_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	data JSON NOT NULL,
-    user VARCHAR(20) NULL,
+    	user VARCHAR(20) NULL,
 	PRIMARY KEY (id)
 );
 GO
