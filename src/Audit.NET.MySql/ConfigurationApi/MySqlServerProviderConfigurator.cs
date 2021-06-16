@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Audit.Core;
+using Audit.NET.MySql;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ namespace Audit.MySql.Configuration
         internal string _tableName = "Event";
         internal string _idColumnName = "Id";
         internal string _jsonColumnName = "Data";
+        internal List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         public IMySqlServerProviderConfigurator ConnectionString(string connectionString)
         {
@@ -36,5 +39,10 @@ namespace Audit.MySql.Configuration
             return this;
         }
 
+        public IMySqlServerProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value)
+        {
+            _customColumns.Add(new CustomColumn(columnName, value));
+            return this;
+        }
     }
 }

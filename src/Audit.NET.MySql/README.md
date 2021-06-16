@@ -28,7 +28,11 @@ Audit.Core.Configuration.DataProvider = new MySqlDataProvider()
     ConnectionString = "Server=localhost; Database=events; Uid=admin; Pwd=admin;",
     TableName = "events",
     IdColumnName = "event_id",
-    JsonColumnName = "data"
+    JsonColumnName = "data",
+    CustomColumns = new List<CustomColumn>()
+    {
+        new CustomColumn("user", ev => ev.Environment.UserName)
+    }
 };
 ```
 
@@ -39,16 +43,17 @@ Audit.Core.Configuration.Setup()
         .ConnectionString("Server=localhost; Database=events; Uid=admin; Pwd=admin;")
         .TableName("events")
         .IdColumnName("event_id")
-        .JsonColumnName("data"));
+        .JsonColumnName("data")
+        .CustomColumn("user", ev => ev.Environment.UserName);
 ```
 
 ### Provider Options
 
-Mandatory:
 - **ConnectionString**: The MySQL connection string.
 - **TableName**: The table name that stores the audit events.
 - **JsonColumnName**: The column name of the event table where the event JSON will be stored.
 - **IdColumnName**: The column name of the event identifier (the primary key column name).
+- **CustomColumn**: Additional columns to store information from the audit event. (optional)
 
 ## Query events
 
@@ -72,6 +77,7 @@ CREATE TABLE event
 	inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	last_updated_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	data JSON NOT NULL,
+    user VARCHAR(20) NULL,
 	PRIMARY KEY (id)
 );
 GO

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [17.0.7] - 2021-06-15
+### Modified
+- Audit.NET.MySql: Adding support for custom columns on MySql data provider (#415)
+
 ## [17.0.6] - 2021-06-05
 ### Modified
 - Audit.EntityFramework: Fix "Sequence contains more than one element" exception for EF entities with inheritance, when more than one mapping fragment is defined on an entity (#409)

@@ -1056,7 +1056,8 @@ namespace Audit.IntegrationTest
                         .ConnectionString("Server=localhost; Database=test; Uid=admin; Pwd=admin;")
                         .TableName("event")
                         .IdColumnName("id")
-                        .JsonColumnName("data"))
+                        .JsonColumnName("data")
+                        .CustomColumn("user", ev => ev.Environment.UserName))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

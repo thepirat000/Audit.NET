@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for AspNet Core MVC Controller actions.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.Mvc.Core</AssemblyTitle>
-    <VersionPrefix>17.0.6</VersionPrefix>
+    <VersionPrefix>17.0.7</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net451;netstandard2.1;netcoreapp3.0</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>

@@ -14,6 +14,12 @@ namespace Audit.UnitTest
     {
         private const string folder = @"D:\temp";
 
+        [SetUp]
+        public void Setup()
+        {
+            System.IO.Directory.CreateDirectory(folder);
+        }
+
         [Test]
         public void Test_FileSystem_1()
         {
