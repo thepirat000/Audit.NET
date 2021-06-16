@@ -79,5 +79,4 @@ CREATE TABLE event
     	user VARCHAR(20) NULL,
 	PRIMARY KEY (id)
 );
-GO
 ```
