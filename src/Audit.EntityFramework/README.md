@@ -383,9 +383,11 @@ Audit.Core.Configuration.DataProvider = new EntityFrameworkDataProvider()
         a.AuditAction = entry.Action; // Insert, Update, Delete
         return Task.FromResult(true); // return false to ignore the audit
     }
-};```
+};
+```
 
 Or use the [fluent API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api) `UseEntityFramework` method, this is the recommended approach:
+
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
