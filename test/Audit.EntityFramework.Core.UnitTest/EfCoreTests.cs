@@ -28,6 +28,64 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
 #if EF_CORE_5
+
+        [Test]
+        public void Test_EF_Core_TablePerTypeConfig()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup().UseDynamicProvider(_ => _.OnInsert(ev =>
+            {
+                evs.Add(ev.GetEntityFrameworkEvent());
+            }));
+
+            var cfg = new DbContextOptionsBuilder<TptConfigContext>().UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=TptConfigTests;Trusted_Connection=True;ConnectRetryCount=0");
+            var ctx = new TptConfigContext(cfg.Options);
+            var guid = Guid.NewGuid().ToString();
+
+            // INSERT
+            ctx.ReservationRequests.Add(new ReservationRequest()
+            {
+                LocationId = guid,
+                UserId = "u",
+                ReservationComments = "test",
+                ReservationTo = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].Entries.Count);
+            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
+            Assert.AreEqual("ReservationRequests", evs[0].Entries[0].Table);
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Id"));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "LocationId" && (string)cv.Value == guid));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Uid" && (string)cv.Value == "u"));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationComments" && (string)cv.Value == "test"));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationTo"));
+
+            evs.Clear();
+
+            // UPDATE
+            var r = ctx.ReservationRequests.FirstOrDefault(r => r.LocationId == guid);
+            var newGuid = Guid.NewGuid().ToString();
+            r.LocationId = newGuid;
+            r.UserId = "u2";
+            ctx.SaveChanges();
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].Entries.Count);
+            Assert.AreEqual("Update", evs[0].Entries[0].Action);
+            Assert.AreEqual("ReservationRequests", evs[0].Entries[0].Table);
+            Assert.AreEqual(2, evs[0].Entries[0].Changes.Count);
+            Assert.IsTrue(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Uid" && (string)ch.OriginalValue == "u" && (string)ch.NewValue == "u2"));
+            Assert.IsTrue(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LocationId" && (string)ch.OriginalValue == guid && (string)ch.NewValue == newGuid));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Id"));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "LocationId" && (string)cv.Value == newGuid));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Uid" && (string)cv.Value == "u2"));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationComments" && (string)cv.Value == "test"));
+            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationTo"));
+        }
+
         [Test]
         public void Test_EF_Core_ManyToMany_NoJoinEntity()
         {
