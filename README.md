@@ -52,7 +52,7 @@ Check the [CHANGELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CH
 Starting on version 18, Audit.NET will default to diferent serialization mechanism depending on the target framework of the client application, 
 as shown on the following table:
 
-| <sub>Target</sub> \ <sup>Library</sup> |
+| Target | Serialization |
 | ------------ | ---------------- |
 | **≥ .NET 5.0** | `System.Text.Json` |
 | **≤ .NETSTANDARD2.1 / .NETCOREAPP3.0** | `Newtonsoft.Json` |
