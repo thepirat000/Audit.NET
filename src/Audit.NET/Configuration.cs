@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using Audit.Core.Providers;
 using Audit.Core.ConfigurationApi;
 using System.Linq;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
+#if IS_NK_JSON
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+#else
+using System.Text.Json;
+using System.Text.Json.Serialization;
+#endif
 
 namespace Audit.Core
 {
@@ -54,8 +60,11 @@ namespace Audit.Core
         /// <summary>
         /// Global json serializer settings for serializing the audit event on the data providers or by calling the ToJson() method on the AuditEvent.
         /// </summary>
+#if IS_NK_JSON
         public static JsonSerializerSettings JsonSettings { get; set; }
-
+#else
+        public static JsonSerializerOptions JsonSettings { get; set; }
+#endif
         // Custom actions
         internal static Dictionary<ActionType, List<Func<AuditScope, Task>>> AuditScopeActions { get; private set; }
 
@@ -63,16 +72,31 @@ namespace Audit.Core
 
         private static IAuditScopeFactory _auditScopeFactory;
 
+        /// <summary>
+        /// Gets or sets the json adapter that controls the JSON serialization mechanism.
+        /// </summary>
+        public static IJsonAdapter JsonAdapter { get; set; } = new JsonAdapter();
+
         static Configuration()
         {
             AuditDisabled = false;
             DataProvider = new FileDataProvider();
             CreationPolicy = EventCreationPolicy.InsertOnEnd;
+#if IS_NK_JSON
             JsonSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
+#else
+            JsonSettings = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = null
+                // TODO: Will be added on .net 6 https://github.com/dotnet/runtime/pull/46101/commits/152db423e06f6d93a560b45b4330fac6507c7aa7
+                //ReferenceHandler = ReferenceHandler.IgnoreCycle
+            };
+#endif
             SystemClock = new DefaultSystemClock();
             ResetCustomActions();
             _auditScopeFactory = new AuditScopeFactory();

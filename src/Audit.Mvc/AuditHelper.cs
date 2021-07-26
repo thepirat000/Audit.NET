@@ -1,6 +1,5 @@
 ﻿#if NET45
 using System.Web.Mvc;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +18,7 @@ namespace Audit.Mvc
             }
             return parameters.ToDictionary(
                 k => k.Key, 
-                v => v.Value == null ? null : JsonConvert.DeserializeObject(JsonConvert.SerializeObject(v.Value, Configuration.JsonSettings), v.Value.GetType(), Configuration.JsonSettings));
+                v => v.Value == null ? null : Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(v.Value), v.Value.GetType()));
         }
 
         internal static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net472</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net472;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
     <AssemblyName>Audit.EntityFramework.Core.v3.UnitTest</AssemblyName>
@@ -26,13 +26,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
-	<PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+	  <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" Version="11.0.50727.1" />
     <PackageReference Include="moq" Version="4.9.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.10" />

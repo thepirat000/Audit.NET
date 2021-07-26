@@ -2,6 +2,8 @@
 cls
 
 del "audit.net\bin\debug\*.symbols.nupkg"
+del "Audit.NET.JsonNetSerializer\bin\debug\*.symbols.nupkg"
+del "Audit.NET.JsonSystemSerializer\bin\debug\*.symbols.nupkg"
 del "audit.mvc\bin\debug\*.symbols.nupkg"
 del "audit.mvc.core\bin\debug\*.symbols.nupkg"
 del "audit.webapi\bin\debug\*.symbols.nupkg"
@@ -34,6 +36,8 @@ del "Audit.NET.AmazonQLDB\bin\debug\*.symbols.nupkg"
 del "Audit.NET.Kafka\bin\debug\*.symbols.nupkg"
 
 nuget push "audit.net\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.JsonNetSerializer\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.JsonSystemSerializer\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.mvc\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.Mvc.Core\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "audit.webapi\bin\debug\*.nupkg" -NoSymbols -source %1

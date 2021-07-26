@@ -1,7 +1,6 @@
 ﻿using System;
 using Audit.Core;
 using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
 
 namespace Audit.AzureTableStorage.ConfigurationApi
 {
@@ -25,7 +24,7 @@ namespace Audit.AzureTableStorage.ConfigurationApi
         /// </summary>
         public AuditEventTableEntity(AuditEvent auditEvent) : base(auditEvent.GetType().Name, Guid.NewGuid().ToString())
         {
-            AuditEvent = JsonConvert.SerializeObject(auditEvent, Configuration.JsonSettings);
+            AuditEvent = Configuration.JsonAdapter.Serialize(auditEvent);
         }
         /// <summary>
         /// Creates a new entity from a partition key and a row key.
@@ -38,7 +37,7 @@ namespace Audit.AzureTableStorage.ConfigurationApi
         /// </summary>
         public AuditEventTableEntity(string partitionKey, string rowKey, AuditEvent auditEvent) : base(partitionKey, rowKey)
         {
-            AuditEvent = JsonConvert.SerializeObject(auditEvent, Configuration.JsonSettings);
+            AuditEvent = Configuration.JsonAdapter.Serialize(auditEvent);
         }
     }
 }

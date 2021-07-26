@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net472</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net472;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
     <AssemblyName>Audit.EntityFramework.Core.UnitTest</AssemblyName>
@@ -20,7 +20,7 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'netstandard2.1' ">
     <DefineConstants>$(DefineConstants);EF_CORE_3</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'net5.0' ">
     <DefineConstants>$(DefineConstants);EF_CORE_5</DefineConstants>
   </PropertyGroup>
     
@@ -48,13 +48,20 @@
 	<PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
+  </ItemGroup>
+
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" Version="11.0.50727.1" />
     <PackageReference Include="moq" Version="4.9.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="nunit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.10" />

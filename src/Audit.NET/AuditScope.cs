@@ -29,7 +29,7 @@ namespace Audit.Core
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
             MethodBase callingMethod = options.CallingMethod;
-#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;

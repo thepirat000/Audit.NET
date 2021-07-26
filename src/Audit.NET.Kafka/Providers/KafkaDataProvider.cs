@@ -1,9 +1,7 @@
 ﻿using Audit.Core;
 using Confluent.Kafka;
 using System;
-using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Audit.Kafka.Providers
 {

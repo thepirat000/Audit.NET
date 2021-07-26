@@ -1,4 +1,4 @@
-﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
 using Audit.Elasticsearch.Providers;
 using Nest;
 using NUnit.Framework;
@@ -46,13 +46,15 @@ namespace Audit.IntegrationTest
                 sb += "-end";
             }
 
+            var evLoad = ela.GetEvent(new ElasticsearchAuditEventId() { Id = guids[0], Index = "auditevent2" });
+
             Assert.AreEqual(1, guids.Count);
             Assert.AreEqual(1, ins.Count);
             Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("\"init\"", ins[0].Target.Old);
+            Assert.AreEqual("init", ins[0].Target.Old.ToString());
             Assert.AreEqual(null, ins[0].Target.New);
-            Assert.AreEqual("\"init\"", repl[0].Target.Old);
-            Assert.AreEqual("\"init-end\"", repl[0].Target.New);
+            Assert.AreEqual("init", repl[0].Target.Old.ToString());
+            Assert.AreEqual("init-end", repl[0].Target.New.ToString());
         }
 
         [Test]
@@ -83,10 +85,10 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(1, guids.Count);
             Assert.AreEqual(1, ins.Count);
             Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("\"init\"", ins[0].Target.Old);
+            Assert.AreEqual("init", ins[0].Target.Old.ToString());
             Assert.AreEqual(null, ins[0].Target.New);
-            Assert.AreEqual("\"init\"", repl[0].Target.Old);
-            Assert.AreEqual("\"init-end\"", repl[0].Target.New);
+            Assert.AreEqual("init", repl[0].Target.Old.ToString());
+            Assert.AreEqual("init-end", repl[0].Target.New.ToString());
         }
     }
 

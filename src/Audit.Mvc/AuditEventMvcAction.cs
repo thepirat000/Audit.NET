@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 
 namespace Audit.Mvc
 {
@@ -12,7 +11,6 @@ namespace Audit.Mvc
         /// Gets or sets the action details.
         /// </summary>
         /// <value>The action.</value>
-        [JsonProperty(Order = 10)]
         public AuditAction Action { get; set; }
     }
 }

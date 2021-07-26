@@ -4,7 +4,6 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Reflection;
 
@@ -14,6 +13,7 @@ namespace Audit.UnitTest
     public class Log4netTests
     {
         private MemoryAppender _adapter;
+        private static JsonAdapter JsonAdapter = new JsonAdapter();
 
         [OneTimeSetUp]
         public void Setup()
@@ -45,9 +45,10 @@ namespace Audit.UnitTest
 
             var events = _adapter.PopAllEvents();
             Assert.AreEqual(2, events.Length);
-            Assert.AreEqual("Test_log4net_InsertOnStartReplaceOnEnd", JsonConvert.DeserializeObject<AuditEvent>(events[0].MessageObject.ToString()).EventType);
-            Assert.AreEqual("Test_log4net_InsertOnStartReplaceOnEnd", JsonConvert.DeserializeObject<AuditEvent>(events[1].MessageObject.ToString()).EventType);
-            Assert.AreEqual(JsonConvert.DeserializeObject<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"], JsonConvert.DeserializeObject<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"]);
+            Assert.AreEqual("Test_log4net_InsertOnStartReplaceOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).EventType);
+            Assert.AreEqual("Test_log4net_InsertOnStartReplaceOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).EventType);
+            var jsonAdapter = new JsonAdapter();
+            Assert.AreEqual(jsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"].ToString(), jsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"].ToString());
         }
 
         [Test]
@@ -78,9 +79,9 @@ namespace Audit.UnitTest
             Assert.AreEqual(2, events.Length);
             Assert.AreEqual(Level.Debug, events[0].Level);
             Assert.AreEqual(Level.Error, events[1].Level);
-            Assert.AreEqual("Test_log4net_InsertOnStartInsertOnEnd", JsonConvert.DeserializeObject<AuditEvent>(events[0].MessageObject.ToString()).EventType);
-            Assert.AreEqual("Test_log4net_InsertOnStartInsertOnEnd", JsonConvert.DeserializeObject<AuditEvent>(events[1].MessageObject.ToString()).EventType);
-            Assert.AreNotEqual(JsonConvert.DeserializeObject<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"], JsonConvert.DeserializeObject<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"]);
+            Assert.AreEqual("Test_log4net_InsertOnStartInsertOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).EventType);
+            Assert.AreEqual("Test_log4net_InsertOnStartInsertOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).EventType);
+            Assert.AreNotEqual(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"].ToString(), JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"].ToString());
         }
     }
 }

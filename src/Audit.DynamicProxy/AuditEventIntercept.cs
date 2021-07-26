@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,6 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Gets or sets the intercepted event details.
         /// </summary>
-        [JsonProperty(Order = 10)]
         public InterceptEvent InterceptEvent { get; set; }
     }
 }

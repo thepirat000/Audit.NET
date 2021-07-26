@@ -4,9 +4,9 @@
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity.Core</AssemblyTitle>
-    <VersionPrefix>17.0.8</VersionPrefix>
+    <VersionPrefix>18.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.5;netstandard2.1;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;netstandard2.1;net461;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -42,14 +42,14 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);EF_CORE</DefineConstants>
   </PropertyGroup>
-	
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">

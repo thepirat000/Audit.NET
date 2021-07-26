@@ -12,7 +12,6 @@ namespace Audit.Core.ConfigurationApi
 
         public void OnEventSaved(Func<AuditScope, Task> action)
         {
-            //TODO: FDCG: Pending test
             Configuration.AddCustomAction(ActionType.OnEventSaved, action);
         }
 
@@ -23,7 +22,6 @@ namespace Audit.Core.ConfigurationApi
 
         public void OnEventSaving(Func<AuditScope, Task> action)
         {
-            //TODO: FDCG: Pending test
             Configuration.AddCustomAction(ActionType.OnEventSaving, action);
         }
 
@@ -34,7 +32,6 @@ namespace Audit.Core.ConfigurationApi
 
         public void OnScopeCreated(Func<AuditScope, Task> action)
         {
-            //TODO: FDCG: Pending test
             Configuration.AddCustomAction(ActionType.OnScopeCreated, action);
         }
     }

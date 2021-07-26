@@ -4,7 +4,6 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -140,7 +139,7 @@ namespace Audit.AzureTableStorage.Providers
         {
             var container = EnsureContainer(auditEvent);
             var blob = container.GetBlockBlobReference(name);
-            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            var json = Configuration.JsonAdapter.Serialize(auditEvent);
             blob.UploadTextAsync(json).Wait();
         }
 
@@ -148,7 +147,7 @@ namespace Audit.AzureTableStorage.Providers
         {
             var container = await EnsureContainerAsync(auditEvent);
             var blob = container.GetBlockBlobReference(name);
-            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            var json = Configuration.JsonAdapter.Serialize(auditEvent);
             await blob.UploadTextAsync(json);
         }
 

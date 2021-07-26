@@ -1,4 +1,4 @@
-﻿#if NET461 || NETCOREAPP3_0
+﻿#if NET461 || NETCOREAPP3_0 || NET5_0
 using Amazon.QLDB.Driver;
 using Amazon.QLDBSession;
 using Audit.Core;
@@ -46,10 +46,10 @@ namespace Audit.IntegrationTest
 
             Assert.AreEqual(1, ins.Count);
             Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("init", ins[0].Target.Old);
+            Assert.AreEqual("init", ins[0].Target.Old.ToString());
             Assert.AreEqual(null, ins[0].Target.New);
-            Assert.AreEqual("init", repl[0].Target.Old);
-            Assert.AreEqual("init-end", repl[0].Target.New);
+            Assert.AreEqual("init", repl[0].Target.Old.ToString());
+            Assert.AreEqual("init-end", repl[0].Target.New.ToString());
         }
     }
 

@@ -214,7 +214,7 @@ namespace Audit.EntityFramework.Providers
                 entryType = entryType.GetTypeInfo().BaseType;
             }
             Type type;
-#if EF_CORE && (NETSTANDARD2_0 || NETSTANDARD2_1 || NET472)
+#if EF_CORE && (NETSTANDARD2_0 || NETSTANDARD2_1 || NET472 || NET5_0)
             IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindRuntimeEntityType(entryType);
             type = definingType?.ClrType;
 #elif NETSTANDARD1_5 || NET461

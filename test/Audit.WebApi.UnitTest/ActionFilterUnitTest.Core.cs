@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_1 || NETCOREAPP2_0 || NETCOREAPP1_0 || NET451
+﻿#if NETCOREAPP3_1 || NETCOREAPP2_0 || NETCOREAPP1_0 || NET451 || NET5_0
 using System.Collections.Generic;
 using Moq;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using Audit.Core.Providers;
 using NUnit.Framework;
 using System.Net;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using System.Reflection;
 using System.Linq;
@@ -68,8 +67,8 @@ namespace Audit.WebApi.UnitTest
 
                 var okIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.OK);
                 var badIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.BadRequest);
-                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {JsonConvert.SerializeObject(testCase)}");
-                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {JsonConvert.SerializeObject(testCase)}");
+                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {Configuration.JsonAdapter.Serialize(testCase)}");
+                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {Configuration.JsonAdapter.Serialize(testCase)}");
             }
         }
 
@@ -323,8 +322,7 @@ namespace Audit.WebApi.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditApiAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
-
+                {"x", new AuditTarget() { Type = "TEST_REFERENCE_TYPE" } }
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
@@ -351,7 +349,7 @@ namespace Audit.WebApi.UnitTest
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
 
             //Assert
-            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName);
+            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);

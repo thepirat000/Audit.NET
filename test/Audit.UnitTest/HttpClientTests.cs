@@ -3,7 +3,6 @@ using Audit.Core.Providers;
 using Audit.Http;
 using Audit.Http.ConfigurationApi;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,8 @@ namespace Audit.UnitTest
 {
     public class HttpClientTests
     {
+        private static JsonAdapter JsonAdapter = new JsonAdapter();
+
         private HttpClient _httpClient = new HttpClient(new AuditHttpClientHandler()
         {
             IncludeRequestBody = true,
@@ -74,8 +75,8 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    evs.Add(JsonConvert.DeserializeObject<AuditEventHttpClient>(JsonConvert.SerializeObject(ev)));
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    evs.Add(JsonAdapter.Deserialize<AuditEventHttpClient>(JsonAdapter.Serialize(ev)));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }))
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnStartInsertOnEnd);
 
@@ -125,7 +126,7 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }))
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnEnd);
 
@@ -168,7 +169,7 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }))
                 .WithCreationPolicy(Core.EventCreationPolicy.Manual);
 
@@ -212,7 +213,7 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }))
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnEnd);
 
@@ -249,8 +250,8 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    evs.Add(JsonConvert.DeserializeObject<AuditEventHttpClient>(JsonConvert.SerializeObject(ev)));
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    evs.Add(JsonAdapter.Deserialize<AuditEventHttpClient>(JsonAdapter.Serialize(ev)));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }))
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnEnd);
 
@@ -298,8 +299,8 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    evs.Add(JsonConvert.DeserializeObject<AuditEventHttpClient>(JsonConvert.SerializeObject(ev)));
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    evs.Add(JsonAdapter.Deserialize<AuditEventHttpClient>(JsonAdapter.Serialize(ev)));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }));
 
             var cli = ClientFactory.Create(config);
@@ -339,8 +340,8 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    evs.Add(JsonConvert.DeserializeObject<AuditEventHttpClient>(JsonConvert.SerializeObject(ev)));
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    evs.Add(JsonAdapter.Deserialize<AuditEventHttpClient>(JsonAdapter.Serialize(ev)));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }));
 
             var cli = ClientFactory.Create(_ => _
@@ -371,8 +372,8 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    evs.Add(JsonConvert.DeserializeObject<AuditEventHttpClient>(JsonConvert.SerializeObject(ev)));
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    evs.Add(JsonAdapter.Deserialize<AuditEventHttpClient>(JsonAdapter.Serialize(ev)));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }));
 
             var cli = ClientFactory.Create(_ => _
@@ -403,8 +404,8 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.Setup()
                 .Use(_ => _.OnInsertAndReplace(ev =>
                 {
-                    evs.Add(JsonConvert.DeserializeObject<AuditEventHttpClient>(JsonConvert.SerializeObject(ev)));
-                    actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                    evs.Add(JsonAdapter.Deserialize<AuditEventHttpClient>(JsonAdapter.Serialize(ev)));
+                    actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
                 }));
 
 
@@ -426,7 +427,7 @@ namespace Audit.UnitTest
             var dp = new DynamicDataProvider();
             dp.AttachOnInsertAndReplace(ev =>
             {
-                actions.Add(JsonConvert.DeserializeObject<HttpAction>(JsonConvert.SerializeObject(ev.GetHttpAction())));
+                actions.Add(JsonAdapter.Deserialize<HttpAction>(JsonAdapter.Serialize(ev.GetHttpAction())));
             });
 
             var factory = new Mock<IAuditScopeFactory>();

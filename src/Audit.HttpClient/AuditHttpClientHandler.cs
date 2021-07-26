@@ -1,6 +1,5 @@
 ﻿using Audit.Core;
 using Audit.Core.Extensions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;

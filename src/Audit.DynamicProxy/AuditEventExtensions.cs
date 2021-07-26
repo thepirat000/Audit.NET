@@ -25,7 +25,7 @@ namespace Audit.DynamicProxy
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("InterceptEvent")
-                ? auditEvent.CustomFields["InterceptEvent"] as InterceptEvent
+                ? Configuration.JsonAdapter.ToObject<InterceptEvent>(auditEvent.CustomFields["InterceptEvent"])
                 : null;
         }
     }

@@ -7,10 +7,6 @@ using MongoDB.Driver;
 using Audit.Core;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson.IO;
-using Newtonsoft.Json;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
-using Newtonsoft.Json.Converters;
 
 namespace Audit.MongoDB.Providers
 {
@@ -55,15 +51,10 @@ namespace Audit.MongoDB.Providers
 
         /// <summary>
         /// Gets or sets a value indicating whether the target object and extra fields should be serialized as Bson.
-        /// Default is false to serialize using Newtonsoft.Json
+        /// Default is false to serialize using the default JSON serializer from Audit.Core.Configiration.JsonAdapter
         /// </summary>
         /// <value><c>true</c> if should serialize as Bson; or <c>false</c> to serialize as Json.</value>
         public bool SerializeAsBson { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets the default JsonSerializerSettings.
-        /// </summary>
-        public JsonSerializerSettings JsonSerializerSettings { get; set; } = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new List<JsonConverter>() { new JavaScriptDateTimeConverter() } };
 
         public MongoDataProvider()
         {
@@ -78,7 +69,6 @@ namespace Audit.MongoDB.Providers
                 Collection = mongoConfig._collection;
                 ConnectionString = mongoConfig._connectionString;
                 Database = mongoConfig._database;
-                JsonSerializerSettings = mongoConfig._jsonSerializerSettings;
                 SerializeAsBson = mongoConfig._serializeAsBson;
             }
         }
@@ -147,7 +137,7 @@ namespace Audit.MongoDB.Providers
             }
             else
             {
-                return BsonDocument.Parse(JsonConvert.SerializeObject(auditEvent, JsonSerializerSettings));
+                return BsonDocument.Parse(Core.Configuration.JsonAdapter.Serialize(auditEvent));
             }
             
         }
@@ -212,7 +202,7 @@ namespace Audit.MongoDB.Providers
             }
             else
             {
-                return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSerializerSettings), value.GetType(), JsonSerializerSettings);
+                return (T)Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(value), value.GetType());
             }
         }
 

@@ -3,6 +3,7 @@ using Amazon.QLDBSession;
 using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
 using System;
+using Newtonsoft.Json;
 
 namespace Audit.NET.AmazonQLDB.ConfigurationApi
 {
@@ -16,6 +17,7 @@ namespace Audit.NET.AmazonQLDB.ConfigurationApi
         private ILogger _logger;
         private AmazonQLDBSessionConfig _sessionConfig;
         private int _maxConcurrentTransactions;
+        internal JsonSerializerSettings _jsonSettings;
 
         public IAmazonQldbProviderTableConfigurator And => _tableConfigurator;
 
@@ -57,6 +59,13 @@ namespace Audit.NET.AmazonQLDB.ConfigurationApi
         public IAmazonQldbProviderConfigurator UseRetryLogging()
         {
             _useRetryLogging = true;
+            CreateDriverFactory();
+            return this;
+        }
+
+        public IAmazonQldbProviderConfigurator UseJsonSettings(JsonSerializerSettings settings)
+        {
+            _jsonSettings = settings;
             CreateDriverFactory();
             return this;
         }

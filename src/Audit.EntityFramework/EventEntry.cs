@@ -1,31 +1,25 @@
 using Audit.Core;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+#if IS_NK_JSON
+using Newtonsoft.Json;
+#else
+using System.Text.Json.Serialization;
+#endif
 
 namespace Audit.EntityFramework
 {
     public class EventEntry : IAuditOutput
     {
-        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)]
         public string Schema { get; set; }
-        [JsonProperty(Order = 10)]
         public string Table { get; set; }
-        [JsonProperty(Order = 15, NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
-        [JsonProperty(Order = 25)]
         public IDictionary<string, object> PrimaryKey { get; set; }
-        [JsonProperty(Order = 20)]
         public string Action { get; set; }
-        [JsonProperty(Order = 30, NullValueHandling = NullValueHandling.Ignore)]
         public object Entity { get; set; }
-        [JsonProperty(Order = 40, NullValueHandling = NullValueHandling.Ignore)]
         public List<EventEntryChange> Changes { get; set; }
-        [JsonProperty(Order = 45, NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, object> ColumnValues { get; set; }
-        [JsonProperty(Order = 50)]
         public bool Valid { get; set; }
-        [JsonProperty(Order = 60, NullValueHandling = NullValueHandling.Ignore)]
         public List<string> ValidationResults { get; set; }
 
         /// <summary>
@@ -42,7 +36,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Core.Configuration.JsonSettings);
+            return Core.Configuration.JsonAdapter.Serialize(this);
         }
         /// <summary>
         /// Parses an Event Entry from its JSON string representation.
@@ -50,7 +44,7 @@ namespace Audit.EntityFramework
         /// <param name="json">JSON string with the Event Entry representation.</param>
         public static EventEntry FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<EventEntry>(json, Core.Configuration.JsonSettings);
+            return Core.Configuration.JsonAdapter.Deserialize<EventEntry>(json);
         }
 
         [JsonIgnore]

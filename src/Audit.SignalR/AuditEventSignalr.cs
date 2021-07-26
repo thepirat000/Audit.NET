@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 
 namespace Audit.SignalR
 {
@@ -11,7 +10,6 @@ namespace Audit.SignalR
         /// <summary>
         /// Gets or sets the SignalR event details.
         /// </summary>
-        [JsonProperty(Order = 10)]
         public SignalrEventBase Event { get; set; }
     }
 }

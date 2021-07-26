@@ -38,6 +38,5 @@ namespace Audit.Elasticsearch.Providers
             : base(connectionPool, connection, (builtin, settings) => new AuditJsonNetSerializer(builtin, settings) , propertyMappingProvider)
         {
         }
-
     }
 }

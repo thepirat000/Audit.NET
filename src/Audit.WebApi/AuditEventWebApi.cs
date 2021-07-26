@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 
 namespace Audit.WebApi
 {
@@ -11,7 +10,6 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets or sets the Web API action details.
         /// </summary>
-        [JsonProperty(Order = 10)]
         public AuditApiAction Action { get; set; }
     }
 }

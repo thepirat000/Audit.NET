@@ -10,13 +10,14 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using System.Reflection;
 
 namespace Audit.UnitTest
 {
     public class UnitTestAsync
     {
+        private static JsonAdapter JsonAdapter = new JsonAdapter();
+
         [Test]
         public async Task Test_AsyncCustomAction_Fluent_Async()
         {
@@ -138,17 +139,17 @@ namespace Audit.UnitTest
             Assert.AreEqual(2, evs_onScopeCreated[0].CustomFields.Count);
             Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromCustomField"));
             Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromAnon"));
-            Assert.AreEqual(1, evs_onScopeCreated[0].CustomFields["FromCustomField"]);
-            Assert.AreEqual(2, evs_onScopeCreated[0].CustomFields["FromAnon"]);
+            Assert.AreEqual("1", evs_onScopeCreated[0].CustomFields["FromCustomField"].ToString());
+            Assert.AreEqual("2", evs_onScopeCreated[0].CustomFields["FromAnon"].ToString());
 
             Assert.AreEqual(1, evs_Provider.Count);
             Assert.AreEqual(3, evs_Provider[0].CustomFields.Count);
             Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromCustomField"));
             Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromAnon"));
             Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromScope"));
-            Assert.AreEqual(1, evs_Provider[0].CustomFields["FromCustomField"]);
-            Assert.AreEqual(2, evs_Provider[0].CustomFields["FromAnon"]);
-            Assert.AreEqual(3, evs_Provider[0].CustomFields["FromScope"]);
+            Assert.AreEqual("1", evs_Provider[0].CustomFields["FromCustomField"].ToString());
+            Assert.AreEqual("2", evs_Provider[0].CustomFields["FromAnon"].ToString());
+            Assert.AreEqual("3", evs_Provider[0].CustomFields["FromScope"].ToString());
         }
 
         [Test]
@@ -270,7 +271,7 @@ namespace Audit.UnitTest
 
             Assert.AreEqual(1, evs.Count);
             Assert.AreEqual("test", evs[0].EventType);
-            Assert.AreEqual("one", evs[0].CustomFields["field1"]);
+            Assert.AreEqual("one", evs[0].CustomFields["field1"].ToString());
         }
 
         [Test]
@@ -301,13 +302,13 @@ namespace Audit.UnitTest
                     .OnInsert(async ev =>
                     {
                         await Task.Delay(1);
-                        insertEvs.Add(JsonConvert.DeserializeObject<AuditEvent>(JsonConvert.SerializeObject(ev)));
+                        insertEvs.Add(JsonAdapter.Deserialize<AuditEvent>(JsonAdapter.Serialize(ev)));
                         return Guid.NewGuid();
                     })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(1);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEvent>(JsonConvert.SerializeObject(ev)));
+                        replaceEvs.Add(JsonAdapter.Deserialize<AuditEvent>(JsonAdapter.Serialize(ev)));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -321,9 +322,9 @@ namespace Audit.UnitTest
 
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual(2, replaceEvs.Count);
-            Assert.AreEqual("x1", insertEvs[0].Target.Old);
-            Assert.AreEqual("x2", replaceEvs[0].Target.New);
-            Assert.AreEqual("x3", replaceEvs[1].Target.New);
+            Assert.AreEqual("x1", insertEvs[0].Target.Old.ToString());
+            Assert.AreEqual("x2", replaceEvs[0].Target.New.ToString());
+            Assert.AreEqual("x3", replaceEvs[1].Target.New.ToString());
         }
 
 
@@ -351,15 +352,15 @@ namespace Audit.UnitTest
 
             var fileFromProvider = await (Audit.Core.Configuration.DataProvider as FileDataProvider).GetEventAsync($@"{dir}\evt-1.json");
 
-            var ev = JsonConvert.DeserializeObject<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
+            var ev = JsonAdapter.Deserialize<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
             var fileCount = Directory.EnumerateFiles(dir).Count();
             Directory.Delete(dir, true);
 
             Assert.AreEqual(1, fileCount);
-            Assert.AreEqual(JsonConvert.SerializeObject(ev), JsonConvert.SerializeObject(fileFromProvider));
+            Assert.AreEqual(JsonAdapter.Serialize(ev), JsonAdapter.Serialize(fileFromProvider));
             Assert.AreEqual("evt", ev.EventType);
-            Assert.AreEqual("start", ev.Target.Old);
-            Assert.AreEqual("end", ev.Target.New);
+            Assert.AreEqual("start", ev.Target.Old.ToString());
+            Assert.AreEqual("end", ev.Target.New.ToString());
             Assert.AreEqual("1", ev.CustomFields["X"].ToString());
         }
 
@@ -710,7 +711,7 @@ namespace Audit.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
         [Test]
         public async Task Test_Dispose_Async()
         {

@@ -25,7 +25,7 @@ namespace Audit.Mvc
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("Action") 
-                ? auditEvent.CustomFields["Action"] as AuditAction
+                ? Configuration.JsonAdapter.ToObject<AuditAction>(auditEvent.CustomFields["Action"])
                 : null;
         }
     }

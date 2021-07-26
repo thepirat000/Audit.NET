@@ -1,5 +1,9 @@
-using Newtonsoft.Json;
 using System;
+#if IS_NK_JSON
+using Newtonsoft.Json;
+#else
+using System.Text.Json;
+#endif
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -14,6 +18,15 @@ namespace Audit.Core.ConfigurationApi
         /// <param name="auditDisabled">A boolean value indicating whether the audit is globally disabled.</param>
         /// <returns></returns>
         IConfigurator AuditDisabled(bool auditDisabled);
+        /// <summary>
+        /// Use a custom JsonAdapter
+        /// </summary>
+        /// <param name="adapter">The JSON adapter instance.</param>
+        IConfigurator JsonAdapter(IJsonAdapter adapter);
+        /// <summary>
+        /// Use a custom JsonAdapter of type <typeparamref name="T"/> using the parameterless constructor
+        /// </summary>
+        IConfigurator JsonAdapter<T>() where T : IJsonAdapter;
         /// <summary>
         /// Use a null provider. No audit events will be saved. Useful for testing purposes or to disable the audit logs.
         /// </summary>
@@ -40,10 +53,9 @@ namespace Audit.Core.ConfigurationApi
         /// <param name="filenamePrefix">Specifies the filename prefix to use in the audit log files.</param>
         /// <param name="directoryPathBuilder">Specifies the directory builder to get the path where to store the audit log files. If this setting is provided, directoryPath setting will be ignored.</param>
         /// <param name="filenameBuilder">Specifies the filename builder to get the filename to store the audit log for an event.</param>
-        /// <param name="jsonSettings">Specifies the JSON settings to use to serialize the audit events.</param>
         ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "",
-            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null,
-            JsonSerializerSettings jsonSettings = null);
+            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null);
+
 #if NET45 || NET461
         /// <summary>
         /// Store the events in the windows Event Log.

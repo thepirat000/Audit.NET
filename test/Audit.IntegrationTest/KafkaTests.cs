@@ -112,8 +112,8 @@ namespace Audit.IntegrationTest
 
             Assert.IsNotNull(r1);
             Assert.IsNotNull(r2);
-            Assert.AreEqual(guid.ToString(), r1.Message.Value.CustomFields["custom_field"]);
-            Assert.AreEqual("UPDATED:" + guid, r2.Message.Value.CustomFields["custom_field"]);
+            Assert.AreEqual(guid.ToString(), r1.Message.Value.CustomFields["custom_field"].ToString());
+            Assert.AreEqual("UPDATED:" + guid, r2.Message.Value.CustomFields["custom_field"].ToString());
         }
 
         [Test]
@@ -162,8 +162,8 @@ namespace Audit.IntegrationTest
             
             Assert.IsNotNull(r1);
             Assert.IsNotNull(r2);
-            Assert.AreEqual(guid.ToString(), r1.Message.Value.CustomFields["custom_field"]);
-            Assert.AreEqual("UPDATED:" + guid, r2.Message.Value.CustomFields["custom_field"]);
+            Assert.AreEqual(guid.ToString(), r1.Message.Value.CustomFields["custom_field"].ToString());
+            Assert.AreEqual("UPDATED:" + guid, r2.Message.Value.CustomFields["custom_field"].ToString());
         }
 
         [Test]
@@ -209,7 +209,7 @@ namespace Audit.IntegrationTest
             var r1 = cv.Consume(1000);
 
             Assert.IsNotNull(r1);
-            Assert.AreEqual("UPDATED:" + guid, r1.Message.Value.CustomFields["custom_field"]);
+            Assert.AreEqual("UPDATED:" + guid, r1.Message.Value.CustomFields["custom_field"].ToString());
             Assert.AreEqual("key1", r1.Message.Key);
         }
 

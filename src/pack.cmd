@@ -2,6 +2,8 @@
 cls
 
 del "audit.net\bin\debug\*.nupkg"
+del "Audit.NET.JsonNetSerializer\bin\debug\*.nupkg"
+del "Audit.NET.JsonSystemSerializer\bin\debug\*.nupkg"
 del "audit.mvc\bin\debug\*.nupkg"
 del "audit.mvc.core\bin\debug\*.nupkg"
 del "audit.webapi\bin\debug\*.nupkg"
@@ -38,6 +40,8 @@ copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 dotnet build "..\Audit.NET.sln" 
 
 dotnet pack "Audit.NET/"
+dotnet pack "Audit.NET.JsonNetSerializer/"
+dotnet pack "Audit.NET.JsonSystemSerializer/"
 dotnet pack "Audit.Mvc/"
 dotnet pack "Audit.Mvc.Core/"
 dotnet pack "Audit.WebApi/"

@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Audit.Integration.AspNetCore.Controllers;
-using Audit.WebApi;
+﻿using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using Audit.Mvc;
 
 namespace Audit.Integration.AspNetCore
@@ -39,6 +30,7 @@ namespace Audit.Integration.AspNetCore
 
             services.AddMvc(mvc =>
             {
+                
                 mvc.EnableEndpointRouting = false;
                 mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
@@ -51,6 +43,10 @@ namespace Audit.Integration.AspNetCore
                     .IncludeResponseHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
                     .IncludeRequestBody()));
+            }).AddJsonOptions(o =>
+            {
+                o.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                o.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
             services.AddRazorPages(options =>

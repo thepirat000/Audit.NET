@@ -19,6 +19,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
             new BlogsMemoryContext().Database.EnsureCreated();
+            Audit.Core.Configuration.ResetCustomActions();
         }
 
         [Test]
@@ -64,8 +65,8 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             Assert.AreEqual(2, evs.Count);
             Assert.IsTrue(evs[0].CustomFields.ContainsKey("TestCustomField"));
-            Assert.AreEqual(1L, evs[0].CustomFields["TestCustomField"]);
-            Assert.AreEqual(2L, evs[1].CustomFields["TestCustomField"]);
+            Assert.AreEqual("1", evs[0].CustomFields["TestCustomField"].ToString());
+            Assert.AreEqual("2", evs[1].CustomFields["TestCustomField"].ToString());
         }
 
         [Test]
@@ -312,7 +313,9 @@ private bool IsCommonEntity(Type type)
                 .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
                 {
                     evs.Add(ev.GetEntityFrameworkEvent());
-                }));
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
 
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();

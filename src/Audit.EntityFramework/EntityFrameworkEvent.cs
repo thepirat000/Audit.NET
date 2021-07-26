@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+
 using System.Collections.Generic;
 using Audit.Core;
 #if EF_CORE
@@ -6,29 +6,26 @@ using Microsoft.EntityFrameworkCore;
 #else
 using System.Data.Entity;
 #endif
+#if IS_NK_JSON
+using Newtonsoft.Json;
+#else
+using System.Text.Json.Serialization;
+#endif
+
 namespace Audit.EntityFramework
 {
     public class EntityFrameworkEvent : IAuditOutput
     {
-        [JsonProperty(Order = 1)]
         public string Database { get; set; }
-        [JsonProperty(Order = 3, NullValueHandling = NullValueHandling.Ignore)]
         public string ConnectionId { get; set; }
-        [JsonProperty(Order = 4, NullValueHandling = NullValueHandling.Ignore)]
         public string AmbientTransactionId { get; set; }
-        [JsonProperty(Order = 5, NullValueHandling = NullValueHandling.Ignore)]
         public string TransactionId { get; set; }
-        [JsonProperty(Order = 10)]
         public List<EventEntry> Entries { get; set; }
 #if EF_FULL
-        [JsonProperty(Order = 15, NullValueHandling = NullValueHandling.Ignore)]
         public List<AssociationEntry> Associations { get; set; }
 #endif
-        [JsonProperty(Order = 20)]
         public int Result { get; set; }
-        [JsonProperty(Order = 30)]
         public bool Success { get; set; }
-        [JsonProperty(Order = 40, NullValueHandling = NullValueHandling.Ignore)]
         public string ErrorMessage { get; set; }
         [JsonIgnore]
         internal DbContext DbContext { get; set; }
@@ -49,7 +46,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Audit.Core.Configuration.JsonSettings);
+            return Core.Configuration.JsonAdapter.Serialize(this);
         }
         /// <summary>
         /// Parses an Entity Framework event from its JSON string representation.
@@ -57,8 +54,7 @@ namespace Audit.EntityFramework
         /// <param name="json">JSON string with the Entity Framework event representation.</param>
         public static EntityFrameworkEvent FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<EntityFrameworkEvent>(json, Audit.Core.Configuration.JsonSettings);
+            return Core.Configuration.JsonAdapter.Deserialize<EntityFrameworkEvent>(json);
         }
-
     }
 }

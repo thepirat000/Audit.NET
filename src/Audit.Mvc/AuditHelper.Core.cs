@@ -1,8 +1,7 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451 || NET5_0
 using Audit.Core;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,7 @@ namespace Audit.Mvc
             }
             return parameters.ToDictionary(
                 k => k.Key, 
-                v => v.Value == null ? null : JsonConvert.DeserializeObject(JsonConvert.SerializeObject(v.Value, Configuration.JsonSettings), v.Value.GetType(), Configuration.JsonSettings));
+                v => v.Value == null ? null : Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(v.Value), v.Value.GetType()));
         }
 
         internal static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)

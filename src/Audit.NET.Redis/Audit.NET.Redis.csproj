@@ -4,9 +4,9 @@
     <Description>Store Audit.NET Trail Logs in a Redis database as a strings, lists, hashes, sortedsets or pubsub</Description>
     <Copyright>Copyright 2017</Copyright>
     <AssemblyTitle>Audit.Redis</AssemblyTitle>
-    <VersionPrefix>17.0.8</VersionPrefix>
+    <VersionPrefix>18.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;net45;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
   </ItemGroup>
 

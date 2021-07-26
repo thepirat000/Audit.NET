@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Audit.NET.AmazonQLDB.Providers
 {
@@ -31,6 +32,15 @@ namespace Audit.NET.AmazonQLDB.Providers
         /// The table name to use when saving an audit event in the QLDB table. 
         /// </summary>
         public Func<AuditEvent, string> TableNameBuilder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the JSON serializer settings.
+        /// </summary>
+        public JsonSerializerSettings JsonSettings { get; set; } = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
 
         /// <summary>
         /// Creates a new AmazonQLDB data provider using the given driver.
@@ -71,6 +81,19 @@ namespace Audit.NET.AmazonQLDB.Providers
             }
         }
 
+        public override object Serialize<T>(T value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            if (value is string)
+            {
+                return value;
+            }
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, JsonSettings), JsonSettings);
+        }
+
         /// <summary>
         /// Inserts an event into AmazonQLDB
         /// </summary>
@@ -86,7 +109,7 @@ namespace Audit.NET.AmazonQLDB.Providers
             IIonValue inserted = null;
             await driver.Execute(async txn =>
             {
-                var json = auditEvent.ToJson();
+                var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
                 var insertInto = $@"INSERT INTO {tableName} VALUE ?";
                 try
                 {
@@ -119,7 +142,7 @@ namespace Audit.NET.AmazonQLDB.Providers
                 $@"UPDATE {tableName} AS e BY eid
                       SET e = ?
                       WHERE eid = ?",
-                IonLoader.Default.Load(auditEvent.ToJson()), new ValueFactory().NewString(insertDocumentId)));
+                IonLoader.Default.Load(JsonConvert.SerializeObject(auditEvent, JsonSettings)), new ValueFactory().NewString(insertDocumentId)));
         }
 
         /// <summary>
@@ -153,8 +176,8 @@ namespace Audit.NET.AmazonQLDB.Providers
                       WHERE eid = ?",
                     new ValueFactory().NewString(insertDocumentId))).FirstAsync();
             });
-
-            var selectedAuditEvent = AuditEvent.FromJson<T>(selectedEvent.ToPrettyString());
+            var json = selectedEvent.ToPrettyString();
+            var selectedAuditEvent = JsonConvert.DeserializeObject<T>(json, JsonSettings);
             return selectedAuditEvent;
         }
 

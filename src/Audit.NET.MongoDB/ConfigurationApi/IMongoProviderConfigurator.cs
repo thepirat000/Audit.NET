@@ -1,7 +1,3 @@
-using Audit.Core;
-using Newtonsoft.Json;
-using System;
-
 namespace Audit.MongoDB.ConfigurationApi
 {
     /// <summary>
@@ -24,11 +20,6 @@ namespace Audit.MongoDB.ConfigurationApi
         /// </summary>
         /// <param name="collection">The collection name.</param>
         IMongoProviderConfigurator Collection(string collection);
-        /// <summary>
-        /// Specifies a custom JSON serializer settings
-        /// </summary>
-        /// <param name="jsonSerializerSettings">The serializer settings.</param>
-        IMongoProviderConfigurator CustomSerializerSettings(JsonSerializerSettings jsonSerializerSettings);
         /// <summary>
         /// Specifies whether the target object and extra fields should be serialized as Bson. Default is Json.
         /// </summary>

@@ -1,7 +1,7 @@
 using System;
-using Audit.Core;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
 
 namespace Audit.AzureCosmos.ConfigurationApi
 {
@@ -13,6 +13,7 @@ namespace Audit.AzureCosmos.ConfigurationApi
         internal Func<string> _containerBuilder = () => "Events";
         internal Func<ConnectionPolicy> _connectionPolicyBuilder = () => null;
         internal IDocumentClient _documentClient = null;
+        internal JsonSerializerSettings _jsonSettings = null;
 
         public IAzureCosmosProviderConfigurator Endpoint(string endpoint)
         {
@@ -76,6 +77,12 @@ namespace Audit.AzureCosmos.ConfigurationApi
         public IAzureCosmosProviderConfigurator ConnectionPolicy(Func<ConnectionPolicy> connectionPolicyBuilder)
         {
             _connectionPolicyBuilder = connectionPolicyBuilder;
+            return this;
+        }
+        
+        public IAzureCosmosProviderConfigurator JsonSettings(JsonSerializerSettings settings)
+        {
+            _jsonSettings = settings;
             return this;
         }
     }

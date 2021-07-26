@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+#if IS_NK_JSON
 using Newtonsoft.Json;
+#else
+using System.Text.Json;
+using System.Text.Json.Serialization;
+#endif
 
 namespace Audit.Core
 {
@@ -13,13 +18,19 @@ namespace Audit.Core
         /// <summary>
         /// The enviroment information
         /// </summary>
+#if IS_NK_JSON
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public AuditEventEnvironment Environment { get; set; }
 
         /// <summary>
         /// Indicates the change type (i.e. CustomerOrder Update)
         /// </summary>
+#if IS_NK_JSON
         [JsonProperty(Order = -999)]
+#endif
         public string EventType { get; set; }
 
         /// <summary>
@@ -32,13 +43,21 @@ namespace Audit.Core
         /// <summary>
         /// The tracked target.
         /// </summary>
+#if IS_NK_JSON
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public AuditTarget Target { get; set; }
 
         /// <summary>
         /// Comments.
         /// </summary>
+#if IS_NK_JSON
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public List<string> Comments { get; set; }
 
         /// <summary>
@@ -54,7 +73,6 @@ namespace Audit.Core
         ///<summary>
         /// The duration of the operation in milliseconds.
         /// </summary>
-        [JsonProperty]
         public int Duration { get; set; }
 
         /// <summary>
@@ -62,16 +80,7 @@ namespace Audit.Core
         /// </summary>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Configuration.JsonSettings);
-        }
-
-        /// <summary>
-        /// Converts the event to its JSON representation using JSON.NET with the given serializer settings.
-        /// </summary>
-        /// <param name="settings">Serializer settings to use.</param>
-        public string ToJson(JsonSerializerSettings settings)
-        {
-            return JsonConvert.SerializeObject(this, settings);
+            return Configuration.JsonAdapter.Serialize(this);
         }
 
         /// <summary>
@@ -80,36 +89,16 @@ namespace Audit.Core
         /// <param name="json">JSON string with the audit event representation.</param>
         public static T FromJson<T>(string json) where T : AuditEvent
         {
-            return JsonConvert.DeserializeObject<T>(json, Configuration.JsonSettings);
+            return Configuration.JsonAdapter.Deserialize<T>(json);
         }
+
         /// <summary>
         /// Parses an AuditEvent from its JSON string representation using JSON.NET.
         /// </summary>
         /// <param name="json">JSON string with the audit event representation.</param>
         public static AuditEvent FromJson(string json) 
         {
-            return JsonConvert.DeserializeObject<AuditEvent>(json, Configuration.JsonSettings);
+            return Configuration.JsonAdapter.Deserialize<AuditEvent>(json);
         }
-
-        /// <summary>
-        /// Parses an AuditEvent from its JSON string representation using JSON.NET with the given serializer settings.
-        /// </summary>
-        /// <param name="settings">Serializer settings to use.</param>
-        /// <param name="json">JSON string with the audit event representation.</param>
-        public static T FromJson<T>(string json, JsonSerializerSettings settings) where T : AuditEvent
-        {
-            return JsonConvert.DeserializeObject<T>(json, settings);
-        }
-
-        /// <summary>
-        /// Parses an AuditEvent from its JSON string representation using JSON.NET with the given serializer settings.
-        /// </summary>
-        /// <param name="json">JSON string with the audit event representation.</param>
-        /// <param name="settings">Serializer settings to use.</param>
-        public static AuditEvent FromJson(string json, JsonSerializerSettings settings)
-        {
-            return JsonConvert.DeserializeObject<AuditEvent>(json, settings);
-        }
-
     }
 }

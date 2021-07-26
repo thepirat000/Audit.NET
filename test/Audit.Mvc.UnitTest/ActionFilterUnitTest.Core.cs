@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_1 || NETCOREAPP1_0 || NETCOREAPP2_0 || NET451
+﻿#if NETCOREAPP3_1 || NETCOREAPP1_0 || NETCOREAPP2_0 || NET451 || NET5_0
 using Audit.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -127,7 +127,7 @@ namespace Audit.Mvc.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
+                {"x", new AuditTarget(){ Type="TEST_REFERENCE_TYPE" } }
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
@@ -159,7 +159,7 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditAttribute).EventTypeName);
+            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
@@ -269,7 +269,7 @@ namespace Audit.Mvc.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
+                {"x", new AuditTarget(){ Type="TEST_REFERENCE_TYPE" } }
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
@@ -305,7 +305,7 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
             Assert.AreEqual(1, action.ActionParameters.Count);
-            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditAttribute).EventTypeName);
+            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
             Assert.AreEqual(200, action.ResponseStatusCode);
 
         }

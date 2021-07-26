@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Audit.DynamicProxy.UnitTest
@@ -16,15 +15,15 @@ namespace Audit.DynamicProxy.UnitTest
         public async Task Test_CreationPolicyAync()
         {
             var inserts = new List<AuditEvent>();
-            var replaces = new List<AuditEvent>();
+            var replaces = new List<AuditEvent>(); 
             Audit.Core.Configuration.Setup()
                 .Use(config => config.OnInsert(ev =>
                 {
-                    inserts.Add(JsonConvert.DeserializeObject(ev.ToJson(), ev.GetType()) as AuditEvent);
+                    inserts.Add(AuditEvent.FromJson(ev.ToJson()));
                 })
                 .OnReplace((id, ev) =>
                 {
-                    replaces.Add(JsonConvert.DeserializeObject(ev.ToJson(), ev.GetType()) as AuditEvent);
+                    replaces.Add(AuditEvent.FromJson(ev.ToJson()));
                 }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -38,7 +37,7 @@ namespace Audit.DynamicProxy.UnitTest
 
             Assert.IsNull(inserts[0].GetAuditInterceptEvent().Result);
             Assert.AreEqual("Task<String>", replaces[0].GetAuditInterceptEvent().Result.Type);
-            Assert.AreEqual("ok", replaces[0].GetAuditInterceptEvent().Result.Value);
+            Assert.AreEqual("ok", replaces[0].GetAuditInterceptEvent().Result.Value.ToString());
         }
 
         [Test]

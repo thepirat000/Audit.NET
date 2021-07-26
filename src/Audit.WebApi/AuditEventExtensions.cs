@@ -25,7 +25,7 @@ namespace Audit.WebApi
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("Action")
-                ? auditEvent.CustomFields["Action"] as AuditApiAction
+                ? Configuration.JsonAdapter.ToObject<AuditApiAction>(auditEvent.CustomFields["Action"])
                 : null;
         }
     }

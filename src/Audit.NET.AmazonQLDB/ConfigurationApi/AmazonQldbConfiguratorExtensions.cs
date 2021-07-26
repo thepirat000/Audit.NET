@@ -35,12 +35,17 @@ namespace Audit.Core
         {
             var amazonQldbProviderConfigurator = new AmazonQldbProviderConfigurator();
             config.Invoke(amazonQldbProviderConfigurator);
-            Configuration.DataProvider = new AmazonQldbDataProvider
+            var provider = new AmazonQldbDataProvider
             {
                 QldbDriver = amazonQldbProviderConfigurator._driverFactory,
                 TableNameBuilder = amazonQldbProviderConfigurator._tableConfigurator?._tableNameBuilder,
                 CustomAttributes = amazonQldbProviderConfigurator._tableConfigurator?._attrConfigurator?._attributes
             };
+            if (amazonQldbProviderConfigurator._jsonSettings != null)
+            {
+                provider.JsonSettings = amazonQldbProviderConfigurator._jsonSettings;
+            }
+            Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
     }

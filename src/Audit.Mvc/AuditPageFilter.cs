@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0
+﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NET5_0
 using Audit.Core;
 using Audit.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;

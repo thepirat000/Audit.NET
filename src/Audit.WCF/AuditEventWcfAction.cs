@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 
 namespace Audit.WCF
 {
@@ -11,7 +10,6 @@ namespace Audit.WCF
         /// <summary>
         /// Gets or sets the WCF action details.
         /// </summary>
-        [JsonProperty(Order = 10)]
         public WcfEvent WcfEvent { get; set; }
     }
 }

@@ -42,7 +42,7 @@ namespace Audit.UnitTest
             Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[0].EventType);
             Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[1].EventType);
             Assert.NotNull(events[0].CustomFields["UdpEventId"]);
-            Assert.AreEqual(events[0].CustomFields["UdpEventId"], events[1].CustomFields["UdpEventId"]);
+            Assert.AreEqual(events[0].CustomFields["UdpEventId"].ToString(), events[1].CustomFields["UdpEventId"].ToString());
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace Audit.UnitTest
             Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[0].EventType);
             Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[1].EventType);
             Assert.NotNull(events[0].CustomFields["UdpEventId"]);
-            Assert.AreEqual(events[0].CustomFields["UdpEventId"], events[1].CustomFields["UdpEventId"]);
+            Assert.AreEqual(events[0].CustomFields["UdpEventId"].ToString(), events[1].CustomFields["UdpEventId"].ToString());
         }
 
         private static bool stop = false;
@@ -144,7 +144,7 @@ namespace Audit.UnitTest
 
             Assert.AreEqual(N, events.Count);
             Assert.IsTrue(events[0].EventType.StartsWith("Test_UdpDataProvider_MultiThread_"));
-            Assert.NotNull(events[0].CustomFields["UdpEventId"]);
+            Assert.NotNull(events[0].CustomFields["UdpEventId"].ToString());
         }
 
         [Test]

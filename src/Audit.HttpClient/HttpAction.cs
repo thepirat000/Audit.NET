@@ -1,18 +1,35 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+#if IS_NK_JSON
+using Newtonsoft.Json;
+#else
+using System.Text.Json.Serialization;
+#endif
 
 namespace Audit.Http
 {
     public class HttpAction : IAuditOutput
     {
         public string Method { get; set; }
+
         public string Url { get; set; }
+
+#if IS_NK_JSON
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+	    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public string Version { get; set; }
+
         public Request Request { get; set; }
+
         public Response Response { get; set; }
+
+#if IS_NK_JSON
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+	    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public string Exception { get; set; }
 
         [JsonExtensionData]
@@ -23,7 +40,7 @@ namespace Audit.Http
         /// </summary>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Core.Configuration.JsonSettings);
+            return Configuration.JsonAdapter.Serialize(this);
         }
         /// <summary>
         /// Parses an HttpAction from its JSON string representation.
@@ -31,7 +48,7 @@ namespace Audit.Http
         /// <param name="json">JSON string with the Entity Audit Action representation.</param>
         public static HttpAction FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<HttpAction>(json, Core.Configuration.JsonSettings);
+            return Configuration.JsonAdapter.Deserialize<HttpAction>(json);
         }
 
     }

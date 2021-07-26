@@ -3,6 +3,7 @@ using Amazon.QLDBSession;
 using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
 using System;
+using Newtonsoft.Json;
 
 namespace Audit.NET.AmazonQLDB.ConfigurationApi
 {
@@ -45,6 +46,11 @@ namespace Audit.NET.AmazonQLDB.ConfigurationApi
         /// Use a driver with logging on retry 
         /// </summary>
         IAmazonQldbProviderConfigurator UseRetryLogging();
+
+        /// <summary>
+        /// Use a custom JsonSerializerSettings
+        /// </summary>
+        IAmazonQldbProviderConfigurator UseJsonSettings(JsonSerializerSettings settings);
 
         /// <summary>
         /// Continues the configuration builder with the table configurator

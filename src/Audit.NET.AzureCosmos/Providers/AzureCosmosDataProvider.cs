@@ -1,12 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using Audit.Core;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace Audit.AzureCosmos.Providers
 {
@@ -69,11 +70,33 @@ namespace Audit.AzureCosmos.Providers
         /// </summary>
         public IDocumentClient DocumentClient { get; set; }
 
+        /// <summary>
+        /// Gets or sets the JSON serializer settings.
+        /// </summary>
+        public JsonSerializerSettings JsonSettings { get; set; } = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+
+        public override object Serialize<T>(T value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            if (value is string)
+            {
+                return value;
+            }
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, JsonSettings), JsonSettings);
+        }
+
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent).Result;
+            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = JsonSettings }).Result;
             return doc.Id;
         }
 
@@ -81,7 +104,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent);
+            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = JsonSettings });
             return doc.Id;
         }
 
@@ -90,12 +113,12 @@ namespace Audit.AzureCosmos.Providers
             var client = GetClient();
             var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
             Document doc;
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(auditEvent, JsonSettings))))
             {
                 doc = JsonSerializable.LoadFrom<Document>(ms);
                 doc.Id = docId.ToString();
             }
-            client.ReplaceDocumentAsync(docUri, doc).Wait();
+            client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = JsonSettings }).Wait();
         }
 
         public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent)
@@ -103,12 +126,12 @@ namespace Audit.AzureCosmos.Providers
             var client = GetClient();
             var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
             Document doc;
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(auditEvent, JsonSettings))))
             {
                 doc = JsonSerializable.LoadFrom<Document>(ms);
                 doc.Id = docId.ToString();
             }
-            await client.ReplaceDocumentAsync(docUri, doc);
+            await client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = JsonSettings });
         }
 
         /// <summary>
@@ -130,7 +153,7 @@ namespace Audit.AzureCosmos.Providers
             var collectionUri = GetCollectionUri();
             var sql = new SqlQuerySpec($"SELECT * FROM {ContainerBuilder?.Invoke()} c WHERE c.id = @id",
                 new SqlParameterCollection(new SqlParameter[] { new SqlParameter() { Name = "@id", Value = docId.ToString() } }));
-            return client.CreateDocumentQuery(collectionUri, sql)
+            return client.CreateDocumentQuery(collectionUri, sql, new FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = JsonSettings })
                 .AsEnumerable()
                 .FirstOrDefault();
         }
@@ -166,8 +189,7 @@ namespace Audit.AzureCosmos.Providers
                     ConnectionMode = ConnectionMode.Direct,
                     ConnectionProtocol = Protocol.Tcp
                 };
-
-            DocumentClient = new DocumentClient(new Uri(EndpointBuilder?.Invoke()), AuthKeyBuilder?.Invoke(), Configuration.JsonSettings, policy);
+            DocumentClient = new DocumentClient(new Uri(EndpointBuilder?.Invoke()), AuthKeyBuilder?.Invoke(), policy);
             Task.Run(() => { ((DocumentClient)DocumentClient).OpenAsync(); });
 
             return DocumentClient;
@@ -187,7 +209,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<AuditEvent>(collectionUri, feedOptions);
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
         }
 
         /// <summary>
@@ -199,7 +221,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<T>(collectionUri, feedOptions);
+            return client.CreateDocumentQuery<T>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
         }
 
         /// <summary>
@@ -211,7 +233,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression, feedOptions);
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
         }
         /// <summary>
         /// Returns an enumeration of audit events for the given Azure Cosmos SQL expression.
@@ -223,7 +245,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions);
+            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
         }
 #endregion
     }

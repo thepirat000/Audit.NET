@@ -42,7 +42,7 @@ namespace Audit.Core
             var cosmosDbConfig = new AzureCosmosProviderConfigurator();
             config.Invoke(cosmosDbConfig);
 
-            Configuration.DataProvider = new AzureCosmosDataProvider()
+            var provider = new AzureCosmosDataProvider()
             {
                 EndpointBuilder = cosmosDbConfig._endpointBuilder,
                 AuthKeyBuilder = cosmosDbConfig._authKeyBuilder,
@@ -51,6 +51,11 @@ namespace Audit.Core
                 ConnectionPolicyBuilder = cosmosDbConfig._connectionPolicyBuilder,
                 DocumentClient = cosmosDbConfig._documentClient
             };
+            if (cosmosDbConfig._jsonSettings != null)
+            {
+                provider.JsonSettings = cosmosDbConfig._jsonSettings;
+            }
+            Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
     }

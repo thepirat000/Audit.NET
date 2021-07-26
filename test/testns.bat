@@ -29,6 +29,9 @@ dotnet test --logger:"console;verbosity=normal"
 echo Running...
 cd ..
 
+cd Audit.JsonAdapter.UnitTest
+dotnet test --logger:"console;verbosity=normal"
+cd ..
 
 cd Audit.WebApi.UnitTest
 echo ---------------------------------------------- RUNNING WEB API UNIT TESTS (3) ----------------------------------------------

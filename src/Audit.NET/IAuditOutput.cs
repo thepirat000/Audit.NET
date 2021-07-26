@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Audit.Core
 {
@@ -11,7 +10,6 @@ namespace Audit.Core
         /// <summary>
         /// Extension fields
         /// </summary>
-        [JsonExtensionData]
         Dictionary<string, object> CustomFields { get; set; }
         /// <summary>
         /// Serialize to JSON string

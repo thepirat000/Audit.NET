@@ -1,7 +1,7 @@
-using Audit.Core;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System;
+using Newtonsoft.Json;
 
 namespace Audit.AzureCosmos.ConfigurationApi
 {
@@ -62,5 +62,9 @@ namespace Audit.AzureCosmos.ConfigurationApi
         /// </summary>
         /// <param name="documentClient">The configured document client object.</param>
         IAzureCosmosProviderConfigurator DocumentClient(IDocumentClient documentClient);
+        /// <summary>
+        /// Use a custom JsonSerializerSettings
+        /// </summary>
+        IAzureCosmosProviderConfigurator JsonSettings(JsonSerializerSettings settings);
     }
 }

@@ -1,6 +1,10 @@
 using System;
 using Audit.Core.Providers;
+#if IS_NK_JSON
 using Newtonsoft.Json;
+#else
+using System.Text.Json;
+#endif
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -11,6 +15,19 @@ namespace Audit.Core.ConfigurationApi
             Configuration.AuditDisabled = auditDisabled;
             return this;
         }
+
+        public IConfigurator JsonAdapter(IJsonAdapter adapter)
+        {
+            Configuration.JsonAdapter = adapter;
+            return this;
+        }
+
+        public IConfigurator JsonAdapter<T>() where T : IJsonAdapter
+        {
+            Configuration.JsonAdapter = Activator.CreateInstance<T>();
+            return this;
+        }
+
         public ICreationPolicyConfigurator UseNullProvider()
         {
             var dataProvider = new NullDataProvider();
@@ -54,7 +71,7 @@ namespace Audit.Core.ConfigurationApi
         {
             var fileLogConfig = new FileLogProviderConfigurator();
             config.Invoke(fileLogConfig);
-            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix, fileLogConfig._directoryPathBuilder, fileLogConfig._filenameBuilder, fileLogConfig._jsonSettings);
+            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix, fileLogConfig._directoryPathBuilder, fileLogConfig._filenameBuilder);
         }
         public ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider)
         {
@@ -81,8 +98,7 @@ namespace Audit.Core.ConfigurationApi
         }
 #endif
         public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "", 
-            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null,
-            JsonSerializerSettings jsonSettings = null)
+            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null)
         {
             var fdp = new FileDataProvider()
             {
@@ -91,10 +107,6 @@ namespace Audit.Core.ConfigurationApi
                 DirectoryPathBuilder = directoryPathBuilder,
                 FilenameBuilder = filenameBuilder
             };
-            if (jsonSettings != null)
-            {
-                fdp.JsonSettings = jsonSettings;
-            }
             Configuration.DataProvider = fdp;
 
             return new CreationPolicyConfigurator();

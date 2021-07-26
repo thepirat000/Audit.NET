@@ -47,6 +47,22 @@ PM> Install-Package Audit.NET
 ## Changelog
 Check the [CHANGELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md) file.
 
+## <span style="color:red">Breaking change in version 18</span>
+
+Starting on version 18, Audit.NET will default to diferent serialization mechanism depending on the target framework of the client application, 
+as shown on the following table:
+
+| <sub>Target</sub> \ <sup>Library</sup> |
+| ------------ | ---------------- |
+| **≥ .NET 5.0** | `Newtonsoft.Json` |
+| **≤ .NETSTANDARD2.0** | `Newtonsoft.Json` |
+| **≤ .NET 4.8** | `Newtonsoft.Json` |
+
+- `System.Text.Json` is the new default for applications and libraries targeting .NET 5.0 or higher
+- `Newtonsoft.Json` will still be the default for applications and libraries targeting lower framework versions.
+
+If you want to change the default behavior, refer to [Custom serialization mechanism](#custom-serialization-mechanism).
+
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its life cycle. 
@@ -662,8 +678,15 @@ if (environment.IsDevelopment())
 
 ### Global serialization settings
 Most of the data providers serializes audit events in JSON format. 
-You can change the default settings used for this serialization via the static property `Configuration.JsonSettings`.
-For example:
+
+The default mechanism for serialization depends on the target framework of your application:
+
+- Targeting **.NET 5.0** or higher: The JSON serialization is done with Microsoft's `System.Text.Json` library.
+- Targeting lower framework versions: The JSON serialization is done with James Newton-King's `Newtonsoft.Json` library.
+
+You can change the settings for the default serialization mechanism via the static property `Configuration.JsonSettings`.
+
+For example, when using _Newtonsoft.Json_:
 
 ```c#
 Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings()
@@ -673,6 +696,86 @@ Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings()
     Converters = new List<JsonConverter>() { new MyStreamConverter() }
 };
 ```
+
+Or, if you target net5.0, using System.Text.Json:
+
+```c#
+Audit.Core.Configuration.JsonSettings = new JsonSerializerOptions
+{
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+    AllowTrailingCommas = true
+};
+```
+
+#### Custom serialization mechanism
+
+If you want to use a custom JSON serialization mechanism, you should create a class implementing `IJsonAdapter` and assign it to the 
+static property `Configuration.JsonAdapter`.
+
+For example:
+```c#
+Audit.Core.Configuration.JsonAdapter = new MyCustomAdapter(); 
+```
+
+Or by using the fluent API:
+```c#
+Audit.Core.Configuration.Setup()
+    .JsonAdapter<MyCustomAdapter>()
+    ...
+```
+
+#### Alternative serialization mechanism
+
+There are also two libraries provided to use the alternative JSON serialization mechanism:
+
+- [`Audit.NET.JsonNewtonsoftAdapter`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonNewtonsoftAdapter): 
+
+    When you target .NET >= 5.0 but want to use `Newtonsoft.Json`.
+
+    Add a reference to the library `Audit.NET.JsonNewtonsoftAdapter` and set an instance of `JsonNewtonsoftAdapter`
+    to the static configuration property `Configuration.JsonAdapter`, for example:
+
+    ```c#
+    var settings = new JsonSerializerSettings()
+    {
+        TypeNameHandling = TypeNameHandling.All
+    };
+    Audit.Core.Configuration.JsonAdapter = new JsonNewtonsoftAdapter(settings);
+    ```
+
+    Or by calling the `JsonNewtonsoftAdapter()` fluent configuration API:
+
+    ```c#
+    Audit.Core.Configuration.Setup()
+        .JsonNewtonsoftAdapter(settings)
+        ...
+    ```
+
+- [`Audit.NET.JsonSystemSerializer`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonSystemAdapter): 
+
+    When you target an older .NET Framework, but want to use `System.Text.Json`
+ 
+    Add a reference to the library `Audit.NET.JsonSystemSerializer` and set an instance of `JsonSystemAdapter`
+    to the static configuration property `Configuration.JsonAdapter`, for example:
+
+    ```c#
+    var options = new JsonSerializerOptions()
+    {
+        WriteIndented = true
+    };
+    Audit.Core.Configuration.JsonAdapter = new JsonSystemAdapter(options);
+    ```
+
+    Or by calling the `JsonSystemAdapter()` fluent configuration API:
+
+    ```c#
+    Audit.Core.Configuration.Setup()
+        .JsonSystemAdapter(options)
+        ...
+    ```
+
+
+
 
 ## Configuration Fluent API
 Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.

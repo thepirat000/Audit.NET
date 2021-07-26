@@ -1,11 +1,9 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Audit.IntegrationTest
 {
@@ -27,7 +25,7 @@ namespace Audit.IntegrationTest
             var id = Guid.NewGuid().ToString();
             var auditEvent = new AuditEventWithId()
             {
-                Id = id
+                id = id
             };
            
             using (var scope = AuditScope.Create(new AuditScopeOptions()
@@ -43,8 +41,8 @@ namespace Audit.IntegrationTest
 
             var ev = dp.GetEvent(id);
 
-            Assert.AreEqual(id, auditEvent.Id);
-            Assert.AreEqual(auditEvent.CustomFields["value"], ev.CustomFields["value"]);
+            Assert.AreEqual(id, auditEvent.id);
+            Assert.AreEqual(auditEvent.CustomFields["value"].ToString(), ev.CustomFields["value"].ToString());
             Assert.AreEqual(eventType, auditEvent.EventType);
         }
 
@@ -63,7 +61,7 @@ namespace Audit.IntegrationTest
             var id = Guid.NewGuid().ToString();
             var auditEvent = new AuditEventWithId()
             {
-                Id = id
+                id = id
             };
 
             using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
@@ -79,7 +77,7 @@ namespace Audit.IntegrationTest
 
             var ev = await dp.GetEventAsync(id);
 
-            Assert.AreEqual(id, auditEvent.Id);
+            Assert.AreEqual(id, auditEvent.id);
             Assert.AreEqual(auditEvent.CustomFields["value"], ev.CustomFields["value"]);
             Assert.AreEqual(eventType, auditEvent.EventType);
         }
@@ -175,6 +173,6 @@ namespace Audit.IntegrationTest
     public class AuditEventWithId : AuditEvent
     {
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string id { get; set; }
     }
 }

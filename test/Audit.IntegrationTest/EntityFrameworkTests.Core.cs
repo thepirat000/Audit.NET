@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP2_0 || NETCOREAPP3_0
+﻿#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NET5_0
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 #endif
 using System.Data.SqlClient;
@@ -46,8 +46,8 @@ namespace Audit.IntegrationTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
         }
-                
-#if NETCOREAPP3_0
+
+#if NETCOREAPP3_0 || NET5_0
         [Test]
         public void Test_EFDataProvider_IdentityContext_Error()
         {
@@ -1280,7 +1280,7 @@ SET IDENTITY_INSERT Posts OFF
         public string Bar { get; set; }
         public string Username { get; set; }
     }
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NET5_0
     public class AuditNetTestContext : Audit.EntityFramework.AuditIdentityDbContext
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

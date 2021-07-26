@@ -25,7 +25,7 @@ namespace Audit.WCF
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("WcfEvent") 
-                ? auditEvent.CustomFields["WcfEvent"] as WcfEvent
+                ? Configuration.JsonAdapter.ToObject<WcfEvent>(auditEvent.CustomFields["WcfEvent"])
                 : null;
         }
     }

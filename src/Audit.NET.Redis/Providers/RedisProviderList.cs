@@ -52,7 +52,7 @@ namespace Audit.Redis.Providers
                 if (item.HasValue)
                 {
                     var auditEvent = FromValue<T>(item);
-                    if (auditEvent != null && subKey.ToString().Equals(auditEvent.CustomFields[RedisEventIdField]))
+                    if (auditEvent != null && subKey.ToString().Equals(auditEvent.CustomFields[RedisEventIdField]?.ToString()))
                     {
                         return auditEvent;
                     }
@@ -82,7 +82,7 @@ namespace Audit.Redis.Providers
                 if (item.HasValue)
                 {
                     var auditEvent = FromValue<T>(item);
-                    if (auditEvent != null && subKey.ToString().Equals(auditEvent.CustomFields[RedisEventIdField]))
+                    if (auditEvent != null && subKey.ToString().Equals(auditEvent.CustomFields[RedisEventIdField]?.ToString()))
                     {
                         return auditEvent;
                     }

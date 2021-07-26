@@ -12,10 +12,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using System.Linq;
-using System.Collections.ObjectModel;
-using System.Collections.Concurrent;
 using System.Collections.Specialized;
 
 namespace Audit.WebApi.UnitTest
@@ -68,8 +65,8 @@ namespace Audit.WebApi.UnitTest
 
                 var okIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.OK);
                 var badIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.BadRequest);
-                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {JsonConvert.SerializeObject(testCase)}");
-                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {JsonConvert.SerializeObject(testCase)}");
+                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {Core.Configuration.JsonAdapter.Serialize(testCase)}");
+                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {Core.Configuration.JsonAdapter.Serialize(testCase)}");
             }
         }
 
@@ -140,13 +137,6 @@ namespace Audit.WebApi.UnitTest
             };
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
-            var self = new TestClass() { Id = 1 };
-            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
-            Console.WriteLine(JsonConvert.SerializeObject(self, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Headers.Add("header-one", "1");
@@ -236,13 +226,6 @@ namespace Audit.WebApi.UnitTest
 
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
-            var self = new TestClass() { Id = 1 };
-            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
-            Console.WriteLine(JsonConvert.SerializeObject(self, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
             var ct = new CancellationTokenSource();
@@ -320,13 +303,6 @@ namespace Audit.WebApi.UnitTest
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             actionExecutingContext.ActionArguments.Add("x", arg);
-            var self = new TestClass() { Id = 1 };
-            actionExecutingContext.ActionArguments.Add("SelfReferencing", self);
-            Console.WriteLine(JsonConvert.SerializeObject(self, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            }));
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
             var ct = new CancellationTokenSource();

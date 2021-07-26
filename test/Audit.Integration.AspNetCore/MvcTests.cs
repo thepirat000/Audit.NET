@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Integration.AspNetCore.Pages.Test;
 using Audit.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Audit.Integration.AspNetCore
@@ -30,13 +29,13 @@ namespace Audit.Integration.AspNetCore
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                 {
                     await Task.Delay(0);
-                    insertEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                    insertEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     return Guid.NewGuid();
                 })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(0);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                        replaceEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
@@ -52,18 +51,18 @@ namespace Audit.Integration.AspNetCore
 
             //POST
             client.Dispose();
-            var json = JsonConvert.SerializeObject(customer);
+            var json = Configuration.JsonAdapter.Serialize(customer);
             client = new HttpClient();
             var result = await client.PostAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
 
-            var returnedCustomer = JsonConvert.DeserializeObject<Customer>(await result.Content.ReadAsStringAsync());
+            var returnedCustomer = Configuration.JsonAdapter.Deserialize<Customer>(await result.Content.ReadAsStringAsync());
             Assert.AreEqual(customer.Name, returnedCustomer.Name);
             Assert.AreEqual(customer.Id, returnedCustomer.Id);
             
             Assert.AreEqual(2, insertEvs.Count);
             Assert.AreEqual(0, replaceEvs.Count);
-            Assert.AreEqual("TEST", (insertEvs[0].Action.Model as JObject).Value<string>("Name"));
-            Assert.AreEqual("TEST", insertEvs[0].Action.ActionParameters["name"]);
+            Assert.AreEqual("TEST", ((JsonElement)insertEvs[0].Action.Model).GetProperty("Name").GetString());
+            Assert.AreEqual("TEST", insertEvs[0].Action.ActionParameters["name"].ToString());
             Assert.AreEqual("GET", insertEvs[0].Action.HttpMethod);
             Assert.AreEqual("/PageTest/Index", insertEvs[0].Action.ActionName);
             Assert.AreEqual("/PageTest/Index", insertEvs[0].Action.ViewPath);
@@ -75,13 +74,13 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNull(insertEvs[0].Action.Exception);
 
             Assert.AreEqual("POST", insertEvs[1].Action.HttpMethod);
-            Assert.AreEqual("test", (insertEvs[1].Action.ActionParameters["customer"] as JObject).Value<string>("Name"));
+            Assert.AreEqual("test", ((JsonElement)insertEvs[1].Action.ActionParameters["customer"]).GetProperty("Name").GetString());
             Assert.AreEqual("/PageTest/Index", insertEvs[1].Action.ActionName);
             Assert.AreEqual("/PageTest/Index", insertEvs[1].Action.ViewPath);
             Assert.AreEqual($"http://localhost:{_port}/PageTest", insertEvs[1].Action.RequestUrl);
             Assert.AreEqual($"JsonResult", insertEvs[1].Action.ResponseBody.Type);
-            Assert.AreEqual(123, (insertEvs[1].Action.ResponseBody.Value as JObject).ToObject<Customer>().Id);
-            Assert.AreEqual("test", (insertEvs[1].Action.ResponseBody.Value as JObject).ToObject<Customer>().Name);
+            Assert.AreEqual(123, ((JsonElement)insertEvs[1].Action.ResponseBody.Value).GetProperty("Id").GetInt32());
+            Assert.AreEqual("test", ((JsonElement)insertEvs[1].Action.ResponseBody.Value).GetProperty("Name").GetString());
             Assert.AreEqual(200, insertEvs[1].Action.ResponseStatusCode);
             Assert.AreEqual("POST:/PageTest/Index", insertEvs[1].EventType);
             Assert.IsNotNull(insertEvs[1].Action.TraceId);
@@ -96,13 +95,13 @@ namespace Audit.Integration.AspNetCore
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                 {
                     await Task.Delay(0);
-                    insertEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                    insertEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     return Guid.NewGuid();
                 })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(0);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                        replaceEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
@@ -113,7 +112,7 @@ namespace Audit.Integration.AspNetCore
             };
 
             var c = new HttpClient();
-            var json = JsonConvert.SerializeObject(customer);
+            var json = Configuration.JsonAdapter.Serialize(customer);
             var result = await c.PostAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
 
             
@@ -137,13 +136,13 @@ namespace Audit.Integration.AspNetCore
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                 {
                     await Task.Delay(0);
-                    insertEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                    insertEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     return Guid.NewGuid();
                 })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(0);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                        replaceEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
@@ -154,13 +153,13 @@ namespace Audit.Integration.AspNetCore
             };
 
             var c = new HttpClient();
-            var json = JsonConvert.SerializeObject(customer);
+            var json = Configuration.JsonAdapter.Serialize(customer);
             var result = await c.PostAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
 
 
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual(0, replaceEvs.Count);
-            Assert.AreEqual("404", ((dynamic)insertEvs[0].Action.ActionParameters["customer"]).Name.Value);
+            Assert.AreEqual("404", Configuration.JsonAdapter.ToObject<Customer>(insertEvs[0].Action.ActionParameters["customer"]).Name);
             Assert.AreEqual("POST", insertEvs[0].Action.HttpMethod);
             Assert.AreEqual("/PageTest/Index", insertEvs[0].Action.ActionName);
             Assert.AreEqual("/PageTest/Index", insertEvs[0].Action.ViewPath);
@@ -177,13 +176,13 @@ namespace Audit.Integration.AspNetCore
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                 {
                     await Task.Delay(0);
-                    insertEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                    insertEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     return Guid.NewGuid();
                 })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(0);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditEventMvcAction>(JsonConvert.SerializeObject(ev)));
+                        replaceEvs.Add(Configuration.JsonAdapter.Deserialize<AuditEventMvcAction>(Configuration.JsonAdapter.Serialize(ev)));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
@@ -197,11 +196,11 @@ namespace Audit.Integration.AspNetCore
 
             //PUT
             client.Dispose();
-            var json = JsonConvert.SerializeObject(customer);
+            var json = Configuration.JsonAdapter.Serialize(customer);
             client = new HttpClient();
             var result = await client.PutAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
-
-            var returnedCustomer = JsonConvert.DeserializeObject<Customer>(await result.Content.ReadAsStringAsync());
+            var resultJson = await result.Content.ReadAsStringAsync();
+            var returnedCustomer = Configuration.JsonAdapter.Deserialize<Customer>(resultJson);
             Assert.AreEqual(customer.Name, returnedCustomer.Name);
             Assert.AreEqual(customer.Id, returnedCustomer.Id);
 
@@ -231,7 +230,7 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNotEmpty(s2);
             Assert.AreEqual(2, insertEvs.Count);
             Assert.AreEqual(1, insertEvs[0].ActionParameters.Count);
-            Assert.AreEqual(123, insertEvs[0].ActionParameters["id"]);
+            Assert.AreEqual("123", insertEvs[0].ActionParameters["id"].ToString());
             Assert.IsNotNull(insertEvs[0].ResponseBody.Value);
 
             Assert.IsNotNull(s3);
@@ -266,13 +265,13 @@ namespace Audit.Integration.AspNetCore
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                     {
                         await Task.Delay(1);
-                        insertEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
+                        insertEvs.Add(Configuration.JsonAdapter.Deserialize<AuditAction>(Configuration.JsonAdapter.Serialize(ev.GetMvcAuditAction())));
                         return Guid.NewGuid();
                     })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(1);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
+                        replaceEvs.Add(Configuration.JsonAdapter.Deserialize<AuditAction>(Configuration.JsonAdapter.Serialize(ev.GetMvcAuditAction())));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -293,13 +292,13 @@ namespace Audit.Integration.AspNetCore
                 .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
                     {
                         await Task.Delay(1);
-                        insertEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
+                        insertEvs.Add(Configuration.JsonAdapter.Deserialize<AuditAction>(Configuration.JsonAdapter.Serialize(ev.GetMvcAuditAction())));
                         return Guid.NewGuid();
                     })
                     .OnReplace(async (id, ev) =>
                     {
                         await Task.Delay(1);
-                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditAction>(JsonConvert.SerializeObject(ev.GetMvcAuditAction())));
+                        replaceEvs.Add(Configuration.JsonAdapter.Deserialize<AuditAction>(Configuration.JsonAdapter.Serialize(ev.GetMvcAuditAction())));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 

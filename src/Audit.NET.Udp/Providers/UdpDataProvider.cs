@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -137,7 +136,8 @@ namespace Audit.Udp.Providers
             {
                 return CustomDeserializer.Invoke(data);
             }
-            return JsonConvert.DeserializeObject<AuditEvent>(Encoding.UTF8.GetString(data));
+            
+            return AuditEvent.FromJson(Encoding.UTF8.GetString(data));
         }
 
         private UdpClient GetSendClient()

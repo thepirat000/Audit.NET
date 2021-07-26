@@ -1,6 +1,5 @@
 ﻿using Audit.Core;
 using Audit.NET.PostgreSql;
-using Newtonsoft.Json;
 using Npgsql;
 using NpgsqlTypes;
 using System;
@@ -254,7 +253,7 @@ namespace Audit.PostgreSql.Providers
                 while (dr.Read())
                 {
                     var data = dr.GetFieldValue<string>(0);
-                    yield return JsonConvert.DeserializeObject<T>(data);
+                    yield return Core.Configuration.JsonAdapter.Deserialize<T>(data);
                 }
             }
         }

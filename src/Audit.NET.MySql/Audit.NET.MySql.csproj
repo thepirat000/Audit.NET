@@ -4,9 +4,9 @@
     <Description>Store Audit.NET Trail Logs into a MySQL database</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MySql</AssemblyTitle>
-    <VersionPrefix>17.0.8</VersionPrefix>
+    <VersionPrefix>18.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;netcoreapp2.1;net45;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard2.0;netcoreapp2.1;net45;net461;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -36,10 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="1.3.9" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
-  
-  
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />

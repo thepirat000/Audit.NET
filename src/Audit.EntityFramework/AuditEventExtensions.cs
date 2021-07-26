@@ -25,7 +25,7 @@ namespace Audit.EntityFramework
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent")
-                ? auditEvent.CustomFields["EntityFrameworkEvent"] as EntityFrameworkEvent
+                ? Core.Configuration.JsonAdapter.ToObject<EntityFrameworkEvent>(auditEvent.CustomFields["EntityFrameworkEvent"])
                 : null;
         }
     }

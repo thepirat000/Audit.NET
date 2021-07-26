@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451
+﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451 || NET5_0
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -308,7 +308,7 @@ namespace Audit.Mvc
             {
                 return vr.ViewName;
             }
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0
+#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NET5_0
             if (result is RedirectToPageResult rtp)
             {
                 return rtp.PageName;

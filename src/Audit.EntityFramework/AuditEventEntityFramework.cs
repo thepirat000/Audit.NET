@@ -1,6 +1,4 @@
-﻿using System;
-using Audit.Core;
-using Newtonsoft.Json;
+﻿using Audit.Core;
 
 namespace Audit.EntityFramework
 {
@@ -12,7 +10,6 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets or sets the entity framework event details.
         /// </summary>
-        [JsonProperty(Order = 10)]
         public EntityFrameworkEvent EntityFrameworkEvent { get; set; }
     }
 }

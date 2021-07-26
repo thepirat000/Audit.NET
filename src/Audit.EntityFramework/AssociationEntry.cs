@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace Audit.EntityFramework
 {
@@ -11,11 +10,8 @@ namespace Audit.EntityFramework
     /// </summary>
     public class AssociationEntry
     {
-        [JsonProperty(Order = 10)]
         public string Table { get; set; }
-        [JsonProperty(Order = 20)]
         public string Action { get; set; }
-        [JsonProperty(Order = 30)]
         public AssociationEntryRecord[] Records { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Transactions;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Audit.EntityFramework.Core.UnitTest
@@ -559,7 +558,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .AuditTypeMapper(t => typeof(CommonAudit))
                     .AuditEntityAction<CommonAudit>((ev, entry, entity) =>
                     {
-                        entity.AuditAction = JsonConvert.SerializeObject(entry, Audit.Core.Configuration.JsonSettings);
+                        entity.AuditAction = "test";
                         entity.Group = guid;
                         entity.EntityId = (int)entry.PrimaryKey.First().Value;
                         entity.EntityType = entry.EntityType.Name;
@@ -720,7 +719,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .AuditTypeMapper(t => typeof(CommonAudit))
                     .AuditEntityAction<CommonAudit>((ev, entry, entity) =>
                     {
-                        entity.AuditAction = JsonConvert.SerializeObject(entry, Audit.Core.Configuration.JsonSettings);
+                        entity.AuditAction = "test";
                         entity.Group = guid;
                         entity.EntityId = (int)entry.PrimaryKey.First().Value;
                         entity.EntityType = entry.EntityType.Name;

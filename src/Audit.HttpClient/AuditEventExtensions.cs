@@ -26,7 +26,7 @@ namespace Audit.Http
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("Action")
-                ? auditEvent.CustomFields["Action"] as HttpAction
+                ? Configuration.JsonAdapter.ToObject<HttpAction>(auditEvent.CustomFields["Action"])
                 : null;
         }
     }

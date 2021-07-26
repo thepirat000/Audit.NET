@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [18.0.0]
+- <span style="color:red">Audit.NET and all the extensions</span>: Changing the JSON serialization default library from Newtonsoft.Json to System.Text.Json for .NET >= 5.0. (#356)
+
 ## [17.0.8] - 2021-07-07
 ### Modified
 - Audit.EntityFramework.Core: Fix error on SaveChanges() when using EntityFramework Core 5.0 Table-per-Type (#421)

@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+#if IS_NK_JSON
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+#else
+using System.Text.Json;
+#endif
 
 namespace Audit.Core
 {
@@ -20,7 +24,11 @@ namespace Audit.Core
             {
                 return null;
             }
-            return JToken.FromObject(value, JsonSerializer.Create(Configuration.JsonSettings));
+            if (value is string)
+            {
+                return value;
+            }
+            return Configuration.JsonAdapter.Deserialize<T>(Configuration.JsonAdapter.Serialize(value));
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 using Audit.Core;
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0
 using Microsoft.EntityFrameworkCore;
 #endif
 

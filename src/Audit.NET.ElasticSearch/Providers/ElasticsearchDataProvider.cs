@@ -14,7 +14,6 @@ namespace Audit.Elasticsearch.Providers
     ///     ConnectionSettingsBuilder: A func that returns the connection settings for an AuditEvent. return an instance of AuditConnectionSettings in order to use the proper Audit Event serializer.
     ///     IdBuilder: A func that returns the ID to use for an AuditEvent.
     ///     IndexBuilder: A func that returns the Index Name to use for an AuditEvent.
-    ///     TypeNameBuilder: A func that returns the type name to use for an AuditEvent.
     /// </remarks>
     public class ElasticsearchDataProvider : AuditDataProvider
     {
@@ -71,7 +70,11 @@ namespace Audit.Elasticsearch.Providers
             {
                 return null;
             }
-            return JsonConvert.SerializeObject(value, Core.Configuration.JsonSettings);
+            if (value is string)
+            {
+                return value;
+            }
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, AuditJsonNetSerializer.Settings), AuditJsonNetSerializer.Settings);
         }
 
         public override object InsertEvent(AuditEvent auditEvent)

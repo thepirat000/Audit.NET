@@ -12,18 +12,25 @@ using Confluent.Kafka;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using MongoDB.Bson;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-#if NETCOREAPP3_0
+using System.Dynamic;
+#if NETCOREAPP3_0 || NET5_0
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data.Common;
 using System.Threading;
 #endif
+#if NK_JSON
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+#else
+using System.Text.Json;
+#endif
+
 
 namespace Audit.IntegrationTest
 {
@@ -83,14 +90,14 @@ namespace Audit.IntegrationTest
                 var x = new FileDataProvider(_ => _
                     .Directory(@"c:\t")
                     .FilenameBuilder(ev => "fn")
-                    .FilenamePrefix("px")
-                    .JsonSettings(new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Populate }));
+                    .FilenamePrefix("px"));
+
                 Assert.AreEqual(@"c:\t", x.DirectoryPath);
                 Assert.AreEqual("fn", x.FilenameBuilder.Invoke(null));
                 Assert.AreEqual("px", x.FilenamePrefix);
-                Assert.AreEqual(DefaultValueHandling.Populate, x.JsonSettings.DefaultValueHandling);
             }
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
             [Test]
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
@@ -198,12 +205,10 @@ namespace Audit.IntegrationTest
                 var x = new MongoDB.Providers.MongoDataProvider(_ => _
                     .ConnectionString("c")
                     .Collection("col")
-                    .CustomSerializerSettings(new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate })
                     .Database("db")
                     .SerializeAsBson(true));
                 Assert.AreEqual("c", x.ConnectionString);
                 Assert.AreEqual("col", x.Collection);
-                Assert.AreEqual(DefaultValueHandling.IgnoreAndPopulate, x.JsonSerializerSettings.DefaultValueHandling);
                 Assert.AreEqual("db", x.Database);
                 Assert.AreEqual(true, x.SerializeAsBson);
             }
@@ -251,7 +256,7 @@ namespace Audit.IntegrationTest
 #endif
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NET5_0
             [Test]
             [Category("SQL")]
             public void Test_Sql_DbContextOptions()
@@ -382,7 +387,7 @@ namespace Audit.IntegrationTest
 
             [Test]
             [Category("AzureDocDb")]
-            public void TestAzure()
+            public void TestAzureCosmos()
             {
                 SetAzureDocDbSettings();
                 TestUpdate();
@@ -392,7 +397,7 @@ namespace Audit.IntegrationTest
 
             [Test]
             [Category("AzureDocDb")]
-            public async Task TestAzureAsync()
+            public async Task TestAzureCosmosAsync()
             {
                 SetAzureDocDbSettings();
                 await TestUpdateAsync();
@@ -539,8 +544,8 @@ namespace Audit.IntegrationTest
 
                     Assert.NotNull(ev);
                     Assert.AreEqual("AuditEvents", ev.EventType);
-                    Assert.AreEqual(DateTime.Now.Year, ev.CustomFields["SortKey"]);
-                    Assert.AreEqual(hash, ev.CustomFields["HashKey"]);
+                    Assert.AreEqual(DateTime.Now.Year.ToString(), ev.CustomFields["SortKey"].ToString());
+                    Assert.AreEqual(hash, ev.CustomFields["HashKey"].ToString());
                 }
             }
 
@@ -610,7 +615,10 @@ namespace Audit.IntegrationTest
                         .Collection("Event"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                     .ResetActions();
-
+#if NK_JSON
+                var prevSettings = Audit.Core.Configuration.JsonSettings;
+                Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new List<JsonConverter>() { new JavaScriptDateTimeConverter() } };
+#endif
                 object evId = null;
                 Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, s =>
                 {
@@ -627,8 +635,12 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.ResetCustomActions();
                 var dp = Audit.Core.Configuration.DataProvider as MongoDataProvider;
                 var evt = dp.GetEvent(evId);
-
+#if NK_JSON
                 Assert.AreEqual(now.ToString("yyyyMMddHHmmss"), (evt.CustomFields["someDate"] as DateTime?).Value.ToString("yyyyMMddHHmmss"));
+                Audit.Core.Configuration.JsonSettings = prevSettings;
+#else
+                Assert.AreEqual(now.ToString("yyyyMMddHHmmss"), DateTime.Parse(evt.CustomFields["someDate"].ToString()).ToUniversalTime().ToString("yyyyMMddHHmmss"));
+#endif
             }
 
             [Test]
@@ -659,7 +671,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
             [Test]
             [Category("Elasticsearch")]
             public void TestElasticsearch()
@@ -678,7 +690,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
-#if NET461 || NETCOREAPP3_0
+#if NET461 || NETCOREAPP3_0 || NET5_0
             [Test]
             [Category("AmazonQLDB")]
             public void TestAmazonQLDB()
@@ -759,29 +771,34 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
                 Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
-                Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
-                if (dpType != "ElasticsearchDataProvider")
+                Assert.AreEqual(ev.CustomFields["ReferenceId"].ToString(), evFromApi.CustomFields["ReferenceId"].ToString());
+                if (evFromApi.Target.Old is TestStruct)
                 {
-                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.Old).Order.Status);
-                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.New).Order.Status);
+                    Assert.AreEqual(OrderStatus.Created, ((TestStruct?)evFromApi.Target.Old).Value.Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, ((TestStruct?)evFromApi.Target.New).Value.Order.Status);
+                }
+                else if (evFromApi.Target.Old is ExpandoObject)
+                {
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)evFromApi.Target.Old).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)evFromApi.Target.New).Order.Status);
                 }
                 else
                 {
-                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.Old.ToString()).Order.Status);
-                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.New.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Created, Core.Configuration.JsonAdapter.Deserialize<TestStruct>(evFromApi.Target.Old.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, Core.Configuration.JsonAdapter.Deserialize<TestStruct>(evFromApi.Target.New.ToString()).Order.Status);
                 }
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, evFromApi.CustomFields["ReferenceId"].ToString());
 
                 order = DbCreateOrder();
 
                 //audit multiple 
-                using (var a = AuditScope.Create(eventType, () => order.Status, new { ReferenceId = order.OrderId }))
+                using (var a = AuditScope.Create(eventType, () => order, new { ReferenceId = order.OrderId }))
                 {
                     ev = a.Event;
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 order = DbCreateOrder();
 
@@ -798,7 +815,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Another Comment");
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 order = DbCreateOrder();
 
@@ -811,7 +828,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Status Updated to Submitted");
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 Audit.Core.Configuration.ResetCustomActions();
             }
@@ -854,18 +871,23 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
                 Assert.AreEqual(ev.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.StartDate.ToUniversalTime().ToString("yyyyMMddHHmmss"));
                 Assert.AreEqual(ev.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"), evFromApi.EndDate.Value.ToUniversalTime().ToString("yyyyMMddHHmmss"));
-                Assert.AreEqual(ev.CustomFields["ReferenceId"], evFromApi.CustomFields["ReferenceId"]);
-                if (dpType != "ElasticsearchDataProvider")
+                Assert.AreEqual(ev.CustomFields["ReferenceId"].ToString(), evFromApi.CustomFields["ReferenceId"].ToString());
+                if (evFromApi.Target.Old is TestStruct)
                 {
-                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)ev.Target.Old).Order.Status);
-                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)ev.Target.New).Order.Status);
+                    Assert.AreEqual(OrderStatus.Created, ((TestStruct?)evFromApi.Target.Old).Value.Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, ((TestStruct?)evFromApi.Target.New).Value.Order.Status);
+                }
+                else if (evFromApi.Target.Old is ExpandoObject)
+                {
+                    Assert.AreEqual((int)OrderStatus.Created, (int)((dynamic)evFromApi.Target.Old).Order.Status);
+                    Assert.AreEqual((int)OrderStatus.Submitted, (int)((dynamic)evFromApi.Target.New).Order.Status);
                 }
                 else
-                {
-                    Assert.AreEqual(OrderStatus.Created, JsonConvert.DeserializeObject<TestStruct>(ev.Target.Old.ToString()).Order.Status);
-                    Assert.AreEqual(OrderStatus.Submitted, JsonConvert.DeserializeObject<TestStruct>(ev.Target.New.ToString()).Order.Status);
+                { 
+                    Assert.AreEqual(OrderStatus.Created, Core.Configuration.JsonAdapter.Deserialize<TestStruct>(evFromApi.Target.Old.ToString()).Order.Status);
+                    Assert.AreEqual(OrderStatus.Submitted, Core.Configuration.JsonAdapter.Deserialize<TestStruct>(evFromApi.Target.New.ToString()).Order.Status);
                 }
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 order = DbCreateOrder();
 
@@ -876,7 +898,7 @@ namespace Audit.IntegrationTest
                     order = DbOrderUpdateStatus(order, OrderStatus.Submitted);
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 order = DbCreateOrder();
 
@@ -893,7 +915,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Another Comment");
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 order = DbCreateOrder();
 
@@ -906,7 +928,7 @@ namespace Audit.IntegrationTest
                     audit.Comment("Status Updated to Submitted");
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
 
                 Audit.Core.Configuration.ResetCustomActions();
             }
@@ -922,7 +944,7 @@ namespace Audit.IntegrationTest
                     audit.SetCustomField("ReferenceId", order.OrderId);
                 }
 
-                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(order.OrderId, ev.CustomFields["ReferenceId"].ToString());
             }
 
             public void TestDelete()
@@ -936,10 +958,10 @@ namespace Audit.IntegrationTest
                     DbDeteleOrder(order.OrderId);
                     order = null;
                 }
-                Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"]);
+                Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"].ToString());
             }
 
-#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
             [Test]
             public void TestEventLog()
             {
@@ -979,8 +1001,7 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseFileLogProvider(fl => fl
                         .FilenameBuilder(_ => $"{_.Environment.UserName}_{DateTime.Now.Ticks}.json")
-                        .DirectoryBuilder(_ => $@"C:\Temp\Logs\{DateTime.Now:yyyy-MM-dd}")
-                        .JsonSettings(new JsonSerializerSettings()))
+                        .DirectoryBuilder(_ => $@"C:\Temp\Logs\{DateTime.Now:yyyy-MM-dd}"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
@@ -1072,16 +1093,17 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
             public void SetElasticsearchSettings()
             {
                 var uri = new Uri(AzureSettings.ElasticSearchUrl);
                 var ec = new Nest.ElasticClient(uri);
                 ec.Indices.Delete(Nest.Indices.AllIndices, x => x.Index("auditevent"));
-
+                var settings = new Elasticsearch.Providers.AuditConnectionSettings(uri);
+                settings.DefaultFieldNameInferrer(s => s);
                 Audit.Core.Configuration.Setup()
                     .UseElasticsearch(config => config
-                        .ConnectionSettings(uri)
+                        .ConnectionSettings(settings)
                         .Index("auditevent")
                         .Id(ev => Guid.NewGuid()))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
@@ -1089,7 +1111,7 @@ namespace Audit.IntegrationTest
             }
 #endif
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
             public void SetAmazonQLDBSettings()
             {
                 Audit.Core.Configuration.Setup()
@@ -1218,7 +1240,7 @@ namespace Audit.IntegrationTest
             public Loop Inner { get; set; }
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NET5_0
         public class TestInterceptor : DbConnectionInterceptor
         {
             public static int Count { get; set; }

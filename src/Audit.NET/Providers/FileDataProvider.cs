@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using Newtonsoft.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 namespace Audit.Core.Providers
 {
@@ -20,13 +18,6 @@ namespace Audit.Core.Providers
     /// </remarks>
     public class FileDataProvider : AuditDataProvider
     {
-        public JsonSerializerSettings JsonSettings { get; set; } = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
-
         private string _filenamePrefix = string.Empty;
         private string _directoryPath = string.Empty;
         private Func<AuditEvent, string> _filenameBuilder;
@@ -84,14 +75,13 @@ namespace Audit.Core.Providers
                 _directoryPathBuilder = fileConfig._directoryPathBuilder;
                 _filenameBuilder = fileConfig._filenameBuilder;
                 _filenamePrefix = fileConfig._filenamePrefix;
-                JsonSettings = fileConfig._jsonSettings;
             }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var fullPath = GetFilePath(auditEvent);
-            var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
+            var json = Configuration.JsonAdapter.Serialize(auditEvent);
             File.WriteAllText(fullPath, json);
             return fullPath;
         }
@@ -106,7 +96,7 @@ namespace Audit.Core.Providers
         public override void ReplaceEvent(object path, AuditEvent auditEvent)
         {
             var fullPath = path.ToString();
-            var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
+            var json = Configuration.JsonAdapter.Serialize(auditEvent);
             File.WriteAllText(fullPath, json);
         }
 
@@ -114,7 +104,7 @@ namespace Audit.Core.Providers
         {
             var fullPath = path.ToString();
             var json = File.ReadAllText(fullPath);
-            return JsonConvert.DeserializeObject<T>(json, JsonSettings);
+            return Configuration.JsonAdapter.Deserialize<T>(json);
         }
 
         public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent)
@@ -131,35 +121,17 @@ namespace Audit.Core.Providers
 
         private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent)
         {
-            var json = JsonConvert.SerializeObject(auditEvent, JsonSettings);
-#if NETSTANDARD1_3
             using (FileStream stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
-            using (StreamWriter sw = new StreamWriter(stream))
             {
-                await sw.WriteAsync(json);
+                await Configuration.JsonAdapter.SerializeAsync(stream, auditEvent);
             }
-#elif NETSTANDARD2_0 || NET45 || NET461
-            using (var file = new StreamWriter(fullPath))
-            {
-                await file.WriteAsync(json);
-            }
-#else
-            await File.WriteAllTextAsync(fullPath, json);
-#endif
         }
-        
+
         private async Task<T> GetFromFileAsync<T>(string fullPath) where T : AuditEvent
         {
-            using (FileStream file = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+            using (var stream = File.OpenRead(fullPath))
             {
-                using (var sr = new StreamReader(file))
-                {
-                    using (var jr = new JsonTextReader(sr))
-                    {
-                        var jObject = await JObject.LoadAsync(jr);
-                        return jObject.ToObject<T>(JsonSerializer.Create(JsonSettings));
-                    }
-                }
+                return await Configuration.JsonAdapter.DeserializeAsync<T>(stream);
             }
         }
 
