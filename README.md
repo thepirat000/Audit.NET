@@ -54,8 +54,8 @@ as shown on the following table:
 
 | <sub>Target</sub> \ <sup>Library</sup> |
 | ------------ | ---------------- |
-| **≥ .NET 5.0** | `Newtonsoft.Json` |
-| **≤ .NETSTANDARD2.0** | `Newtonsoft.Json` |
+| **≥ .NET 5.0** | `System.Text.Json` |
+| **≤ .NETSTANDARD2.1 / .NETCOREAPP3.0** | `Newtonsoft.Json` |
 | **≤ .NET 4.8** | `Newtonsoft.Json` |
 
 - `System.Text.Json` is the new default for applications and libraries targeting .NET 5.0 or higher
