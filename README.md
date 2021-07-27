@@ -55,7 +55,7 @@ as shown on the following table:
 | Target | Serialization |
 | ------------ | ---------------- |
 | **≥ .NET 5.0** | `System.Text.Json` |
-| **≤ .NETSTANDARD2.1 / .NETCOREAPP3.0** | `Newtonsoft.Json` |
+| **≤ .NETSTANDARD2.1 / .NETCOREAPP3.1** | `Newtonsoft.Json` |
 | **≤ .NET 4.8** | `Newtonsoft.Json` |
 
 - `System.Text.Json` is the new default for applications and libraries targeting .NET 5.0 or higher
