@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Generate detailed Audit Logs for client-side WCF service calls.</Description>
     <Copyright>Copyright 2021</Copyright>
     <AssemblyTitle>Audit.Wcf.Client</AssemblyTitle>
-    <VersionPrefix>18.0.0</VersionPrefix>
+    <VersionPrefix>18.0.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFramework>net45</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
