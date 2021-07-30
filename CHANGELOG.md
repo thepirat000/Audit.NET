@@ -3,7 +3,13 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [18.0.0]
+## [18.0.1] - 2021-07-29
+- Audit.WCF.Client: New extension providing client-side audit capabilities for WCF service calls (#427)
+- Audit.SqlServer: Adding support for providing the DbConnection instead of the connection string on .NET framework (#428)
+- Audit.EntityFrameworkCore: Fix issue with OwnedEntities when using the EF data provider (#430)
+- Audit.HttpClient: Removed Newtonsoft.json dependency from Audit.HttpClient
+
+## [18.0.0] - 2021-07-25
 - <span style="color:red">Audit.NET and all the extensions</span>: Changing the JSON serialization default library from Newtonsoft.Json to System.Text.Json for .NET >= 5.0. (#356)
 
 ## [17.0.8] - 2021-07-07

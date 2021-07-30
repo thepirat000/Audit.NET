@@ -27,7 +27,8 @@ namespace Audit.Core
                 SchemaBuilder = sqlDbConfig._schemaBuilder,
                 CustomColumns = sqlDbConfig._customColumns,
 #if NET45
-                SetDatabaseInitializerNull = sqlDbConfig._setDatabaseInitializerNull
+                SetDatabaseInitializerNull = sqlDbConfig._setDatabaseInitializerNull,
+                DbConnectionBuilder = sqlDbConfig._dbConnectionBuilder
 #else
                 DbContextOptionsBuilder = sqlDbConfig._dbContextOptionsBuilder
 #endif

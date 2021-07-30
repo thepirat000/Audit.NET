@@ -148,7 +148,7 @@ private bool IsCommonEntity(Type type)
                             auditLog.AuditData = entry.ToJson();
                             auditLog.EntityType = entry.EntityType.Name;
                             auditLog.AuditDate = DateTime.Now;
-                            auditLog.AuditUser = Environment.UserName;
+                            auditLog.AuditUser = "test user";
                             auditLog.TablePk = entry.PrimaryKey.First().Value.ToString();
                         })
                         .AuditEntityAction((evt, entry, entity) =>
@@ -156,7 +156,7 @@ private bool IsCommonEntity(Type type)
                             if (entity is OrderMemoryContext.IAudit auditEntity)
                             {
                                 auditEntity.AuditDate = DateTime.UtcNow;
-                                auditEntity.UserName = evt.Environment.UserName;
+                                auditEntity.UserName = "test user";
                                 auditEntity.AuditAction = entry.Action;
                             }                
                         }))
@@ -194,8 +194,8 @@ private bool IsCommonEntity(Type type)
 
                 Assert.AreEqual(1, auditLogs.Count);
                 Assert.AreEqual(1, orderAudits.Count);
-                Assert.AreEqual(Environment.UserName, orderAudits[0].UserName);
-                Assert.AreEqual(Environment.UserName, auditLogs[0].AuditUser);
+                Assert.AreEqual("test user", orderAudits[0].UserName);
+                Assert.AreEqual("test user", auditLogs[0].AuditUser);
             }
 
         }

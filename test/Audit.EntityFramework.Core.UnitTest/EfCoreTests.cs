@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Transactions;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -315,6 +314,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForContext<BlogsContext>().Reset();
         }
 
+#if !NETCOREAPP1_0
         [Test]
         public void Test_ProxiedLazyLoading()
         {
@@ -363,6 +363,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsNotNull(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"]);
             Assert.IsNotNull(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"]);
         }
+#endif
 
         [Test]
         public void Test_EF_CustomFields()
@@ -515,7 +516,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         {
                             entity.AuditAction = entry.Action;
                             entity.AuditDate = DateTime.Now;
-                            entity.AuditUser = Environment.UserName;
+                            entity.AuditUser = "test user";
                             entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
                         })));
 
@@ -542,8 +543,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.AreEqual(post.Id, audits[1].EntityId);
                 Assert.AreEqual(post.Title, audits[1].Title);
 
-                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
-                Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
+                Assert.AreEqual("test user", audits[0].AuditUser);
+                Assert.AreEqual("test user", audits[1].AuditUser);
             }
         }
 
@@ -563,7 +564,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         entity.EntityId = (int)entry.PrimaryKey.First().Value;
                         entity.EntityType = entry.EntityType.Name;
                         entity.AuditDate = DateTime.Now;
-                        entity.AuditUser = Environment.UserName;
+                        entity.AuditUser = "test user";
                         entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
                     }));
 
@@ -590,8 +591,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.AreEqual(post.Id, audits[1].EntityId);
                 Assert.AreEqual(post.Title, audits[1].Title);
 
-                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
-                Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
+                Assert.AreEqual("test user", audits[0].AuditUser);
+                Assert.AreEqual("test user", audits[1].AuditUser);
             }
         }
 
@@ -630,7 +631,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         {
                             entity.AuditAction = entry.Action;
                             entity.AuditDate = DateTime.Now;
-                            entity.AuditUser = Environment.UserName;
+                            entity.AuditUser = "test user";
                             entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
                         })));
 
@@ -654,7 +655,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.AreEqual("Blog", audits[0].EntityType);
                 Assert.AreEqual(blog.Id, audits[0].EntityId);
                 Assert.AreEqual("TestBlog", audits[0].Title);
-                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
+                Assert.AreEqual("test user", audits[0].AuditUser);
             }
         }
 
@@ -677,7 +678,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         {
                             entity.AuditAction = entry.Action;
                             entity.AuditDate = DateTime.Now;
-                            entity.AuditUser = Environment.UserName;
+                            entity.AuditUser = "test user";
                             entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
                         })));
 
@@ -708,6 +709,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
+#if !NETCOREAPP1_0
         [Test]
         public void Test_EF_MapProxyTypes()
         {
@@ -724,7 +726,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                         entity.EntityId = (int)entry.PrimaryKey.First().Value;
                         entity.EntityType = entry.EntityType.Name;
                         entity.AuditDate = DateTime.Now;
-                        entity.AuditUser = Environment.UserName;
+                        entity.AuditUser = "test user";
                         entity.Exception = ev.GetEntityFrameworkEvent().ErrorMessage;
                     }));
 
@@ -751,8 +753,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.AreEqual(post.Id, audits[1].EntityId);
                 Assert.AreEqual($"F:TestPost", audits[1].Title);
 
-                Assert.AreEqual(Environment.UserName, audits[0].AuditUser);
-                Assert.AreEqual(Environment.UserName, audits[1].AuditUser);
+                Assert.AreEqual("test user", audits[0].AuditUser);
+                Assert.AreEqual("test user", audits[1].AuditUser);
             }
         }
 
@@ -760,6 +762,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
            public override string Title { get => base.Title; set => base.Title = $"F:{value}"; }
         }
+#endif
 
     }
 }

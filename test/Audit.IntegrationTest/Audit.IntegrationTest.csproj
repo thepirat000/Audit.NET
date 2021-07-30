@@ -13,6 +13,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsTestProject>true</IsTestProject>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

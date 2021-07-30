@@ -95,10 +95,18 @@ echo Running...
 cd ..
 
 cd Audit.Redis.UnitTest
-echo ---------------------------------------------- RUNNING REDIS UNIT TESTS (10) ----------------------------------------------
-TITLE RUNNING REDIS UNIT TESTS (10)
+echo ---------------------------------------------- RUNNING REDIS UNIT TESTS (10.1) ----------------------------------------------
+TITLE RUNNING REDIS UNIT TESTS (10.1)
 dotnet test --logger:"console;verbosity=normal"
 
+echo Running...
+cd ..
+
+
+cd Audit.Wcf.UnitTest
+echo ---------------------------------------------- RUNNING WCF CLIENT TESTS (10.2) ----------------------------------------------
+TITLE RUNNING WCF CLIENT TESTS (10.2)
+dotnet test --logger:"console;verbosity=normal"
 echo Running...
 cd ..
 

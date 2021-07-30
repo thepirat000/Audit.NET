@@ -66,6 +66,7 @@ Audit.Core.Configuration.Setup()
 ### Provider Options
 
 - **ConnectionString**: The SQL Server connection string.
+- **DbConnection**: The `DbConnection` to use, alternative to ConnectionString when you need more control or configuration over the DB connection. (optional, only for .NET Framework) 
 - **Schema**: The SQL schema for the table. (optional)
 - **TableName**: The audit events table name.
 - **IdColumnName**: The column name of the event identifier (the primary key).

@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;
+using System.Data.Common;
 #endif
 #if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,10 @@ namespace Audit.SqlServer.Providers
         /// True to set the database initializer to NULL on the internal DbContext 
         /// </summary>
         public bool SetDatabaseInitializerNull { get; set; }
+        /// <summary>
+        /// The DbConnection builder to use, alternative to ConnectionString when you need more control or configuration over the DB connection. 
+        /// </summary>
+        public Func<AuditEvent, DbConnection> DbConnectionBuilder { get; set; }
 #endif
         /// <summary>
         /// The SQL connection string builder
@@ -117,6 +122,7 @@ namespace Audit.SqlServer.Providers
                 CustomColumns = sqlConfig._customColumns;
 #if NET45
                 SetDatabaseInitializerNull = sqlConfig._setDatabaseInitializerNull;
+                DbConnectionBuilder = sqlConfig._dbConnectionBuilder;
 #else
                 DbContextOptionsBuilder = sqlConfig._dbContextOptionsBuilder;
 #endif
@@ -375,7 +381,15 @@ namespace Audit.SqlServer.Providers
         private AuditContext CreateContext(AuditEvent auditEvent)
         {
 #if NET45
-            return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), SetDatabaseInitializerNull);
+            if (DbConnectionBuilder != null)
+            {
+                return new AuditContext(DbConnectionBuilder.Invoke(auditEvent), SetDatabaseInitializerNull, true);
+            }
+            else
+            {
+                return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), SetDatabaseInitializerNull);
+            }
+
 #else
             if (DbContextOptionsBuilder != null)
             {

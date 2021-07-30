@@ -2,11 +2,19 @@
 {
 #if NET45
     using System.Data.Entity;
+    using System.Data.Common;
 
     internal class AuditContext : DbContext
     {
         public AuditContext(string connectionString, bool setNullInitializer)
             : base(connectionString)
+        {
+            if (setNullInitializer)
+            {
+                Database.SetInitializer<AuditContext>(null);
+            }
+        }
+        public AuditContext(DbConnection connection, bool setNullInitializer, bool contextOwnsConnection) : base(connection, contextOwnsConnection)
         {
             if (setNullInitializer)
             {

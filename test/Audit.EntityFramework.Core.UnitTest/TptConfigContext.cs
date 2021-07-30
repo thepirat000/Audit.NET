@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#if EF_CORE_5
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -76,3 +77,4 @@ namespace Audit.EntityFramework.Core.UnitTest
     }
 
 }
+#endif

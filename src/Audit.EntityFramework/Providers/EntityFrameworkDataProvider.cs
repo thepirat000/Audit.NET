@@ -214,10 +214,13 @@ namespace Audit.EntityFramework.Providers
                 entryType = entryType.GetTypeInfo().BaseType;
             }
             Type type;
-#if EF_CORE && (NETSTANDARD2_0 || NETSTANDARD2_1 || NET472 || NET5_0)
-            IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindRuntimeEntityType(entryType);
+#if (EF_CORE_3 || EF_CORE_5)
+            IEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
             type = definingType?.ClrType;
-#elif NETSTANDARD1_5 || NET461
+#elif EF_CORE_2
+            IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.ClrType);
+            type = definingType?.ClrType;
+#elif EF_CORE 
             IEntityType definingType = localDbContext.Model.FindEntityType(entryType);
             type = definingType?.ClrType;
 #else

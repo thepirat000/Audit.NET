@@ -4,8 +4,10 @@
 
 Generate Audit Logs for Windows Communication Foundation (WCF) service calls.
 
-Audit.Wcf provides the server-side infrastructure to log interactions with WCF services. 
+`Audit.Wcf` provides the **server-side** infrastructure to log interactions with WCF services. 
 It records detailed information of the service method calls.
+
+If you are looking for client-side audit, please check the [`Audit.WCF.Client`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF.Client/README.md) library.
 
 ## Install
 
@@ -114,7 +116,7 @@ The library will automatically detect the property and use the given data provid
 
 ## Output
 
-Audit.Wcf output includes:
+`Audit.Wcf` output includes:
 
 - Execution time and duration
 - Environment information such as user, machine, domain and locale.
@@ -130,7 +132,7 @@ With this information, you can not just know who did the operation, but also mea
 
 ## Output details
 
-The following table describes the Audit.Wcf output fields:
+The following table describes the `Audit.Wcf` output fields:
 
 - ### [AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs)
 
