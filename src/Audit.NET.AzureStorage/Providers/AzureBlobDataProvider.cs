@@ -46,6 +46,16 @@ namespace Audit.AzureTableStorage.Providers
         public Func<AuditEvent, string> BlobNameBuilder { get; set; }
 
         /// <summary>
+        /// Gets or sets a function that returns the standard blob tier to set on the blob after uploading (or null to use the default).
+        /// </summary>
+        public Func<AuditEvent, StandardBlobTier?> AccessTierBuilder { get; set; }
+
+        /// <summary>
+        /// Gets or sets a function that returns the metadata key/values to store on the blob.
+        /// </summary>
+        public Func<AuditEvent, IDictionary<string, string>> MetadataBuilder { get; set; }
+
+        /// <summary>
         /// Gets or sets a function that returns a container name for the event.
         /// </summary>
         public Func<AuditEvent, string> ContainerNameBuilder { get; set; }
@@ -140,7 +150,26 @@ namespace Audit.AzureTableStorage.Providers
             var container = EnsureContainer(auditEvent);
             var blob = container.GetBlockBlobReference(name);
             var json = Configuration.JsonAdapter.Serialize(auditEvent);
-            blob.UploadTextAsync(json).Wait();
+            if (MetadataBuilder != null)
+            {
+                var metadata = MetadataBuilder.Invoke(auditEvent);
+                if (metadata != null)
+                {
+                    foreach(var md in metadata)
+                    {
+                        blob.Metadata[md.Key] = md.Value;
+                    }
+                }
+            }
+            blob.UploadTextAsync(json).GetAwaiter().GetResult();
+            if (AccessTierBuilder != null)
+            {
+                var accessTier = AccessTierBuilder.Invoke(auditEvent);
+                if (accessTier.HasValue)
+                {
+                    blob.SetStandardBlobTierAsync(accessTier.Value).GetAwaiter().GetResult();
+                }
+            }
         }
 
         private async Task UploadAsync(string name, AuditEvent auditEvent)
@@ -148,7 +177,26 @@ namespace Audit.AzureTableStorage.Providers
             var container = await EnsureContainerAsync(auditEvent);
             var blob = container.GetBlockBlobReference(name);
             var json = Configuration.JsonAdapter.Serialize(auditEvent);
+            if (MetadataBuilder != null)
+            {
+                var metadata = MetadataBuilder.Invoke(auditEvent);
+                if (metadata != null)
+                {
+                    foreach (var md in metadata)
+                    {
+                        blob.Metadata[md.Key] = md.Value;
+                    }
+                }
+            }
             await blob.UploadTextAsync(json);
+            if (AccessTierBuilder != null)
+            {
+                var accessTier = AccessTierBuilder.Invoke(auditEvent);
+                if (accessTier.HasValue)
+                {
+                    await blob.SetStandardBlobTierAsync(accessTier.Value);
+                }
+            }
         }
 
         protected string GetBlobName(AuditEvent auditEvent)
@@ -237,7 +285,7 @@ namespace Audit.AzureTableStorage.Providers
             var storageAccount = CloudStorageAccount.Parse(cnnString);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
-            container.CreateIfNotExistsAsync().Wait();
+            container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
             ContainerCache[cacheKey] = container;
             return container;
         }
@@ -271,7 +319,7 @@ namespace Audit.AzureTableStorage.Providers
             var storageAccount = new CloudStorageAccount(storageCredentials, accountName, EndpointSuffix, UseHttps);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
-            container.CreateIfNotExistsAsync().Wait();
+            container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
             ContainerCache[cacheKey] = container;
             return container;
         }

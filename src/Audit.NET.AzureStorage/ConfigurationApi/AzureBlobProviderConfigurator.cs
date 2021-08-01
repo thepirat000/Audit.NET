@@ -17,7 +17,7 @@ namespace Audit.AzureTableStorage.ConfigurationApi
             return _eventConfig;
         }
 
-        public IAzureBlobProviderEventConfigurator ConnectionStringBuilder(Func<AuditEvent, string> connectionStringBuilder)
+        public IAzureBlobProviderEventConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder)
         {
             _eventConfig = new AzureBlobProviderEventConfigurator
             {

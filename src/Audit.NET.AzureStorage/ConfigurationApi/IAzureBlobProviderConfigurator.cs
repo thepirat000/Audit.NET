@@ -17,7 +17,7 @@ namespace Audit.AzureTableStorage.ConfigurationApi
         /// Specifies a function that returns the connection string for an event
         /// </summary>
         /// <param name="connectionStringBuilder">A function that returns the connection string for an event.</param>
-        IAzureBlobProviderEventConfigurator ConnectionStringBuilder(Func<AuditEvent, string> connectionStringBuilder);
+        IAzureBlobProviderEventConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder);
         /// <summary>
         /// Uses Azure Active Directory authentication for managed identities. 
         /// </summary>

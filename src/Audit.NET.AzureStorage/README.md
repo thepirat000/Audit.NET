@@ -35,7 +35,9 @@ Audit.Core.Configuration.Setup()
     .UseAzureBlobStorage(config => config
         .ConnectionString("DefaultEndpointsProtocol=https;AccountName=your account;AccountKey=your key")
         .ContainerName("event")
-        .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"));
+        .BlobName(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json")
+        .WithAccessTier(StandardBlobTier.Cool)
+        .WithMetadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName } }));
 ```
 
 Using Azure Active Directory (authentication token):
@@ -47,7 +49,7 @@ Audit.Core.Configuration.Setup()
             .AccountName("your account")
             .TenantId("your tenant ID"))
         .ContainerName("event")
-        .BlobNameBuilder(ev => $"{Guid.NewGuid()}.json"));
+        .BlobName(ev => $"{Guid.NewGuid()}.json"));
 ```
 
 #### Provider Options
@@ -56,25 +58,28 @@ Audit.Core.Configuration.Setup()
 
 Depending on the authentication method, you can call one of the following two methods:
 
-- **`ConnectionString()`**: To use **Account Access Key or SAS** authentication via an Azure Storage connection string.
-- **`AzureActiveDirectory()`**: To use [**Azure Active Directory**](https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-app) authentication via access tokens acquired automatically.
+- **`ConnectionString`**: To use **Account Access Key or SAS** authentication via an Azure Storage connection string.
+- **`AzureActiveDirectory`**: To use [**Azure Active Directory**](https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-app) authentication via access tokens acquired automatically.
 
 ##### AzureActiveDirectory configuration
 
 When using Azure Active Directory authentication you can provide the following configuration to `AzureActiveDirectory()` method:
 
-- **`AccountName()`**: The Account Name of your Azure Storage.
-- **`TenantId()`**: The Tenant ID, this is your Azure Active Directory ID. See [How to get it](https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-app#get-the-tenant-id-for-your-azure-active-directory).
+- **`AccountName`**: The Account Name of your Azure Storage.
+- **`TenantId`**: The Tenant ID, this is your Azure Active Directory ID. See [How to get it](https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-app#get-the-tenant-id-for-your-azure-active-directory).
 
-- **`AuthConnectionString()`**: (Optional) Specifies a custom connection string for the Token Provider. Check [this](https://docs.microsoft.com/en-us/azure/key-vault/service-to-service-authentication#connection-string-support) for more information.
-- **`ResouceUrl()`**: (Optional) Specifies a custom resource URL to acquire the tokens for. By default the Azure Storage resource ID `https://storage.azure.com/` is used.
-- **`EndpointSuffix()`**: (Optional) Specifies a custom DNS endpoint suffix to use for the storage services. Default is `core.windows.net`.
-- **`UseHttps()`**: (Optional) Specifies whether to use HTTPS to connect to storage service endpoints. Default is `true`.
+- **`AuthConnectionString`**: (Optional) Specifies a custom connection string for the Token Provider. Check [this](https://docs.microsoft.com/en-us/azure/key-vault/service-to-service-authentication#connection-string-support) for more information.
+- **`ResouceUrl`**: (Optional) Specifies a custom resource URL to acquire the tokens for. By default the Azure Storage resource ID `https://storage.azure.com/` is used.
+- **`EndpointSuffix`**: (Optional) Specifies a custom DNS endpoint suffix to use for the storage services. Default is `core.windows.net`.
+- **`UseHttps`**: (Optional) Specifies whether to use HTTPS to connect to storage service endpoints. Default is `true`.
 
 ##### Container options
 
-- **`ContainerName()`/`ContainerNameBuilder`**: The container name to use (see the naming restrictions [here](https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata)). By default, "event" is used as the container name.
-- **`BlobNameBuilder`**: A function that takes an Audit Event and returns a unique blob name for the event. The resulting name can include path information (slash separated sub-folders). By default, a random Guid is used as the blob name.
+- **`ContainerName`/`ContainerNameBuilder`**: The container name to use (see the naming restrictions [here](https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata)). By default, "event" is used as the container name.
+- **`BlobName`**: A function that takes an Audit Event and returns a unique blob name for the event. The resulting name can include path information (slash separated sub-folders). By default, a random Guid is used as the blob name.
+- **`WithAccessTier`**: (optional) A function that takes an Audit Event and returns the Standard BLOB [Access Tier](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-storage-tiers) to set after the blob upload.
+Note that using this setting implies that each upload will require two calls: one to upload the blob, and another one to set the access tier. 
+- **`WithMetadata`**: (optional) A function that takes an Audit Event and returns a set of key-value pairs to be associated with the blob storage resource.
 
 #### Query events
 

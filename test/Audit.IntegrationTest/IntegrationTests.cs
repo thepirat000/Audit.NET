@@ -463,8 +463,8 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                    .UseAzureBlobStorage(config => config
                        .ConnectionString(AzureSettings.AzureBlobCnnString)
-                       .ContainerNameBuilder(ev => ev.EventType)
-                       .BlobNameBuilder(ev => $"{ev.EventType}_{Guid.NewGuid()}.json"))
+                       .ContainerName(ev => ev.EventType)
+                       .BlobName(ev => $"{ev.EventType}_{Guid.NewGuid()}.json"))
                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
                 var rnd = new Random();
@@ -1010,9 +1010,10 @@ namespace Audit.IntegrationTest
                 Audit.Core.Configuration.Setup()
                     .UseAzureBlobStorage(config => config
                         .ConnectionString(AzureSettings.AzureBlobCnnString)
-                        //.ContainerName("event")
-                        .ContainerNameBuilder(ev => $"events{DateTime.Today:yyyyMMdd}")
-                        .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
+                        .ContainerName(ev => $"events{DateTime.Today:yyyyMMdd}")
+                        .BlobName(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json")
+                        .WithAccessTier(StandardBlobTier.Hot)
+                        .WithMetadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
@@ -1023,8 +1024,8 @@ namespace Audit.IntegrationTest
                         .AzureActiveDirectory(adConfig => adConfig
                             .AccountName(AzureSettings.BlobAccountName)
                             .TenantId(AzureSettings.BlobTenantId))
-                        .ContainerNameBuilder(ev => $"events{DateTime.Today:yyyyMMdd}")
-                        .BlobNameBuilder(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
+                        .ContainerName(ev => $"events{DateTime.Today:yyyyMMdd}")
+                        .BlobName(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
