@@ -4,11 +4,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [18.1.0] - 2021-08-01
-- Audit.AzureStorage: Adding support for configuring the Azure Blob Tier after upload, and to set Metadata associated with the blog (#429)
+- Audit.NET.AzureStorage: Adding support for configuring the Azure Blob Tier after upload, and to set Metadata associated with the blog (#429)
 
 ## [18.0.1] - 2021-07-29
 - Audit.WCF.Client: New extension providing client-side audit capabilities for WCF service calls (#427)
-- Audit.SqlServer: Adding support for providing the DbConnection instead of the connection string on .NET framework (#428)
+- Audit.NET.SqlServer: Adding support for providing the DbConnection instead of the connection string on .NET framework (#428)
 - Audit.EntityFrameworkCore: Fix issue with OwnedEntities when using the EF data provider (#430)
 - Audit.HttpClient: Removed Newtonsoft.json dependency from Audit.HttpClient
 
