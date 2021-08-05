@@ -88,7 +88,7 @@ Depending on the authentication method, you can call one of the following method
 
 - **`ContainerName`**: The container name to use as a function of the Audit Event (see the naming restrictions [here](https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata)). 
 - **`BlobName`**: The unique blob name to use as a function of the Audit Event. The resulting name can include path information (slash separated sub-folders). 
-- **`AccessTier`**: (optional) The [Access Tier]([Access Tier](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-storage-tiers)) to use as a function of the Audit Event. 
+- **`AccessTier`**: (optional) The [Access Tier](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-storage-tiers) to use as a function of the Audit Event. 
 - **`Metadata`**: (optional) Extra information to include as metadata to be associated with the blob storage resource.
 
 #### Query events
