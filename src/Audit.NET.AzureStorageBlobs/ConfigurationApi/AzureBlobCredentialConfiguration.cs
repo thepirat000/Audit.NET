@@ -1,10 +1,6 @@
-﻿using Audit.Core;
-using Azure;
+﻿using Azure;
 using Azure.Core;
 using Azure.Storage;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Audit.AzureStorageBlobs.ConfigurationApi
 {

@@ -1,8 +1,10 @@
 ﻿using Audit.Core;
 using System;
 using System.Threading.Tasks;
+#if NETSTANDARD2_0
 using System.Text.Json;
 using System.Text.Json.Serialization;
+#endif
 using Azure.Storage.Blobs;
 using Audit.AzureStorageBlobs.ConfigurationApi;
 using Azure.Storage;
