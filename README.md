@@ -556,7 +556,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [PostgreSqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/Providers/PostgreSqlDataProvider.cs) | [Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.PostgreSql#auditnetpostgresql) | Store the events as rows in a **PostgreSQL** database table, in JSON format. | `.UsePostgreSql()`
 [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()`
 [AzureCosmosDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/Providers/AzureCosmosDataProvider.cs) | [Audit.NET.AzureCosmos](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureCosmos#auditnetazurecosmos) | Store the events in an **Azure Cosmos DB** container, in JSON format. | `.UseAzureCosmos()`
-[AzureBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureBlobDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureBlobStorage()`
+[AzureStorageBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/Providers/AzureStorageBlobDataProvider.cs) | [Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageBlobs) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureStorageBlobs()`
 [AzureTableDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureTableDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Table**. | `.UseAzureTableStorage()`
 [UdpDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/Providers/UdpDataProvider.cs) | [Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md) | Send Audit Logs as UDP datagrams to a network. | `.UseUdp()`
 [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes or publish to a PubSub channel. | `.UseRedis()`
@@ -774,9 +774,6 @@ There are also two libraries provided to use the alternative JSON serialization 
         ...
     ```
 
-
-
-
 ## Configuration Fluent API
 Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.
 
@@ -849,7 +846,8 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
 <img src="https://i.imgur.com/yeBZZiP.png" alt="icon" width="80"/> | **[Audit.NET.AzureCosmos](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/README.md)** | Store the events in an **Azure Cosmos DB** container, in JSON format.
-<img src="https://i.imgur.com/ouaw5CX.png" alt="icon" width="80"/> | **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)** | Store the events in an **Azure Blob Storage** container or an **Azure Table**.
+<img src="https://i.imgur.com/ouaw5CX.png" alt="icon" width="80"/> | **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)** | Store the events in an **Azure Blob Storage** container or an **Azure Table** using the legacy client [WindowsAzure.Storage](https://www.nuget.org/packages/WindowsAzure.Storage/).
+<img src="https://i.imgur.com/ouaw5CX.png" alt="icon" width="80"/> | **[Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/README.md)** | Store the events in an **Azure Blob Storage** container using the latest client [Azure.Storage.Blobs](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.blobs-readme).
 <img src="https://i.imgur.com/kIGe4Z5.png" alt="icon" width="80"/> | **[Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md)** | Store the audit events in Amazon DynamoDB tables.
 <img src="https://i.imgur.com/PbeWVKz.png" alt="icon" width="80"/> | **[Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md)** | Store the audit events in Elasticsearch indices.
 <img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md)** | Store the audit events using Apache log4net™.

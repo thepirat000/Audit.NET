@@ -24,6 +24,10 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data.Common;
 using System.Threading;
 #endif
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+using Azure.Storage;
+using Azure.Storage.Blobs.Models;
+#endif
 #if NK_JSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -568,6 +572,26 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+            [Test]
+            [Category("AzureStorageBlobs")]
+            public void TestAzureStorageBlobs()
+            {
+                SetAzureStorageBlobsSettings();
+                TestUpdate();
+                TestInsert();
+                TestDelete();
+            }
+
+            [Test]
+            [Category("AzureStorageBlobs")]
+            public async Task TestAzureStorageBlobsAsync()
+            {
+                SetAzureStorageBlobsSettings();
+                await TestUpdateAsync();
+            }
+#endif
+
             [Test]
             [Category("SQL")]
             public void TestSql()
@@ -1029,6 +1053,21 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+            public void SetAzureStorageBlobsSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseAzureStorageBlobs(config => config
+                        .WithCredentials(_ => _
+                            .Url(AzureSettings.AzureBlobServiceUrl)
+                            .Credential(new StorageSharedKeyCredential(AzureSettings.AzureBlobAccountName, AzureSettings.AzureBlobAccountKey)))
+                        .ContainerName(ev => $"events{DateTime.Today:yyyyMMdd}")
+                        .BlobName(ev => $"{ev.StartDate:yyyy-MM}/{ev.Environment.UserName}/{Guid.NewGuid()}.json")
+                        .AccessTier(AccessTier.Cool)
+                        .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }))
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd); 
+            }
+#endif
 
             public void SetAzureTableSettings()
             {

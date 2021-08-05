@@ -2,11 +2,15 @@
 {
     public static class AzureSettings
     {
-        public const string AzureBlobCnnString = "DefaultEndpointsProtocol=https;AccountName=thepirat;AccountKey=XXXXX==;EndpointSuffix=core.windows.net";
-        public const string AzureDocDbUrl = "https://XXXXX.documents.azure.com:443/";
-        public const string AzureDocDbAuthKey = "XXXXXXX";
-        public const string ElasticSearchUrl = "http://localhost:9200";
-        public const string BlobTenantId = "XXXXXXX";
-        public const string BlobAccountName = "XXXXXXX";
+        public const string AzureBlobServiceUrl = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string AzureBlobAccountName = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string AzureBlobAccountKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string AzureBlobCnnString = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+        public const string AzureDocDbUrl = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string AzureDocDbAuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string BlobAccountName = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string BlobTenantId = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string ElasticSearchUrl = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     }
 }

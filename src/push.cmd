@@ -21,6 +21,7 @@ del "audit.entityframework.identity.core.v3\bin\debug\*.symbols.nupkg"
 del "audit.Wcf\bin\debug\*.symbols.nupkg"
 del "audit.Wcf.Client\bin\debug\*.symbols.nupkg"
 del "audit.net.azurestorage\bin\debug\*.symbols.nupkg"
+del "audit.net.azurestorageblobs\bin\debug\*.symbols.nupkg"
 del "audit.dynamicproxy\bin\debug\*.symbols.nupkg"
 del "audit.net.udp\bin\debug\*.symbols.nupkg"
 del "audit.net.redis\bin\debug\*.symbols.nupkg"
@@ -56,6 +57,7 @@ nuget push "audit.EntityFramework.Identity.Core.v3\bin\debug\*.nupkg" -NoSymbols
 nuget push "audit.Wcf\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.Wcf.Client\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureStorage\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.AzureStorageBlobs\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.DynamicProxy\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Udp\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Redis\bin\debug\*.nupkg" -NoSymbols -source %1

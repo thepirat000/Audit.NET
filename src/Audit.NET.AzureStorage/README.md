@@ -15,8 +15,21 @@ PM> Install-Package Audit.NET.AzureStorage
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.AzureStorage.svg?style=flat)](https://www.nuget.org/packages/Audit.NET.AzureStorage/)
 [![NuGet Count](https://img.shields.io/nuget/dt/Audit.NET.AzureStorage.svg)](https://www.nuget.org/packages/Audit.NET.AzureStorage/)
 
+# IMPORTANT NOTES
+
+This library will be **deprecated** in a future version.
+
+This library uses the **legacy** client [WindowsAzure.Storage](https://www.nuget.org/packages/WindowsAzure.Storage/) package
+which has been split into multiple client libraries ([Azure.Storage.Blobs](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.blobs-readme), [Microsoft.Azure.Cosmos.Table](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table)) and replaced.
+
+For Azure Blob storage, a new audit library which uses the latest client is provided: [`Audit.NET.AzureStorageBlobs`](https://www.nuget.org/packages/Audit.NET.AzureStorageBlobs/).
+
+ 
+
+
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)
+
 
 ## Configuration
 Set the static `Audit.Core.Configuration.DataProvider` property to set one of the Azure Storage data providers, or call the `UseAzureBlobStorage()`/`UseAzureTableStorage()` 

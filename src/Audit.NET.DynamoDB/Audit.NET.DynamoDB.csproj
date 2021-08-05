@@ -4,7 +4,7 @@
     <Description>Store Audit.NET Trail Logs into Amazon DynamoDB</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.DynamoDB</AssemblyTitle>
-    <VersionPrefix>18.1.0</VersionPrefix>
+    <VersionPrefix>18.1.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.3;net45;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
