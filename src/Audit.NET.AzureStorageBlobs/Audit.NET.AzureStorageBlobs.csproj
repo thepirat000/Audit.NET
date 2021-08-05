@@ -26,6 +26,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.9.1" />
   </ItemGroup>
 
@@ -36,5 +40,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 </Project>
