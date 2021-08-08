@@ -4,7 +4,7 @@
     <Description>Log Audit.NET events to the Windows EventLog when targeting net standard</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.NET.EventLog.Core</AssemblyTitle>
-    <VersionPrefix>18.1.1</VersionPrefix>
+    <VersionPrefix>18.1.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

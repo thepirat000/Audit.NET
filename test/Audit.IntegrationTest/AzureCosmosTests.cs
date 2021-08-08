@@ -14,20 +14,17 @@ namespace Audit.IntegrationTest
         [Category("AzureDocDb")]
         public void TestAzureCosmos_CustomId()
         {
+            var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
                 Endpoint = AzureSettings.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey
+                AuthKey = AzureSettings.AzureDocDbAuthKey,
+                IdBuilder = _ => id
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
-            var id = Guid.NewGuid().ToString();
-            var auditEvent = new AuditEventWithId()
-            {
-                id = id
-            };
-           
+            var auditEvent = new AuditEvent();
             using (var scope = AuditScope.Create(new AuditScopeOptions()
             {
                 DataProvider = dp,
@@ -39,30 +36,29 @@ namespace Audit.IntegrationTest
                 scope.SetCustomField("value", "added");
             };
 
-            var ev = dp.GetEvent(id);
-
-            Assert.AreEqual(id, auditEvent.id);
+            var ev = dp.GetEvent(id, eventType);
+            
+            Assert.AreEqual(id, auditEvent.CustomFields["id"].ToString());
             Assert.AreEqual(auditEvent.CustomFields["value"].ToString(), ev.CustomFields["value"].ToString());
             Assert.AreEqual(eventType, auditEvent.EventType);
         }
-
+        
         [Test]
         [Category("AzureDocDb")]
         public async Task TestAzureCosmos_CustomIdAsync()
         {
+            var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
                 Endpoint = AzureSettings.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey
+                AuthKey = AzureSettings.AzureDocDbAuthKey,
+                IdBuilder = _ => id
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
-            var id = Guid.NewGuid().ToString();
-            var auditEvent = new AuditEventWithId()
-            {
-                id = id
-            };
+            var auditEvent = new AuditEvent();
 
             using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
             {
@@ -75,13 +71,14 @@ namespace Audit.IntegrationTest
                 scope.SetCustomField("value", "added");
             };
 
-            var ev = await dp.GetEventAsync(id);
+            var ev = await dp.GetEventAsync(id, eventType);
 
-            Assert.AreEqual(id, auditEvent.id);
-            Assert.AreEqual(auditEvent.CustomFields["value"], ev.CustomFields["value"]);
+            Assert.AreEqual(id, auditEvent.CustomFields["id"].ToString());
+            Assert.AreEqual(auditEvent.CustomFields["value"].ToString(), ev.CustomFields["value"].ToString());
             Assert.AreEqual(eventType, auditEvent.EventType);
         }
 
+#if NET452 || NET461 
         [Test]
         [Category("AzureDocDb")]
         public void TestAzureCosmos_Query()
@@ -167,6 +164,7 @@ namespace Audit.IntegrationTest
             Assert.IsFalse(evs[1].CustomFields.ContainsKey("value"));
             Assert.AreEqual(100, evs[2].CustomFields["value"]);
         }
+#endif
 
     }
 

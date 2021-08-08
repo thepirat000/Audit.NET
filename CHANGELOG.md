@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [18.1.2] - 2021-08-07
+- Audit.NET.AzureCosmos: Added support for .NET Standard 2.0 and .NET 5.0, using latest client library Microsoft.Azure.Cosmos (fixes #434)
+
 ## [18.1.1] - 2021-08-04
 - Audit.NET.AzureStorageBlobs: New library to store audit event on Azure Storage blobs, using the latest client [Azure.Storage.Blobs](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.blobs-readme).
 

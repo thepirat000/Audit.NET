@@ -24,21 +24,12 @@ or use the `UseAzureCosmos` method on the fluent configuration. This should be d
 
 For example:
 ```c#
-Audit.Core.Configuration.DataProvider = new Audit.AzureCosmos.Providers.AzureCosmosDataProvider()
-{
-    Endpoint = "https://mycompany.documents.azure.com:443/",
-    AuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==",
-    Database = "Audit",
-    ContainerBuilder = () => context.GetContainer(),
-    ConnectionPolicy = new ConnectionPolicy { ConnectionMode = ConnectionMode.Direct, ConnectionProtocol = Protocol.Tcp }
-};
-
-Audit.Core.Configuration.DataProvider = new Audit.AzureCosmos.Providers.AzureCosmosDataProvider()
-{
-    DocumentClient = myClient,
-    Database = "Audit",
-    Container = "Event"
-};
+Audit.Core.Configuration.DataProvider = new Audit.AzureCosmos.Providers.AzureCosmosDataProvider(config => config
+    .Endpoint("https://mycompany.documents.azure.com:443/")
+    .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")
+    .Database("Audit")
+    .Container("logs")
+    .WithId(_ => Guid.NewGuid().ToString().ToUpper()));
 ```
 
 Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
@@ -46,14 +37,10 @@ Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.
 Audit.Core.Configuration.Setup()
     .UseAzureCosmos(config => config
         .Endpoint("https://mycompany.documents.azure.com:443/")
-        .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")
+        .AuthKey("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==")
         .Database("Audit")
-        .Container("Test")
-        .ConnectionPolicy(new ConnectionPolicy
-        {
-            ConnectionMode = ConnectionMode.Direct,
-            ConnectionProtocol = Protocol.Tcp
-        }));
+        .Container("logs")
+        .ClientOptions(options => { options.ConnectionMode = ConnectionMode.Gateway; }));
 ```
 
 ### Provider options
@@ -61,24 +48,33 @@ Audit.Core.Configuration.Setup()
 Mandatory config with an Endpoint and an AuthKey:
 - **Endpoint** / **EndpointBuilder**: The Azure Cosmos endpoint URL.
 - **AuthKey** / **AuthKeyBuilder**: The Auth Key to use.
+
+Or with a previously configured instance of DocumentClient/CosmosClient:
+- **DocumentClient** / **CosmosClient**: Sets an already configured document/cosmos client. 
+
+Container seetings:
 - **Database** / **DatabaseBuilder**: The audit database name.
 - **Container** / **ContainerBuilder**: The events container name.
-
-Or with a previously configured instance of DocumentClient:
-- **DocumentClient**: An already configured document client.
+- **WithId** / **IdBuilder**: A func that returns the document id to use for a given audit event. By default it will generate a new random id.
 
 ## Query events
 
-This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id and partition key. Note that if your container
+has a partition key defined, you need to provide both id and partition key:
 
 ```c#
-var event = cosmosDbDataProvider.GetEvent("eventId");
+var event = auditDataProvider.GetEvent(("eventId", "partitionValue"));
+```
+
+or using the overload on the concrete AzureCosmosDataProvider:
+
+```c#
+var event = azureCosmosDataProvider.GetEvent("eventId", "partitionValue");
 ```
 
 The Azure Cosmos data provider also includes support for querying the events collection.
 
 Use the `QueryEvents()` method on `AzureCosmosDataProvider` class to run LINQ queries against the audit events.
-
 
 For example, to get the top 10 most time-consuming events for a specific machine:
 ```c#

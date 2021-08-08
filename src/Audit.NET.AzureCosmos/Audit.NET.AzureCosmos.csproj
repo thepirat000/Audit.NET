@@ -4,9 +4,9 @@
     <Description>Store Audit.NET Trail Logs into an Azure Cosmos database</Description>
     <Copyright>Copyright 2021</Copyright>
     <AssemblyTitle>Audit.AzureCosmos</AssemblyTitle>
-    <VersionPrefix>18.1.1</VersionPrefix>
+    <VersionPrefix>18.1.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>net45;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.6;netstandard2.0;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1573;1591;3001;3003</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -22,7 +22,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+	  <RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,9 +44,22 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.14.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.20.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.20.1" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);IS_COSMOS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' and '$(TargetFramework)' != 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);IS_DOCDB</DefineConstants>
+  </PropertyGroup>
+
 
   <ItemGroup>
     <None Include="images\icon.png" Pack="true" PackagePath="\"/>

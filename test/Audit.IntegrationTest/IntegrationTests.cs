@@ -218,6 +218,35 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
+            [Category("AzureDocDb")]
+            public void Test_AzureCosmos_FluentApi()
+            {
+                var x = new AzureCosmos.Providers.AzureCosmosDataProvider(_ => _
+                    .Endpoint(() => "Endpoint")
+                    .AuthKey(() => "AuthKey")
+                    .Container(() => "Container")
+                    .Database(() => "Database")
+#if NET5_0 || NETCOREAPP2_0 || NETCOREAPP3_0
+                    .ClientOptions(o => o.MaxRequestsPerTcpConnection = 123)
+#else
+                    .ConnectionPolicy(new Microsoft.Azure.Documents.Client.ConnectionPolicy() { ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol.Tcp })
+#endif
+                    .WithId(ev => "Id"));
+                Assert.AreEqual("Endpoint", x.EndpointBuilder?.Invoke());
+                Assert.AreEqual("AuthKey", x.AuthKeyBuilder?.Invoke());
+                Assert.AreEqual("Database", x.DatabaseBuilder?.Invoke());
+                Assert.AreEqual("Container", x.ContainerBuilder?.Invoke());
+                Assert.AreEqual("Id", x.IdBuilder?.Invoke(null));
+#if NET5_0 || NETCOREAPP2_0 || NETCOREAPP3_0
+                var opt = new Microsoft.Azure.Cosmos.CosmosClientOptions();
+                x.CosmosClientOptionsAction?.Invoke(opt);
+                Assert.AreEqual(123, opt.MaxRequestsPerTcpConnection);
+#else
+                Assert.AreEqual(Microsoft.Azure.Documents.Client.Protocol.Tcp, x.ConnectionPolicyBuilder.Invoke().ConnectionProtocol);
+#endif
+            }
+
+            [Test]
             [Category("MySql")]
             public void Test_MySqlDataProvider_FluentApi()
             {
@@ -789,7 +818,23 @@ namespace Audit.IntegrationTest
                 }
 
                 var dpType = Configuration.DataProvider.GetType().Name;
-                var evFromApi = (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider" || dpType == "AzureTableDataProvider") ? ev : Configuration.DataProvider.GetEvent(ids[0]);
+                AuditEvent evFromApi;
+                if (dpType == "AzureCosmosDataProvider")
+                {
+#if NET452 || NET461
+                    evFromApi = Configuration.DataProvider.GetEvent(new Tuple<string, string>(ids[0].ToString(), eventType));
+#else
+                    evFromApi = Configuration.DataProvider.GetEvent((ids[0].ToString(), eventType));
+#endif
+                }
+                else if (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider" || dpType == "AzureTableDataProvider")
+                {
+                    evFromApi = ev;
+                }
+                else
+                {
+                    evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
+                }
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);
@@ -889,7 +934,23 @@ namespace Audit.IntegrationTest
                 }
 
                 var dpType = Configuration.DataProvider.GetType().Name;
-                var evFromApi = (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider" || dpType == "AzureTableDataProvider") ? ev : await Audit.Core.Configuration.DataProvider.GetEventAsync(ids[0]);
+                AuditEvent evFromApi;
+                if (dpType == "AzureCosmosDataProvider")
+                {
+#if NET452 || NET461
+                    evFromApi = await Configuration.DataProvider.GetEventAsync(new Tuple<string, string>(ids[0].ToString(), eventType));
+#else
+                    evFromApi = await Configuration.DataProvider.GetEventAsync((ids[0].ToString(), eventType));
+#endif
+                }
+                else if (dpType == "UdpDataProvider" || dpType == "EventLogDataProvider" || dpType == "AzureTableDataProvider")
+                {
+                    evFromApi = ev;
+                }
+                else
+                {
+                    evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
+                }
                 Assert.AreEqual(2, ids.Count);
                 Assert.AreEqual(ids[0], ids[1]);
                 Assert.AreEqual(ev.EventType, evFromApi.EventType);

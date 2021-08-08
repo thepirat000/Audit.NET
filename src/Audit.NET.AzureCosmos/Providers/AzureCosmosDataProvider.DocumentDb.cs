@@ -1,13 +1,14 @@
-﻿using System;
+﻿#if IS_DOCDB
+using System;
 using Audit.Core;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using System.IO;
 using System.Text;
+using Audit.AzureCosmos.ConfigurationApi;
 
 namespace Audit.AzureCosmos.Providers
 {
@@ -69,34 +70,34 @@ namespace Audit.AzureCosmos.Providers
         /// Gets or Sets the custom DocumentClient to use. Default is NULL to use an internal cached client.
         /// </summary>
         public IDocumentClient DocumentClient { get; set; }
-
         /// <summary>
-        /// Gets or sets the JSON serializer settings.
+        /// A func that returns the document id to use for a given audit event. By default it will generate a new random Guid as the id.
         /// </summary>
-        public JsonSerializerSettings JsonSettings { get; set; } = new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
+        public Func<AuditEvent, string> IdBuilder { get; set; }
 
-        public override object Serialize<T>(T value)
+        public AzureCosmosDataProvider()
         {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is string)
-            {
-                return value;
-            }
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, JsonSettings), JsonSettings);
+        }
+
+        public AzureCosmosDataProvider(Action<IAzureCosmosProviderConfigurator> config)
+        {
+            var cosmosDbConfig = new AzureCosmosProviderConfigurator();
+            config.Invoke(cosmosDbConfig);
+            EndpointBuilder = cosmosDbConfig._endpointBuilder;
+            AuthKeyBuilder = cosmosDbConfig._authKeyBuilder;
+            ContainerBuilder = cosmosDbConfig._containerBuilder;
+            DatabaseBuilder = cosmosDbConfig._databaseBuilder;
+            ConnectionPolicyBuilder = cosmosDbConfig._connectionPolicyBuilder;
+            DocumentClient = cosmosDbConfig._documentClient;
+            IdBuilder = cosmosDbConfig._idBuilder;
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = JsonSettings }).Result;
+            SetId(auditEvent);
+            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }).Result;
             return doc.Id;
         }
 
@@ -104,7 +105,8 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = JsonSettings });
+            SetId(auditEvent);
+            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
             return doc.Id;
         }
 
@@ -113,69 +115,103 @@ namespace Audit.AzureCosmos.Providers
             var client = GetClient();
             var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
             Document doc;
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(auditEvent, JsonSettings))))
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
                 doc = JsonSerializable.LoadFrom<Document>(ms);
-                doc.Id = docId.ToString();
             }
-            client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = JsonSettings }).Wait();
+            doc.Id = docId.ToString();
+            client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }).Wait();
         }
-
+        
         public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent)
         {
             var client = GetClient();
             var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
             Document doc;
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(auditEvent, JsonSettings))))
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
                 doc = JsonSerializable.LoadFrom<Document>(ms);
-                doc.Id = docId.ToString();
             }
-            await client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = JsonSettings });
+            doc.Id = docId.ToString();
+            await client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
 
         /// <summary>
-        /// Gets an event stored on cosmos DB from its document id on the collection returned by calling the collection builder with a null AuditEvent.
+        /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
         /// </summary>
-        /// <param name="docId">The document id</param>
-        public override T GetEvent<T>(object docId)
+        public override T GetEvent<T>(object id)
         {
-            return GetEvent<T>(docId?.ToString());
+#if !NET45
+            if (id is ValueTuple<string, string> vt)
+            {
+                return GetEvent<T>(vt.Item1, vt.Item2);
+            }
+#endif
+            if (id is Tuple<string, string> t)
+            {
+                return GetEvent<T>(t.Item1, t.Item2);
+            }
+            return GetEvent<T>(id?.ToString(), null);
         }
 
         /// <summary>
-        /// Gets an event stored on cosmos DB from its document id.
+        /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
         /// </summary>
-        /// <param name="docId">The document id</param>
-        public T GetEvent<T>(string docId)
+        public override async Task<T> GetEventAsync<T>(object id)
+        {
+#if !NET45
+            if (id is ValueTuple<string, string> vt)
+            {
+                return await GetEventAsync<T>(vt.Item1, vt.Item2);
+            }
+#endif
+            if (id is Tuple<string, string> t)
+            {
+                return await GetEventAsync<T>(t.Item1, t.Item2);
+            }
+            return await GetEventAsync<T>(id?.ToString(), null);
+        }
+
+        /// <summary>
+        /// Gets an event stored on cosmos DB from its id and partition key.
+        /// </summary>
+        public T GetEvent<T>(string docId, string partitionKey)
+        {
+            return GetEventAsync<T>(docId, partitionKey).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Gets an event stored on cosmos DB from its id and partition key.
+        /// </summary>
+        public AuditEvent GetEvent(string docId, string partitionKey)
+        {
+            return GetEvent<AuditEvent>(docId, partitionKey);
+        }
+
+        /// <summary>
+        /// Gets an event stored on cosmos DB from its id and partition key.
+        /// </summary>
+        public async Task<AuditEvent> GetEventAsync(string docId, string partitionKey)
+        {
+            return await GetEventAsync<AuditEvent>(docId, partitionKey);
+        }
+
+        /// <summary>
+        /// Gets an event stored on cosmos DB from its id and partition key.
+        /// </summary>
+        public async Task<T> GetEventAsync<T>(string docId, string partitionKey)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            var sql = new SqlQuerySpec($"SELECT * FROM {ContainerBuilder?.Invoke()} c WHERE c.id = @id",
-                new SqlParameterCollection(new SqlParameter[] { new SqlParameter() { Name = "@id", Value = docId.ToString() } }));
-            return client.CreateDocumentQuery(collectionUri, sql, new FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = JsonSettings })
-                .AsEnumerable()
-                .FirstOrDefault();
+            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
+#if NET45
+            var pk = new PartitionKey(partitionKey);
+#else
+            var pk = partitionKey == null ? PartitionKey.None : new PartitionKey(partitionKey);
+#endif
+            return (await client.ReadDocumentAsync<T>(docUri, new RequestOptions() { PartitionKey = pk })).Document;
         }
 
-        /// <summary>
-        /// Gets an event stored on cosmos DB from its document id on the collection returned by calling the collection builder with a null AuditEvent.
-        /// </summary>
-        /// <param name="eventId">The event id</param>
-        public override async Task<T> GetEventAsync<T>(object eventId)
-        {
-            return await GetEventAsync<T>(eventId?.ToString());
-        }
-
-        /// <summary>
-        /// Gets an event stored on cosmos DB from its document id.
-        /// </summary>
-        /// <param name="docId">The document id</param>
-        public async Task<T> GetEventAsync<T>(string docId)
-        {
-            return await Task.FromResult(GetEvent<T>(docId));
-        }
-        
         private IDocumentClient GetClient()
         {
             return DocumentClient ?? InitializeClient();
@@ -200,7 +236,15 @@ namespace Audit.AzureCosmos.Providers
             return UriFactory.CreateDocumentCollectionUri(DatabaseBuilder?.Invoke(), ContainerBuilder.Invoke());
         }
 
-#region Events Query        
+        private void SetId(AuditEvent auditEvent)
+        {
+            if (!auditEvent.CustomFields.ContainsKey("id") && IdBuilder != null)
+            {
+                var id = IdBuilder.Invoke(auditEvent) ?? Guid.NewGuid().ToString();
+                auditEvent.CustomFields["id"] = id;
+            }
+        }
+
         /// <summary>
         /// Returns an IQueryable that enables the creation of queries against the audit events stored on Azure Cosmos.
         /// </summary>
@@ -209,7 +253,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<AuditEvent>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
 
         /// <summary>
@@ -221,7 +265,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<T>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
+            return client.CreateDocumentQuery<T>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
 
         /// <summary>
@@ -233,7 +277,7 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
+            return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
         /// <summary>
         /// Returns an enumeration of audit events for the given Azure Cosmos SQL expression.
@@ -245,8 +289,8 @@ namespace Audit.AzureCosmos.Providers
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
-            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = JsonSettings });
+            return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
-#endregion
     }
 }
+#endif

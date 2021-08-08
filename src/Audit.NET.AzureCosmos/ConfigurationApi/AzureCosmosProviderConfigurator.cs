@@ -1,7 +1,12 @@
 using System;
+using Audit.Core;
+#if IS_COSMOS
+using Microsoft.Azure.Cosmos;
+#else
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Newtonsoft.Json;
+#endif
 
 namespace Audit.AzureCosmos.ConfigurationApi
 {
@@ -11,9 +16,15 @@ namespace Audit.AzureCosmos.ConfigurationApi
         internal Func<string> _authKeyBuilder = () => null;
         internal Func<string> _databaseBuilder = () => "Audit";
         internal Func<string> _containerBuilder = () => "Events";
+        internal Func<AuditEvent, string> _idBuilder;
+#if IS_COSMOS
+        internal CosmosClient _cosmosClient;
+        internal Action<CosmosClientOptions> _cosmosClientOptionsAction;
+#else
         internal Func<ConnectionPolicy> _connectionPolicyBuilder = () => null;
         internal IDocumentClient _documentClient = null;
-        internal JsonSerializerSettings _jsonSettings = null;
+#endif
+
 
         public IAzureCosmosProviderConfigurator Endpoint(string endpoint)
         {
@@ -39,6 +50,30 @@ namespace Audit.AzureCosmos.ConfigurationApi
             return this;
         }
 
+        public IAzureCosmosProviderConfigurator WithId(Func<AuditEvent, string> idBuilder)
+        {
+            _idBuilder = idBuilder;
+            return this;
+        }
+
+
+#if IS_COSMOS
+        public IAzureCosmosProviderConfigurator CosmosClient(CosmosClient cosmosClient)
+        {
+            _cosmosClient = cosmosClient;
+            return this;
+        }
+        public IAzureCosmosProviderConfigurator ClientOptions(Action<CosmosClientOptions> cosmosClientOptionsAction)
+        {
+            _cosmosClientOptionsAction = cosmosClientOptionsAction;
+            return this;
+        }
+#else
+        public IAzureCosmosProviderConfigurator ConnectionPolicy(Func<ConnectionPolicy> connectionPolicyBuilder)
+        {
+            _connectionPolicyBuilder = connectionPolicyBuilder;
+            return this;
+        }
         public IAzureCosmosProviderConfigurator ConnectionPolicy(ConnectionPolicy connectionPolicy)
         {
             _connectionPolicyBuilder = () => connectionPolicy;
@@ -49,7 +84,7 @@ namespace Audit.AzureCosmos.ConfigurationApi
             _documentClient = documentClient;
             return this;
         }
-
+#endif
         public IAzureCosmosProviderConfigurator Endpoint(Func<string> endpointBuilder)
         {
             _endpointBuilder = endpointBuilder;
@@ -71,18 +106,6 @@ namespace Audit.AzureCosmos.ConfigurationApi
         public IAzureCosmosProviderConfigurator AuthKey(Func<string> authKeyBuilder)
         {
             _authKeyBuilder = authKeyBuilder;
-            return this;
-        }
-
-        public IAzureCosmosProviderConfigurator ConnectionPolicy(Func<ConnectionPolicy> connectionPolicyBuilder)
-        {
-            _connectionPolicyBuilder = connectionPolicyBuilder;
-            return this;
-        }
-        
-        public IAzureCosmosProviderConfigurator JsonSettings(JsonSerializerSettings settings)
-        {
-            _jsonSettings = settings;
             return this;
         }
     }
