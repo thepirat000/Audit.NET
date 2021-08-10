@@ -712,7 +712,7 @@ Audit.Core.Configuration.JsonSettings = new JsonSerializerOptions
 If you want to use a custom JSON serialization mechanism, you should create a class implementing `IJsonAdapter` and assign it to the 
 static property `Configuration.JsonAdapter`.
 
-> NOTE: When using a custom `JsonAdapter` some of the `AuditEvent` fields could be serialized in a different way than the default. This is because some of the `AuditEvent` properties are decorated with attributes from `Newtonsoft.Json` (or `System.Text.Json`). For example on .NET 5.0, the `AuditEvent.CustomFields` property is decorated with `System.Text.Json.JsonExtensionData`, so if the `AuditEvent` is serialized using `Newtonsoft.Json`, then the `CustomFields` property will be serialized as a normal field, not as an extension data field. The same will happen with some properties that are ignored by default with `JsonIgnore` attribute.
+> NOTE: Take into account that some of the `AuditEvent` properties relies on attribute decoration for the serialization / deserialization mechanism (i.e. `[JsonExtensionData]` and `[JsonIgnore]`). So if you change the default serialization mechanism, some of the `AuditEvent` fields could be serialized differently than expected. For example on .NET 5.0, the `AuditEvent.CustomFields` property is decorated with `JsonExtensionData` from `System.Text.Json`, so if the audit event is serialized using `Newtonsoft.Json`, then the `CustomFields` property will be serialized as a normal field.
 
 For example:
 ```c#
