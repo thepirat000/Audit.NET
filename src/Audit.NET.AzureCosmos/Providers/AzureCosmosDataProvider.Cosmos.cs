@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using Audit.AzureCosmos.ConfigurationApi;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Audit.AzureCosmos.Providers
 {
@@ -248,6 +249,36 @@ namespace Audit.AzureCosmos.Providers
             var container = GetContainer();
             return container.GetItemLinqQueryable<T>(true, null, options);
         }
+
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Azure Cosmos SQL expression.
+        /// </summary>
+        /// <param name="sqlExpression">The Azure Cosmos SQL expression</param>
+        /// <param name="queryOptions">The options for processing the query results feed.</param>
+        public IAsyncEnumerable<AuditEvent> EnumerateEvents(string sqlExpression, QueryRequestOptions queryOptions = null)
+        {
+            return EnumerateEvents<AuditEvent>(sqlExpression, queryOptions);
+        }
+
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Azure Cosmos SQL expression.
+        /// </summary>
+        /// <typeparam name="T">The AuditEvent type</typeparam>
+        /// <param name="sqlExpression">The Azure Cosmos SQL expression</param>
+        /// <param name="queryOptions">The options for processing the query results feed.</param>
+        public async IAsyncEnumerable<T> EnumerateEvents<T>(string sqlExpression, QueryRequestOptions queryOptions = null) where T : AuditEvent
+        {
+            var container = GetContainer();
+            var feed = container.GetItemQueryIterator<T>(sqlExpression, null, queryOptions);
+            while (feed.HasMoreResults)
+            {
+                foreach (var auditEvent in await feed.ReadNextAsync())
+                {
+                    yield return auditEvent;
+                }
+            }
+        }
+
     }
 }
 #endif

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [18.1.2] - 2021-08-19
+- Audit.NET.MongoDB: Added async methods for InsertEvent / ReplaceEvent
+- Audit.NET.AzureCosmos: Added EnumerateEvents method to CosmosDB provider
+  
 ## [18.1.2] - 2021-08-07
 - Audit.NET.AzureCosmos: Added support for .NET Standard 2.0 and .NET 5.0, using latest client library Microsoft.Azure.Cosmos (fixes #434)
 

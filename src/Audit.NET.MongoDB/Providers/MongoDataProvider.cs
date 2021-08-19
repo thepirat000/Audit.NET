@@ -107,6 +107,20 @@ namespace Audit.MongoDB.Providers
             return (BsonObjectId)doc["_id"];
         }
 
+        public async override Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var db = GetDatabase();
+            var col = db.GetCollection<BsonDocument>(Collection);
+            SerializeExtraFields(auditEvent);
+            var doc = ParseBson(auditEvent);
+            if (!IgnoreElementNames)
+            {
+                FixDocumentElementNames(doc);
+            }
+            await col.InsertOneAsync(doc);
+            return (BsonObjectId)doc["_id"];
+        }
+
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var db = GetDatabase();
@@ -119,6 +133,20 @@ namespace Audit.MongoDB.Providers
             }
             var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
             col.ReplaceOne(filter, doc);
+        }
+
+        public async override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            var db = GetDatabase();
+            var col = db.GetCollection<BsonDocument>(Collection);
+            SerializeExtraFields(auditEvent);
+            var doc = ParseBson(auditEvent);
+            if (!IgnoreElementNames)
+            {
+                FixDocumentElementNames(doc);
+            }
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            await col.ReplaceOneAsync(filter, doc);
         }
 
         private void SerializeExtraFields(AuditEvent auditEvent)
