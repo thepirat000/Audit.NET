@@ -83,7 +83,7 @@ In order to to that, you can define your `DbContext` in the following way:
 ```c#
 public class MyContext : DbContext
 {
-    private static DbContextHelper _helper = new DbContextHelper();
+    private readonly DbContextHelper _helper = new DbContextHelper();
     private readonly IAuditDbContext _auditContext;
 
     public MyContext(DbContextOptions<MyContext> options) : base(options)
