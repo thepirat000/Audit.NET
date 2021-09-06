@@ -74,8 +74,8 @@ namespace Audit.EntityFramework.Full.UnitTest
             Assert.AreEqual("Insert", evs[0].EntityFrameworkEvent.Entries[0].Action);
             Assert.AreEqual("Insert", evs[1].EntityFrameworkEvent.Entries[0].Action);
 
-            Assert.AreEqual("DefaultAuditContext:Type1", evs[0].EventType);
-            Assert.AreEqual("DefaultAuditContext:Type2", evs[1].EventType);
+            Assert.AreEqual("DepartmentContext1:Type1", evs[0].EventType);
+            Assert.AreEqual("DepartmentContext2:Type2", evs[1].EventType);
 
             Assert.AreEqual("Override 1", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
             Assert.AreEqual("Override 2", evs[1].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);

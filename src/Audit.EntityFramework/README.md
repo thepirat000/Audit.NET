@@ -1,10 +1,11 @@
 # Audit.EntityFramework
 
-**EntityFramework (EF) Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
+**Entity Framework Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
 
-Automatically generates Audit Logs for EntityFramework's operations. **Supporting EF >=6 (including EF Core)**.
+Automatically generates Audit Logs for EntityFramework's operations. **Supporting EntityFramework and EntityFramework Core**
 
-Audit.EntityFramework provides the infrastructure to log interactions with the EF `DbContext`. It can record detailed information about Insert, Update and Delete operations in your database.
+This library provides the infrastructure to log interactions with the EF `DbContext`. 
+It can record detailed information about Insert, Update and Delete operations in your database.
 
 ## Install
 
@@ -51,7 +52,12 @@ Examples:
 - Your app targets .NET standard 2.1 and want to use EntityFramework Core 3, you must install `Audit.EntityFramework.Core.v3` package.
 
 ## Usage
-Change your EF Context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
+
+There are three ways to configure your `DbContext` to enable auditing:
+
+### 1. Inheriting from `AuditDbContext`
+
+Change your EF context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
 
 For example, if you have a context like this:
 
@@ -63,7 +69,7 @@ public class MyContext : DbContext
 }
 ```
 
-to enable the audit log, you should change it to inherit from `AuditDbContext`:
+In order to enable the audit log, you should change it to inherit from `AuditDbContext`:
 ```c#
 public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramework.AuditDbContext
 {
@@ -75,15 +81,15 @@ public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramewor
 > If you're using [IdentityDbContext](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx) instead of DbContext, 
 you can install the package `Audit.EntityFramework.Identity` or `Audit.EntityFramework.Identity.Core` and inherit from the class `AuditIdentityDbContext` instead of `AuditDbContext`.
 
-## Without inheritance
+### 2. Without inheritance, overriding `SaveChanges`
 
-You can use the library without inheriting from `DbContext`/`AuditIdentityDbContext`.
-In order to to that, you can define your `DbContext` in the following way:
+You can use the library without changing the inheritance of your `DbContext`.
+In order to to that, you can define your `DbContext` in the following way, overriding `SaveChanges` and `SaveChangesAsync`:
 
 ```c#
 public class MyContext : DbContext
 {
-    private static DbContextHelper _helper = new DbContextHelper();
+    private readonly DbContextHelper _helper = new DbContextHelper();
     private readonly IAuditDbContext _auditContext;
 
     public MyContext(DbContextOptions<MyContext> options) : base(options)
@@ -104,12 +110,47 @@ public class MyContext : DbContext
 }
 ```
 
+### 3. With the provided save changes interceptor
+
+[Save Changes Interceptors](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.diagnostics.savechangesinterceptor?view=efcore-5.0) were introduced in EF Core 5.0. 
+
+If you can't change the inheritance of your `DbContext`, and/or can't override the `SaveChanges`, you can attach an instance of `AuditSaveChangesInterceptor` to your DbContext configuration. 
+
+For example:
+
+```c#
+public class MyContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(new AuditSaveChangesInterceptor());
+    }
+    // ...
+}
+```
+
+Or alternatively, when creating your DbContext:
+
+```c#
+var options = new DbContextOptionsBuilder()
+    .AddInterceptors(new AuditSaveChangesInterceptor())
+    .Options;
+using (var ctx = new MyContext(options))
+{
+    // ...
+}
+```
+> Notice that a new instance of the interceptor is registered for each DbContext instance. This is because the auditing interceptor contains state linked to the current context instance.
+ 
+### Notes
+
+- All the three methods produces the same output. You should use **only one** of these methods, otherwise you could get duplicated audit logs.
+
 
 ## How it works
 This library intercepts calls to `SaveChanges()` / `SaveChangesAsync()` on your `DbContext`, to generate [Audit.NET events](https://github.com/thepirat000/Audit.NET#usage) with the affected entities information. 
 
 Each call to `SaveChanges` generates an audit event that includes information of all the entities affected by the save operation.
-
 
 ## Configuration
 

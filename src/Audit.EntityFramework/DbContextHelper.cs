@@ -215,7 +215,7 @@ namespace Audit.EntityFramework
             if (result == null)
             {
                 // No static attributes, check the filters
-                var localConfig = EntityFramework.Configuration.GetConfigForType(context.GetType());
+                var localConfig = EntityFramework.Configuration.GetConfigForType(context.DbContext.GetType());
                 var globalConfig = EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
                 var included = EvalIncludeFilter(type, localConfig, globalConfig);
                 var ignored = EvalIgnoreFilter(type, localConfig, globalConfig);
@@ -342,7 +342,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public IAuditScope CreateAuditScope(IAuditDbContext context, EntityFrameworkEvent efEvent)
         {
-            var typeName = context.GetType().Name;
+            var typeName = context.DbContext.GetType().Name;
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
             var auditEfEvent = new AuditEventEntityFramework
             {
@@ -371,7 +371,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public async Task<IAuditScope> CreateAuditScopeAsync(IAuditDbContext context, EntityFrameworkEvent efEvent)
         {
-            var typeName = context.GetType().Name;
+            var typeName = context.DbContext.GetType().Name;
             var eventType = context.AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
             var auditEfEvent = new AuditEventEntityFramework
             {
@@ -521,6 +521,70 @@ namespace Audit.EntityFramework
             efEvent.Success = true;
             SaveScope(context, scope, efEvent);
             return efEvent.Result;
+        }
+
+        public IAuditScope BeginSaveChanges(IAuditDbContext context)
+        {
+            if (context.AuditDisabled)
+            {
+                return null;
+            }
+            var efEvent = CreateAuditEvent(context);
+            if (efEvent == null)
+            {
+                return null;
+            }
+            var scope = CreateAuditScope(context, efEvent);
+            if (context.EarlySavingAudit)
+            {
+                SaveScope(context, scope, efEvent);
+            }
+            return scope;
+        }
+
+        public async Task<IAuditScope> BeginSaveChangesAsync(IAuditDbContext context)
+        {
+            if (context.AuditDisabled)
+            {
+                return null;
+            }
+            var efEvent = CreateAuditEvent(context);
+            if (efEvent == null)
+            {
+                return null;
+            }
+            var scope = await CreateAuditScopeAsync(context, efEvent);
+            if (context.EarlySavingAudit)
+            {
+                await SaveScopeAsync(context, scope, efEvent);
+            }
+            return scope;
+        }
+
+        public void EndSaveChanges(IAuditDbContext context, IAuditScope scope, int result, Exception exception = null)
+        {
+            var efEvent = scope.GetEntityFrameworkEvent();
+            if (efEvent == null)
+            {
+                return;
+            }
+            efEvent.Success = exception == null;
+            efEvent.Result = result;
+            efEvent.ErrorMessage = exception?.GetExceptionInfo();
+            SaveScope(context, scope, efEvent);
+        }
+
+        public async Task EndSaveChangesAsync(IAuditDbContext context, IAuditScope scope, int result, Exception exception = null)
+        {
+            var efEvent = scope.GetEntityFrameworkEvent();
+            if (efEvent == null)
+            {
+                return;
+            }
+            efEvent.Success = exception == null;
+            efEvent.Result = result;
+            efEvent.ErrorMessage = exception?.GetExceptionInfo();
+            await SaveScopeAsync(context, scope, efEvent);
         }
     }
 }
