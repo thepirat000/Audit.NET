@@ -168,7 +168,7 @@ using (var ctx = new MyContext(options))
 }
 ```
 
-> Note the **Command Interceptor** generates a different type of output audit events than the **Save Changes Interceptor**
+> Note the **Command Interceptor** generates a different type of [audit output](#command-interceptor-audit-output) than the **Save Changes Interceptor**
 
 > You can combine the Command Interceptor with any of the Save Changes interception mechanisms
 
