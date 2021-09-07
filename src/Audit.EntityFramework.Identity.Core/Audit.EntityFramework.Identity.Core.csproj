@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity.Core</AssemblyTitle>
-    <VersionPrefix>18.1.4</VersionPrefix>
+    <VersionPrefix>18.1.5</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.1;net461;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
