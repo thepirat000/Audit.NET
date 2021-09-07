@@ -232,6 +232,9 @@ namespace Audit.EntityFramework
                 Entries = new List<EventEntry>(),
                 Database = dbConnection?.Database,
                 ConnectionId = clientConnectionId,
+#if EF_CORE_3 || EF_CORE_5
+                ContextId = dbContext.ContextId.ToString(),
+#endif
                 AmbientTransactionId = !context.ExcludeTransactionId ? GetAmbientTransactionId() : null,
                 TransactionId = !context.ExcludeTransactionId ? GetCurrentTransactionId(dbContext, clientConnectionId) : null,
                 DbContext = dbContext
@@ -259,6 +262,40 @@ namespace Audit.EntityFramework
                 });
             }
             return efEvent;
+        }
+
+        /// <summary>
+        /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
+        /// </summary>
+        public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
+        {
+            // Update PK and FK
+            foreach (var efEntry in efEvent.Entries)
+            {
+                var entry = efEntry.Entry;
+                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
+                foreach (var pk in efEntry.PrimaryKey)
+                {
+                    if (efEntry.ColumnValues.ContainsKey(pk.Key))
+                    {
+                        efEntry.ColumnValues[pk.Key] = pk.Value;
+                    }
+                }
+                var fks = GetForeignKeys(context.DbContext, entry);
+                foreach (var fk in fks)
+                {
+                    if (efEntry.ColumnValues.ContainsKey(fk.Key))
+                    {
+                        efEntry.ColumnValues[fk.Key] = fk.Value;
+                    }
+                }
+            }
+            // Update ConnectionId
+            var clientConnectionId = GetClientConnectionId(context.DbContext);
+            if (clientConnectionId != null)
+            {
+                efEvent.ConnectionId = clientConnectionId;
+            }
         }
 
         private string GetAmbientTransactionId()

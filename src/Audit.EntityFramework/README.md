@@ -5,7 +5,7 @@
 Automatically generates Audit Logs for EntityFramework's operations. **Supporting EntityFramework and EntityFramework Core**
 
 This library provides the infrastructure to log interactions with the EF `DbContext`. 
-It can record detailed information about Insert, Update and Delete operations in your database.
+It can record detailed information about CRUD operations in your database.
 
 ## Install
 
@@ -53,9 +53,11 @@ Examples:
 
 ## Usage
 
-There are three ways to configure your `DbContext` to enable auditing:
+### High-Level SaveChanges Interception
 
-### 1. Inheriting from `AuditDbContext`
+In order to audit *Insert*, *Delete* and *Update* operations, you can use any of the three `SaveChanges` interception mechanisms provided:
+
+#### 1. Inheriting from `AuditDbContext`
 
 Change your EF context class to inherit from `Audit.EntityFramework.AuditDbContext` instead of `DbContext`. 
 
@@ -81,7 +83,7 @@ public class MyContext : AuditDbContext // <-- inherit from Audit.EntityFramewor
 > If you're using [IdentityDbContext](https://msdn.microsoft.com/en-us/library/microsoft.aspnet.identity.entityframework.identitydbcontext(v=vs.108).aspx) instead of DbContext, 
 you can install the package `Audit.EntityFramework.Identity` or `Audit.EntityFramework.Identity.Core` and inherit from the class `AuditIdentityDbContext` instead of `AuditDbContext`.
 
-### 2. Without inheritance, overriding `SaveChanges`
+#### 2. Without inheritance, overriding `SaveChanges`
 
 You can use the library without changing the inheritance of your `DbContext`.
 In order to to that, you can define your `DbContext` in the following way, overriding `SaveChanges` and `SaveChangesAsync`:
@@ -110,7 +112,7 @@ public class MyContext : DbContext
 }
 ```
 
-### 3. With the provided save changes interceptor
+#### 3. With the provided save changes interceptor
 
 [Save Changes Interceptors](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.diagnostics.savechangesinterceptor?view=efcore-5.0) were introduced in EF Core 5.0. 
 
@@ -140,17 +142,35 @@ using (var ctx = new MyContext(options))
     // ...
 }
 ```
+
 > Notice that a new instance of the interceptor is registered for each DbContext instance. This is because the auditing interceptor contains state linked to the current context instance.
  
-### Notes
+#### Notes
 
-- All the three methods produces the same output. You should use **only one** of these methods, otherwise you could get duplicated audit logs.
+- All the Save Changes interception methods produces the same output. You should use **only one** of these methods, otherwise you could get duplicated audit logs.
 
+### Low-Level Command Interception
 
-## How it works
-This library intercepts calls to `SaveChanges()` / `SaveChangesAsync()` on your `DbContext`, to generate [Audit.NET events](https://github.com/thepirat000/Audit.NET#usage) with the affected entities information. 
+A low-level command interceptor is also provided for EF Core ≥ 3.0. 
 
-Each call to `SaveChanges` generates an audit event that includes information of all the entities affected by the save operation.
+In order to audit low-level operations like *reads*, *stored procedure calls* and *non-query commands*, you can attach the provided `AuditCommandInterceptor` to 
+your `DbContext` configuration. 
+
+For example:
+
+```c#
+var options = new DbContextOptionsBuilder()
+    .AddInterceptors(new AuditCommandInterceptor())
+    .Options;
+using (var ctx = new MyContext(options))
+{
+    // ...
+}
+```
+
+> Note the **Command Interceptor** generates a different type of output audit events than the **Save Changes Interceptor**
+
+> You can combine the Command Interceptor with any of the Save Changes interception mechanisms
 
 ## Configuration
 
@@ -341,13 +361,16 @@ With this information, you can measure performance, observe exceptions thrown or
 
 ## Output details
 
-The following tables describes the Audit.EntityFramework output fields:
+### SaveChanges audit output
 
-- ### [EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
+The following tables describes the output fields for the SaveChanges interception:
+
+- #### [EntityFrameworkEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EntityFrameworkEvent.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Database** | string | Name of the database affected |
-| **ConnectionId** | Guid | Unique client connection ID (only available when the connection is open at the beginning of the event) |
+| **ConnectionId** | Guid | A unique identifier for the database connection. |
+| **ContextId** | string | A unique identifier for the context instance and pool lease. |
 | **TransactionId** | string | Unique identifier for the DB transaction used on the audited operation (if any). To group events that are part of the same transaction. |
 | **AmbientTransactionId** | string | Unique identifier for the ambient transaction used on the audited operation (if any). To group events that are part of the same ambient transaction. |
 | **Entries** | Array of [EventEntry](#evententry) | Array with information about the entities affected by the audited operation |
@@ -356,7 +379,7 @@ The following tables describes the Audit.EntityFramework output fields:
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
 
-- ### [EventEntry](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntry.cs)
+- #### [EventEntry](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntry.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **Table** | string | Name of the affected table |
@@ -369,12 +392,31 @@ The following tables describes the Audit.EntityFramework output fields:
 | **Valid** | boolean | Bolean indicating if the entity passes the validations |
 | **ValidationResults** | Array of string | The validation messages when the entity validation fails |
 
-- ### [ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
+- #### [ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
 | Field Name | Type | Description | 
 | ------------ | ---------------- |  -------------- |
 | **ColumnName** | string | The column name that was updated |
 | **OriginalValue** | string | The original value before the update |
 | **NewValue** | string | The new value after the update |
+
+### Command Interceptor audit output
+
+The following table describes the output fields for the low-level command interception:
+
+- #### [CommandEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/CommandEvent.cs)
+| Field Name | Type | Description | 
+| ------------ | ---------------- |  -------------- |
+| **Database** | string | Name of the database affected |
+| **ConnectionId** | Guid | A unique identifier for the database connection. |
+| **ContextId** | string | A unique identifier for the context instance and pool lease. |
+| **Method** | string | The command method executed (NonQuery, Scalar, Reader) |
+| **CommandType** | string | The command type (Text, StoredProcedure) |
+| **CommandText** | string | The command text |
+| **Parameters** | Dictionary | The parameter values, if any, when `EnableSensitiveDataLogging` is enabled |
+| **IsAsync** | boolean | Indicates whether the call was asynchronous |
+| **Result** | object | Result of the operation, only for Scalar and NonQuery methods. Reader methods does not include the result on the output. |
+| **Success** | boolean | Boolean to indicate if the operation was successful |
+| **ErrorMessage** | string | The exception thrown details (if any) |
 
 ## Customization
 
@@ -400,13 +442,17 @@ Another way to customize the output is by using global custom actions, please se
 If you plan to store the audit logs via EntityFramework, you can use the provided `EntityFrameworkDataProvider`. 
 Use this to store the logs on audit tables handled by EntityFramework.
 
+> Note that only the high-level audit events are processed by this data provider. Any other audit event, including the low-level events generated with the command interceptor,
+>  are ignored by the entity framework data provider. 
+
 For example, you want to audit `Order` and `OrderItem` tables into `Audit_Order` and `Audit_OrderItem` tables respectively, 
 and the structure of the `Audit_*` tables mimic the audited table plus some fields like the event date, an action and the username:
 
 ![Audit entities](http://i.imgur.com/QvfXS9H.png)
 
 > Note that, by default, the library uses the same `DbContext` audited to store the audit logs. 
-> This is not mandatory and you can provide a different _DbContext_ instance per audit event.
+> This is not mandatory and the recommendation is to provide a different _DbContext_ instance per audit event by using the `UseDbcontext()` 
+> fluent API.
 
 ### EF Provider configuration
 
@@ -415,6 +461,7 @@ To set the EntityFramework data provider globally, set the static `Audit.Core.Co
 ```c#
 Audit.Core.Configuration.DataProvider = new EntityFrameworkDataProvider()
 {
+    DbContextBuilder = ev => new OrderDbContext(),
     AuditTypeMapper = (t, ee) => t == typeof(Order) ? typeof(OrderAudit) : t == typeof(Orderline) ? typeof(OrderlineAudit) : null,
     AuditEntityAction = (evt, entry, auditEntity) =>
     {
@@ -432,6 +479,7 @@ Or use the [fluent API](https://github.com/thepirat000/Audit.NET#configuration-f
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
+        .UseDbContext<OrderDbContext>()
         .AuditTypeExplicitMapper(m => m
             .Map<Order, OrderAudit>()
             .Map<Orderline, OrderlineAudit>()
@@ -448,11 +496,9 @@ Audit.Core.Configuration.Setup()
 ### EF Provider Options
 
 Mandatory:
-- **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
-
-Optional:
-- **ExplicitMapper**: A function that excplicitly maps an entry to its audited type, useful to configure mapping when no entity type is associated with a table, or to setup complex mapping rules.
 - **UseDbContext**: A function that returns the DbContext to use for storing the audit events, by default it will use the same context being audited. 
+- **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
+- **ExplicitMapper**: A function that excplicitly maps an entry to its audited type, useful to configure mapping when no entity type is associated with a table, or to setup complex mapping rules.
 - **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties like user name or the audit date. It can also be used to filter out audit entities. Make this function return a boolean value to indicate whether to include the entity on the output log. 
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is false).
 - **IgnoreMatchedPropertiesFunc**: Allows to selectively ignore property matching on certain types. It's a function that receives the audit entity type and returns a boolean to indicate if the property matching must be ignored for that type.

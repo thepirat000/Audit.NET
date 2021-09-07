@@ -16,10 +16,35 @@ namespace Audit.EntityFramework
 {
     public class EntityFrameworkEvent : IAuditOutput
     {
+        /// <summary>
+        /// The database name
+        /// </summary>
         public string Database { get; set; }
+        /// <summary>
+        /// A unique identifier for the database connection.
+        /// This identifier is primarily intended as a correlation ID for logging and debugging such
+        /// that it is easy to identify that multiple events are using the same or different database connection.
+        /// </summary>
         public string ConnectionId { get; set; }
+#if EF_CORE_3 || EF_CORE_5
+        /// <summary>
+        /// A unique identifier for the context instance and pool lease, if any.
+        /// This identifier is primarily intended as a correlation ID for logging and debugging such
+        /// that it is easy to identify that multiple events are using the same or different context instances.
+        /// </summary>
+        public string ContextId { get; set; }
+#endif
+        /// <summary>
+        /// The ambient transaction identifier, if any.
+        /// </summary>
         public string AmbientTransactionId { get; set; }
+        /// <summary>
+        /// The local transaction identifier, if any.
+        /// </summary>
         public string TransactionId { get; set; }
+        /// <summary>
+        /// Collection of affected entities
+        /// </summary>
         public List<EventEntry> Entries { get; set; }
 #if EF_FULL
         public List<AssociationEntry> Associations { get; set; }

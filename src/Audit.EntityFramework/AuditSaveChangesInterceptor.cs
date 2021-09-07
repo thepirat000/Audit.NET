@@ -17,10 +17,6 @@ namespace Audit.EntityFramework
         private IAuditDbContext _auditContext;
         private IAuditScope _auditScope;
 
-        public AuditSaveChangesInterceptor()
-        {
-        }
-
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
             _auditContext = new DefaultAuditContext(eventData.Context);
@@ -29,7 +25,7 @@ namespace Audit.EntityFramework
             return base.SavingChanges(eventData, result);
         }
 
-        public async override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
         {
             _auditContext = new DefaultAuditContext(eventData.Context);
             _helper.SetConfig(_auditContext);
@@ -43,7 +39,7 @@ namespace Audit.EntityFramework
             return base.SavedChanges(eventData, result);
         }
 
-        public async override ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
+        public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
         {
             await _helper.EndSaveChangesAsync(_auditContext, _auditScope, result);
             return await base.SavedChangesAsync(eventData, result, cancellationToken);
@@ -55,7 +51,7 @@ namespace Audit.EntityFramework
             base.SaveChangesFailed(eventData);
         }
 
-        public async override Task SaveChangesFailedAsync(DbContextErrorEventData eventData, CancellationToken cancellationToken = default)
+        public override async Task SaveChangesFailedAsync(DbContextErrorEventData eventData, CancellationToken cancellationToken = default)
         {
             await _helper.EndSaveChangesAsync(_auditContext, _auditScope, 0, eventData.Exception);
             await base.SaveChangesFailedAsync(eventData, cancellationToken);

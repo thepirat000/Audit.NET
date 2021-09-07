@@ -153,52 +153,6 @@ namespace Audit.EntityFramework
             await scope.SaveAsync();
         }
 
-        /// <summary>
-        /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
-        /// </summary>
-        public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
-        {
-            foreach (var efEntry in efEvent.Entries)
-            {
-                var entry = efEntry.Entry;
-                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
-                foreach(var pk in efEntry.PrimaryKey)
-                {
-                    if (efEntry.ColumnValues.ContainsKey(pk.Key))
-                    {
-                        efEntry.ColumnValues[pk.Key] = pk.Value;
-                    }
-                }
-                var fks = GetForeignKeys(context.DbContext, entry);
-                foreach (var fk in fks)
-                {
-#if EF_FULL
-                    // When deleting an entity, sometimes the foreign keys are set to NULL by EF. This only happens on EF6.
-                    if (fk.Value == null)
-                    {
-                        continue;
-                    }
-#endif
-                    if (efEntry.ColumnValues.ContainsKey(fk.Key))
-                    {
-                        efEntry.ColumnValues[fk.Key] = fk.Value;
-                    }
-                }
-            }
-#if EF_FULL
-            if (efEvent.Associations != null)
-            {
-                foreach (var association in efEvent.Associations)
-                {
-                    var e1 = association.Records[0].InternalEntity;
-                    var e2 = association.Records[1].InternalEntity;
-                    association.Records[0].PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(e1, context.DbContext);
-                    association.Records[1].PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(e2, context.DbContext);
-                }
-            }
-#endif
-        }
-
         // Determines whether to include the entity on the audit log or not
         private bool IncludeEntity(IAuditDbContext context, object entity, AuditOptionMode mode)
         {
@@ -395,7 +349,6 @@ namespace Audit.EntityFramework
             return scope;
         }
 
-
         /// <summary>
         /// Gets the modified entries to process.
         /// </summary>
@@ -428,16 +381,26 @@ namespace Audit.EntityFramework
             return string.Format("{0}_{1}", clientConnectionId, tranId ?? 0);
         }
 
-        public string GetClientConnectionId(DbConnection connection)
+        public string GetClientConnectionId(DbContext dbContext)
         {
-            if (connection == null)
+#if EF_CORE
+            var connection = IsRelational(dbContext) ? dbContext.Database.GetDbConnection() : null;
+#else
+            var connection = dbContext.Database.Connection;
+#endif
+            return GetClientConnectionId(connection);
+        }
+
+        public string GetClientConnectionId(DbConnection dbConnection)
+        {
+            if (dbConnection == null)
             {
                 return null;
             }
 #if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET472 || NET5_0)
             try
             {
-                var connId = ((connection as dynamic).ClientConnectionId) as Guid?;
+                var connId = ((dbConnection as dynamic).ClientConnectionId) as Guid?;
                 return connId.HasValue && !connId.Value.Equals(Guid.Empty) ? connId.Value.ToString() : null;
             }
             catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
@@ -446,7 +409,7 @@ namespace Audit.EntityFramework
             }
 #else
             // Get the connection id (returns NULL if the connection is not open)
-            var sqlConnection = connection as System.Data.SqlClient.SqlConnection;
+            var sqlConnection = dbConnection as System.Data.SqlClient.SqlConnection;
             var connId = sqlConnection?.ClientConnectionId;
             return connId.HasValue && !connId.Value.Equals(Guid.Empty) ? connId.Value.ToString() : null;
 #endif

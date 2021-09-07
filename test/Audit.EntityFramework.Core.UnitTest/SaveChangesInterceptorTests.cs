@@ -37,11 +37,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<InterceptContext>(_ => _
                     .AuditEventType("{context}**")
-                    .ForEntity<Department>(dc => dc.Override(d => d.Comments, "override"))
+                    .ForEntity<InterceptContext.Department>(dc => dc.Override(d => d.Comments, "override"))
                     .IncludeEntityObjects(true));
 
             var guid = Guid.NewGuid().ToString();
-            var dept = new Department() { Name = guid, Comments = "test" };
+            var dept = new InterceptContext.Department() { Name = guid, Comments = "test" };
             var options = new DbContextOptionsBuilder().AddInterceptors(new AuditSaveChangesInterceptor()).Options;
             using (var ctx = new InterceptContext(options))
             {
@@ -77,11 +77,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<InterceptContext>(_ => _
                     .AuditEventType("{context}**")
-                    .ForEntity<Department>(dc => dc.Override(d => d.Comments, "override"))
+                    .ForEntity<InterceptContext.Department>(dc => dc.Override(d => d.Comments, "override"))
                     .IncludeEntityObjects(true));
 
             var guid = Guid.NewGuid().ToString();
-            var dept = new Department() { Name = guid, Comments = "test" };
+            var dept = new InterceptContext.Department() { Name = guid, Comments = "test" };
             using (var ctx = new InterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditSaveChangesInterceptor()).Options))
             {
                 await ctx.Database.EnsureDeletedAsync();
@@ -118,7 +118,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .AuditEventType("{context}**")
                     .IncludeEntityObjects(true));
 
-            var dept = new Department() { Id = 1, Name = "test", Comments = "test" };
+            var dept = new InterceptContext.Department() { Id = 1, Name = "test", Comments = "test" };
             using (var ctx = new InterceptContext(new DbContextOptionsBuilder().Options))
             {
                 // not intercepted
@@ -170,7 +170,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .AuditEventType("{context}**")
                     .IncludeEntityObjects(true));
 
-            var dept = new Department() { Id = 1, Name = "test", Comments = "test" };
+            var dept = new InterceptContext.Department() { Id = 1, Name = "test", Comments = "test" };
             using (var ctx = new InterceptContext(new DbContextOptionsBuilder().Options))
             {
                 // not intercepted
@@ -237,7 +237,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Action<int> insertAction = (int index) =>
             {
                 var guid = Guid.NewGuid().ToString();
-                var dept = new Department() { Id = index, Name = guid, Comments = "test" };
+                var dept = new InterceptContext.Department() { Id = index, Name = guid, Comments = "test" };
                 using (var ctx = new InterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditSaveChangesInterceptor()).Options))
                 {
                     ctx.Departments.Add(dept);
@@ -269,22 +269,23 @@ namespace Audit.EntityFramework.Core.UnitTest
 
     public class InterceptContext : DbContext
     {
-        public DbSet<Department> Departments { get; set; }
+        public DbSet<InterceptContext.Department> Departments { get; set; }
         public InterceptContext(DbContextOptions opt) : base(opt) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseInMemoryDatabase("InterceptDb");
             //optionsBuilder.UseSqlServer("data source=localhost;initial catalog=InterceptDb;integrated security=true;");
         }
+
+        public class Department
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Comments { get; set; }
+        }
     }
 
-    public class Department
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Comments { get; set; }
-    }
 }
 #endif

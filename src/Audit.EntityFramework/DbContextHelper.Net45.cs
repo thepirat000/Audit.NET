@@ -221,6 +221,56 @@ namespace Audit.EntityFramework
             return efEvent;
         }
 
+        /// <summary>
+        /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
+        /// </summary>
+        public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
+        {
+            // Update PK and FK
+            foreach (var efEntry in efEvent.Entries)
+            {
+                var entry = efEntry.Entry;
+                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
+                foreach (var pk in efEntry.PrimaryKey)
+                {
+                    if (efEntry.ColumnValues.ContainsKey(pk.Key))
+                    {
+                        efEntry.ColumnValues[pk.Key] = pk.Value;
+                    }
+                }
+                var fks = GetForeignKeys(context.DbContext, entry);
+                foreach (var fk in fks)
+                {
+                    // When deleting an entity, sometimes the foreign keys are set to NULL by EF. This only happens on EF6.
+                    if (fk.Value == null)
+                    {
+                        continue;
+                    }
+                    if (efEntry.ColumnValues.ContainsKey(fk.Key))
+                    {
+                        efEntry.ColumnValues[fk.Key] = fk.Value;
+                    }
+                }
+            }
+            // Update associations
+            if (efEvent.Associations != null)
+            {
+                foreach (var association in efEvent.Associations)
+                {
+                    var e1 = association.Records[0].InternalEntity;
+                    var e2 = association.Records[1].InternalEntity;
+                    association.Records[0].PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(e1, context.DbContext);
+                    association.Records[1].PrimaryKey = EntityKeyHelper.Instance.GetPrimaryKeyValues(e2, context.DbContext);
+                }
+            }
+            // Update ConnectionId
+            var clientConnectionId = GetClientConnectionId(context.DbContext.Database.Connection);
+            if (clientConnectionId != null)
+            {
+                efEvent.ConnectionId = clientConnectionId;
+            }
+        }
+
         private List<AssociationEntry> GetAssociationEntries(IAuditDbContext context, bool includeEntityObjects)
         {
             var dbContext = context.DbContext;
