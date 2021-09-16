@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using System.Threading.Tasks;
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -675,7 +675,7 @@ namespace Audit.IntegrationTest
             }
         }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
         [Test]
         public void Test_EF_ProxiedLazyLoading()
         {
@@ -993,7 +993,7 @@ namespace Audit.IntegrationTest
 #endif
         }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
         private IDbContextTransaction GetCurrentTran(DbContext context)
         {
             var dbtxmgr = context.GetInfrastructure().GetService<IDbContextTransactionManager>();

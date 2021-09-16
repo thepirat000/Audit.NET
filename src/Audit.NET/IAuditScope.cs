@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Audit.Core
 {
     public interface IAuditScope : IDisposable
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0_OR_GREATER
         , IAsyncDisposable
 #endif
     {

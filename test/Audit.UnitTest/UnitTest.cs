@@ -876,7 +876,7 @@ namespace Audit.UnitTest
             Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
             Assert.AreEqual(1, x);
         }
-#if NET461 || NETCOREAPP2_0 || NET5_0
+#if NET461 || NETCOREAPP2_0 || NET5_0_OR_GREATER
         [Test]
         public void Test_FluentConfig_EventLog()
         {

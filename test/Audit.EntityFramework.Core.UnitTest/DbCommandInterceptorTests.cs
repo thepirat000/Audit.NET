@@ -1,4 +1,4 @@
-﻿#if EF_CORE_3 || EF_CORE_5
+﻿#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
 using Audit.Core;
 using Audit.EntityFramework.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +53,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
             {
                 //ReaderExecuting
-                var depts = ctx.Departments.Where(d => d.Comments != null).ToList();
+                var depts = ctx.Departments.Where(d => d.Comments != null).FirstOrDefault();
 
                 //NonQueryExecuting
                 var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES ({0}, 'test', {1})", id, "comments");
@@ -237,7 +237,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual("DbCommandIntercept", inserted[0].CommandEvent.Database);
         }
 
-#if EF_CORE_5
+#if EF_CORE_5 || EF_CORE_6
         [Test]
         public void Test_DbCommandInterceptor_CombineSaveChanges()
         {
@@ -300,7 +300,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual(insertedCommands[0].CommandEvent.ContextId, insertedSavechanges[0].EntityFrameworkEvent.ContextId);
         }
 #endif
-        
+
         [Test]
         public void Test_DbCommandInterceptor_IgnoreParams()
         {

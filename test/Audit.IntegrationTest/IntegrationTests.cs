@@ -18,13 +18,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Dynamic;
-#if NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data.Common;
 using System.Threading;
 #endif
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Azure.Storage;
 using Azure.Storage.Blobs.Models;
 #endif
@@ -101,7 +101,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("px", x.FilenamePrefix);
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("Elasticsearch")]
             public void Test_ElasticSearchDataProvider_FluentApi()
@@ -226,7 +226,7 @@ namespace Audit.IntegrationTest
                     .AuthKey(() => "AuthKey")
                     .Container(() => "Container")
                     .Database(() => "Database")
-#if NET5_0 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
                     .ClientOptions(o => o.MaxRequestsPerTcpConnection = 123)
 #else
                     .ConnectionPolicy(new Microsoft.Azure.Documents.Client.ConnectionPolicy() { ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol.Tcp })
@@ -237,7 +237,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual("Database", x.DatabaseBuilder?.Invoke());
                 Assert.AreEqual("Container", x.ContainerBuilder?.Invoke());
                 Assert.AreEqual("Id", x.IdBuilder?.Invoke(null));
-#if NET5_0 || NETCOREAPP2_0 || NETCOREAPP3_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
                 var opt = new Microsoft.Azure.Cosmos.CosmosClientOptions();
                 x.CosmosClientOptionsAction?.Invoke(opt);
                 Assert.AreEqual(123, opt.MaxRequestsPerTcpConnection);
@@ -289,7 +289,7 @@ namespace Audit.IntegrationTest
 #endif
             }
 
-#if NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("SQL")]
             public void Test_Sql_DbContextOptions()
@@ -601,7 +601,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("AzureStorageBlobs")]
             public void TestAzureStorageBlobs()
@@ -724,7 +724,7 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("Elasticsearch")]
             public void TestElasticsearch()
@@ -743,7 +743,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 #endif
-#if NET461 || NETCOREAPP3_0 || NET5_0
+#if NET461 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("AmazonQLDB")]
             public void TestAmazonQLDB()
@@ -1046,7 +1046,7 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"].ToString());
             }
 
-#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             public void TestEventLog()
             {
@@ -1114,7 +1114,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             public void SetAzureStorageBlobsSettings()
             {
                 Audit.Core.Configuration.Setup()
@@ -1194,7 +1194,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             public void SetElasticsearchSettings()
             {
                 var uri = new Uri(AzureSettings.ElasticSearchUrl);
@@ -1212,7 +1212,7 @@ namespace Audit.IntegrationTest
             }
 #endif
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             public void SetAmazonQLDBSettings()
             {
                 Audit.Core.Configuration.Setup()
@@ -1341,7 +1341,7 @@ namespace Audit.IntegrationTest
             public Loop Inner { get; set; }
         }
 
-#if NETCOREAPP3_0 || NET5_0
+#if NETCOREAPP3_0 || NET5_0_OR_GREATER
         public class TestInterceptor : DbConnectionInterceptor
         {
             public static int Count { get; set; }

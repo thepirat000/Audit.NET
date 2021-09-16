@@ -29,7 +29,7 @@ namespace Audit.EntityFramework
                 : null;
         }
 
-#if EF_CORE_3 || EF_CORE_5
+#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
         /// <summary>
         /// Gets the Low-Level EF Command Event portion of the Audit Event on the given scope.
         /// </summary>

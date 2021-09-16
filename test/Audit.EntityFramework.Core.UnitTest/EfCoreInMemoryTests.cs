@@ -262,7 +262,7 @@ private bool IsCommonEntity(Type type)
         }
 
 
-#if EF_CORE_5
+#if EF_CORE_5 || EF_CORE_6
 
         [Test]
         public void Test_OwnedEntity_EFCore5()

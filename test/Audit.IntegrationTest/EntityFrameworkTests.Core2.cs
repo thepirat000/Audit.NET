@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+﻿#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework;

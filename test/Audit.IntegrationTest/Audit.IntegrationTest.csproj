@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>net452;netcoreapp2.0;net461;netcoreapp3.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp2.0;net461;netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
     <AssemblyName>Audit.IntegrationTest</AssemblyName>
     <PackageId>Audit.IntegrationTest</PackageId>
@@ -63,20 +63,20 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <DefineConstants>$(DefineConstants);NK_JSON</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
     <DefineConstants>$(DefineConstants);TEXT_JSON</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp3.0' Or '$(TargetFramework)' == 'net5.0' ">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp3.0' Or '$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0' ">
     <ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
     <PackageReference Include="Azure.Identity" Version="1.4.0" />
@@ -89,6 +89,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.1" />
+	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
@@ -98,6 +99,17 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.8" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+	<ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
+	<ProjectReference Include="..\..\src\Audit.EntityFramework.Identity.Core\Audit.EntityFramework.Identity.Core.csproj" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0-rc.1.21452.10" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0-rc.1.21452.10" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0-rc.1.21452.15" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0-rc.1.21452.10" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">

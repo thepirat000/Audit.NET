@@ -4,9 +4,9 @@
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>18.1.5</VersionPrefix>
+    <VersionPrefix>19.0.0-rc.net60.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472;net5.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -38,8 +38,11 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0' ">
     <DefineConstants>$(DefineConstants);EF_CORE_5</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+	<DefineConstants>$(DefineConstants);EF_CORE_6</DefineConstants>
+  </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
   </ItemGroup>
   
@@ -90,22 +93,24 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+	<PackageReference Include="System.Text.Json" Version="5.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.8" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0-rc.1.21452.10" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0-rc.1.21452.10" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <DefineConstants>$(DefineConstants);IS_NK_JSON</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
     <DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
   </PropertyGroup>  
   
