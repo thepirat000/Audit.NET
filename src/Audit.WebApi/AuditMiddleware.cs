@@ -52,7 +52,7 @@ namespace Audit.WebApi
                 using (var responseBody = new MemoryStream())
                 {
                     context.Response.Body = responseBody;
-                    await InvokeNextAsync(context, true, includeResponseHeaders);
+                    await InvokeNextAsync(context, true, includeResponseHeaders, originalBody);
                     responseBody.Seek(0L, SeekOrigin.Begin);
                     await responseBody.CopyToAsync(originalBody);
                     context.Response.Body = originalBody;
@@ -60,11 +60,11 @@ namespace Audit.WebApi
             }
             else
             {
-                await InvokeNextAsync(context, false, includeResponseHeaders);
+                await InvokeNextAsync(context, false, includeResponseHeaders, originalBody);
             }
         }
 
-        private async Task InvokeNextAsync(HttpContext context, bool includeResponseBody, bool includeResponseHeaders)
+        private async Task InvokeNextAsync(HttpContext context, bool includeResponseBody, bool includeResponseHeaders, Stream originalBody)
         {
             Exception exception = null;
             try
@@ -76,6 +76,7 @@ namespace Audit.WebApi
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
                 exception = ex;
 #pragma warning restore IDE0059 // Value assigned to symbol is never used
+                context.Response.Body = originalBody;
                 throw;
             }
             finally

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [18.1.6] - 2021-09-26
+- Audit.WebApi: Audit Middleware disposing the response body stream if exception was thrown (#459)
+
 ## [18.1.5] - 2021-09-07
 - Audit.EntityFrameworkCore: Adding `AuditCommandInterceptor` for low-level auditing of commands (reads, writes, non-query) on EF Core 3.0 and 5.0. (#100, #449)
 
