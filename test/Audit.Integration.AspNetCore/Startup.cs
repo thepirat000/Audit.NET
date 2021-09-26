@@ -83,6 +83,8 @@ namespace Audit.Integration.AspNetCore
                 endpoints.MapRazorPages();
             });
 
+            app.UseWhen(ctx => ctx.Request.Headers.ContainsKey("UseErrorHandler"), a => a.UseMiddleware<ApiErrorHandlerMiddleware_Test>());
+
             app.UseAuditMiddleware(_ => _
                 .IncludeRequestBody(true)
                 .IncludeResponseBody(ctx => !ctx.Request.QueryString.HasValue || !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))

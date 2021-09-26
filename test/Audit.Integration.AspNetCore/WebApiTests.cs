@@ -826,5 +826,42 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("this is a bad request test", insertEvs[0].ResponseBody.Value);
             Assert.IsNull(insertEvs[1].ResponseBody);
         }
+
+        public async Task Test_WebApi_MultiMiddleware_Async()
+        {
+            var insertEvs = new List<AuditApiAction>();
+            var replaceEvs = new List<AuditApiAction>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                    return Guid.NewGuid();
+                })
+                    .OnReplace(async (id, ev) =>
+                    {
+                        await Task.Delay(1);
+                        replaceEvs.Add(JsonConvert.DeserializeObject<AuditApiAction>(JsonConvert.SerializeObject(ev.GetWebApiAuditAction())));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var c = new HttpClient();
+            c.DefaultRequestHeaders.Add("UseErrorHandler", "True");
+            string s = null;
+            try
+            {
+                s = await c.GetStringAsync($"http://localhost:{_port}/api/values/666?middleware=1");
+            }
+            catch
+            {
+            }
+            finally
+            {
+            }
+            Assert.AreEqual("ApiErrorHandlerMiddleware", s);
+            Assert.IsTrue(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), "returned exception: " + replaceEvs[0].Exception);
+            Assert.IsTrue(replaceEvs[0].Exception.Contains("at Audit.Integration.AspNetCore.Controllers.ValuesController"), "stacktrace not found");
+        }
+
     }
 }

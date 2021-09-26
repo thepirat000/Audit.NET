@@ -33,6 +33,11 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_WebApi_MultiMiddleware_Async");
+                await webApiTests.Test_WebApi_MultiMiddleware_Async();
+                Console.WriteLine("PASSED - Test_WebApi_MultiMiddleware_Async");
+
+
                 Console.WriteLine("START - Test_MvcRazorPages_IgnoreResponse");
                 await mvcTests.Test_MvcRazorPages_IgnoreResponse();
                 Console.WriteLine("PASSED - Test_MvcRazorPages_IgnoreResponse");
