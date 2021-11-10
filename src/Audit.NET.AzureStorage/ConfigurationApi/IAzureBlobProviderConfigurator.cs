@@ -12,16 +12,17 @@ namespace Audit.AzureTableStorage.ConfigurationApi
         /// Specifies the Azure Storage connection string
         /// </summary>
         /// <param name="connectionString">The Azure Storage connection string.</param>
-        IAzureBlobProviderConfigurator ConnectionString(string connectionString);
+        IAzureBlobProviderEventConfigurator ConnectionString(string connectionString);
         /// <summary>
-        /// Specifies the container name (must be lower case)
+        /// Specifies a function that returns the connection string for an event
         /// </summary>
-        /// <param name="containerName">The container name (must be lower case).</param>
-        IAzureBlobProviderConfigurator ContainerName(string containerName);
+        /// <param name="connectionStringBuilder">A function that returns the connection string for an event.</param>
+        IAzureBlobProviderEventConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder);
         /// <summary>
-        /// Specifies a function that returns the unique blob name for an event (can contain folders)
+        /// Uses Azure Active Directory authentication for managed identities. 
         /// </summary>
-        /// <param name="blobNameBuilder">A function that returns the unique blob name for an event (can contain folders).</param>
-        IAzureBlobProviderConfigurator BlobNameBuilder(Func<AuditEvent, string> blobNameBuilder);
+        /// <param name="configuration">The Azure AD configuration</param>
+        /// <remarks>https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-app</remarks>
+        IAzureBlobProviderEventConfigurator AzureActiveDirectory(Action<IAzureActiveDirectoryConfigurator> configuration);
     }
 }

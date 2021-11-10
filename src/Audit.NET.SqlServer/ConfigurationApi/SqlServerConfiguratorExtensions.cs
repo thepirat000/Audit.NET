@@ -10,38 +10,30 @@ namespace Audit.Core
         /// <summary>
         /// Store the events in a Sql Server database.
         /// </summary>
-        /// <param name="connectionString">The Sql Server connection string.</param>
-        /// <param name="tableName">The Sql table name to store the events.</param>
-        /// <param name="idColumnName">The primary key column name.</param>
-        /// <param name="jsonColumnName">The column name where to store the json data.</param>
-        /// <param name="lastUpdatedDateColumnName">The column name where to store the last updated date.</param>
-        /// <param name="lastUpdatedDateColumnName">The column name where to store the last updated date.</param>
-        /// <param name="schema">The schema name to use when storing the events.</param>
-        public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, string connectionString,
-            string tableName = "Event", string idColumnName = "Id", string jsonColumnName = "Data", string lastUpdatedDateColumnName = null,
-            string schema = null)
-        {
-            Configuration.DataProvider = new SqlDataProvider()
-            {
-                ConnectionString = connectionString,
-                TableName = tableName,
-                IdColumnName = idColumnName,
-                JsonColumnName = jsonColumnName,
-                LastUpdatedDateColumnName = lastUpdatedDateColumnName,
-                Schema = schema
-            };
-            return new CreationPolicyConfigurator();
-        }
-        /// <summary>
-        /// Store the events in a Sql Server database.
-        /// </summary>
-        /// <param name="config">The Sql Serevr provider configuration.</param>
+        /// <param name="config">The Sql Server provider configuration.</param>
+        /// <param name="configurator">The Audit.NET configurator object.</param>
+        [CLSCompliant(false)]
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, Action<ISqlServerProviderConfigurator> config)
         {
             var sqlDbConfig = new SqlServerProviderConfigurator();
             config.Invoke(sqlDbConfig);
-            return UseSqlServer(configurator, sqlDbConfig._connectionString, sqlDbConfig._tableName, 
-                sqlDbConfig._idColumnName, sqlDbConfig._jsonColumnName, sqlDbConfig._lastUpdatedColumnName, sqlDbConfig._schema);
+            Configuration.DataProvider = new SqlDataProvider()
+            {
+                ConnectionStringBuilder = sqlDbConfig._connectionStringBuilder,
+                TableNameBuilder = sqlDbConfig._tableNameBuilder,
+                IdColumnNameBuilder = sqlDbConfig._idColumnNameBuilder,
+                JsonColumnNameBuilder = sqlDbConfig._jsonColumnNameBuilder,
+                LastUpdatedDateColumnNameBuilder = sqlDbConfig._lastUpdatedColumnNameBuilder,
+                SchemaBuilder = sqlDbConfig._schemaBuilder,
+                CustomColumns = sqlDbConfig._customColumns,
+#if NET45
+                SetDatabaseInitializerNull = sqlDbConfig._setDatabaseInitializerNull,
+                DbConnectionBuilder = sqlDbConfig._dbConnectionBuilder
+#else
+                DbContextOptionsBuilder = sqlDbConfig._dbContextOptionsBuilder
+#endif
+            };
+            return new CreationPolicyConfigurator();
         }
     }
 }

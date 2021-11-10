@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Generate detailed Audit Logs for HttpClient instances.</Description>
+    <Copyright>Copyright 2019</Copyright>
+    <AssemblyTitle>Audit.HttpClient</AssemblyTitle>
+    <VersionPrefix>18.1.6</VersionPrefix>
+    <Authors>Federico Colombo</Authors>
+    <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1;net45;net461;net5.0</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Audit.HttpClient</AssemblyName>
+    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Audit.HttpClient</PackageId>
+    <PackageTags>Audit;Trail;Log;HttpClient</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>Audit.Http</RootNamespace>
+	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Store Audit.NET Trail Logs into a PostgreSQL database</Description>
+    <Copyright>Copyright 2017</Copyright>
+    <AssemblyTitle>Audit.PostgreSql</AssemblyTitle>
+    <VersionPrefix>18.1.6</VersionPrefix>
+    <Authors>Federico Colombo</Authors>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net5.0</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Audit.NET.PostgreSql</AssemblyName>
+    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Audit.NET.PostgreSql</PackageId>
+    <PackageTags>Audit;Trail;Log;Postgres;PostgreSQL</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+    <PackageReference Include="npgsql" Version="4.1.5" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="npgsql" Version="5.0.7" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,31 @@
+{
+  "author": "Federico Colombo",
+  "classifications": [
+    "MVC",
+    "AspNet Core MVC",
+    "Audit.NET"
+  ],
+  "name": "Audited MVC",
+  "identity": "Audit.Mvc.Template",
+  "shortName": "mvcaudit",
+  "tags": {
+    "language": "C#"
+  },
+  "sourceName": "Audit.Mvc.Template",
+  "symbols": {
+    "Description": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "Audited MVC",
+      "replaces": "PROJECT-DESCRIPTION",
+      "description": "A description of the project which determines the assembly description."
+    },
+    "Author": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "Federico Colombo",
+      "replaces": "PROJECT-AUTHOR",
+      "description": "The name of the author of the project which determines the assembly author, company and copyright information."
+    }
+  }
+}

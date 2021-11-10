@@ -1,21 +1,24 @@
-﻿#if NET45
-using Audit.Core;
-using Audit.Core.Extensions;
+﻿#if ASP_NET
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
+using Audit.Core;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using System.Web.Http.ModelBinding;
+using System.Net;
+using System.Linq;
 
 namespace Audit.WebApi
 {
-    public class AuditApiAttribute : System.Web.Http.Filters.ActionFilterAttribute
+    public class AuditApiAttribute : ActionFilterAttribute
     {
+        private AuditApiAdapter _adapter = new AuditApiAdapter();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the output should include the Http Response Headers.
+        /// </summary>
+        public bool IncludeResponseHeaders { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether the output should include the Http Request Headers.
         /// </summary>
@@ -25,9 +28,32 @@ namespace Audit.WebApi
         /// </summary>
         public bool IncludeModelState { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether the output should include the Http Response text.
+        /// Gets or sets a value indicating whether the output should include the Http Response body for all the requests.
+        /// (Use the alternative IncludeResponseBodyFor/ExcludeResponseBodyFor to log the body only for certain response status codes).
         /// </summary>
         public bool IncludeResponseBody { get; set; }
+        /// <summary>
+        /// Gets or sets an array of status codes that conditionally indicates when the response body should be included.
+        /// The response body is included only when the request return any of these status codes.
+        /// When set to NULL, the IncludeResponseBody boolean is used to determine whether to include the response body or not. Exclude has precedence over Include.
+        /// When to set to non-NULL, the IncludeResponseBody boolean is ignored.
+        /// </summary>
+        public HttpStatusCode[] IncludeResponseBodyFor { get; set; }
+        /// <summary>
+        /// Gets or sets an array of status codes that conditionally indicates when the response body should be excluded.
+        /// The response body is included only when the request return a status code not in this array.
+        /// When set to NULL, the IncludeResponseBodyFor or IncludeResponseBody are used to determine whether to include the response body or not. Exclude has precedence over Include.
+        /// When to set to non-NULL, the IncludeResponseBody boolean is ignored.
+        /// </summary>
+        public HttpStatusCode[] ExcludeResponseBodyFor { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the output should include the Http request body string.
+        /// </summary>
+        public bool IncludeRequestBody { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the action arguments should be pre-serialized to the audit event.
+        /// </summary>
+        public bool SerializeActionParameters { get; set; }
         /// <summary>
         /// Gets or sets a string indicating the event type to use.
         /// Can contain the following placeholders:
@@ -36,139 +62,71 @@ namespace Audit.WebApi
         /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </summary>
         public string EventTypeName { get; set; }
-
-        private const string AuditApiActionKey = "__private_AuditApiAction__";
-        private const string AuditApiScopeKey = "__private_AuditApiScope__";
-
         /// <summary>
-        /// Occurs before the action method is invoked.
+        /// Gets or sets the class type that will be used as a context wrapper. 
+        /// It must be a class implementing IContextWrapper with a public constructor receiving a single HttpRequestMessage parameter.
+        /// Default is NULL to use the default ContextWrapper class.
         /// </summary>
-        /// <param name="actionContext">The action context.</param>
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        public Type ContextWrapperType { get; set; }
+        
+        private IContextWrapper GetContextWrapper(HttpRequestMessage request)
         {
-            var request = actionContext.Request;
-            var httpContext = GetHttpContext(request);
-
-            var auditAction = new AuditApiAction
+            if (ContextWrapperType == null)
             {
-                UserName = actionContext.RequestContext?.Principal?.Identity?.Name,
-                IpAddress = GetClientIp(request),
-                RequestUrl = request.RequestUri?.AbsoluteUri,
-                HttpMethod = actionContext.Request.Method?.Method,
-                FormVariables = ToDictionary(httpContext.Request?.Form),
-                Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
-                ActionName = actionContext.ActionDescriptor?.ActionName,
-                ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
-                ActionParameters = actionContext.ActionArguments
-            };
-            var eventType = (EventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
-                .Replace("{controller}", auditAction.ControllerName)
-                .Replace("{action}", auditAction.ActionName);
-            // Create the audit scope
-            var auditScope = AuditScope.Create(eventType, null, new { Action = auditAction }, EventCreationPolicy.Manual);
-            httpContext.Items[AuditApiActionKey] = auditAction;
-            httpContext.Items[AuditApiScopeKey] = auditScope;
+                return new ContextWrapper(request);
+            }
+            else
+            {
+                return Activator.CreateInstance(ContextWrapperType, new object[] { request }) as IContextWrapper;
+            }
+        }
+        
+        public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
+        {
+            if (Configuration.AuditDisabled || _adapter.IsActionIgnored(actionContext))
+            {
+                return;
+            }
+            await _adapter.BeforeExecutingAsync(actionContext, GetContextWrapper(actionContext.Request), IncludeHeaders, IncludeRequestBody, SerializeActionParameters, EventTypeName);
         }
 
-        /// <summary>
-        /// Occurs after the action method is invoked.
-        /// </summary>
-        /// <param name="actionExecutedContext">The action executed context.</param>
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
         {
-            var httpContext = GetHttpContext(actionExecutedContext.Request);
-            var auditAction = httpContext.Items[AuditApiActionKey] as AuditApiAction;
-            var auditScope = httpContext.Items[AuditApiScopeKey] as AuditScope;
-            if (auditAction != null && auditScope != null)
+            if (Configuration.AuditDisabled || _adapter.IsActionIgnored(actionExecutedContext.ActionContext))
             {
-                auditAction.Exception = actionExecutedContext.Exception.GetExceptionInfo();
-                auditAction.ModelStateErrors = IncludeModelState ? GetModelStateErrors(actionExecutedContext.ActionContext.ModelState) : null;
-                auditAction.ModelStateValid = IncludeModelState ? actionExecutedContext.ActionContext.ModelState?.IsValid : null;
-                auditAction.ResponseBodyType = actionExecutedContext.Response.Content?.GetType().Name;
-                if (actionExecutedContext.Response != null)
+                return;
+            }
+            await _adapter.AfterExecutedAsync(actionExecutedContext, GetContextWrapper(actionExecutedContext.Request), IncludeModelState, ShouldIncludeResponseBody(actionExecutedContext), IncludeResponseHeaders);
+        }
+
+        private bool ShouldIncludeResponseBody(HttpActionExecutedContext context)
+        {
+            if (context?.Response == null)
+            {
+                return IncludeResponseBody;
+            }
+            return ShouldIncludeResponseBody(context.Response.StatusCode);
+        }
+
+        internal bool ShouldIncludeResponseBody(HttpStatusCode responseStatusCode)
+        {
+            if (ExcludeResponseBodyFor != null)
+            {
+                if (ExcludeResponseBodyFor.Contains(responseStatusCode))
                 {
-                    auditAction.ResponseStatus = actionExecutedContext.Response.ReasonPhrase;
-                    auditAction.ResponseStatusCode = (int)actionExecutedContext.Response.StatusCode;
-                    if (IncludeResponseBody)
-                    {
-                        var objContent = actionExecutedContext.Response.Content as ObjectContent;
-                        auditAction.ResponseBody = objContent != null
-                            ? new { Type = objContent.ObjectType.Name, Value = objContent.Value }
-                            : (object)actionExecutedContext.Response.Content?.ReadAsStringAsync().Result;
-                    }
+                    return false;
                 }
-                // Replace the Action field and save
-                auditScope.SetCustomField("Action", auditAction);
-                auditScope.Save();
-            }
-        }
-
-        private static IDictionary<string, string> ToDictionary(HttpRequestHeaders col)
-        {
-            if (col == null)
-            {
-                return null;
-            }
-            IDictionary<string, string> dict = new Dictionary<string, string>();
-            foreach (var k in col)
-            {
-                dict.Add(k.Key, string.Join(", ", k.Value));
-            }
-            return dict;
-        }
-
-        private static IDictionary<string, string> ToDictionary(NameValueCollection col)
-        {
-            if (col == null)
-            {
-                return null;
-            }
-            IDictionary<string, string> dict = new Dictionary<string, string>();
-            foreach (var k in col.AllKeys)
-            {
-                dict.Add(k, col[k]);
-            }
-            return dict;
-        }
-
-        private static Dictionary<string, string> GetModelStateErrors(ModelStateDictionary modelState)
-        {
-            if (modelState == null)
-            {
-                return null;
-            }
-            var dict = new Dictionary<string, string>();
-            foreach (var state in modelState)
-            {
-                if (state.Value.Errors.Count > 0)
+                if (IncludeResponseBodyFor == null)
                 {
-                    dict.Add(state.Key, string.Join(", ", state.Value.Errors.Select(e => e.ErrorMessage)));
+                    // there is an exclude not matched, and there is NO include list
+                    return true;
                 }
             }
-            return dict.Count > 0 ? dict : null;
-        }
-
-        private string GetClientIp(HttpRequestMessage request)
-        {
-            return GetHttpContext(request).Request.UserHostAddress;
-        }
-
-        private static HttpContextBase GetHttpContext(HttpRequestMessage request)
-        {
-            HttpContextBase context = null;
-            if (request?.Properties != null && request.Properties.ContainsKey("MS_HttpContext"))
+            if (IncludeResponseBodyFor != null)
             {
-                object obj;
-                request.Properties.TryGetValue("MS_HttpContext", out obj);
-                context = obj as HttpContextBase;
+                return IncludeResponseBodyFor.Contains(responseStatusCode);
             }
-            return context ?? new HttpContextWrapper(HttpContext.Current);
-        }
-
-        internal static AuditScope GetCurrentScope(HttpRequestMessage request)
-        {
-            var httpContext = GetHttpContext(request);
-            return httpContext?.Items[AuditApiScopeKey] as AuditScope;
+            return IncludeResponseBody;
         }
     }
 }

@@ -1,80 +1,86 @@
 ﻿using Audit.Core.Extensions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Audit.Core
 {
     /// <summary>
     /// Makes a code block auditable.
     /// </summary>
-    /// <typeparam name="T">The type of the object to audit</typeparam>
-    public partial class AuditScope : IDisposable
+    public partial class AuditScope : IAuditScope
     {
+        private readonly AuditScopeOptions _options;
         #region Constructors
-        /// <summary>
-        /// Creates an audit scope from a reference value, an event type and a reference Id.
-        /// </summary>
-        /// <param name="eventType">Type of the event.</param>
-        /// <param name="target">The target object getter.</param>
-        /// <param name="extraFields">An anonymous object that can contain additional fields will be merged into the audit event.</param>
-        /// <param name="creationPolicy">The event creation policy to use.</param>
-        /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
-        /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
+
         [MethodImpl(MethodImplOptions.NoInlining)]
-        protected internal AuditScope(string eventType, Func<object> target, object extraFields = null, 
-            AuditDataProvider dataProvider = null, 
-            EventCreationPolicy? creationPolicy = null,
-            bool isCreateAndSave = false)
+        internal AuditScope(AuditScopeOptions options)
         {
-            _creationPolicy = creationPolicy ?? Configuration.CreationPolicy;
-            _dataProvider = dataProvider ?? Configuration.DataProvider;
-            _targetGetter = target;
+            _options = options;
+            _creationPolicy = options.CreationPolicy ?? Configuration.CreationPolicy;
+            _dataProvider = options.DataProvider ?? Configuration.DataProvider;
+            _targetGetter = options.TargetGetter;
             var environment = new AuditEventEnvironment()
             {
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
-#if NET45
-            //This will be possible in future NETStandard: 
-            //See: https://github.com/dotnet/corefx/issues/1797, https://github.com/dotnet/corefx/issues/1784
-            var callingMethod = new StackFrame(2).GetMethod();
+            MethodBase callingMethod = options.CallingMethod;
+#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
-            environment.CallingMethodName = (callingMethod.DeclaringType != null
-                ? callingMethod.DeclaringType.FullName + "."
-                : "") + callingMethod.Name + "()";
-            environment.AssemblyName = callingMethod.DeclaringType?.Assembly.FullName;
-#elif NETSTANDARD1_3
+            if (callingMethod == null)
+            {
+                callingMethod = new StackFrame(2 + options.SkipExtraFrames).GetMethod();
+            }
+#else
             environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
             environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
 #endif
-            _event = new AuditEvent()
+            if (callingMethod != null)
             {
-                Environment = environment,
-                StartDate = DateTime.Now,
-                EventType = eventType,
-                CustomFields = new Dictionary<string, object>()
-            };
-            if (target != null)
+                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "")
+                    + callingMethod.Name + "()";
+                environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
+            }
+            _event = options.AuditEvent ?? new AuditEvent();
+            _event.Environment = environment;
+            _event.StartDate = Configuration.SystemClock.UtcNow;
+            if (options.EventType != null)
             {
-                var targetValue = target.Invoke();
+                _event.EventType = options.EventType;
+            }
+            if (_event.CustomFields == null)
+            {
+                _event.CustomFields = new Dictionary<string, object>();
+            }
+            if (options.TargetGetter != null)
+            {
+                var targetValue = options.TargetGetter.Invoke();
                 _event.Target = new AuditTarget
                 {
-                    SerializedOld = _dataProvider.Serialize(targetValue),
+                    Old = _dataProvider.Serialize(targetValue),
                     Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
                 };
             }
-            ProcessExtraFields(extraFields);
+            ProcessExtraFields(options.ExtraFields);
+        }
+        /// <summary>
+        /// Starts an audit scope
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        protected internal AuditScope Start()
+        {
+            _saveMode = SaveMode.InsertOnStart;
             // Execute custom on scope created actions
             Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
 
             // Process the event insertion (if applies)
-            if (isCreateAndSave)
+            if (_options.IsCreateAndSave)
             {
                 EndEvent();
                 SaveEvent();
@@ -83,11 +89,62 @@ namespace Audit.Core
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
                 SaveEvent();
+                _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
             }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            {
+                _saveMode = SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.Manual)
+            {
+                _saveMode = SaveMode.Manual;
+            }
+            return this;
         }
-#endregion
 
-#region Public Properties
+        /// <summary>
+        /// Starts an audit scope asynchronously
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        protected internal async Task<AuditScope> StartAsync()
+        {
+            _saveMode = SaveMode.InsertOnStart;
+            // Execute custom on scope created actions
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeCreated, this);
+
+            // Process the event insertion (if applies)
+            if (_options.IsCreateAndSave)
+            {
+                EndEvent();
+                await SaveEventAsync();
+                _ended = true;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            {
+                await SaveEventAsync();
+                _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            {
+                _saveMode = SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.Manual)
+            {
+                _saveMode = SaveMode.Manual;
+            }
+            return this;
+        }
+        #endregion
+
+        #region Public Properties
+        /// <summary>
+        /// The current save mode. Useful on custom actions to determine the saving trigger.
+        /// </summary>
+        public SaveMode SaveMode
+        {
+            get { return _saveMode; }
+        }
+
         /// <summary>
         /// Indicates the change type
         /// </summary>
@@ -123,25 +180,58 @@ namespace Audit.Core
                 return _eventId;
             }
         }
+
+        /// <summary>
+        /// Gets the creation policy for this scope.
+        /// </summary>
+        public EventCreationPolicy EventCreationPolicy
+        {
+            get
+            {
+                return _creationPolicy;
+            }
+        }
         #endregion
 
-#region Private fields
-        private EventCreationPolicy _creationPolicy;
+        #region Private fields
+        private SaveMode _saveMode;
+        private readonly EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
         private object _eventId;
         private bool _disposed;
         private bool _ended;
         private readonly AuditDataProvider _dataProvider;
-        private readonly Func<object> _targetGetter;
-#endregion
+        private Func<object> _targetGetter;
+        #endregion
 
-#region Public Methods
+        #region Public Methods
+        /// <summary>
+        /// Replaces the target object getter whose old/new value will be stored on the AuditEvent.Target property
+        /// </summary>
+        /// <param name="targetGetter">A function that returns the target</param>
+        public void SetTargetGetter(Func<object> targetGetter)
+        {
+            _targetGetter = targetGetter;
+            if (_targetGetter != null)
+            {
+                var targetValue = targetGetter.Invoke();
+                _event.Target = new AuditTarget
+                {
+                    Old = _dataProvider.Serialize(targetValue),
+                    Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
+                };
+            }
+            else
+            {
+                _event.Target = null;
+            }
+        }
         /// <summary>
         /// Add a textual comment to the event
         /// </summary>
         public void Comment(string text)
         {
-            Comment(text, new object[0]); 
+            Comment(text, new object[0]);
         }
 
         /// <summary>
@@ -182,6 +272,20 @@ namespace Audit.Core
         }
 
         /// <summary>
+        /// Async version of the dispose method
+        /// </summary>
+        /// <returns></returns>
+        public async ValueTask DisposeAsync()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            _disposed = true;
+            await EndAsync();
+        }
+
+        /// <summary>
         /// Discards this audit scope, so the event will not be written.
         /// </summary>
         public void Discard()
@@ -195,7 +299,7 @@ namespace Audit.Core
         /// </summary>
         private void End()
         {
-            if (_ended)
+            if (IsEndedOrDisabled())
             {
                 return;
             }
@@ -213,46 +317,93 @@ namespace Audit.Core
         }
 
         /// <summary>
-        /// Manually Saves (insert/replace) the Event.
-        /// Use this method when the Data Provider's CreationPolicy is set to Manual.
+        /// Saves the event.
         /// </summary>
-        public void Save()
+        private async Task EndAsync()
         {
-            if (_creationPolicy != EventCreationPolicy.Manual)
+            if (IsEndedOrDisabled())
             {
                 return;
             }
-            if (_ended)
+            EndEvent();
+            // process event creation/replacement
+            if (_creationPolicy == EventCreationPolicy.InsertOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            {
+                await SaveEventAsync(true);
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
+            {
+                await SaveEventAsync();
+            }
+            _ended = true;
+        }
+
+        /// <summary>
+        /// Manually Saves (insert/replace) the Event.
+        /// Use this method to save (insert/replace) the event when CreationPolicy is set to Manual.
+        /// </summary>
+        public void Save()
+        {
+            if (IsEndedOrDisabled())
             {
                 return;
             }
             EndEvent();
             SaveEvent();
         }
-#endregion
 
-#region Private Methods
+        /// <summary>
+        /// Manually Saves (insert/replace) the Event asynchronously.
+        /// Use this method to save (insert/replace) the event when CreationPolicy is set to Manual.
+        /// </summary>
+        public async Task SaveAsync()
+        {
+            if (IsEndedOrDisabled())
+            {
+                return;
+            }
+            EndEvent();
+            await SaveEventAsync();
+        }
+        #endregion
 
+        #region Private Methods
+
+        private bool IsEndedOrDisabled()
+        {
+            if (!_ended && Configuration.AuditDisabled)
+            {
+                this.Discard();
+            }
+            return _ended;
+        }
         // Update event info prior to save
         private void EndEvent()
         {
             var exception = GetCurrentException();
             _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
-            _event.EndDate = DateTime.Now;
+            _event.EndDate = Configuration.SystemClock.UtcNow;
             _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
             if (_targetGetter != null)
             {
-                _event.Target.SerializedNew = _dataProvider.Serialize(_targetGetter.Invoke());
+                _event.Target.New = _dataProvider.Serialize(_targetGetter.Invoke());
             }
         }
 
-        private static Exception GetCurrentException()
+        private Exception GetCurrentException()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (PlatformHelper.IsRunningOnMono())
+            {
+                // Mono doesn't implement Marshal.GetExceptionCode() (https://github.com/mono/mono/blob/master/mcs/class/corlib/System.Runtime.InteropServices/Marshal.cs#L521)
+                return null;
+            }
             if (Marshal.GetExceptionCode() != 0)
             {
                 return Marshal.GetExceptionForHR(Marshal.GetExceptionCode());
             }
             return null;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private void ProcessExtraFields(object extraFields)
@@ -261,21 +412,25 @@ namespace Audit.Core
             {
                 return;
             }
-            
-            foreach (var prop in extraFields.GetType().GetRuntimeProperties())
+            var props = extraFields.GetType().GetRuntimeProperties();
+            foreach (var prop in props)
             {
-                SetCustomField(prop.Name, prop.GetValue(extraFields));
+                SetCustomField(prop.Name, prop.GetValue(extraFields, null));
             }
         }
 
         private void SaveEvent(bool forceInsert = false)
         {
-            if (_ended)
+            if (IsEndedOrDisabled())
             {
-                return; 
+                return;
             }
             // Execute custom on event saving actions
             Configuration.InvokeScopeCustomActions(ActionType.OnEventSaving, this);
+            if (IsEndedOrDisabled())
+            {
+                return;
+            }
             if (_eventId != null && !forceInsert)
             {
                 _dataProvider.ReplaceEvent(_eventId, _event);
@@ -284,8 +439,33 @@ namespace Audit.Core
             {
                 _eventId = _dataProvider.InsertEvent(_event);
             }
+            // Execute custom after saving actions
+            Configuration.InvokeScopeCustomActions(ActionType.OnEventSaved, this);
         }
 
+        private async Task SaveEventAsync(bool forceInsert = false)
+        {
+            if (IsEndedOrDisabled())
+            {
+                return;
+            }
+            // Execute custom on event saving actions
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaving, this);
+            if (IsEndedOrDisabled())
+            {
+                return;
+            }
+            if (_eventId != null && !forceInsert)
+            {
+                await _dataProvider.ReplaceEventAsync(_eventId, _event);
+            }
+            else
+            {
+                _eventId = await _dataProvider.InsertEventAsync(_event);
+            }
+            // Execute custom after saving actions
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaved, this);
+        }
         #endregion
     }
 }

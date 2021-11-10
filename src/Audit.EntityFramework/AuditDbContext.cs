@@ -1,41 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Reflection;
 using Audit.Core;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
 using Audit.EntityFramework.ConfigurationApi;
-using Audit.Core.Extensions;
-#if NETCOREAPP1_0
+#if EF_CORE
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-#elif NET45
+#else
+using System.Data.Common;
 using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 #endif
 
 namespace Audit.EntityFramework
 {
     /// <summary>
-    /// The base DbContext class for Audit
-    /// (Common).
+    /// Base DbContext class for Audit. Inherit your DbContext from this class to enable audit.
     /// </summary>
-    public abstract partial class AuditDbContext : DbContext
+    public abstract partial class AuditDbContext : DbContext, IAuditDbContext, IAuditBypass
     {
-        #region Contructors
+        private readonly DbContextHelper _helper = new DbContextHelper();
+
+#if EF_CORE
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        protected AuditDbContext(DbContextOptions options) : base(options)
+        {
+            _helper.SetConfig(this);
+        }
+#else
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        protected AuditDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        {
+            _helper.SetConfig(this);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        protected AuditDbContext(DbCompiledModel model) : base(model)
+        {
+            _helper.SetConfig(this);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        protected AuditDbContext(string nameOrConnectionString, DbCompiledModel model) : base(nameOrConnectionString, model)
+        {
+            _helper.SetConfig(this);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        protected AuditDbContext(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection)
+        {
+            _helper.SetConfig(this);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        protected AuditDbContext(DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection) : base(existingConnection, model, contextOwnsConnection)
+        {
+            _helper.SetConfig(this);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
+        /// </summary>
+        protected AuditDbContext(ObjectContext objectContext, bool dbContextOwnsObjectContext) : base(objectContext, dbContextOwnsObjectContext)
+        {
+            _helper.SetConfig(this);
+        }
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>
         protected AuditDbContext() : base()
         {
-            SetConfig();
+            _helper.SetConfig(this);
         }
-        #endregion
 
         #region Properties
         /// <summary>
@@ -44,244 +90,77 @@ namespace Audit.EntityFramework
         ///  - {context}: replaced with the Db Context type name.
         ///  - {database}: replaced with the database name.
         /// </summary>
-        protected virtual string AuditEventType { get; set; }
+        public virtual string AuditEventType { get; set; }
 
         /// <summary>
         /// Indicates if the Audit is disabled.
         /// Default is false.
         /// </summary>
-        protected virtual bool AuditDisabled { get; set; }
+        public virtual bool AuditDisabled { get; set; }
 
         /// <summary>
         /// To indicate if the output should contain the modified entities objects. (Default is false)
         /// </summary>
-        protected virtual bool IncludeEntityObjects { get; set; }
+        public virtual bool IncludeEntityObjects { get; set; }
+
+        /// <summary>
+        /// To indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
+        /// </summary>
+        public virtual bool ExcludeValidationResults { get; set; }
 
         /// <summary>
         /// To indicate the audit operation mode. (Default is OptOut). 
         ///  - OptOut: All the entities are tracked by default, except those decorated with the AuditIgnore attribute. 
         ///  - OptIn: No entity is tracked by default, except those decorated with the AuditInclude attribute.
         /// </summary>
-        protected virtual AuditOptionMode Mode { get; set; }
+        public virtual AuditOptionMode Mode { get; set; }
 
         /// <summary>
         /// To indicate the Audit Data Provider to use. (Default is NULL to use the configured default data provider). 
         /// </summary>
-        protected virtual AuditDataProvider AuditDataProvider { get; set; }
+        public virtual AuditDataProvider AuditDataProvider { get; set; }
+
+        /// <summary>
+        /// To indicate a custom audit scope factory. (Default is NULL to use the Audit.Core.Configuration.DefaultAuditScopeFactory). 
+        /// </summary>
+        public virtual IAuditScopeFactory AuditScopeFactory { get; set; }
+
+        /// <summary>
+        /// Optional custom fields added to the audit event
+        /// </summary>
+        public Dictionary<string, object> ExtraFields { get; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// To indicate if the Transaction Id retrieval should be ignored. If set to <c>true</c> the Transations Id will not be included on the output.
+        /// </summary>
+        public bool ExcludeTransactionId { get; set; }
+
+        /// <summary>
+        /// To indicate if the audit event should be saved before the entity saving operation takes place. 
+        /// Default is false to save the audit event after the entity saving operation completes or fails.
+        /// </summary>
+        public bool EarlySavingAudit { get; set; }
+
+        public DbContext DbContext { get { return this; } }
+#if EF_FULL
+        /// <summary>
+        /// Value to indicate if the Independant Associations should be included. Independant associations are logged on EntityFrameworkEvent.Associations.
+        /// </summary>
+        public bool IncludeIndependantAssociations { get; set; }
+#endif
+        /// <summary>
+        /// A collection of settings per entity type.
+        /// </summary>
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
         #endregion
 
-        #region Private fields
-        // Entities Include/Ignore attributes cache
-        private static readonly Dictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new Dictionary<Type, bool?>();
-        // AuditDbContext Attribute cache
-        private static Dictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new Dictionary<Type, AuditDbContextAttribute>();
-        // User defined fields that will be stored as Custom Fields on the audit event
-        private Dictionary<string, object> _extraFields;
-        #endregion
-
-        #region Private methods
-        private void SetConfig()
-        {
-            var type = GetType();
-            if (!_auditAttributeCache.ContainsKey(type))
-            {
-                _auditAttributeCache[type] = GetType().GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute;
-            }
-            var attrConfig = _auditAttributeCache[type]?.InternalConfig;
-            var localConfig = Audit.EntityFramework.Configuration.GetConfigForType(GetType());
-            var globalConfig = Audit.EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
-
-            Mode = attrConfig?.Mode ?? localConfig?.Mode ?? globalConfig?.Mode ?? AuditOptionMode.OptOut;
-            IncludeEntityObjects = attrConfig?.IncludeEntityObjects ?? localConfig?.IncludeEntityObjects ?? globalConfig?.IncludeEntityObjects ?? false;
-            AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
-        }
-
-        /// <summary>
-        /// Gets the validation results, return NULL if there are no validation errors.
-        /// </summary>
-        private static List<ValidationResult> GetValidationResults(object entity)
-        {
-            var validationContext = new ValidationContext(entity);
-            var validationResults = new List<ValidationResult>();
-            bool valid = Validator.TryValidateObject(entity, validationContext, validationResults, true);
-            return valid ? null : validationResults;
-        }
-
-        /// <summary>
-        /// Gets the name for an entity state.
-        /// </summary>
-        private static string GetStateName(EntityState state)
-        {
-            switch (state)
-            {
-                case EntityState.Added:
-                    return "Insert";
-                case EntityState.Modified:
-                    return "Update";
-                case EntityState.Deleted:
-                    return "Delete";
-                default:
-                    return "Unknown";
-            }
-        }
-
-        /// <summary>
-        /// Saves the scope.
-        /// </summary>
-        private void SaveScope(AuditScope scope, EntityFrameworkEvent @event)
-        {
-            scope.SetCustomField("EntityFrameworkEvent", @event);
-            OnScopeSaving(scope);
-            scope.Save();
-        }
-
-        // Determines whether to include the entity on the audit log or not
-#if NETCOREAPP1_0
-        private bool IncludeEntity(EntityEntry entry, AuditOptionMode mode)
-#elif NET45
-        private bool IncludeEntity(DbEntityEntry entry, AuditOptionMode mode)
-#endif
-        {
-            var type = entry.Entity.GetType();
-            bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false=ignored null=unknown
-            if (result == null)
-            {
-                // No static attributes, check the filters
-                var localConfig = EntityFramework.Configuration.GetConfigForType(GetType());
-                var globalConfig = EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
-                var included = EvalIncludeFilter(type, localConfig, globalConfig);
-                var ignored = EvalIgnoreFilter(type, localConfig, globalConfig);
-                result = included ? true : ignored ? false : (bool?)null;
-            }
-            if (mode == AuditOptionMode.OptIn)
-            {
-                // Include only explicitly included entities
-                return result.GetValueOrDefault();
-            }
-            // Include all, except the explicitly ignored entities
-            return result == null || result.Value;
-        }
-
-        private bool? EnsureEntitiesIncludeIgnoreAttrCache(Type type)
-        {
-            if (!EntitiesIncludeIgnoreAttrCache.ContainsKey(type))
-            {
-                var includeAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIncludeAttribute));
-                if (includeAttr != null)
-                {
-                    EntitiesIncludeIgnoreAttrCache[type] = true; // Type Included by IncludeAttribute
-                }
-                else if (type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute)) != null)
-                {
-                    EntitiesIncludeIgnoreAttrCache[type] = false; // Type Ignored by IgnoreAttribute
-                }
-                else
-                {
-                    EntitiesIncludeIgnoreAttrCache[type] = null; // No attribute
-                }
-            }
-            return EntitiesIncludeIgnoreAttrCache[type];
-        }
-        /// <summary>
-        /// Gets the include value for a given entity type.
-        /// </summary>
-        private bool EvalIncludeFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
-        {
-            var includedExplicit = localConfig?.IncludedTypes.Contains(type) ?? globalConfig?.IncludedTypes.Contains(type) ?? false;
-            if (includedExplicit)
-            {
-                return true;
-            }
-            var includedFilter = localConfig?.IncludedTypesFilter ?? globalConfig?.IncludedTypesFilter;
-            if (includedFilter != null)
-            {
-                return includedFilter.Invoke(type);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the exclude value for a given entity type.
-        /// </summary>
-        private bool EvalIgnoreFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
-        {
-            var ignoredExplicit = localConfig?.IgnoredTypes.Contains(type) ?? globalConfig?.IgnoredTypes.Contains(type) ?? false;
-            if (ignoredExplicit)
-            {
-                return true;
-            }
-            var ignoredFilter = localConfig?.IgnoredTypesFilter ?? globalConfig?.IgnoredTypesFilter;
-            if (ignoredFilter != null)
-            {
-                return ignoredFilter.Invoke(type);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Creates the Audit scope.
-        /// </summary>
-        private AuditScope CreateAuditScope(EntityFrameworkEvent efEvent)
-        {
-            var typeName = GetType().Name;
-            var eventType = AuditEventType?.Replace("{context}", typeName).Replace("{database}", efEvent.Database) ?? typeName;
-            var scope = AuditScope.Create(eventType, null, new { EntityFrameworkEvent = efEvent }, EventCreationPolicy.Manual, AuditDataProvider);
-            if (_extraFields != null)
-            {
-                foreach(var field in _extraFields)
-                {
-                    scope.SetCustomField(field.Key, field.Value);
-                }
-            }
-            OnScopeCreated(scope);
-            return scope;
-        }
-
-        /// <summary>
-        /// Gets the modified entries to process.
-        /// </summary>
-#if NETCOREAPP1_0
-        private List<EntityEntry> GetModifiedEntries(AuditOptionMode mode)
-#elif NET45
-        private List<DbEntityEntry> GetModifiedEntries(AuditOptionMode mode)
-#endif
-        {
-            return ChangeTracker.Entries()
-                .Where(x => x.State != EntityState.Unchanged
-                         && x.State != EntityState.Detached
-                         && IncludeEntity(x, mode))
-                .ToList();
-        }
-
-        /// <summary>
-        /// Gets a unique ID for the current SQL transaction.
-        /// </summary>
-        /// <param name="transaction">The transaction.</param>
-        /// <param name="clientConnectionId">The client connection identifier.</param>
-        /// <returns>System.String.</returns>
-        private static string GetTransactionId(DbTransaction transaction, string clientConnectionId)
-        {
-            var propIntTran = transaction.GetType().GetProperty("InternalTransaction", BindingFlags.NonPublic | BindingFlags.Instance);
-            object intTran = propIntTran?.GetValue(transaction);
-            var propTranId = intTran?.GetType().GetProperty("TransactionId", BindingFlags.NonPublic | BindingFlags.Instance);
-            var tranId = (int)(long)propTranId?.GetValue(intTran);
-            return string.Format("{0}_{1}", clientConnectionId, tranId);
-        }
-
-        private string GetClientConnectionId(DbConnection connection)
-        {
-            // Get the connection id (returns NULL if the connection is not open)
-            var sqlConnection = connection as SqlConnection;
-            var connId = sqlConnection?.ClientConnectionId;
-            return connId.HasValue && !connId.Equals(Guid.Empty) ? connId.Value.ToString() : null;
-        }
-
+        #region Public methods
         /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.
         /// </summary>
         /// <param name="auditScope">The audit scope.</param>
-        protected virtual void OnScopeCreated(AuditScope auditScope)
+        public virtual void OnScopeCreated(IAuditScope auditScope)
         {
         }
         /// <summary>
@@ -289,12 +168,9 @@ namespace Audit.EntityFramework
         /// Override to specify custom logic.
         /// </summary>
         /// <param name="auditScope">The audit scope.</param>
-        protected virtual void OnScopeSaving(AuditScope auditScope)
+        public virtual void OnScopeSaving(IAuditScope auditScope)
         {
         }
-        #endregion
-
-        #region Public methods
 
         /// <summary>
         /// Adds a custom field to the audit scope.
@@ -304,75 +180,44 @@ namespace Audit.EntityFramework
         /// <param name="value">The value.</param>
         public void AddAuditCustomField(string fieldName, object value)
         {
-            if (_extraFields == null)
-            {
-                _extraFields = new Dictionary<string, object>();
-            }
-            _extraFields.Add(fieldName, value);
+            ExtraFields[fieldName] = value;
         }
 
-        /// <summary>
-        /// Saves the changes synchronously.
-        /// </summary>
+#if EF_FULL
         public override int SaveChanges()
         {
-            if (AuditDisabled)
-            {
-                return base.SaveChanges();
-            }
-            var efEvent = CreateAuditEvent(IncludeEntityObjects, Mode);
-            if (efEvent == null)
-            {
-                return base.SaveChanges();
-            }
-            var scope = CreateAuditScope(efEvent);
-            try
-            {
-                efEvent.Result = base.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                efEvent.Success = false;
-                efEvent.ErrorMessage = ex.GetExceptionInfo();
-                SaveScope(scope, efEvent);
-                throw;
-            }
-            efEvent.Success = true;
-            SaveScope(scope, efEvent);
-            return efEvent.Result;
+            return _helper.SaveChanges(this, () => base.SaveChanges());
         }
-
-        /// <summary>
-        /// Saves the changes asynchronously.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            if (AuditDisabled)
-            {
-                return await base.SaveChangesAsync(cancellationToken);
-            }
-            var efEvent = CreateAuditEvent(IncludeEntityObjects, Mode);
-            if (efEvent == null)
-            {
-                return await base.SaveChangesAsync(cancellationToken);
-            }
-            var scope = CreateAuditScope(efEvent);
-            try
-            {
-                efEvent.Result = await base.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                efEvent.Success = false;
-                efEvent.ErrorMessage = ex.GetExceptionInfo();
-                SaveScope(scope, efEvent);
-                throw;
-            }
-            efEvent.Success = true;
-            SaveScope(scope, efEvent);
-            return efEvent.Result;
+            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
         }
-#endregion
+        int IAuditBypass.SaveChangesBypassAudit()
+        {
+            return base.SaveChanges();
+        }
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        {
+            return base.SaveChangesAsync(CancellationToken.None);
+        }
+#else
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
+        }
+        int IAuditBypass.SaveChangesBypassAudit()
+        {
+            return base.SaveChanges(true);
+        }
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        {
+            return base.SaveChangesAsync(true, default);
+        }
+#endif
+        #endregion
     }
 }

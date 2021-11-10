@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using Newtonsoft.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.Core.Providers
 {
+
     /// <summary>
     /// Write the event outputs as files.
     /// </summary>
@@ -61,19 +61,78 @@ namespace Audit.Core.Providers
             set { _directoryPath = value; }
         }
 
+        public FileDataProvider()
+        {
+        }
+
+        public FileDataProvider(Action<ConfigurationApi.IFileLogProviderConfigurator> config)
+        {
+            var fileConfig = new ConfigurationApi.FileLogProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(fileConfig);
+                _directoryPath = fileConfig._directoryPath;
+                _directoryPathBuilder = fileConfig._directoryPathBuilder;
+                _filenameBuilder = fileConfig._filenameBuilder;
+                _filenamePrefix = fileConfig._filenamePrefix;
+            }
+        }
+
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var fullPath = GetFilePath(auditEvent);
-            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            var json = Configuration.JsonAdapter.Serialize(auditEvent);
             File.WriteAllText(fullPath, json);
+            return fullPath;
+        }
+
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        {
+            var fullPath = GetFilePath(auditEvent);
+            await SaveFileAsync(fullPath, auditEvent);
             return fullPath;
         }
 
         public override void ReplaceEvent(object path, AuditEvent auditEvent)
         {
             var fullPath = path.ToString();
-            var json = JsonConvert.SerializeObject(auditEvent, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+            var json = Configuration.JsonAdapter.Serialize(auditEvent);
             File.WriteAllText(fullPath, json);
+        }
+
+        public override T GetEvent<T>(object path)
+        {
+            var fullPath = path.ToString();
+            var json = File.ReadAllText(fullPath);
+            return Configuration.JsonAdapter.Deserialize<T>(json);
+        }
+
+        public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent)
+        {
+            var fullPath = path.ToString();
+            await SaveFileAsync(fullPath, auditEvent);
+        }
+
+        public override async Task<T> GetEventAsync<T>(object path) 
+        {
+            var fullPath = path.ToString();
+            return await GetFromFileAsync<T>(fullPath);
+        }
+
+        private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent)
+        {
+            using (FileStream stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+            {
+                await Configuration.JsonAdapter.SerializeAsync(stream, auditEvent);
+            }
+        }
+
+        private async Task<T> GetFromFileAsync<T>(string fullPath) where T : AuditEvent
+        {
+            using (var stream = File.OpenRead(fullPath))
+            {
+                return await Configuration.JsonAdapter.DeserializeAsync<T>(stream);
+            }
         }
 
         private string GetFilePath(AuditEvent auditEvent)
@@ -85,7 +144,7 @@ namespace Audit.Core.Providers
             }
             else
             {
-                fileName += $"{DateTime.Now:yyyyMMddHHmmss}_{HiResDateTime.UtcNowTicks}.json";
+                fileName += $"{Configuration.SystemClock.UtcNow:yyyyMMddHHmmss}_{HiResDateTime.UtcNowTicks}.json";
             }
             string directory;
             if (_directoryPathBuilder != null)
@@ -106,7 +165,7 @@ namespace Audit.Core.Providers
         // Original from: http://stackoverflow.com/a/14369695/122195
         public class HiResDateTime
         {
-            private static long lastTimeStamp = DateTime.UtcNow.Ticks;
+            private static long lastTimeStamp = Configuration.SystemClock.UtcNow.Ticks;
             public static long UtcNowTicks
             {
                 get
@@ -115,7 +174,7 @@ namespace Audit.Core.Providers
                     do
                     {
                         original = lastTimeStamp;
-                        long now = DateTime.UtcNow.Ticks;
+                        long now = Configuration.SystemClock.UtcNow.Ticks;
                         newValue = Math.Max(now, original + 1);
                     } while (Interlocked.CompareExchange
                                  (ref lastTimeStamp, newValue, original) != original);

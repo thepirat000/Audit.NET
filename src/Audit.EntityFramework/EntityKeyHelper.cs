@@ -1,5 +1,7 @@
-﻿#if NET45
+﻿#if EF_FULL
+using Audit.EntityFramework;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core.Mapping;
@@ -10,12 +12,10 @@ using System.Linq;
 using System.Reflection;
 
 /*
-Original modified to support edmx, etc.
 https://michaelmairegger.wordpress.com/2013/03/30/find-primary-keys-from-entities-from-dbcontext/
-and
 https://romiller.com/2014/04/08/ef6-1-mapping-between-types-tables/
-and
 https://romiller.com/2015/08/05/ef6-1-get-mapping-between-properties-and-columns/
+https://lowrymedia.com/2014/06/10/ef6-1-mapping-between-types-tables-including-derived-types/
 */
 
 /// <summary>
@@ -26,11 +26,13 @@ public sealed class EntityKeyHelper
     //Singleton
     private static readonly Lazy<EntityKeyHelper> LazyInstance = new Lazy<EntityKeyHelper>(() => new EntityKeyHelper());
     //Type -> KeyNames
-    private readonly Dictionary<Type, string[]> _keyNamesCache = new Dictionary<Type, string[]>();
+    private readonly ConcurrentDictionary<Type, string[]> _keyNamesCache = new ConcurrentDictionary<Type, string[]>();
+    //Type -> ForeignKeyNames
+    private readonly ConcurrentDictionary<Type, string[]> _foreignKeyNamesCache = new ConcurrentDictionary<Type, string[]>();
     //Type -> TableName
-    private readonly Dictionary<Type, string> _tableNamesCache = new Dictionary<Type, string>();
+    private readonly ConcurrentDictionary<Type, EntityName> _tableNamesCache = new ConcurrentDictionary<Type, EntityName>();
     //Type -> PropertyName -> ColumnName
-    private readonly Dictionary<Type, Dictionary<string, string>> _columnNamesCache = new Dictionary<Type, Dictionary<string, string>>();
+    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _columnNamesCache = new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
 
     private EntityKeyHelper() { }
 
@@ -42,7 +44,7 @@ public sealed class EntityKeyHelper
     #region Private Methods
     private string[] GetKeyNames(DbContext context, Type entityType)
     {
-        entityType = GetBaseEntityType(entityType);
+        entityType = GetBaseEntityType(context, entityType);
         string[] keys;
         if (_keyNamesCache.TryGetValue(entityType, out keys))
         {
@@ -53,14 +55,36 @@ public sealed class EntityKeyHelper
         MethodInfo method = typeof(ObjectContext).GetMethod("CreateObjectSet", Type.EmptyTypes)
                                                  .MakeGenericMethod(entityType);
         dynamic objectSet = method.Invoke(objectContext, null);
+
         IEnumerable<dynamic> keyMembers = objectSet.EntitySet.ElementType.KeyMembers;
         string[] keyNames = keyMembers.Select(k => (string)k.Name).ToArray();
 
-        _keyNamesCache.Add(entityType, keyNames);
+        _keyNamesCache[entityType] = keyNames;
         return keyNames;
     }
 
-    private EntitySetMapping GetMapping(Type type, DbContext context)
+    private string[] GetForeignKeyNames(DbContext context, Type entityType)
+    {
+        entityType = GetBaseEntityType(context, entityType);
+        string[] keys;
+        if (_foreignKeyNamesCache.TryGetValue(entityType, out keys))
+        {
+            return keys;
+        }
+        ObjectContext objectContext = ((IObjectContextAdapter)context).ObjectContext;
+        //create method CreateObjectSet with the generic parameter of the base-type
+        MethodInfo method = typeof(ObjectContext).GetMethod("CreateObjectSet", Type.EmptyTypes)
+                                                 .MakeGenericMethod(entityType);
+        dynamic objectSet = method.Invoke(objectContext, null);
+
+        var navProps = objectSet.EntitySet.ElementType.NavigationProperties as IEnumerable<NavigationProperty>;
+        string[] keyNames = navProps?.SelectMany(n => n.GetDependentProperties()).Select(fk => fk.Name).Distinct().ToArray();
+
+        _foreignKeyNamesCache[entityType] = keyNames;
+        return keyNames;
+    }
+
+    private MappingFragment GetMappingFragment(Type type, DbContext context)
     {
         var metadata = ((IObjectContextAdapter)context).ObjectContext.MetadataWorkspace;
 
@@ -72,28 +96,52 @@ public sealed class EntityKeyHelper
                 .GetItems<EntityType>(DataSpace.OSpace)
                       .Single(e => objectItemCollection.GetClrType(e) == type);
 
+
         // Get the entity set that uses this entity type
-        var entitySet = metadata
-            .GetItems<EntityContainer>(DataSpace.CSpace)
-                  .Single()
-                  .EntitySets
-                  .Single(s => s.ElementType.Name == entityType.Name);
+        var entitySet = metadata.GetItems(DataSpace.CSpace)
+            .Where(x => x.BuiltInTypeKind == BuiltInTypeKind.EntityType)
+            .Cast<EntityType>()
+            .Single(x => x.Name == entityType.Name);
+
+        var entitySetMappings = metadata.GetItems<EntityContainerMapping>(DataSpace.CSSpace).Single().EntitySetMappings.ToList();
 
         // Find the mapping between conceptual and storage model for this entity set
-        var mapping = metadata.GetItems<EntityContainerMapping>(DataSpace.CSSpace)
-                      .Single()
-                      .EntitySetMappings
-                      .Single(s => s.EntitySet == entitySet);
-
-        return mapping;
+        var mapping = entitySetMappings.SingleOrDefault(x => x.EntitySet.Name == entitySet.Name);
+        if (mapping != null && mapping.EntityTypeMappings.Count(m => m.Fragments.Count > 0) == 1)
+        {
+            return mapping.EntityTypeMappings.Single(m => m.Fragments.Count > 0).Fragments.First();
+        }
+        else
+        {
+            mapping = entitySetMappings.SingleOrDefault(x => x.EntityTypeMappings.Where(y => y.EntityType != null).Any(y => y.EntityType.Name == entitySet.Name));
+            if (mapping != null)
+            {
+                return mapping.EntityTypeMappings.Where(x => x.EntityType != null).Single(x => x.EntityType.Name == entityType.Name && x.Fragments.Count > 0).Fragments.First();
+            }
+            else
+            {
+                var entitySetMapping = entitySetMappings.Single(x => x.EntityTypeMappings.Any(y => y.IsOfEntityTypes.Any(z => z.Name == entitySet.Name)));
+                return entitySetMapping.EntityTypeMappings.First(x => x.IsOfEntityTypes.Any(y => y.Name == entitySet.Name)).Fragments.First();
+            }
+        }
     }
 
-    private Type GetBaseEntityType(Type type)
+    private Type GetObjectEntityType(Type type)
     {
-        //retreive the base type
-        while (type.BaseType != typeof(object))
+        return ObjectContext.GetObjectType(type);
+    }
+
+    private Type GetBaseEntityType(DbContext context, Type type)
+    {
+        var objectContext = ((IObjectContextAdapter)context).ObjectContext;
+        type = ObjectContext.GetObjectType(type);
+        if (type.BaseType != null && type.BaseType != typeof(object))
         {
-            type = type.BaseType;
+            var baseIsMapped = objectContext.MetadataWorkspace.TryGetType(type.BaseType.Name, type.BaseType.Namespace, DataSpace.OSpace, out var edmType);
+            if (baseIsMapped)
+            {
+                return GetBaseEntityType(context, type.BaseType);
+            }
         }
         return type;
     }
@@ -108,7 +156,7 @@ public sealed class EntityKeyHelper
     public Dictionary<string, object> GetPrimaryKeyValues(object entity, DbContext context)
     {
         var result = new Dictionary<string, object>();
-        var entityType = GetBaseEntityType(entity.GetType());
+        var entityType = GetObjectEntityType(entity.GetType());
         var keyNames = GetKeyNames(context, entityType);
         for (int i = 0; i < keyNames.Length; i++)
         {
@@ -119,31 +167,50 @@ public sealed class EntityKeyHelper
     }
 
     /// <summary>
+    /// Gets the foreign keys and values for a given entity in a given db context.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <param name="context">The db context.</param>
+    public Dictionary<string, object> GetForeignKeysValues(object entity, DbContext context)
+    {
+        var result = new Dictionary<string, object>();
+        var entityType = GetObjectEntityType(entity.GetType());
+        var fkNames = GetForeignKeyNames(context, entityType);
+        foreach (var fk in fkNames)
+        {
+            result.Add(fk, entityType.GetProperty(fk).GetValue(entity, null));
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Gets the name of the table given an entity type (or proxy) and a db context.
     /// </summary>
     /// <param name="type">The entity type (or proxy).</param>
     /// <param name="context">The db context.</param>
-    public string GetTableName(Type type, DbContext context)
+    public EntityName GetTableName(Type type, DbContext context)
     {
-        type = GetBaseEntityType(type);
-        string name;
+        type = GetObjectEntityType(type);
+        EntityName name;
         if (_tableNamesCache.TryGetValue(type, out name))
         {
             return name;
         }
         // Get the type mapping
-        var mapping = GetMapping(type, context);
+        var mappingFragment = GetMappingFragment(type, context);
 
         // Find the storage entity set (table) that the entity is mapped
-        var table = mapping
-            .EntityTypeMappings.Single()
-            .Fragments.Single()
-            .StoreEntitySet;
+        var table = mappingFragment.StoreEntitySet;
 
         // Return the table name from the storage entity set
-        var tableName = (string)table.MetadataProperties["Table"].Value ?? table.Name;
-        _tableNamesCache[type] = tableName;
-        return tableName;
+        name = new EntityName()
+        {
+            Table = (string)table.MetadataProperties["Table"].Value ?? table.Name ?? type.Name,
+            Schema = table.Schema
+        };
+
+        _tableNamesCache[type] = name;
+        return name;
     }
 
     /// <summary>
@@ -154,28 +221,38 @@ public sealed class EntityKeyHelper
     /// <param name="context">The db context.</param>
     public string GetColumnName(Type type, string propertyName, DbContext context)
     {
-        type = GetBaseEntityType(type);
+        type = GetObjectEntityType(type);
         if (_columnNamesCache.ContainsKey(type) && _columnNamesCache[type].ContainsKey(propertyName))
         {
             return _columnNamesCache[type][propertyName];
         }
         // Get the type mapping
-        var mapping = GetMapping(type, context);
+        var mappingFragment = GetMappingFragment(type, context);
         // Find the storage property (column) that the property is mapped
-        var columnName = mapping
-            .EntityTypeMappings.Single()
-            .Fragments.Single()
+        var columnName = mappingFragment
             .PropertyMappings
             .OfType<ScalarPropertyMapping>()
                   .SingleOrDefault(m => m.Property.Name == propertyName)?
                 .Column
                 .Name;
-
+        if (columnName == null)
+        {
+            // Try to get the column name from the base type, if any
+            var baseType = GetBaseEntityType(context, type);
+            if (baseType != type)
+            {
+                return GetColumnName(baseType, propertyName, context);
+            }
+        }
+        if (columnName == null)
+        {
+            columnName = propertyName;
+        }
         if (!_columnNamesCache.ContainsKey(type))
         {
-            _columnNamesCache[type] = new Dictionary<string, string>(); // Not thread-safe, but not dangerous since at most it will lost some cached values
+            _columnNamesCache[type] = new ConcurrentDictionary<string, string>();
         }
-        _columnNamesCache[type].Add(propertyName, columnName);
+        _columnNamesCache[type][propertyName] = columnName;
         return columnName;
     }
     #endregion

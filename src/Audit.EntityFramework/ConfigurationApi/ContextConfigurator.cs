@@ -1,4 +1,10 @@
 ﻿using System;
+#if EF_CORE
+using Microsoft.EntityFrameworkCore;
+#else
+using System.Data.Entity;
+#endif
+
 
 namespace Audit.EntityFramework.ConfigurationApi
 {
@@ -13,7 +19,8 @@ namespace Audit.EntityFramework.ConfigurationApi
             }
             return new ModeConfigurator<AuditDbContext>();
         }
-        public IModeConfigurator<T> ForContext<T>(Action<IContextSettingsConfigurator<T>> config = null) where T : AuditDbContext
+        public IModeConfigurator<T> ForContext<T>(Action<IContextSettingsConfigurator<T>> config = null)
+            where T : DbContext
         {
             if (config != null)
             {

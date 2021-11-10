@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Generate Audit Logs from EntityFramework context changes</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <AssemblyTitle>Audit.EntityFramework.Core.v3</AssemblyTitle>
+    <VersionPrefix>18.1.6</VersionPrefix>
+    <Authors>Federico Colombo</Authors>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Audit.EntityFramework.Core.v3</AssemblyName>
+    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Audit.EntityFramework.Core.v3</PackageId>
+    <PackageTags>Audit;Trail;Log;EntityFramework;Core</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\Audit.EntityFramework\**\*.cs" Exclude="..\Audit.EntityFramework\obj\**\*.*;..\**\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ConfigurationApi\**" />
+    <EmbeddedResource Remove="ConfigurationApi\**" />
+    <None Remove="ConfigurationApi\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+    <DefineConstants>$(DefineConstants);IS_NK_JSON</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+</Project>

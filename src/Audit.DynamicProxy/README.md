@@ -10,11 +10,15 @@ It relies on [Castle DynamicProxy](http://www.castleproject.org/projects/dynamic
 ## Install
 
 **NuGet Package** 
+
+To install the package run the following command on the Package Manager Console:
+
 ```
 PM> Install-Package Audit.DynamicProxy
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.DynamicProxy.svg?style=flat)](https://www.nuget.org/packages/Audit.DynamicProxy/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.DynamicProxy.svg)](https://www.nuget.org/packages/Audit.DynamicProxy/)
 
 ## Usage
 
@@ -175,7 +179,7 @@ With this information you can know who did the operation, and also measure perfo
 
 The following table describes the Audit.DynamicProxy output fields:
 
-- <h3>[AuditInterceptEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptEvent.cs)</h3>
+### [AuditInterceptEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptEvent.cs)
 
 Describes an operation call event
 
@@ -194,7 +198,7 @@ Describes an operation call event
 | Exception | string | The exception details when an exception is thrown |
 | Result | [argument](#auditinterceptargument) object | The result of the operation |
 
-- <h3>[AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)</h3>
+### [AuditInterceptArgument](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/AuditInterceptArgument.cs)
 
 Describes an operation argument
 

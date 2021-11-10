@@ -1,16 +1,16 @@
 ﻿using Audit.Core;
 using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace Audit.DynamicProxy.UnitTest
 {
     public class ConcurrencyTests
     {
-        [Fact]
+        [Test]
         public void Test_Concurrency()
         {
             var provider = new Mock<AuditDataProvider>();
@@ -44,23 +44,23 @@ namespace Audit.DynamicProxy.UnitTest
             });
             th.Start();
             th.Join();
-            Assert.Equal("M1", scope.Event.GetAuditInterceptEvent().MethodName);
-            Assert.Equal(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
+            Assert.AreEqual("M1", scope.Event.GetAuditInterceptEvent().MethodName);
+            Assert.AreEqual(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
         }
 
         public virtual void M2(Guid i)
         {
             var rnd = new Random();
             var scope = AuditProxy.CurrentScope;
-            Assert.Equal("M2", scope.Event.GetAuditInterceptEvent().MethodName);
-            Assert.Equal(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
+            Assert.AreEqual("M2", scope.Event.GetAuditInterceptEvent().MethodName);
+            Assert.AreEqual(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
         }
         public virtual void M3(Guid i)
         {
             var rnd = new Random();
             var scope = AuditProxy.CurrentScope;
-            Assert.Equal("M3", scope.Event.GetAuditInterceptEvent().MethodName);
-            Assert.Equal(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
+            Assert.AreEqual("M3", scope.Event.GetAuditInterceptEvent().MethodName);
+            Assert.AreEqual(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
         }
     }
 }

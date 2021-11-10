@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
+﻿#if NET45 || EVENTLOG_CORE || NET461
+using System;
+using System.Diagnostics;
 
 namespace Audit.Core.Providers
 {
-#if NET45
     /// <summary>
     /// Writes to the windows event log
     /// </summary>
@@ -14,49 +15,38 @@ namespace Audit.Core.Providers
     /// </remarks>
     public class EventLogDataProvider : AuditDataProvider
     {
-        private string _sourcePath = "Application";
-        private string _machineName = ".";
-        private string _logName = "Application";
-
         /// <summary>
         /// The EventLog Log Name
         /// </summary>
-        public string LogName
-        {
-            get { return _logName; }
-            set { _logName = value; }
-        }
+        public string LogName { get; set; } = "Application";
 
         /// <summary>
         /// The EventLog Source Path
         /// </summary>
-        public string SourcePath
-        {
-            get { return _sourcePath; }
-            set { _sourcePath = value; }
-        }
+        public string SourcePath { get; set; } = "Application";
+
+        /// <summary>
+        /// The Message builder. A function to obtain the message string to log to the event log.
+        /// </summary>
+        public Func<AuditEvent, string> MessageBuilder { get; set; }
 
         /// <summary>
         /// The Machine name (use "." to set local machine)
         /// </summary>
-        public string MachineName
-        {
-            get { return _machineName; }
-            set { _machineName = value; }
-        }
+        public string MachineName { get; set; } = ".";
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var source = _sourcePath;
+            var source = SourcePath;
             var logName = LogName;
-            var json = auditEvent.ToJson();
-            if (!EventLog.SourceExists(source, _machineName))
+            var message = MessageBuilder != null ? MessageBuilder.Invoke(auditEvent) : auditEvent.ToJson();
+            if (!EventLog.SourceExists(source, MachineName))
             {
                 EventLog.CreateEventSource(source, logName);
             }
-            using (var eventLog = new EventLog(logName, _machineName, source))
+            using (var eventLog = new EventLog(logName, MachineName, source))
             {
-                eventLog.WriteEntry(json, auditEvent.Environment.Exception == null ? EventLogEntryType.Information : EventLogEntryType.Error);
+                eventLog.WriteEntry(message, auditEvent.Environment.Exception == null ? EventLogEntryType.Information : EventLogEntryType.Error);
             }
             return null;
         }
@@ -66,5 +56,5 @@ namespace Audit.Core.Providers
             InsertEvent(auditEvent);
         }
     }
-#endif
 }
+#endif

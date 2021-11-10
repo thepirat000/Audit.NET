@@ -1,6 +1,6 @@
 namespace Audit.EntityFramework.ConfigurationApi
 {
-    public class ModeConfigurator<T> : IModeConfigurator<T> where T : AuditDbContext
+    public class ModeConfigurator<T> : IModeConfigurator<T>
     {
         public IIncludeConfigurator<T> UseOptIn()
         {

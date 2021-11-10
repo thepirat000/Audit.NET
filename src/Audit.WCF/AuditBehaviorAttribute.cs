@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Audit.Core;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.ServiceModel;
@@ -23,11 +24,15 @@ namespace Audit.WCF
         public string EventType { get; set; }
 
         /// <summary>
+        /// Gets or sets the event creation policy to use. By default it will use the global Configuration.CreationPolicy.
+        /// </summary>
+        public EventCreationPolicy? CreationPolicy { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AuditBehaviorAttribute"/> class.
         /// </summary>
         public AuditBehaviorAttribute()
         {
-
         }
 
         /// <summary>
@@ -67,7 +72,7 @@ namespace Audit.WCF
         #region IOperationBehavior
         public void ApplyDispatchBehavior(OperationDescription operationDescription, DispatchOperation dispatchOperation)
         {
-            var invoker = new AuditOperationInvoker(dispatchOperation.Invoker, dispatchOperation, operationDescription, EventType);
+            var invoker = new AuditOperationInvoker(dispatchOperation.Invoker, dispatchOperation, operationDescription, EventType, CreationPolicy);
             dispatchOperation.Invoker = invoker;
         }
         public void AddBindingParameters(OperationDescription operationDescription, BindingParameterCollection bindingParameters)

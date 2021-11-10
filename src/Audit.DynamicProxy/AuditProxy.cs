@@ -12,9 +12,9 @@ namespace Audit.DynamicProxy
     /// </summary>
     public class AuditProxy
     {
-        private static readonly ProxyGenerator _generator = new ProxyGenerator();
+        private static readonly ProxyGenerator Generator = new ProxyGenerator();
         [ThreadStatic]
-        private static AuditScope _currentScope;
+        private static IAuditScope _currentScope;
 
         /// <summary>
         /// Gets the scope for the current running thread. Get this property value from the audited methods to customize the Audit.
@@ -22,16 +22,10 @@ namespace Audit.DynamicProxy
         /// Calling this property from a different thread will return NULL or an unexpected value.
         /// </summary>
         /// <value>The current scope related to the running thread, or NULL.</value>
-        public static AuditScope CurrentScope
+        public static IAuditScope CurrentScope
         {
-            get
-            {
-                return _currentScope;
-            }
-            internal set
-            {
-                _currentScope = value;
-            }
+            get => _currentScope;
+            internal set => _currentScope = value;
         }
 
         /// <summary>
@@ -53,11 +47,11 @@ namespace Audit.DynamicProxy
             };
             if (typeof(T).GetTypeInfo().IsInterface)
             {
-                auditedInstance = _generator.CreateInterfaceProxyWithTarget<T>(instance, new[] { interceptor }) as T;
+                auditedInstance = Generator.CreateInterfaceProxyWithTarget<T>(instance, new[] { interceptor }) as T;
             }
             else
             {
-                auditedInstance = _generator.CreateClassProxyWithTarget<T>(instance, new[] { interceptor }) as T;
+                auditedInstance = Generator.CreateClassProxyWithTarget<T>(instance, new[] { interceptor }) as T;
             }
             return auditedInstance;
         }

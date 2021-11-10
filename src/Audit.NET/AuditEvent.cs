@@ -1,25 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+#if IS_NK_JSON
 using Newtonsoft.Json;
+#else
+using System.Text.Json;
+using System.Text.Json.Serialization;
+#endif
 
 namespace Audit.Core
 {
     /// <summary>
     /// Represents the output of the audit process
     /// </summary>
-    public class AuditEvent
+    public class AuditEvent : IAuditOutput
     {
         /// <summary>
         /// The enviroment information
         /// </summary>
-        [JsonProperty]
+#if IS_NK_JSON
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public AuditEventEnvironment Environment { get; set; }
 
         /// <summary>
         /// Indicates the change type (i.e. CustomerOrder Update)
         /// </summary>
+#if IS_NK_JSON
         [JsonProperty(Order = -999)]
+#endif
         public string EventType { get; set; }
 
         /// <summary>
@@ -32,41 +43,62 @@ namespace Audit.Core
         /// <summary>
         /// The tracked target.
         /// </summary>
-        [JsonProperty("Target", NullValueHandling = NullValueHandling.Ignore)]
+#if IS_NK_JSON
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public AuditTarget Target { get; set; }
 
         /// <summary>
         /// Comments.
         /// </summary>
-        [JsonProperty("Comments", NullValueHandling = NullValueHandling.Ignore)]
+#if IS_NK_JSON
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
         public List<string> Comments { get; set; }
 
         /// <summary>
         /// The date then the event started
         /// </summary>
-        [JsonProperty("StartDate")]
         public DateTime StartDate { get; set; }
 
         /// <summary>
         /// The date then the event finished
         /// </summary>
-        [JsonProperty("EndDate")]
         public DateTime? EndDate { get; set; }
 
         ///<summary>
         /// The duration of the operation in milliseconds.
         /// </summary>
-        [JsonProperty]
         public int Duration { get; set; }
-
-        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
 
         /// <summary>
         /// Converts the event to its JSON representation using JSON.NET.
         /// </summary>
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, JsonSettings);
+            return Configuration.JsonAdapter.Serialize(this);
+        }
+
+        /// <summary>
+        /// Parses an AuditEvent from its JSON string representation using JSON.NET.
+        /// </summary>
+        /// <param name="json">JSON string with the audit event representation.</param>
+        public static T FromJson<T>(string json) where T : AuditEvent
+        {
+            return Configuration.JsonAdapter.Deserialize<T>(json);
+        }
+
+        /// <summary>
+        /// Parses an AuditEvent from its JSON string representation using JSON.NET.
+        /// </summary>
+        /// <param name="json">JSON string with the audit event representation.</param>
+        public static AuditEvent FromJson(string json) 
+        {
+            return Configuration.JsonAdapter.Deserialize<AuditEvent>(json);
         }
     }
 }

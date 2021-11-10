@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Audit.Core;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.MongoDB.Providers
 {
@@ -21,11 +22,6 @@ namespace Audit.MongoDB.Providers
     /// </remarks>
     public class MongoDataProvider : AuditDataProvider
     {
-        private string _connectionString = "mongodb://localhost:27017";
-        private string _database = "Audit";
-        private string _collection = "Event";
-        private bool _ignoreElementNames = false;
-
         static MongoDataProvider()
         {
             ConfigureBsonMapping();
@@ -34,52 +30,60 @@ namespace Audit.MongoDB.Providers
         /// <summary>
         /// Gets or sets the MongoDB connection string.
         /// </summary>
-        public string ConnectionString
-        {
-            get { return _connectionString; }
-            set { _connectionString = value; }
-        }
+        public string ConnectionString { get; set; } = "mongodb://localhost:27017";
 
         /// <summary>
         /// Gets or sets the MongoDB Database name.
         /// </summary>
-        public string Database
-        {
-            get { return _database; }
-            set { _database = value; }
-        }
+        public string Database { get; set; } = "Audit";
 
         /// <summary>
         /// Gets or sets the MongoDB collection name.
         /// </summary>
-        public string Collection
-        {
-            get { return _collection; }
-            set { _collection = value; }
-        }
+        public string Collection { get; set; } = "Event";
 
         /// <summary>
         /// Gets or sets a value to indicate whether the element names should be validated/fixed or not.
         /// If <c>true</c> the element names are not validated, use this when you know the element names will not contain invalid characters.
         /// If <c>false</c> (default) the element names are validated and fixed to avoid containing invalid characters.
         /// </summary>
-        public bool IgnoreElementNames
+        public bool IgnoreElementNames { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the target object and extra fields should be serialized as Bson.
+        /// Default is false to serialize using the default JSON serializer from Audit.Core.Configiration.JsonAdapter
+        /// </summary>
+        /// <value><c>true</c> if should serialize as Bson; or <c>false</c> to serialize as Json.</value>
+        public bool SerializeAsBson { get; set; } = false;
+
+        public MongoDataProvider()
         {
-            get { return _ignoreElementNames; }
-            set { _ignoreElementNames = value; }
+        }
+
+        public MongoDataProvider(Action<ConfigurationApi.IMongoProviderConfigurator> config)
+        {
+            var mongoConfig = new ConfigurationApi.MongoProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(mongoConfig);
+                Collection = mongoConfig._collection;
+                ConnectionString = mongoConfig._connectionString;
+                Database = mongoConfig._database;
+                SerializeAsBson = mongoConfig._serializeAsBson;
+            }
         }
 
         private static void ConfigureBsonMapping()
         {
-            var pack = new ConventionPack();
-            pack.Add(new IgnoreIfNullConvention(true));
+            var pack = new ConventionPack
+            {
+                new IgnoreIfNullConvention(true)
+            };
             ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof(AuditEvent));
 
             BsonClassMap.RegisterClassMap<AuditTarget>(cm =>
             {
                 cm.AutoMap();
-                cm.MapProperty(x => x.SerializedOld).SetElementName("Old");
-                cm.MapProperty(x => x.SerializedNew).SetElementName("New");
             });
 
             BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
@@ -92,10 +96,10 @@ namespace Audit.MongoDB.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var db = GetDatabase();
-            var col = db.GetCollection<BsonDocument>(_collection);
+            var col = db.GetCollection<BsonDocument>(Collection);
             SerializeExtraFields(auditEvent);
-            var doc = auditEvent.ToBsonDocument();
-            if (!_ignoreElementNames)
+            var doc = ParseBson(auditEvent);
+            if (!IgnoreElementNames)
             {
                 FixDocumentElementNames(doc);
             }
@@ -103,17 +107,46 @@ namespace Audit.MongoDB.Providers
             return (BsonObjectId)doc["_id"];
         }
 
-        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        public async override Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var db = GetDatabase();
-            var col = db.GetCollection<BsonDocument>(_collection);
+            var col = db.GetCollection<BsonDocument>(Collection);
             SerializeExtraFields(auditEvent);
-            var doc = auditEvent.ToBsonDocument();
-            if (!_ignoreElementNames)
+            var doc = ParseBson(auditEvent);
+            if (!IgnoreElementNames)
             {
                 FixDocumentElementNames(doc);
             }
-            col.ReplaceOne(d => d["_id"] == (BsonObjectId)eventId, doc);
+            await col.InsertOneAsync(doc);
+            return (BsonObjectId)doc["_id"];
+        }
+
+        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        {
+            var db = GetDatabase();
+            var col = db.GetCollection<BsonDocument>(Collection);
+            SerializeExtraFields(auditEvent);
+            var doc = ParseBson(auditEvent);
+            if (!IgnoreElementNames)
+            {
+                FixDocumentElementNames(doc);
+            }
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            col.ReplaceOne(filter, doc);
+        }
+
+        public async override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        {
+            var db = GetDatabase();
+            var col = db.GetCollection<BsonDocument>(Collection);
+            SerializeExtraFields(auditEvent);
+            var doc = ParseBson(auditEvent);
+            if (!IgnoreElementNames)
+            {
+                FixDocumentElementNames(doc);
+            }
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            await col.ReplaceOneAsync(filter, doc);
         }
 
         private void SerializeExtraFields(AuditEvent auditEvent)
@@ -122,6 +155,19 @@ namespace Audit.MongoDB.Providers
             {
                 auditEvent.CustomFields[k] = Serialize(auditEvent.CustomFields[k]);
             }
+        }
+
+        private BsonDocument ParseBson(AuditEvent auditEvent)
+        {
+            if (SerializeAsBson)
+            {
+                return auditEvent.ToBsonDocument();
+            }
+            else
+            {
+                return BsonDocument.Parse(Core.Configuration.JsonAdapter.Serialize(auditEvent));
+            }
+            
         }
 
         /// <summary>
@@ -174,28 +220,21 @@ namespace Audit.MongoDB.Providers
             {
                 return null;
             }
-            // if is a serialized document already, return that.
-            if (value is BsonDocument)
+            if (SerializeAsBson)
             {
-                return value;
-            }
-            // if can be converted to bsonvalue, return the value
-            try
-            {
-                BsonValue bsonValue;
-                if (BsonTypeMapper.TryMapToBsonValue(value, out bsonValue))
+                if (value is BsonDocument)
                 {
                     return value;
                 }
+                return value.ToBsonDocument(typeof(object));
             }
-            catch
+            else
             {
-                // ignored. TryMapToBsonValue can throw exception (i.e. when the type is an array of objects that cannot be mapped to a bsonvalue)
+                return (T)Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(value), value.GetType());
             }
-            return value.ToBsonDocument(typeof(object));
         }
 
-        private void TestConnection()
+        public void TestConnection()
         {
             var db = GetDatabase();
             var test = db.RunCommand((Command<BsonDocument>)"{ping:1}");
@@ -208,9 +247,67 @@ namespace Audit.MongoDB.Providers
 
         private IMongoDatabase GetDatabase()
         {
-            var client = new MongoClient(_connectionString);
-            var db = client.GetDatabase(_database);
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
             return db;
         }
+
+        public override T GetEvent<T>(object eventId)
+        {
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            var doc = db.GetCollection<BsonDocument>(Collection).Find(filter).FirstOrDefault();
+            return doc == null ? null : BsonSerializer.Deserialize<T>(doc);
+        }
+
+        public override async Task<T> GetEventAsync<T>(object eventId)
+        {
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
+            var doc = await (await db.GetCollection<BsonDocument>(Collection).FindAsync(filter)).FirstOrDefaultAsync();
+            return doc == null ? null : BsonSerializer.Deserialize<T>(doc);
+        }
+
+        #region Events Query        
+        /// <summary>
+        /// Returns an IQueryable that enables querying against the audit events stored on Azure Document DB.
+        /// </summary>
+        public IQueryable<AuditEvent> QueryEvents()
+        {
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
+            return db.GetCollection<AuditEvent>(Collection).AsQueryable();
+        }
+        /// <summary>
+        /// Returns an IQueryable that enables querying against the audit events stored on Azure Document DB, for the audit event type given.
+        /// </summary>
+        /// <typeparam name="T">The AuditEvent type</typeparam>
+        public IQueryable<T> QueryEvents<T>() where T : AuditEvent
+        {
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
+            return db.GetCollection<T>(Collection).AsQueryable();
+        }
+        /// <summary>
+        /// Returns a native mongo collection of audit events
+        /// </summary>
+        public IMongoCollection<AuditEvent> GetMongoCollection()
+        {
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
+            return db.GetCollection<AuditEvent>(Collection);
+        }
+        /// <summary>
+        /// Returns a native mongo collection of audit events
+        /// </summary>
+        public IMongoCollection<T> GetMongoCollection<T>() where T : AuditEvent
+        {
+            var client = new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database);
+            return db.GetCollection<T>(Collection);
+        }
+        #endregion
     }
 }

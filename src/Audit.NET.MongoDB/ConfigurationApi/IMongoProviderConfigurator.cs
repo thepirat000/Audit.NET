@@ -20,5 +20,10 @@ namespace Audit.MongoDB.ConfigurationApi
         /// </summary>
         /// <param name="collection">The collection name.</param>
         IMongoProviderConfigurator Collection(string collection);
+        /// <summary>
+        /// Specifies whether the target object and extra fields should be serialized as Bson. Default is Json.
+        /// </summary>
+        /// <param name="value">The setting value.</param>
+        IMongoProviderConfigurator SerializeAsBson(bool value = true);
     }
 }

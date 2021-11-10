@@ -1,10 +1,15 @@
-﻿namespace Audit.Core.ConfigurationApi
+﻿using System;
+
+namespace Audit.Core.ConfigurationApi
 {
     public class EventLogProviderConfigurator : IEventLogProviderConfigurator
     {
         internal string _logName = "Application";
         internal string _sourcePath = "Application";
         internal string _machineName = ".";
+        internal Func<AuditEvent, string> _messageBuilder;
+
+
         public IEventLogProviderConfigurator LogName(string logName)
         {
             _logName = logName;
@@ -20,6 +25,12 @@
         public IEventLogProviderConfigurator SourcePath(string sourcePath)
         {
             _sourcePath = sourcePath;
+            return this;
+        }
+
+        public IEventLogProviderConfigurator MessageBuilder(Func<AuditEvent, string> messageBuilder)
+        {
+            _messageBuilder = messageBuilder;
             return this;
         }
     }

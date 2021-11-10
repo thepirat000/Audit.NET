@@ -4,17 +4,23 @@
 
 Generate Audit Logs for Windows Communication Foundation (WCF) service calls.
 
-Audit.Wcf provides the server-side infrastructure to log interactions with WCF services. It can record service method calls with caller info and arguments.
+`Audit.Wcf` provides the **server-side** infrastructure to log interactions with WCF services. 
+It records detailed information of the service method calls.
+
+If you are looking for client-side audit, please check the [`Audit.WCF.Client`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF.Client/README.md) library.
 
 ## Install
 
 **NuGet Package** 
+
+To install the package run the following command on the Package Manager Console:
 
 ```
 PM> Install-Package Audit.Wcf
 ```
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.Wcf.svg?style=flat)](https://www.nuget.org/packages/Audit.Wcf/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.Wcf.svg)](https://www.nuget.org/packages/Audit.Wcf/)
 
 ## Usage
 
@@ -26,7 +32,7 @@ For example:
 [AuditBehavior(EventType = "{contract}.{operation}")]
 public class OrderService : IOrderService
 {
-  public GetOrderResponse GetOrder(GetOrderRequest request)
+  public async Task<GetOrderResponse> GetOrder(GetOrderRequest request)
   {
     ...
   }
@@ -38,7 +44,7 @@ You can also decorate the specific methods you want to audit, for example:
 public class OrderService : IOrderService
 {
   [AuditBehavior]
-  public GetOrderResponse GetOrder(GetOrderRequest request)
+  public async Task<GetOrderResponse> GetOrder(GetOrderRequest request)
   {
     ...
   }
@@ -110,7 +116,7 @@ The library will automatically detect the property and use the given data provid
 
 ## Output
 
-Audit.Wcf output includes:
+`Audit.Wcf` output includes:
 
 - Execution time and duration
 - Environment information such as user, machine, domain and locale.
@@ -126,9 +132,9 @@ With this information, you can not just know who did the operation, but also mea
 
 ## Output details
 
-The following table describes the Audit.Wcf output fields:
+The following table describes the `Audit.Wcf` output fields:
 
-- <h3>[AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs)</h3>
+- ### [AuditWcfEvent](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEvent.cs)
 
 Describes an audited WCF event
 
@@ -137,6 +143,7 @@ Describes an audited WCF event
 | ContractName | string | Name of the contract (service interface) |
 | OperationName | string | Name of the operation (service method) |
 | InstanceQualifiedName | string | Assembly qualified type name of the service instance |
+| IsAsync | boolean | Indicates if the operation is asynchronous |
 | MethodSignature | string | Signature of the audited method |
 | Action | string | Action absolute address |
 | ReplyAction | string |Reply action absolute address |
@@ -149,7 +156,7 @@ Describes an audited WCF event
 | InputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Input parameters object values |
 | OutputParameters | Array of [AuditWcfEventElement](#AuditWcfEventElement) | Output parameters object values |
 
-- <h3>[AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)</h3>
+- ### [AuditWcfEventFault](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventFault.cs)
 
 Describes a WCF fault/exception
 
@@ -162,7 +169,7 @@ Describes a WCF fault/exception
 | FaultReason | string | The fault reason |
 | FaultDetails | [AuditWcfEventElement](#AuditWcfEventElement) | The detail object related to the fault |
 
-- <h3>[AuditWcfEventElement](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventElement.cs)</h3>
+- ### [AuditWcfEventElement](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/AuditWcfEventElement.cs)
 
 Describes an element/object related to the WCF audit event.
 
@@ -202,8 +209,8 @@ See [Audit.NET](https://github.com/thepirat000/Audit.NET) documentation about [C
 		"UserName": "Federico",
 		"MachineName": "HP",
 		"DomainName": "HP",
-		"CallingMethodName": "Audit.WCF.AuditOperationInvoker.Invoke()",
-		"AssemblyName": "Audit.WCF, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null",
+		"CallingMethodName": "WCF_IIS.IOrderService.GetData()",
+		"AssemblyName": "WCF_IIS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
 		"Exception": null,
 		"Culture": "en-GB"
 	},

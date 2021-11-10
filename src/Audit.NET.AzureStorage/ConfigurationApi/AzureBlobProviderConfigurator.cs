@@ -5,26 +5,38 @@ namespace Audit.AzureTableStorage.ConfigurationApi
 {
     public class AzureBlobProviderConfigurator : IAzureBlobProviderConfigurator
     {
-        internal Func<AuditEvent, string> _blobNameBuilder = null;
-        internal string _connectionString = null;
-        internal string _containerName = "event";
+        internal AzureBlobProviderEventConfigurator _eventConfig;
 
-        public IAzureBlobProviderConfigurator ConnectionString(string connectionString)
+        public IAzureBlobProviderEventConfigurator ConnectionString(string connectionString)
         {
-            _connectionString = connectionString;
-            return this;
+            _eventConfig = new AzureBlobProviderEventConfigurator
+            {
+                _useActiveDirectory = false,
+                _connectionStringBuilder = ev => connectionString
+            };
+            return _eventConfig;
         }
 
-        public IAzureBlobProviderConfigurator ContainerName(string containerName)
+        public IAzureBlobProviderEventConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder)
         {
-            _containerName = containerName;
-            return this;
+            _eventConfig = new AzureBlobProviderEventConfigurator
+            {
+                _useActiveDirectory = false,
+                _connectionStringBuilder = connectionStringBuilder
+            };
+            return _eventConfig;
         }
 
-        public IAzureBlobProviderConfigurator BlobNameBuilder(Func<AuditEvent, string> blobNamebuilder)
+        public IAzureBlobProviderEventConfigurator AzureActiveDirectory(Action<IAzureActiveDirectoryConfigurator> configuration)
         {
-            _blobNameBuilder = blobNamebuilder;
-            return this;
+            var adConfig = new AzureActiveDirectoryConfigurator();
+            configuration.Invoke(adConfig);
+            _eventConfig = new AzureBlobProviderEventConfigurator
+            {
+                _useActiveDirectory = true,
+                _activeDirectoryConfiguration = adConfig
+            };
+            return _eventConfig;
         }
     }
 }

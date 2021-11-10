@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0;net461;net5.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+    <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+    <AssemblyName>Audit.JsonAdapter.UnitTest</AssemblyName>
+    <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Audit.JsonAdapter.UnitTest</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+    <PackageReference Include="Moq" Version="4.7.99" />
+  </ItemGroup>
+    
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <ProjectReference Include="..\..\src\Audit.NET.JsonNewtonsoftAdapter\Audit.NET.JsonNewtonsoftAdapter.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+    <ProjectReference Include="..\..\src\Audit.NET.JsonSystemAdapter\Audit.NET.JsonSystemAdapter.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+    <DefineConstants>$(DefineConstants);NK_JSON</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <DefineConstants>$(DefineConstants);TEXT_JSON</DefineConstants>
+  </PropertyGroup>
+
+
+</Project>

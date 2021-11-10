@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 
 namespace Audit.Core
 {
@@ -17,13 +16,11 @@ namespace Audit.Core
         /// <summary>
         /// The value of the object tracked when the auditscope is created
         /// </summary>
-        [JsonProperty("Old")]
-        public object SerializedOld { get; set; }
+        public object Old { get; set; }
 
         /// <summary>
         /// The value of the object tracked after the auditscope is saved
         /// </summary>
-        [JsonProperty("New")]
-        public object SerializedNew { get; set; }
+        public object New { get; set; }
     }
 }
