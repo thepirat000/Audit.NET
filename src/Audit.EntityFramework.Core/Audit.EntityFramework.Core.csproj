@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>19.0.0-rc.net60.2</VersionPrefix>
+    <VersionPrefix>19.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472;net5.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
@@ -103,8 +103,8 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0-rc.1.21452.10" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0-rc.1.21452.10" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <DefineConstants>$(DefineConstants);IS_NK_JSON</DefineConstants>

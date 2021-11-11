@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity.Core</AssemblyTitle>
-    <VersionPrefix>19.0.0-rc.net60.2</VersionPrefix>
+    <VersionPrefix>19.0.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.1;net461;net5.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0-rc.1.21452.15" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">

@@ -86,10 +86,10 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0-rc.1.21452.10" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0-rc.1.21452.10" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0-rc.1.21452.10" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0-rc.1.21452.10" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
   </ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp1.0' ">
