@@ -45,11 +45,9 @@ The following table shows the entity framework package version used for each .NE
 | **.NET Standard 2.0** | Microsoft.EntityFrameworkCore 2.2.4 | Microsoft.EntityFrameworkCore 3.1.0 | Microsoft.EntityFrameworkCore 3.1.0 |
 | **.NET Standard 2.1** | EntityFramework 6.3.0 | Microsoft.EntityFrameworkCore 5.0.1 | Microsoft.EntityFrameworkCore 3.1.0 |
 | **.NET 5.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 5.0.8 | Microsoft.EntityFrameworkCore 3.1.0 |
-| **.NET 6.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 6.0.0 <sup>1</sup> | N/C |
+| **.NET 6.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 6.0.0 | N/C |
 
 > N/C: Not Compatible
-> 
-> <sup>1</sup>: Release candidate version rc.1.21452.10 
 
 Examples:
 
