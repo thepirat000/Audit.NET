@@ -1,4 +1,4 @@
-﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0
+﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Audit.Elasticsearch.Providers;
 using Nest;
 using NUnit.Framework;

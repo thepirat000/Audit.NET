@@ -25,7 +25,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             new BlogsContext().Database.EnsureCreated();
         }
 
-#if EF_CORE_5
+#if EF_CORE_5 || EF_CORE_6
 
         [Test]
         public void Test_EF_Core_TablePerTypeConfig()
@@ -185,7 +185,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 #endif
 
-#if EF_CORE_3 || EF_CORE_5
+#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
         [Test]
         public void Test_EF_Core_OwnedSingleMultiple()
         {

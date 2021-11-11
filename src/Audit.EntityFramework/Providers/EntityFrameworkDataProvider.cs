@@ -214,13 +214,16 @@ namespace Audit.EntityFramework.Providers
                 entryType = entryType.GetTypeInfo().BaseType;
             }
             Type type;
-#if (EF_CORE_3 || EF_CORE_5)
+#if (EF_CORE_6)
+            IReadOnlyEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
+            type = definingType?.ClrType;
+#elif (EF_CORE_3 || EF_CORE_5)
             IEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
             type = definingType?.ClrType;
 #elif EF_CORE_2
             IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.ClrType);
             type = definingType?.ClrType;
-#elif EF_CORE 
+#elif EF_CORE
             IEntityType definingType = localDbContext.Model.FindEntityType(entryType);
             type = definingType?.ClrType;
 #else
