@@ -34,5 +34,15 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="config">Mapping explicit configuration.</param>
         IEntityFrameworkProviderConfiguratorExtra AuditTypeExplicitMapper(Action<IAuditEntityMapping> config);
+        /// <summary>
+        /// Specifies a function that creates the audit entity instances, instead of using a type mapper
+        /// </summary>
+        /// <param name="auditEntityCreator">Function that creates the audited entity from the Event Entry and the Audit DbContext.</param>
+        IEntityFrameworkProviderConfiguratorAction AuditEntityCreator(Func<DbContext, EventEntry, object> auditEntityCreator);
+        /// <summary>
+        /// Specifies a function that creates the audit entity instances, instead of using a type mapper
+        /// </summary>
+        /// <param name="auditEntityCreator">Function that creates the audited entity from the Audit DbContext.</param>
+        IEntityFrameworkProviderConfiguratorAction AuditEntityCreator(Func<DbContext, object> auditEntityCreator);
     }
 }

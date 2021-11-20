@@ -18,13 +18,14 @@ namespace Audit.Core
         /// Store the audits logs in the same EntityFramework model as the audited entities.
         /// </summary>
         internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Action<AuditEvent, EventEntry, object> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
-            Func<EventEntry, Type> explicitMapper)
+            Func<EventEntry, Type> explicitMapper, Func<DbContext, EventEntry, object> auditEntityCreator)
         {
             var efdp = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
                 IgnoreMatchedPropertiesFunc = ignoreMatchedPropertiesFunc,
-                ExplicitMapper = explicitMapper
+                ExplicitMapper = explicitMapper,
+                AuditEntityCreator = auditEntityCreator
             };
             if (auditEntityAction != null)
             {
@@ -39,7 +40,7 @@ namespace Audit.Core
         }
 
         internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Func<AuditEvent, EventEntry, object, Task<bool>> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
-            Func<AuditEventEntityFramework, DbContext> dbContextBuilder, Func<EventEntry, Type> explicitMapper)
+            Func<AuditEventEntityFramework, DbContext> dbContextBuilder, Func<EventEntry, Type> explicitMapper, Func<DbContext, EventEntry, object> auditEntityCreator)
         {
             var efdp = new EntityFrameworkDataProvider()
             {
@@ -47,7 +48,8 @@ namespace Audit.Core
                 IgnoreMatchedPropertiesFunc = ignoreMatchedPropertiesFunc,
                 AuditEntityAction = auditEntityAction,
                 DbContextBuilder = dbContextBuilder,
-                ExplicitMapper = explicitMapper
+                ExplicitMapper = explicitMapper,
+                AuditEntityCreator = auditEntityCreator
             };
             Configuration.DataProvider = efdp;
             return new CreationPolicyConfigurator();
@@ -62,7 +64,7 @@ namespace Audit.Core
         {
             var efConfig = new EntityFrameworkProviderConfigurator();
             config.Invoke(efConfig);
-            return UseEntityFramework(configurator, efConfig._auditTypeMapper, efConfig._auditEntityAction, efConfig._ignoreMatchedPropertiesFunc, efConfig._dbContextBuilder, efConfig._explicitMapper);
+            return UseEntityFramework(configurator, efConfig._auditTypeMapper, efConfig._auditEntityAction, efConfig._ignoreMatchedPropertiesFunc, efConfig._dbContextBuilder, efConfig._explicitMapper, efConfig._auditEntityCreator);
         }
     }
 }

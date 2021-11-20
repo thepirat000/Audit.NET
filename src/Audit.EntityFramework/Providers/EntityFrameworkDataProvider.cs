@@ -31,6 +31,7 @@ namespace Audit.EntityFramework.Providers
         private Func<AuditEvent, EventEntry, object, Task<bool>> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
         private Func<EventEntry, Type> _explicitMapper;
+        private Func<DbContext, EventEntry, object> _auditEntityCreator;
 
         public EntityFrameworkDataProvider()
         {
@@ -47,7 +48,17 @@ namespace Audit.EntityFramework.Providers
                 _dbContextBuilder = efConfig._dbContextBuilder;
                 _ignoreMatchedPropertiesFunc = efConfig._ignoreMatchedPropertiesFunc;
                 _explicitMapper = efConfig._explicitMapper;
+                _auditEntityCreator = efConfig._auditEntityCreator;
             }
+        }
+
+        /// <summary>
+        /// A function that creates a new audit entity instance from the Event Entry and the Audit DbContext. 
+        /// </summary>
+        public Func<DbContext, EventEntry, object> AuditEntityCreator
+        {
+            get { return _auditEntityCreator; }
+            set { _auditEntityCreator = value; }
         }
 
         public Func<Type, EventEntry, Type> AuditTypeMapper
@@ -98,24 +109,29 @@ namespace Audit.EntityFramework.Providers
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
             foreach(var entry in efEvent.EntityFrameworkEvent.Entries)
             {
-                Type mappedType = _explicitMapper?.Invoke(entry);
-                object auditEntity = null;
-                if (mappedType != null)
+                // Explicit creator (Entry -> object)
+                object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
+                Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
+                if (auditEntity == null)
                 {
-                    // Explicit mapping (Table -> Type)
-                    auditEntity = CreateAuditEntityExplicit(mappedType, entry);
-                }
-                else
-                {
-                    // Implicit mapping (Type -> Type)
-                    Type type = GetEntityType(entry, localDbContext);
-                    if (type != null)
+                    mappedType = _explicitMapper?.Invoke(entry);
+                    if (mappedType != null)
                     {
-                        entry.EntityType = type;
-                        mappedType = _auditTypeMapper?.Invoke(type, entry);
-                        if (mappedType != null)
+                        // Explicit mapping (Table -> Type)
+                        auditEntity = CreateAuditEntityFromTable(mappedType, entry);
+                    }
+                    else
+                    {
+                        // Implicit mapping (Type -> Type)
+                        Type type = GetEntityType(entry, localDbContext);
+                        if (type != null)
                         {
-                            auditEntity = CreateAuditEntity(type, mappedType, entry);
+                            entry.EntityType = type;
+                            mappedType = _auditTypeMapper?.Invoke(type, entry);
+                            if (mappedType != null)
+                            {
+                                auditEntity = CreateAuditEntityFromType(type, mappedType, entry);
+                            }
                         }
                     }
                 }
@@ -159,26 +175,31 @@ namespace Audit.EntityFramework.Providers
             {
                 Type entityType = GetEntityType(entry, localDbContext);
                 entry.EntityType = entityType;
-                Type mappedType = _explicitMapper?.Invoke(entry);
-                object auditEntity = null;
-                if (mappedType != null)
+                // Explicit creator (Entry -> object)
+                object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
+                Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
+                if (auditEntity == null)
                 {
-                    // Explicit mapping (Table -> Type)
-                    auditEntity = CreateAuditEntityExplicit(mappedType, entry);
-                }
-                else
-                {
-                    // Implicit mapping (Type -> Type)
-                    if (entityType != null)
+                    mappedType = _explicitMapper?.Invoke(entry);
+                    if (mappedType != null)
                     {
-                        entry.EntityType = entityType;
-                        mappedType = _auditTypeMapper?.Invoke(entityType, entry);
-                        if (mappedType != null)
+                        // Explicit mapping (Entry -> Type)
+                        auditEntity = CreateAuditEntityFromTable(mappedType, entry);
+                    }
+                    else
+                    {
+                        // Implicit mapping (Type -> Type)
+                        if (entityType != null)
                         {
-                            auditEntity = CreateAuditEntity(entityType, mappedType, entry);
+                            entry.EntityType = entityType;
+                            mappedType = _auditTypeMapper?.Invoke(entityType, entry);
+                            if (mappedType != null)
+                            {
+                                auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
+                            }
                         }
                     }
-                }
+                }               
                 if (auditEntity != null)
                 {
                     if (_auditEntityAction == null || await _auditEntityAction.Invoke(efEvent, entry, auditEntity))
@@ -208,11 +229,7 @@ namespace Audit.EntityFramework.Providers
 
         private Type GetEntityType(EventEntry entry, DbContext localDbContext)
         {
-            var entryType = entry.Entry.Entity.GetType();
-            if (entryType.FullName.StartsWith("Castle.Proxies."))
-            {
-                entryType = entryType.GetTypeInfo().BaseType;
-            }
+            var entryType = GetTypeNoProxy(entry.Entry.Entity.GetType());
             Type type;
 #if (EF_CORE_6)
             IReadOnlyEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
@@ -232,7 +249,7 @@ namespace Audit.EntityFramework.Providers
             return type;
         }
 
-        private object CreateAuditEntity(Type definingType, Type auditType, EventEntry entry)
+        private object CreateAuditEntityFromType(Type definingType, Type auditType, EventEntry entry)
         {
             var entity = entry.Entry.Entity;
             var auditEntity = Activator.CreateInstance(auditType);
@@ -248,10 +265,29 @@ namespace Audit.EntityFramework.Providers
             }
             return auditEntity;
         }
-
-        private object CreateAuditEntityExplicit(Type auditType, EventEntry entry)
+        
+        private object CreateAuditEntityFromTable(Type auditType, EventEntry entry)
         {
             var auditEntity = Activator.CreateInstance(auditType);
+            if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
+            {
+                var auditFields = GetPropertiesToSet(auditType);
+                foreach (var field in entry.ColumnValues.Where(cv => auditFields.ContainsKey(cv.Key)))
+                {
+                    auditFields[field.Key].SetValue(auditEntity, field.Value);
+                }
+            }
+            return auditEntity;
+        }
+
+        private object CreateAuditEntityFromFactory(EventEntry entry, DbContext auditDbContext)
+        {
+            var auditEntity = _auditEntityCreator?.Invoke(auditDbContext, entry);
+            if (auditEntity == null)
+            {
+                return null;
+            }
+            var auditType = GetTypeNoProxy(auditEntity.GetType());
             if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
                 var auditFields = GetPropertiesToSet(auditType);
@@ -286,6 +322,20 @@ namespace Audit.EntityFramework.Providers
             }
             return result;
         }
+
+        private Type GetTypeNoProxy(Type type)
+        {
+            if (type == null)
+            {
+                return null;
+            }
+            if (type.FullName.StartsWith("Castle.Proxies."))
+            {
+                return type.GetTypeInfo().BaseType;
+            }
+            return type;
+        }
+
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {

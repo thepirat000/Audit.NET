@@ -19,6 +19,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         internal Func<AuditEvent, EventEntry, object, Task<bool>> _auditEntityAction;
         internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
         internal Func<EventEntry, Type> _explicitMapper;
+        internal Func<DbContext, EventEntry, object> _auditEntityCreator;
 
         public IEntityFrameworkProviderConfigurator UseDbContext(Func<AuditEventEntityFramework, DbContext> dbContextBuilder)
         {
@@ -62,6 +63,18 @@ namespace Audit.EntityFramework.ConfigurationApi
             _auditTypeMapper = mapping.GetMapper();
             _auditEntityAction = mapping.GetAction();
             _explicitMapper = mapping.GetExplicitMapper();
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfiguratorAction AuditEntityCreator(Func<DbContext, EventEntry, object> auditEntityCreator)
+        {
+            _auditEntityCreator = auditEntityCreator;
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfiguratorAction AuditEntityCreator(Func<DbContext, object> auditEntityCreator)
+        {
+            _auditEntityCreator = (ctx, _) => auditEntityCreator.Invoke(ctx);
             return this;
         }
 

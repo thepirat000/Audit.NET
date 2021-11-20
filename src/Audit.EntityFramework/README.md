@@ -441,7 +441,7 @@ using(var context = new MyEntitites())
 
 Another way to customize the output is by using global custom actions, please see [custom actions](https://github.com/thepirat000/Audit.NET#custom-actions) for more information.
 
-## Entity Framework Data Provider
+# Entity Framework Data Provider
 
 If you plan to store the audit logs via EntityFramework, you can use the provided `EntityFrameworkDataProvider`. 
 Use this to store the logs on audit tables handled by EntityFramework.
@@ -458,7 +458,7 @@ and the structure of the `Audit_*` tables mimic the audited table plus some fiel
 > This is not mandatory and the recommendation is to provide a different _DbContext_ instance per audit event by using the `UseDbcontext()` 
 > fluent API.
 
-### EF Provider configuration
+## EF Provider configuration
 
 To set the EntityFramework data provider globally, set the static `Audit.Core.Configuration.DataProvider` property to a new `EntityFrameworkDataProvider`:
 
@@ -497,21 +497,22 @@ Audit.Core.Configuration.Setup()
     );
 ```
 
-### EF Provider Options
+## EF Provider Options
 
 Mandatory:
 - **UseDbContext**: A function that returns the DbContext to use for storing the audit events, by default it will use the same context being audited. 
 - **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
-- **ExplicitMapper**: A function that excplicitly maps an entry to its audited type, useful to configure mapping when no entity type is associated with a table, or to setup complex mapping rules.
+- **ExplicitMapper**: An alternative mapper, as a function that excplicitly maps an entry to its audited type, useful to configure mapping when no entity type is associated with a table, or to setup complex mapping rules.
+- **AuditEntityCreator**: An alternative to the mapper, as a function that creates the audit entity instance from the Event Entry and the Audit DbContext. Useful to control the Audit Entity object creation for example when using change-tracking proxies. 
 - **AuditEntityAction**: An action to perform on the audit entity before saving it, for example to update specific audit properties like user name or the audit date. It can also be used to filter out audit entities. Make this function return a boolean value to indicate whether to include the entity on the output log. 
 - **IgnoreMatchedProperties**: Set to true to avoid the property values copy from the entity to the audited entity (default is false).
 - **IgnoreMatchedPropertiesFunc**: Allows to selectively ignore property matching on certain types. It's a function that receives the audit entity type and returns a boolean to indicate if the property matching must be ignored for that type.
 
-### EF Provider configuration examples
+## EF Provider configuration examples
 
 The `UseEntityFramework` method provides several ways to indicate the Type Mapper and the Audit Action.
 
-#### Map by type name:
+### Map by type name:
 
 You can map the audited entity to its audit log entity by the entity name using the `AuditTypeNameMapper` method, for example to prepend `Audit_` to the entity name. 
 This assumes both entity types are defined on the same assembly and namespace:
@@ -540,7 +541,7 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
-#### Common action:
+### Common action:
 
 If your audit log entities implements a common interface or base class, you can use the generic version of the `AuditEntityAction` method 
 to configure the action to be performed to each audit trail entity before saving. Also this action can be asynchronous, for example:
@@ -557,7 +558,7 @@ Audit.Core.Configuration.Setup()
         }));
 ```
 
-#### Use the explicit mapper to provide granular configuration per audit type:
+### Use the explicit mapper to provide granular configuration per audit type:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -576,7 +577,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-#### Ignore certain entities on the audit log:
+### Ignore certain entities on the audit log:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -593,7 +594,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-#### Custom DbContext instance:
+### Custom DbContext instance:
 
 To set a custom DbContext instance for storing the audit events, for example when your Audit_* entities 
 are defined in a different database and context (i.e. `AuditDatabaseDbContext`):
@@ -610,7 +611,7 @@ Audit.Core.Configuration.Setup()
             })));
 ```
 
-#### Map multiple entity types to the same audit type with independent actions:
+### Map multiple entity types to the same audit type with independent actions:
 
 When you want to store the audit logs of different entities in the same audit table, for example:
 
@@ -663,7 +664,7 @@ Audit.Core.Configuration.Setup()
 
 > Note the use of `.IgnoreMatchedProperties(true)` to avoid the library trying to set properties automatically by matching names between the audited entities and the type `AuditLog`.
 
-#### Map an entity type to multiple audit types, depending on the modified entry:
+### Map an entity type to multiple audit types, depending on the modified entry:
 
 When you want to save audit logs to different tables for the same entity, for example, 
 if you have different audit tables per operation:
@@ -694,7 +695,7 @@ Audit.Core.Configuration.Setup()
 > - Any other operation on `Blog` table -> Audit to `Audit_Blog` table
 
 
-#### Map Many to Many relations without join entity:
+### Map Many to Many relations without join entity:
 
 When you want to audit many to many relations which are not mapped to an entity type, i.e. implicitly created join tables.
 You have to use the `AuditTypeExplicitMapper` and set up the mapping of the relation table by using `MapTable` or `MapExplicit` methods.
@@ -710,6 +711,7 @@ you want to audit the `PostTag` relation table to an `Audit_PostTag` table.
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(_ => _
+        .UseDbContext<YourAuditDbContext>()
         .AuditTypeExplicitMapper(map => map
             .Map<Post, Audit_Post>()
             .Map<Tag, Audit_Tag>()
@@ -730,6 +732,47 @@ Audit.Core.Configuration.Setup()
 > You can optionally pass an action to execute on the audit entity as the second parameter. 
 > If property matching is enabled for the target type, the framework will map the Column values to the entity Property values.
 
+### Map via Factory: 
+
+When you need to control the Audit Entity creation, for example when using [change-tracking proxies](https://docs.microsoft.com/en-us/ef/core/change-tracking/change-detection#change-tracking-proxies),
+you can use the `AuditEntityCreator` to specify a factory that creates the Audit Entity for a given entry.
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(ef => ef
+        .UseDbContext<YourAuditDbContext>()
+        .AuditEntityCreator(auditDbContext => auditDbContext.CreateProxy<AuditLog>())
+        .AuditEntityAction<AuditLog>((ev, ent, auditEntity) =>
+        {
+            auditEntity.DateTime = DateTime.Now;
+            auditEntity.Action = ent.Action;
+            auditEntity.Table = ent.Table;
+        })
+        .IgnoreMatchedProperties());
+```
+
+Another example of an andit Entity factory, but mapping to different entity types depending on the audited table:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseEntityFramework(ef => ef
+        .UseDbContext<YourAuditDbContext>()
+        .AuditEntityCreator((auditDbContext, entry) => entry.Table switch
+        {
+            "Customer" => auditDbContext.CreateProxy<AuditCustomer>(),
+            "User" => auditDbContext.CreateProxy<AuditUser>(),
+            _ => auditDbContext.CreateProxy<AuditLog>()
+        })
+        .AuditEntityAction<IAuditLog>((ev, ent, auditEntity) =>
+        {
+            auditEntity.DateTime = DateTime.Now;
+            auditEntity.Action = ent.Action;
+            auditEntity.Table = ent.Table;
+        })
+        .IgnoreMatchedProperties());
+
+);
+```
 
 # Contribute
 

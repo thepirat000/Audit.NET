@@ -130,10 +130,10 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
-private bool IsCommonEntity(Type type)
-{
-    return type == typeof(OrderMemoryContext.Order) || type == typeof(OrderMemoryContext.Orderline);
-}
+        private bool IsCommonEntity(Type type)
+        {
+            return type == typeof(OrderMemoryContext.Order) || type == typeof(OrderMemoryContext.Orderline);
+        }
 
         [Test]
         public async Task Test_MapExplicitAndMultipleActions()
@@ -263,6 +263,65 @@ private bool IsCommonEntity(Type type)
 
 
 #if EF_CORE_5 || EF_CORE_6
+
+        [Test]
+        public void Test_ChangeTrackingProxyContext()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            var guid = Guid.NewGuid().ToString();
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(ef => ef
+                    .UseDbContext<ChangeTrackingProxyContext>()
+                    .AuditEntityCreator((ctx, ent) => ctx.CreateProxy<ChangeTrackingProxyContext.AuditLog>())
+                    .AuditEntityAction<ChangeTrackingProxyContext.AuditLog>((ev, ent, auditEntity) => 
+                    { 
+                        auditEntity.DateTime = DateTime.Now;
+                        auditEntity.Action = ent.Action;
+                        auditEntity.Table = ent.Table;
+                    })
+                    .IgnoreMatchedProperties(t => t != typeof(ChangeTrackingProxyContext.AuditLog)));
+
+            using var context = new ChangeTrackingProxyContext();
+
+            context.Customers.Add(context.CreateProxy<ChangeTrackingProxyContext.Customer>(test => test.CustomerName = guid));
+            context.SaveChanges();
+
+            var log = context.AuditLogs.FirstOrDefault(a => a.CustomerName == guid);
+            Assert.IsNotNull(log);
+            Assert.AreEqual(guid, log.CustomerName);
+            Assert.AreEqual("Insert", log.Action);
+            Assert.AreEqual("Customer", log.Table);
+        }
+
+        [Test]
+        public async Task Test_ChangeTrackingProxyContext_Async()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            var guid = Guid.NewGuid().ToString();
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(ef => ef
+                    .UseDbContext<ChangeTrackingProxyContext>()
+                    .AuditEntityCreator(ctx => ctx.CreateProxy<ChangeTrackingProxyContext.AuditLog>())
+                    .AuditEntityAction<ChangeTrackingProxyContext.AuditLog>(async (ev, ent, auditEntity) =>
+                    {
+                        auditEntity.DateTime = DateTime.Now;
+                        auditEntity.Action = ent.Action;
+                        auditEntity.Table = ent.Table;
+                        await Task.Delay(0);
+                    })
+                    .IgnoreMatchedProperties(t => t != typeof(ChangeTrackingProxyContext.AuditLog)));
+
+            using var context = new ChangeTrackingProxyContext();
+
+            await context.Customers.AddAsync(context.CreateProxy<ChangeTrackingProxyContext.Customer>(test => test.CustomerName = guid));
+            await context.SaveChangesAsync();
+
+            var log = await context.AuditLogs.FirstOrDefaultAsync(a => a.CustomerName == guid);
+            Assert.IsNotNull(log);
+            Assert.AreEqual(guid, log.CustomerName);
+            Assert.AreEqual("Insert", log.Action);
+            Assert.AreEqual("Customer", log.Table);
+        }
 
         [Test]
         public void Test_OwnedEntity_EFCore5()
