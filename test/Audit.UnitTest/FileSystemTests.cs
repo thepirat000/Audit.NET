@@ -4,14 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Audit.UnitTest
 {
     public class FileSystemTests
     {
-        private const string folder = @"D:\temp";
+        private const string folder = @"C:\temp";
 
         [SetUp]
         public void Setup()

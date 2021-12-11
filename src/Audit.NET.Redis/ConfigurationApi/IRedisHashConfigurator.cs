@@ -28,5 +28,15 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="fieldBuilder">A function that returns the hash field to use</param>
         IRedisHashConfigurator HashField(Func<AuditEvent, string> fieldBuilder);
+        /// <summary>
+        /// Specifies the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndex">Database ID to use</param>
+        IRedisHashConfigurator Database(int dbIndex);
+        /// <summary>
+        /// Specifies a function that returns the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use</param>
+        IRedisHashConfigurator Database(Func<AuditEvent, int> dbIndexBuilder);
     }
 }

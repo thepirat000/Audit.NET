@@ -18,9 +18,10 @@ namespace Audit.Redis.Providers
         /// <param name="timeToLive">The Time To Live for the Redis Key. NULL for no TTL.</param>
         /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
         /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
         public RedisProviderString(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive, Func<AuditEvent, byte[]> serializer,
-            Func<byte[], AuditEvent> deserializer)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer)
+            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
         { }
 
         internal override object Insert(AuditEvent auditEvent)
@@ -59,28 +60,28 @@ namespace Audit.Redis.Providers
 
         private void StringSet(string key, AuditEvent auditEvent)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(auditEvent);
             var value = GetValue(auditEvent);
             db.StringSet(key, value, TimeToLive);
         }
 
         private async Task StringSetAsync(string key, AuditEvent auditEvent)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(auditEvent);
             var value = GetValue(auditEvent);
             await db.StringSetAsync(key, value, TimeToLive);
         }
 
         private T StringGet<T>(string key) where T : AuditEvent
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             var value = db.StringGet(key);
             return FromValue<T>(value);
         }
 
         private async Task<T> StringGetAsync<T>(string key) where T : AuditEvent
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             var value = await db.StringGetAsync(key);
             return FromValue<T>(value);
         }

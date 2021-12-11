@@ -23,5 +23,15 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="timeToLive">The Time to Live</param>
         IRedisStringConfigurator TimeToLive(TimeSpan? timeToLive);
+        /// <summary>
+        /// Specifies the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndex">Database ID to use</param>
+        IRedisStringConfigurator Database(int dbIndex);
+        /// <summary>
+        /// Specifies a function that returns the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use</param>
+        IRedisStringConfigurator Database(Func<AuditEvent, int> dbIndexBuilder);
     }
 }

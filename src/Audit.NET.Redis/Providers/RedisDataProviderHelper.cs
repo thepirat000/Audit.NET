@@ -1,7 +1,6 @@
 using System;
 using Audit.Core;
 using Audit.Redis.Configuration;
-using Audit.Redis.Providers;
 
 namespace Audit.Redis.Providers
 {
@@ -43,7 +42,7 @@ namespace Audit.Redis.Providers
             var strConfig = new RedisStringConfigurator();
             config.Invoke(strConfig);
             return new RedisDataProvider(new RedisProviderString(
-                _connectionString, strConfig._keyBuilder, strConfig._timeToLive, _serializer, _deserializer));
+                _connectionString, strConfig._keyBuilder, strConfig._timeToLive, _serializer, _deserializer, strConfig._dbIndexBuilder));
         }
 
         /// <summary>
@@ -56,7 +55,7 @@ namespace Audit.Redis.Providers
             config.Invoke(hashConfig);
             return new RedisDataProvider(new RedisProviderHash(
                 _connectionString, hashConfig._keyBuilder, hashConfig._timeToLive, _serializer, _deserializer,
-                hashConfig._fieldBuilder));
+                hashConfig._fieldBuilder, hashConfig._dbIndexBuilder));
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace Audit.Redis.Providers
             config.Invoke(listConfig);
             return new RedisDataProvider(new RedisProviderList(
                 _connectionString, listConfig._keyBuilder, listConfig._timeToLive, _serializer, _deserializer,
-                listConfig._maxLength));
+                listConfig._maxLength, listConfig._dbIndexBuilder));
         }
 
         /// <summary>
@@ -83,7 +82,7 @@ namespace Audit.Redis.Providers
             return new RedisDataProvider(new RedisProviderSortedSet(
                 _connectionString, ssConfig._keyBuilder, ssConfig._timeToLive, _serializer, _deserializer,
                 ssConfig._scoreBuilder, ssConfig._maxScoreBuilder, ssConfig._maxScoreExclusive, ssConfig._minScoreBuilder, ssConfig._minScoreExclusive,
-                ssConfig._maxRankBuilder));
+                ssConfig._maxRankBuilder, ssConfig._dbIndexBuilder));
         }
 
         /// <summary>

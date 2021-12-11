@@ -28,5 +28,15 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="maxLength">the maximum quantity of events that the list will store</param>
         IRedisListConfigurator MaxLength(long maxLength);
+        /// <summary>
+        /// Specifies the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndex">Database ID to use</param>
+        IRedisListConfigurator Database(int dbIndex);
+        /// <summary>
+        /// Specifies a function that returns the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use</param>
+        IRedisListConfigurator Database(Func<AuditEvent, int> dbIndexBuilder);
     }
 }

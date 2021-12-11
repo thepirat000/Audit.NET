@@ -70,5 +70,15 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="maxRank">The maximum rank allowed. Greater than zero to maintain the top M scored elements. Less than zero to maintain the bottom -M scored elements.</param>
         IRedisSortedSetConfigurator MaxRank(long maxRank);
+        /// <summary>
+        /// Specifies the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndex">Database ID to use</param>
+        IRedisSortedSetConfigurator Database(int dbIndex);
+        /// <summary>
+        /// Specifies a function that returns the redis database ID to use.
+        /// </summary>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use</param>
+        IRedisSortedSetConfigurator Database(Func<AuditEvent, int> dbIndexBuilder);
     }
 }

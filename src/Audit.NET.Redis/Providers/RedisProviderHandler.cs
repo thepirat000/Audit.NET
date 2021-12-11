@@ -19,9 +19,11 @@ namespace Audit.Redis.Providers
         protected TimeSpan? TimeToLive { get; set; }
         protected Func<AuditEvent, byte[]> Serializer { get; set; }
         protected Func<byte[], object> Deserializer { get; set; }
+        protected Func<AuditEvent, int> DbIndexBuilder { get; set; }
+
 
         protected RedisProviderHandler(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive, Func<AuditEvent, byte[]> serializer,
-            Func<byte[], AuditEvent> deserializer)
+            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder)
         {
             Context = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(connectionString), LazyThreadSafetyMode.ExecutionAndPublication);
             ConnectionString = connectionString;
@@ -29,6 +31,7 @@ namespace Audit.Redis.Providers
             TimeToLive = timeToLive;
             Serializer = serializer ?? (ev => Encoding.UTF8.GetBytes(ev.ToJson()));
             Deserializer = deserializer;
+            DbIndexBuilder = dbIndexBuilder;
         }
 
         internal abstract object Insert(AuditEvent auditEvent);
@@ -44,9 +47,9 @@ namespace Audit.Redis.Providers
             throw new NotImplementedException($"Events retrieval is not supported by {GetType().Name}");
         }
 
-        internal IDatabase GetDatabase()
+        internal IDatabase GetDatabase(AuditEvent auditEvent)
         {
-            return Context.Value.GetDatabase();
+            return Context.Value.GetDatabase(DbIndexBuilder?.Invoke(auditEvent) ?? -1);
         }
 
         internal string GetKey(AuditEvent auditEvent)

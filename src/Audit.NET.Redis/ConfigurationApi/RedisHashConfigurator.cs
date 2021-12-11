@@ -7,6 +7,7 @@ namespace Audit.Redis.Configuration
     {
         internal Func<AuditEvent, string> _keyBuilder;
         internal TimeSpan? _timeToLive;
+        internal Func<AuditEvent, int> _dbIndexBuilder;
         internal Func<AuditEvent, string> _fieldBuilder;
 
         public IRedisHashConfigurator Key(Func<AuditEvent, string> keyBuilder)
@@ -24,6 +25,18 @@ namespace Audit.Redis.Configuration
         public IRedisHashConfigurator TimeToLive(TimeSpan? timeToLive)
         {
             _timeToLive = timeToLive;
+            return this;
+        }
+
+        public IRedisHashConfigurator Database(int dbIndex)
+        {
+            _dbIndexBuilder = _ => dbIndex;
+            return this;
+        }
+
+        public IRedisHashConfigurator Database(Func<AuditEvent, int> dbIndexBuilder)
+        {
+            _dbIndexBuilder = dbIndexBuilder;
             return this;
         }
 

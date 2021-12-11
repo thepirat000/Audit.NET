@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for client-side WCF service calls.</Description>
     <Copyright>Copyright 2021</Copyright>
     <AssemblyTitle>Audit.Wcf.Client</AssemblyTitle>
-    <VersionPrefix>19.0.1</VersionPrefix>
+    <VersionPrefix>19.0.2</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFramework>net45</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

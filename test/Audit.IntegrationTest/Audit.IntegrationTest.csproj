@@ -29,7 +29,6 @@
     <ProjectReference Include="..\..\src\Audit.DynamicProxy\Audit.DynamicProxy.csproj" />
     <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
     <ProjectReference Include="..\..\src\Audit.WebApi\Audit.WebApi.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.Redis\Audit.NET.Redis.csproj" />
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
@@ -43,7 +42,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Moq" Version="4.8.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
-    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
   </ItemGroup>  
   

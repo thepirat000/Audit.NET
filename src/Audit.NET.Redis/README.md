@@ -67,6 +67,7 @@ Mandatory settings
 
 Optional settings
 - `TimeToLive` specifies the Time To Live for the Redis Key. Default is no TTL.
+- `Database` specifies the database ID to use. Default is database 0.
 
 ### Redis Hash
 
@@ -89,6 +90,7 @@ Mandatory settings:
 
 Optional settings
 - `TimeToLive` specifies the Time To Live for the Redis Hash. Default is no TTL.
+- `Database` specifies the database ID to use. Default is database 0.
 
 ### Redis List
 
@@ -111,6 +113,7 @@ Mandatory settings:
 Optional settings:
 - `MaxLength` to indicate the maximum quantity of events that the list will store. Older elements will be deleted. Default is no-limit.
 - `TimeToLive` specifies the Time To Live for the Redis List. Default is no TTL.
+- `Database` specifies the database ID to use. Default is database 0.
 
 ### Redis Sorted Set
 
@@ -138,6 +141,7 @@ Optional settings:
 - `MaxRank` specifies a function that returns the maximum rank allowed for the sorted set. Max>0: Maintain only the top N scored elements.
 Max<0: Maintain only the bottom N scored elements.
 - `TimeToLive` specifies the Time To Live for the Redis Sorted Set. Default is no TTL.
+- `Database` specifies the database ID to use. Default is database 0.
 
 ### Redis PubSub
 

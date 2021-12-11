@@ -20,7 +20,7 @@ namespace Audit.Redis.Providers
         /// <param name="channelBuilder">A function that returns the Redis PubSub Channel to use.</param>
         public RedisProviderPubSub(string connectionString, Func<AuditEvent, byte[]> serializer,
             Func<AuditEvent, string> channelBuilder)
-            : base(connectionString, null, null, serializer, null)
+            : base(connectionString, null, null, serializer, null, null)
         {
             _channelBuilder = channelBuilder;
         }

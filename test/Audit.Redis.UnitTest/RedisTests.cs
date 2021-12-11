@@ -14,7 +14,10 @@ namespace Audit.IntegrationTest
         private const string RedisCnnString = "localhost:6379,allowAdmin=true";
 
         [Test, Order(10)]
-        public void Redis_String_Basic()
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(2)]
+        public void Redis_String_Basic(int dbIndex)
         {
             var key = Guid.NewGuid().ToString();
             var ids = new List<object>();
@@ -22,7 +25,8 @@ namespace Audit.IntegrationTest
                 .UseRedis(redis => redis
                     .ConnectionString(RedisCnnString)
                     .AsString(s => s
-                        .Key(ev => key)))
+                        .Key(ev => key)
+                        .Database(_ => dbIndex)))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                 .WithAction(_ => _.OnEventSaved(scope =>
                 {
@@ -37,7 +41,7 @@ namespace Audit.IntegrationTest
             }
             
             var mx = GetMultiplexer();
-            var db = mx.GetDatabase();
+            var db = mx.GetDatabase(dbIndex);
             var value = db.StringGet(key);
             var evFromApi = (Audit.Core.Configuration.DataProvider as RedisDataProvider).GetEvent(key);
             
@@ -168,7 +172,10 @@ namespace Audit.IntegrationTest
         }
 
         [Test, Order(10)]
-        public void Redis_List_Basic()
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(2)]
+        public void Redis_List_Basic(int dbIndex)
         {
             var ids = new List<object>();
             var key = Guid.NewGuid().ToString();
@@ -177,7 +184,8 @@ namespace Audit.IntegrationTest
                 .UseRedis(redis => redis
                     .ConnectionString(RedisCnnString)
                     .AsList(s => s
-                        .Key(ev => key)))
+                        .Key(ev => key)
+                        .Database(dbIndex)))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                  .WithAction(_ => _.OnEventSaved(scope =>
                  {
@@ -192,7 +200,7 @@ namespace Audit.IntegrationTest
             }
 
             var mx = GetMultiplexer();
-            var db = mx.GetDatabase();
+            var db = mx.GetDatabase(dbIndex);
             var values = db.ListRange(key);
             var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
             var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3]);
@@ -344,7 +352,10 @@ namespace Audit.IntegrationTest
         }
 
         [Test, Order(10)]
-        public void Redis_Hash_Basic()
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(2)]
+        public void Redis_Hash_Basic(int dbIndex)
         {
             var key = Guid.NewGuid().ToString();
             var ids = new List<object>();
@@ -355,7 +366,8 @@ namespace Audit.IntegrationTest
                     .ConnectionString(RedisCnnString)
                     .AsHash(h => h
                         .Key(ev => key)
-                        .HashField(ev => ev.EventType)))
+                        .HashField(ev => ev.EventType)
+                        .Database(dbIndex)))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                  .WithAction(_ => _.OnEventSaved(scope =>
                  {
@@ -373,7 +385,7 @@ namespace Audit.IntegrationTest
             }
 
             var mx = GetMultiplexer();
-            var db = mx.GetDatabase();
+            var db = mx.GetDatabase(dbIndex);
             var values = db.HashGetAll(key);
             var v1 = db.HashGet(key, "Redis_Hash_Basic_1");
             var v2 = db.HashGet(key, "Redis_Hash_Basic_2");
@@ -504,7 +516,10 @@ namespace Audit.IntegrationTest
         }
 
         [Test, Order(10)]
-        public void Redis_SortedSet_Basic()
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(2)]
+        public void Redis_SortedSet_Basic(int dbIndex)
         {
             var key = Guid.NewGuid().ToString();
             var ids = new List<object>();
@@ -514,7 +529,8 @@ namespace Audit.IntegrationTest
                     .ConnectionString(RedisCnnString)
                     .AsSortedSet(h => h
                         .Key(ev => key)
-                        .Score(ev => (double)ev.CustomFields["Score"])))
+                        .Score(ev => (double)ev.CustomFields["Score"])
+                        .Database(dbIndex)))
                  .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                  .WithAction(_ => _.OnEventSaved(scope =>
                  {
@@ -529,7 +545,7 @@ namespace Audit.IntegrationTest
             }
 
             var mx = GetMultiplexer();
-            var db = mx.GetDatabase();
+            var db = mx.GetDatabase(dbIndex);
             var values = db.SortedSetRangeByRankWithScores(key);
             var evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
 

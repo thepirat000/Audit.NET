@@ -33,14 +33,16 @@ namespace Audit.Redis.Providers
         /// <param name="minScoreBuilder">A function that returns the minimum score allowed for the sorted set members.</param>
         /// <param name="minScoreExclusive">Indicates if the minimum is an Exclusive range. Default is Inclusive.</param>
         /// <param name="maxRankBuilder">A function that returns the maximum rank allowed for a capped collection. Greater than zero to maintain the top M scored elements. Less than zero to maintain the bottom -M scored elements.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
         public RedisProviderSortedSet(string connectionString, Func<AuditEvent, string> keyBuilder,
             TimeSpan? timeToLive, 
             Func<AuditEvent, byte[]> serializer,
             Func<byte[], AuditEvent> deserializer,
             Func<AuditEvent, double> scoreBuilder, Func<AuditEvent, double> maxScoreBuilder = null, bool maxScoreExclusive = false, 
             Func<AuditEvent, double> minScoreBuilder = null, bool minScoreExclusive = false,
-            Func<AuditEvent, long> maxRankBuilder = null)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer)
+            Func<AuditEvent, long> maxRankBuilder = null,
+            Func<AuditEvent, int> dbIndexBuilder = null)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
         {
             _scoreBuilder = scoreBuilder;
             _maxScoreBuilder = maxScoreBuilder;
@@ -78,7 +80,7 @@ namespace Audit.Redis.Providers
 
         internal override T Get<T>(string key, object subKey)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             foreach (var item in db.SortedSetRangeByRank(key))
             {
                 if (item.HasValue)
@@ -95,7 +97,7 @@ namespace Audit.Redis.Providers
 
         internal override async Task<T> GetAsync<T>(string key, object subKey)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             foreach (var item in await db.SortedSetRangeByRankAsync(key))
             {
                 if (item.HasValue)
@@ -133,7 +135,7 @@ namespace Audit.Redis.Providers
             var tasks = new List<Task>();
             var key = GetKey(auditEvent);
             var value = GetValue(auditEvent);
-            var batch = GetDatabase().CreateBatch();
+            var batch = GetDatabase(auditEvent).CreateBatch();
             tasks.Add(batch.SortedSetAddAsync(key, value, score));
             if (TimeToLive.HasValue)
             {

@@ -22,11 +22,13 @@ namespace Audit.Redis.Providers
         /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
         /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
         /// <param name="maxLength">Maximum quantity of events that the list will store. Older elements will be deleted. Default is 0 for no-limit.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
         public RedisProviderList(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
             Func<AuditEvent, byte[]> serializer,
             Func<byte[], AuditEvent> deserializer,
-            long maxLength)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer)
+            long maxLength,
+            Func<AuditEvent, int> dbIndexBuilder)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
         {
             _maxLength = maxLength;
         }
@@ -46,7 +48,7 @@ namespace Audit.Redis.Providers
 
         internal override T Get<T>(string key, object subKey)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             foreach(var item in db.ListRange(key))
             {
                 if (item.HasValue)
@@ -76,7 +78,7 @@ namespace Audit.Redis.Providers
 
         internal override async Task<T> GetAsync<T>(string key, object subKey)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             foreach (var item in await db.ListRangeAsync(key))
             {
                 if (item.HasValue)
@@ -109,7 +111,7 @@ namespace Audit.Redis.Providers
             var tasks = new List<Task>();
             var key = GetKey(auditEvent);
             var value = GetValue(auditEvent);
-            var batch = GetDatabase().CreateBatch();
+            var batch = GetDatabase(auditEvent).CreateBatch();
             tasks.Add(batch.ListLeftPushAsync(key, value));
             if (_maxLength > 0)
             {

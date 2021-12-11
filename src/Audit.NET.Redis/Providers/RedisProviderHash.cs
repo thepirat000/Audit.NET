@@ -24,11 +24,13 @@ namespace Audit.Redis.Providers
         /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
         /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
         /// <param name="fieldBuilder">A function that returns the hash field to use.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
         public RedisProviderHash(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
             Func<AuditEvent, byte[]> serializer,
             Func<byte[], AuditEvent> deserializer,
-            Func<AuditEvent, string> fieldBuilder)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer)
+            Func<AuditEvent, string> fieldBuilder,
+            Func<AuditEvent, int> dbIndexBuilder)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
         {
             _fieldBuilder = fieldBuilder;
         }
@@ -52,7 +54,7 @@ namespace Audit.Redis.Providers
 
         internal override T Get<T>(string key, object subKey)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             var value = db.HashGet(key, (string)subKey);
             if (value.HasValue)
             {
@@ -80,7 +82,7 @@ namespace Audit.Redis.Providers
 
         internal override async Task<T> GetAsync<T>(string key, object subKey)
         {
-            var db = GetDatabase();
+            var db = GetDatabase(null);
             var value = await db.HashGetAsync(key, (string)subKey);
             if (value.HasValue)
             {
@@ -104,7 +106,7 @@ namespace Audit.Redis.Providers
         private Task[] ExecInsertBatch(string key, object subKey, AuditEvent auditEvent)
         {
             var value = GetValue(auditEvent);
-            var batch = GetDatabase().CreateBatch();
+            var batch = GetDatabase(auditEvent).CreateBatch();
             var tasks = new List<Task>();
             tasks.Add(batch.HashSetAsync(key, (string)subKey, value));
             if (TimeToLive.HasValue)
