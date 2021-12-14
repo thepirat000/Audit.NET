@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Providers
 {
@@ -19,57 +21,68 @@ namespace Audit.Redis.Providers
         /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
         /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
         /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
         public RedisProviderString(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive, Func<AuditEvent, byte[]> serializer,
-            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
+            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder, List<Func<IBatch, AuditEvent, Task>> extraTasks)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
         { }
 
-        internal override object Insert(AuditEvent auditEvent)
+        public override object Insert(AuditEvent auditEvent)
         {
             var key = GetKey(auditEvent);
             StringSet(key, auditEvent);
             return key;
         }
 
-        internal override async Task<object> InsertAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertAsync(AuditEvent auditEvent)
         {
             var key = GetKey(auditEvent);
             await StringSetAsync(key, auditEvent);
             return key;
         }
 
-        internal override void Replace(string key, object subKey, AuditEvent auditEvent)
+        public override void Replace(string key, object subKey, AuditEvent auditEvent)
         {
             StringSet(key, auditEvent);
         }
 
-        internal override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
+        public override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
         {
             await StringSetAsync(key, auditEvent);
         }
 
-        internal override T Get<T>(string key, object subKey)
+        public override T Get<T>(string key, object subKey)
         {
             return StringGet<T>(key);
         }
 
-        internal override async Task<T> GetAsync<T>(string key, object subKey)
+        public override async Task<T> GetAsync<T>(string key, object subKey)
         {
             return await StringGetAsync<T>(key);
         }
 
         private void StringSet(string key, AuditEvent auditEvent)
         {
-            var db = GetDatabase(auditEvent);
-            var value = GetValue(auditEvent);
-            db.StringSet(key, value, TimeToLive);
+            var tasks = ExecStringSetBatch(key, auditEvent);
+            Task.WaitAll(tasks);
         }
 
         private async Task StringSetAsync(string key, AuditEvent auditEvent)
         {
+            var tasks = ExecStringSetBatch(key, auditEvent);
+            await Task.WhenAll(tasks);
+        }
+
+        private Task[] ExecStringSetBatch(string key, AuditEvent auditEvent)
+        {
             var db = GetDatabase(auditEvent);
             var value = GetValue(auditEvent);
-            await db.StringSetAsync(key, value, TimeToLive);
+            var batch = db.CreateBatch();
+            var tasks = new List<Task>();
+            tasks.Add(batch.StringSetAsync(key, value, TimeToLive));
+            OnBatchExecuting(batch, tasks, auditEvent);
+            batch.Execute();
+            return tasks.ToArray();
         }
 
         private T StringGet<T>(string key) where T : AuditEvent

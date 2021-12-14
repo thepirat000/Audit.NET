@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Redis.Providers;
@@ -56,6 +57,38 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(evFromApi.EndDate, aev.EndDate);
             Assert.AreEqual("Redis_String_Basic", aev.EventType);
             Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+        }
+
+        [Test]
+        public void Redis_String_ExtraTasks()
+        {
+            var key = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+            Audit.Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConnectionString(RedisCnnString)
+                    .AsString(s => s
+                        .Key(ev => key)
+                        .AttachTask(batch => batch.StringSetAsync(key2, "test"))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var scope = AuditScope.Create(new AuditScopeOptions()
+            {
+                EventType = "Redis_String_ExtraTasks"
+            });
+            scope.Dispose();
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase();
+            var value1 = db.StringGet(key);
+            var value2 = db.StringGet(key2);
+
+            db.KeyDelete(key);
+            db.KeyDelete(key2);
+
+            Assert.IsTrue(value1.HasValue);
+            Assert.IsTrue(value2.HasValue);
+            Assert.AreEqual("test", value2.ToString());
         }
 
         [Test, Order(10)]
@@ -214,6 +247,35 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(evFromApi.StartDate, aev2.StartDate);
             Assert.AreEqual("Redis_List_Basic_2", aev1.EventType);
             Assert.AreEqual("Redis_List_Basic_1", aev2.EventType);
+        }
+
+        [Test]
+        public void Redis_List_ExtraTasks()
+        {
+            var key = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+            Audit.Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConnectionString(RedisCnnString)
+                    .AsList(l => l
+                        .Key(ev => key)
+                        .AttachTask(batch => batch.StringSetAsync(key2, "test"))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var scope = AuditScope.Create("Redis_List_ExtraTasks", null);
+            scope.Dispose();
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase();
+            var value1 = db.ListGetByIndex(key, 0);
+            var value2 = db.StringGet(key2);
+
+            db.KeyDelete(key);
+            db.KeyDelete(key2);
+
+            Assert.IsTrue(value1.HasValue);
+            Assert.IsTrue(value2.HasValue);
+            Assert.AreEqual("test", value2.ToString());
         }
 
         [Test, Order(10)]
@@ -402,6 +464,36 @@ namespace Audit.IntegrationTest
             Assert.AreEqual("updated", Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
         }
 
+        [Test]
+        public void Redis_Hash_ExtraTasks()
+        {
+            var key = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+            Audit.Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConnectionString(RedisCnnString)
+                    .AsHash(h => h
+                        .Key(ev => key)
+                        .HashField(ev => ev.EventType)
+                        .AttachTask(batch => batch.StringSetAsync(key2, "test"))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var scope = AuditScope.Create("Redis_Hash_ExtraTasks", null);
+            scope.Dispose();
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase();
+            var value1 = db.HashGet(key, "Redis_Hash_ExtraTasks");
+            var value2 = db.StringGet(key2);
+
+            db.KeyDelete(key);
+            db.KeyDelete(key2);
+
+            Assert.IsTrue(value1.HasValue);
+            Assert.IsTrue(value2.HasValue);
+            Assert.AreEqual("test", value2.ToString());
+        }
+
         [Test, Order(10)]
         public async Task Redis_Hash_Basic_Async()
         {
@@ -559,6 +651,36 @@ namespace Audit.IntegrationTest
             Assert.AreEqual("Redis_SortedSet_Basic_2", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
             Assert.AreEqual(12.34, values[3].Score);
             Assert.AreEqual("Redis_SortedSet_Basic_1", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
+        }
+
+        [Test]
+        public void Redis_SortedSet_ExtraTasks()
+        {
+            var key = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+            Audit.Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConnectionString(RedisCnnString)
+                    .AsSortedSet(ss => ss
+                        .Key(ev => key)
+                        .Score(ev => 1)
+                        .AttachTask(batch => batch.StringSetAsync(key2, "test"))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var scope = AuditScope.Create("Redis_SortedSet_ExtraTasks", null);
+            scope.Dispose();
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase();
+            var value1 = db.SortedSetRangeByScore(key, 1, 1).FirstOrDefault();
+            var value2 = db.StringGet(key2);
+
+            db.KeyDelete(key);
+            db.KeyDelete(key2);
+
+            Assert.IsTrue(value1.HasValue);
+            Assert.IsTrue(value2.HasValue);
+            Assert.AreEqual("test", value2.ToString());
         }
 
         [Test, Order(10)]
@@ -795,7 +917,10 @@ namespace Audit.IntegrationTest
             });
 
             using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_1" })) {}
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_2" })) { }
+
+            Task.Delay(500).Wait();
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_2" })) {}
 
             Task.Delay(1000).Wait();
 
@@ -824,6 +949,9 @@ namespace Audit.IntegrationTest
             });
 
             using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_1" })) { await scope.DisposeAsync(); }
+            
+            await Task.Delay(500);
+
             using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_2" })) { await scope.DisposeAsync(); }
 
             await Task.Delay(1000);

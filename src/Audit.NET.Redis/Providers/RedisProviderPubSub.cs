@@ -9,7 +9,7 @@ namespace Audit.Redis.Providers
     /// </summary>
     public class RedisProviderPubSub : RedisProviderHandler
     {
-        private readonly Func<AuditEvent, string> _channelBuilder;
+        protected Func<AuditEvent, string> ChannelBuilder { get; set; }
 
         /// <summary>
         /// Creates new redis provider that uses Redis PubSub channel to send the events.
@@ -20,32 +20,32 @@ namespace Audit.Redis.Providers
         /// <param name="channelBuilder">A function that returns the Redis PubSub Channel to use.</param>
         public RedisProviderPubSub(string connectionString, Func<AuditEvent, byte[]> serializer,
             Func<AuditEvent, string> channelBuilder)
-            : base(connectionString, null, null, serializer, null, null)
+            : base(connectionString, null, null, serializer, null, null, null)
         {
-            _channelBuilder = channelBuilder;
+            ChannelBuilder = channelBuilder;
         }
 
-        internal override object Insert(AuditEvent auditEvent)
+        public override object Insert(AuditEvent auditEvent)
         {
             var eventId = Guid.NewGuid();
             Publish(eventId, auditEvent);
             return eventId;
         }
 
-        internal override async Task<object> InsertAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertAsync(AuditEvent auditEvent)
         {
             var eventId = Guid.NewGuid();
             await PublishAsync(eventId, auditEvent);
             return eventId;
         }
 
-        internal override void Replace(string key, object subKey, AuditEvent auditEvent)
+        public override void Replace(string key, object subKey, AuditEvent auditEvent)
         {
             // values cannot be updated on a pubsub. This will send a new message.
             Publish((Guid)subKey, auditEvent);
         }
 
-        internal override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
+        public override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
         {
             // values cannot be updated on a pubsub. This will send a new message.
             await PublishAsync((Guid)subKey, auditEvent);
@@ -53,12 +53,12 @@ namespace Audit.Redis.Providers
 
         private void Publish(Guid eventId, AuditEvent auditEvent)
         {
-            if (_channelBuilder == null)
+            if (ChannelBuilder == null)
             {
                 throw new ArgumentException("The channel was not provided");
             }
             auditEvent.CustomFields[RedisEventIdField] = eventId;
-            var channel = _channelBuilder.Invoke(auditEvent);
+            var channel = ChannelBuilder.Invoke(auditEvent);
             var sub = Context.Value.GetSubscriber();
             var value = GetValue(auditEvent);
             sub.Publish(channel, value);
@@ -66,12 +66,12 @@ namespace Audit.Redis.Providers
 
         private async Task PublishAsync(Guid eventId, AuditEvent auditEvent)
         {
-            if (_channelBuilder == null)
+            if (ChannelBuilder == null)
             {
                 throw new ArgumentException("The channel was not provided");
             }
             auditEvent.CustomFields[RedisEventIdField] = eventId;
-            var channel = _channelBuilder.Invoke(auditEvent);
+            var channel = ChannelBuilder.Invoke(auditEvent);
             var sub = Context.Value.GetSubscriber();
             var value = GetValue(auditEvent);
             await sub.PublishAsync(channel, value);

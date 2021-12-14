@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Audit.Core;
 using System.Threading.Tasks;
 using StackExchange.Redis;
@@ -12,7 +11,9 @@ namespace Audit.Redis.Providers
     /// </summary>
     public class RedisProviderHash : RedisProviderHandler
     {
-        private readonly Func<AuditEvent, string> _fieldBuilder;
+        protected Func<AuditEvent, string> FieldBuilder { get; set; }
+
+
 
         /// <summary>
         /// Creates new redis provider that uses Redis Hashes to store the events.
@@ -25,34 +26,36 @@ namespace Audit.Redis.Providers
         /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
         /// <param name="fieldBuilder">A function that returns the hash field to use.</param>
         /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
         public RedisProviderHash(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
             Func<AuditEvent, byte[]> serializer,
             Func<byte[], AuditEvent> deserializer,
             Func<AuditEvent, string> fieldBuilder,
-            Func<AuditEvent, int> dbIndexBuilder)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
+            Func<AuditEvent, int> dbIndexBuilder,
+            List<Func<IBatch, AuditEvent, Task>> extraTasks)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
         {
-            _fieldBuilder = fieldBuilder;
+            FieldBuilder = fieldBuilder;
         }
 
-        internal override object Insert(AuditEvent auditEvent)
+        public override object Insert(AuditEvent auditEvent)
         {
-            if (_fieldBuilder == null)
+            if (FieldBuilder == null)
             {
                 throw new ArgumentException("The hash field was not provided");
             }
             var key = GetKey(auditEvent);
-            var field = _fieldBuilder.Invoke(auditEvent);
+            var field = FieldBuilder.Invoke(auditEvent);
             HashSet(key, field, auditEvent);
             return field;
         }
 
-        internal override void Replace(string key, object subKey, AuditEvent auditEvent)
+        public override void Replace(string key, object subKey, AuditEvent auditEvent)
         {
             HashSet(key, subKey, auditEvent);
         }
 
-        internal override T Get<T>(string key, object subKey)
+        public override T Get<T>(string key, object subKey)
         {
             var db = GetDatabase(null);
             var value = db.HashGet(key, (string)subKey);
@@ -63,24 +66,24 @@ namespace Audit.Redis.Providers
             return null;
         }
 
-        internal override async Task<object> InsertAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertAsync(AuditEvent auditEvent)
         {
-            if (_fieldBuilder == null)
+            if (FieldBuilder == null)
             {
                 throw new ArgumentException("The hash field was not provided");
             }
             var key = GetKey(auditEvent);
-            var field = _fieldBuilder.Invoke(auditEvent);
+            var field = FieldBuilder.Invoke(auditEvent);
             await HashSetAsync(key, field, auditEvent);
             return field;
         }
 
-        internal override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
+        public override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
         {
             await HashSetAsync(key, subKey, auditEvent);
         }
 
-        internal override async Task<T> GetAsync<T>(string key, object subKey)
+        public override async Task<T> GetAsync<T>(string key, object subKey)
         {
             var db = GetDatabase(null);
             var value = await db.HashGetAsync(key, (string)subKey);
@@ -102,7 +105,7 @@ namespace Audit.Redis.Providers
             var tasks = ExecInsertBatch(key, subKey, auditEvent);
             await Task.WhenAll(tasks);
         }
-
+        
         private Task[] ExecInsertBatch(string key, object subKey, AuditEvent auditEvent)
         {
             var value = GetValue(auditEvent);
@@ -113,6 +116,7 @@ namespace Audit.Redis.Providers
             {
                 tasks.Add(batch.KeyExpireAsync(key, TimeToLive));
             }
+            OnBatchExecuting(batch, tasks, auditEvent);
             batch.Execute();
             return tasks.ToArray();
         }

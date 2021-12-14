@@ -42,7 +42,7 @@ namespace Audit.Redis.Providers
             var strConfig = new RedisStringConfigurator();
             config.Invoke(strConfig);
             return new RedisDataProvider(new RedisProviderString(
-                _connectionString, strConfig._keyBuilder, strConfig._timeToLive, _serializer, _deserializer, strConfig._dbIndexBuilder));
+                _connectionString, strConfig._keyBuilder, strConfig._timeToLive, _serializer, _deserializer, strConfig._dbIndexBuilder, strConfig._extraTasks));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Audit.Redis.Providers
             config.Invoke(hashConfig);
             return new RedisDataProvider(new RedisProviderHash(
                 _connectionString, hashConfig._keyBuilder, hashConfig._timeToLive, _serializer, _deserializer,
-                hashConfig._fieldBuilder, hashConfig._dbIndexBuilder));
+                hashConfig._fieldBuilder, hashConfig._dbIndexBuilder, hashConfig._extraTasks));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Audit.Redis.Providers
             config.Invoke(listConfig);
             return new RedisDataProvider(new RedisProviderList(
                 _connectionString, listConfig._keyBuilder, listConfig._timeToLive, _serializer, _deserializer,
-                listConfig._maxLength, listConfig._dbIndexBuilder));
+                listConfig._maxLength, listConfig._dbIndexBuilder, listConfig._extraTasks));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Audit.Redis.Providers
             return new RedisDataProvider(new RedisProviderSortedSet(
                 _connectionString, ssConfig._keyBuilder, ssConfig._timeToLive, _serializer, _deserializer,
                 ssConfig._scoreBuilder, ssConfig._maxScoreBuilder, ssConfig._maxScoreExclusive, ssConfig._minScoreBuilder, ssConfig._minScoreExclusive,
-                ssConfig._maxRankBuilder, ssConfig._dbIndexBuilder));
+                ssConfig._maxRankBuilder, ssConfig._dbIndexBuilder, ssConfig._extraTasks));
         }
 
         /// <summary>

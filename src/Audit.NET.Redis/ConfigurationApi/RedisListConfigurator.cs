@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Configuration
 {
@@ -9,6 +12,7 @@ namespace Audit.Redis.Configuration
         internal TimeSpan? _timeToLive;
         internal Func<AuditEvent, int> _dbIndexBuilder;
         internal long _maxLength;
+        internal List<Func<IBatch, AuditEvent, Task>> _extraTasks = new List<Func<IBatch, AuditEvent, Task>>();
 
         public IRedisListConfigurator Key(Func<AuditEvent, string> keyBuilder)
         {
@@ -43,6 +47,18 @@ namespace Audit.Redis.Configuration
         public IRedisListConfigurator MaxLength(long maxLength)
         {
             _maxLength = maxLength;
+            return this;
+        }
+
+        public IRedisListConfigurator AttachTask(Func<IBatch, Task> task)
+        {
+            _extraTasks.Add((batch, _) => task.Invoke(batch));
+            return this;
+        }
+
+        public IRedisListConfigurator AttachTask(Func<IBatch, AuditEvent, Task> task)
+        {
+            _extraTasks.Add(task);
             return this;
         }
     }

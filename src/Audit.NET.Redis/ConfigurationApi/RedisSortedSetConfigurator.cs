@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Configuration
 {
@@ -16,6 +19,7 @@ namespace Audit.Redis.Configuration
         internal bool _minScoreExclusive;
 
         internal Func<AuditEvent, long> _maxRankBuilder;
+        internal List<Func<IBatch, AuditEvent, Task>> _extraTasks = new List<Func<IBatch, AuditEvent, Task>>();
 
         public IRedisSortedSetConfigurator Key(Func<AuditEvent, string> keyBuilder)
         {
@@ -91,6 +95,18 @@ namespace Audit.Redis.Configuration
         public IRedisSortedSetConfigurator MaxRank(long maxRank)
         {
             _maxRankBuilder = ev => maxRank;
+            return this;
+        }
+
+        public IRedisSortedSetConfigurator AttachTask(Func<IBatch, Task> task)
+        {
+            _extraTasks.Add((batch, _) => task.Invoke(batch));
+            return this;
+        }
+
+        public IRedisSortedSetConfigurator AttachTask(Func<IBatch, AuditEvent, Task> task)
+        {
+            _extraTasks.Add(task);
             return this;
         }
     }

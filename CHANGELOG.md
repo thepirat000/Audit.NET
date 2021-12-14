@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.0.3] - 2021-12-13
+- Audit.NET.Redis: Ability to add custom Redis commands to the audit event saving batch (#471)
+
 ## [19.0.2] - 2021-12-10
 - Audit.NET.Redis: Adding ability to configure the redis database ID to use. Upgrade StackExchange.Redis references to version 2.2.88. (#471)
 

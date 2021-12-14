@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,9 +22,10 @@ namespace Audit.Redis.Providers
         protected Func<byte[], object> Deserializer { get; set; }
         protected Func<AuditEvent, int> DbIndexBuilder { get; set; }
 
+        protected List<Func<IBatch, AuditEvent, Task>> ExtraTasks { get; set; }
 
         protected RedisProviderHandler(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive, Func<AuditEvent, byte[]> serializer,
-            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder)
+            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder, List<Func<IBatch, AuditEvent, Task>> extraTasks)
         {
             Context = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(connectionString), LazyThreadSafetyMode.ExecutionAndPublication);
             ConnectionString = connectionString;
@@ -32,27 +34,33 @@ namespace Audit.Redis.Providers
             Serializer = serializer ?? (ev => Encoding.UTF8.GetBytes(ev.ToJson()));
             Deserializer = deserializer;
             DbIndexBuilder = dbIndexBuilder;
+            ExtraTasks = extraTasks ?? new List<Func<IBatch, AuditEvent, Task>>();
         }
 
-        internal abstract object Insert(AuditEvent auditEvent);
-        internal abstract Task<object> InsertAsync(AuditEvent auditEvent);
-        internal abstract void Replace(string key, object subKey, AuditEvent auditEvent);
-        internal abstract Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent);
-        internal virtual T Get<T>(string key, object subKey) where T : AuditEvent
+        public abstract object Insert(AuditEvent auditEvent);
+
+        public abstract Task<object> InsertAsync(AuditEvent auditEvent);
+
+        public abstract void Replace(string key, object subKey, AuditEvent auditEvent);
+
+        public abstract Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent);
+
+        public virtual T Get<T>(string key, object subKey) where T : AuditEvent
         {
             throw new NotImplementedException($"Events retrieval is not supported by {GetType().Name}");
         }
-        internal virtual Task<T> GetAsync<T>(string key, object subKey) where T : AuditEvent
+
+        public virtual Task<T> GetAsync<T>(string key, object subKey) where T : AuditEvent
         {
             throw new NotImplementedException($"Events retrieval is not supported by {GetType().Name}");
         }
 
-        internal IDatabase GetDatabase(AuditEvent auditEvent)
+        public IDatabase GetDatabase(AuditEvent auditEvent)
         {
             return Context.Value.GetDatabase(DbIndexBuilder?.Invoke(auditEvent) ?? -1);
         }
 
-        internal string GetKey(AuditEvent auditEvent)
+        public string GetKey(AuditEvent auditEvent)
         {
             if (KeyBuilder == null)
             {
@@ -61,12 +69,12 @@ namespace Audit.Redis.Providers
             return KeyBuilder.Invoke(auditEvent);
         }
 
-        internal RedisValue GetValue(AuditEvent auditEvent)
+        public RedisValue GetValue(AuditEvent auditEvent)
         {
             return (RedisValue)Serializer.Invoke(auditEvent);
         }
 
-        internal T FromValue<T>(RedisValue value) where T : AuditEvent
+        public T FromValue<T>(RedisValue value) where T : AuditEvent
         {
             if (Deserializer == null)
             {
@@ -74,5 +82,14 @@ namespace Audit.Redis.Providers
             }
             return Deserializer.Invoke(value) as T;
         }
+
+        protected virtual void OnBatchExecuting(IBatch batch, List<Task> tasks, AuditEvent auditEvent)
+        {
+            foreach (var task in ExtraTasks)
+            {
+                tasks.Add(task.Invoke(batch, auditEvent));
+            }
+        }
+
     }
 }

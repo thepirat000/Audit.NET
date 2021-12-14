@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Providers
 {
@@ -10,7 +11,7 @@ namespace Audit.Redis.Providers
     /// </summary>
     public class RedisProviderList : RedisProviderHandler
     {
-        private readonly long _maxLength;
+        protected long MaxLength { get; set; }
 
         /// <summary>
         /// Creates new redis provider that uses a Redis List to store the events.
@@ -23,30 +24,32 @@ namespace Audit.Redis.Providers
         /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
         /// <param name="maxLength">Maximum quantity of events that the list will store. Older elements will be deleted. Default is 0 for no-limit.</param>
         /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
         public RedisProviderList(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
             Func<AuditEvent, byte[]> serializer,
             Func<byte[], AuditEvent> deserializer,
             long maxLength,
-            Func<AuditEvent, int> dbIndexBuilder)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
+            Func<AuditEvent, int> dbIndexBuilder,
+            List<Func<IBatch, AuditEvent, Task>> extraTasks)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
         {
-            _maxLength = maxLength;
+            MaxLength = maxLength;
         }
 
-        internal override object Insert(AuditEvent auditEvent)
+        public override object Insert(AuditEvent auditEvent)
         {
             var eventId = Guid.NewGuid();
             Push(eventId, auditEvent);
             return eventId;
         }
 
-        internal override void Replace(string key, object subKey, AuditEvent auditEvent)
+        public override void Replace(string key, object subKey, AuditEvent auditEvent)
         {
             // List values cannot be properly updated. This will insert a new member to the list.
             Push((Guid)subKey, auditEvent);
         }
 
-        internal override T Get<T>(string key, object subKey)
+        public override T Get<T>(string key, object subKey)
         {
             var db = GetDatabase(null);
             foreach(var item in db.ListRange(key))
@@ -63,20 +66,20 @@ namespace Audit.Redis.Providers
             return null;
         }
 
-        internal override async Task<object> InsertAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertAsync(AuditEvent auditEvent)
         {
             var eventId = Guid.NewGuid();
             await PushAsync(eventId, auditEvent);
             return eventId;
         }
 
-        internal override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
+        public override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
         {
             // List values cannot be properly updated. This will insert a new member to the list.
             await PushAsync((Guid)subKey, auditEvent);
         }
 
-        internal override async Task<T> GetAsync<T>(string key, object subKey)
+        public override async Task<T> GetAsync<T>(string key, object subKey)
         {
             var db = GetDatabase(null);
             foreach (var item in await db.ListRangeAsync(key))
@@ -113,14 +116,15 @@ namespace Audit.Redis.Providers
             var value = GetValue(auditEvent);
             var batch = GetDatabase(auditEvent).CreateBatch();
             tasks.Add(batch.ListLeftPushAsync(key, value));
-            if (_maxLength > 0)
+            if (MaxLength > 0)
             {
-                tasks.Add(batch.ListTrimAsync(key, 0, _maxLength - 1));
+                tasks.Add(batch.ListTrimAsync(key, 0, MaxLength - 1));
             }
             if (TimeToLive.HasValue)
             {
                 tasks.Add(batch.KeyExpireAsync(key, TimeToLive));
             }
+            OnBatchExecuting(batch, tasks, auditEvent);
             batch.Execute();
             return tasks.ToArray();
         }

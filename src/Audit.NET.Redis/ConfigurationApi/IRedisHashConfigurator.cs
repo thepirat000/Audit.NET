@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Configuration
 {
@@ -38,5 +40,15 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="dbIndexBuilder">A function that returns the database ID to use</param>
         IRedisHashConfigurator Database(Func<AuditEvent, int> dbIndexBuilder);
+        /// <summary>
+        /// Attach an extra redis command to the execution
+        /// </summary>
+        /// <param name="task">Task to add to the batch</param>
+        IRedisHashConfigurator AttachTask(Func<IBatch, Task> task);
+        /// <summary>
+        /// Attach an extra redis command to the execution
+        /// </summary>
+        /// <param name="task">Task to add to the batch</param>
+        IRedisHashConfigurator AttachTask(Func<IBatch, AuditEvent, Task> task);
     }
 }

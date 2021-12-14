@@ -11,12 +11,12 @@ namespace Audit.Redis.Providers
     /// </summary>
     public class RedisProviderSortedSet : RedisProviderHandler
     {
-        private readonly Func<AuditEvent, double> _scoreBuilder;
-        private readonly Func<AuditEvent, double> _maxScoreBuilder;
-        private readonly bool _maxScoreExclusive;
-        private readonly Func<AuditEvent, double> _minScoreBuilder;
-        private readonly bool _minScoreExclusive;
-        private readonly Func<AuditEvent, long> _maxRankBuilder;
+        protected Func<AuditEvent, double> ScoreBuilder { get; set; }
+        protected Func<AuditEvent, double> MaxScoreBuilder { get; set; }
+        protected bool MaxScoreExclusive { get; set; }
+        protected Func<AuditEvent, double> MinScoreBuilder { get; set; }
+        protected bool MinScoreExclusive { get; set; }
+        protected Func<AuditEvent, long> MaxRankBuilder { get; set; }
 
         /// <summary>
         /// Creates new redis provider that uses a Redis Sorted Set to store the events.
@@ -34,6 +34,7 @@ namespace Audit.Redis.Providers
         /// <param name="minScoreExclusive">Indicates if the minimum is an Exclusive range. Default is Inclusive.</param>
         /// <param name="maxRankBuilder">A function that returns the maximum rank allowed for a capped collection. Greater than zero to maintain the top M scored elements. Less than zero to maintain the bottom -M scored elements.</param>
         /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
         public RedisProviderSortedSet(string connectionString, Func<AuditEvent, string> keyBuilder,
             TimeSpan? timeToLive, 
             Func<AuditEvent, byte[]> serializer,
@@ -41,44 +42,45 @@ namespace Audit.Redis.Providers
             Func<AuditEvent, double> scoreBuilder, Func<AuditEvent, double> maxScoreBuilder = null, bool maxScoreExclusive = false, 
             Func<AuditEvent, double> minScoreBuilder = null, bool minScoreExclusive = false,
             Func<AuditEvent, long> maxRankBuilder = null,
-            Func<AuditEvent, int> dbIndexBuilder = null)
-            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder)
+            Func<AuditEvent, int> dbIndexBuilder = null,
+            List<Func<IBatch, AuditEvent, Task>> extraTasks = null)
+            : base(connectionString, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
         {
-            _scoreBuilder = scoreBuilder;
-            _maxScoreBuilder = maxScoreBuilder;
-            _minScoreBuilder = minScoreBuilder;
-            _maxScoreExclusive = maxScoreExclusive;
-            _minScoreExclusive = minScoreExclusive;
-            _maxRankBuilder = maxRankBuilder;
+            ScoreBuilder = scoreBuilder;
+            MaxScoreBuilder = maxScoreBuilder;
+            MinScoreBuilder = minScoreBuilder;
+            MaxScoreExclusive = maxScoreExclusive;
+            MinScoreExclusive = minScoreExclusive;
+            MaxRankBuilder = maxRankBuilder;
         }
 
-        internal override object Insert(AuditEvent auditEvent)
+        public override object Insert(AuditEvent auditEvent)
         {
             var eventId = Guid.NewGuid();
             SortedSetAdd(eventId, auditEvent);
             return eventId;
         }
 
-        internal override async Task<object> InsertAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertAsync(AuditEvent auditEvent)
         {
             var eventId = Guid.NewGuid();
             await SortedSetAddAsync(eventId, auditEvent);
             return eventId;
         }
 
-        internal override void Replace(string key, object subKey, AuditEvent auditEvent)
+        public override void Replace(string key, object subKey, AuditEvent auditEvent)
         {
             // SortedSet values cannot be properly updated. This will insert a new member to the list.
             SortedSetAdd((Guid)subKey, auditEvent);
         }
 
-        internal override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
+        public override async Task ReplaceAsync(string key, object subKey, AuditEvent auditEvent)
         {
             // SortedSet values cannot be properly updated. This will insert a new member to the list.
             await SortedSetAddAsync((Guid)subKey, auditEvent);
         }
 
-        internal override T Get<T>(string key, object subKey)
+        public override T Get<T>(string key, object subKey)
         {
             var db = GetDatabase(null);
             foreach (var item in db.SortedSetRangeByRank(key))
@@ -95,7 +97,7 @@ namespace Audit.Redis.Providers
             return null;
         }
 
-        internal override async Task<T> GetAsync<T>(string key, object subKey)
+        public override async Task<T> GetAsync<T>(string key, object subKey)
         {
             var db = GetDatabase(null);
             foreach (var item in await db.SortedSetRangeByRankAsync(key))
@@ -126,11 +128,11 @@ namespace Audit.Redis.Providers
 
         private Task[] ExecSortedSetAdd(Guid eventId, AuditEvent auditEvent)
         {
-            if (_scoreBuilder == null)
+            if (ScoreBuilder == null)
             {
                 throw new ArgumentException("The score builder was not provided");
             }
-            var score = _scoreBuilder.Invoke(auditEvent);
+            var score = ScoreBuilder.Invoke(auditEvent);
             auditEvent.CustomFields[RedisEventIdField] = eventId;
             var tasks = new List<Task>();
             var key = GetKey(auditEvent);
@@ -142,22 +144,22 @@ namespace Audit.Redis.Providers
                 tasks.Add(batch.KeyExpireAsync(key, TimeToLive));
             }
             // trim by scores
-            if (_minScoreBuilder != null)
+            if (MinScoreBuilder != null)
             {
-                double stop = _minScoreBuilder.Invoke(auditEvent);
-                var exclude = _minScoreExclusive ? Exclude.None : Exclude.Stop;
+                double stop = MinScoreBuilder.Invoke(auditEvent);
+                var exclude = MinScoreExclusive ? Exclude.None : Exclude.Stop;
                 tasks.Add(batch.SortedSetRemoveRangeByScoreAsync(key, double.NegativeInfinity, stop, exclude));
             }
-            if (_maxScoreBuilder != null)
+            if (MaxScoreBuilder != null)
             {
-                double start = _maxScoreBuilder.Invoke(auditEvent);
-                var exclude = _maxScoreExclusive ? Exclude.None : Exclude.Start;
+                double start = MaxScoreBuilder.Invoke(auditEvent);
+                var exclude = MaxScoreExclusive ? Exclude.None : Exclude.Start;
                 tasks.Add(batch.SortedSetRemoveRangeByScoreAsync(key, start, double.PositiveInfinity, exclude));
             }
             // trim by ranks
-            if (_maxRankBuilder != null)
+            if (MaxRankBuilder != null)
             {
-                long max = _maxRankBuilder.Invoke(auditEvent);
+                long max = MaxRankBuilder.Invoke(auditEvent);
                 if (max > 0)
                 {
                     tasks.Add(batch.SortedSetRemoveRangeByRankAsync(key, 0, -(max + 1)));
@@ -167,6 +169,7 @@ namespace Audit.Redis.Providers
                     tasks.Add(batch.SortedSetRemoveRangeByRankAsync(key, -max, -1));
                 }
             }
+            OnBatchExecuting(batch, tasks, auditEvent);
             batch.Execute();
             return tasks.ToArray();
         }
