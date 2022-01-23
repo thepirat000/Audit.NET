@@ -70,7 +70,7 @@ namespace Audit.AzureTableStorage.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
-            var table = EnsureTable(auditEvent);
+            var table = await EnsureTableAsync(auditEvent);
             var entity = GetTableEntity(auditEvent);
             await table.ExecuteAsync(TableOperation.InsertOrMerge(entity));
             return new [] { entity.PartitionKey, entity.RowKey };
@@ -94,7 +94,7 @@ namespace Audit.AzureTableStorage.Providers
             var fields = eventId as string[];
             var partKey = fields[0];
             var rowKey = fields[1];
-            var table = EnsureTable(auditEvent);
+            var table = await EnsureTableAsync(auditEvent);
             var entity = GetTableEntity(auditEvent);
             entity.PartitionKey = partKey;
             entity.RowKey = rowKey;
