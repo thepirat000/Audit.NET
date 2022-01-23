@@ -4,7 +4,7 @@
     <Description>Generate detailed Audit Logs for AspNet Core Web API Controller calls.</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.WebApi.Core</AssemblyTitle>
-    <VersionPrefix>19.0.3</VersionPrefix>
+    <VersionPrefix>19.0.4</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net451;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
     <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>

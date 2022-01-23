@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.0.4] - 2022-01-23
+- Audit.NET.AzureStorage: Azure Table Storage InsertEventAsync bug fix. Method was using sync version of EnsureTable. This was causing the thread to be blocked. (#474)
+
 ## [19.0.3] - 2021-12-13
 - Audit.NET.Redis: Ability to add custom Redis commands to the audit event saving batch (#471)
 
