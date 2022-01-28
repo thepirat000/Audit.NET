@@ -1,20 +1,94 @@
 ﻿#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Audit.Core;
-using Azure.Core;
-using Azure.Identity;
 using Azure.Storage;
 using Azure.Storage.Blobs.Models;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
 {
     public class AzureStorageBlobsTests
     {
+        [Test]
+        [Category("AzureStorageBlobs")]
+        public void Test_AzureStorageBlobs_HappyPath()
+        {
+            var id = Guid.NewGuid().ToString();
+            var originalId = id;
+            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .AccessTier(AccessTier.Cool)
+                .BlobName(ev => ev.EventType + "_" + id + ".json")
+                .ContainerName(ev => containerName)
+                .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }));
+
+            Configuration.ResetCustomActions();
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+
+            var efEvent = new EntityFramework.AuditEventEntityFramework()
+            {
+                EventType = id,
+                Environment = new AuditEventEnvironment()
+                {
+                    MachineName = "Machine",
+                    UserName = "User"
+                },
+                EntityFrameworkEvent = new EntityFramework.EntityFrameworkEvent()
+                {
+                    Database = "DB"
+                }
+            };
+
+            var blobName = dp.InsertEvent(efEvent);
+            var efEventGet = dp.GetEvent<EntityFramework.AuditEventEntityFramework>(containerName, blobName.ToString());
+
+            Assert.AreEqual(id, efEventGet.EventType);
+            Assert.AreEqual("Machine", efEventGet.Environment.MachineName);
+            Assert.AreEqual("DB", efEventGet.EntityFrameworkEvent.Database);
+        }
+
+        [Test]
+        [Category("AzureStorageBlobs")]
+        public async Task Test_AzureStorageBlobs_HappyPathAsync()
+        {
+            var id = Guid.NewGuid().ToString();
+            var originalId = id;
+            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .AccessTier(AccessTier.Cool)
+                .BlobName(ev => ev.EventType + "_" + id + ".json")
+                .ContainerName(ev => containerName)
+                .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }));
+
+            Configuration.ResetCustomActions();
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+
+            var efEvent = new EntityFramework.AuditEventEntityFramework()
+            {
+                EventType = id,
+                Environment = new AuditEventEnvironment()
+                {
+                    MachineName = "Machine",
+                    UserName = "User"
+                },
+                EntityFrameworkEvent = new EntityFramework.EntityFrameworkEvent()
+                {
+                    Database = "DB"
+                }
+            };
+
+            var blobName = await dp.InsertEventAsync(efEvent);
+            var efEventGet = await dp.GetEventAsync<EntityFramework.AuditEventEntityFramework>(containerName, blobName.ToString());
+
+            Assert.AreEqual(id, efEventGet.EventType);
+            Assert.AreEqual("Machine", efEventGet.Environment.MachineName);
+            Assert.AreEqual("DB", efEventGet.EntityFrameworkEvent.Database);
+        }
+
         [Test]
         [Category("AzureStorageBlobs")]
         public void Test_AzureStorageBlobs_ConnectionString()
@@ -29,9 +103,9 @@ namespace Audit.IntegrationTest
                 .ContainerName(ev => containerName)
                 .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }));
 
-            Audit.Core.Configuration.ResetCustomActions();
-            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
-            Audit.Core.Configuration.DataProvider = dp;
+            Configuration.ResetCustomActions();
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            Configuration.DataProvider = dp;
 
             using (var scope = AuditScope.Create("Test", () => id, new { custom = 123 }))
             {
@@ -65,9 +139,9 @@ namespace Audit.IntegrationTest
                 .ContainerName(ev => containerName)
                 .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }));
 
-            Audit.Core.Configuration.ResetCustomActions();
-            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
-            Audit.Core.Configuration.DataProvider = dp;
+            Configuration.ResetCustomActions();
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            Configuration.DataProvider = dp;
 
             using (var scope = AuditScope.Create("Test", () => id, new { custom = 123 }))
             {

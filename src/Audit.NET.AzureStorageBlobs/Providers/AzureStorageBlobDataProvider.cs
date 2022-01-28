@@ -181,9 +181,9 @@ namespace Audit.AzureStorageBlobs.Providers
                 AccessTier = AccessTierBuilder?.Invoke(auditEvent)
             };
 #if NETSTANDARD2_0
-            blob.Upload(BinaryData.FromObjectAsJson(auditEvent, JsonSettings), options);
+            blob.Upload(new BinaryData(auditEvent, JsonSettings), options);
 #else
-            blob.Upload(BinaryData.FromObjectAsJson(auditEvent, Core.Configuration.JsonSettings), options);
+            blob.Upload(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options);
 #endif
             return blobName;
         }
@@ -198,9 +198,9 @@ namespace Audit.AzureStorageBlobs.Providers
                 AccessTier = AccessTierBuilder?.Invoke(auditEvent)
             };
 #if NETSTANDARD2_0
-            await blob.UploadAsync(BinaryData.FromObjectAsJson(auditEvent, JsonSettings), options);
+            await blob.UploadAsync(new BinaryData(auditEvent, JsonSettings), options);
 #else
-            await blob.UploadAsync(BinaryData.FromObjectAsJson(auditEvent, Core.Configuration.JsonSettings), options);
+            await blob.UploadAsync(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options);
 #endif
             return blobName;
         }

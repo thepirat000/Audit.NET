@@ -3,7 +3,7 @@
     <Description>Alternative Newtonsoft.JSON serialization for Audit.NET</Description>
     <Copyright>Copyright 2021</Copyright>
     <AssemblyTitle>Audit.NET.JsonNewtonsoftAdapter</AssemblyTitle>
-    <VersionPrefix>19.0.4</VersionPrefix>
+    <VersionPrefix>19.0.5</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
