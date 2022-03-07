@@ -3,7 +3,7 @@
     <Description>Alternative System.Text.Json serialization for Audit.NET</Description>
     <Copyright>Copyright 2021</Copyright>
     <AssemblyTitle>Audit.NET.JsonSystemAdapter</AssemblyTitle>
-    <VersionPrefix>19.0.5</VersionPrefix>
+    <VersionPrefix>19.0.6</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

@@ -382,7 +382,7 @@ namespace Audit.PostgreSql.Providers
             {
                 for (int i = 0; i < CustomColumns.Count; i++)
                 {
-                    parameters.Add(new NpgsqlParameter($"c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                    parameters.Add(new NpgsqlParameter($"c{i}", CustomColumns[i].Value.Invoke(auditEvent) ?? DBNull.Value));
                 }
             }
             return parameters.ToArray();
@@ -400,7 +400,7 @@ namespace Audit.PostgreSql.Providers
             {
                 for (int i = 0; i < CustomColumns.Count; i++)
                 {
-                    parameters.Add(new NpgsqlParameter($"c{i}", CustomColumns[i].Value.Invoke(auditEvent)));
+                    parameters.Add(new NpgsqlParameter($"c{i}", CustomColumns[i].Value.Invoke(auditEvent) ?? DBNull.Value));
                 }
             }
             return parameters.ToArray();

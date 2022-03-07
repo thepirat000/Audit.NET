@@ -5,4 +5,4 @@ start "MONGO" "D:\Program Files\MongoDB\Server\3.4\bin\mongod.exe"
 start "DYNAMO" /D D:\DynamoDb "D:\DynamoDb\Run.bat"
 net start mysql80
 net start mssqlserver
-net start postgresql-x64-13
+net start postgresql-x64-14

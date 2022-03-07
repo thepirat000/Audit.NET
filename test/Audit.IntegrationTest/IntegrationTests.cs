@@ -196,7 +196,8 @@ namespace Audit.IntegrationTest
                         .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)
                         .LastUpdatedColumnName("updated_date")
                         .CustomColumn("event_type", ev => ev.EventType)
-                        .CustomColumn("some_date", ev => DateTime.UtcNow))
+                        .CustomColumn("some_date", ev => DateTime.UtcNow)
+                        .CustomColumn("some_null", ev => null))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
