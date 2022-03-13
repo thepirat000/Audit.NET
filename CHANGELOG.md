@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.0.7] - 2022-03-13
+- Audit.NET.Elasticsearch: Fix issue using Auto Generated IDs. Change to use an IndexRequest instead of a CreateRequest (#473)
+
 ## [19.0.5] - 2022-03-07
 - Audit.NET.PostgreSql: Fix issue when setting null to a custom column (#357)
 

@@ -20,6 +20,11 @@ namespace Audit.Elasticsearch.Providers
         private readonly Lazy<IElasticClient> _client;
 
         /// <summary>
+        /// The Elasticsearch NEST client
+        /// </summary>
+        public IElasticClient Client => _client.Value;
+
+        /// <summary>
         /// The Elasticsearch connection settings to use. 
         /// The recommendation is to return an instance of AuditConnectionSettings in order to use the proper Audit Event serializer.
         /// </summary>
@@ -80,8 +85,8 @@ namespace Audit.Elasticsearch.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-            var createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
-            var response = _client.Value.Create(createRequest);
+            var createRequest = new IndexRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
+            var response = Client.Index(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
                 return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
@@ -96,8 +101,8 @@ namespace Audit.Elasticsearch.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-            ICreateRequest<AuditEvent> createRequest = new CreateRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
-            var response = await _client.Value.CreateAsync(createRequest);
+            var createRequest = new IndexRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
+            var response = await Client.IndexAsync(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
                 return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
@@ -113,7 +118,7 @@ namespace Audit.Elasticsearch.Providers
         {
             var el = eventId as ElasticsearchAuditEventId;
             var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
-            var response = _client.Value.Index(indexRequest);
+            var response = Client.Index(indexRequest);
             if (response.OriginalException != null)
             {
                 throw response.OriginalException;
@@ -124,7 +129,7 @@ namespace Audit.Elasticsearch.Providers
         {
             var el = eventId as ElasticsearchAuditEventId;
             var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
-            var response = await _client.Value.IndexAsync(indexRequest);
+            var response = await Client.IndexAsync(indexRequest);
             if (response.OriginalException != null)
             {
                 throw response.OriginalException;
@@ -140,7 +145,7 @@ namespace Audit.Elasticsearch.Providers
         public T GetEvent<T>(ElasticsearchAuditEventId eventId) where T : AuditEvent
         {
             var request = new GetRequest(eventId.Index, eventId.Id);
-            var response = _client.Value.Get(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
+            var response = Client.Get(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
             if (response.IsValid && response.Found)
             {
                 return response.Source;
@@ -161,7 +166,7 @@ namespace Audit.Elasticsearch.Providers
         public async Task<T> GetEventAsync<T>(ElasticsearchAuditEventId eventId) where T : AuditEvent
         {
             var request = new GetRequest(eventId.Index, eventId.Id);
-            var response = await _client.Value.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
+            var response = await Client.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
             if (response.IsValid && response.Found)
             {
                 return response.Source;
