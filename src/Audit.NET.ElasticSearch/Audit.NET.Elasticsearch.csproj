@@ -32,6 +32,7 @@
   <ItemGroup>
     <PackageReference Include="NEST" Version="7.17.0" />
     <PackageReference Include="NEST.jsonnetserializer" Version="7.17.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
