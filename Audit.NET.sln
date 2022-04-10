@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29102.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E62475E8-0BE1-4464-BBD9-FD06CC546593}"
 EndProject
@@ -125,7 +125,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WCF.Client", "src\Aud
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Wcf.UnitTest", "test\Audit.Wcf.UnitTest\Audit.Wcf.UnitTest.csproj", "{E659C62F-FFFC-4C79-BF2B-ADF94628AC96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.NET.AzureStorageBlobs", "src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj", "{18423ECF-EF88-4145-9582-A894A096C1E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.AzureStorageBlobs", "src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj", "{18423ECF-EF88-4145-9582-A894A096C1E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.RavenDB", "src\Audit.NET.RavenDB\Audit.NET.RavenDB.csproj", "{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.RavenDB.UnitTest", "test\Audit.RavenDB.UnitTest\Audit.RavenDB.UnitTest.csproj", "{0A61745A-5FF6-43A1-9634-FE029217A4E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -535,6 +539,22 @@ Global
 		{18423ECF-EF88-4145-9582-A894A096C1E8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18423ECF-EF88-4145-9582-A894A096C1E8}.Release|x64.ActiveCfg = Release|Any CPU
 		{18423ECF-EF88-4145-9582-A894A096C1E8}.Release|x64.Build.0 = Release|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Debug|x64.Build.0 = Debug|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Release|x64.ActiveCfg = Release|Any CPU
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC}.Release|x64.Build.0 = Release|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Debug|x64.Build.0 = Debug|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Release|x64.ActiveCfg = Release|Any CPU
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -592,6 +612,8 @@ Global
 		{7EDB1EC7-D0C4-4A4E-BB64-57205101936D} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{E659C62F-FFFC-4C79-BF2B-ADF94628AC96} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 		{18423ECF-EF88-4145-9582-A894A096C1E8} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
+		{9CFFC932-7B09-4B5D-A7DE-DB5F717BFBEC} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
+		{0A61745A-5FF6-43A1-9634-FE029217A4E4} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}

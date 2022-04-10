@@ -1,11 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Audit.JsonNewtonsoftAdapter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Audit.Core
 {
+    /// <summary>
+    /// Adapter to serialize Audit Events using Newtonsoft.Json instead of the default System.Text.Json.
+    /// This adapter will register and use a custom IContractResolver that honors <see cref="JsonExtensionDataAttribute"/> and <see cref="JsonIgnoreAttribute"/> from <see cref="System.Text.Json.Serialization"/>
+    /// </summary>
     public class JsonNewtonsoftAdapter : IJsonAdapter
     {
         public JsonSerializerSettings Settings { get; set; }
@@ -14,12 +19,18 @@ namespace Audit.Core
         {
             Settings = new JsonSerializerSettings()
             {
+                ContractResolver = new AuditContractResolver(),
                 NullValueHandling = NullValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
         }
+
         public JsonNewtonsoftAdapter(JsonSerializerSettings settings)
         {
+            if (settings.ContractResolver == null)
+            {
+                settings.ContractResolver = new AuditContractResolver();
+            }
             Settings = settings;
         }
         

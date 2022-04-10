@@ -4,7 +4,7 @@
     <Description>Generate Audit Logs from EntityFramework context changes</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
-    <VersionPrefix>19.0.7</VersionPrefix>
+    <VersionPrefix>19.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472;net5.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
@@ -94,7 +94,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
 	<PackageReference Include="System.Text.Json" Version="5.0.2" />

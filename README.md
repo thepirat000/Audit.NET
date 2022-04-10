@@ -17,6 +17,7 @@ With Audit.NET you can generate tracking information about operations being exec
 [Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
 [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), 
 [PostgreSQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md), 
+[RavenDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/README.md), 
 [MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md), 
 [AzureBlob](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md), 
 [AzureCosmos](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/README.md), 
@@ -554,6 +555,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()`
 [MySqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/Providers/MySqlDataProvider.cs) | [Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MySql#auditnetmysql) | Store the events as rows in a **MySQL** database table, in JSON format. | `.UseMySql()` 
 [PostgreSqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/Providers/PostgreSqlDataProvider.cs) | [Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.PostgreSql#auditnetpostgresql) | Store the events as rows in a **PostgreSQL** database table, in JSON format. | `.UsePostgreSql()`
+[RavenDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/Providers/RavenDbSqlDataProvider.cs) | [Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.RavenDB#auditnetravendb) | Store the events as documents in a **Raven DB** database table, in JSON format. | `.UseRavenDB()`
 [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()`
 [AzureCosmosDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/Providers/AzureCosmosDataProvider.cs) | [Audit.NET.AzureCosmos](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureCosmos#auditnetazurecosmos) | Store the events in an **Azure Cosmos DB** container, in JSON format. | `.UseAzureCosmos()`
 [AzureStorageBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/Providers/AzureStorageBlobDataProvider.cs) | [Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageBlobs) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureStorageBlobs()`
@@ -697,7 +699,7 @@ Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings()
 };
 ```
 
-Or, if you target net5.0, using System.Text.Json:
+Or, if you target net5.0 or higher, using System.Text.Json:
 
 ```c#
 Audit.Core.Configuration.JsonSettings = new JsonSerializerOptions
@@ -709,10 +711,8 @@ Audit.Core.Configuration.JsonSettings = new JsonSerializerOptions
 
 #### Custom serialization mechanism
 
-If you want to use a custom JSON serialization mechanism, you should create a class implementing `IJsonAdapter` and assign it to the 
+If you want to use a custom JSON serialization mechanism for the Audit Events, you can create a class implementing `IJsonAdapter` and assign it to the 
 static property `Configuration.JsonAdapter`.
-
-> NOTE: Take into account that some of the `AuditEvent` properties relies on attribute decoration for the serialization / deserialization mechanism (i.e. `[JsonExtensionData]` and `[JsonIgnore]`). So if you change the default serialization mechanism, some of the `AuditEvent` fields could be serialized differently than expected. For example on .NET 5.0, the `AuditEvent.CustomFields` property is decorated with `JsonExtensionData` from `System.Text.Json`, so if the audit event is serialized using `Newtonsoft.Json`, then the `CustomFields` property will be serialized as a normal field.
 
 For example:
 ```c#
@@ -726,13 +726,17 @@ Audit.Core.Configuration.Setup()
     ...
 ```
 
+> NOTE: Take into account that some of the `AuditEvent` properties relies on attribute decoration for serialization and deserialization.
+(On .NET 5.0 and higher, these decorations are from `System.Text.Json`, but when targeting an older .NET framework the decorators are from `Newtonsoft.Json`).
+The recommendation is to use the alternative adapters provided (see next section).
+
 #### Alternative serialization mechanism
 
-There are also two libraries provided to use the alternative JSON serialization mechanism:
+Two libraries are provided to configure an alternative JSON serialization mechanism:
 
 - [`Audit.NET.JsonNewtonsoftAdapter`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonNewtonsoftAdapter): 
 
-    When you target .NET >= 5.0 but want to use `Newtonsoft.Json`.
+    To use when you target .NET 5.0 or higher, but you want to use `Newtonsoft.Json` as the serialization mechanism.
 
     Add a reference to the library `Audit.NET.JsonNewtonsoftAdapter` and set an instance of `JsonNewtonsoftAdapter`
     to the static configuration property `Configuration.JsonAdapter`, for example:
@@ -752,6 +756,9 @@ There are also two libraries provided to use the alternative JSON serialization 
         .JsonNewtonsoftAdapter(settings)
         ...
     ```
+
+    > NOTE: This `JsonNewtonsoftAdapter` takes into account `JsonExtensionDataAttribute` and `JsonIgnoreAttribute` decorators from both `System.Text.Json` and `Newtonsoft.Json`, so the Audit Events 
+    > will be properly serialized.
 
 - [`Audit.NET.JsonSystemSerializer`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonSystemAdapter): 
 
@@ -857,6 +864,7 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img src="https://i.imgur.com/NHRBp86.png" alt="icon" width="80"/> | **[Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md)** | Store the events as rows in **MySQL** database, in JSON format.
 <img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md)** | Store the audit events using NLog™.
 <img src="https://i.imgur.com/ZxbDxAU.png" alt="icon" width="80"/> | **[Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md)** | Store the events as rows in a **PostgreSQL** database, in JSON format.
+<img src="https://i.imgur.com/C0Xu3iX.png" alt="icon" width="80"/> | **[Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/README.md)** | Store the events as documents in a **Raven DB** database, in JSON format.
 <img src="https://i.imgur.com/abs6duI.png" alt="icon" width="80"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set or publishing to a Redis PubSub channel.
 <img src="https://i.imgur.com/lmzs1gw.png" alt="icon" width="80"/> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
 <img src="https://i.imgur.com/FItQD9n.png" alt="icon" width="80"/> | **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)** | Send Audit Logs as **UDP datagrams** to a network.

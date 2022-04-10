@@ -3,7 +3,7 @@
     <Description>Generate Audit Logs for ASP.NET SignalR invokations</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.SignalR</AssemblyTitle>
-    <VersionPrefix>19.0.7</VersionPrefix>
+    <VersionPrefix>19.1.0</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFramework>net45</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
@@ -30,7 +30,7 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>

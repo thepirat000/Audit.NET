@@ -16,6 +16,11 @@ namespace Audit.Core
     public class AuditEvent : IAuditOutput
     {
         /// <summary>
+        /// Indicates the change type (i.e. CustomerOrder Update)
+        /// </summary>
+        public string EventType { get; set; }
+
+        /// <summary>
         /// The enviroment information
         /// </summary>
 #if IS_NK_JSON
@@ -24,14 +29,6 @@ namespace Audit.Core
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 #endif
         public AuditEventEnvironment Environment { get; set; }
-
-        /// <summary>
-        /// Indicates the change type (i.e. CustomerOrder Update)
-        /// </summary>
-#if IS_NK_JSON
-        [JsonProperty(Order = -999)]
-#endif
-        public string EventType { get; set; }
 
         /// <summary>
         /// The extension data. 

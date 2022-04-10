@@ -26,6 +26,7 @@ del "audit.dynamicproxy\bin\debug\*.symbols.nupkg"
 del "audit.net.udp\bin\debug\*.symbols.nupkg"
 del "audit.net.redis\bin\debug\*.symbols.nupkg"
 del "Audit.NET.PostgreSql\bin\debug\*.symbols.nupkg"
+del "Audit.NET.RavenDB\bin\debug\*.symbols.nupkg"
 del "Audit.FileSystem\bin\debug\*.symbols.nupkg"
 del "Audit.SignalR\bin\debug\*.symbols.nupkg"
 del "Audit.NET.log4net\bin\debug\*.symbols.nupkg"
@@ -62,6 +63,7 @@ nuget push "Audit.DynamicProxy\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Udp\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Redis\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.PostgreSql\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.RavenDB\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.FileSystem\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.SignalR\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.log4net\bin\debug\*.nupkg" -NoSymbols -source %1

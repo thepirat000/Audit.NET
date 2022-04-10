@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.1.0] - 2022-04-10
+- Audit.NET.JsonNewtonsoftAdapter: New `AuditContractResolver` configured by default on the Newtonsoft.Json adapter to enhance 
+compatibility when targeting newer frameworks (.NET >= 5.0) and still using Newtonsoft.Json as the serializer.
+- Audit.NET.RavenDB: New data provider `Audit.NET.RavenDB` for storing Audit Events as documents on Raven DB. (#485)
+
 ## [19.0.7] - 2022-03-13
 - Audit.NET.Elasticsearch: Fix issue using Auto Generated IDs. Change to use an IndexRequest instead of a CreateRequest (#473)
 

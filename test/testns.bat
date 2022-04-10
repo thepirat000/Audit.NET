@@ -22,13 +22,15 @@ echo Running...
 cd ..
 
 cd Audit.UnitTest
-echo ---------------------------------------------- RUNNING GENERAL UNIT TESTS (2) ----------------------------------------------
-TITLE RUNNING GENERAL UNIT TESTS (2)
+echo ---------------------------------------------- RUNNING GENERAL UNIT TESTS (2.1) ----------------------------------------------
+TITLE RUNNING GENERAL UNIT TESTS (2.1)
 dotnet test --logger:"console;verbosity=normal"
 
 echo Running...
 cd ..
 
+echo ---------------------------------------------- RUNNING JSON ADAPTER UNIT TESTS (2.2) ----------------------------------------------
+TITLE RUNNING JSON ADAPTER UNIT TESTS (2.2)
 cd Audit.JsonAdapter.UnitTest
 dotnet test --logger:"console;verbosity=normal"
 cd ..
@@ -106,6 +108,13 @@ cd ..
 cd Audit.Wcf.UnitTest
 echo ---------------------------------------------- RUNNING WCF CLIENT TESTS (10.2) ----------------------------------------------
 TITLE RUNNING WCF CLIENT TESTS (10.2)
+dotnet test --logger:"console;verbosity=normal"
+echo Running...
+cd ..
+
+cd Audit.RavenDB.UnitTest
+echo ---------------------------------------------- RUNNING RAVEN TESTS (10.3) ----------------------------------------------
+TITLE RUNNING RAVEN TESTS (10.3)
 dotnet test --logger:"console;verbosity=normal"
 echo Running...
 cd ..

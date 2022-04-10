@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net461;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net461;net5.0;net6.0</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
@@ -28,18 +28,18 @@
     <PackageReference Include="Moq" Version="4.7.99" />
   </ItemGroup>
     
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
     <ProjectReference Include="..\..\src\Audit.NET.JsonNewtonsoftAdapter\Audit.NET.JsonNewtonsoftAdapter.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <ProjectReference Include="..\..\src\Audit.NET.JsonSystemAdapter\Audit.NET.JsonSystemAdapter.csproj" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
     <DefineConstants>$(DefineConstants);NK_JSON</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
     <DefineConstants>$(DefineConstants);TEXT_JSON</DefineConstants>
   </PropertyGroup>
 

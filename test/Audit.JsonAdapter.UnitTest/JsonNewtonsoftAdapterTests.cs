@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Newtonsoft.Json;
 using Audit.Core;
 using System.Collections.Generic;
+using Newtonsoft.Json.Serialization;
 
 namespace Audit.JsonNetAdapter.UnitTest
 {
@@ -20,6 +21,7 @@ namespace Audit.JsonNetAdapter.UnitTest
         {
             var settings = new JsonSerializerSettings()
             {
+                Formatting = Formatting.Indented,
                 TypeNameHandling = TypeNameHandling.All
             };
             var evs = new List<string>();
@@ -30,12 +32,17 @@ namespace Audit.JsonNetAdapter.UnitTest
                     evs.Add(ev.ToJson());
                 }));
 
-            using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "test" }))
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "test", ExtraFields = new { ExtraField = 123 } } ))
             {
             }
 
+            var deserialized = AuditEvent.FromJson(evs[0]);
+
             Assert.AreEqual(1, evs.Count);
             Assert.IsTrue(evs[0].Contains(@"""$type"":"));
+            Assert.IsFalse(evs[0].Contains(@"""CustomFields"""));
+            Assert.IsTrue(evs[0].Contains(@"""ExtraField"""));
+            Assert.AreEqual("123", deserialized.CustomFields["ExtraField"].ToString());
         }
     }
 }

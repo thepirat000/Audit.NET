@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<LangVersion>8.0</LangVersion>
+		<Description>Store Audit.NET Trail Logs into RavenDB</Description>
+		<PackageDescription>Store Audit.NET Trail Logs into a RavenDB document store</PackageDescription>
+		<Copyright>Copyright 2022</Copyright>
+		<AssemblyTitle>Audit.RavenDB</AssemblyTitle>
+		<VersionPrefix>19.1.0</VersionPrefix>
+		<Authors>opsAI;Federico Colombo</Authors>
+		<TargetFrameworks>net5.0;net6.0;netstandard2.0</TargetFrameworks>
+		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+		<NoWarn>$(NoWarn);1573;1591;3001;3003</NoWarn>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyName>Audit.NET.RavenDB</AssemblyName>
+		<AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+		<PackageId>Audit.NET.RavenDB</PackageId>
+		<PackageTags>audit.net;audit;audit trails;ravendb</PackageTags>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="RavenDB.Client" Version="5.3.101" Exclude="Build,Analyzers" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
+		<ProjectReference Include="..\Audit.NET.JsonNewtonsoftAdapter\Audit.NET.JsonNewtonsoftAdapter.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="images\icon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' ">
+		<DefineConstants>$(DefineConstants);IS_NK_JSON</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
+		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
+	</PropertyGroup>
+</Project>

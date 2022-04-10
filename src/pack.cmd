@@ -26,6 +26,7 @@ del "audit.dynamicproxy\bin\debug\*.nupkg"
 del "audit.net.udp\bin\debug\*.nupkg"
 del "audit.net.redis\bin\debug\*.nupkg"
 del "Audit.NET.PostgreSql\bin\debug\*.nupkg"
+del "Audit.NET.RavenDB\bin\debug\*.nupkg"
 del "Audit.FileSystem\bin\debug\*.nupkg"
 del "Audit.SignalR\bin\debug\*.nupkg"
 del "Audit.NET.log4net\bin\debug\*.nupkg"
@@ -66,6 +67,7 @@ dotnet pack "Audit.DynamicProxy/"
 dotnet pack "Audit.NET.Udp/"
 dotnet pack "Audit.NET.Redis/"
 dotnet pack "Audit.NET.PostgreSql/"
+dotnet pack "Audit.NET.RavenDB/"
 dotnet pack "Audit.FileSystem/"
 dotnet pack "Audit.SignalR/"
 dotnet pack "Audit.NET.log4net/"
@@ -79,3 +81,4 @@ dotnet pack "Audit.NET.Kafka/"
 
 ECHO.
 ECHO ADD TAG NOW !
+ECHO git tag -a x.x.x -m x.x.x
