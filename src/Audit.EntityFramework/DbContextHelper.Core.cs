@@ -293,6 +293,12 @@ namespace Audit.EntityFramework
                     {
                         efEntry.ColumnValues[fk.Key] = fk.Value;
                     }
+
+                    var change = efEntry.Changes?.FirstOrDefault(e => e.ColumnName == fk.Key);
+                    if (change != null)
+                    {
+                        change.NewValue = fk.Value;
+                    }
                 }
             }
             // Update ConnectionId
