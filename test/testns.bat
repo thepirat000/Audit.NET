@@ -1,5 +1,4 @@
 @echo off
-
 title Audit.NET Unit Tests Runner
 
 echo Disabling GitHub nuget source to avoid conflicts
