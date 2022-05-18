@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Generate Audit Logs for ASP.NET SignalR invokations</Description>
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.SignalR</AssemblyTitle>
-    <VersionPrefix>19.1.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFramework>net45</TargetFramework>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

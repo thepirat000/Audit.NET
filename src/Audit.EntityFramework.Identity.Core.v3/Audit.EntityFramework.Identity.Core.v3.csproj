@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity.Core.v3</AssemblyTitle>
-    <VersionPrefix>19.1.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

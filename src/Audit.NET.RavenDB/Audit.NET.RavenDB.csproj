@@ -1,11 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<LangVersion>8.0</LangVersion>
 		<Description>Store Audit.NET Trail Logs into RavenDB</Description>
 		<PackageDescription>Store Audit.NET Trail Logs into a RavenDB document store</PackageDescription>
 		<Copyright>Copyright 2022</Copyright>
 		<AssemblyTitle>Audit.RavenDB</AssemblyTitle>
-		<VersionPrefix>19.1.1</VersionPrefix>
 		<Authors>opsAI;Federico Colombo</Authors>
 		<TargetFrameworks>net5.0;net6.0;netstandard2.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>

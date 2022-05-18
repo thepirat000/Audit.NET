@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Send Audit.NET Trail Logs to an Apache Kafka server</Description>
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.Kafka</AssemblyTitle>
-    <VersionPrefix>19.1.1</VersionPrefix>
     <Authors>Federico Colombo</Authors>
     <TargetFrameworks>netstandard2.0;netstandard1.3;net45;net5.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
