@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-	 <Version>19.1.1</Version>
-	 <PackageReleaseNotes></PackageReleaseNotes>
+	 <Version>19.1.2</Version>
+	 <PackageReleaseNotes>Audit.MVC / Audit.MVC.Core: Adding extension methods on HttpContext to get the Audit Scope (#492)</PackageReleaseNotes>
  </PropertyGroup>
 </Project>

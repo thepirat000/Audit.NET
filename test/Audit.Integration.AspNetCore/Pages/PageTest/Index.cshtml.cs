@@ -18,7 +18,7 @@ namespace Audit.Integration.AspNetCore.Pages.Test
 
         public void OnGet(string name)
         {
-            var scope = this.GetCurrentAuditScope();
+            var scope = this.HttpContext.GetCurrentAuditScope();
             if (scope == null)
             {
                 throw new Exception("Current Scope is null");
