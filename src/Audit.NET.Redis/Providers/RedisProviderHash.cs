@@ -13,7 +13,28 @@ namespace Audit.Redis.Providers
     {
         protected Func<AuditEvent, string> FieldBuilder { get; set; }
 
-
+        /// <summary>
+        /// Creates new redis provider that uses Redis Hashes to store the events.
+        /// </summary>
+        /// <param name="configurationOptions">The redis configuration options.
+        /// </param>
+        /// <param name="keyBuilder">A function that returns the Redis Key to use</param>
+        /// <param name="timeToLive">The Time To Live for the Redis Key. NULL for no TTL.</param>
+        /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
+        /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
+        /// <param name="fieldBuilder">A function that returns the hash field to use.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
+        public RedisProviderHash(ConfigurationOptions configurationOptions, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
+            Func<AuditEvent, byte[]> serializer,
+            Func<byte[], AuditEvent> deserializer,
+            Func<AuditEvent, string> fieldBuilder,
+            Func<AuditEvent, int> dbIndexBuilder,
+            List<Func<IBatch, AuditEvent, Task>> extraTasks)
+            : base(configurationOptions, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
+        {
+            FieldBuilder = fieldBuilder;
+        }
 
         /// <summary>
         /// Creates new redis provider that uses Redis Hashes to store the events.

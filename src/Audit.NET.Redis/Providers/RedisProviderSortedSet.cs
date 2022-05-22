@@ -21,6 +21,42 @@ namespace Audit.Redis.Providers
         /// <summary>
         /// Creates new redis provider that uses a Redis Sorted Set to store the events.
         /// </summary>
+        /// <param name="configurationOptions">The redis configuration options.
+        /// </param>
+        /// <param name="keyBuilder">A function that returns the Redis Key to use</param>
+        /// <param name="timeToLive">The Time To Live for the Redis Key. NULL for no TTL.</param>
+        /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
+        /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
+        /// <param name="scoreBuilder">A function that returns the score for the sorted set member.</param>
+        /// <param name="maxScoreBuilder">A function that returns the maximum score allowed for the sorted set members.</param>
+        /// <param name="maxScoreExclusive">Indicates if the maximum is an Exclusive range. Default is Inclusive.</param>
+        /// <param name="minScoreBuilder">A function that returns the minimum score allowed for the sorted set members.</param>
+        /// <param name="minScoreExclusive">Indicates if the minimum is an Exclusive range. Default is Inclusive.</param>
+        /// <param name="maxRankBuilder">A function that returns the maximum rank allowed for a capped collection. Greater than zero to maintain the top M scored elements. Less than zero to maintain the bottom -M scored elements.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
+        public RedisProviderSortedSet(ConfigurationOptions configurationOptions, Func<AuditEvent, string> keyBuilder,
+            TimeSpan? timeToLive,
+            Func<AuditEvent, byte[]> serializer,
+            Func<byte[], AuditEvent> deserializer,
+            Func<AuditEvent, double> scoreBuilder, Func<AuditEvent, double> maxScoreBuilder = null, bool maxScoreExclusive = false,
+            Func<AuditEvent, double> minScoreBuilder = null, bool minScoreExclusive = false,
+            Func<AuditEvent, long> maxRankBuilder = null,
+            Func<AuditEvent, int> dbIndexBuilder = null,
+            List<Func<IBatch, AuditEvent, Task>> extraTasks = null)
+            : base(configurationOptions, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
+        {
+            ScoreBuilder = scoreBuilder;
+            MaxScoreBuilder = maxScoreBuilder;
+            MinScoreBuilder = minScoreBuilder;
+            MaxScoreExclusive = maxScoreExclusive;
+            MinScoreExclusive = minScoreExclusive;
+            MaxRankBuilder = maxRankBuilder;
+        }
+
+        /// <summary>
+        /// Creates new redis provider that uses a Redis Sorted Set to store the events.
+        /// </summary>
         /// <param name="connectionString">The redis connection string. https://stackexchange.github.io/StackExchange.Redis/Configuration
         /// </param>
         /// <param name="keyBuilder">A function that returns the Redis Key to use</param>

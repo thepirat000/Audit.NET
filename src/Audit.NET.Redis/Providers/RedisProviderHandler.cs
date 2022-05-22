@@ -25,10 +25,15 @@ namespace Audit.Redis.Providers
         protected List<Func<IBatch, AuditEvent, Task>> ExtraTasks { get; set; }
 
         protected RedisProviderHandler(string connectionString, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive, Func<AuditEvent, byte[]> serializer,
+            Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder, List<Func<IBatch, AuditEvent, Task>> extraTasks) 
+            : this(ConfigurationOptions.Parse(connectionString), keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
+        {
+        }
+
+        protected RedisProviderHandler(ConfigurationOptions configurationOptions, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive, Func<AuditEvent, byte[]> serializer,
             Func<byte[], AuditEvent> deserializer, Func<AuditEvent, int> dbIndexBuilder, List<Func<IBatch, AuditEvent, Task>> extraTasks)
         {
-            Context = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(connectionString), LazyThreadSafetyMode.ExecutionAndPublication);
-            ConnectionString = connectionString;
+            Context = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(configurationOptions), LazyThreadSafetyMode.ExecutionAndPublication);
             KeyBuilder = keyBuilder;
             TimeToLive = timeToLive;
             Serializer = serializer ?? (ev => Encoding.UTF8.GetBytes(ev.ToJson()));

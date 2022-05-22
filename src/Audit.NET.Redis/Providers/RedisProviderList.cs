@@ -16,6 +16,29 @@ namespace Audit.Redis.Providers
         /// <summary>
         /// Creates new redis provider that uses a Redis List to store the events.
         /// </summary>
+        /// <param name="configurationOptions">The redis configuration options.
+        /// </param>
+        /// <param name="keyBuilder">A function that returns the Redis Key to use</param>
+        /// <param name="timeToLive">The Time To Live for the Redis Key. NULL for no TTL.</param>
+        /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
+        /// <param name="deserializer">Custom deserializer to retrieve events from the redis server. Default is the audit event deserialized from UTF-8 JSon.</param>
+        /// <param name="maxLength">Maximum quantity of events that the list will store. Older elements will be deleted. Default is 0 for no-limit.</param>
+        /// <param name="dbIndexBuilder">A function that returns the database ID to use.</param>
+        /// <param name="extraTasks">A list of extra redis commands to execute.</param>
+        public RedisProviderList(ConfigurationOptions configurationOptions, Func<AuditEvent, string> keyBuilder, TimeSpan? timeToLive,
+            Func<AuditEvent, byte[]> serializer,
+            Func<byte[], AuditEvent> deserializer,
+            long maxLength,
+            Func<AuditEvent, int> dbIndexBuilder,
+            List<Func<IBatch, AuditEvent, Task>> extraTasks)
+            : base(configurationOptions, keyBuilder, timeToLive, serializer, deserializer, dbIndexBuilder, extraTasks)
+        {
+            MaxLength = maxLength;
+        }
+
+        /// <summary>
+        /// Creates new redis provider that uses a Redis List to store the events.
+        /// </summary>
         /// <param name="connectionString">The redis connection string. https://stackexchange.github.io/StackExchange.Redis/Configuration
         /// </param>
         /// <param name="keyBuilder">A function that returns the Redis Key to use</param>

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Providers
 {
@@ -10,6 +11,20 @@ namespace Audit.Redis.Providers
     public class RedisProviderPubSub : RedisProviderHandler
     {
         protected Func<AuditEvent, string> ChannelBuilder { get; set; }
+
+        /// <summary>
+        /// Creates new redis provider that uses Redis PubSub channel to send the events.
+        /// </summary>
+        /// <param name="configurationOptions">The redis configuration options.
+        /// </param>
+        /// <param name="serializer">Custom serializer to store/send the data on/to the redis server. Default is the audit event serialized as JSon encoded as UTF-8.</param>
+        /// <param name="channelBuilder">A function that returns the Redis PubSub Channel to use.</param>
+        public RedisProviderPubSub(ConfigurationOptions configurationOptions, Func<AuditEvent, byte[]> serializer,
+            Func<AuditEvent, string> channelBuilder)
+            : base(configurationOptions, null, null, serializer, null, null, null)
+        {
+            ChannelBuilder = channelBuilder;
+        }
 
         /// <summary>
         /// Creates new redis provider that uses Redis PubSub channel to send the events.

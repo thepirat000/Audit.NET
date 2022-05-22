@@ -1,5 +1,6 @@
 using System;
 using Audit.Core;
+using StackExchange.Redis;
 
 namespace Audit.Redis.Configuration
 {
@@ -14,6 +15,12 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="connectionString">The redis connection string.</param>
         IRedisConfigurator ConnectionString(string connectionString);
+        /// <summary>
+        /// Specifies the redis connection configuration options.
+        /// https://stackexchange.github.io/StackExchange.Redis/Configuration
+        /// </summary>
+        /// <param name="configuration">The redis configuration options.</param>
+        IRedisConfigurator ConfigurationOptions(ConfigurationOptions configuration);
         /// <summary>
         /// Specifies a custom serializer to store/send the data on/to the redis server.
         /// Default is the audit event serialized as JSon encoded as UTF-8.

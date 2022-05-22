@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.1.3] - 2022-05-20
+- Audit.NET.Redis: Allow setting redis connection configuration via ConfigurationOptions (#493)
+
 ## [19.1.2] - 2022-05-18
 - Audit.MVC / Audit.MVC.Core: Adding extension methods on HttpContext to get the Audit Scope `Audit.Mvc.GetCurrentAuditScope()` (#492)
 

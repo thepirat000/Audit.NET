@@ -42,6 +42,7 @@ If you need to set different providers/configuration per scope, you can use the 
 
 ## Common settings
 - `ConnectionString` indicates the redis connection string, based on [StackExchange.Redis configuration](https://stackexchange.github.io/StackExchange.Redis/Configuration).
+- `ConfigurationOptions` indicates the redis connection configuration options, when you need to provide custom connection options. Alternative to ConnectionString.
 - `Serializer` indicates a custom serialization method for the audit events. By default the events are serialized as JSON encoded as UTF-8.
 
 ## Modes
