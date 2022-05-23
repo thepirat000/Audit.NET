@@ -153,7 +153,7 @@ using (var ctx = new MyContext(options))
 > 
 > Notice that a new instance of the interceptor is registered for each DbContext instance. This is because the auditing interceptor contains state linked to the current context instance.
  
-#### Notes
+#### Considerations
 
 - All the Save Changes interception methods produces the same output. You should use **only one** of these methods, otherwise you could get duplicated audit logs.
 
@@ -179,7 +179,7 @@ using (var ctx = new MyContext(options))
 > **Note**
 > 
 > The **Command Interceptor** generates a different type of [audit output](#command-interceptor-audit-output) than the **Save Changes Interceptor**.
-> You can combine the Command Interceptor with any of the Save Changes interception mechanisms
+> Nevertheless, you can combine the Command Interceptor with any of the Save Changes interception mechanisms.
 
 ## Configuration
 
@@ -198,6 +198,8 @@ The following settings can be configured per DbContext or globally:
    - \{context}: replaced with the Db Context type name.
    - \{database}: replaced with the database name.
 - **IncludeIndependantAssociations**: Value to indicate if the Independant Associations should be included. Default is false. (Only for EF <= 6.2)
+ > **Note**
+ > 
  > Note: EF Core <= 3 does not support many-to-many relations without a join entity, and for EF Core 5 the many-to-many relations are normally included on the audit event entries. 
 - **ExcludeTransactionId**: Value to indicate if the Transaction IDs should be excluded from the output and not be retrieved (default is false to include the Transaction IDs).
 - **ExcludeValidationResults**: Value to indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
