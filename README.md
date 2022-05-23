@@ -144,8 +144,12 @@ using (AuditScope.Create("Order:Update", () => order))
 }
 ```
 
+> **Note**
+> 
 > It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing the detection of exceptions and calculating the duration by implicitly saving the event on disposal. 
 
+> **Note**
+> 
 > When using the [extensions](#extensions) that logs interactions with different systems, like [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), etc. you don't need to explicitly create the `AuditScope` or `AuditEvent`, they are created internally by the extension.
 
 ### Simple logging
@@ -211,7 +215,9 @@ public async Task SaveOrderAsync(Order order)
 }
 ```
 
-> Note: On older .NET framework versions [the `Dispose` method was always synchronous](https://github.com/dotnet/roslyn/issues/114), so if your audit code is on async methods and you created the scope within a `using` statement, you should explicitly call the `DisposeAsync()` method. For projects targeting .NET Standard starting on version 2.0 and C# 8, you can simply use the `await using` statement, since the `AuditScope` implements the [`IAsyncDisposable` interface](https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable).
+> **Note**
+> 
+> On older .NET framework versions [the `Dispose` method was always synchronous](https://github.com/dotnet/roslyn/issues/114), so if your audit code is on async methods and you created the scope within a `using` statement, you should explicitly call the `DisposeAsync()` method. For projects targeting .NET Standard starting on version 2.0 and C# 8, you can simply use the `await using` statement, since the `AuditScope` implements the [`IAsyncDisposable` interface](https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable).
 
 ## Output
 
@@ -329,6 +335,8 @@ using (var audit = AuditScope.Create("Order:Update", () => order, new { Referenc
 }
 ```
 
+> **Note**
+> 
 > Custom fields are not limited to single properties, you can store any object as well, by default they will be JSON serialized.
 
 ### Extending AuditEvent
@@ -494,7 +502,9 @@ Audit.Core.Configuration.Setup()
 	.UseFactory(() => new LazyDataProvider());
 ```
 
-**NOTE:** If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
+> **Note**
+> 
+> If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
 
 See [Configuration section](#configuration) for more information.
 
@@ -561,7 +571,7 @@ Data Provider | Package | Description | [Configuration API](#configuration-fluen
 [AzureStorageBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/Providers/AzureStorageBlobDataProvider.cs) | [Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageBlobs) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureStorageBlobs()`
 [AzureTableDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/Providers/AzureTableDataProvider.cs) | [Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorage#auditnetazurestorage) | Store the events in an **Azure Table**. | `.UseAzureTableStorage()`
 [UdpDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/Providers/UdpDataProvider.cs) | [Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md) | Send Audit Logs as UDP datagrams to a network. | `.UseUdp()`
-[RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes or publish to a PubSub channel. | `.UseRedis()`
+[RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes, Streams or publish to a PubSub channel. | `.UseRedis()`
 [Log4netDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/Providers/Log4netDataProvider.cs) | [Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md) | Store the audit events using [Apache log4net™](https://logging.apache.org/log4net/). | `.UseLog4net()`
 [EntityFrameworkDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/Providers/EntityFrameworkDataProvider.cs) | [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md#entity-framework-data-provider) | Store EntityFramework audit events in the same EF context. (This data provider can only be used for Entity Framework audits) | `.UseEntityFramework()`
 [ElasticsearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/Providers/ElasticsearchDataProvider.cs) | [Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md) | Store audit events in Elasticsearch indices. | `.UseElasticsearch()`
@@ -594,6 +604,8 @@ using (var scope = AuditScope.Create(new AuditScopeOptions { CreationPolicy = Ev
 }
 ```
 
+> **Note**
+> 
 > If you don't provide a Creation Policy, the default Creation Policy configured will be used (see the [configuration](#configuration) section).
 
 ## AuditScope statechart
@@ -612,6 +624,8 @@ For example, to set your own provider as the default data provider:
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
+> **Note**
+> 
 > If you don't specify a Data Provider, a default `FileDataProvider` will be used to write the events as .json files into the current working directory.
 
 ### Creation Policy
@@ -622,6 +636,8 @@ For example, to set the default creation policy to Manual:
 Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
 ```
 
+> **Note**
+> 
 > If you don't specify a Creation Policy, the default `Insert on End` will be used.
 
 ### Custom Actions
@@ -726,9 +742,11 @@ Audit.Core.Configuration.Setup()
     ...
 ```
 
-> NOTE: Take into account that some of the `AuditEvent` properties relies on attribute decoration for serialization and deserialization.
+> **Note**
+> 
+> Take into account that some of the `AuditEvent` properties relies on attribute decoration for serialization and deserialization.
 (On .NET 5.0 and higher, these decorations are from `System.Text.Json`, but when targeting an older .NET framework the decorators are from `Newtonsoft.Json`).
-The recommendation is to use the alternative adapters provided (see next section).
+The recommendation is to use the default adapter amd, when needed, use the alternative adapters provided (see next section).
 
 #### Alternative serialization mechanism
 
@@ -865,7 +883,7 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img src="https://i.imgur.com/qxbK98k.png" alt="icon" width="80"/> | **[Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md)** | Store the audit events using NLog™.
 <img src="https://i.imgur.com/ZxbDxAU.png" alt="icon" width="80"/> | **[Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md)** | Store the events as rows in a **PostgreSQL** database, in JSON format.
 <img src="https://i.imgur.com/C0Xu3iX.png" alt="icon" width="80"/> | **[Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/README.md)** | Store the events as documents in a **Raven DB** database, in JSON format.
-<img src="https://i.imgur.com/abs6duI.png" alt="icon" width="80"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set or publishing to a Redis PubSub channel.
+<img src="https://i.imgur.com/abs6duI.png" alt="icon" width="80"/> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set, Streams or publishing to a Redis PubSub channel.
 <img src="https://i.imgur.com/lmzs1gw.png" alt="icon" width="80"/> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
 <img src="https://i.imgur.com/FItQD9n.png" alt="icon" width="80"/> | **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)** | Send Audit Logs as **UDP datagrams** to a network.
 <img src="https://i.imgur.com/C0Xu3iX.png" alt="icon" width="80"/> | **[Audit.NET.AmazonQLDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/README.md)** | Store the audit events in **Amazon QLDB** (Quantum Ledger Database).
