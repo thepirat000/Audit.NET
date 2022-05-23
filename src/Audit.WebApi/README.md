@@ -106,6 +106,8 @@ public class Startup
 }
 ```
 
+> **Note**
+> 
 > For custom configuration it is recommended to use the 
 > `AuditApiGlobalFilter` as a global filter. See next section.
 
@@ -164,7 +166,9 @@ public class Startup
 }
 ```
 
-> Note you should call `UseAuditMiddleware()` before `UseMvc()`, otherwise the middleware will 
+> **Warning**
+> 
+> You should call `UseAuditMiddleware()` before `UseMvc()`, otherwise the middleware will 
 > not be able to process MVC actions.
 
 If you _only_ configure the middleware (no audit action filters) but want to ignore actions via `[AuditIgnoreAttribute]`, you **must** 
@@ -288,7 +292,6 @@ public class AccountController : Controller
 
 }
 ```
-
 
 ## Output details
 
