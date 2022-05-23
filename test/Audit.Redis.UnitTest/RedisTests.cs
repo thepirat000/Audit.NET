@@ -1143,6 +1143,164 @@ namespace Audit.IntegrationTest
 
         }
 
+        [Test, Order(10)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(2)]
+        public void Redis_Stream_Basic(int dbIndex)
+        {
+            var ids = new List<object>();
+            var key = Guid.NewGuid().ToString();
+            Core.Configuration.ResetCustomActions();
+            Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConfigurationOptions(ConfigurationOptions.Parse(RedisCnnString))
+                    .AsStream(s => s
+                        .Key(ev => key)
+                        .Database(dbIndex)
+                        .DefaultAuditEventFieldName("MyAuditEvent")
+                        .WithCustomField("EventType", ev => ev.EventType)))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(_ => _.OnEventSaved(scope =>
+                {
+                    ids.Add(scope.EventId);
+                }));
+
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "Redis_Stream_Basic_1" }))
+            {
+            }
+            using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "Redis_Stream_Basic_2" }))
+            {
+            }
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase(dbIndex);
+            var values = db.StreamRange(key);
+
+            Assert.AreEqual(2, ids.Count);
+            Assert.AreEqual(2, values.Length);
+
+            var evType1 = values[0]["EventType"].ToString();
+            var evType2 = values[1]["EventType"].ToString();
+
+            var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]["MyAuditEvent"]);
+            var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]["MyAuditEvent"]);
+
+            var evFromApi1 = Configuration.DataProvider.GetEvent(ids[0]);
+            var evFromApi2 = Configuration.DataProvider.GetEvent(ids[1]);
+            var evFromApiNotExists = Configuration.DataProvider.GetEvent("0-0");
+
+            db.KeyDelete(key);
+            Core.Configuration.ResetCustomActions();
+
+            Assert.IsNull(evFromApiNotExists);
+            Assert.AreEqual(evType1, aev1.EventType);
+            Assert.AreEqual(evType2, aev2.EventType);
+            Assert.AreEqual(evFromApi1.EventType, aev1.EventType);
+            Assert.AreEqual(evFromApi1.StartDate, aev1.StartDate);
+            Assert.AreEqual(evFromApi2.EventType, aev2.EventType);
+            Assert.AreEqual(evFromApi2.StartDate, aev2.StartDate);
+            Assert.AreEqual("Redis_Stream_Basic_1", aev1.EventType);
+            Assert.AreEqual("Redis_Stream_Basic_2", aev2.EventType);
+        }
+
+        [Test, Order(10)]
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(2)]
+        public async Task Redis_Stream_BasicAsync(int dbIndex)
+        {
+            var ids = new List<object>();
+            var key = Guid.NewGuid().ToString();
+            Core.Configuration.ResetCustomActions();
+            Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConfigurationOptions(ConfigurationOptions.Parse(RedisCnnString))
+                    .AsStream(s => s
+                        .Key(ev => key)
+                        .Database(dbIndex)
+                        .DefaultAuditEventFieldName("MyAuditEvent")
+                        .WithCustomField("EventType", ev => ev.EventType)))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(_ => _.OnEventSaved(scope =>
+                {
+                    ids.Add(scope.EventId);
+                }));
+
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = "Redis_Stream_Basic_1" }))
+            {
+            }
+            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = "Redis_Stream_Basic_2" }))
+            {
+            }
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase(dbIndex);
+            var values = await db.StreamRangeAsync(key);
+
+            Assert.AreEqual(2, ids.Count);
+            Assert.AreEqual(2, values.Length);
+
+            var evType1 = values[0]["EventType"].ToString();
+            var evType2 = values[1]["EventType"].ToString();
+
+            var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]["MyAuditEvent"]);
+            var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]["MyAuditEvent"]);
+
+            var evFromApi1 = await Configuration.DataProvider.GetEventAsync(ids[0]);
+            var evFromApi2 = await Configuration.DataProvider.GetEventAsync(ids[1]);
+            var evFromApiNotExists = await Configuration.DataProvider.GetEventAsync("0-0");
+
+            await db.KeyDeleteAsync(key);
+            Core.Configuration.ResetCustomActions();
+
+            Assert.IsNull(evFromApiNotExists);
+            Assert.AreEqual(evType1, aev1.EventType);
+            Assert.AreEqual(evType2, aev2.EventType);
+            Assert.AreEqual(evFromApi1.EventType, aev1.EventType);
+            Assert.AreEqual(evFromApi1.StartDate, aev1.StartDate);
+            Assert.AreEqual(evFromApi2.EventType, aev2.EventType);
+            Assert.AreEqual(evFromApi2.StartDate, aev2.StartDate);
+            Assert.AreEqual("Redis_Stream_Basic_1", aev1.EventType);
+            Assert.AreEqual("Redis_Stream_Basic_2", aev2.EventType);
+        }
+
+        [Test, Order(10)]
+        public void Redis_Stream_MaxLen()
+        {
+            var ids = new List<object>();
+            var key = Guid.NewGuid().ToString();
+            Core.Configuration.ResetCustomActions();
+            Core.Configuration.Setup()
+                .UseRedis(redis => redis
+                    .ConfigurationOptions(ConfigurationOptions.Parse(RedisCnnString))
+                    .AsStream(s => s
+                        .Key(ev => key)
+                        .MaxLength(5, false)
+                        .WithCustomField("EventType", ev => ev.EventType)))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .WithAction(_ => _.OnEventSaved(scope =>
+                {
+                    ids.Add(scope.EventId);
+                }));
+
+            for (int i = 0; i < 10; i++)
+            {
+                AuditScope.Log($"Redis_Stream_MaxLen_{i}", new { number = i });
+            }
+
+            var mx = GetMultiplexer();
+            var db = mx.GetDatabase();
+            var values = db.StreamRange(key);
+
+            Assert.AreEqual(10, ids.Count);
+            Assert.AreEqual(5, values.Length);
+
+            db.KeyDelete(key);
+            Core.Configuration.ResetCustomActions();
+        }
+
+
         private ConnectionMultiplexer _multiplexer;
 
         private ConnectionMultiplexer GetMultiplexer()

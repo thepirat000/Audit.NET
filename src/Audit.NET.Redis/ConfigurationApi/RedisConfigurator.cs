@@ -65,6 +65,10 @@ namespace Audit.Redis.Configuration
             Core.Configuration.DataProvider = helper.AsPubSub(config);
         }
 
-
+        public void AsStream(Action<IRedisStreamConfigurator> config)
+        {
+            var helper = new RedisDataProviderHelper(_configurationOptions, _serializer, _deserializer);
+            Core.Configuration.DataProvider = helper.AsStream(config);
+        }
     }
 }

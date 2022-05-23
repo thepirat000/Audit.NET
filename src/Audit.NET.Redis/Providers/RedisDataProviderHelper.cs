@@ -102,5 +102,19 @@ namespace Audit.Redis.Providers
             config.Invoke(pubConfig);
             return new RedisDataProvider(new RedisProviderPubSub(_configurationOptions, _serializer, pubConfig._channelBuilder));
         }
+
+        /// <summary>
+        /// Returns a data provider that adds the events to Redis Streams.
+        /// </summary>
+        /// <param name="config">The redis stream configuration.</param>
+        public AuditDataProvider AsStream(Action<IRedisStreamConfigurator> config)
+        {
+            var streamConfig = new RedisStreamConfigurator();
+            config.Invoke(streamConfig);
+            return new RedisDataProvider(new RedisProviderStream(
+                _configurationOptions, streamConfig._keyBuilder, null, _serializer, _deserializer,
+                streamConfig._maxLength, streamConfig._useApproximateMaxLength, streamConfig._defaultAuditEventFieldName,
+                streamConfig._customFieldsDictionary, streamConfig._dbIndexBuilder, streamConfig._extraTasks));
+        }
     }
 }

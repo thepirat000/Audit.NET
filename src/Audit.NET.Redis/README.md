@@ -1,7 +1,7 @@
 # Audit.NET.Redis
 **Redis storage provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
-Store the audit events in a Redis database as Strings, List, SortedSet, Hash or publish to a PubSub channel.
+Store the audit events in a Redis database as Strings, List, SortedSet, Hash, publish to a PubSub channel or add to a Redis Stream.
 
 ## Install
 
@@ -70,6 +70,32 @@ Optional settings
 - `TimeToLive` specifies the Time To Live for the Redis Key. Default is no TTL.
 - `Database` specifies the database ID to use. Default is database 0.
 - `AttachTask` attaches an additional redis command to the execution.
+
+### Redis Stream
+
+Adds each audit event to a Redis Stream.
+
+Setup sample:
+```c#
+// Store audits as strings.
+Audit.Core.Configuration.Setup()
+    .UseRedis(redis => redis
+        .ConnectionString("localhost")
+        .AsStream(stream => stream
+            .Key("MyAuditStream")
+            .MaxLength(5000)
+            .WithCustomField("Date", ev => DateTime.UtcNow.ToString())));
+```
+
+Mandatory settings
+- Use the `Key` method to indicate the stream redis key, this key can depend on the `AuditEvent` object.
+
+Optional settings
+- `Database` specifies the database ID to use. Default is database 0.
+- `AttachTask` attaches an additional redis command to the execution.
+- `MaxLength` specifies the maximum quantity of events that the stream will store. Older elements will be deleted. Default is NULL for no-limit.
+- `DefaultAuditEventFieldName` specifies the default field name that will contain the AuditEvent JSON representation in the stream entry. Default is "AuditEvent".
+- `WithCustomField` allows specifying custom fields to be stored in the stream entry. By default, only the field named "AuditEvent" is stored, containing the JSON representation of the Audit Event.
 
 ### Redis Hash
 

@@ -58,5 +58,10 @@ namespace Audit.Redis.Configuration
         /// </summary>
         /// <param name="config">The redis PubSub configurator.</param>
         void AsPubSub(Action<IRedisPubSubConfigurator> config);
+        /// <summary>
+        /// Specifies that the audit events will be added to a Redis Stream.
+        /// </summary>
+        /// <param name="config">The redis Stream configurator.</param>
+        void AsStream(Action<IRedisStreamConfigurator> config);
     }
 }
