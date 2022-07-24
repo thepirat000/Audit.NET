@@ -76,8 +76,6 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp3.0' Or '$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0' ">
     <ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
-    <PackageReference Include="Azure.Identity" Version="1.4.0" />
   </ItemGroup>  
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
@@ -98,9 +96,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.8" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+    <ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
+    <PackageReference Include="Azure.Identity" Version="1.4.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
 	<ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
 	<ProjectReference Include="..\..\src\Audit.EntityFramework.Identity.Core\Audit.EntityFramework.Identity.Core.csproj" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
@@ -108,9 +108,12 @@
 	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+	<ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
+	<PackageReference Include="Azure.Identity" Version="1.4.0" />
   </ItemGroup>
+	
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />

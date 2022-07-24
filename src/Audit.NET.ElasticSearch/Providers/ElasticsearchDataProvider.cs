@@ -69,19 +69,6 @@ namespace Audit.Elasticsearch.Providers
             }
         }
 
-        public override object Serialize<T>(T value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is string)
-            {
-                return value;
-            }
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, AuditJsonNetSerializer.Settings), AuditJsonNetSerializer.Settings);
-        }
-
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);

@@ -24,7 +24,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data.Common;
 using System.Threading;
 #endif
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
 using Azure.Storage;
 using Azure.Storage.Blobs.Models;
 #endif
@@ -602,7 +602,7 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
             [Test]
             [Category("AzureStorageBlobs")]
             public void TestAzureStorageBlobs()
@@ -1115,7 +1115,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
             public void SetAzureStorageBlobsSettings()
             {
                 Audit.Core.Configuration.Setup()

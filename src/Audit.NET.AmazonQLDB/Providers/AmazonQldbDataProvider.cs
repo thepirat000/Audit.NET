@@ -91,7 +91,7 @@ namespace Audit.NET.AmazonQLDB.Providers
             {
                 return value;
             }
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, JsonSettings), JsonSettings);
+            return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSettings), value.GetType(), JsonSettings);
         }
 
         /// <summary>

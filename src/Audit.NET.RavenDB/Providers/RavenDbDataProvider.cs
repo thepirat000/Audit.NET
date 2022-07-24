@@ -103,10 +103,10 @@ namespace Audit.NET.RavenDB.Providers
             if (Configuration.JsonAdapter is Audit.Core.JsonNewtonsoftAdapter adapter)
             {
                 // The adapter is Newtonsoft, use the adapter
-                return adapter.Deserialize<T>(adapter.Serialize(value));
+                return adapter.Deserialize(adapter.Serialize(value), value.GetType());
             }
             // Default to use Newtonsoft directly
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value, JsonSerializerSettings), JsonSerializerSettings);
+            return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSerializerSettings), value.GetType(), JsonSerializerSettings);
         }
 #endif
 

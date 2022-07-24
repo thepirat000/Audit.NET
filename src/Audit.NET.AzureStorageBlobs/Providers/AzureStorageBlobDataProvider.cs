@@ -102,7 +102,7 @@ namespace Audit.AzureStorageBlobs.Providers
             {
                 return value;
             }
-            return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, JsonSettings), JsonSettings);
+            return JsonSerializer.Deserialize(JsonSerializer.Serialize(value, JsonSettings), value.GetType(), JsonSettings);
         }
 #endif
 

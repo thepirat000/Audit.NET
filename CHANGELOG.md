@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.2.0] - 2022-07-23
+- Audit.NET.ElasticSearch: Fix issue when pre-serializing the Target object (#509)
+- Audit.NET.AzureStorageBlobs: Bump Azure.Storage.Blobs from 12.9.1 to 12.13.0 (#510)
+- Audit.NET: Fix pre-serialization method on base AuditDataProvider
+
 ## [19.1.4] - 2022-05-22
 - Audit.NET.Redis: Adding Redis Stream provider to allow storing the audit events into Redis Streams.
 

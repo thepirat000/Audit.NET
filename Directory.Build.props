@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-	 <Version>19.1.4</Version>
-	 <PackageReleaseNotes>Audit.NET.Redis: Adding Redis Stream provider to allow storing the audit events into Redis Streams</PackageReleaseNotes>
+	 <Version>19.2.0</Version>
+	 <PackageReleaseNotes>Audit.NET.ElasticSearch: Fix issue when pre-serializing the Target object (#509)</PackageReleaseNotes>
  </PropertyGroup>
 </Project>

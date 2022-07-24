@@ -28,7 +28,8 @@ namespace Audit.Core
             {
                 return value;
             }
-            return Configuration.JsonAdapter.Deserialize<T>(Configuration.JsonAdapter.Serialize(value));
+            
+            return Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(value), value.GetType());
         }
 
         /// <summary>

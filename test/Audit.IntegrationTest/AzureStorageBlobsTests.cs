@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
+﻿#if NET5_0_OR_GREATER
 using Audit.Core;
 using Azure.Storage;
 using Azure.Storage.Blobs.Models;

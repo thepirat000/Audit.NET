@@ -228,10 +228,8 @@ namespace Audit.MongoDB.Providers
                 }
                 return value.ToBsonDocument(typeof(object));
             }
-            else
-            {
-                return (T)Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(value), value.GetType());
-            }
+
+            return base.Serialize(value);
         }
 
         public void TestConnection()

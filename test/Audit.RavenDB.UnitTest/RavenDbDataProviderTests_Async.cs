@@ -105,8 +105,8 @@ namespace Audit.RavenDB.UnitTest
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?.subField?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?.prop.ToString());
 #endif
-            Assert.AreEqual(20, (ev.Target.Old as JToken)?["LowTemp"]?.Value<int>());
-            Assert.AreEqual(21, (ev.Target.New as JToken)?["LowTemp"]?.Value<int>());
+            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
+            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
 
 #if IS_TEXT_JSON
@@ -147,8 +147,8 @@ namespace Audit.RavenDB.UnitTest
             Assert.IsNotNull(ev);
             Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
             Assert.AreEqual("sub-field value", (ev.CustomFields["doc"] as JToken)?["subField"]?.ToString());
-            Assert.AreEqual(20, (ev.Target.Old as JToken)?["LowTemp"]?.Value<int>());
-            Assert.AreEqual(21, (ev.Target.New as JToken)?["LowTemp"]?.Value<int>());
+            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
+            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
 #endif
 
@@ -199,8 +199,8 @@ namespace Audit.RavenDB.UnitTest
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?.subField?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?.prop.ToString());
 #endif
-            Assert.AreEqual(20, (ev.Target.Old as JToken)?["LowTemp"]?.Value<int>());
-            Assert.AreEqual(21, (ev.Target.New as JToken)?["LowTemp"]?.Value<int>());
+            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
+            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
 
         [Test]
@@ -258,10 +258,10 @@ namespace Audit.RavenDB.UnitTest
             Assert.AreEqual("sub-field value", ((dynamic)ev2.CustomFields["doc"])?.subField?.ToString());
             Assert.AreEqual("test", ((dynamic)ev2.Environment.CustomFields["extra"])?.prop.ToString());
 #endif
-            Assert.AreEqual(20, (ev1.Target.Old as JToken)?["LowTemp"]?.Value<int>());
+            Assert.AreEqual(20, (ev1.Target.Old as DailyTemperature)?.LowTemp);
             Assert.IsNull(ev1.Target.New);
-            Assert.AreEqual(20, (ev2.Target.Old as JToken)?["LowTemp"]?.Value<int>());
-            Assert.AreEqual(21, (ev2.Target.New as JToken)?["LowTemp"]?.Value<int>());
+            Assert.AreEqual(20, (ev2.Target.Old as DailyTemperature)?.LowTemp);
+            Assert.AreEqual(21, (ev2.Target.New as DailyTemperature)?.LowTemp);
         }
 
 
