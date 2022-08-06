@@ -1,45 +1,59 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<Description>Generate detailed Audit Logs for client-side WCF service calls.</Description>
+		<Copyright>Copyright 2021</Copyright>
+		<AssemblyTitle>Audit.Wcf.Client</AssemblyTitle>
+		<Authors>Federico Colombo</Authors>
+		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyName>Audit.Wcf.Client</AssemblyName>
+		<AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+		<PackageId>Audit.WCF.Client</PackageId>
+		<PackageTags>Audit;Trail;Log;WCF</PackageTags>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+		<DebugType>Full</DebugType>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <Description>Generate detailed Audit Logs for client-side WCF service calls.</Description>
-    <Copyright>Copyright 2021</Copyright>
-    <AssemblyTitle>Audit.Wcf.Client</AssemblyTitle>
-    <Authors>Federico Colombo</Authors>
-    <TargetFramework>net45</TargetFramework>
-    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
-    <NoWarn>$(NoWarn);1591</NoWarn>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.Wcf.Client</AssemblyName>
-    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.WCF.Client</PackageId>
-    <PackageTags>Audit;Trail;Log;WCF</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
-    <DebugType>Full</DebugType>
-  </PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
-  </ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+		<Reference Include="System.Configuration" />
+		<Reference Include="System.ServiceModel" />
+		<Reference Include="System" />
+		<Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
-  </ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<Reference Include="System.ServiceModel" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+		<PackageReference Include="System.Runtime" Version="4.3.1" />
+		<PackageReference Include="System.ServiceModel.Http" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
+	</ItemGroup>
+	
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<PackageReference Include="System.ServiceModel.Federation" Version="4.9.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="images\icon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
 </Project>

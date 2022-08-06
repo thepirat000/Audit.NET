@@ -5,17 +5,45 @@ using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Threading;
+#if NET6_0_OR_GREATER
+using Microsoft.AspNetCore.Hosting;
+using CoreWCF.Configuration;
+#endif
 
 namespace Audit.Wcf.UnitTest
 {
     public class WcfClientTests
     {
+        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        
         [OneTimeSetUp]
         public void Setup()
         {
+#if NET45_OR_GREATER
             ServiceHost host = new ServiceHost(typeof(CatalogService));
             host.Open();
+#else
+            IWebHost host = CreateWebHostBuilder().Build();
+            host.RunAsync(_cancellationToken.Token);
+#endif
         }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _cancellationToken.Cancel();
+        }
+
+#if NET6_0_OR_GREATER
+        public static IWebHostBuilder CreateWebHostBuilder() =>
+            Microsoft.AspNetCore.WebHost.CreateDefaultBuilder()
+                .UseKestrel(options => {
+                    options.ListenAnyIP(Startup.HTTP_PORT);
+                })
+                .UseNetTcp(Startup.NETTCP_PORT)
+                .UseStartup<Startup>();
+#endif
 
         [Test]
         public void Test_WcfClient_Success()
@@ -167,7 +195,11 @@ namespace Audit.Wcf.UnitTest
 
         public static IContextChannel GetServiceProxy(out ICatalogService svc)
         {
+#if NET45_OR_GREATER
             var channelFactory = new ChannelFactory<ICatalogService>(new BasicHttpBinding(), new EndpointAddress("http://localhost:8733/Design_Time_Addresses/Audit.Wcf.UnitTest/CatalogService/"));
+#else
+            var channelFactory = new ChannelFactory<ICatalogService>(new BasicHttpBinding(), new EndpointAddress("http://localhost:8733/CatalogService/basicHttp"));
+#endif
             channelFactory.Endpoint.EndpointBehaviors.Add(new AuditEndpointBehavior()
             {
                 EventType = "Catalog:{action}",

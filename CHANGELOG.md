@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.2.1] - 2022-08-06
+- Audit.WCF.Client: Adding .NET Core support to Audit.WCF.Client (#514)
+
 ## [19.2.0] - 2022-07-23
 - Audit.NET.ElasticSearch: Fix issue when pre-serializing the Target object (#509)
 - Audit.NET.AzureStorageBlobs: Bump Azure.Storage.Blobs from 12.9.1 to 12.13.0 (#510)

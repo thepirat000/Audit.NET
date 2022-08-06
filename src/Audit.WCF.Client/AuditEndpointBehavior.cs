@@ -36,7 +36,7 @@ namespace Audit.Wcf.Client
         }
         public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
         {
-            clientRuntime.MessageInspectors.Add(new AuditMessageInspector(EventType, IncludeRequestHeaders, IncludeResponseHeaders));
+            clientRuntime.ClientMessageInspectors.Add(new AuditMessageInspector(EventType, IncludeRequestHeaders, IncludeResponseHeaders));
         }
         public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
         {

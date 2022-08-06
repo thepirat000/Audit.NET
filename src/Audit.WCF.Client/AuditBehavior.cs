@@ -1,7 +1,6 @@
-﻿using Audit.Core;
+﻿#if NET45_OR_GREATER
 using System;
 using System.Configuration;
-using System.Runtime.Remoting.Messaging;
 using System.ServiceModel.Configuration;
 
 namespace Audit.Wcf.Client
@@ -86,3 +85,4 @@ namespace Audit.Wcf.Client
         }
     }
 }
+#endif
