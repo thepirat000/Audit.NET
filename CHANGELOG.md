@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [19.2.1] - 2022-08-06
 - Audit.WCF.Client: Adding .NET Core support to Audit.WCF.Client (#514)
+- Audit.NET.log4net: Security upgrade log4net from 2.0.10 to 2.0.15 (#511)
 
 ## [19.2.0] - 2022-07-23
 - Audit.NET.ElasticSearch: Fix issue when pre-serializing the Target object (#509)
