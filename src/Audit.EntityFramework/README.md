@@ -164,7 +164,7 @@ A low-level command interceptor is also provided for EF Core ≥ 3.0.
 In order to audit low-level operations like *reads*, *stored procedure calls* and *non-query commands*, you can attach the provided `AuditCommandInterceptor` to 
 your `DbContext` configuration. 
 
-For example:
+#### 1. On DbContext instantiation:
 
 ```c#
 var options = new DbContextOptionsBuilder()
@@ -176,19 +176,56 @@ using (var ctx = new MyContext(options))
 }
 ```
 
+#### 2. Or inside DbContext configuration:
+
+```c#
+public class MyDbContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(new AuditCommandInterceptor());
+    }
+
+    // ...
+}
+```
+
 > **Note**
 > 
 > The **Command Interceptor** generates a different type of [audit output](#command-interceptor-audit-output) than the **Save Changes Interceptor**.
 > Nevertheless, you can combine the Command Interceptor with any of the Save Changes interception mechanisms.
 
-## Configuration
+
+
+## Configuration 
 
 ### Output
 
 The EF audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. This can be set per `DbContext` instance or globally. If you plan to store the audit logs with EF, you can use the [Entity Framework Data Provider](#entity-framework-data-provider). 
 
-### Settings
-The following settings can be configured per DbContext or globally:
+### Settings (low-Level interceptor)
+The low-level command interceptor can be configured by setting the `AuditCommandInterceptor` properties, for example:
+
+```c#
+optionsBuilder.AddInterceptors(new AuditCommandInterceptor()
+{
+    ExcludeNonQueryEvents = true,
+    AuditEventType = "{database}",
+    IncludeReaderResults = true
+});
+```
+
+- **LogParameterValues**: Boolean value to indicate whether to log the command parameter values. By default (when null) it will depend on EnableSensitiveDataLogging setting on the DbContext.
+- **ExcludeReaderEvents**: Boolean value to indicate whether to exclude the events handled by ReaderExecuting. Default is false to include the ReaderExecuting events.
+- **ExcludeNonQueryEvents**: Boolean value to indicate whether to exclude the events handled by NonQueryExecuting. Default is false to include the NonQueryExecuting events.
+- **ExcludeScalarEvents**: Boolean value to indicate whether to exclude the events handled by ScalarExecuting. Default is false to include the ScalarExecuting events.
+- **AuditEventType**: To indicate the event type to use on the audit event. (Default is the execute method name). Can contain the following placeholders: 
+    - \{database}: Replaced with the database name 
+    - \{method}: Replaced with the execute method name (ExecuteReader, ExecuteNonQuery or ExecuteScalar) 
+- **IncludeReaderResults**: Boolean value to indicate whether to include the query results to the audit output. Default is false.
+
+### Settings (High-Level interceptor)
+The following settings for the high-level interceptor can be configured per DbContext or globally:
 
 - **Mode**: To indicate the audit operation mode
   - _Opt-Out_: All the entities are tracked by default, except those explicitly ignored. (Default)
@@ -222,6 +259,9 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 {
 ...
 ```
+
+You can also use the [Fluent API](#fluent-api) to configure the high-level interceptor settings globally.
+
 
 #### Include/Ignore entities (tables)
 

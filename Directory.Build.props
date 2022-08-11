@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-	 <Version>19.2.1</Version>
-	 <PackageReleaseNotes>Audit.WCF.Client: Adding .NET Core support (#514)</PackageReleaseNotes>
+	 <Version>19.2.2</Version>
+	 <PackageReleaseNotes>Audit.EntityFramework.Core: Allow optional logging for SQL read results. New setting for command interceptor IncludeReaderResults (#515)</PackageReleaseNotes>
  </PropertyGroup>
 </Project>

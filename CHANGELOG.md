@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.2.2] - 2022-08-08
+- Audit.EntityFramework.Core: Allow optional logging for SQL read results. New setting for command interceptor `AuditCommandIntercaptor.IncludeReaderResults` (#515)
+
 ## [19.2.1] - 2022-08-06
 - Audit.WCF.Client: Adding .NET Core support to Audit.WCF.Client (#514)
 - Audit.NET.log4net: Security upgrade log4net from 2.0.10 to 2.0.15 (#511)

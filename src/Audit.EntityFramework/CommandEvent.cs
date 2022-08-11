@@ -52,7 +52,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public string ErrorMessage { get; set; }
         /// <summary>
-        /// The result of the command execution (only for NonQuery and Scalar)
+        /// The result of the command execution
         /// </summary>
         public object Result { get; set; }
     }

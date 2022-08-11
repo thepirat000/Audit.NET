@@ -237,6 +237,72 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual("DbCommandIntercept", inserted[0].CommandEvent.Database);
         }
 
+        [Test]
+        public void Test_DbCommandInterceptor_IncludeReaderResult()
+        {
+            var inserted = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => inserted.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+            var interceptor = new AuditCommandInterceptor() { LogParameterValues = true, IncludeReaderResults = true };
+            DbCommandInterceptContext.Department dept;
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
+            {
+                int i = 22;
+                dept = ctx.Departments.FirstOrDefault(d => d.Id != i);
+            }
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.IsNotNull(inserted[0].Parameters);
+            Assert.IsTrue(inserted[0].Parameters.Any());
+            Assert.AreEqual(22, inserted[0].Parameters.First().Value);
+            Assert.IsNotNull(inserted[0].Result);
+            var resultList = inserted[0].Result as List<Dictionary<string, object>>;
+            Assert.AreEqual(1, resultList.Count);
+            Assert.AreEqual(dept.Id, (int)resultList[0]["Id"]);
+            Assert.AreEqual(dept.Comments, resultList[0]["Comments"]);
+            Assert.AreEqual(dept.Name, resultList[0]["Name"]);
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_IncludeReaderResultAsync()
+        {
+            var inserted = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => inserted.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+            var interceptor = new AuditCommandInterceptor() { LogParameterValues = true, IncludeReaderResults = true };
+            DbCommandInterceptContext.Department dept;
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
+            {
+                int i = 22;
+                dept = await ctx.Departments.FirstOrDefaultAsync(d => d.Id != i);
+            }
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.IsNotNull(inserted[0].Parameters);
+            Assert.IsTrue(inserted[0].Parameters.Any());
+            Assert.AreEqual(22, inserted[0].Parameters.First().Value);
+            Assert.IsNotNull(inserted[0].Result);
+            var resultList = inserted[0].Result as List<Dictionary<string, object>>;
+            Assert.AreEqual(1, resultList.Count);
+            Assert.AreEqual(dept.Id, (int)resultList[0]["Id"]);
+            Assert.AreEqual(dept.Comments, resultList[0]["Comments"]);
+            Assert.AreEqual(dept.Name, resultList[0]["Name"]);
+        }
+        
 #if EF_CORE_5 || EF_CORE_6
         [Test]
         public void Test_DbCommandInterceptor_CombineSaveChanges()

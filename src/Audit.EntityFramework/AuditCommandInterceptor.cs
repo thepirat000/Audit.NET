@@ -3,6 +3,7 @@ using Audit.Core;
 using Audit.Core.Extensions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading;
@@ -30,14 +31,17 @@ namespace Audit.EntityFramework.Interceptors
         /// Boolean value to indicate whether to exclude the events handled by ReaderExecuting. Default is false to include the ReaderExecuting events.
         /// </summary>
         public bool ExcludeReaderEvents { get; set; }
+        
         /// <summary>
         /// Boolean value to indicate whether to exclude the events handled by NonQueryExecuting. Default is false to include the NonQueryExecuting events.
         /// </summary>
         public bool ExcludeNonQueryEvents { get; set; }
+        
         /// <summary>
         /// Boolean value to indicate whether to exclude the events handled by ScalarExecuting. Default is false to include the ScalarExecuting events.
         /// </summary>
         public bool ExcludeScalarEvents { get; set; }
+
         /// <summary>
         /// To indicate the event type to use on the audit event. (Default is the execute method name). 
         /// Can contain the following placeholders: 
@@ -46,6 +50,11 @@ namespace Audit.EntityFramework.Interceptors
         /// </summary>
         public string AuditEventType { get; set; } = "{method}";
 
+        /// <summary>
+        /// Boolean value to indicate whether to include the query results to the audit output. Default is false.
+        /// </summary>
+        public bool IncludeReaderResults { get; set; }
+        
         private readonly DbContextHelper _dbContextHelper = new DbContextHelper();
         private IAuditScope _currentScope;
 
@@ -70,7 +79,11 @@ namespace Audit.EntityFramework.Interceptors
             {
                 return result;
             }
-            UpdateExecutedEvent(eventData);
+            var newDataReader = UpdateExecutedEvent(eventData, result);
+            if (newDataReader != null)
+            {
+                result = newDataReader;
+            }
             EndScope();
             return result;
         }
@@ -103,7 +116,12 @@ namespace Audit.EntityFramework.Interceptors
             {
                 return await base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
             }
-            UpdateExecutedEvent(eventData);
+            var newDataReader = UpdateExecutedEvent(eventData, result);
+            if (newDataReader != null)
+            {
+                result = newDataReader;
+            }
+
             await EndScopeAsync();
             return await base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
         }
@@ -123,6 +141,7 @@ namespace Audit.EntityFramework.Interceptors
             _currentScope = CreateAuditScope(auditEvent);
             return result;
         }
+        
         public override int NonQueryExecuted(DbCommand command, CommandExecutedEventData eventData, int result)
         {
             if (ExcludeNonQueryEvents)
@@ -181,6 +200,7 @@ namespace Audit.EntityFramework.Interceptors
             _currentScope = CreateAuditScope(auditEvent);
             return result;
         }
+        
         public override object ScalarExecuted(DbCommand command, CommandExecutedEventData eventData, object result)
         {
             if (ExcludeScalarEvents)
@@ -262,21 +282,33 @@ namespace Audit.EntityFramework.Interceptors
         /// Updated a Command event from the command executed data
         /// </summary>
         /// <param name="eventData">The event data</param>
-        protected virtual void UpdateExecutedEvent(CommandExecutedEventData eventData)
+        /// <param name="result">The original DbDataReader reference</param>
+        protected virtual DbDataReader UpdateExecutedEvent(CommandExecutedEventData eventData, DbDataReader result = null)
         {
             var cmdEvent = _currentScope?.GetCommandEntityFrameworkEvent();
             if (cmdEvent == null)
             {
-                return;
+                return null;
             }
+            
             cmdEvent.Success = true;
             cmdEvent.ErrorMessage = null;
-            if (eventData.ExecuteMethod != DbCommandMethod.ExecuteReader)
+            if (eventData.ExecuteMethod == DbCommandMethod.ExecuteReader)
+            {
+                if (IncludeReaderResults && result != null)
+                {
+                    cmdEvent.Result = SerializeDataReader(result, out DbDataReader newDataReader);
+                    return newDataReader;
+                }
+            }
+            else
             {
                 cmdEvent.Result = eventData.Result;
             }
-        }
 
+            return null;
+        }
+       
         /// <summary>
         /// Updated a Command event from the command failed data
         /// </summary>
@@ -292,6 +324,28 @@ namespace Audit.EntityFramework.Interceptors
             cmdEvent.ErrorMessage = eventData.Exception?.GetExceptionInfo();
         }
 
+        /// <summary>
+        /// Serializes the result DB data reader and returns a new data reader to be overriden to the EF result.
+        /// </summary>
+        protected virtual List<Dictionary<string, object>> SerializeDataReader(DbDataReader reader, out DbDataReader newDataReader)
+        {
+            if (reader == null)
+            {
+                newDataReader = null;
+                return null;
+            }
+
+            var dataTable = new DataTable();
+            dataTable.Load(reader);
+            newDataReader = dataTable.CreateDataReader();
+
+            return dataTable.AsEnumerable().Select(
+                row => dataTable.Columns.Cast<DataColumn>().ToDictionary(
+                    column => column.ColumnName,
+                    column => row[column]
+                )).ToList();
+        }
+        
         private void EndScope()
         {
             _currentScope?.Dispose();
