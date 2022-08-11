@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #else
 using System.Text.Json;
+using System.Text.Json.Serialization;
 #endif
 
 namespace Audit.UnitTest
@@ -86,6 +87,11 @@ namespace Audit.UnitTest
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
 
+#if NET6_0_OR_GREATER                  
+            var prevSettings = Configuration.JsonSettings;
+            Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
+#endif
+
             try
             {
                 new AuditScopeFactory().Log(guid, loop);
@@ -98,7 +104,9 @@ namespace Audit.UnitTest
                     Assert.Fail("Should have failed with JsonException object cycle");
                 }
             }
-
+#if NET6_0_OR_GREATER
+            Configuration.JsonSettings = prevSettings;
+#endif
             Assert.IsFalse(File.Exists(Path.Combine(_directory, guid)));
         }
 #endif
@@ -143,6 +151,11 @@ namespace Audit.UnitTest
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
 
+#if NET6_0_OR_GREATER                  
+            var prevSettings = Configuration.JsonSettings;
+            Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
+#endif
+
             try
             {
                 await new AuditScopeFactory().LogAsync(guid, loop);
@@ -155,12 +168,14 @@ namespace Audit.UnitTest
                     Assert.Fail("Should have failed with JsonException object cycle");
                 }
             }
-
+#if NET6_0_OR_GREATER
+            Configuration.JsonSettings = prevSettings;
+#endif
             Assert.IsTrue(File.Exists(Path.Combine(_directory, guid)));
             Assert.IsEmpty(File.ReadAllText(Path.Combine(_directory, guid)));
         }
 #endif
-        [Test]
+            [Test]
         public void Test_FileDataProvider_Indent()
         {
             var loop = new Loop() { Id = 1 };
@@ -238,6 +253,9 @@ namespace Audit.UnitTest
             };
 #if NK_JSON
             Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Error;
+#elif NET6_0_OR_GREATER
+            var prevSettings = Configuration.JsonSettings;
+            Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
 #endif
             Configuration.Setup().UseFileLogProvider(_ => _
                 .Directory(_directory)
@@ -255,6 +273,8 @@ namespace Audit.UnitTest
             }
 #if NK_JSON
             Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+#elif NET6_0_OR_GREATER
+            Configuration.JsonSettings = prevSettings;
 #endif
         }
 
@@ -271,6 +291,9 @@ namespace Audit.UnitTest
             };
 #if NK_JSON
             Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Error;
+#elif NET6_0_OR_GREATER
+            var prevSettings = Configuration.JsonSettings;
+            Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
 #endif
             Configuration.Setup().UseFileLogProvider(_ => _
                 .Directory(_directory)
@@ -288,6 +311,8 @@ namespace Audit.UnitTest
             }
 #if NK_JSON
             Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+#elif NET6_0_OR_GREATER
+            Configuration.JsonSettings = prevSettings;
 #endif
         }
     }

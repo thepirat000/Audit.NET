@@ -92,12 +92,13 @@ namespace Audit.Core
             JsonSettings = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                PropertyNamingPolicy = null
-                // TODO: Will be added on .net 6 https://github.com/dotnet/runtime/pull/46101/commits/152db423e06f6d93a560b45b4330fac6507c7aa7
-                //ReferenceHandler = ReferenceHandler.IgnoreCycle
+                PropertyNamingPolicy = null,
+#if NET6_0_OR_GREATER
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+#endif
             };
 #endif
-            SystemClock = new DefaultSystemClock();
+                SystemClock = new DefaultSystemClock();
             ResetCustomActions();
             _auditScopeFactory = new AuditScopeFactory();
         }

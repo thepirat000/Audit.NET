@@ -6,7 +6,7 @@ using System.Linq;
 namespace Audit.EntityFramework
 {
     /// <summary>
-    /// Global configuration for Audit.EntityFramework
+    /// Global configuration for High-Level SaveChanges interceptor
     /// </summary>
     public static class Configuration
     {

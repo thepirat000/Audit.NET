@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [19.2.2] - 2022-08-08
 - Audit.EntityFramework.Core: Allow optional logging for SQL read results. New setting for command interceptor `AuditCommandIntercaptor.IncludeReaderResults` (#515)
+- Audit.NET: Changing default IgnoreCycles reference handling for JSON serialization on .NET 6 (#517)
 
 ## [19.2.1] - 2022-08-06
 - Audit.WCF.Client: Adding .NET Core support to Audit.WCF.Client (#514)
