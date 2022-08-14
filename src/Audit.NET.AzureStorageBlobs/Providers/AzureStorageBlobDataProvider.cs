@@ -12,6 +12,7 @@ using Azure;
 using Azure.Core;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
 using Azure.Storage.Blobs.Models;
 
 namespace Audit.AzureStorageBlobs.Providers
@@ -205,6 +206,27 @@ namespace Audit.AzureStorageBlobs.Providers
             return blobName;
         }
 
+        private static List<BlobHierarchyItem> GetBlobHierarchyItems(BlobContainerClient containerClient, string prefix, string delimiter = "/")
+        {
+            List<BlobHierarchyItem> items = containerClient.GetBlobsByHierarchy(BlobTraits.None, BlobStates.None, delimiter, 
+                prefix).ToList();
+
+            var theList = new List<BlobHierarchyItem>();
+
+            foreach (BlobHierarchyItem b in items)
+            {
+                if (b.IsBlob)
+                {
+                    theList.Add(b);
+                }
+                else
+                {
+                    theList.AddRange(GetBlobHierarchyItems(containerClient, b.Prefix));
+                }
+            }
+            return theList;
+        }
+
 #region Public
 
         public override object InsertEvent(AuditEvent auditEvent)
@@ -278,6 +300,30 @@ namespace Audit.AzureStorageBlobs.Providers
 #endif
             }
             return default;
+        }
+
+        public async Task<List<BlobHierarchyItem>> SearchEventsAsync(string prefix, string delimiter = "/")
+        {
+            var blobHierarchyItems = new List<BlobHierarchyItem>();
+            if (string.IsNullOrEmpty(prefix)) return blobHierarchyItems;
+
+            var containerName = ContainerNameBuilder.Invoke(null);
+            BlobContainerClient client = await EnsureContainerClientAsync(containerName);
+            blobHierarchyItems = GetBlobHierarchyItems(client, prefix, delimiter);
+
+            return blobHierarchyItems;
+        }
+
+        public List<BlobHierarchyItem> SearchEvents(string prefix, string delimiter = "/")
+        {
+            var blobHierarchyItems = new List<BlobHierarchyItem>();
+            if (string.IsNullOrEmpty(prefix)) return blobHierarchyItems;
+
+            var containerName = ContainerNameBuilder.Invoke(null);
+            BlobContainerClient client = EnsureContainerClient(containerName);
+            blobHierarchyItems = GetBlobHierarchyItems(client, prefix, delimiter);
+
+            return blobHierarchyItems;
         }
 #endregion
     }
