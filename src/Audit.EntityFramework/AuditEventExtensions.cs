@@ -54,5 +54,30 @@ namespace Audit.EntityFramework
                 : null;
         }
 #endif
+#if EF_CORE_5 || EF_CORE_6
+        /// <summary>
+        /// Gets the Low-Level EF Transaction Event portion of the Audit Event on the given scope.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        public static TransactionEvent GetTransactionEntityFrameworkEvent(this IAuditScope auditScope)
+        {
+            return auditScope?.Event.GetTransactionEntityFrameworkEvent();
+        }
+
+        /// <summary>
+        /// Gets the Low-Level EF Transaction Event portion of the Audit Event.
+        /// </summary>
+        /// <param name="auditEvent">The audit event.</param>
+        public static TransactionEvent GetTransactionEntityFrameworkEvent(this AuditEvent auditEvent)
+        {
+            if (auditEvent is AuditEventTransactionEntityFramework)
+            {
+                return (auditEvent as AuditEventTransactionEntityFramework).TransactionEvent;
+            }
+            return auditEvent.CustomFields.ContainsKey("TransactionEvent")
+                ? Core.Configuration.JsonAdapter.ToObject<TransactionEvent>(auditEvent.CustomFields["TransactionEvent"])
+                : null;
+        }
+#endif
     }
 }

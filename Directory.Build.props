@@ -1,6 +1,9 @@
 <Project>
  <PropertyGroup>
-	 <Version>19.2.2</Version>
-	 <PackageReleaseNotes>Audit.EntityFramework.Core: Allow optional logging for SQL read results. New setting for command interceptor IncludeReaderResults (#515)</PackageReleaseNotes>
+	 <Version>19.3.0</Version>
+	 <PackageReleaseNotes>
+		 - Audit.SqlServer: Fixing compatibility with .NET 6 for Audit.SqlServer library (#522)
+		 - Audit.EntityFramework.Core: Addiing DbTransaction interceptor to log transaction events (AuditTransactionInterceptor).
+	 </PackageReleaseNotes>
  </PropertyGroup>
 </Project>

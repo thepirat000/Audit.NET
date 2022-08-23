@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.3.0] - 2022-08-22
+- Audit.SqlServer: Fixing compatibility with .NET 6 for Audit.SqlServer library (#522)
+- Audit.EntityFramework.Core: Addiing DbTransaction interceptor to log transaction events (`AuditTransactionInterceptor`).
+
 ## [19.2.2] - 2022-08-08
 - Audit.EntityFramework.Core: Allow optional logging for SQL read results. New setting for command interceptor `AuditCommandIntercaptor.IncludeReaderResults` (#515)
 - Audit.NET: Changing default IgnoreCycles reference handling for JSON serialization on .NET 6 (#517)

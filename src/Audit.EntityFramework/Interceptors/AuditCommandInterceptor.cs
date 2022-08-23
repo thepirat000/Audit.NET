@@ -58,7 +58,7 @@ namespace Audit.EntityFramework.Interceptors
         private readonly DbContextHelper _dbContextHelper = new DbContextHelper();
         private IAuditScope _currentScope;
 
-        #region "Reader"
+#region "Reader"
         public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
         {
             if (Core.Configuration.AuditDisabled || ExcludeReaderEvents)
@@ -125,9 +125,9 @@ namespace Audit.EntityFramework.Interceptors
             await EndScopeAsync();
             return await base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
         }
-        #endregion
+#endregion
 
-        #region "Non-query"
+#region "Non-query"
         public override InterceptionResult<int> NonQueryExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<int> result)
         {
             if (Core.Configuration.AuditDisabled || ExcludeNonQueryEvents)
@@ -183,9 +183,9 @@ namespace Audit.EntityFramework.Interceptors
             await EndScopeAsync();
             return await base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
         }
-        #endregion
+#endregion
 
-        #region "Scalar"
+#region "Scalar"
         // Scalar
         public override InterceptionResult<object> ScalarExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<object> result)
         {
@@ -242,9 +242,9 @@ namespace Audit.EntityFramework.Interceptors
             await EndScopeAsync();
             return await base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
         }
-        #endregion
+#endregion
 
-        #region "CommandFailed"
+#region "CommandFailed"
         public override void CommandFailed(DbCommand command, CommandErrorEventData eventData)
         {
             UpdateFailedEvent(eventData);
@@ -256,7 +256,7 @@ namespace Audit.EntityFramework.Interceptors
             UpdateFailedEvent(eventData);
             await EndScopeAsync();
         }
-        #endregion 
+#endregion
 
         /// <summary>
         /// Creates a Command event from the command data
@@ -270,16 +270,18 @@ namespace Audit.EntityFramework.Interceptors
                 CommandText = command.CommandText,
                 CommandType = command.CommandType,
                 ConnectionId = _dbContextHelper.GetClientConnectionId(command.Connection),
+                DbConnectionId = eventData.ConnectionId.ToString(),
                 Database = command.Connection?.Database,
                 Parameters = GetParameters(command, eventData),
                 IsAsync = eventData.IsAsync,
                 Method = eventData.ExecuteMethod, 
-                ContextId = eventData.Context.ContextId.ToString()
+                ContextId = eventData.Context?.ContextId.ToString(),
+                TransactionId = eventData.Context?.Database.CurrentTransaction?.TransactionId.ToString()
             };
         }
 
         /// <summary>
-        /// Updated a Command event from the command executed data
+        /// Updates a Command event from the command executed data
         /// </summary>
         /// <param name="eventData">The event data</param>
         /// <param name="result">The original DbDataReader reference</param>
