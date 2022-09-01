@@ -42,9 +42,21 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <summary>
         /// Overrides a column value to a value given as a function of the current value.
         /// </summary>
+        /// <param name="property">The property selector. Must be a simple property expression i.e. x -> x.PropertyName</param>
+        /// <param name="format">A function of the current value that returns the value to override</param>
+        IContextEntitySetting<TEntity> Format<TProp>(Expression<Func<TEntity, TProp>> property, Func<TProp, object> format);
+        /// <summary>
+        /// Overrides a column value to a value given as a function of the current value.
+        /// </summary>
         /// <param name="propertyName">The entity's property name (case sensitive)</param>
         /// <param name="format">A function of the current value that returns the value to override</param>
         IContextEntitySetting<TEntity> Format<TProp>(string propertyName, Func<TProp, TProp> format);
+        /// <summary>
+        /// Overrides a column value to a value given as a function of the current value.
+        /// </summary>
+        /// <param name="propertyName">The entity's property name (case sensitive)</param>
+        /// <param name="format">A function of the current value that returns the value to override</param>
+        IContextEntitySetting<TEntity> Format<TProp>(string propertyName, Func<TProp, object> format);
     }
 }
  

@@ -17,7 +17,20 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
+        public IContextEntitySetting<TEntity> Format<TProp>(Expression<Func<TEntity, TProp>> property, Func<TProp, object> format)
+        {
+            var name = GetMemberName(property);
+            FormatProperties[name] = entity => format.Invoke((TProp)entity);
+            return this;
+        }
+
         public IContextEntitySetting<TEntity> Format<TProp>(string propertyName, Func<TProp, TProp> format)
+        {
+            FormatProperties[propertyName] = entity => format.Invoke((TProp)entity);
+            return this;
+        }
+
+        public IContextEntitySetting<TEntity> Format<TProp>(string propertyName, Func<TProp, object> format)
         {
             FormatProperties[propertyName] = entity => format.Invoke((TProp)entity);
             return this;

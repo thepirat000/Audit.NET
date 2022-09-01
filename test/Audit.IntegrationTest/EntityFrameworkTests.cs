@@ -46,13 +46,16 @@ namespace Audit.IntegrationTest
                     .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Format(b => b.Title, t => t + "X")));
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Format(b => b.Title, t => t + "X")
+                                                           .Format(b => b.Id, t => t + "X")));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
+            var id = 1;
             using (var ctx = new MyTransactionalContext())
             {
                 var blog = new Blog()
                 {
+                    Id = id,
                     Title = title,
                     BloggerName = "test"
                 };
@@ -73,6 +76,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual("Insert", entries[0].Action);
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
             Assert.AreEqual(title + "X", entries[0].ColumnValues["Title"]);
+            Assert.AreEqual(id + "X", entries[0].ColumnValues["Id"]);
             entries = list[1].EntityFrameworkEvent.Entries;
             Assert.AreEqual(1, entries.Count);
             Assert.AreEqual("Update", entries[0].Action);
