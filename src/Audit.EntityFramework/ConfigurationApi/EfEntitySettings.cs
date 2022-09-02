@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+#if EF_CORE
+using EntityEntry = Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry;
+#else
+using EntityEntry = System.Data.Entity.Infrastructure.DbEntityEntry;
+#endif
 
 namespace Audit.EntityFramework.ConfigurationApi
 {
@@ -15,7 +20,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <summary>
         /// To indicate constant values to override properties on the audit logs. Key: property name, Value: constant value.
         /// </summary>
-        public Dictionary<string, object> OverrideProperties = new Dictionary<string, object>();
+        public Dictionary<string, Func<EntityEntry, object>> OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>();
         /// <summary>
         /// To indicate replacement functions for the property's values on the audit logs. Key: property name, Value: function of the actual value.
         /// </summary>

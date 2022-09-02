@@ -246,7 +246,7 @@ The following settings for the high-level interceptor can be configured per DbCo
 The following settings can be configured per entity type:
 
 - **IgnoredProperties**: To indicate the entity's properties (columns) to be ignored on the audit logs.
-- **OverrideProperties**: To indicate constant values to override properties on the audit logs.
+- **OverrideProperties**: To override property values on the audit logs.
 - **FormatProperties**: To indicate replacement functions for the property's values on the audit logs.
 
 > The Ignore, Override and Format settings are only applied to the **Changes** and **ColumnValues** collections on the [EventEntry](#evententry). The `Entity` object (if included) will not be affected by these settings.

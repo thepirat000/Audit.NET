@@ -11,6 +11,9 @@ using System.IO;
 using System.Linq;
 using Audit.EntityFramework.ConfigurationApi;
 using System.Reflection;
+#if NETCOREAPP3_0_OR_GREATER || NET20_OR_GREATER
+using System.Data.Entity.Infrastructure;
+#endif
 #if NK_JSON
 using Newtonsoft.Json;
 #else
@@ -532,6 +535,7 @@ namespace Audit.UnitTest
             Assert.AreEqual(0, list.Count);
         }
 
+#if NETCOREAPP3_0_OR_GREATER || NET20_OR_GREATER
         [Test]
         public void Test_EF_MergeEntitySettings()
         {
@@ -543,23 +547,23 @@ namespace Audit.UnitTest
             attr[typeof(string)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I1" }),
-                OverrideProperties = new Dictionary<string, object>() { { "C1", 1 }, { "C2", "ATTR" } }
+                OverrideProperties = new Dictionary<string, Func<DbEntityEntry, object>>() { { "C1", _ => 1 }, { "C2", _ => "ATTR" } }
             };
             local[typeof(string)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I1", "I2" }),
-                OverrideProperties = new Dictionary<string, object>() { { "C2", "LOCAL" }, { "C3", now } } 
+                OverrideProperties = new Dictionary<string, Func<DbEntityEntry, object>>() { { "C2", _ => "LOCAL" }, { "C3", _ => now } } 
             };
             global[typeof(string)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I3" }),
-                OverrideProperties = new Dictionary<string, object>() { { "C2", "GLOBAL" }, { "C4", null } }
+                OverrideProperties = new Dictionary<string, Func<DbEntityEntry, object>>() { { "C2", _ => "GLOBAL" }, { "C4", _ => null } }
             };
 
             attr[typeof(int)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I3" }),
-                OverrideProperties = new Dictionary<string, object>() { { "C2", "INT" }, { "C4", null } }
+                OverrideProperties = new Dictionary<string, Func<DbEntityEntry, object>>() { { "C2", _ => "INT" }, { "C4", _ => null } }
             };
 
             var merged = helper.MergeEntitySettings(attr, local, global);
@@ -576,17 +580,18 @@ namespace Audit.UnitTest
             Assert.IsTrue(merge.IgnoredProperties.Contains("I2"));
             Assert.IsTrue(merge.IgnoredProperties.Contains("I3"));
             Assert.AreEqual(4, merge.OverrideProperties.Count);
-            Assert.AreEqual(1, merge.OverrideProperties["C1"]);
-            Assert.AreEqual("ATTR", merge.OverrideProperties["C2"]);
-            Assert.AreEqual(now, merge.OverrideProperties["C3"]);
-            Assert.AreEqual(null, merge.OverrideProperties["C4"]);
+            Assert.AreEqual(1, merge.OverrideProperties["C1"].Invoke(null));
+            Assert.AreEqual("ATTR", merge.OverrideProperties["C2"].Invoke(null));
+            Assert.AreEqual(now, merge.OverrideProperties["C3"].Invoke(null));
+            Assert.AreEqual(null, merge.OverrideProperties["C4"].Invoke(null));
             merge = merged[typeof(int)];
             Assert.AreEqual(1, merge.IgnoredProperties.Count);
             Assert.IsTrue(merge.IgnoredProperties.Contains("I3"));
-            Assert.AreEqual("INT", merge.OverrideProperties["C2"]);
-            Assert.AreEqual(null, merge.OverrideProperties["C4"]);
+            Assert.AreEqual("INT", merge.OverrideProperties["C2"].Invoke(null));
+            Assert.AreEqual(null, merge.OverrideProperties["C4"].Invoke(null));
         }
-
+#endif
+        
         [Test]
         public void Test_FileLog_HappyPath()
         {

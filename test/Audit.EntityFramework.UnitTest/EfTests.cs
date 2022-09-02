@@ -154,7 +154,7 @@ namespace Audit.EntityFramework.UnitTest
                     .ForEntity<Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DataBaseContext>(config => config
-                    .ForEntity<Blog>(_ => _.Override<string>("Title", null)));
+                    .ForEntity<Blog>(_ => _.Override<string>(b => b.Title, ent => null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new BlogsEntities())

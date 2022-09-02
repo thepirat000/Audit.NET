@@ -1,32 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+#if EF_CORE
+using EntityEntry = Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry;
+#else
+using EntityEntry = System.Data.Entity.Infrastructure.DbEntityEntry;
+#endif
 
 namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ContextEntitySetting<TEntity> : IContextEntitySetting<TEntity>
     {
         internal HashSet<string> IgnoredProperties = new HashSet<string>();
-        internal Dictionary<string, object> OverrideProperties = new Dictionary<string, object>();
+        internal Dictionary<string, Func<EntityEntry, object>> OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>();
         internal Dictionary<string, Func<object, object>> FormatProperties = new Dictionary<string, Func<object, object>>();
 
-        public IContextEntitySetting<TEntity> Format<TProp>(Expression<Func<TEntity, TProp>> property, Func<TProp, TProp> format)
+        public IContextEntitySetting<TEntity> Format<TProp>(Expression<Func<TEntity, TProp>> property, Func<TProp, object> format)
         {
             var name = GetMemberName(property);
-            FormatProperties[name] = entity => format.Invoke((TProp)entity);
+            FormatProperties[name] = value => format.Invoke((TProp)value);
             return this;
         }
 
-        public IContextEntitySetting<TEntity> Format<TProp>(string propertyName, Func<TProp, TProp> format)
+        public IContextEntitySetting<TEntity> Format<TProp>(string propertyName, Func<TProp, object> format)
         {
-            FormatProperties[propertyName] = entity => format.Invoke((TProp)entity);
+            FormatProperties[propertyName] = value => format.Invoke((TProp)value);
             return this;
         }
 
-        public IContextEntitySetting<TEntity> Override<TProp>(Expression<Func<TEntity, TProp>> property, TProp value)
+        public IContextEntitySetting<TEntity> Override<TProp>(Expression<Func<TEntity, TProp>> property, Func<EntityEntry, object> valueSelector)
         {
             var name = GetMemberName(property);
-            OverrideProperties[name] = value;
+            OverrideProperties[name] = entry => valueSelector?.Invoke(entry);
+            return this;
+        }
+        
+        public IContextEntitySetting<TEntity> Override(string propertyName, Func<EntityEntry, object> valueSelector)
+        {
+            OverrideProperties[propertyName] = entry => valueSelector?.Invoke(entry);
+            return this;
+        }
+
+        public IContextEntitySetting<TEntity> Override<TProp>(Expression<Func<TEntity, TProp>> property, object value)
+        {
+            var name = GetMemberName(property);
+            OverrideProperties[name] = _ => value;
+            return this;
+        }
+
+        public IContextEntitySetting<TEntity> Override(string propertyName, object value)
+        {
+            OverrideProperties[propertyName] = _ => value;
             return this;
         }
 
@@ -40,12 +64,6 @@ namespace Audit.EntityFramework.ConfigurationApi
         public IContextEntitySetting<TEntity> Ignore(string propertyName)
         {
             IgnoredProperties.Add(propertyName);
-            return this;
-        }
-
-        public IContextEntitySetting<TEntity> Override<TProp>(string propertyName, TProp value)
-        {
-            OverrideProperties[propertyName] = value;
             return this;
         }
 

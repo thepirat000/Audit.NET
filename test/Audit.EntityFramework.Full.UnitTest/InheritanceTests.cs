@@ -37,7 +37,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DepartmentContext1>(_ => _
                     .IncludeEntityObjects()
-                    .ForEntity<Department>(emp => emp.Override(e => e.Name, "Override 1"))
+                    .ForEntity<Department>(emp => emp.Override(e => e.Name, e => "Override " + e.CurrentValues["Name"]))
                     .AuditEventType("Type1"));
 
             Audit.EntityFramework.Configuration.Setup()
@@ -79,7 +79,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             Assert.AreEqual("Type1", evs[0].EventType);
             Assert.AreEqual("Type2", evs[1].EventType);
 
-            Assert.AreEqual("Override 1", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
+            Assert.AreEqual("Override test 1", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
             Assert.AreEqual("Override 2", evs[1].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
             Assert.IsNotNull(evs[0].EntityFrameworkEvent.Entries[0].Entity);
             Assert.IsNull(evs[1].EntityFrameworkEvent.Entries[0].Entity);

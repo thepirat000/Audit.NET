@@ -66,7 +66,6 @@ namespace Audit.EntityFramework
         /// </summary>
         private Dictionary<string, object> GetColumnValues(IAuditDbContext context, EntityEntry entry)
         {
-            var dbContext = context.DbContext;
             var result = new Dictionary<string, object>();
             var props = entry.Metadata.GetProperties();
             foreach (var prop in props)
@@ -127,13 +126,13 @@ namespace Audit.EntityFramework
             {
                 if (settings.OverrideProperties.ContainsKey(propName))
                 {
-                    // property overriden with a constant value
-                    value = settings.OverrideProperties[propName];
+                    // property overriden with a func value
+                    value = settings.OverrideProperties[propName].Invoke(entry);
                     return true;
                 }
                 if (settings.FormatProperties.ContainsKey(propName))
                 {
-                    // property overriden with a func value
+                    // property formatted
                     value = settings.FormatProperties[propName].Invoke(currentValue);
                     return true;
 

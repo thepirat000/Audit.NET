@@ -692,7 +692,7 @@ namespace Audit.IntegrationTest
                     .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<MyBaseContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Override("Title", null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
@@ -728,7 +728,7 @@ namespace Audit.IntegrationTest
                     .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<MyBaseContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
+                    .ForEntity<IntegrationTest.Blog>(_ => _.Override("Title", null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
@@ -766,7 +766,7 @@ namespace Audit.IntegrationTest
                   .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
               .ForAnyContext(config => config
-                  .ForEntity<IntegrationTest.Blog>(_ => _.Override<string>("Title", null)));
+                  .ForEntity<IntegrationTest.Blog>(_ => _.Override("Title", null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
