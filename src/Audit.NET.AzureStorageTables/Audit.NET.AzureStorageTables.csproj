@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Store Audit.NET Logs into an Azure Table Storage</Description>
+    <Copyright>Copyright 2022</Copyright>
+    <AssemblyTitle>Audit.AzureStorageTables</AssemblyTitle>
+    <Authors>Federico Colombo</Authors>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Audit.NET.AzureStorageTables</AssemblyName>
+    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Audit.NET.AzureStorageTables</PackageId>
+    <PackageTags>Audit;Trail;Log;Azure;Tables;TableStorage</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="images\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

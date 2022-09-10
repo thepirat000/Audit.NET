@@ -20,7 +20,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Build Failed !!!" -foregroundcolor white -BackgroundColor red
     EXIT 1
 }
-& 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe' Audit.EntityFramework.UnitTest
+& 'C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe' Audit.EntityFramework.UnitTest
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build Failed !!!" -foregroundcolor white -BackgroundColor red
     EXIT 1
@@ -45,6 +45,7 @@ StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureBlob' '--filter=TestCategory=
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dynamo';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
+StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 
 start-process powershell -argumentlist "[Console]::Title='RUN: AspNetCore' ; dotnet run --project Audit.Integration.AspNetCore ; pause";
 

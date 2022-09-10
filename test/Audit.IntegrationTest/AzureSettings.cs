@@ -6,6 +6,7 @@
         public const string AzureBlobAccountName = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         public const string AzureBlobAccountKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         public const string AzureBlobCnnString = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string AzureTableCnnString = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
         public const string AzureDocDbUrl = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         public const string AzureDocDbAuthKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";

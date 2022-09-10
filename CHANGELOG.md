@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [19.4.1] - 2022-09-10
+- Audit.NET.AzureStorageTable: New package for Azure Table data provider, using the latest client Azure.Data.Table (#528)
+
 ## [19.4.0] - 2022-09-02
 - Audit.EntityFramework / Audit.EntityFramework.Core: Adding overloads to `Format()` and `Override()` methods for Entity Framework config fluent API, to override entity values on the audit output (#526)
 

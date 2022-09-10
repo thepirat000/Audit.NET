@@ -17,15 +17,17 @@ PM> Install-Package Audit.NET.AzureStorage
 
 # IMPORTANT NOTES
 
-This library will be **deprecated** in a future version.
+> **Warning**
+> 
+> This library has been **deprecated**.
 
 This library uses the **legacy** client [WindowsAzure.Storage](https://www.nuget.org/packages/WindowsAzure.Storage/) package
-which has been split into multiple client libraries ([Azure.Storage.Blobs](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.blobs-readme), [Microsoft.Azure.Cosmos.Table](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table)) and replaced.
+which has been deprecated and split into multiple client libraries ([Azure.Storage.Blobs](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.blobs-readme), [Azure.Data.Tables](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/data.tables-readme), etc).
 
-For Azure Blob storage, a new audit library which uses the latest client is provided: [`Audit.NET.AzureStorageBlobs`](https://www.nuget.org/packages/Audit.NET.AzureStorageBlobs/).
+**Suggested Alternatives**
 
- 
-
+- For Azure Blob storage use: [`Audit.NET.AzureStorageBlobs`](https://www.nuget.org/packages/Audit.NET.AzureStorageBlobs/)
+- For Azure Table storage use: [`Audit.NET.AzureStorageTables`](https://www.nuget.org/packages/Audit.NET.AzureStorageTables/)
 
 ## Usage
 Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage)

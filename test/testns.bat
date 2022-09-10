@@ -80,7 +80,7 @@ IF NOT EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\M
 	echo The file does not exist
         exit /B 1
 )
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe"
+"C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe"
 ..\..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb
 ..\..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql
 ..\..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Stress
@@ -146,6 +146,13 @@ dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Elasticse
 echo ---------------------------------------------- RUNNING DYNAMO DB INTEGRATION TEST (19) ----------------------------------------------
 TITLE RUNNING DYNAMO DB INTEGRATION TEST (19)
 dotnet test --logger:"console;verbosity=normal" --filter "TestCategory=Dynamo"
+
+cd ..
+
+cd Audit.AzureStorageTables.UnitTest
+echo ---------------------------------------------- RUNNING AZURE TABLES INTEGRATION TEST (20) ----------------------------------------------
+TITLE RUNNING AZURE TABLES INTEGRATION TEST (20)
+dotnet test --logger:"console;verbosity=normal"
 
 cd ..
 

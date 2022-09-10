@@ -1,8 +1,7 @@
 <Project>
  <PropertyGroup>
-	 <Version>19.4.0</Version>
+	 <Version>19.4.1</Version>
 	 <PackageReleaseNotes>
-		 - Audit.EntityFramework / Audit.EntityFramework.Core: Adding overloads to `Format()` and `Override()` mnethods for Entity Framework config fluent API, to override entity values on the audit output (#526)
 	 </PackageReleaseNotes>
  </PropertyGroup>
 </Project>
