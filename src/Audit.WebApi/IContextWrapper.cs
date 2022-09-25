@@ -1,5 +1,6 @@
 ﻿#if ASP_NET
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Audit.WebApi
@@ -17,7 +18,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets the form variables.
         /// </summary>
-        IDictionary<string, string> GetFormVariables();
+        async Task<IDictionary<string, string>> GetFormVariables();
         /// <summary>
         /// Gets the HttpContext
         /// </summary>

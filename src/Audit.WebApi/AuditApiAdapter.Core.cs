@@ -96,7 +96,7 @@ namespace Audit.WebApi
                     UserName = httpContext.User?.Identity.Name,
                     IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                     HttpMethod = httpContext.Request.Method,
-                    FormVariables = AuditApiHelper.GetFormVariables(httpContext),
+                    FormVariables = await AuditApiHelper.GetFormVariables(httpContext),
                     TraceId = httpContext.TraceIdentifier,
                     ActionExecutingContext = actionContext
                 };
@@ -156,8 +156,8 @@ namespace Audit.WebApi
                     auditAction.ResponseStatusCode = 500;
                     auditAction.ResponseStatus = "Internal Server Error";
                 }
-                
-                // Replace the Action field 
+
+                // Replace the Action field
                 (auditScope.Event as AuditEventWebApi).Action = auditAction;
                 // Save, if action was not created by middleware
                 if (!auditAction.IsMiddleware)
@@ -239,7 +239,7 @@ namespace Audit.WebApi
 
         private IDictionary<string, object> GetActionParameters(ControllerActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
         {
-            var args = actionArguments.ToDictionary(k => k.Key, v => v.Value); 
+            var args = actionArguments.ToDictionary(k => k.Key, v => v.Value);
             foreach (var param in actionDescriptor.Parameters)
             {
                 var paramDescriptor = param as ControllerParameterDescriptor;

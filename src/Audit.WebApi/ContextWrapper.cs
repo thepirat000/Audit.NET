@@ -107,11 +107,12 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets the form variables.
         /// </summary>
-        public virtual IDictionary<string, string> GetFormVariables()
+        public virtual async Task<IDictionary<string, string>> GetFormVariables()
         {
             if (HttpContext != null)
             {
-                return ToDictionary(HttpContext?.Request?.Form);
+                IFormCollection formCollection = await HttpContext?.Request?.ReadFormAsync();
+                return ToDictionary(formCollection);
             }
             return null;
         }

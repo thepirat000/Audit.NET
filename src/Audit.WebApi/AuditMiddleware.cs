@@ -94,7 +94,7 @@ namespace Audit.WebApi
                 IpAddress = context.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = context.Request.GetDisplayUrl(),
                 HttpMethod = context.Request.Method,
-                FormVariables = AuditApiHelper.GetFormVariables(context),
+                FormVariables = await AuditApiHelper.GetFormVariables(context),
                 Headers = includeHeaders ? AuditApiHelper.ToDictionary(context.Request.Headers) : null,
                 ActionName = null,
                 ControllerName = null,
