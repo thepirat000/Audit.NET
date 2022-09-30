@@ -49,7 +49,7 @@ namespace Audit.WebApi
                 IpAddress = contextWrapper.GetClientIp(),
                 RequestUrl = request.RequestUri?.AbsoluteUri,
                 HttpMethod = actionContext.Request.Method?.Method,
-                FormVariables = contextWrapper.GetFormVariables(),
+                FormVariables = await contextWrapper.GetFormVariables(),
                 Headers = includeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,

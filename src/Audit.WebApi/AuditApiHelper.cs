@@ -29,7 +29,7 @@ namespace Audit.WebApi
                 return null;
             }
             return parameters.ToDictionary(
-                k => k.Key, 
+                k => k.Key,
                 v => v.Value == null ? null : Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(v.Value), v.Value.GetType()));
         }
 
@@ -66,7 +66,7 @@ namespace Audit.WebApi
         }
 
 
-        internal static IDictionary<string, string> GetFormVariables(HttpContext context)
+        internal static async Task<IDictionary<string, string>> GetFormVariables(HttpContext context)
         {
             if (!context.Request.HasFormContentType)
             {
@@ -75,7 +75,7 @@ namespace Audit.WebApi
             IFormCollection formCollection;
             try
             {
-                formCollection = context.Request.Form;
+                formCollection = await context.Request.ReadFormAsync();
             }
             catch (InvalidDataException)
             {
