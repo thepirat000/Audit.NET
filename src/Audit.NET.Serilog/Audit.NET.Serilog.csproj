@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Description>Log Audit.NET Audit Trail Serilog™</Description>
+        <Copyright>Copyright 2019</Copyright>
+        <AssemblyTitle>Audit.Serilog</AssemblyTitle>
+        <Authors>Kori Seng</Authors>
+        <TargetFrameworks>netstandard1.3;net45;net5.0</TargetFrameworks>
+        <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>Audit.NET.NLog</AssemblyName>
+        <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly>true</SignAssembly>
+        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+        <PackageId>Audit.NET.Serilog</PackageId>
+        <PackageTags>Audit;Trail;Log;Serilog</PackageTags>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+        <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Serilog" Version="2.12.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="images\icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+</Project>
