@@ -1,16 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <Description>Log Audit.NET Audit Trail Serilog™</Description>
-        <Copyright>Copyright 2019</Copyright>
+        <Copyright>Copyright 2022</Copyright>
         <AssemblyTitle>Audit.Serilog</AssemblyTitle>
         <Authors>Kori Seng</Authors>
         <TargetFrameworks>netstandard1.3;net45;net5.0</TargetFrameworks>
         <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
         <NoWarn>$(NoWarn);1591</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AssemblyName>Audit.NET.NLog</AssemblyName>
+        <AssemblyName>Audit.NET.Serilog</AssemblyName>
         <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
         <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>

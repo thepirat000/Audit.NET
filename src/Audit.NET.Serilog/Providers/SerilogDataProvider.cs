@@ -5,7 +5,6 @@ namespace Audit.NET.Serilog.Providers
     using Audit.Serilog.Configuration;
     using global::Serilog;
 
-
     /// <summary>
     ///     Store Audit logs using Serilog.
     /// </summary>
@@ -42,24 +41,23 @@ namespace Audit.NET.Serilog.Providers
         public Func<AuditEvent, object, object> LogMessageBuilder { get; set; }
         
         /// <summary>
-        ///     Initializes a new instance of the <see cref="SerilogDataProvider" /> class.
+        /// Initializes a new instance of the <see cref="SerilogDataProvider" /> class.
         /// </summary>
         public SerilogDataProvider()
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="SerilogDataProvider" /> class.
+        /// Initializes a new instance of the <see cref="SerilogDataProvider" /> class.
         /// </summary>
         /// <param name="config">Configurator instance.</param>
         public SerilogDataProvider(Action<ISerilogConfigurator> config)
         {
-            var logConfig = new SerilogConfigurator();
             if (config == null)
             {
                 return;
             }
-
+            var logConfig = new SerilogConfigurator();
             config.Invoke(logConfig);
             LoggerBuilder = logConfig._loggerBuilder;
             LogLevelBuilder = logConfig._logLevelBuilder;
@@ -67,7 +65,7 @@ namespace Audit.NET.Serilog.Providers
         }
 
         /// <summary>
-        ///     Stores an event via Serilog.
+        /// Stores an event via Serilog.
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>
         /// <returns>Event Id.</returns>
@@ -79,7 +77,7 @@ namespace Audit.NET.Serilog.Providers
         }
 
         /// <summary>
-        ///     Stores an event related to a previous event, via Serilog.
+        /// Stores an event related to a previous event, via Serilog.
         /// </summary>
         /// <param name="eventId">The event id.</param>
         /// <param name="auditEvent">The audit event.</param>

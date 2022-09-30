@@ -65,7 +65,6 @@ namespace Audit.WebApi
             return dict;
         }
 
-
         internal static async Task<IDictionary<string, string>> GetFormVariables(HttpContext context)
         {
             if (!context.Request.HasFormContentType)

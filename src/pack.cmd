@@ -38,6 +38,7 @@ del "Audit.NET.NLog\bin\debug\*.nupkg"
 del "Audit.NET.AmazonQLDB\bin\debug\*.nupkg"
 del "Audit.NET.Kafka\bin\debug\*.nupkg"
 del "Audit.NET.AzureStorageTables\bin\debug\*.nupkg"
+del "Audit.NET.Serilog\bin\debug\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -80,7 +81,9 @@ dotnet pack "Audit.NET.NLog/"
 dotnet pack "Audit.NET.AmazonQLDB/"
 dotnet pack "Audit.NET.Kafka/"
 dotnet pack "Audit.NET.AzureStorageTables/"
+dotnet pack "Audit.NET.Serilog/"
 
 ECHO.
 ECHO ADD TAG NOW !
 ECHO git tag -a x.x.x -m x.x.x
+ECHO git push --tags

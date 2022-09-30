@@ -204,6 +204,14 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Called after the AuditScope saving.
+        /// Override to specify custom logic.
+        /// </summary>
+        public virtual void OnScopeSaved(IAuditScope auditScope)
+        {
+        }
+
+        /// <summary>
         /// Adds a custom field to the audit scope.
         /// The value will be serialized when SaveChanges takes place.
         /// </summary>

@@ -3,6 +3,13 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.0.0] - 2022--
+
+- Audit.NET.MongoDB: Changing default serialization mechanism for BSON (#531)
+- Audit.NET.Serilog: New data provider for Serilog (#532)
+- Audit.EntityFramework: Adding OnScopeSaved virtual method on DbContext triggered after the scope is saved (#529)
+- Audit.WebApi.Core: Use ReadFormAsync instead of Request.Form to avoid sync over async on net core (#534)
+
 ## [19.4.1] - 2022-09-10
 - Audit.NET.AzureStorageTable: New package for Azure Table data provider, using the latest client Azure.Data.Table (#528)
 

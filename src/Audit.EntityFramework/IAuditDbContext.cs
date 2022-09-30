@@ -27,6 +27,7 @@ namespace Audit.EntityFramework
         DbContext DbContext { get; }
         Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
         void OnScopeSaving(IAuditScope auditScope);
+        void OnScopeSaved(IAuditScope auditScope);
         void OnScopeCreated(IAuditScope auditScope);
         bool ExcludeTransactionId { get; set; }
         bool EarlySavingAudit { get; set; }

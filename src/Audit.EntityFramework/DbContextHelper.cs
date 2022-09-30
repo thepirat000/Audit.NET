@@ -140,6 +140,7 @@ namespace Audit.EntityFramework
             (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             scope.Save();
+            context.OnScopeSaved(scope);
         }
 
         /// <summary>
@@ -151,6 +152,7 @@ namespace Audit.EntityFramework
             (scope.Event as AuditEventEntityFramework).EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             await scope.SaveAsync();
+            context.OnScopeSaved(scope);
         }
 
         // Determines whether to include the entity on the audit log or not

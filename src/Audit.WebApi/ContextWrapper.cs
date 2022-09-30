@@ -3,6 +3,7 @@ using Microsoft.Owin;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Audit.WebApi
@@ -107,12 +108,11 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets the form variables.
         /// </summary>
-        public virtual async Task<IDictionary<string, string>> GetFormVariables()
+        public virtual IDictionary<string, string> GetFormVariables()
         {
             if (HttpContext != null)
             {
-                IFormCollection formCollection = await HttpContext?.Request?.ReadFormAsync();
-                return ToDictionary(formCollection);
+                return ToDictionary(HttpContext?.Request?.Form);
             }
             return null;
         }

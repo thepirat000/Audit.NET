@@ -26,6 +26,32 @@ namespace Audit.MongoDB.Providers
         {
             ConfigureBsonMapping();
         }
+        
+        private static void ConfigureBsonMapping()
+        {
+            var pack = new ConventionPack
+            {
+                new IgnoreIfNullConvention(true)
+            };
+            ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof(AuditEvent));
+
+            BsonClassMap.RegisterClassMap<AuditTarget>(cm =>
+            {
+                cm.AutoMap();
+            });
+
+            BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
+            {
+                cm.AutoMap();
+                cm.MapExtraElementsField(c => c.CustomFields);
+            });
+
+            BsonClassMap.RegisterClassMap<AuditEventEnvironment>(cm =>
+            {
+                cm.AutoMap();
+                cm.MapExtraElementsField(c => c.CustomFields);
+            });
+        }
 
         /// <summary>
         /// Gets or sets the MongoDB connection string.
@@ -71,26 +97,6 @@ namespace Audit.MongoDB.Providers
                 Database = mongoConfig._database;
                 SerializeAsBson = mongoConfig._serializeAsBson;
             }
-        }
-
-        private static void ConfigureBsonMapping()
-        {
-            var pack = new ConventionPack
-            {
-                new IgnoreIfNullConvention(true)
-            };
-            ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof(AuditEvent));
-
-            BsonClassMap.RegisterClassMap<AuditTarget>(cm =>
-            {
-                cm.AutoMap();
-            });
-
-            BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
-            {
-               cm.AutoMap();
-               cm.MapExtraElementsField(c => c.CustomFields);
-            });
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
@@ -156,18 +162,40 @@ namespace Audit.MongoDB.Providers
                 auditEvent.CustomFields[k] = Serialize(auditEvent.CustomFields[k]);
             }
         }
+        
+        public override object Serialize<T>(T value)
+        {
+            if (value == null || value is string)
+            {
+                return value;
+            }
 
+            if (SerializeAsBson)
+            {
+                if (value is BsonDocument || value is BsonValue)
+                {
+                    return value;
+                }
+
+                if (BsonTypeMapper.TryMapToBsonValue(value, out BsonValue bsonValue))
+                {
+                    return bsonValue;
+                }
+
+                return value.ToBsonDocument(typeof(object));
+            }
+
+            return base.Serialize(value);
+        }
+        
         private BsonDocument ParseBson(AuditEvent auditEvent)
         {
             if (SerializeAsBson)
             {
-                return auditEvent.ToBsonDocument();
+                return auditEvent.ToBsonDocument(auditEvent.GetType());
             }
-            else
-            {
-                return BsonDocument.Parse(Core.Configuration.JsonAdapter.Serialize(auditEvent));
-            }
-            
+
+            return BsonDocument.Parse(Core.Configuration.JsonAdapter.Serialize(auditEvent));
         }
 
         /// <summary>
@@ -212,24 +240,6 @@ namespace Audit.MongoDB.Providers
                 document.Remove(x.Item1);
                 document.Add(new BsonElement(x.Item3, x.Item2));
             }
-        }
-
-        public override object Serialize<T>(T value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (SerializeAsBson)
-            {
-                if (value is BsonDocument)
-                {
-                    return value;
-                }
-                return value.ToBsonDocument(typeof(object));
-            }
-
-            return base.Serialize(value);
         }
 
         public void TestConnection()

@@ -38,6 +38,7 @@ del "Audit.NET.NLog\bin\debug\*.symbols.nupkg"
 del "Audit.NET.AmazonQLDB\bin\debug\*.symbols.nupkg"
 del "Audit.NET.Kafka\bin\debug\*.symbols.nupkg"
 del "Audit.NET.AzureStorageTables\bin\debug\*.symbols.nupkg"
+del "Audit.NET.Serilog\bin\debug\*.symbols.nupkg"
 
 nuget push "audit.net\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.JsonNewtonsoftAdapter\bin\debug\*.nupkg" -NoSymbols -source %1
@@ -76,3 +77,4 @@ nuget push "Audit.NET.NLog\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AmazonQLDB\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Kafka\bin\debug\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureStorageTables\bin\debug\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.Serilog\bin\debug\*.nupkg" -NoSymbols -source %1

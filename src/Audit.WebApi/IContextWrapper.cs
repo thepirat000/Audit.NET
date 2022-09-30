@@ -18,7 +18,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Gets the form variables.
         /// </summary>
-        async Task<IDictionary<string, string>> GetFormVariables();
+        IDictionary<string, string> GetFormVariables();
         /// <summary>
         /// Gets the HttpContext
         /// </summary>
