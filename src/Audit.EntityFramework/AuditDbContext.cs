@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
@@ -192,10 +193,12 @@ namespace Audit.EntityFramework
         }
 
 #if EF_FULL
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public override int SaveChanges()
         {
             return _helper.SaveChanges(this, () => base.SaveChanges());
         }
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
@@ -209,10 +212,13 @@ namespace Audit.EntityFramework
             return base.SaveChangesAsync(CancellationToken.None);
         }
 #else
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
         }
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             return _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));

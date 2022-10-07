@@ -41,13 +41,6 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Audit.EntityFramework, Version=7.0.6.0, Culture=neutral, PublicKeyToken=571d6b80b242c87e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\src\Audit.EntityFramework\bin\Debug\net45\Audit.EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Audit.NET">
-      <HintPath>..\..\src\Audit.NET\bin\Debug\net45\Audit.NET.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -182,9 +175,17 @@
       <Project>{5d72ec4d-e147-4958-b4e7-afcc019de54f}</Project>
       <Name>Audit.EntityFramework.Identity</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj">
+      <Project>{0e1077b5-0166-46ae-bd6d-7ccea001d1a3}</Project>
+      <Name>Audit.EntityFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj">
       <Project>{d6c86273-942b-4be7-8764-fa4567f19c9a}</Project>
       <Name>Audit.NET.SqlServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj">
+      <Project>{95370b23-ed59-420a-b22c-722bf38def42}</Project>
+      <Name>Audit.NET</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

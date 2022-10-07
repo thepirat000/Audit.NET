@@ -1,26 +1,25 @@
-﻿function StartDotnetUnitTests ([String]$project, [String]$title, [String]$extraParams='') {
-    start-process powershell -argumentlist ".\_execDotnetTest.ps1 -projects:$project -title:$title -extraParams:'$extraParams'";
+﻿function StartDotnetUnitTests ([String]$project, [String]$title, [String]$extraParams='', [int32]$delay=0) {
+    start-process powershell -argumentlist ".\_execDotnetTest.ps1 -projects:$project -title:$title -extraParams:'$extraParams' -delay:$delay";
 }
 
 function StartEfUnitTests ([String]$category) {
     start-process powershell -argumentlist "
         [Console]::Title='RUN: EF_$category' ; 
-        ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Debug\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=$category ;
+        ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=$category ;
         [Console]::Title='END: EF_$category' ;
         pause
     ";
-
 }
 
 [Console]::Title='RUNNER: Build'
 
 #Build solution
-& dotnet build ..\audit.net.sln
+& dotnet build ..\audit.net.sln -c Release
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build Failed !!!" -foregroundcolor white -BackgroundColor red
     EXIT 1
 }
-& 'C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe' Audit.EntityFramework.UnitTest
+& 'C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe' Audit.EntityFramework.UnitTest -p:Configuration=Release
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build Failed !!!" -foregroundcolor white -BackgroundColor red
     EXIT 1
@@ -47,7 +46,7 @@ StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dyn
 StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
 StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 
-start-process powershell -argumentlist "[Console]::Title='RUN: AspNetCore' ; dotnet run --project Audit.Integration.AspNetCore ; pause";
+start-process powershell -argumentlist "[Console]::Title='RUN: AspNetCore' ; dotnet run --project Audit.Integration.AspNetCore -c Release ; pause";
 
 StartEfUnitTests 'LocalDb';
 StartEfUnitTests 'Sql';

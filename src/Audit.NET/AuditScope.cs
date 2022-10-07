@@ -43,8 +43,7 @@ namespace Audit.Core
 #endif
             if (callingMethod != null)
             {
-                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "")
-                    + callingMethod.Name + "()";
+                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()";
                 environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
             }
             _event = options.AuditEvent ?? new AuditEvent();

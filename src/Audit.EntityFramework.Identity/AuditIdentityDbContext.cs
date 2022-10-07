@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Audit.Core;
 using System.Threading;
@@ -225,6 +226,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Saves the changes synchronously.
         /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public override int SaveChanges()
         {
             return _helper.SaveChanges(this, () => base.SaveChanges());
@@ -234,6 +236,7 @@ namespace Audit.EntityFramework
         /// Saves the changes asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));

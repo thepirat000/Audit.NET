@@ -1,9 +1,15 @@
 ﻿param([Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][String[]]$projects,
 [Parameter(Mandatory=$false)][String]$extraParams='',
 [Parameter(Mandatory=$false)][String]$title='',
-[Parameter(Mandatory=$false)][switch]$nopause = $false) 
+[Parameter(Mandatory=$false)][switch]$nopause = $false,
+[Parameter(Mandatory=$false)][int32]$delay = 0) 
 
 $host.ui.RawUI.WindowTitle = "RUN: $title";
+
+if ($delay -ne 0) {
+	Write-Host "Will wait $delay seconds before start..."
+	Start-Sleep #delay
+}
 
 Write-Host "`r`n`r`n RUNNING $title UNIT TESTS `r`n`r`n" -foregroundcolor white -BackgroundColor DarkCyan
 
@@ -17,7 +23,7 @@ if ($totalProjs -eq 0) {
 $hasFailed = $false;
 
 $projects | ForEach {
-    & dotnet test $_ --"logger:console;verbosity=normal" --no-build $extraParams
+    & dotnet test $_ --"logger:console;verbosity=normal" --no-build -c Release $extraParams
     if ($LASTEXITCODE -ne 0) {
         $hasFailed = $true;
     }
