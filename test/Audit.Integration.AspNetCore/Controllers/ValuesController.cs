@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +27,7 @@ namespace Audit.Integration.AspNetCore.Controllers
 
         [HttpGet("TestFromServiceIgnore")]
         [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
-        public IActionResult TestFromServiceIgnore([FromServices] IServiceProvider provider, string t)
+        public async Task<IActionResult> TestFromServiceIgnore([FromServices] IServiceProvider provider, string t, CancellationToken cancellationToken)
         {
             return Ok(t);
         }

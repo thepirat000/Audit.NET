@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.0.1] - 2022-10-21
+- Audit.NET: Adding InMemory data provider for testing purposes.
+- Audit.WebApi.Core: Fix issue when serializing some action parameters that are not user input (i.e. CancellationToken) (#536)
+
 ## [20.0.0] - 2022-09-30
 
 - Audit.NET.MongoDB: Changing default serialization mechanism for BSON (#531)

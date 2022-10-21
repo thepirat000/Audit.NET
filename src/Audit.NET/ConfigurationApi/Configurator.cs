@@ -111,5 +111,12 @@ namespace Audit.Core.ConfigurationApi
 
             return new CreationPolicyConfigurator();
         }
+
+        public ICreationPolicyConfigurator UseInMemoryProvider()
+        {
+            Configuration.DataProvider = new InMemoryDataProvider();
+
+            return new CreationPolicyConfigurator();
+        }
     }
 }

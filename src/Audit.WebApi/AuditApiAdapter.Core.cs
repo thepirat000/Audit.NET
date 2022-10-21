@@ -243,7 +243,12 @@ namespace Audit.WebApi
             foreach (var param in actionDescriptor.Parameters)
             {
                 var paramDescriptor = param as ControllerParameterDescriptor;
-                if (paramDescriptor?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) != null)
+
+                if (paramDescriptor?.BindingInfo?.BindingSource?.IsFromRequest == false)
+                {
+                    args.Remove(param.Name);
+                }
+                else if (paramDescriptor?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) != null)
                 {
                     args.Remove(param.Name);
                 }

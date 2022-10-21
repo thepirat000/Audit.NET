@@ -99,5 +99,10 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         /// <param name="dataProviderFactory">The data provider factory to use. A delegate that is invoked to instantiate an AuditDataProvider</param>
         ICreationPolicyConfigurator Use(Func<AuditDataProvider> dataProviderFactory);
+
+        /// <summary>
+        /// Store the events in memory in a thread-safe list. Useful for testing purposes.
+        /// </summary>
+        ICreationPolicyConfigurator UseInMemoryProvider();
     }
 }
