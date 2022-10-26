@@ -77,7 +77,7 @@ namespace Audit.MongoDB.Providers
 
         /// <summary>
         /// Gets or sets a value indicating whether the target object and extra fields should be serialized as Bson.
-        /// Default is false to serialize using the default JSON serializer from Audit.Core.Configiration.JsonAdapter
+        /// Default is false to serialize using the default JSON serializer from Audit.Core.Configuration.JsonAdapter
         /// </summary>
         /// <value><c>true</c> if should serialize as Bson; or <c>false</c> to serialize as Json.</value>
         public bool SerializeAsBson { get; set; } = false;
@@ -113,7 +113,7 @@ namespace Audit.MongoDB.Providers
             return (BsonObjectId)doc["_id"];
         }
 
-        public async override Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
         {
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(Collection);
@@ -141,7 +141,7 @@ namespace Audit.MongoDB.Providers
             col.ReplaceOne(filter, doc);
         }
 
-        public async override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
         {
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(Collection);
@@ -187,8 +187,8 @@ namespace Audit.MongoDB.Providers
 
             return base.Serialize(value);
         }
-        
-        private BsonDocument ParseBson(AuditEvent auditEvent)
+
+        protected virtual BsonDocument ParseBson(AuditEvent auditEvent)
         {
             if (SerializeAsBson)
             {
@@ -202,7 +202,7 @@ namespace Audit.MongoDB.Providers
         /// Fixes the document Element Names (avoid using dots '.' and starting with '$').
         /// </summary>
         /// <param name="document">The document to fix.</param>
-        private void FixDocumentElementNames(BsonDocument document)
+        protected virtual void FixDocumentElementNames(BsonDocument document)
         {
             var toRename = new List<Tuple<string, BsonValue, string>>();
             foreach (var elem in document)

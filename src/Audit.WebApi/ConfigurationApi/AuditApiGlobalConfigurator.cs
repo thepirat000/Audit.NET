@@ -99,6 +99,11 @@ namespace Audit.WebApi.ConfigurationApi
             _includeResponseBodyBuilder = includeBuilder;
             return this;
         }
-    }
 
+        public IAuditApiGlobalConfigurator SerializeActionParameters(bool serialize = true)
+        {
+            _serializeActionParameters = serialize;
+            return this;
+        }
+    }
 }

@@ -5,6 +5,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Audit.Core;
+using Audit.Core.Providers;
+using Audit.Integration.AspNetCore.Pages.Test;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
@@ -863,5 +865,40 @@ namespace Audit.Integration.AspNetCore
             Assert.IsTrue(replaceEvs[0].Exception.Contains("at Audit.Integration.AspNetCore.Controllers.ValuesController"), "stacktrace not found");
         }
 
+        public async Task Test_WebApi_GlobalFilter_SerializeParams_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var c = new HttpClient();
+
+            var customer = new Customer() {Id = 123, Name = "Test"};
+            var s = await c.PostAsync($"http://localhost:{_port}/api/values/TestSerializeParams", new StringContent(Configuration.JsonAdapter.Serialize(customer), Encoding.UTF8, "application/json"));
+
+            var events = (Core.Configuration.DataProvider as InMemoryDataProvider).GetAllEventsOfType<AuditEventWebApi>();
+            
+            Assert.AreEqual(1, events.Count);
+            Assert.AreEqual(1, events[0].Action.ActionParameters.Count);
+            Assert.AreEqual(123, (events[0].Action.ActionParameters["customer"] as Customer)?.Id);
+        }
+
+        public async Task Test_WebApi_GlobalFilter_DoNotSerializeParams_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var c = new HttpClient();
+
+            var customer = new Customer() { Id = 123, Name = "Test" };
+            var s = await c.PostAsync($"http://localhost:{_port}/api/values/TestDoNotSerializeParams", new StringContent(Configuration.JsonAdapter.Serialize(customer), Encoding.UTF8, "application/json"));
+
+            var events = (Core.Configuration.DataProvider as InMemoryDataProvider).GetAllEventsOfType<AuditEventWebApi>();
+
+            Assert.AreEqual(1, events.Count);
+            Assert.AreEqual(1, events[0].Action.ActionParameters.Count);
+            Assert.AreEqual(-1, (events[0].Action.ActionParameters["customer"] as Customer)?.Id);
+        }
     }
 }

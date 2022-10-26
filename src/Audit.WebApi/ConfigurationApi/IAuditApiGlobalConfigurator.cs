@@ -78,6 +78,11 @@ namespace Audit.WebApi.ConfigurationApi
         /// </summary>
         /// <param name="includePredicate">A function of the executed context to determine whether the response body should be included on the audit output</param>
         IAuditApiGlobalConfigurator IncludeResponseBody(Func<ActionExecutedContext, bool> includePredicate);
+        /// <summary>
+        /// Specifies whether the action arguments should be pre-serialized to the audit event.
+        /// </summary>
+        /// <param name="serialize"></param>
+        IAuditApiGlobalConfigurator SerializeActionParameters(bool serialize = true);
     }
 
 }

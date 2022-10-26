@@ -228,6 +228,7 @@ The `AuditApiGlobalFilter` can be configured with the following methods:
 - **IncludeRequestBody()**: Boolean (or function of the executing context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
 - **IncludeResponseBody()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include response body or not. Default is false.
 - **IncludeModelState()**: Boolean (or function of the executed context that returns a boolean) to indicate whether to include the Model State info or not. Default is false.
+- **SerializeActionParameters()**: Boolean to indicate whether the action arguments should be pre-serialized to the audit event. Default is false.
 
 To configure the output persistence mechanism please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers).
 

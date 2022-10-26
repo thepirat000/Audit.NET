@@ -30,19 +30,24 @@ namespace Audit.Integration.AspNetCore
 
             services.AddMvc(mvc =>
             {
-                
                 mvc.EnableEndpointRouting = false;
                 mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                     .LogActionIf(d => d.ControllerName == "MoreValues"
                         || (d.ControllerName == "Mvc" && d.ActionName == "Details")
                         || (d.ControllerName == "Values" &&
-                                (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix") || d.ActionName == "TestResponseHeadersGlobalFilter")))
+                                (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix") || d.ActionName == "TestResponseHeadersGlobalFilter"
+                                || d.ActionName == "TestDoNotSerializeParams")))
                     .WithEventType("{verb}.{controller}.{action}")
                     .IncludeHeaders()
                     .IncludeResponseHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
                     .IncludeRequestBody()));
+
+                mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+                    .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "TestSerializeParams")
+                    .SerializeActionParameters(true)
+                ));
             }).AddJsonOptions(o =>
             {
                 o.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;

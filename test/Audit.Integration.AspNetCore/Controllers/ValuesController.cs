@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Audit.Integration.AspNetCore.Pages.Test;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -129,6 +129,20 @@ namespace Audit.Integration.AspNetCore.Controllers
         {
             await Task.Delay(0);
             HttpContext.Response.Headers.Add("some-header-global", id);
+            return Ok();
+        }
+
+        [HttpPost("TestSerializeParams")]
+        public IActionResult TestSerializeParams([FromBody]Customer customer)
+        {
+            customer.Id = -1;
+            return Ok();
+        }
+
+        [HttpPost("TestDoNotSerializeParams")]
+        public IActionResult TestDoNotSerializeParams([FromBody] Customer customer)
+        {
+            customer.Id = -1;
             return Ok();
         }
 
