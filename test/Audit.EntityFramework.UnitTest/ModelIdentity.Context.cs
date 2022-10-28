@@ -13,10 +13,9 @@ namespace Audit.EntityFramework.UnitTest
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     using Microsoft.AspNet.Identity.EntityFramework;
-
     public partial class Entities : AuditIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserLogin, IdentityUserRole, IdentityUserClaim>
     {
-        public Entities() 
+        public Entities()
         {
         }
     

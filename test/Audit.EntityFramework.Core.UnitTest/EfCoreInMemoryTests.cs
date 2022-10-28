@@ -4,7 +4,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Audit.Core.Providers;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -20,6 +22,179 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForAnyContext().Reset();
             new BlogsMemoryContext().Database.EnsureCreated();
             Audit.Core.Configuration.ResetCustomActions();
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Test_EF_DataProvider_DbContextDisposal(bool dispose)
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false))
+                .UseOptIn()
+                .Include<Blog>();
+
+            var ctx1 = new BlogsContext();
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .UseDbContext(_ => ctx1)
+                    .DisposeDbContext(dispose)
+                    .AuditTypeMapper(_ => typeof(CommonAudit))
+                    .AuditEntityAction<CommonAudit>((ev, ent, au) =>
+                    {
+                        au.Title = ent.ColumnValues["BloggerName"].ToString();
+                        au.AuditDate = DateTime.Now;
+                    }));
+
+            var blog = new Blog()
+            {
+                BloggerName = Guid.NewGuid().ToString(),
+                Title = "test"
+            };
+            CommonAudit audit;
+            using (var ctx2 = new BlogsContext())
+            {
+                ctx2.Blogs.Add(blog);
+                ctx2.SaveChanges();
+
+                audit = ctx2.CommonAudits.FirstOrDefault(x => x.Title == blog.BloggerName);
+            }
+
+            var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.IsNotNull(audit);
+            Assert.AreEqual(blog.BloggerName, audit.Title);
+            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Test_EF_DataProvider_DbContextDisposalAsync(bool dispose)
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false))
+                .UseOptIn()
+                .Include<Blog>();
+
+            var ctx1 = new BlogsContext();
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .UseDbContext(_ => ctx1)
+                    .DisposeDbContext(dispose)
+                    .AuditTypeMapper(_ => typeof(CommonAudit))
+                    .AuditEntityAction<CommonAudit>((ev, ent, au) =>
+                    {
+                        au.Title = ent.ColumnValues["BloggerName"].ToString();
+                        au.AuditDate = DateTime.Now;
+                    }));
+
+            var blog = new Blog()
+            {
+                BloggerName = Guid.NewGuid().ToString(),
+                Title = "test"
+            }; 
+            CommonAudit audit;
+            using (var ctx2 = new BlogsContext())
+            {
+                await ctx2.Blogs.AddAsync(blog);
+                await ctx2.SaveChangesAsync();
+
+                audit = await ctx2.CommonAudits.FirstOrDefaultAsync(x => x.Title == blog.BloggerName);
+            }
+
+            var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            Assert.IsNotNull(audit);
+            Assert.AreEqual(blog.BloggerName, audit.Title);
+            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Test_EF_DataProvider_DbContextShouldDisposeEvenIfExceptionThrown(bool dispose)
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false))
+                .UseOptIn()
+                .Include<Blog>();
+
+            var ctx1 = new BlogsContext();
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .UseDbContext(_ => ctx1)
+                    .DisposeDbContext(dispose)
+                    .AuditTypeMapper(_ => typeof(CommonAudit))
+                    .AuditEntityAction<CommonAudit>((ev, ent, au) =>
+                    {
+                        au.AuditAction = "";
+                        throw new ArgumentException("test exception");
+                        return null;
+                    }));
+
+            var blog = new Blog()
+            {
+                BloggerName = Guid.NewGuid().ToString(),
+                Title = "test"
+            };
+            
+            using (var ctx2 = new BlogsContext())
+            {
+                ctx2.Blogs.AddAsync(blog);
+
+                var exception = Assert.Throws<AggregateException>(() => ctx2.SaveChanges());
+                Assert.AreEqual("test exception", exception.GetBaseException().Message);
+            }
+
+            var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+        }
+
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Test_EF_DataProvider_DbContextShouldDisposeEvenIfExceptionThrownAsync(bool dispose)
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(false))
+                .UseOptIn()
+                .Include<Blog>();
+
+            var ctx1 = new BlogsContext();
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseEntityFramework(ef => ef
+                    .UseDbContext(_ => ctx1)
+                    .DisposeDbContext(dispose)
+                    .AuditTypeMapper(_ => typeof(CommonAudit))
+                    .AuditEntityAction<CommonAudit>((ev, ent, au) =>
+                    {
+                        au.AuditAction = "";
+                        throw new ArgumentException("test exception");
+                        return null;
+                    }));
+
+            var blog = new Blog()
+            {
+                BloggerName = Guid.NewGuid().ToString(),
+                Title = "test"
+            };
+
+            using (var ctx2 = new BlogsContext())
+            {
+                await ctx2.Blogs.AddAsync(blog);
+
+                var exception = Assert.ThrowsAsync<ArgumentException>(async () => await ctx2.SaveChangesAsync());
+                Assert.AreEqual("test exception", exception.GetBaseException().Message);
+            }
+
+            var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
         }
 
         [Test]

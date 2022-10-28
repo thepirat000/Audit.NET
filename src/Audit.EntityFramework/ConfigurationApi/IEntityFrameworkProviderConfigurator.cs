@@ -20,6 +20,11 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <param name="constructorArgs">The arguments to pass to the <typeparamref name="T"/> constructor, if any.</param>
         IEntityFrameworkProviderConfigurator UseDbContext<T>(params object[] constructorArgs) where T : DbContext;
         /// <summary>
+        /// Indicates that the audit DbContext instance should be disposed after saving.
+        /// </summary>
+        /// <param name="dispose">Boolean value to indicate if the DbContext should be disposed after saving the audit</param>
+        IEntityFrameworkProviderConfigurator DisposeDbContext(bool dispose = true);
+        /// <summary>
         /// Specifies a function that maps an entity type to its audited type. If the function returns null for a given type, the audit event will not be saved.
         /// </summary>
         /// <param name="mapper">Function that maps an entity type to its audited type.</param>

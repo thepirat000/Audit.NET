@@ -20,16 +20,23 @@ namespace Audit.EntityFramework.ConfigurationApi
         internal Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
         internal Func<EventEntry, Type> _explicitMapper;
         internal Func<DbContext, EventEntry, object> _auditEntityCreator;
+        internal bool _disposeDbContext;
 
         public IEntityFrameworkProviderConfigurator UseDbContext(Func<AuditEventEntityFramework, DbContext> dbContextBuilder)
         {
             _dbContextBuilder = dbContextBuilder;
             return this;
         }
-
-        public IEntityFrameworkProviderConfigurator UseDbContext<T>(params object[] constructorArgs) where T : DbContext
+        
+        public IEntityFrameworkProviderConfigurator UseDbContext<T>(object[] constructorArgs = null) where T : DbContext
         {
             _dbContextBuilder = ev => (T)Activator.CreateInstance(typeof(T), constructorArgs);
+            return this;
+        }
+
+        public IEntityFrameworkProviderConfigurator DisposeDbContext(bool dispose = true)
+        {
+            _disposeDbContext = dispose;
             return this;
         }
 

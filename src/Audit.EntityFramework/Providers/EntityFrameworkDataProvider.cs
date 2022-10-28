@@ -30,6 +30,7 @@ namespace Audit.EntityFramework.Providers
         private Func<Type, EventEntry, Type> _auditTypeMapper;
         private Func<AuditEvent, EventEntry, object, Task<bool>> _auditEntityAction;
         private Func<AuditEventEntityFramework, DbContext> _dbContextBuilder;
+        private bool _disposeDbContext;
         private Func<EventEntry, Type> _explicitMapper;
         private Func<DbContext, EventEntry, object> _auditEntityCreator;
 
@@ -49,6 +50,7 @@ namespace Audit.EntityFramework.Providers
                 _ignoreMatchedPropertiesFunc = efConfig._ignoreMatchedPropertiesFunc;
                 _explicitMapper = efConfig._explicitMapper;
                 _auditEntityCreator = efConfig._auditEntityCreator;
+                _disposeDbContext = efConfig._disposeDbContext;
             }
         }
 
@@ -98,6 +100,15 @@ namespace Audit.EntityFramework.Providers
             set { _dbContextBuilder = value; }
         }
 
+        /// <summary>
+        /// Indicates if the Audit DbContext should be disposed after saving the audit
+        /// </summary>
+        public bool DisposeDbContext
+        {
+            get { return _disposeDbContext; }
+            set { _disposeDbContext = value; }
+        }
+
         public override object InsertEvent(AuditEvent auditEvent)
         {
             bool save = false;
@@ -107,59 +118,70 @@ namespace Audit.EntityFramework.Providers
             }
             var localDbContext = efEvent.EntityFrameworkEvent.DbContext;
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
-            foreach(var entry in efEvent.EntityFrameworkEvent.Entries)
+            try
             {
-                // Explicit creator (Entry -> object)
-                object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
-                Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
-                if (auditEntity == null)
+                foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
                 {
-                    mappedType = _explicitMapper?.Invoke(entry);
-                    if (mappedType != null)
+                    // Explicit creator (Entry -> object)
+                    object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
+                    Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
+                    if (auditEntity == null)
                     {
-                        // Explicit mapping (Table -> Type)
-                        auditEntity = CreateAuditEntityFromTable(mappedType, entry);
-                    }
-                    else
-                    {
-                        // Implicit mapping (Type -> Type)
-                        Type type = GetEntityType(entry, localDbContext);
-                        if (type != null)
+                        mappedType = _explicitMapper?.Invoke(entry);
+                        if (mappedType != null)
                         {
-                            entry.EntityType = type;
-                            mappedType = _auditTypeMapper?.Invoke(type, entry);
-                            if (mappedType != null)
+                            // Explicit mapping (Table -> Type)
+                            auditEntity = CreateAuditEntityFromTable(mappedType, entry);
+                        }
+                        else
+                        {
+                            // Implicit mapping (Type -> Type)
+                            Type type = GetEntityType(entry, localDbContext);
+                            if (type != null)
                             {
-                                auditEntity = CreateAuditEntityFromType(type, mappedType, entry);
+                                entry.EntityType = type;
+                                mappedType = _auditTypeMapper?.Invoke(type, entry);
+                                if (mappedType != null)
+                                {
+                                    auditEntity = CreateAuditEntityFromType(type, mappedType, entry);
+                                }
                             }
                         }
                     }
-                }
-                if (auditEntity != null)
-                {
-                    if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity).Result)
+                    if (auditEntity != null)
                     {
+                        if (_auditEntityAction == null || _auditEntityAction.Invoke(efEvent, entry, auditEntity).Result)
+                        {
 #if EF_FULL
-                        auditDbContext.Set(mappedType).Add(auditEntity);
+                            auditDbContext.Set(mappedType).Add(auditEntity);
 #else
-                        auditDbContext.Add(auditEntity);
+                            auditDbContext.Add(auditEntity);
 #endif
-                        save = true;
+                            save = true;
+                        }
+                    }
+                }
+                if (save)
+                {
+                    if (auditDbContext is IAuditBypass)
+                    {
+                        (auditDbContext as IAuditBypass).SaveChangesBypassAudit();
+                    }
+                    else
+                    {
+                        auditDbContext.SaveChanges();
                     }
                 }
             }
-            if (save)
+            finally
             {
-                if (auditDbContext is IAuditBypass)
+                if (_disposeDbContext)
                 {
-                    (auditDbContext as IAuditBypass).SaveChangesBypassAudit();
-                }
-                else
-                {
-                    auditDbContext.SaveChanges();
+                    auditDbContext.Dispose();
                 }
             }
-            return null;
+
+            return auditEvent;
         }
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
@@ -171,59 +193,74 @@ namespace Audit.EntityFramework.Providers
             }
             var localDbContext = efEvent.EntityFrameworkEvent.DbContext;
             var auditDbContext = DbContextBuilder?.Invoke(efEvent) ?? localDbContext;
-            foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
+            try
             {
-                Type entityType = GetEntityType(entry, localDbContext);
-                entry.EntityType = entityType;
-                // Explicit creator (Entry -> object)
-                object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
-                Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
-                if (auditEntity == null)
+                foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
                 {
-                    mappedType = _explicitMapper?.Invoke(entry);
-                    if (mappedType != null)
+                    Type entityType = GetEntityType(entry, localDbContext);
+                    entry.EntityType = entityType;
+                    // Explicit creator (Entry -> object)
+                    object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
+                    Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
+                    if (auditEntity == null)
                     {
-                        // Explicit mapping (Entry -> Type)
-                        auditEntity = CreateAuditEntityFromTable(mappedType, entry);
-                    }
-                    else
-                    {
-                        // Implicit mapping (Type -> Type)
-                        if (entityType != null)
+                        mappedType = _explicitMapper?.Invoke(entry);
+                        if (mappedType != null)
                         {
-                            entry.EntityType = entityType;
-                            mappedType = _auditTypeMapper?.Invoke(entityType, entry);
-                            if (mappedType != null)
+                            // Explicit mapping (Entry -> Type)
+                            auditEntity = CreateAuditEntityFromTable(mappedType, entry);
+                        }
+                        else
+                        {
+                            // Implicit mapping (Type -> Type)
+                            if (entityType != null)
                             {
-                                auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
+                                entry.EntityType = entityType;
+                                mappedType = _auditTypeMapper?.Invoke(entityType, entry);
+                                if (mappedType != null)
+                                {
+                                    auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
+                                }
                             }
                         }
                     }
-                }               
-                if (auditEntity != null)
-                {
-                    if (_auditEntityAction == null || await _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                    if (auditEntity != null)
                     {
+                        if (_auditEntityAction == null || await _auditEntityAction.Invoke(efEvent, entry, auditEntity))
+                        {
 #if EF_FULL
-                        auditDbContext.Set(mappedType).Add(auditEntity);
+                            auditDbContext.Set(mappedType).Add(auditEntity);
 #else
-                        await auditDbContext.AddAsync(auditEntity);
+                            await auditDbContext.AddAsync(auditEntity);
 #endif
-                        save = true;
+                            save = true;
+                        }
+                    }
+                }
+                if (save)
+                {
+                    if (auditDbContext is IAuditBypass)
+                    {
+                        await (auditDbContext as IAuditBypass).SaveChangesBypassAuditAsync();
+                    }
+                    else
+                    {
+                        await auditDbContext.SaveChangesAsync();
                     }
                 }
             }
-            if (save)
+            finally
             {
-                if (auditDbContext is IAuditBypass)
+                if (_disposeDbContext)
                 {
-                    await (auditDbContext as IAuditBypass).SaveChangesBypassAuditAsync();
-                }
-                else
-                {
-                    await auditDbContext.SaveChangesAsync();
+#if EF_CORE_1 || EF_CORE_2 || EF_FULL
+                    auditDbContext.Dispose();
+#else
+                    await auditDbContext.DisposeAsync();
+#endif
                 }
             }
+
             return auditEvent;
         }
 
@@ -335,7 +372,6 @@ namespace Audit.EntityFramework.Providers
             }
             return type;
         }
-
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {

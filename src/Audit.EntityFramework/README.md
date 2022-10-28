@@ -554,6 +554,7 @@ Audit.Core.Configuration.Setup()
 
 Mandatory:
 - **UseDbContext**: A function that returns the DbContext to use for storing the audit events, by default it will use the same context being audited. 
+- **DisposeDbContext**: A boolean value to indicate if the audit DbContext should be disposed after saving the audit. Default is false.
 - **AuditTypeMapper**: A function that maps an entity type to its audited type (i.e. Order -> Audit_Order, etc). 
 - **ExplicitMapper**: An alternative mapper, as a function that excplicitly maps an entry to its audited type, useful to configure mapping when no entity type is associated with a table, or to setup complex mapping rules.
 - **AuditEntityCreator**: An alternative to the mapper, as a function that creates the audit entity instance from the Event Entry and the Audit DbContext. Useful to control the Audit Entity object creation for example when using change-tracking proxies. 
@@ -656,6 +657,7 @@ are defined in a different database and context (i.e. `AuditDatabaseDbContext`):
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(x => x
         .UseDbContext<AuditDatabaseDbContext>()
+        .DisposeDbContext()
         .AuditTypeExplicitMapper(m => m
             .Map<Order, Audit_Order>()
             .AuditEntityAction<IAudit>((ev, ent, auditEntity) =>
@@ -767,6 +769,7 @@ you want to audit the `PostTag` relation table to an `Audit_PostTag` table.
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(_ => _
         .UseDbContext<YourAuditDbContext>()
+        .DisposeDbContext()
         .AuditTypeExplicitMapper(map => map
             .Map<Post, Audit_Post>()
             .Map<Tag, Audit_Tag>()
@@ -790,12 +793,13 @@ Audit.Core.Configuration.Setup()
 ### Map via Factory: 
 
 When you need to control the Audit Entity creation, for example when using [change-tracking proxies](https://docs.microsoft.com/en-us/ef/core/change-tracking/change-detection#change-tracking-proxies),
-you can use the `AuditEntityCreator` to specify a factory that creates the Audit Entity for a given entry.
+you can use the `AuditEntityCreator` to specify a factory that creates the Audit Entity for a given entry. 
 
 ```c#
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
         .UseDbContext<YourAuditDbContext>()
+        .DisposeDbContext()
         .AuditEntityCreator(auditDbContext => auditDbContext.CreateProxy<AuditLog>())
         .AuditEntityAction<AuditLog>((ev, ent, auditEntity) =>
         {
@@ -812,6 +816,7 @@ Another example of an andit Entity factory, but mapping to different entity type
 Audit.Core.Configuration.Setup()
     .UseEntityFramework(ef => ef
         .UseDbContext<YourAuditDbContext>()
+        .DisposeDbContext()
         .AuditEntityCreator((auditDbContext, entry) => entry.Table switch
         {
             "Customer" => auditDbContext.CreateProxy<AuditCustomer>(),

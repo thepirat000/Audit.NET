@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.0.3] - 2022-10-27
+- Audit.EntityFramework / Audit.EntityFramework.Core: Adding new setting on the EntityFramework Data Provider to indicate if the audit DbContext should be disposed after saving (#539)
+
 ## [20.0.2] - 2022-10-26
 - Audit.WebApi: Adding missing SerializeActionParameters setting on the fluent API configurator for the global audit filter. (#538)
 
