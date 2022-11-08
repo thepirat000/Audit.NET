@@ -437,7 +437,7 @@ You can optionally include Entity Framework Core by adding the `-E` parameter
 dotnet new webapiaudit -E
 ```
 
-Also you can include a Swagger endpoint by adding the `-S` parameter
+Also you can include a service interceptor (using Audit.DynamicProxy) for your service dependencies calls, by adding the `-S` parameter
 
 ```sh
 dotnet new webapiaudit -S

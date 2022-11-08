@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Audit.WebApi.Template.Providers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Audit.WebApi.Template.Controllers
 {
-    
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private IValuesProvider _provider;
+        private IValuesService _provider;
 
-        public ValuesController(IValuesProvider provider)
+        public ValuesController(IValuesService provider)
         {
             _provider = provider;
         }

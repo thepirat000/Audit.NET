@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BF23B905-16A6-4367-B27E-C0D8D2C44347}"
 	ProjectSection(SolutionItems) = preProject
 		Audit.WebApi.Template.nuspec = Audit.WebApi.Template.nuspec
 		README.md = README.md
 		content\Audit.WebApi.Template\.template.config\template.json = content\Audit.WebApi.Template\.template.config\template.json
+	EndProjectSection
+	ProjectSection(FolderGlobals) = preProject
+		D_5_4MIOS_4Proyectos _1NET_4Audit_1NET_4templates_4WebApi_4content_4Audit_1WebApi_1Template_4_1template_1config_4template_1json__JsonSchema = http://json.schemastore.org/template
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WebApi.Template", "content\Audit.WebApi.Template\Audit.WebApi.Template.csproj", "{C03204CB-77E5-42EA-9285-9F21C722BF50}"

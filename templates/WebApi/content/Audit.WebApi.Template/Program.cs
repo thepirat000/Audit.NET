@@ -1,24 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿
+var builder = WebApplication.CreateBuilder(args);
 
-namespace Audit.WebApi.Template
+// Add services to the container and configure the audit global filter
+builder.Services.AddControllers(mvc => 
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+    mvc.AuditSetupFilter(); 
+});
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
-    }
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// HTTP context accessor
+builder.Services.AddHttpContextAccessor();
+
+// TODO: Configure your services
+#if ServiceInterception
+builder.Services.AddAuditedTransient<IValuesService, ValuesService>();
+#else
+builder.Services.AddTransient<IValuesService, ValuesService>();
+#endif
+
+#if EnableEntityFramework
+// TODO: Configure your context connection
+builder.Services.AddDbContext<MyContext>(_ => _.UseInMemoryDatabase("default"));
+#endif
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+// Enable buffering for auditing HTTP request body
+app.Use(async (context, next) => {
+    context.Request.EnableBuffering();
+    await next();
+});
+
+// Configure the audit middleware
+app.AuditSetupMiddleware();
+
+#if (EnableEntityFramework)
+// Configure the Entity framework audit.
+app.AuditSetupDbContext();
+#endif
+
+// Configure the audit output.
+app.AuditSetupOutput();
+
+app.Run();

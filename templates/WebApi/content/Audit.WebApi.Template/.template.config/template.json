@@ -1,6 +1,8 @@
 {
+  "$schema": "http://json.schemastore.org/template",
   "author": "Federico Colombo",
   "classifications": [
+    "Asp NET Core",
     "Web API",
     "Audit.NET"
   ],
@@ -8,6 +10,7 @@
   "identity": "Audit.WebApi.Template",
   "shortName": "webapiaudit",
   "tags": {
+    "type": "project",
     "language": "C#"
   },
   "sourceName": "Audit.WebApi.Template",
@@ -29,14 +32,15 @@
     "EnableEntityFramework": {
       "type": "parameter",
       "dataType": "bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Include Entity Framework Core"
     },
-    "Swagger": {
+    "ServiceInterception": {
       "type": "parameter",
       "dataType": "bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Include a service interceptor"
     }
-
   },
   "sources": [
     {

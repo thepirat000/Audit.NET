@@ -1,31 +1,34 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-#if (EnableEntityFramework)
-using Audit.WebApi.Template.Providers.Database;
+#if EnableEntityFramework
+using Audit.WebApi.Template.Services.Database;
 #else
 using System;
 using System.Collections.Concurrent;
 #endif
 
-namespace Audit.WebApi.Template.Providers
+namespace Audit.WebApi.Template.Services
 {
-#if (EnableEntityFramework)   
-    public class ValuesProvider : IValuesProvider
+#if EnableEntityFramework
+    /// <summary>
+    /// Sample service with CRUD operations on a Database 
+    /// </summary>
+    public class ValuesService : IValuesService
     {
-        private MyContext _dbContext;
+        private readonly MyContext _dbContext;
 
-        public ValuesProvider(MyContext dbContext)
+        public ValuesService(MyContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public IEnumerable<string> GetValues()
+        public IEnumerable<string?> GetValues()
         {
             return _dbContext.Values.Select(x => x.Value);
         }
 
-        public async Task<string> GetAsync(int id)
+        public async Task<string?> GetAsync(int id)
         {
             var entity = await _dbContext.Values.FindAsync(id);
             return entity?.Value;
@@ -69,7 +72,10 @@ namespace Audit.WebApi.Template.Providers
         }
     }
 #else
-    public class ValuesProvider : IValuesProvider
+    /// <summary>
+    /// Sample provider with CRUD operations on a dictionary
+    /// </summary>
+    public class ValuesService : IValuesService
     {
         private static Random _random = new Random();
         private static IDictionary<int, string> _data = new ConcurrentDictionary<int, string>();
@@ -112,7 +118,6 @@ namespace Audit.WebApi.Template.Providers
             }
             return c;
         }
-
     }
 #endif
 }

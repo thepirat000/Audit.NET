@@ -1,7 +1,7 @@
 ﻿using Audit.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
-namespace Audit.WebApi.Template.Providers.Database
+namespace Audit.WebApi.Template.Services.Database
 {
     public class MyContext : AuditDbContext
     {

@@ -1,41 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<Authors>PROJECT-AUTHOR</Authors>
+		<Description>PROJECT-DESCRIPTION</Description>
+		<AssemblyName>Audit.WebApi.Template</AssemblyName>
+		<AssemblyTitle>Audit.WebApi.Template</AssemblyTitle>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <Authors>PROJECT-AUTHOR</Authors>
-    <Description>PROJECT-DESCRIPTION</Description>
-    <AssemblyName>Audit.WebApi.Template</AssemblyName>
-    <AssemblyTitle>Audit.WebApi.Template</AssemblyTitle>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <!--#if (EnableEntityFramework)-->
-    <DefineConstants>DEBUG;EnableEntityFramework;NETCOREAPP;NETCOREAPP3_0</DefineConstants>
-    <!--#endif-->
-    <!--#if (Swagger)-->
-    <DefineConstants>DEBUG;Swagger;NETCOREAPP;NETCOREAPP3_0</DefineConstants>
-    <!--#endif-->
-    <NoWarn>1701;1702;CS1591</NoWarn>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
+	<PropertyGroup>
+		<!--#if (EnableEntityFramework)-->
+		<DefineConstants>$(DefineConstants);EnableEntityFramework</DefineConstants>
+		<!--#endif-->
+		<!--#if (ServiceInterception)-->
+		<DefineConstants>$(DefineConstants);ServiceInterception</DefineConstants>
+		<!--#endif-->
+		<NoWarn>1701;1702;CS1591</NoWarn>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Audit.WebApi.Core" Version="18.1.6" />
-    <!--#if (EnableEntityFramework)-->
-    <PackageReference Include="Audit.EntityFramework.Core" Version="18.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.12" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <!--#endif-->
+	<ItemGroup>
+		<Folder Include="wwwroot\" />
+	</ItemGroup>
 
-    <!--#if (Swagger)-->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
-    <!--#endif-->
-  </ItemGroup>
-
+	<ItemGroup>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="*" />
+		<PackageReference Include="Audit.WebApi.Core" Version="*" />
+		<!--#if (EnableEntityFramework)-->
+		<PackageReference Include="Audit.EntityFramework.Core" Version="*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="*" />
+		<!--#endif-->
+		<!--#if (ServiceInterception)-->
+		<PackageReference Include="Audit.DynamicProxy" Version="*" />
+		<!--#endif-->
+	</ItemGroup>
 </Project>

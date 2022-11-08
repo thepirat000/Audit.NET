@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>
-    <id>Audit.WebApi.Template</id>
-    <version>1.0.1</version>
-    <description>Audited Web API</description>
-    <authors>Federico Colombo</authors>
-    <packageTypes>
-      <packageType name="Template" />
-    </packageTypes>
-  </metadata>
-  <files>
-    <file src="**\" exclude="**\.git\**\*.*;**\.vs\**\*.*;**\bin\**\*.*;**\obj\**\*.*;**\*.csproj.user"/>
-  </files>
+<package>
+	<metadata>
+		<id>Audit.WebApi.Template</id>
+		<version>6.0.0</version>
+		<title>Audited AspNetCore Web API</title>
+		<authors>Federico Colombo</authors>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<license type="expression">MIT</license>
+		<description>Audited AspNetCore Web API</description>
+		<copyright>ThePirat 2022</copyright>
+		<packageTypes>
+			<packageType name="Template" />
+		</packageTypes>
+	</metadata>
+	<files>
+		<file src="**\" exclude="**\.git\**\*.*;**\.vs\**\*.*;**\bin\**\*.*;**\obj\**\*.*;**\*.csproj.user"/>
+	</files>
 </package>
