@@ -24,6 +24,104 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.Core.Configuration.ResetCustomActions();
         }
 
+        [Test]
+        public void Test_EF_SaveChangesGetAudit()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+            var id = Rnd.Next();
+            EntityFrameworkEvent efEventInsert;
+            EntityFrameworkEvent efEventRemove;
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "1",
+                    Token = "2"
+                };
+                ctx.Users.Add(user);
+                efEventInsert = ctx.SaveChangesGetAudit();
+
+                ctx.Users.Remove(user);
+                efEventRemove = ctx.SaveChangesGetAudit();
+            }
+
+            Assert.IsNotNull(efEventInsert);
+            Assert.IsNotNull(efEventRemove);
+            Assert.AreEqual(1, efEventInsert.Result);
+            Assert.AreEqual(1, efEventInsert.Entries.Count);
+            Assert.AreEqual("Insert", efEventInsert.Entries[0].Action);
+            Assert.AreEqual("User", efEventInsert.Entries[0].Table);
+            Assert.AreEqual(id.ToString(), efEventInsert.Entries[0].PrimaryKey.First().Value.ToString());
+
+            Assert.AreEqual(1, efEventRemove.Result);
+            Assert.AreEqual(1, efEventRemove.Entries.Count);
+            Assert.AreEqual("Delete", efEventRemove.Entries[0].Action);
+            Assert.AreEqual("User", efEventRemove.Entries[0].Table);
+            Assert.AreEqual(id.ToString(), efEventRemove.Entries[0].PrimaryKey.First().Value.ToString());
+        }
+
+        [Test]
+        public async Task Test_EF_SaveChangesGetAudit_Async()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsContext>(x => x
+                    .IncludeEntityObjects(true));
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+            var id = Rnd.Next();
+            EntityFrameworkEvent efEventInsert;
+            EntityFrameworkEvent efEventRemove;
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "1",
+                    Token = "2"
+                };
+                ctx.Users.Add(user);
+                efEventInsert = await ctx.SaveChangesGetAuditAsync();
+
+                ctx.Users.Remove(user);
+                efEventRemove = await ctx.SaveChangesGetAuditAsync();
+            }
+
+            Assert.IsNotNull(efEventInsert);
+            Assert.IsNotNull(efEventRemove);
+            Assert.AreEqual(1, efEventInsert.Result);
+            Assert.AreEqual(1, efEventInsert.Entries.Count);
+            Assert.AreEqual("Insert", efEventInsert.Entries[0].Action);
+            Assert.AreEqual("User", efEventInsert.Entries[0].Table);
+            Assert.AreEqual(id.ToString(), efEventInsert.Entries[0].PrimaryKey.First().Value.ToString());
+
+            Assert.AreEqual(1, efEventRemove.Result);
+            Assert.AreEqual(1, efEventRemove.Entries.Count);
+            Assert.AreEqual("Delete", efEventRemove.Entries[0].Action);
+            Assert.AreEqual("User", efEventRemove.Entries[0].Table);
+            Assert.AreEqual(id.ToString(), efEventRemove.Entries[0].PrimaryKey.First().Value.ToString());
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void Test_EF_DataProvider_DbContextDisposal(bool dispose)

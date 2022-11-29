@@ -44,9 +44,12 @@ namespace Audit.WebApi.Template.Services
 
         public async Task ReplaceAsync(int id, string value)
         {
-            var entity = new ValueEntity() {Id = id, Value = value};
-            _dbContext.Update(entity);
-            await _dbContext.SaveChangesAsync();
+			var entity = await _dbContext.Values.FindAsync(id);
+            if (entity != null)
+            {
+                entity.Value = value;
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)

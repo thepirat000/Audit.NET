@@ -315,7 +315,11 @@ namespace Audit.EntityFramework
                 CreationPolicy = EventCreationPolicy.Manual,
                 DataProvider = context.AuditDataProvider,
                 AuditEvent = auditEfEvent,
-                SkipExtraFrames = 3
+#if NET45 || NET461 || NETSTANDARD1_5 || NETSTANDARD2_0
+                SkipExtraFrames = 4
+#else
+                SkipExtraFrames = 5
+#endif
             };
             var scope = factory.Create(options);
             context.OnScopeCreated(scope);
@@ -399,7 +403,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-#if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET472 || NET5_0_OR_GREATER )
+#if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET472 || NET5_0_OR_GREATER)
             try
             {
                 var connId = ((dbConnection as dynamic).ClientConnectionId) as Guid?;
@@ -422,15 +426,22 @@ namespace Audit.EntityFramework
         /// </summary>
         public async Task<int> SaveChangesAsync(IAuditDbContext context, Func<Task<int>> baseSaveChanges)
         {
-            var dbContext = context.DbContext;
+            return (await SaveChangesGetAuditAsync(context, baseSaveChanges)).Result;
+        }
+
+        /// <summary>
+        /// Saves the changes asynchronously and returns the audit event generated.
+        /// </summary>
+        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(IAuditDbContext context, Func<Task<int>> baseSaveChanges)
+        {
             if (context.AuditDisabled)
             {
-                return await baseSaveChanges();
+                return new EntityFrameworkEvent() { Result = await baseSaveChanges() };
             }
             var efEvent = CreateAuditEvent(context);
             if (efEvent == null)
             {
-                return await baseSaveChanges();
+                return new EntityFrameworkEvent() { Result = await baseSaveChanges() };
             }
             var scope = await CreateAuditScopeAsync(context, efEvent);
             if (context.EarlySavingAudit)
@@ -450,7 +461,7 @@ namespace Audit.EntityFramework
             }
             efEvent.Success = true;
             await SaveScopeAsync(context, scope, efEvent);
-            return efEvent.Result;
+            return efEvent;
         }
 
         /// <summary>
@@ -458,14 +469,22 @@ namespace Audit.EntityFramework
         /// </summary>
         public int SaveChanges(IAuditDbContext context, Func<int> baseSaveChanges)
         {
+            return SaveChangesGetAudit(context, baseSaveChanges).Result;
+        }
+
+        /// <summary>
+        /// Saves the changes and returns the audit event generated.
+        /// </summary>
+        public EntityFrameworkEvent SaveChangesGetAudit(IAuditDbContext context, Func<int> baseSaveChanges)
+        {
             if (context.AuditDisabled)
             {
-                return baseSaveChanges();
+                return new EntityFrameworkEvent() { Result = baseSaveChanges() };
             }
             var efEvent = CreateAuditEvent(context);
             if (efEvent == null)
             {
-                return baseSaveChanges();
+                return new EntityFrameworkEvent() { Result = baseSaveChanges() };
             }
             var scope = CreateAuditScope(context, efEvent);
             if (context.EarlySavingAudit)
@@ -485,7 +504,7 @@ namespace Audit.EntityFramework
             }
             efEvent.Success = true;
             SaveScope(context, scope, efEvent);
-            return efEvent.Result;
+            return efEvent;
         }
 
         public IAuditScope BeginSaveChanges(IAuditDbContext context)

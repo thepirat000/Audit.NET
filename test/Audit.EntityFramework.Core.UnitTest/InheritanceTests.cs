@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace Audit.EntityFramework.Full.UnitTest
+namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
     [Category("LocalDb")]
@@ -52,7 +52,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                     Location = "location 1"
                 };
                 set.Add(dept);
-                context.SaveChanges();
+                context.SaveChanges(true);
             }
 
             using (var context2 = new DepartmentContext2())
@@ -65,7 +65,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                     Location = "location 2"
                 };
                 context2.Departments.Add(dept);
-                context2.SaveChanges();
+                context2.SaveChanges(true);
             }
 
             Assert.AreEqual(2, evs.Count);

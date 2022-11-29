@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Audit.EntityFramework.Full.UnitTest
+namespace Audit.EntityFramework.Core.UnitTest
 {
     public class DepartmentContext1 : DbContext
     {
@@ -26,9 +26,9 @@ namespace Audit.EntityFramework.Full.UnitTest
 #endif
         }
 
-        public override int SaveChanges()
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            return helper.SaveChanges(auditDbContext, () => base.SaveChanges());
+            return helper.SaveChanges(auditDbContext, () => base.SaveChanges(acceptAllChangesOnSuccess));
         }
     }
 
@@ -56,9 +56,9 @@ namespace Audit.EntityFramework.Full.UnitTest
 #endif
         }
 
-        public override int SaveChanges()
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            return helper.SaveChanges(auditDbContext, () => base.SaveChanges());
+            return helper.SaveChanges(auditDbContext, () => base.SaveChanges(acceptAllChangesOnSuccess));
         }
     }
 
