@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.0.4] - 2022-11-29
+- Audit.EntityFramework / Audit.EntityFramework.Core: Adding SaveChangesGetAudit methods in the AuditDbContext to allow obtaining the EF audit event when saving changes (#546, #547)
+
 ## [20.0.3] - 2022-10-27
 - Audit.EntityFramework / Audit.EntityFramework.Core: Adding new setting on the EntityFramework Data Provider to indicate if the audit DbContext should be disposed after saving (#539)
 
