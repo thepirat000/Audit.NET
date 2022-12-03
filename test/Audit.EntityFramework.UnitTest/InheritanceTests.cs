@@ -20,7 +20,7 @@ namespace Audit.EntityFramework.UnitTest
             DbConfiguration.Loaded += (_, a) =>
             {
                 a.ReplaceService<DbProviderServices>((s, k) => SqlProviderServices.Instance);
-                a.ReplaceService<IDbConnectionFactory>((s, k) => new SqlConnectionFactory("data source=(local);Initial Catalog=AuditTest;Integrated Security=True"));
+                a.ReplaceService<IDbConnectionFactory>((s, k) => new SqlConnectionFactory("data source=(local);Initial Catalog=AuditTest;Integrated Security=True;Encrypt=False;"));
             };
         }
 

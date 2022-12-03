@@ -35,7 +35,7 @@ namespace Audit.IntegrationTest
             {
                 ctx.Database.ExecuteSqlRaw(sql1);
             }
-            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true;";
+            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true;Encrypt=False;";
             using (var ctx = new ApplicationDbContext(SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options))
             {
                 ctx.Database.ExecuteSqlRaw(sql2);
@@ -106,7 +106,7 @@ namespace Audit.IntegrationTest
                 }));
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext(_ => _.IncludeEntityObjects(true));
-            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true";
+            var connectionString = "data source=localhost;initial catalog=ParentChild;integrated security=true;Encrypt=False;";
             using (var _dbContext = new ApplicationDbContext(SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), connectionString).EnableSensitiveDataLogging().Options))
             {
                 _dbContext.Database.EnsureCreated();
@@ -155,7 +155,7 @@ namespace Audit.IntegrationTest
 
         public class MyContext : AuditDbContext
         {
-            public MyContext() : base(GetOptions("data source=localhost;initial catalog=Blogs;integrated security=true;"))
+            public MyContext() : base(GetOptions("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;"))
             {
             }
             public DbSet<Blog> Blogs { get; set; }

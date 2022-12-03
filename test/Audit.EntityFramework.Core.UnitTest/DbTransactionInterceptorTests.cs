@@ -1,4 +1,4 @@
-﻿#if EF_CORE_5 || EF_CORE_6
+﻿#if EF_CORE_5_OR_GREATER
 using Audit.Core;
 using Audit.EntityFramework.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
                 optionsBuilder.UseSqlServer(
-                    "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;");
+                    "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;Encrypt=False");
                 optionsBuilder.EnableSensitiveDataLogging();
 
             }

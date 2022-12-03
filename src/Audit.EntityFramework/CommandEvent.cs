@@ -1,4 +1,4 @@
-﻿#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+﻿#if EF_CORE_3_OR_GREATER
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Collections.Generic;
 using System.Data;

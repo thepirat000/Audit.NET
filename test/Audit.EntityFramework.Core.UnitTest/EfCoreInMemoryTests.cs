@@ -535,7 +535,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
 
-#if EF_CORE_5 || EF_CORE_6
+#if EF_CORE_5_OR_GREATER
 
         [Test]
         public void Test_ChangeTrackingProxyContext()

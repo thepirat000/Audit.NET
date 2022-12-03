@@ -87,7 +87,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         private static DbContextHelper _helper = new DbContextHelper();
         private readonly IAuditDbContext _auditContext;
 
-        public DataBaseContext() : base("data source=localhost;initial catalog=inheritance_test_multi;integrated security=true;")
+        public DataBaseContext() : base("data source=localhost;initial catalog=inheritance_test_multi;integrated security=true;Encrypt=False;")
         {
             _auditContext = new DefaultAuditContext(this);
             _helper.SetConfig(_auditContext);

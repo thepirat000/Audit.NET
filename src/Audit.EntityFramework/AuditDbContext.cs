@@ -212,7 +212,6 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="acceptAllChangesOnSuccess">Indicates whether ChangeTracker.AcceptAllChanges is called after the changes have been sent successfully to the database.</param>
         /// <returns>The generated EF audit event</returns>
-
         [MethodImpl(MethodImplOptions.NoInlining)]
         public EntityFrameworkEvent SaveChangesGetAudit(bool acceptAllChangesOnSuccess = true)
         {

@@ -35,7 +35,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             var id = new Random().Next();
-            using (var ctx = new BlogContext("data source=(localDb)\\MSSQLLocaldb;initial catalog=Blogs2;integrated security=true;"))
+            using (var ctx = new BlogContext("data source=(localDb)\\MSSQLLocaldb;initial catalog=Blogs2;integrated security=true;Encrypt=False;"))
             {
                 var blog = new Blog()
                 {
@@ -66,7 +66,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             var id = new Random().Next();
-            using (var ctx = new BlogContext("data source=(localDb)\\MSSQLLocaldb;initial catalog=Blogs2;integrated security=true;"))
+            using (var ctx = new BlogContext("data source=(localDb)\\MSSQLLocaldb;initial catalog=Blogs2;integrated security=true;Encrypt=False;"))
             {
                 var blog = new Blog()
                 {
@@ -97,7 +97,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             var id = new Random().Next();
-            using (var ctx = new BlogContext("data source=(localDb)\\MSSQLLocaldb;initial catalog=Blogs2;integrated security=true;"))
+            using (var ctx = new BlogContext("data source=(localDb)\\MSSQLLocaldb;initial catalog=Blogs2;integrated security=true;Encrypt=False;"))
             {
                 var blog = new Blog()
                 {

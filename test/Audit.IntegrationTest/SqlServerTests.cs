@@ -23,7 +23,7 @@ namespace Audit.IntegrationTest
         public void Test_SqlServer_DbConnection()
         {
             var sqlDp = new SqlDataProvider(_ => _
-                    .DbConnection(ev => GetConnection("data source=localhost;initial catalog=Audit;integrated security=true;"))
+                    .DbConnection(ev => GetConnection("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;"))
                     .TableName(ev => "Event")
                     .IdColumnName(ev => "EventId")
                     .JsonColumnName(ev => "Data")

@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);EF_CORE;EF_CORE_3</DefineConstants>
+    <DefineConstants>$(DefineConstants);EF_CORE;EF_CORE_3;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

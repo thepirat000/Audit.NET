@@ -8,7 +8,7 @@ namespace Audit.EntityFramework.Full.UnitTest
 {
     public class BlogContext : AuditDbContext
     {
-        public BlogContext() : base("data source=localhost;initial catalog=Blogs2;integrated security=true;")
+        public BlogContext() : base("data source=localhost;initial catalog=Blogs2;integrated security=true;Encrypt=False;")
         {
         }
         public BlogContext(string connectionString) : base(connectionString)

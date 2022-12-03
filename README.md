@@ -287,6 +287,7 @@ Field Name | Type | Description
 **MachineName** | string | Executing machine name
 **DomainName** | string | Current user domain
 **CallingMethodName** | string | Calling method signature information
+**StackTrace** | string | The full stack trace at the moment of the audit scope creation (NULL unless it's enabled by configuration)
 **Exception** | string | Indicates if an Exception has been detected (NULL if no exception has been thrown)
 **Culture** | string | Current culture identifier
 
@@ -684,6 +685,15 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnScopeCreated`: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 - `OnEventSaved`: After an Audit Scope's Event is saved. 
+
+### IncludeStackTrace
+
+Include the stack trace in the event. Default is `false`.
+
+```c#
+Audit.Core.Configuration.IncludeStackTrace = true;
+```
+
 
 ### Global switch off
 

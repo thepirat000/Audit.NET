@@ -45,6 +45,10 @@ namespace Audit.Core
         /// Sets a specific calling method to store on the event.
         /// </summary>
         IAuditScopeOptionsConfigurator CallingMethod(MethodBase method);
+        /// <summary>
+        /// Sets the value used to indicate whether the audit event's environment should include the full stack trace
+        /// </summary>
+        IAuditScopeOptionsConfigurator IncludeStackTrace(bool includeStackTrace = true);
     }
 
 }

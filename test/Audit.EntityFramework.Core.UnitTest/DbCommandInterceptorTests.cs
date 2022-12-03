@@ -1,4 +1,4 @@
-﻿#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+﻿#if EF_CORE_3_OR_GREATER
 using Audit.Core;
 using Audit.EntityFramework.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -302,8 +302,8 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual(dept.Comments, resultList[0]["Comments"]);
             Assert.AreEqual(dept.Name, resultList[0]["Name"]);
         }
-        
-#if EF_CORE_5 || EF_CORE_6
+
+#if EF_CORE_5_OR_GREATER
         [Test]
         public void Test_DbCommandInterceptor_CombineSaveChanges()
         {
@@ -411,6 +411,10 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForContext<DbCommandInterceptContext>(_ => _
                     .IncludeEntityObjects(true));
             int id = new Random().Next();
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor()).Options))
             {
@@ -430,7 +434,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public DbCommandInterceptContext(DbContextOptions opt) : base(opt) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=DbCommandIntercept;integrated security=true;");
+            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=DbCommandIntercept;integrated security=true;Encrypt=False;");
             optionsBuilder.EnableSensitiveDataLogging();
         }
 

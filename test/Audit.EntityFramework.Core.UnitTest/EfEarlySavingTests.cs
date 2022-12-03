@@ -41,7 +41,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             public DbSet<MessageAudit> MessageAudits { get; set; }
 
             protected override void OnConfiguring(DbContextOptionsBuilder options)
-                => options.UseSqlServer("data source=localhost;initial catalog=TransactionTestEfCore;integrated security=true;");
+                => options.UseSqlServer("data source=localhost;initial catalog=TransactionTestEfCore;integrated security=true;Encrypt=False;");
         }
 
         [OneTimeSetUp]

@@ -26,7 +26,7 @@ namespace Audit.EntityFramework
         /// that it is easy to identify that multiple events are using the same or different database connection.
         /// </summary>
         public string ConnectionId { get; set; }
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
         /// <summary>
         /// A unique identifier for the context instance and pool lease, if any.
         /// This identifier is primarily intended as a correlation ID for logging and debugging such

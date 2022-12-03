@@ -315,10 +315,12 @@ namespace Audit.EntityFramework
                 CreationPolicy = EventCreationPolicy.Manual,
                 DataProvider = context.AuditDataProvider,
                 AuditEvent = auditEfEvent,
-#if NET45 || NET461 || NETSTANDARD1_5 || NETSTANDARD2_0
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+                SkipExtraFrames = 5
+#elif EF_CORE && !NETSTANDARD2_0 && !NET461 && !NET472
                 SkipExtraFrames = 4
 #else
-                SkipExtraFrames = 5
+                SkipExtraFrames = 3
 #endif
             };
             var scope = factory.Create(options);
@@ -422,17 +424,38 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Saves the changes synchronously.
+        /// </summary>
+        public int SaveChanges(IAuditDbContext context, Func<int> baseSaveChanges)
+        {
+            return SaveChangesGetAuditImpl(context, baseSaveChanges).Result;
+        }
+
+        /// <summary>
         /// Saves the changes asynchronously.
         /// </summary>
         public async Task<int> SaveChangesAsync(IAuditDbContext context, Func<Task<int>> baseSaveChanges)
         {
-            return (await SaveChangesGetAuditAsync(context, baseSaveChanges)).Result;
+            return (await SaveChangesGetAuditAsyncImpl(context, baseSaveChanges)).Result;
+        }
+        
+        /// <summary>
+        /// Saves the changes and returns the audit event generated.
+        /// </summary>
+        public EntityFrameworkEvent SaveChangesGetAudit(IAuditDbContext context, Func<int> baseSaveChanges)
+        {
+            return SaveChangesGetAuditImpl(context, baseSaveChanges);
         }
 
         /// <summary>
         /// Saves the changes asynchronously and returns the audit event generated.
         /// </summary>
         public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(IAuditDbContext context, Func<Task<int>> baseSaveChanges)
+        {
+            return await SaveChangesGetAuditAsyncImpl(context, baseSaveChanges);
+        }
+
+        private async Task<EntityFrameworkEvent> SaveChangesGetAuditAsyncImpl(IAuditDbContext context, Func<Task<int>> baseSaveChanges)
         {
             if (context.AuditDisabled)
             {
@@ -463,19 +486,8 @@ namespace Audit.EntityFramework
             await SaveScopeAsync(context, scope, efEvent);
             return efEvent;
         }
-
-        /// <summary>
-        /// Saves the changes synchronously.
-        /// </summary>
-        public int SaveChanges(IAuditDbContext context, Func<int> baseSaveChanges)
-        {
-            return SaveChangesGetAudit(context, baseSaveChanges).Result;
-        }
-
-        /// <summary>
-        /// Saves the changes and returns the audit event generated.
-        /// </summary>
-        public EntityFrameworkEvent SaveChangesGetAudit(IAuditDbContext context, Func<int> baseSaveChanges)
+        
+        private EntityFrameworkEvent SaveChangesGetAuditImpl(IAuditDbContext context, Func<int> baseSaveChanges)
         {
             if (context.AuditDisabled)
             {

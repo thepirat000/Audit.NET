@@ -31,7 +31,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         public DbSet<Car> Cars { get; set; }
         public DbSet<Brand> Brands { get; set; }
 
-        public SimpleContext() : base("data source=localhost;initial catalog=SimpleContext;integrated security=true;") { } 
+        public SimpleContext() : base("data source=localhost;initial catalog=SimpleContext;integrated security=true;Encrypt=False;") { } 
        
     }
 }

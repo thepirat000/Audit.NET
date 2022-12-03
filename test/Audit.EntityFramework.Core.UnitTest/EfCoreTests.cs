@@ -25,7 +25,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             new BlogsContext().Database.EnsureCreated();
         }
 
-#if EF_CORE_5 || EF_CORE_6
+#if EF_CORE_5_OR_GREATER
 
         [Test]
         public void Test_EF_Core_TablePerTypeConfig()
@@ -185,7 +185,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 #endif
 
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
         [Test]
         public void Test_EF_Core_OwnedSingleMultiple()
         {
@@ -225,6 +225,34 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 #endif
 
+#if !NETCOREAPP1_0
+        [Test]
+        public void Test_EF_StackTrace()
+        {
+            var evs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .Use(_ => _.OnInsert(ev =>
+                {
+                    evs.Add(ev);
+                }));
+            Audit.Core.Configuration.IncludeStackTrace = true;
+
+            var id1 = Guid.NewGuid().ToString().Substring(0, 8);
+            var id2 = Guid.NewGuid().ToString().Substring(0, 8);
+            using (var context = new BlogsContext())
+            {
+                var blog1 = context.Blogs.Add(new Blog() { Title = id1 });
+                context.SaveChanges();
+            }
+            Audit.Core.Configuration.IncludeStackTrace = false;
+            
+            Assert.AreEqual(1, evs.Count);
+           
+            Assert.IsTrue(evs[0].Environment.StackTrace.Contains(nameof(Test_EF_StackTrace)), $"Expected contains {nameof(Test_EF_StackTrace)} but was {evs[0].Environment.StackTrace}");
+            
+        }
+#endif
+        
         [Test]
         public void Test_EF_TransactionId()
         {

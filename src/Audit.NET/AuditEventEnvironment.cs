@@ -45,6 +45,16 @@ namespace Audit.Core
         public string CallingMethodName { get; set; }
 
         /// <summary>
+        /// The full stack trace
+        /// </summary>
+#if IS_NK_JSON
+	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+#else
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+#endif
+        public string StackTrace { get; set; }
+
+        /// <summary>
         /// The name of the assembly from where the audit scope was invoked
         /// </summary>
 #if IS_NK_JSON

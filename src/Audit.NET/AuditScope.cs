@@ -37,6 +37,10 @@ namespace Audit.Core
             {
                 callingMethod = new StackFrame(2 + options.SkipExtraFrames).GetMethod();
             }
+            if (options.IncludeStackTrace)
+            {
+                environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
+            }
 #else
             environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
             environment.UserName = Environment.GetEnvironmentVariable("USERNAME");

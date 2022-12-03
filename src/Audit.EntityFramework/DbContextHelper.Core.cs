@@ -49,7 +49,7 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetColumnName(IProperty prop)
         {
-#if EF_CORE_5 || EF_CORE_6
+#if EF_CORE_5_OR_GREATER
             var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringEntityType, StoreObjectType.Table);
             return storeObjectIdentifier.HasValue 
                 ? prop.GetColumnName(storeObjectIdentifier.Value)
@@ -152,7 +152,7 @@ namespace Audit.EntityFramework
             {
                 return result;
             }
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
             result.Table = definingType.GetTableName();
             result.Schema = definingType.GetSchema();
 #else
@@ -163,15 +163,15 @@ namespace Audit.EntityFramework
             return result;
         }
 
-#if EF_CORE_6
+#if EF_CORE_6_OR_GREATER
         private static IReadOnlyEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
 #else
         private static IEntityType GetDefiningType(DbContext dbContext, EntityEntry entry)
 #endif
         {
-#if EF_CORE_6
+#if EF_CORE_6_OR_GREATER
             IReadOnlyEntityType definingType = entry.Metadata.FindOwnership()?.DeclaringEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.Name);
-#elif EF_CORE_3 || EF_CORE_5
+#elif EF_CORE_3_OR_GREATER
             IEntityType definingType = entry.Metadata.FindOwnership()?.DeclaringEntityType ?? entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.Name);
 #elif EF_CORE_2
             IEntityType definingType = entry.Metadata.DefiningEntityType ?? dbContext.Model.FindEntityType(entry.Metadata.ClrType);
@@ -190,7 +190,7 @@ namespace Audit.EntityFramework
             var foreignKeys = entry.Metadata.GetForeignKeys();
             if (foreignKeys != null)
             {
-#if EF_CORE_2 || EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_2_OR_GREATER
                 //Filter ownership relations as they are not foreign keys
                 foreignKeys = foreignKeys.Where(fk => !fk.IsOwnership);
 #endif
@@ -236,7 +236,7 @@ namespace Audit.EntityFramework
                 Entries = new List<EventEntry>(),
                 Database = dbConnection?.Database,
                 ConnectionId = clientConnectionId,
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
                 ContextId = dbContext.ContextId.ToString(),
 #endif
                 AmbientTransactionId = !context.ExcludeTransactionId ? GetAmbientTransactionId() : null,
@@ -259,7 +259,7 @@ namespace Audit.EntityFramework
                     Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
                     Table = entityName.Table,
                     Schema = entityName.Schema,
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
                     Name = entry.Metadata.DisplayName(),
 #endif
                     ColumnValues = GetColumnValues(context, entry)
@@ -310,7 +310,7 @@ namespace Audit.EntityFramework
 
         private string GetAmbientTransactionId()
         {
-#if EF_CORE_2 || EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_2_OR_GREATER
             var tranInfo = System.Transactions.Transaction.Current?.TransactionInformation;
             if (tranInfo != null)
             {

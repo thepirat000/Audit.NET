@@ -407,7 +407,7 @@ SET IDENTITY_INSERT Posts OFF
     public class OtherContextFromDbContext : DbContext
     {
         public OtherContextFromDbContext()
-            : base("data source=localhost;initial catalog=Blogs;integrated security=true;")
+            : base("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;")
         { }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -439,7 +439,7 @@ SET IDENTITY_INSERT Posts OFF
         public override bool AuditDisabled { get; set; }
 
         public MyBaseContext()
-            : base("data source=localhost;initial catalog=Blogs;integrated security=true;")
+            : base("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;")
         {
         }
 
@@ -552,7 +552,7 @@ SET IDENTITY_INSERT Posts OFF
     public class AuditPerTableContext : AuditDbContext
     {
         public AuditPerTableContext()
-            : base("data source=localhost;initial catalog=Audit;integrated security=true;")
+            : base("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
         {
         }
 
@@ -631,7 +631,7 @@ SET IDENTITY_INSERT Posts OFF
     public class Issue78Context : AuditDbContext
     {
         public Issue78Context()
-            : base("data source=localhost;initial catalog=Audit;integrated security=true;")
+            : base("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
         {
         }
 

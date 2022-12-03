@@ -66,6 +66,12 @@ namespace Audit.Core
             _options.TargetGetter = targetGetter;
             return this;
         }
+
+        public IAuditScopeOptionsConfigurator IncludeStackTrace(bool includeStackTrace = true)
+        {
+            _options.IncludeStackTrace = includeStackTrace;
+            return this;
+        }
     }
 
 }

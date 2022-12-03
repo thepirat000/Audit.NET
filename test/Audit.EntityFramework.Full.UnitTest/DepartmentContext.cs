@@ -8,7 +8,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         private readonly IAuditDbContext auditDbContext;
 
         public DepartmentContext1()
-            : base("Data Source=localhost;Initial Catalog=DepartmentDatabase1;Integrated Security=True")
+            : base("Data Source=localhost;Initial Catalog=DepartmentDatabase1;Integrated Security=True;Encrypt=False;")
         {
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;
@@ -33,7 +33,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         private readonly IAuditDbContext auditDbContext;
 
         public DepartmentContext2()
-            : base("Data Source=localhost;Initial Catalog=DepartmentDatabase2;Integrated Security=True")
+            : base("Data Source=localhost;Initial Catalog=DepartmentDatabase2;Integrated Security=True;Encrypt=False;")
         {
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;

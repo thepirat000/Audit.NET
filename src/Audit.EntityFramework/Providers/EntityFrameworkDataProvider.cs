@@ -268,10 +268,10 @@ namespace Audit.EntityFramework.Providers
         {
             var entryType = GetTypeNoProxy(entry.Entry.Entity.GetType());
             Type type;
-#if (EF_CORE_6)
+#if EF_CORE_6_OR_GREATER
             IReadOnlyEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
             type = definingType?.ClrType;
-#elif (EF_CORE_3 || EF_CORE_5)
+#elif EF_CORE_3_OR_GREATER
             IEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
             type = definingType?.ClrType;
 #elif EF_CORE_2

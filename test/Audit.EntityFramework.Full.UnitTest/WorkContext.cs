@@ -11,7 +11,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         private readonly IAuditDbContext auditDbContext;
 
         public WorkContext()
-            : base("Data Source=localhost;Initial Catalog=WorkDatabase;Integrated Security=True")
+            : base("Data Source=localhost;Initial Catalog=WorkDatabase;Integrated Security=True;Encrypt=False;")
         {
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;

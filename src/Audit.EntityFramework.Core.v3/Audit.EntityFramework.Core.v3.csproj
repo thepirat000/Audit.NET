@@ -5,7 +5,7 @@
 		<AssemblyTitle>Audit.EntityFramework.Core.v3</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
 		<TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
-		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3</DefineConstants>
+		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE;EF_CORE_3;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AssemblyName>Audit.EntityFramework.Core.v3</AssemblyName>

@@ -297,7 +297,7 @@ namespace Audit.IntegrationTest
             {
                 TestInterceptor.Count = 0;
                 var sqlProvider = new SqlDataProvider(config => config
-                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
                         .DbContextOptions(new DbContextOptionsBuilder().AddInterceptors(new TestInterceptor()).Options)
                         .TableName(ev => "Event")
                         .IdColumnName(ev => "EventId")
@@ -1147,7 +1147,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UseSqlServer(config => config
-                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;")
+                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
                         .TableName(ev => "Event")
                         .IdColumnName(ev => "EventId")
                         .JsonColumnName(ev => "Data")

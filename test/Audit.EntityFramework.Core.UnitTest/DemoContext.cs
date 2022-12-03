@@ -9,7 +9,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 {
     public class DemoContext : AuditDbContext
     {
-        public const string CnnString = "data source=localhost;initial catalog=Demo;integrated security=true;";
+        public const string CnnString = "data source=localhost;initial catalog=Demo;integrated security=true;Encrypt=False;";
 
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<Employee> Employees { get; set; }

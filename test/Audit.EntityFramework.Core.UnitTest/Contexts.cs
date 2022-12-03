@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
-#if EF_CORE_5 || EF_CORE_6
+#if EF_CORE_5_OR_GREATER
     [AuditDbContext(IncludeEntityObjects = true)]
     public class Context_OwnedEntity : AuditDbContext
     {
@@ -82,7 +82,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     }
 #endif
 
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
     [AuditDbContext(IncludeEntityObjects = true)]
     public class OwnedSingleMultiple_Context : AuditDbContext
     {
@@ -111,7 +111,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-            //.UseSqlServer("data source=localhost;initial catalog=OwnedSingleMultiple;integrated security=true;");
+            //.UseSqlServer("data source=localhost;initial catalog=OwnedSingleMultiple;integrated security=true;Encrypt=False;");
             .UseInMemoryDatabase("testing-db");
             //.UseLazyLoadingProxies();
         }

@@ -40,6 +40,10 @@ namespace Audit.Core
         /// </summary>
         public static bool IncludeTypeNamespaces { get; set; }
         /// <summary>
+        /// Gets or Sets the value used to indicate whether the audit event's environment should include the full stack trace
+        /// </summary>
+        public static bool IncludeStackTrace { get; set; }
+        /// <summary>
         /// Gets or Sets the Default audit scope factory.
         /// </summary>
         public static IAuditScopeFactory AuditScopeFactory

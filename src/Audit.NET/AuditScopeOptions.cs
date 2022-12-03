@@ -48,7 +48,10 @@ namespace Audit.Core
         /// Gets or sets a specific calling method to store on the event. NULL to use the calling stack to determine the calling method.
         /// </summary>
         public MethodBase CallingMethod { get; set; }
-
+        /// <summary>
+        /// Gets or sets a value indicating whether the audit event's environment should include the full stack trace.
+        /// </summary>
+        public bool IncludeStackTrace { get; set; }
         /// <summary>
         /// Creates an instance of options for an audit scope creation.
         /// </summary>
@@ -60,6 +63,7 @@ namespace Audit.Core
         /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
         /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
         /// <param name="skipExtraFrames">Used to indicate how many frames in the stack should be skipped to determine the calling method.</param>
+        /// <param name="includeStackTrace">Used to indicate whether the audit event's environment should include the full stack trace.</param>
         public AuditScopeOptions(
             string eventType = null,
             Func<object> targetGetter = null,
@@ -68,7 +72,8 @@ namespace Audit.Core
             EventCreationPolicy? creationPolicy = null,
             bool isCreateAndSave = false,
             AuditEvent auditEvent = null,
-            int skipExtraFrames = 0)
+            int skipExtraFrames = 0,
+            bool? includeStackTrace = null)
         {
             EventType = eventType;
             TargetGetter = targetGetter;
@@ -79,6 +84,7 @@ namespace Audit.Core
             AuditEvent = auditEvent;
             SkipExtraFrames = skipExtraFrames;
             CallingMethod = null;
+            IncludeStackTrace = includeStackTrace ?? Configuration.IncludeStackTrace;
         }
 
         /// <summary>
@@ -106,6 +112,7 @@ namespace Audit.Core
                 AuditEvent = scopeConfig._options.AuditEvent;
                 SkipExtraFrames = scopeConfig._options.SkipExtraFrames;
                 CallingMethod = scopeConfig._options.CallingMethod;
+                IncludeStackTrace = scopeConfig._options.IncludeStackTrace;
             }
 
         }

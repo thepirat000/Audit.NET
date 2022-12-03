@@ -29,7 +29,7 @@ namespace Audit.EntityFramework
                 : null;
         }
 
-#if EF_CORE_3 || EF_CORE_5 || EF_CORE_6
+#if EF_CORE_3_OR_GREATER
         /// <summary>
         /// Gets the Low-Level EF Command Event portion of the Audit Event on the given scope.
         /// </summary>
@@ -54,7 +54,7 @@ namespace Audit.EntityFramework
                 : null;
         }
 #endif
-#if EF_CORE_5 || EF_CORE_6
+#if EF_CORE_5_OR_GREATER
         /// <summary>
         /// Gets the Low-Level EF Transaction Event portion of the Audit Event on the given scope.
         /// </summary>
