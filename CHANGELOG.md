@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.1.1] - 2022-12-12
+- Audit.Mvc: Adding `IncludeChildActions` configuration to the `AuditAttribute` action filter for MVC 5 (#554)
+
 ## [20.1.0] - 2022-12-01
 - Audit.NET / Audit.EntityFramework.Core: Upgrade to net7.0 as target, adding support for EF Core 7.0.0 (#544)
 

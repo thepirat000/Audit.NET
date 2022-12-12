@@ -49,13 +49,17 @@ namespace Audit.Mvc
         /// Gets or sets a value indicating whether the action arguments should be pre-serialized to the audit event.
         /// </summary>
         public bool SerializeActionParameters { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the child actions should be audited.
+        /// </summary>
+        public bool IncludeChildActions { get; set; }
 
         private const string AuditActionKey = "__private_AuditAction__";
         private const string AuditScopeKey = "__private_AuditScope__";
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (Configuration.AuditDisabled || IsActionIgnored(filterContext.ActionDescriptor))
+            if (IsActionIgnored(filterContext.ActionDescriptor, filterContext.IsChildAction))
             {
                 base.OnActionExecuting(filterContext);
                 return;
@@ -103,7 +107,7 @@ namespace Audit.Mvc
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            if (Configuration.AuditDisabled)
+            if (IsActionIgnored(filterContext.ActionDescriptor, filterContext.IsChildAction))
             {
                 base.OnActionExecuted(filterContext);
                 return;
@@ -133,7 +137,7 @@ namespace Audit.Mvc
 
         public override void OnResultExecuted(ResultExecutedContext filterContext)
         {
-            if (Configuration.AuditDisabled)
+            if (IsActionIgnored(null, filterContext.IsChildAction))
             {
                 base.OnResultExecuted(filterContext);
                 return;
@@ -165,19 +169,25 @@ namespace Audit.Mvc
             base.OnResultExecuted(filterContext);
         }
 
-        private bool IsActionIgnored(ActionDescriptor actionDescriptor)
+        private bool IsActionIgnored(ActionDescriptor actionDescriptor, bool isChildAction)
         {
+            if (Configuration.AuditDisabled || !IncludeChildActions && isChildAction)
+            {
+                return true;
+            }
+
             if (actionDescriptor == null)
             {
                 return false;
             }
+
             var controllerIgnored = actionDescriptor.ControllerDescriptor.ControllerType
                 .GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
-
             if (controllerIgnored)
             {
                 return true;
             }
+
             return actionDescriptor.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
         }
 

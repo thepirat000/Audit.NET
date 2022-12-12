@@ -160,7 +160,7 @@ namespace Audit.Mvc
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (Configuration.AuditDisabled || IsActionIgnored(context.ActionDescriptor))
+            if (IsActionIgnored(context.ActionDescriptor))
             {
                 await next.Invoke();
                 return;
@@ -172,7 +172,7 @@ namespace Audit.Mvc
 
         public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
-            if (Configuration.AuditDisabled || IsActionIgnored(context.ActionDescriptor))
+            if (IsActionIgnored(context.ActionDescriptor))
             {
                 await next.Invoke();
                 return;
@@ -319,6 +319,11 @@ namespace Audit.Mvc
 
         private bool IsActionIgnored(ActionDescriptor actionDescriptor)
         {
+            if (Configuration.AuditDisabled)
+            {
+                return true;
+            }
+
             if (actionDescriptor == null)
             {
                 return false;
