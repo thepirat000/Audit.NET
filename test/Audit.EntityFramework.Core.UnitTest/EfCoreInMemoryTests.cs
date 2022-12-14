@@ -24,6 +24,88 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.Core.Configuration.ResetCustomActions();
         }
 
+#if EF_CORE_7_OR_GREATER
+        [Test]
+        public void Test_EF_OwnedEntity_ToJson()
+        {
+            using var context = new Context_OwnedEntity_ToJson();
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            context.People.Add(new Context_OwnedEntity_ToJson.Person()
+            {
+                Id = 1,
+                Name = "Development",
+                Address = new Context_OwnedEntity_ToJson.Address { City = "Vienna", Street = "Street" },
+            });
+
+            context.SaveChanges();
+
+            Assert.AreEqual(1, evs.Count);
+
+            Assert.AreEqual(2, evs[0].Entries.Count);
+
+            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
+            Assert.AreEqual("Insert", evs[0].Entries[1].Action);
+
+            Assert.AreEqual(1, evs[0].Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+
+            Assert.AreEqual("Vienna", evs[0].Entries[1].ColumnValues["City"]);
+            Assert.AreEqual("Street", evs[0].Entries[1].ColumnValues["Street"]);
+
+            Assert.AreEqual(1, ((dynamic)evs[0].Entries[0].Entity).Id);
+            Assert.AreEqual("Vienna", ((dynamic)evs[0].Entries[0].Entity).Address.City);
+        }
+
+        [Test]
+        public async Task Test_EF_OwnedEntity_ToJson_Async()
+        {
+            using var context = new Context_OwnedEntity_ToJson();
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
+
+            await context.People.AddAsync(new Context_OwnedEntity_ToJson.Person()
+            {
+                Id = 1,
+                Name = "Development",
+                Address = new Context_OwnedEntity_ToJson.Address { City = "Vienna", Street = "Street" },
+            });
+
+            await context.SaveChangesAsync();
+
+            Assert.AreEqual(1, evs.Count);
+
+            Assert.AreEqual(2, evs[0].Entries.Count);
+
+            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
+            Assert.AreEqual("Insert", evs[0].Entries[1].Action);
+
+            Assert.AreEqual(1, evs[0].Entries[0].ColumnValues["Id"]);
+            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+
+            Assert.AreEqual("Vienna", evs[0].Entries[1].ColumnValues["City"]);
+            Assert.AreEqual("Street", evs[0].Entries[1].ColumnValues["Street"]);
+
+            Assert.AreEqual(1, ((dynamic)evs[0].Entries[0].Entity).Id);
+            Assert.AreEqual("Vienna", ((dynamic)evs[0].Entries[0].Entity).Address.City);
+        }
+#endif
+
         [Test]
         public void Test_EF_SaveChangesGetAudit()
         {

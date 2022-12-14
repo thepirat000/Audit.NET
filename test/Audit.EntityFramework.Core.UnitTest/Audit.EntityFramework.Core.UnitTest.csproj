@@ -37,7 +37,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_7;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_7;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">

@@ -49,7 +49,12 @@ namespace Audit.EntityFramework
         /// </summary>
         private static string GetColumnName(IProperty prop)
         {
-#if EF_CORE_5_OR_GREATER
+#if EF_CORE_7_OR_GREATER
+            var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringEntityType, StoreObjectType.Table);
+            return storeObjectIdentifier.HasValue
+                ? (prop.GetColumnName(storeObjectIdentifier.Value) ?? prop.GetDefaultColumnName())
+                : prop.GetDefaultColumnName();
+#elif EF_CORE_5_OR_GREATER
             var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringEntityType, StoreObjectType.Table);
             return storeObjectIdentifier.HasValue 
                 ? prop.GetColumnName(storeObjectIdentifier.Value)

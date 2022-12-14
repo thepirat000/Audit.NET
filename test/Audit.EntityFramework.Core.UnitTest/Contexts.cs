@@ -4,6 +4,40 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
+#if EF_CORE_7_OR_GREATER
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_OwnedEntity_ToJson : AuditDbContext
+    {
+        public class Person
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public Address Address { get; set; }
+        }
+        public class Address
+        {
+            public string City { get; set; }
+            public string Street { get; set; }
+        }
+
+        public DbSet<Person> People { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(@$"Server=(localdb)\mssqllocaldb;Database={nameof(Context_OwnedEntity_ToJson)};Trusted_Connection=True;ConnectRetryCount=0").UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>().OwnsOne(e => e.Address, b => b.ToJson());
+        }
+    }
+#endif
+
 #if EF_CORE_5_OR_GREATER
     [AuditDbContext(IncludeEntityObjects = true)]
     public class Context_OwnedEntity : AuditDbContext
