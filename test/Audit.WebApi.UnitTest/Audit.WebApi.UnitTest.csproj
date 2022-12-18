@@ -57,6 +57,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.17" />
     <ProjectReference Include="..\..\src\Audit.WebApi.Core\Audit.WebApi.Core.csproj" />
   </ItemGroup>
 

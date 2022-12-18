@@ -29,11 +29,12 @@ namespace Audit.WebApi.UnitTest
     
     public class TestHelper
     {
-        public static TestServer GetTestServer()
+        public static TestServer GetTestServer(AuditDataProvider dataProvider)
         {
             return new TestServer(WebHost.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
+                    services.AddSingleton(dataProvider);
                     services.AddControllers();
                 })
                 .Configure((ctx, app) =>
@@ -54,57 +55,53 @@ namespace Audit.WebApi.UnitTest
         [Test]
         public async Task Test1()
         {
-            Configuration.Setup().UseInMemoryProvider();
-            
-            using var app = TestHelper.GetTestServer();
+            var dataProvider = new InMemoryDataProvider();
+            using var app = TestHelper.GetTestServer(dataProvider);
             using var client = app.CreateClient();
 
             var response = await client.GetAsync("/test2/action");
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(1, ((InMemoryDataProvider)Configuration.DataProvider).GetAllEvents().Count);
+            Assert.AreEqual(1, dataProvider.GetAllEvents().Count);
         }
         
         [Test]
         public async Task Test2()
         {
-            Configuration.Setup().UseInMemoryProvider();
-            
-            using var app = TestHelper.GetTestServer();
+            var dataProvider = new InMemoryDataProvider();
+            using var app = TestHelper.GetTestServer(dataProvider);
             using var client = app.CreateClient();
 
             var response = await client.GetAsync("/test2/action");
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(1, ((InMemoryDataProvider)Configuration.DataProvider).GetAllEvents().Count);
+            Assert.AreEqual(1, dataProvider.GetAllEvents().Count);
         }
         
         [Test]
         public async Task Test3()
         {
-            Configuration.Setup().UseInMemoryProvider();
-            
-            using var app = TestHelper.GetTestServer();
+            var dataProvider = new InMemoryDataProvider();
+            using var app = TestHelper.GetTestServer(dataProvider);
             using var client = app.CreateClient();
 
             var response = await client.GetAsync("/test2/action");
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(1, ((InMemoryDataProvider)Configuration.DataProvider).GetAllEvents().Count);
+            Assert.AreEqual(1, dataProvider.GetAllEvents().Count);
         }
         
         [Test]
         public async Task Test4()
         {
-            Configuration.Setup().UseInMemoryProvider();
-            
-            using var app = TestHelper.GetTestServer();
+            var dataProvider = new InMemoryDataProvider();
+            using var app = TestHelper.GetTestServer(dataProvider);
             using var client = app.CreateClient();
 
             var response = await client.GetAsync("/test2/action");
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(1, ((InMemoryDataProvider)Configuration.DataProvider).GetAllEvents().Count);
+            Assert.AreEqual(1, dataProvider.GetAllEvents().Count);
         }
     }
 }
