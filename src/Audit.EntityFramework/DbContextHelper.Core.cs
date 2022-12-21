@@ -140,7 +140,6 @@ namespace Audit.EntityFramework
                     // property formatted
                     value = settings.FormatProperties[propName].Invoke(currentValue);
                     return true;
-
                 }
             }
             return false;

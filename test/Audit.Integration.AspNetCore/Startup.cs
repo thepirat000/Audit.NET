@@ -1,4 +1,6 @@
-﻿using Audit.WebApi;
+﻿using System.Linq;
+using Audit.Core;
+using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -7,6 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Audit.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
+using Microsoft.CodeAnalysis;
 
 namespace Audit.Integration.AspNetCore
 {
@@ -22,7 +28,6 @@ namespace Audit.Integration.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
             services.Configure<FormOptions>(options =>
             {
                 options.ValueCountLimit = 2;
@@ -30,6 +35,8 @@ namespace Audit.Integration.AspNetCore
 
             services.AddMvc(mvc =>
             {
+                mvc.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+
                 mvc.EnableEndpointRouting = false;
                 mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
@@ -43,7 +50,7 @@ namespace Audit.Integration.AspNetCore
                     .IncludeResponseHeaders()
                     .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
                     .IncludeRequestBody()));
-
+                
                 mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                     .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "TestSerializeParams")
                     .SerializeActionParameters(true)
@@ -100,6 +107,22 @@ namespace Audit.Integration.AspNetCore
 
             app.UseMvc();
 
+        }
+
+        private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
+        {
+            var builder = new ServiceCollection()
+                .AddLogging()
+                .AddMvc()
+                .AddNewtonsoftJson()
+                .Services.BuildServiceProvider();
+
+            return builder
+                .GetRequiredService<IOptions<MvcOptions>>()
+                .Value
+                .InputFormatters
+                .OfType<NewtonsoftJsonPatchInputFormatter>()
+                .First();
         }
     }
 }

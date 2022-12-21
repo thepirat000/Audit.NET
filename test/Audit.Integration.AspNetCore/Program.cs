@@ -33,6 +33,10 @@ namespace Audit.Integration.AspNetCore
                 await webApiTests.TestInitialize();
                 Console.WriteLine("PASSED - TestInitialize");
 
+                Console.WriteLine("START - Test_WebApi_JsonPatch_Async");
+                await webApiTests.Test_WebApi_JsonPatch_Async();
+                Console.WriteLine("PASSED - Test_WebApi_JsonPatch_Async");
+
                 Console.WriteLine("START - Test_WebApi_GlobalFilter_SerializeParams_Async");
                 await webApiTests.Test_WebApi_GlobalFilter_SerializeParams_Async();
                 Console.WriteLine("PASSED - Test_WebApi_GlobalFilter_SerializeParams_Async");

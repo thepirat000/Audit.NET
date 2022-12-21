@@ -67,14 +67,17 @@ namespace Audit.WebApi
             {
                 Action = auditAction
             };
+
+            var dataProvider = contextWrapper.GetHttpContext()?.GetService(typeof(AuditDataProvider)) as AuditDataProvider;
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = auditEventAction,
+                DataProvider = dataProvider,
                 // the inner ActionDescriptor is of type ReflectedHttpActionDescriptor even when using api versioning:
                 CallingMethod = (actionContext.ActionDescriptor?.ActionBinding?.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
             };
-            var auditScope = await AuditScope.CreateAsync(options);
+            var auditScope = await Configuration.AuditScopeFactory.CreateAsync(options);
             contextWrapper.Set(AuditApiHelper.AuditApiActionKey, auditAction);
             contextWrapper.Set(AuditApiHelper.AuditApiScopeKey, auditScope);
         }

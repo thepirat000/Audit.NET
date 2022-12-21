@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audit.WebApi;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -24,12 +25,17 @@ namespace Audit.Integration.AspNetCore.Controllers
             {
                 scope.Event.CustomFields["ScopeExists"] = true;
             }
+
             base.OnActionExecuting(context);
         }
 
-        public override void OnActionExecuted(ActionExecutedContext context)
+        // PATCH api/my/JsonPatch
+        [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true, IncludeResponseHeaders = true)]
+        [HttpPatch("JsonPatch")]
+        public IActionResult JsonPatch([FromBody] JsonPatchDocument<Customer> patchDoc)
         {
-            base.OnActionExecuted(context);
+            return Ok();
         }
     }
+
 }

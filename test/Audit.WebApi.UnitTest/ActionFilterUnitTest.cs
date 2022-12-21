@@ -14,6 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Specialized;
+using System.Web.Http;
+using System.Web.Http.Dependencies;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -70,13 +72,13 @@ namespace Audit.WebApi.UnitTest
             }
         }
 
-        [Test]
-        public async Task Test_AuditApiActionFilter_InsertOnEnd()
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Test_AuditApiActionFilter_InsertOnEnd(bool injectDataProvider)
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequestBase>();
 
-            //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -89,12 +91,14 @@ namespace Audit.WebApi.UnitTest
             var httpResponse = new Mock<HttpResponseBase>();
 
             httpResponse.Setup(c => c.StatusCode).Returns(200);
-            httpResponse.Setup(c => c.Headers).Returns(new NameValueCollection() { {"header-one", "1" }, { "header-two", "2" } });
+            httpResponse.Setup(c => c.Headers).Returns(new NameValueCollection()
+                { { "header-one", "1" }, { "header-two", "2" } });
             var itemsDict = new Dictionary<object, object>();
             var httpContext = new Mock<HttpContextBase>();
             httpContext.SetupGet(c => c.Request).Returns(request.Object);
             httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
             httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+            
             var controllerContext = new HttpControllerContext()
             {
                 ControllerDescriptor = new HttpControllerDescriptor()
@@ -112,12 +116,13 @@ namespace Audit.WebApi.UnitTest
 
             var args = new Dictionary<string, object>()
             {
-                {"test1", "value1" }
+                { "test1", "value1" }
             };
-            
+
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
-            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>()))
+                .ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
             var filter = new AuditApiAttribute()
             {
@@ -133,11 +138,23 @@ namespace Audit.WebApi.UnitTest
             {
                 ActionDescriptor = actionDescriptor,
                 ControllerContext = controllerContext,
-                
+
             };
             var actionExecutingContext = new HttpActionContext(controllerContext, actionDescriptor);
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
+
+            if (injectDataProvider)
+            {
+                Audit.Core.Configuration.DataProvider = null;
+                httpContext.Setup(h => h.GetService(typeof(AuditDataProvider)))
+                    .Returns(dataProvider.Object);
+            }
+            else
+            {
+                Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            }
+
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Headers.Add("header-one", "1");
             response.Headers.Add("header-two", "2");

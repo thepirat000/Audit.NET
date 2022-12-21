@@ -198,7 +198,28 @@ You can mix the **Audit Middleware** together with the **Global Action Filter** 
 
 ### Output
 
-The audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
+The audit events are stored using a **_Data Provider_**. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. Please refer to the [data providers](https://github.com/thepirat000/Audit.NET#data-providers) section on Audit.NET documentation.
+
+You can setup the data provider to use by registering an instance of an `AuditDataProdiver`
+to the `IServiceCollection` on your start-up code, for example:
+
+```c#
+var dataProvider = new FileDataProvider(cfg => cfg.Directory(@"C:\Logs"));
+services.AddSingleton<AuditDataProvider>(dataProvider);
+```
+
+Or, alternatively, you can setup the data provider globally with the static configuration:
+
+```c#
+Audit.Core.Configuration.DataProvider = new FileDataProvider(cfg => cfg.Directory(@"C:\Logs"));
+```
+
+Or using the fluent API:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseFileLogProvider(cfg => cfg.Directory(@"C:\Logs"));
+```
 
 ### Settings (Action Filter)
 

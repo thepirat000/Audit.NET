@@ -72,8 +72,9 @@ namespace Audit.WebApi.UnitTest
             }
         }
 
-        [Test]
-        public async Task Test_AuditApiActionFilter_InsertOnEnd()
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Test_AuditApiActionFilter_InsertOnEnd(bool injectDataProvider)
         {
             // Mock out the context to run the action filter.
             var request = new Mock<HttpRequest>();
@@ -95,6 +96,25 @@ namespace Audit.WebApi.UnitTest
             httpContext.SetupGet(c => c.Request).Returns(request.Object);
             httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
             httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
+
+            var dataProvider = new Mock<AuditDataProvider>();
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+
+            Mock<IServiceProvider> svcProvider = null;
+            if (injectDataProvider)
+            {
+                Audit.Core.Configuration.DataProvider = null;
+                svcProvider = new Mock<IServiceProvider>();
+                svcProvider.Setup(s => s.GetService(It.IsAny<Type>()))
+                    .Returns((Type t) => t == typeof(AuditDataProvider) ? dataProvider.Object : null);
+
+                httpContext.SetupGet(c => c.RequestServices).Returns(() => svcProvider.Object);
+            }
+            else
+            {
+                Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            }
+
             var ci = new Mock<ConnectionInfo>();
             ci.SetupGet(_ => _.RemoteIpAddress).Returns(() => null);
             httpContext.SetupGet(c => c.Connection).Returns(() => ci.Object);
@@ -117,9 +137,7 @@ namespace Audit.WebApi.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
-            Audit.Core.Configuration.DataProvider = dataProvider.Object;
+            
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
             var filter = new AuditApiAttribute()
@@ -144,6 +162,10 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            if (injectDataProvider)
+            {
+                svcProvider.Verify(p => p.GetService(It.IsAny<Type>()), Times.AtLeastOnce);
+            }
             Assert.IsNotNull(action.ActionExecutingContext);
             Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName, (action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ActionName);
             Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName, (action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ControllerName);
@@ -218,6 +240,7 @@ namespace Audit.WebApi.UnitTest
         }
 
         [Test]
+        [NonParallelizable]
         public async Task Test_AuditApiActionFilter_Manual()
         {
             // Mock out the context to run the action filter.
@@ -272,6 +295,8 @@ namespace Audit.WebApi.UnitTest
             actionExecutedContext.Result = new ObjectResult("this is the result");
 
             await filter.OnActionExecutionAsync(actionExecutingContext, async () => await Task.FromResult(actionExecutedContext));
+
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;

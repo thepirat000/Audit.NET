@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Http.Extensions;
 using Audit.Core.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Audit.WebApi
 {
@@ -114,7 +115,13 @@ namespace Audit.WebApi
             {
                 Action = auditAction
             };
-            var auditScope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction });
+            var dataProvider = context.RequestServices?.GetService<AuditDataProvider>();
+            var auditScope = await Core.Configuration.AuditScopeFactory.CreateAsync(new AuditScopeOptions()
+            {
+                EventType = eventType, 
+                AuditEvent = auditEventAction,
+                DataProvider = dataProvider
+            });
             context.Items[AuditApiHelper.AuditApiActionKey] = auditAction;
             context.Items[AuditApiHelper.AuditApiScopeKey] = auditScope;
         }
@@ -158,7 +165,6 @@ namespace Audit.WebApi
                 await auditScope.DisposeAsync();
             }
         }
-
     }
 }
 #endif

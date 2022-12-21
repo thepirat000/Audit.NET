@@ -238,6 +238,7 @@ namespace Audit.EntityFramework.UnitTest
         {
             AuditEventEntityFramework auditEvent = null;
             Audit.Core.Configuration.Setup()
+               .IncludeStackTrace(true)
                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
                {
                    auditEvent = ev as AuditEventEntityFramework;
@@ -264,6 +265,9 @@ namespace Audit.EntityFramework.UnitTest
                 ctx.SaveChanges();
             }
 
+            Audit.Core.Configuration.Setup()
+                .IncludeStackTrace(false);
+
             Assert.AreEqual(1, auditEvent.EntityFrameworkEvent.Entries.Count);
             // PK is zero because the insertion via SP
             Assert.IsTrue((int)(auditEvent.EntityFrameworkEvent.Entries[0].PrimaryKey["Id"]) == 0);
@@ -271,7 +275,7 @@ namespace Audit.EntityFramework.UnitTest
             Assert.AreEqual("Insert", auditEvent.EntityFrameworkEvent.Entries[0].Action);
             Assert.AreEqual("Blogs", auditEvent.EntityFrameworkEvent.Entries[0].Table);
             Assert.AreEqual(title, auditEvent.EntityFrameworkEvent.Entries[0].ColumnValues["Title"]);
-            Assert.IsTrue(auditEvent.Environment.CallingMethodName.Contains("Test_FunctionMapping"));
+            Assert.IsTrue(auditEvent.Environment.StackTrace.Contains("Test_FunctionMapping"));
         }
 
         [Test]

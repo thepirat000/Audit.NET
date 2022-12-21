@@ -28,6 +28,10 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         IConfigurator JsonAdapter<T>() where T : IJsonAdapter;
         /// <summary>
+        /// Globally include the full stack trace in the audit events.
+        /// </summary>
+        IConfigurator IncludeStackTrace(bool includeStackTrace = true);
+        /// <summary>
         /// Use a null provider. No audit events will be saved. Useful for testing purposes or to disable the audit logs.
         /// </summary>
         ICreationPolicyConfigurator UseNullProvider();

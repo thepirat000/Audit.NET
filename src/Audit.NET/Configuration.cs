@@ -102,7 +102,7 @@ namespace Audit.Core
 #endif
             };
 #endif
-                SystemClock = new DefaultSystemClock();
+            SystemClock = new DefaultSystemClock();
             ResetCustomActions();
             _auditScopeFactory = new AuditScopeFactory();
         }

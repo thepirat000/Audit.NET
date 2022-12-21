@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -8,6 +9,7 @@ using Audit.Core;
 using Audit.Core.Providers;
 using Audit.Integration.AspNetCore.Pages.Test;
 using Audit.WebApi;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -899,6 +901,31 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(1, events.Count);
             Assert.AreEqual(1, events[0].Action.ActionParameters.Count);
             Assert.AreEqual(-1, (events[0].Action.ActionParameters["customer"] as Customer)?.Id);
+        }
+
+        public async Task Test_WebApi_JsonPatch_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var client = new HttpClient();
+            var patchDoc = new JsonPatchDocument<Customer>();
+            patchDoc.Replace(e => e.Name, "NewValue");
+            var bodyJson = JsonConvert.SerializeObject(patchDoc);
+            
+            var result = await client.PatchAsync($"http://localhost:{_port}/api/My/JsonPatch", new StringContent(bodyJson, Encoding.UTF8, "application/json-patch+json"));
+
+            var events = (Configuration.DataProvider as InMemoryDataProvider)?.GetAllEventsOfType<AuditEventWebApi>();
+            var eventJson = events?.FirstOrDefault()?.ToJson();
+            var op = (events?[0].Action.ActionParameters.First().Value as JsonPatchDocument<Customer>)?.Operations[0];
+            
+            Assert.IsNotNull(events);
+            Assert.IsNotNull(eventJson);
+            Assert.IsNotNull(op);
+            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.AreEqual(1, events.Count);
+            Assert.AreEqual("NewValue", op.value);
         }
     }
 }

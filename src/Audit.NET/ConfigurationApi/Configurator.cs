@@ -28,6 +28,12 @@ namespace Audit.Core.ConfigurationApi
             return this;
         }
 
+        public IConfigurator IncludeStackTrace(bool includeStackTrace = true)
+        {
+            Configuration.IncludeStackTrace = includeStackTrace;
+            return this;
+        }
+
         public ICreationPolicyConfigurator UseNullProvider()
         {
             var dataProvider = new NullDataProvider();
