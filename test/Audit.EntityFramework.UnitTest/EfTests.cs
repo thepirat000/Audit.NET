@@ -330,6 +330,7 @@ namespace Audit.EntityFramework.UnitTest
                     IncludeEntityObjects(true));
             Audit.Core.Configuration.Setup()
                 .AuditDisabled(false)
+                .IncludeStackTrace()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -373,7 +374,7 @@ namespace Audit.EntityFramework.UnitTest
 
             Assert.AreEqual("test-content", p1.Content);
             Assert.AreEqual(guid, p2.Content);
-            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_General"));
+            Assert.IsTrue(evs[0].Environment.StackTrace.Contains(nameof(Test_General)));
         }
 
 
@@ -388,6 +389,7 @@ namespace Audit.EntityFramework.UnitTest
                 .ForContext<Entities>(x => x.
                     IncludeEntityObjects(true));
             Audit.Core.Configuration.Setup()
+                .IncludeStackTrace()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -420,7 +422,7 @@ namespace Audit.EntityFramework.UnitTest
 
             Assert.AreEqual("test-content", p1.Data);
             Assert.AreEqual(guid, p2.Data);
-            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_General_IdentityContext"));
+            Assert.IsTrue(evs[0].Environment.StackTrace.Contains(nameof(Test_General_IdentityContext)));
         }
     }
 }
