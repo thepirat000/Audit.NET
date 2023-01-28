@@ -13,5 +13,6 @@
         public const string BlobAccountName = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         public const string BlobTenantId = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
         public const string ElasticSearchUrl = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        public const string PostgreSqlConnectionString = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     }
 }
