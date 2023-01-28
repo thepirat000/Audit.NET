@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.1.4] - 2023-01-28
+- Audit.NET.PostgreSQL: Adding DataColumn override to allow changing the way to generate the JSON string from the Audit Event (#566)
+
 ## [20.1.3] - 2022-12-20
 - Audit.WebApi / Audit.WebApi.Core: Allow configuring the `AuditDataProvider` as a service in the `IServiceCollection` (#557)
 

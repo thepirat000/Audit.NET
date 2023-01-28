@@ -49,6 +49,10 @@ namespace Audit.PostgreSql.Providers
         /// <value>The data column name builder.</value>
         public Func<AuditEvent, string> DataColumnNameBuilder { get; set; } = _ => "data";
         /// <summary>
+        /// Gets or sets the function that returns the JSON string to store in the data column. By default it's the result of calling AuditEvent.ToJson().
+        /// </summary>
+        public Func<AuditEvent, string> DataJsonStringBuilder { get; set; } = ev => ev.ToJson();
+        /// <summary>
         /// Gets or sets the last updated date column name builder.
         /// </summary>
         /// <value>The last updated date column name builder.</value>
@@ -132,6 +136,7 @@ namespace Audit.PostgreSql.Providers
                 config.Invoke(pgConfig);
                 ConnectionStringBuilder = pgConfig._connectionStringBuilder;
                 DataColumnNameBuilder = pgConfig._dataColumnNameBuilder;
+                DataJsonStringBuilder = pgConfig._dataJsonStringBuilder ?? (ev => ev.ToJson());
                 _dataType = pgConfig._dataColumnType.ToString();
                 IdColumnNameBuilder = pgConfig._idColumnNameBuilder;
                 LastUpdatedDateColumnNameBuilder = pgConfig._lastUpdatedColumnNameBuilder;
@@ -376,7 +381,7 @@ namespace Audit.PostgreSql.Providers
             var parameters = new List<NpgsqlParameter>();
             if (GetDataColumnName(auditEvent) != null)
             {
-                parameters.Add(new NpgsqlParameter("data", auditEvent.ToJson()));
+                parameters.Add(new NpgsqlParameter("data", DataJsonStringBuilder.Invoke(auditEvent)));
             }
             if (CustomColumns != null)
             {
@@ -393,7 +398,7 @@ namespace Audit.PostgreSql.Providers
             var parameters = new List<NpgsqlParameter>();
             if (GetDataColumnName(auditEvent) != null)
             {
-                parameters.Add(new NpgsqlParameter("data", auditEvent.ToJson()));
+                parameters.Add(new NpgsqlParameter("data", DataJsonStringBuilder.Invoke(auditEvent)));
             }
             parameters.Add(new NpgsqlParameter("id", eventId));
             if (CustomColumns != null)
@@ -405,8 +410,7 @@ namespace Audit.PostgreSql.Providers
             }
             return parameters.ToArray();
         }
-
-
+        
         private string GetConnectionString(AuditEvent auditEvent)
         {
             return ConnectionStringBuilder?.Invoke(auditEvent);

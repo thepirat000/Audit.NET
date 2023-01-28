@@ -190,7 +190,7 @@ namespace Audit.IntegrationTest
             {
                 Audit.Core.Configuration.Setup()
                     .UsePostgreSql(config => config
-                        .ConnectionString(_ => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;")
+                        .ConnectionString(_ => AzureSettings.PostgreSqlConnectionString)
                         .TableName("event")
                         .IdColumnName(_ => "id")
                         .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB)

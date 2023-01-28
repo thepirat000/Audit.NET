@@ -23,6 +23,7 @@ namespace Audit.Core
                 TableNameBuilder = pgDbConfig._tableNameBuilder,
                 IdColumnNameBuilder = pgDbConfig._idColumnNameBuilder,
                 DataColumnNameBuilder = pgDbConfig._dataColumnNameBuilder,
+                DataJsonStringBuilder = pgDbConfig._dataJsonStringBuilder ?? (ev => ev.ToJson()),
                 DataType = pgDbConfig._dataColumnType == DataType.String ? null : pgDbConfig._dataColumnType.ToString(),
                 LastUpdatedDateColumnNameBuilder = pgDbConfig._lastUpdatedColumnNameBuilder,
                 SchemaBuilder = pgDbConfig._schemaBuilder,

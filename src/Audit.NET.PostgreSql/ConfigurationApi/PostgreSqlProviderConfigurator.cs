@@ -15,6 +15,7 @@ namespace Audit.PostgreSql.Configuration
         internal Func<AuditEvent, string> _tableNameBuilder = _ => "event";
         internal Func<AuditEvent, string> _idColumnNameBuilder = _ => "id";
         internal Func<AuditEvent, string> _dataColumnNameBuilder = _ => "data";
+        internal Func<AuditEvent, string> _dataJsonStringBuilder = null;
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = _ => null;
 
         internal DataType _dataColumnType = DataType.JSON;
@@ -56,18 +57,19 @@ namespace Audit.PostgreSql.Configuration
             return this;
         }
 
-
-        public IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON)
+        public IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
         {
             _dataColumnNameBuilder = _ => dataColumnName;
             _dataColumnType = dataColumnType;
+            _dataJsonStringBuilder = jsonStringBuilder;
             return this;
         }
 
-        public IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON)
+        public IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
         {
             _dataColumnNameBuilder = dataColumnNameBuilder;
             _dataColumnType = dataColumnType;
+            _dataJsonStringBuilder = jsonStringBuilder;
             return this;
         }
 

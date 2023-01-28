@@ -38,18 +38,23 @@ namespace Audit.PostgreSql.Configuration
         /// </summary>
         /// <param name="idColumnNameBuilder">The id column name builder.</param>
         IPostgreSqlProviderConfigurator IdColumnName(Func<AuditEvent, string> idColumnNameBuilder);
+
         /// <summary>
         /// Specifies the column name and type where to store the event data. Default is the column named "data" assuming type JSON.
         /// </summary>
         /// <param name="dataColumnName">The data column name.</param>
         /// <param name="dataColumnType">The data column type.</param>
-        IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON);
+        /// <param name="jsonStringBuilder">A function that returns the JSON string to store in the data column. By default it's the result of calling AuditEvent.ToJson().</param>
+        IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON,Func<AuditEvent, string> jsonStringBuilder = null);
+
         /// <summary>
         /// Specifies the column name and type where to store the event data. Default is the column named "data" assuming type JSON.
         /// </summary>
         /// <param name="dataColumnNameBuilder">The data column name builder.</param>
         /// <param name="dataColumnType">The data column type.</param>
-        IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON);
+        /// <param name="jsonStringBuilder">A function that returns the JSON string to store in the data column. By default it's the result of calling AuditEvent.ToJson().</param>
+        IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null);
+
         /// <summary>
         /// Specifies the column where to store the last updated date. NULL to ignore. Default is NULL.
         /// </summary>
