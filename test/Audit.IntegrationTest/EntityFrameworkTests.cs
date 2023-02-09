@@ -855,6 +855,7 @@ namespace Audit.IntegrationTest
         {
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
+                .IncludeStackTrace()
                 .UseDynamicProvider(p => p
                     .OnInsert(ev =>
                     {
@@ -920,7 +921,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
             Assert.AreEqual("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
 
-            Assert.IsTrue(logs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+            Assert.IsTrue(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
         }
 
 
@@ -931,6 +932,7 @@ namespace Audit.IntegrationTest
             var p1Title = Guid.NewGuid().ToString().Substring(1, 10);
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
+                .IncludeStackTrace()
                 .UseDynamicProvider(p => p
                     .OnInsert(ev =>
                     {
@@ -988,7 +990,7 @@ namespace Audit.IntegrationTest
 
             Assert.AreEqual(3, logs.Count);
 #if NET452 || NET461
-            Assert.IsTrue(logs[0].Environment.CallingMethodName.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+            Assert.IsTrue(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
 #endif
         }
 

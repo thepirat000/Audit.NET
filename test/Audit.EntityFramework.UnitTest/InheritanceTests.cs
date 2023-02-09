@@ -156,13 +156,9 @@ namespace Audit.EntityFramework.UnitTest
             Assert.AreEqual("Entities3", evs[0].Entries[0].Table);
             Assert.AreEqual(guid, (evs[0].Entries[0].Entity as dynamic).Name3);
 
-            //ningun columnname null, todos los name_ newvalue terminan en X
             Assert.IsFalse(evs[1].Entries[0].Changes.Any(e => e.ColumnName == null));
             Assert.IsTrue(evs[1].Entries[0].Changes.Where(e => e.ColumnName.StartsWith("Name"))
                 .All(e => e.NewValue.ToString().EndsWith("X")));
-
         }
     }
-
-
 }

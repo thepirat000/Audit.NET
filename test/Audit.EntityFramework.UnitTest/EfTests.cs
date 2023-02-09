@@ -394,7 +394,8 @@ namespace Audit.EntityFramework.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         evs.Add(ev);
-                    }));
+                    }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
             using (var ctx = new Entities())
             {
                 var ev = new Event()

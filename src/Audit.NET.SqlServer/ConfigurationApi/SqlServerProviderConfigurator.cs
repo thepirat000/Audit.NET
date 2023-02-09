@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
 using Microsoft.EntityFrameworkCore;
 #endif
 #if NET45
@@ -22,7 +22,7 @@ namespace Audit.SqlServer.Configuration
         internal Func<AuditEvent, string> _jsonColumnNameBuilder;
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
         internal Func<AuditEvent, DbContextOptions> _dbContextOptionsBuilder = null;
 #endif
 #if NET45
@@ -119,7 +119,7 @@ namespace Audit.SqlServer.Configuration
             _customColumns.Add(new CustomColumn(columnName, value));
             return this;
         }
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
         public ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;

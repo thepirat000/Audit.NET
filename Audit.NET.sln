@@ -134,9 +134,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.RavenDB.UnitTest", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.AzureStorageTables", "src\Audit.NET.AzureStorageTables\Audit.NET.AzureStorageTables.csproj", "{934D38BE-7631-430F-B274-07152767F58F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.AzureStorageTables.UnitTest", "test\Audit.AzureStorageTables.UnitTest\Audit.AzureStorageTables.UnitTest.csproj", "{97F2CC5D-6AE6-40E9-AFAC-D4F513C63330}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.AzureStorageTables.UnitTest", "test\Audit.AzureStorageTables.UnitTest\Audit.AzureStorageTables.UnitTest.csproj", "{97F2CC5D-6AE6-40E9-AFAC-D4F513C63330}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.NET.Serilog", "src\Audit.NET.Serilog\Audit.NET.Serilog.csproj", "{BFB6AB47-0ECC-447E-BD37-3D3B8AA5ACE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Serilog", "src\Audit.NET.Serilog\Audit.NET.Serilog.csproj", "{BFB6AB47-0ECC-447E-BD37-3D3B8AA5ACE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.SqlServer.UnitTest", "test\Audit.SqlServer.UnitTest\Audit.SqlServer.UnitTest.csproj", "{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -586,6 +588,14 @@ Global
 		{BFB6AB47-0ECC-447E-BD37-3D3B8AA5ACE9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BFB6AB47-0ECC-447E-BD37-3D3B8AA5ACE9}.Release|x64.ActiveCfg = Release|Any CPU
 		{BFB6AB47-0ECC-447E-BD37-3D3B8AA5ACE9}.Release|x64.Build.0 = Release|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Debug|x64.Build.0 = Debug|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Release|x64.ActiveCfg = Release|Any CPU
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -648,6 +658,7 @@ Global
 		{934D38BE-7631-430F-B274-07152767F58F} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{97F2CC5D-6AE6-40E9-AFAC-D4F513C63330} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 		{BFB6AB47-0ECC-447E-BD37-3D3B8AA5ACE9} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
+		{B9F11735-5303-47C6-A8FA-EF9EDAD5FBE8} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}
