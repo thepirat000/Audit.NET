@@ -245,15 +245,33 @@ namespace Audit.PostgreSql.Providers
         /// <remarks>
         /// JSONB data querying: http://schinckel.net/2014/05/25/querying-json-in-postgres/, https://www.postgresql.org/docs/9.5/static/functions-json.html
         /// </remarks>
-        public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
+        private IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
         {
+            return this.EnumerateEvents<T>(whereExpression, string.Empty, string.Empty);
+        }
+        public IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize) where T : AuditEvent
+        {
+            int offset = (pageSize * pageNumber) - pageSize;
+            string whereExpression = $@" ""{GetIdColumnName(null)}"" > {offset}";
+            string orderByExpression = $@" ""{GetIdColumnName(null)}""";
+            string limitExpression = $" {pageSize}";
+            return this.EnumerateEvents<T>(whereExpression, orderByExpression, limitExpression);
+        }
+
+        private IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
+        {
+            string schema = GetSchema(null);
+            string where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
+            string orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
+            string limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
+            string finalSql =
+                $@"SELECT ""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" {where} {orderBy} {limit}";
+            
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 cnn.Open();
                 var cmd = cnn.CreateCommand();
-                var schema = GetSchema(null);
-                var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
-                cmd.CommandText = $@"SELECT ""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" {where}";
+                cmd.CommandText = finalSql;
                 var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -262,7 +280,7 @@ namespace Audit.PostgreSql.Providers
                 }
             }
         }
-
+        
         private NpgsqlCommand GetInsertCommand(NpgsqlConnection cnn, AuditEvent auditEvent)
         {
             cnn.Open();

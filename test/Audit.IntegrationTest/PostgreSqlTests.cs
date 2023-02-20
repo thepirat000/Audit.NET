@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Audit.Core;
+using Audit.PostgreSql.Configuration;
 using Audit.PostgreSql.Providers;
 
 namespace Audit.IntegrationTest
@@ -18,6 +19,37 @@ namespace Audit.IntegrationTest
         public void Test_PostgreDataProvider_CustomDataColumn()
         {
             var overrideEventType = Guid.NewGuid().ToString();
+            RunLocalAuditConfiguration(overrideEventType);
+
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+
+            var id = scope.EventId;
+            var dp = (PostgreSqlDataProvider)Configuration.DataProvider;
+
+            var getEvent = dp?.GetEvent<AuditEvent>(id);
+
+            Assert.AreEqual(overrideEventType, getEvent?.EventType);
+        }
+
+        [Test]
+        [Category("PostgreSQL")]
+        public void Test_PostgreDataProvider_Paging()
+        {
+            string overrideEventType = Guid.NewGuid().ToString();
+            RunLocalAuditConfiguration(overrideEventType);
+
+            const int pageNumber = 3;
+            const int pageSize = 10;
+
+            PostgreSqlDataProvider dp = (PostgreSqlDataProvider)Configuration.DataProvider;
+            IEnumerable<AuditEvent> events = dp?.EnumerateEvents<AuditEvent>(pageNumber, pageSize);
+            ICollection<AuditEvent> realizedEvents = events.ToList();
+            Assert.IsNotNull(realizedEvents);
+        }
+
+        private static void RunLocalAuditConfiguration(string overrideEventType)
+        {
             Audit.Core.Configuration.Setup()
                 .UsePostgreSql(config => config
                     .ConnectionString(AzureSettings.PostgreSqlConnectionString)
@@ -34,16 +66,6 @@ namespace Audit.IntegrationTest
                     .CustomColumn("some_null", ev => null))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                 .ResetActions();
-
-            var scope = AuditScope.Create("test", null);
-            scope.Dispose();
-
-            var id = scope.EventId;
-            var dp = (PostgreSqlDataProvider)Configuration.DataProvider;
-
-            var getEvent = dp?.GetEvent<AuditEvent>(id);
-
-            Assert.AreEqual(overrideEventType, getEvent?.EventType);
         }
     }
 }
