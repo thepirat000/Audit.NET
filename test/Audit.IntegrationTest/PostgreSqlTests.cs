@@ -34,7 +34,23 @@ namespace Audit.IntegrationTest
 
         [Test]
         [Category("PostgreSQL")]
-        public void Test_PostgreDataProvider_Paging()
+        public void Test_PostgreDataProvider_Paging_No_Where()
+        {
+            string overrideEventType = Guid.NewGuid().ToString();
+            RunLocalAuditConfiguration(overrideEventType);
+
+            const int pageNumberOne = 1;
+            const int pageSize = 10;
+
+            PostgreSqlDataProvider dp = (PostgreSqlDataProvider)Configuration.DataProvider;
+            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
+            ICollection<AuditEvent> realizedEvents = events.ToList();
+            Assert.IsNotNull(realizedEvents);
+        }
+        
+        [Test]
+        [Category("PostgreSQL")]
+        public void Test_PostgreDataProvider_Paging_With_Where()
         {
             string overrideEventType = Guid.NewGuid().ToString();
             RunLocalAuditConfiguration(overrideEventType);
@@ -42,12 +58,19 @@ namespace Audit.IntegrationTest
             const int pageNumber = 3;
             const int pageSize = 10;
 
+            string whereExpression = @""""+ GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
             PostgreSqlDataProvider dp = (PostgreSqlDataProvider)Configuration.DataProvider;
-            IEnumerable<AuditEvent> events = dp?.EnumerateEvents<AuditEvent>(pageNumber, pageSize);
+            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumber, pageSize, whereExpression);
             ICollection<AuditEvent> realizedEvents = events.ToList();
             Assert.IsNotNull(realizedEvents);
         }
-
+        
+        private static string GetLastUpdatedColumnNameColumnName()
+        {
+            /* this value is encapsulated so both RunLocalAuditConfiguration and Test_PostgreDataProvider_Paging_With_Where use the same value */
+            return "updated_date";
+        }
+        
         private static void RunLocalAuditConfiguration(string overrideEventType)
         {
             Audit.Core.Configuration.Setup()
@@ -60,7 +83,7 @@ namespace Audit.IntegrationTest
                         auditEvent.EventType = overrideEventType;
                         return auditEvent.ToJson();
                     })
-                    .LastUpdatedColumnName("updated_date")
+                    .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
                     .CustomColumn("event_type", ev => ev.EventType)
                     .CustomColumn("some_date", ev => DateTime.UtcNow)
                     .CustomColumn("some_null", ev => null))

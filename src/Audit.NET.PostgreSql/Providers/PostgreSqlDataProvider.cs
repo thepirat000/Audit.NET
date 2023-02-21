@@ -5,6 +5,7 @@ using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Audit.PostgreSql.Providers
@@ -249,24 +250,78 @@ namespace Audit.PostgreSql.Providers
         {
             return this.EnumerateEvents<T>(whereExpression, string.Empty, string.Empty);
         }
-        public IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize) where T : AuditEvent
+        
+        /// <summary>
+        /// Provide paging functionality.
+        /// Note, the "Id"(ColumnName) will be the used in the Order-By.
+        /// </summary>
+        /// <param name="pageNumber">The specified page number.</param>
+        /// <param name="pageSize">The number of rows on a page</param>
+        /// <returns></returns>
+        public IEnumerable<AuditEvent> EnumerateEvents(int pageNumber, int pageSize)
+        {
+            return EnumerateEvents<AuditEvent>(pageNumber, pageSize);
+        }
+        
+        private IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize) where T : AuditEvent
+        {
+            return this.EnumerateEvents<T>(pageNumber, pageSize, string.Empty);
+        }
+        
+        /// <summary>
+        /// Provide paging functionality with a user-defined where-expression.
+        /// Note, the "Id"(ColumnName) will be the used in the Order-By.
+        /// </summary>
+        /// <param name="pageNumber">The specified page number.</param>
+        /// <param name="pageSize">The number of rows on a page</param>
+        /// <param name="whereExpression">where-clause that is applied before the "cut out the page" conditions are applied</param>
+        /// <returns></returns>
+        public IEnumerable<AuditEvent> EnumerateEvents(int pageNumber, int pageSize, string whereExpression)
+        {
+            return EnumerateEvents<AuditEvent>(pageNumber, pageSize, whereExpression);
+        }
+        
+        private IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize, string whereExpression) where T : AuditEvent
         {
             int offset = (pageSize * pageNumber) - pageSize;
-            string whereExpression = $@" ""{GetIdColumnName(null)}"" > {offset}";
-            string orderByExpression = $@" ""{GetIdColumnName(null)}""";
-            string limitExpression = $" {pageSize}";
-            return this.EnumerateEvents<T>(whereExpression, orderByExpression, limitExpression);
+            string schema = GetSchema(null);
+            
+            /* note, the "where-clause" must be applied "inside" the "derived1" inner-query...thus the variable name "inner-where-clause" */
+            string innerWhereClause = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
+
+            /* create the paging-query...which uses an inner-derived-table to capture the ROW_NUMBER values */
+            string finalSql =
+                $@"SELECT aet.""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" as aet"
+                + 
+                $@" JOIN ( SELECT ""{GetIdColumnName(null)}"", ROW_NUMBER() OVER (ORDER BY ""{GetIdColumnName(null)}"")"
+                + 
+                $@" as ""RowNumb"" FROM {schema}""{GetTableName(null)}"" innerAet" 
+                +
+                $@" {innerWhereClause}) as derived1"
+                + 
+                $@" ON derived1.""{GetIdColumnName(null)}"" = aet.""{GetIdColumnName(null)}"" WHERE derived1.""RowNumb"" > {offset}"
+                + 
+                $@" ORDER BY aet.""{GetIdColumnName(null)}"" ASC LIMIT {pageSize};";
+            
+            return this.EnumerateEventsByFinalSql<T>(finalSql);
         }
 
-        private IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
+        /* while not yet made "public", order-by-expression and limit-expression are available here for future extensibility */
+        private IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression,
+            string limitExpression) where T : AuditEvent
         {
             string schema = GetSchema(null);
+            string selectExpression = $@"""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}""";
             string where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
             string orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
             string limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
             string finalSql =
-                $@"SELECT ""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" {where} {orderBy} {limit}";
-            
+                $@"SELECT {selectExpression} {where} {orderBy} {limit}";
+            return this.EnumerateEventsByFinalSql<T>(finalSql);
+        }
+
+        private IEnumerable<T> EnumerateEventsByFinalSql<T>(string finalSql) where T : AuditEvent
+        {
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 cnn.Open();
