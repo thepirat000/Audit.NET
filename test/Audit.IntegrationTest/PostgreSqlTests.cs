@@ -46,6 +46,20 @@ namespace Audit.IntegrationTest
         
         [Test]
         [Category("PostgreSQL")]
+        public void Test_PostgreDataProvider_Paging_OutOfRange_Inputs()
+        {
+            /* define negative values.  the code should "safety-ize" them to page-number=1 and page-size=1 */
+            const int pageNumberOne = -333;
+            const int pageSize = -444;
+
+            PostgreSqlDataProvider dp = GetConfiguredPostgreSqlDataProvider();
+            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
+            ICollection<AuditEvent> realizedEvents = events.ToList();
+            Assert.IsNotNull(realizedEvents);
+        }        
+        
+        [Test]
+        [Category("PostgreSQL")]
         public void Test_PostgreDataProvider_Paging_With_Where()
         {
             const int pageNumber = 3;
@@ -88,7 +102,6 @@ namespace Audit.IntegrationTest
                     .CustomColumn("some_null", ev => null))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                 .ResetActions();
-            
             
             var dp = (PostgreSqlDataProvider)Configuration.DataProvider;
             return dp;
