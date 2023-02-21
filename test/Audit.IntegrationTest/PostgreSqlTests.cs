@@ -61,7 +61,7 @@ namespace Audit.IntegrationTest
         private static string GetLastUpdatedColumnNameColumnName()
         {
             /* this value is encapsulated so both RunLocalAuditConfiguration and Test_PostgreDataProvider_Paging_With_Where use the same value */
-            return "UpdateDate";
+            return "updated_date";
         }
 
         private static PostgreSqlDataProvider GetConfiguredPostgreSqlDataProvider()
