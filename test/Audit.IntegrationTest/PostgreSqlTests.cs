@@ -77,7 +77,7 @@ namespace Audit.IntegrationTest
                     .ConnectionString(AzureSettings.PostgreSqlConnectionString)
                     .TableName("event")
                     .IdColumnName(_ => "id")
-                    .DataColumn("data", DataType.JSONB, auditEvent =>
+                    .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB, auditEvent =>
                     {
                         auditEvent.EventType = overrideEventType;
                         return auditEvent.ToJson();
