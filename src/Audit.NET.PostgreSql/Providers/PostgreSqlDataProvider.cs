@@ -1,11 +1,9 @@
 ﻿using Audit.Core;
 using Audit.NET.PostgreSql;
 using Npgsql;
-using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Audit.PostgreSql.Providers
@@ -283,14 +281,16 @@ namespace Audit.PostgreSql.Providers
         
         private IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize, string whereExpression) where T : AuditEvent
         {
-            int offset = (pageSize * pageNumber) - pageSize;
+            int safePageNumber = Math.Max(pageNumber, 1);
+            int safePageSize = Math.Max(pageSize, 1);
+            int offset = (safePageSize * safePageNumber) - safePageSize;
             string schema = GetSchema(null);
             
             /* note, the "where-clause" must be applied "inside" the "derived1" inner-query...thus the variable name "inner-where-clause" */
             string innerWhereClause = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
 
             /* create the paging-query...which uses an inner-derived-table to capture the ROW_NUMBER values */
-            string finalSql =
+            string fullPagingSql =
                 $@"SELECT aet.""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" as aet"
                 + 
                 $@" JOIN ( SELECT ""{GetIdColumnName(null)}"", ROW_NUMBER() OVER (ORDER BY ""{GetIdColumnName(null)}"")"
@@ -301,9 +301,9 @@ namespace Audit.PostgreSql.Providers
                 + 
                 $@" ON derived1.""{GetIdColumnName(null)}"" = aet.""{GetIdColumnName(null)}"" WHERE derived1.""RowNumb"" > {offset}"
                 + 
-                $@" ORDER BY aet.""{GetIdColumnName(null)}"" ASC LIMIT {pageSize};";
+                $@" ORDER BY aet.""{GetIdColumnName(null)}"" ASC LIMIT {safePageSize};";
             
-            return this.EnumerateEventsByFinalSql<T>(finalSql);
+            return this.EnumerateEventsByFullSql<T>(fullPagingSql);
         }
 
         /* while not yet made "public", order-by-expression and limit-expression are available here for future extensibility */
@@ -317,16 +317,16 @@ namespace Audit.PostgreSql.Providers
             string limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
             string finalSql =
                 $@"SELECT {selectExpression} {where} {orderBy} {limit}";
-            return this.EnumerateEventsByFinalSql<T>(finalSql);
+            return this.EnumerateEventsByFullSql<T>(finalSql);
         }
 
-        private IEnumerable<T> EnumerateEventsByFinalSql<T>(string finalSql) where T : AuditEvent
+        private IEnumerable<T> EnumerateEventsByFullSql<T>(string fullSql) where T : AuditEvent
         {
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 cnn.Open();
                 var cmd = cnn.CreateCommand();
-                cmd.CommandText = finalSql;
+                cmd.CommandText = fullSql;
                 var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
