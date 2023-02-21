@@ -19,13 +19,12 @@ namespace Audit.IntegrationTest
         public void Test_PostgreDataProvider_CustomDataColumn()
         {
             var overrideEventType = Guid.NewGuid().ToString();
-            RunLocalAuditConfiguration(overrideEventType);
-
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+            
             var scope = AuditScope.Create("test", null);
             scope.Dispose();
 
             var id = scope.EventId;
-            var dp = (PostgreSqlDataProvider)Configuration.DataProvider;
 
             var getEvent = dp?.GetEvent<AuditEvent>(id);
 
@@ -36,13 +35,10 @@ namespace Audit.IntegrationTest
         [Category("PostgreSQL")]
         public void Test_PostgreDataProvider_Paging_No_Where()
         {
-            string overrideEventType = Guid.NewGuid().ToString();
-            RunLocalAuditConfiguration(overrideEventType);
-
             const int pageNumberOne = 1;
             const int pageSize = 10;
 
-            PostgreSqlDataProvider dp = (PostgreSqlDataProvider)Configuration.DataProvider;
+            PostgreSqlDataProvider dp = GetConfiguredPostgreSqlDataProvider();
             IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
             ICollection<AuditEvent> realizedEvents = events.ToList();
             Assert.IsNotNull(realizedEvents);
@@ -52,14 +48,11 @@ namespace Audit.IntegrationTest
         [Category("PostgreSQL")]
         public void Test_PostgreDataProvider_Paging_With_Where()
         {
-            string overrideEventType = Guid.NewGuid().ToString();
-            RunLocalAuditConfiguration(overrideEventType);
-
             const int pageNumber = 3;
             const int pageSize = 10;
 
             string whereExpression = @""""+ GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
-            PostgreSqlDataProvider dp = (PostgreSqlDataProvider)Configuration.DataProvider;
+            PostgreSqlDataProvider dp = GetConfiguredPostgreSqlDataProvider();
             IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumber, pageSize, whereExpression);
             ICollection<AuditEvent> realizedEvents = events.ToList();
             Assert.IsNotNull(realizedEvents);
@@ -68,17 +61,23 @@ namespace Audit.IntegrationTest
         private static string GetLastUpdatedColumnNameColumnName()
         {
             /* this value is encapsulated so both RunLocalAuditConfiguration and Test_PostgreDataProvider_Paging_With_Where use the same value */
-            return "updated_date";
+            return "UpdateDate";
+        }
+
+        private static PostgreSqlDataProvider GetConfiguredPostgreSqlDataProvider()
+        {
+            string overrideEventType = Guid.NewGuid().ToString();
+            return GetConfiguredPostgreSqlDataProvider(overrideEventType);
         }
         
-        private static void RunLocalAuditConfiguration(string overrideEventType)
+        private static PostgreSqlDataProvider GetConfiguredPostgreSqlDataProvider(string overrideEventType)
         {
             Audit.Core.Configuration.Setup()
                 .UsePostgreSql(config => config
                     .ConnectionString(AzureSettings.PostgreSqlConnectionString)
                     .TableName("event")
                     .IdColumnName(_ => "id")
-                    .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB, auditEvent =>
+                    .DataColumn("data", DataType.JSONB, auditEvent =>
                     {
                         auditEvent.EventType = overrideEventType;
                         return auditEvent.ToJson();
@@ -89,6 +88,10 @@ namespace Audit.IntegrationTest
                     .CustomColumn("some_null", ev => null))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                 .ResetActions();
+            
+            
+            var dp = (PostgreSqlDataProvider)Configuration.DataProvider;
+            return dp;
         }
     }
 }
