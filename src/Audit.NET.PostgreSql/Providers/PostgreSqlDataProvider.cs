@@ -244,83 +244,23 @@ namespace Audit.PostgreSql.Providers
         /// <remarks>
         /// JSONB data querying: http://schinckel.net/2014/05/25/querying-json-in-postgres/, https://www.postgresql.org/docs/9.5/static/functions-json.html
         /// </remarks>
-        private IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
+        public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
         {
-            return this.EnumerateEvents<T>(whereExpression, string.Empty, string.Empty);
+            var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
+            var sql = $@"SELECT ""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}"" {where}";
+            return EnumerateEventsByFullSql<T>(sql);
         }
         
-        /// <summary>
-        /// Provide paging functionality.
-        /// Note, the "Id"(ColumnName) will be the used in the Order-By.
-        /// </summary>
-        /// <param name="pageNumber">The specified page number.</param>
-        /// <param name="pageSize">The number of rows on a page</param>
-        /// <returns></returns>
-        public IEnumerable<AuditEvent> EnumerateEvents(int pageNumber, int pageSize)
+        public IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
         {
-            return EnumerateEvents<AuditEvent>(pageNumber, pageSize);
+            var selectExpression = $@"""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}""";
+            var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
+            var orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
+            var limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
+            var finalSql = $@"SELECT {selectExpression} {where} {orderBy} {limit}";
+            return EnumerateEventsByFullSql<T>(finalSql);
         }
-        
-        private IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize) where T : AuditEvent
-        {
-            return this.EnumerateEvents<T>(pageNumber, pageSize, string.Empty);
-        }
-        
-        /// <summary>
-        /// Provide paging functionality with a user-defined where-expression.
-        /// Note, the "Id"(ColumnName) will be the used in the Order-By.
-        /// </summary>
-        /// <param name="pageNumber">The specified page number.</param>
-        /// <param name="pageSize">The number of rows on a page</param>
-        /// <param name="whereExpression">where-clause that is applied before the "cut out the page" conditions are applied</param>
-        /// <returns></returns>
-        public IEnumerable<AuditEvent> EnumerateEvents(int pageNumber, int pageSize, string whereExpression)
-        {
-            return EnumerateEvents<AuditEvent>(pageNumber, pageSize, whereExpression);
-        }
-        
-        private IEnumerable<T> EnumerateEvents<T>(int pageNumber, int pageSize, string whereExpression) where T : AuditEvent
-        {
-            int safePageNumber = Math.Max(pageNumber, 1);
-            int safePageSize = Math.Max(pageSize, 1);
-            int offset = (safePageSize * safePageNumber) - safePageSize;
-            string schema = GetSchema(null);
-            
-            /* note, the "where-clause" must be applied "inside" the "derived1" inner-query...thus the variable name "inner-where-clause" */
-            string innerWhereClause = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
-
-            /* create the paging-query...which uses an inner-derived-table to capture the ROW_NUMBER values */
-            string fullPagingSql =
-                $@"SELECT aet.""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" as aet"
-                + 
-                $@" JOIN ( SELECT ""{GetIdColumnName(null)}"", ROW_NUMBER() OVER (ORDER BY ""{GetIdColumnName(null)}"")"
-                + 
-                $@" as ""RowNumb"" FROM {schema}""{GetTableName(null)}"" innerAet" 
-                +
-                $@" {innerWhereClause}) as derived1"
-                + 
-                $@" ON derived1.""{GetIdColumnName(null)}"" = aet.""{GetIdColumnName(null)}"" WHERE derived1.""RowNumb"" > {offset}"
-                + 
-                $@" ORDER BY aet.""{GetIdColumnName(null)}"" ASC LIMIT {safePageSize};";
-            
-            return this.EnumerateEventsByFullSql<T>(fullPagingSql);
-        }
-
-        /* while not yet made "public", order-by-expression and limit-expression are available here for future extensibility */
-        private IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression,
-            string limitExpression) where T : AuditEvent
-        {
-            string schema = GetSchema(null);
-            string selectExpression = $@"""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}""";
-            string where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
-            string orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
-            string limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
-            string finalSql =
-                $@"SELECT {selectExpression} {where} {orderBy} {limit}";
-            return this.EnumerateEventsByFullSql<T>(finalSql);
-        }
-
-        private IEnumerable<T> EnumerateEventsByFullSql<T>(string fullSql) where T : AuditEvent
+        protected IEnumerable<T> EnumerateEventsByFullSql<T>(string fullSql) where T : AuditEvent
         {
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
@@ -352,11 +292,6 @@ namespace Audit.PostgreSql.Providers
                 GetColumnsForInsert(auditEvent),
                 GetValuesForInsert(auditEvent),
                 GetIdColumnName(auditEvent));
-        }
-
-        private string GetFullTableName(AuditEvent auditEvent)
-        {
-            return string.Format($@"{GetSchema(auditEvent)}""{GetTableName(auditEvent)}""");
         }
 
         private NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
@@ -483,37 +418,41 @@ namespace Audit.PostgreSql.Providers
             }
             return parameters.ToArray();
         }
-        
-        private string GetConnectionString(AuditEvent auditEvent)
+
+        protected string GetConnectionString(AuditEvent auditEvent)
         {
             return ConnectionStringBuilder?.Invoke(auditEvent);
         }
 
-        private string GetSchema(AuditEvent auditEvent)
+        protected string GetSchema(AuditEvent auditEvent)
         {
             var schema = SchemaBuilder?.Invoke(auditEvent);
             return string.IsNullOrWhiteSpace(schema) ? "" : (@"""" + schema + @""".");
         }
 
-        private string GetTableName(AuditEvent auditEvent)
+        protected string GetTableName(AuditEvent auditEvent)
         {
             return TableNameBuilder?.Invoke(auditEvent);
         }
 
-        private string GetIdColumnName(AuditEvent auditEvent)
+        protected string GetFullTableName(AuditEvent auditEvent)
+        {
+            return string.Format($@"{GetSchema(auditEvent)}""{GetTableName(auditEvent)}""");
+        }
+
+        protected string GetIdColumnName(AuditEvent auditEvent)
         {
             return IdColumnNameBuilder?.Invoke(auditEvent);
         }
 
-        private string GetDataColumnName(AuditEvent auditEvent)
+        protected string GetDataColumnName(AuditEvent auditEvent)
         {
             return DataColumnNameBuilder?.Invoke(auditEvent);
         }
 
-        private string GetLastUpdatedDateColumnName(AuditEvent auditEvent)
+        protected string GetLastUpdatedDateColumnName(AuditEvent auditEvent)
         {
             return LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
         }
     }
-
 }
