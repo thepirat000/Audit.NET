@@ -250,7 +250,19 @@ namespace Audit.PostgreSql.Providers
             var sql = $@"SELECT ""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}"" {where}";
             return EnumerateEventsByFullSql<T>(sql);
         }
-        
+
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Postgres WHERE, ORDER BY and LIMIT expression.
+        /// </summary>
+        /// <param name="whereExpression">Any valid PostgreSQL where expression for the events table.
+        /// The query executed will be SELECT * FROM public.eventb WHERE <paramref name="whereExpression"/>;.
+        /// For example: EnumerateEvents("data ? CustomerId") will return the events whose JSON representation includes CustomerId property on its root.
+        /// </param>
+        /// <param name="orderByExpression">Any valid PostgreSQL order by expression for the events table.</param>
+        /// <param name="limitExpression">Any valid PostgreSQL limit expression for the events table.</param>
+        /// <remarks>
+        /// JSONB data querying: http://schinckel.net/2014/05/25/querying-json-in-postgres/, https://www.postgresql.org/docs/9.5/static/functions-json.html
+        /// </remarks>
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
         {
             var selectExpression = $@"""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}""";
@@ -260,6 +272,11 @@ namespace Audit.PostgreSql.Providers
             var finalSql = $@"SELECT {selectExpression} {where} {orderBy} {limit}";
             return EnumerateEventsByFullSql<T>(finalSql);
         }
+
+        /// <summary>
+        /// Returns an enumeration of audit events for the given Postgres SELECT expression.
+        /// </summary>
+        /// <param name="fullSql">The string with the SELECT expression</param>
         protected IEnumerable<T> EnumerateEventsByFullSql<T>(string fullSql) where T : AuditEvent
         {
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))

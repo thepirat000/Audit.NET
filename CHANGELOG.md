@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.1.6] - 2023-02-22
+- Audit.NET.PostgreSql: Adding overloads to EnumerateEvents to allow passing where, orderby, limit or select expression. (#569)
+
 ## [20.1.5] - 2023-02-08
 - Audit.NET.SqlServer: Adding net7.0 as a target framework and referencing EF Core 7 (#568)
 
