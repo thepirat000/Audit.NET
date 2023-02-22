@@ -1,7 +1,6 @@
 ﻿using Audit.Core;
 using Audit.NET.PostgreSql;
 using Npgsql;
-using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -247,13 +246,27 @@ namespace Audit.PostgreSql.Providers
         /// </remarks>
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
         {
+            var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
+            var sql = $@"SELECT ""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}"" {where}";
+            return EnumerateEventsByFullSql<T>(sql);
+        }
+        
+        public IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
+        {
+            var selectExpression = $@"""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}""";
+            var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
+            var orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
+            var limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
+            var finalSql = $@"SELECT {selectExpression} {where} {orderBy} {limit}";
+            return EnumerateEventsByFullSql<T>(finalSql);
+        }
+        protected IEnumerable<T> EnumerateEventsByFullSql<T>(string fullSql) where T : AuditEvent
+        {
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 cnn.Open();
                 var cmd = cnn.CreateCommand();
-                var schema = GetSchema(null);
-                var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
-                cmd.CommandText = $@"SELECT ""{GetDataColumnName(null)}"" FROM {schema}""{GetTableName(null)}"" {where}";
+                cmd.CommandText = fullSql;
                 var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -262,7 +275,7 @@ namespace Audit.PostgreSql.Providers
                 }
             }
         }
-
+        
         private NpgsqlCommand GetInsertCommand(NpgsqlConnection cnn, AuditEvent auditEvent)
         {
             cnn.Open();
@@ -279,11 +292,6 @@ namespace Audit.PostgreSql.Providers
                 GetColumnsForInsert(auditEvent),
                 GetValuesForInsert(auditEvent),
                 GetIdColumnName(auditEvent));
-        }
-
-        private string GetFullTableName(AuditEvent auditEvent)
-        {
-            return string.Format($@"{GetSchema(auditEvent)}""{GetTableName(auditEvent)}""");
         }
 
         private NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
@@ -410,37 +418,41 @@ namespace Audit.PostgreSql.Providers
             }
             return parameters.ToArray();
         }
-        
-        private string GetConnectionString(AuditEvent auditEvent)
+
+        protected string GetConnectionString(AuditEvent auditEvent)
         {
             return ConnectionStringBuilder?.Invoke(auditEvent);
         }
 
-        private string GetSchema(AuditEvent auditEvent)
+        protected string GetSchema(AuditEvent auditEvent)
         {
             var schema = SchemaBuilder?.Invoke(auditEvent);
             return string.IsNullOrWhiteSpace(schema) ? "" : (@"""" + schema + @""".");
         }
 
-        private string GetTableName(AuditEvent auditEvent)
+        protected string GetTableName(AuditEvent auditEvent)
         {
             return TableNameBuilder?.Invoke(auditEvent);
         }
 
-        private string GetIdColumnName(AuditEvent auditEvent)
+        protected string GetFullTableName(AuditEvent auditEvent)
+        {
+            return string.Format($@"{GetSchema(auditEvent)}""{GetTableName(auditEvent)}""");
+        }
+
+        protected string GetIdColumnName(AuditEvent auditEvent)
         {
             return IdColumnNameBuilder?.Invoke(auditEvent);
         }
 
-        private string GetDataColumnName(AuditEvent auditEvent)
+        protected string GetDataColumnName(AuditEvent auditEvent)
         {
             return DataColumnNameBuilder?.Invoke(auditEvent);
         }
 
-        private string GetLastUpdatedDateColumnName(AuditEvent auditEvent)
+        protected string GetLastUpdatedDateColumnName(AuditEvent auditEvent)
         {
             return LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
         }
     }
-
 }
