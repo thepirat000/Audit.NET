@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-	 <Version>20.1.6</Version>
+	 <Version>20.1.7</Version>
 	 <PackageReleaseNotes>
 	 </PackageReleaseNotes>
  </PropertyGroup>

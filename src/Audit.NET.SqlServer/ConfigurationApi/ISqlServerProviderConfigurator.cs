@@ -99,6 +99,14 @@ namespace Audit.SqlServer.Configuration
         /// <param name="value">A function of the audit event that returns the value to insert/update on this column</param>
         ISqlServerProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value);
         /// <summary>
+        /// Specifies an extra custom column on the audit log table that should be included only when the guard condition is true
+        /// and the value is provided as a function of the audit event 
+        /// </summary>
+        /// <param name="columnName">The column name</param>
+        /// <param name="value">A function of the audit event that returns the value to insert/update on this column</param>
+        /// <param name="guard">The guard condition to determine if the column should be included or not</param>
+        ISqlServerProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value, Func<AuditEvent, bool> guard);
+        /// <summary>
         /// Specifies the SQL schema where to store the events as a function of the audit event
         /// </summary>
         /// <param name="schemaBuilder">The Schema name as a function of the audit event.</param>

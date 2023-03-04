@@ -280,7 +280,10 @@ namespace Audit.SqlServer.Providers
             {
                 foreach (var column in CustomColumns)
                 {
-                    columns.Add(column.Name);
+                    if (column.Guard == null || column.Guard.Invoke(auditEvent))
+                    {
+                        columns.Add(column.Name);
+                    }
                 }
             }
             return string.Join(", ", columns.Select(c => $"[{c}]"));
@@ -295,9 +298,14 @@ namespace Audit.SqlServer.Providers
             }
             if (CustomColumns != null)
             {
-                for (int i = 0; i < CustomColumns.Count; i++)
+                int i = 0;
+                foreach (var column in CustomColumns)
                 {
-                    values.Add($"@c{i}");
+                    if (column.Guard == null || column.Guard.Invoke(auditEvent))
+                    {
+                        values.Add($"@c{i}");
+                        i++;
+                    }
                 }
             }
             return string.Join(", ", values);
@@ -312,9 +320,14 @@ namespace Audit.SqlServer.Providers
             }
             if (CustomColumns != null)
             {
-                for (int i = 0; i < CustomColumns.Count; i++)
+                int i = 0;
+                foreach (var column in CustomColumns)
                 {
-                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent) ?? DBNull.Value));
+                    if (column.Guard == null || column.Guard.Invoke(auditEvent))
+                    {
+                        parameters.Add(new SqlParameter($"@c{i}", column.Value.Invoke(auditEvent) ?? DBNull.Value));
+                        i++;
+                    }
                 }
             }
             return parameters.ToArray();
@@ -330,9 +343,14 @@ namespace Audit.SqlServer.Providers
             parameters.Add(new SqlParameter("@eventId", eventId));
             if (CustomColumns != null)
             {
-                for (int i = 0; i < CustomColumns.Count; i++)
+                int i = 0;
+                foreach (var column in CustomColumns)
                 {
-                    parameters.Add(new SqlParameter($"@c{i}", CustomColumns[i].Value.Invoke(auditEvent) ?? DBNull.Value));
+                    if (column.Guard == null || column.Guard.Invoke(auditEvent))
+                    {
+                        parameters.Add(new SqlParameter($"@c{i}", column.Value.Invoke(auditEvent) ?? DBNull.Value));
+                        i++;
+                    }
                 }
             }
             return parameters.ToArray();
@@ -360,11 +378,16 @@ namespace Audit.SqlServer.Providers
             {
                 sets.Add($"[{ludColumn}] = GETUTCDATE()");
             }
-            if (CustomColumns != null && CustomColumns.Any())
+            if (CustomColumns != null)
             {
-                for(int i = 0; i < CustomColumns.Count; i++)
+                int i = 0;
+                foreach (var column in CustomColumns)
                 {
-                    sets.Add($"[{CustomColumns[i].Name}] = @c{i}");
+                    if (column.Guard == null || column.Guard.Invoke(auditEvent))
+                    {
+                        sets.Add($"[{column.Name}] = @c{i}");
+                        i++;
+                    }
                 }
             }
             return string.Join(", ", sets);

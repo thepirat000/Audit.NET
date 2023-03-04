@@ -119,6 +119,13 @@ namespace Audit.SqlServer.Configuration
             _customColumns.Add(new CustomColumn(columnName, value));
             return this;
         }
+
+        public ISqlServerProviderConfigurator CustomColumn(string columnName, Func<AuditEvent, object> value, Func<AuditEvent, bool> guard)
+        {
+            _customColumns.Add(new CustomColumn(columnName, value, guard));
+            return this;
+        }
+
 #if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
         public ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder)
         {

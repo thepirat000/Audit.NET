@@ -10,6 +10,7 @@ namespace Audit.SqlServer
     {
         public string Name { get; set; }
         public Func<AuditEvent, object> Value { get; set; }
+        public Func<AuditEvent, bool> Guard { get; set; }
 
         public CustomColumn()
         {
@@ -19,6 +20,13 @@ namespace Audit.SqlServer
         {
             Name = name;
             Value = value;
+        }
+
+        public CustomColumn(string name, Func<AuditEvent, object> value, Func<AuditEvent, bool> guard)
+        {
+            Name = name;
+            Value = value;
+            Guard = guard;
         }
     }
 }

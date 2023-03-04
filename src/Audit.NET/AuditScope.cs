@@ -1,11 +1,11 @@
 ﻿using Audit.Core.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Audit.Core
 {
@@ -14,7 +14,6 @@ namespace Audit.Core
     /// </summary>
     public partial class AuditScope : IAuditScope
     {
-        private readonly AuditScopeOptions _options;
         #region Constructors
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -197,6 +196,7 @@ namespace Audit.Core
         #endregion
 
         #region Private fields
+        private readonly AuditScopeOptions _options;
         private SaveMode _saveMode;
         private readonly EventCreationPolicy _creationPolicy;
         private readonly AuditEvent _event;
