@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if ASP_NET
+using System.Collections.Generic;
 using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -29,3 +30,4 @@ namespace Audit.SignalR
         public IHubIncomingInvokerContext InvokerContext { get; set; }
     }
 }
+#endif

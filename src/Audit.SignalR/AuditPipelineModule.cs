@@ -1,4 +1,5 @@
-﻿using Audit.Core;
+﻿#if ASP_NET
+using Audit.Core;
 using Audit.Core.Extensions;
 using Microsoft.AspNet.SignalR.Hubs;
 using System;
@@ -306,3 +307,4 @@ namespace Audit.SignalR
         }
     }
 }
+#endif

@@ -1,8 +1,12 @@
 ﻿using System;
 using Audit.Core;
 using Audit.SignalR.Configuration;
+#if ASP_NET
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
+#else
+using Microsoft.AspNetCore.SignalR;
+#endif
 
 namespace Audit.SignalR
 {
@@ -27,6 +31,7 @@ namespace Audit.SignalR
             return (auditEvent as AuditEventSignalr)?.Event as T;
         }
 
+#if ASP_NET
         /// <summary>
         /// Adds a custom field to the current Incoming event
         /// </summary>
@@ -99,10 +104,47 @@ namespace Audit.SignalR
         /// <param name="pipeline">The hub pipeline</param>
         /// <param name="config">The audit module configuration</param>
         /// <returns></returns>
-        public static IHubPipeline AddAuditModule(this IHubPipeline pipeline, Action<IPipelineBuilder> config)
+        public static IHubPipeline AddAuditModule(this IHubPipeline pipeline, Action<IAuditHubConfigurator> config)
         {
             GlobalHost.HubPipeline.AddModule(AuditPipelineModule.Create(config));
             return pipeline;
         }
+#else
+        /// <summary>
+        /// Adds a custom field to the current Incoming event
+        /// </summary>
+        /// <typeparam name="TC">The type of the value.</typeparam>
+        /// <param name="hub">The hub object.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="value">The value object.</param>
+        /// <param name="serialize">if set to <c>true</c> the field is serialized immediately.</param>
+        public static void AddCustomField<TC>(this Hub hub, string fieldName, TC value, bool serialize = false)
+        {
+            hub.GetAuditScope()?.SetCustomField(fieldName, value, serialize);
+        }
+
+        /// <summary>
+        /// Gets the current AuditScope related to an Incoming message. 
+        /// This can be used on the Hub methods to get the current scope with the Incoming event information.
+        /// </summary>
+        public static AuditScope GetAuditScope(this Hub hub)
+        {
+            if (hub.Context.GetHttpContext()?.Items.TryGetValue(AuditHubFilter.AuditScopeKey, out var scope) == true)
+            {
+                return scope as AuditScope;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Adds the hub filter to the pipeline.
+        /// </summary>
+        /// <param name="options">The audit configuration options</param>
+        /// <param name="config">The audit filter configuration</param>
+        public static void AddAuditFilter(this HubOptions options, Action<IAuditHubConfigurator> config)
+        {
+            options.AddFilter(new AuditHubFilter(config));
+        }
+#endif
     }
 }

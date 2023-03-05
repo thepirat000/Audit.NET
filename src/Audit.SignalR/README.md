@@ -1,22 +1,22 @@
 ﻿# Audit.SignalR
 
-**SignalR Auditing Extension Module for [Audit.NET library](https://github.com/thepirat000/Audit.NET).**
+**SignalR Auditing Extension for [Audit.NET](https://github.com/thepirat000/Audit.NET) library.**
 
-Automatically generates Audit Logs for SignalR invokations.
+Automatically generates Audit Logs for ASP.NET SignalR or Asp Net Core SignalR invokations.
 
-Audit.SignalR provides a configurable [Hub Pipeline Module](https://docs.microsoft.com/en-us/aspnet/signalr/overview/guide-to-the-api/hubs-api-guide-server#hubpipeline) 
+Audit.SignalR provides a configurable Hub Pipeline [Module](https://docs.microsoft.com/en-us/aspnet/signalr/overview/guide-to-the-api/hubs-api-guide-server#hubpipeline)/[Filter](https://learn.microsoft.com/en-us/aspnet/core/signalr/hub-filters?view=aspnetcore-7.0) 
 that intercepts the hub processing to generate an audit trail.
 
 It generate logs for the following events:
 
-| Event Name | Description | 
-| ------------ |  -------------- |
-| Connect | Client is connecting to the server |
-| Reconnect | Client reconnecting to the server |
-| Disconnect | Client disconnect from the server |
-| Outgoing | Server invoking client-side method |
-| Incoming | Client invoking server-side method |
-| Error | An error has occurred |
+| Event Name | Description | ASP.NET SignalR | ASP.NET Core SignalR
+| ------------ |  -------------- | -------------- | -------------- |
+| Connect | Client is connecting to the server | :white_check_mark: | :white_check_mark:
+| Disconnect | Client disconnect from the server | :white_check_mark: | :white_check_mark:
+| Incoming | Client invoking server-side method | :white_check_mark: | :white_check_mark:
+| Reconnect | Client reconnecting to the server | :white_check_mark: | :x:
+| Outgoing | Server invoking client-side method | :white_check_mark: | :x:
+| Error | An error has occurred | :white_check_mark: | :x:
 
 ## Install
 
@@ -31,13 +31,15 @@ PM> Install-Package Audit.SignalR
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.SignalR.svg?style=flat)](https://www.nuget.org/packages/Audit.SignalR/)
 [![NuGet Count](https://img.shields.io/nuget/dt/Audit.SignalR.svg)](https://www.nuget.org/packages/Audit.SignalR/)
 
-## Note 
+## SignalR Version
 
-This library is **not** compatible with ASP.NET **Core**. This is because the ASP.NET Core does not includes the hub pipeline.
-Check this [issue](https://github.com/aspnet/SignalR/issues/924).
+This library supports:
+
+- [ASP.NET SignalR](#Usage-ASP.NETSignalR)
+- [ASP.NET Core SignalR](#Usage-ASP.NETSignalR)
 
 
-## Usage
+## Usage - ASP.NET SignalR
 On your ASP.NET startup logic, call the extension method `AddAuditModule()` defined on namespace `Microsoft.AspNet.SignalR.GlobalHost.HubPipeline`, to setup the audit pipeline. This must be called before `IAppBuilder.MapSignalR()`.
 
 This method provides a fluent API to configure the audit module.
@@ -89,10 +91,39 @@ var module = AuditPipelineModule.Create(config => config
 GlobalHost.HubPipeline.AddModule(module);
 ```
 
+## Usage - ASP.NET Core SignalR
+On your ASP.NET Core startup logic, call the extension method `AddAuditFilter()` defined on namespace `Audit.SignalR` 
+when adding the SignalR service.
+
+This method provides a fluent API to configure the audit filter.
+
+For example:
+```c#
+using Audit.SignalR;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR(c =>
+{
+    c.AddAuditFilter(cfg => cfg
+        .IncludeHeaders()
+        .IncludeQueryString()
+        .Filters(f => f
+            .IncludeIncomingEvent(true)
+            .IncludeConnectEvent(false)
+            .IncludeDisconnectEvent(false))
+    );
+});
+
+
+```
+
+This will create an Audit `HubFilter` and add it to the hub pipeline.
+
 ## Configuration
 
 ### Settings
-The following settings can be configured on the module:
+The following settings can be configured on the module/filter:
 
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the event name). Can contain the following placeholders: 
    - \{event}: replaced with the SignalR event name (Connect, Reconnect, Disconnect, Incoming, Outgoing, Error).
@@ -114,7 +145,7 @@ The module allows to configure filtering of events. By default it will log all t
 ### Extension Methods
 
 You can access the current [Audit Scope](https://github.com/thepirat000/Audit.NET#usage) 
-for the incoming event inside server-side methods, by calling the Hub extension method `GetIncomingAuditScope()`, 
+for the incoming event inside server-side methods, by calling the Hub extension method `GetIncomingAuditScope()` / `GetAuditScope()`, 
 for example:
 
 ```c#
@@ -122,12 +153,15 @@ public class MyHub : Hub
 {
     public int Send(string name, string message)
     {
-        AuditScope scope = this.GetIncomingAuditScope();
+        var scope = this.GetAuditScope();
         if (someCondition)
         {
             scope.Discard()
         }
-        scope.SetCustomField("UserType", user.UserType);
+        else
+        {
+            scope.SetCustomField("UserType", user.UserType);
+        }
 
         //...
     }
@@ -136,14 +170,7 @@ public class MyHub : Hub
 The SignalR specific event information on the AuditScope can be accessed as follows:
 
 ```c#
-AuditScope scope = this.GetIncomingAuditScope();
-var auditEvent = scope.Event as AuditEventSignalr;
-var signalrEventIncoming = auditEvent.Event as SignalrEventIncoming;
-```
-
-Alternatively you can use the `GetSignalrEvent()` extension method provided:
-```c#
-AuditScope scope = this.GetIncomingAuditScope();
+var scope = this.GetIncomingAuditScope();
 var signalrEventIncoming = scope.Event.GetSignalrEvent<SignalrEventIncoming>();
 ```
 
@@ -201,6 +228,7 @@ The following tables describes the Audit.SignalR output fields per event type:
 | **MethodName** | string | The name of the invoked method |
 | **Args** | List<Object> | The arguments passed in the invokation |
 | **Result** | Object | The invoked method return value |
+| **Exception** | string | Exception information when the hub method fails |
 
 - ### [SignalrEventOutgoing](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/SignalrEventOutgoing.cs)
 | Field Name | Type | Description | 

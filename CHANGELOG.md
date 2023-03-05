@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [20.1.7] - ????-??-??
 - Audit.NET.SqlServer: Adding overload to `CustomColumn` configuration to allow passing a guard condition to determine when the column should be included/ignored (#576)
+- Audit.SignalR: Adding support for ASP .NET Core SignalR (#578)
 
 ## [20.1.6] - 2023-02-22
 - Audit.NET.PostgreSql: Adding overloads to EnumerateEvents to allow passing where, orderby, limit or select expression. (#569)

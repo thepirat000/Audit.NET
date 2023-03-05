@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#if ASP_NET
+using System;
 using Audit.SignalR.Configuration;
 using Microsoft.AspNet.SignalR.Hubs;
 
@@ -14,11 +11,11 @@ namespace Audit.SignalR
         /// Creates a new AuditPipelineModule using the fluent configuration API.
         /// </summary>
         /// <param name="builder">Module configuration as a fluent API</param>
-        public static AuditPipelineModule Create(Action<IPipelineBuilder> builder)
+        public static AuditPipelineModule Create(Action<IAuditHubConfigurator> builder)
         {
-            var config = new PipelineBuilder();
+            var config = new AuditHubConfigurator();
             builder.Invoke(config);
-            var filters = config._filters as PipelineBuilderFilters ?? new PipelineBuilderFilters();
+            var filters = config._filters as AuditHubFilterConfigurator ?? new AuditHubFilterConfigurator();
             var module = new AuditPipelineModule()
             {
                 AuditDataProvider = config._dataProvider,
@@ -38,3 +35,4 @@ namespace Audit.SignalR
         }
     }
 }
+#endif
