@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Audit.Core;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +11,6 @@ using Audit.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
-using Microsoft.CodeAnalysis;
 
 namespace Audit.Integration.AspNetCore
 {
@@ -104,7 +102,7 @@ namespace Audit.Integration.AspNetCore
                 .IncludeResponseHeaders()
                 .WithEventType("{verb}.{url}")
                 .FilterByRequest(r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));
-
+            
             app.UseMvc();
 
         }

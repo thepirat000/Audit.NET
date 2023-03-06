@@ -39,8 +39,7 @@ StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCateg
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dynamo';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
 StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
-
-start-process powershell -argumentlist "[Console]::Title='RUN: AspNetCore' ; dotnet run --project Audit.Integration.AspNetCore -c Release ; pause";
+StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
 
 # Run sequential tests
 $hasFailed = $false;

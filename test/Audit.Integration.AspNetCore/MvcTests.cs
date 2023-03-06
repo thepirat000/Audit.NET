@@ -1,26 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Audit.Core;
-using Audit.Integration.AspNetCore.Pages.Test;
 using Audit.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using NUnit.Framework;
 
 namespace Audit.Integration.AspNetCore
 {
+    [TestFixture]
     public class MvcTests
     {
-        private readonly int _port;
-        public MvcTests(int port)
+        private HttpClient _httpClient;
+        private WebApplicationFactory<Program> _application;
+
+        [OneTimeSetUp]
+        public async Task OneTimeSetup()
         {
-            _port = port;
+            _application = new WebApplicationFactory<Program>();
+            _httpClient = _application
+                .WithWebHostBuilder(b => b.UseSolutionRelativeContentRoot(""))
+                .CreateClient();
         }
 
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _httpClient?.Dispose();
+            _application?.Dispose();
+        }
+        
+        [Test]
         public async Task Test_MvcRazorPages_HappyPath()
         {
             var insertEvs = new List<AuditEventMvcAction>();
@@ -44,21 +58,20 @@ namespace Audit.Integration.AspNetCore
                 Id = 123,
                 Name = "test"
             };
-
-            var client = new HttpClient();
+            
             //GET
-            var getResult = await client.GetStringAsync($"http://localhost:{_port}/PageTest?name=TEST");
+            var getResult = await _httpClient.GetStringAsync($"PageTest?name=TEST");
 
             //POST
-            client.Dispose();
             var json = Configuration.JsonAdapter.Serialize(customer);
-            client = new HttpClient();
-            var result = await client.PostAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
+            
+            var result = await _httpClient.PostAsync($"PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
 
             var returnedCustomer = Configuration.JsonAdapter.Deserialize<Customer>(await result.Content.ReadAsStringAsync());
             Assert.AreEqual(customer.Name, returnedCustomer.Name);
             Assert.AreEqual(customer.Id, returnedCustomer.Id);
-            
+            Assert.IsTrue(getResult.Contains("<p>TEST</p>"));
+
             Assert.AreEqual(2, insertEvs.Count);
             Assert.AreEqual(0, replaceEvs.Count);
             Assert.AreEqual("TEST", ((JsonElement)insertEvs[0].Action.Model).GetProperty("Name").GetString());
@@ -66,7 +79,7 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("GET", insertEvs[0].Action.HttpMethod);
             Assert.AreEqual("/PageTest/Index", insertEvs[0].Action.ActionName);
             Assert.AreEqual("/PageTest/Index", insertEvs[0].Action.ViewPath);
-            Assert.AreEqual($"http://localhost:{_port}/PageTest?name=TEST", insertEvs[0].Action.RequestUrl);
+            Assert.IsTrue(insertEvs[0].Action.RequestUrl.EndsWith("PageTest?name=TEST"));
             Assert.AreEqual($"PageResult", insertEvs[0].Action.ResponseBody.Type);
             Assert.AreEqual(200, insertEvs[0].Action.ResponseStatusCode);
             Assert.AreEqual("GET:/PageTest/Index", insertEvs[0].EventType);
@@ -77,7 +90,7 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual("test", ((JsonElement)insertEvs[1].Action.ActionParameters["customer"]).GetProperty("Name").GetString());
             Assert.AreEqual("/PageTest/Index", insertEvs[1].Action.ActionName);
             Assert.AreEqual("/PageTest/Index", insertEvs[1].Action.ViewPath);
-            Assert.AreEqual($"http://localhost:{_port}/PageTest", insertEvs[1].Action.RequestUrl);
+            Assert.IsTrue(insertEvs[1].Action.RequestUrl.EndsWith("PageTest"));
             Assert.AreEqual($"JsonResult", insertEvs[1].Action.ResponseBody.Type);
             Assert.AreEqual(123, ((JsonElement)insertEvs[1].Action.ResponseBody.Value).GetProperty("Id").GetInt32());
             Assert.AreEqual("test", ((JsonElement)insertEvs[1].Action.ResponseBody.Value).GetProperty("Name").GetString());
@@ -87,6 +100,7 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNull(insertEvs[1].Action.Exception);
         }
 
+        [Test]
         public async Task Test_MvcRazorPages_Exception()
         {
             var insertEvs = new List<AuditEventMvcAction>();
@@ -111,9 +125,9 @@ namespace Audit.Integration.AspNetCore
                 Name = "ThrowException"
             };
 
-            var c = new HttpClient();
+            
             var json = Configuration.JsonAdapter.Serialize(customer);
-            var result = await c.PostAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
+            var result = await _httpClient.PostAsync($"PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
 
             
             Assert.AreEqual(1, insertEvs.Count);
@@ -128,6 +142,7 @@ namespace Audit.Integration.AspNetCore
             Assert.IsTrue(insertEvs[0].Action.Exception.Contains("TEST EXCEPTION"));
         }
 
+        [Test]
         public async Task Test_MvcRazorPages_404()
         {
             var insertEvs = new List<AuditEventMvcAction>();
@@ -152,9 +167,9 @@ namespace Audit.Integration.AspNetCore
                 Name = "404"
             };
 
-            var c = new HttpClient();
+            
             var json = Configuration.JsonAdapter.Serialize(customer);
-            var result = await c.PostAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
+            var result = await _httpClient.PostAsync($"PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
 
 
             Assert.AreEqual(1, insertEvs.Count);
@@ -168,6 +183,7 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNull(insertEvs[0].Action.Exception);
         }
 
+        [Test]
         public async Task Test_MvcRazorPages_IgnoreResponse()
         {
             var insertEvs = new List<AuditEventMvcAction>();
@@ -192,13 +208,9 @@ namespace Audit.Integration.AspNetCore
                 Name = "test"
             };
 
-            var client = new HttpClient();
-
             //PUT
-            client.Dispose();
             var json = Configuration.JsonAdapter.Serialize(customer);
-            client = new HttpClient();
-            var result = await client.PutAsync($"http://localhost:{_port}/PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
+            var result = await _httpClient.PutAsync($"PageTest", new StringContent(json, Encoding.UTF8, "application/json"));
             var resultJson = await result.Content.ReadAsStringAsync();
             var returnedCustomer = Configuration.JsonAdapter.Deserialize<Customer>(resultJson);
             Assert.AreEqual(customer.Name, returnedCustomer.Name);
@@ -210,6 +222,7 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNull(insertEvs[0].Action.ResponseBody.Value);
         }
 
+        [Test]
         public async Task Test_Mvc_Ignore()
         {
             var insertEvs = new List<AuditAction>();
@@ -221,10 +234,10 @@ namespace Audit.Integration.AspNetCore
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
 
-            var c = new HttpClient();
-            var s1 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreme");
-            var s2 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreparam?id=123&secret=pass");
-            var s3 = await c.GetStringAsync($"http://localhost:{_port}/mvc/ignoreresponse?id=123&secret=pass");
+            
+            var s1 = await _httpClient.GetStringAsync($"mvc/ignoreme");
+            var s2 = await _httpClient.GetStringAsync($"mvc/ignoreparam?id=123&secret=pass");
+            var s3 = await _httpClient.GetStringAsync($"mvc/ignoreresponse?id=123&secret=pass");
 
             Assert.IsNotEmpty(s1);
             Assert.IsNotEmpty(s2);
@@ -237,6 +250,7 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNull(insertEvs[1].ResponseBody.Value);
         }
 
+        [Test]
         public async Task Test_Mvc_AuditIgnoreAttribute_Middleware_Async()
         {
             // Action ignored via AuditIgnoreAttribute and handled by Middleware and GlobalFilter
@@ -250,13 +264,14 @@ namespace Audit.Integration.AspNetCore
                 }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
-            var c = new HttpClient();
-            var s1 = await c.GetStringAsync($"http://localhost:{_port}/mvc/details/5?middleware=1");
+            
+            var s1 = await _httpClient.GetStringAsync($"mvc/details/5?middleware=1");
 
             Assert.IsNotEmpty(s1);
             Assert.AreEqual(0, insertEvs.Count);
         }
 
+        [Test]
         public async Task Test_Mvc_HappyPath_Async()
         {
             var insertEvs = new List<AuditAction>();
@@ -275,8 +290,8 @@ namespace Audit.Integration.AspNetCore
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
-            var c = new HttpClient();
-            var s = await c.GetStringAsync($"http://localhost:{_port}/test/mytitle");
+            
+            var s = await _httpClient.GetStringAsync($"test/mytitle");
             Assert.IsTrue(s.Contains("<h2>mytitle</h2>"));
             Assert.AreEqual(1, insertEvs.Count);
             Assert.AreEqual(1, replaceEvs.Count);
@@ -284,6 +299,7 @@ namespace Audit.Integration.AspNetCore
             Assert.AreEqual(@"{""Title"":""mytitle""}", replaceEvs[0].Model.ToString().Replace(" ", "").Replace("\r", "").Replace("\n", ""));
         }
 
+        [Test]
         public async Task Test_Mvc_Exception_Async()
         {
             var insertEvs = new List<AuditAction>();
@@ -302,11 +318,10 @@ namespace Audit.Integration.AspNetCore
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
-            var c = new HttpClient();
             string s = null;
             try
             {
-                s = await c.GetStringAsync($"http://localhost:{_port}/test/666");
+                s = await _httpClient.GetStringAsync($"test/666");
             }
             catch
             {
