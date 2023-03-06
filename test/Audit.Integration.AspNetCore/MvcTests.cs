@@ -19,11 +19,13 @@ namespace Audit.Integration.AspNetCore
         private WebApplicationFactory<Program> _application;
 
         [OneTimeSetUp]
-        public async Task OneTimeSetup()
+        public void OneTimeSetup()
         {
             _application = new WebApplicationFactory<Program>();
             _httpClient = _application
-                .WithWebHostBuilder(b => b.UseSolutionRelativeContentRoot(""))
+                .WithWebHostBuilder(b => b
+                    .UseSolutionRelativeContentRoot("")
+                    .UseSetting("IsMvc", "true"))
                 .CreateClient();
         }
 

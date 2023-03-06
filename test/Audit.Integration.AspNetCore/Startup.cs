@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Audit.Mvc;
+using Audit.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
@@ -16,9 +17,14 @@ namespace Audit.Integration.AspNetCore
 {
     public class Startup
     {
+        private bool _isMvc;
+        private bool _isWebApi;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _isMvc = configuration.GetValue<bool>("IsMvc");
+            _isWebApi = configuration.GetValue<bool>("IsWebApi");
         }
 
         public IConfiguration Configuration { get; }
@@ -31,45 +37,56 @@ namespace Audit.Integration.AspNetCore
                 options.ValueCountLimit = 2;
             });
 
-            services.AddMvc(mvc =>
+            if (_isMvc || _isWebApi)
             {
-                mvc.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
-
-                mvc.EnableEndpointRouting = false;
-                mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
-                mvc.Filters.Add(new AuditApiGlobalFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "MoreValues"
-                        || (d.ControllerName == "Mvc" && d.ActionName == "Details")
-                        || (d.ControllerName == "Values" &&
-                                (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" || d.ActionName.StartsWith("TestIgnore") || d.ActionName.StartsWith("PostMix") || d.ActionName == "TestResponseHeadersGlobalFilter"
-                                || d.ActionName == "TestDoNotSerializeParams")))
-                    .WithEventType("{verb}.{controller}.{action}")
-                    .IncludeHeaders()
-                    .IncludeResponseHeaders()
-                    .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
-                    .IncludeRequestBody()));
-                
-                mvc.Filters.Add(new AuditApiGlobalFilter(config => config
-                    .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "TestSerializeParams")
-                    .SerializeActionParameters(true)
-                ));
-            }).AddJsonOptions(o =>
-            {
-                o.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-                o.JsonSerializerOptions.PropertyNamingPolicy = null;
-            });
-
-            services.AddRazorPages(options =>
-            {
-                options.Conventions.AddFolderApplicationModelConvention("/PageTest", model => model.Filters.Add(new AuditPageFilter()
+                services.AddMvc(mvc =>
                 {
-                    IncludeHeaders = true,
-                    IncludeModel = true,
-                    IncludeRequestBody = true,
-                    IncludeResponseBody = true,
-                    EventTypeName = "{verb}:{path}"
-                }));
-            });
+                    mvc.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+
+                    mvc.EnableEndpointRouting = false;
+                    mvc.Filters.Add(new AuditIgnoreActionFilter_ForTest());
+                    mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+                        .LogActionIf(d => d.ControllerName == "MoreValues"
+                                          || (d.ControllerName == "Mvc" && d.ActionName == "Details")
+                                          || (d.ControllerName == "Values" &&
+                                              (d.ActionName == "GlobalAudit" || d.ActionName == "TestForm" ||
+                                               d.ActionName.StartsWith("TestIgnore") ||
+                                               d.ActionName.StartsWith("PostMix") ||
+                                               d.ActionName == "TestResponseHeadersGlobalFilter"
+                                               || d.ActionName == "TestDoNotSerializeParams")))
+                        .WithEventType("{verb}.{controller}.{action}")
+                        .IncludeHeaders()
+                        .IncludeResponseHeaders()
+                        .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
+                        .IncludeRequestBody()));
+
+                    mvc.Filters.Add(new AuditApiGlobalFilter(config => config
+                        .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "TestSerializeParams")
+                        .SerializeActionParameters(true)
+                    ));
+                }).AddJsonOptions(o =>
+                {
+                    o.JsonSerializerOptions.DefaultIgnoreCondition =
+                        System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                    o.JsonSerializerOptions.PropertyNamingPolicy = null;
+                });
+            }
+
+            if (_isMvc)
+            {
+                services.AddRazorPages(options =>
+                {
+                    options.Conventions.AddFolderApplicationModelConvention("/PageTest", model =>
+                        model.Filters.Add(new AuditPageFilter()
+                        {
+                            IncludeHeaders = true,
+                            IncludeModel = true,
+                            IncludeRequestBody = true,
+                            IncludeResponseBody = true,
+                            EventTypeName = "{verb}:{path}"
+                        }));
+                });
+            }
         }
 
 
@@ -88,23 +105,34 @@ namespace Audit.Integration.AspNetCore
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
+            if (_isMvc)
             {
-                endpoints.MapRazorPages();
-            });
-
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapRazorPages();
+                });
+            }
+            
             app.UseWhen(ctx => ctx.Request.Headers.ContainsKey("UseErrorHandler"), a => a.UseMiddleware<ApiErrorHandlerMiddleware_Test>());
 
-            app.UseAuditMiddleware(_ => _
-                .IncludeRequestBody(true)
-                .IncludeResponseBody(ctx => !ctx.Request.QueryString.HasValue || !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))
-                .IncludeHeaders(true)
-                .IncludeResponseHeaders()
-                .WithEventType("{verb}.{url}")
-                .FilterByRequest(r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));
-            
-            app.UseMvc();
+            if (_isMvc || _isWebApi)
+            {
+                app.UseAuditMiddleware(_ => _
+                    .IncludeRequestBody(true)
+                    .IncludeResponseBody(ctx =>
+                        !ctx.Request.QueryString.HasValue ||
+                        !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))
+                    .IncludeHeaders(true)
+                    .IncludeResponseHeaders()
+                    .WithEventType("{verb}.{url}")
+                    .FilterByRequest(
+                        r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));
+            }
 
+            if (_isMvc || _isWebApi)
+            {
+                app.UseMvc();
+            }
         }
 
         private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()

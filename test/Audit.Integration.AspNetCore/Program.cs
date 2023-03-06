@@ -14,7 +14,15 @@ namespace Audit.Integration.AspNetCore
 
         static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseSetting("IsMvc", "true");
+                    webBuilder.UseSetting("IsWebApi", "true");
+                    webBuilder.UseStartup<Startup>();
+                })
+                .Build()
+                .Run();
         }
     }
 }
