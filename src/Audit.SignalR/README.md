@@ -35,8 +35,8 @@ PM> Install-Package Audit.SignalR
 
 This library supports:
 
-- [ASP.NET SignalR](#Usage-ASP.NETSignalR)
-- [ASP.NET Core SignalR](#Usage-ASP.NETSignalR)
+- [ASP.NET SignalR](#usage---aspnet-signalr)
+- [ASP.NET Core SignalR](#usage---aspnet-core-signalr)
 
 
 ## Usage - ASP.NET SignalR
