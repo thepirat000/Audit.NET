@@ -115,7 +115,9 @@ namespace Audit.IntegrationTest
                 Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
                 Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
             }
+#endif
 
+#if NET461 || NET5_0_OR_GREATER
             [Test]
             [Category("PostgreSQL")]
             public void Test_PostgreDataProvider_FluentApi()

@@ -1,5 +1,4 @@
 ﻿using System;
-using Amazon.DynamoDBv2.DocumentModel;
 using Audit.Core;
 
 namespace Audit.DynamoDB.Configuration
