@@ -14,6 +14,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsTestProject>true</IsTestProject>
     <DebugType>Full</DebugType>
+	<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -85,8 +86,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" ExcludeAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
@@ -129,7 +128,6 @@
     <ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" ExcludeAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">

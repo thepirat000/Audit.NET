@@ -3,8 +3,8 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## [21.0.0] - 2023-03-06
-- Audit.NET.PostgreSql: Upgrading PostgreSql driver (Npgsql) to vesion 7.0.2, removed support for older .net core frameworks
+## [20.2.0] - 2023-03-06
+- Audit.NET.PostgreSql: Upgrading PostgreSql driver (Npgsql) to vesion 7.0.2
 - Audit.NET.SqlServer: Adding overload to `CustomColumn` configuration to allow passing a guard condition to determine when the column should be included/ignored (#576)
 - Audit.SignalR: Adding support for ASP .NET Core SignalR (#578)
 
