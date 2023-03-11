@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net45;netcoreapp2.0;netcoreapp3.0;net5.0;net6.0;net7.0</TargetFrameworks>
+		<TargetFrameworks>net45;net462;netcoreapp2.0;netcoreapp3.0;net5.0;net6.0;net7.0</TargetFrameworks>
 	</PropertyGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp2.0' AND '$(TargetFramework)' != 'netcoreapp3.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp2.0' AND '$(TargetFramework)' != 'netcoreapp3.0' AND '$(TargetFramework)' != 'net462' ">
 		<PackageReference Include="NUnit" Version="3.13.3" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' OR '$(TargetFramework)' == 'netcoreapp3.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' OR '$(TargetFramework)' == 'netcoreapp3.0' OR '$(TargetFramework)' == 'net462' ">
 		<PackageReference Include="NUnit" Version="3.13.3" />
 		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />

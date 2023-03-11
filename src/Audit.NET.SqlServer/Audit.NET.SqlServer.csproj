@@ -5,7 +5,7 @@
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.SqlServer</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;netstandard1.3;net45;net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;netstandard1.3;net45;net462;net5.0;net6.0;net7.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -53,7 +53,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'net462' ">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
   </ItemGroup>

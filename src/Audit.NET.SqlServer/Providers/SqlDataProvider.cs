@@ -6,12 +6,12 @@ using System.Collections.Generic;
 #if NET45
 using System.Data.Common;
 #endif
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#if NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
 using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;
 #endif
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 #endif
@@ -96,7 +96,7 @@ namespace Audit.SqlServer.Providers
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
         public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
         /// <summary>
         /// The DbContext options builder, to provide custom database options for the DbContext
         /// </summary>
@@ -142,7 +142,7 @@ namespace Audit.SqlServer.Providers
 #elif NETSTANDARD1_3
                 var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
                 return result.ToList().FirstOrDefault()?.Id;
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
                 return result.ToList().FirstOrDefault()?.Id;
 #endif
@@ -161,7 +161,7 @@ namespace Audit.SqlServer.Providers
 #elif NETSTANDARD1_3
                 var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
                 return (await result.ToListAsync()).FirstOrDefault()?.Id;
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
                 return (await result.ToListAsync()).FirstOrDefault()?.Id;
 #endif
@@ -174,7 +174,7 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#if NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 ctx.Database.ExecuteSqlRaw(cmdText, parameters);
 #else
                 ctx.Database.ExecuteSqlCommand(cmdText, parameters);
@@ -190,7 +190,7 @@ namespace Audit.SqlServer.Providers
                 var cmdText = GetReplaceCommandText(auditEvent);
 #if NETSTANDARD1_3
                 await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), parameters);
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters);
 #else
                 await ctx.Database.ExecuteSqlCommandAsync(cmdText, parameters);
@@ -213,7 +213,7 @@ namespace Audit.SqlServer.Providers
 #elif NETSTANDARD1_3
                 var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
                 var json = result.FirstOrDefault()?.Id;
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
                 var json = result.FirstOrDefault()?.Id;
 #endif
@@ -240,7 +240,7 @@ namespace Audit.SqlServer.Providers
 #elif NETSTANDARD1_3
                 var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
                 var json = (await result.FirstOrDefaultAsync())?.Id;
-#elif NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
                 var json = (await result.FirstOrDefaultAsync())?.Id;
 #endif

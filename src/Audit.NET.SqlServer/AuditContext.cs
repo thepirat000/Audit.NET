@@ -22,7 +22,7 @@
             }
         }
     }
-#elif NETSTANDARD1_3 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
+#elif NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
     using System.ComponentModel.DataAnnotations;
     using Microsoft.EntityFrameworkCore;
     
