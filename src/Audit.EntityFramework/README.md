@@ -200,7 +200,9 @@ public class MyDbContext : DbContext
 
 ### Output
 
-The EF audit events are stored using a _Data Provider_. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. This can be set per `DbContext` instance or globally. If you plan to store the audit logs with EF, you can use the [Entity Framework Data Provider](#entity-framework-data-provider). 
+The EF audit events are stored using a _Data Provider_. 
+You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. 
+This can be set per `DbContext` instance or globally. If you plan to store the audit logs with EF, you can use the [Entity Framework Data Provider](#entity-framework-data-provider). 
 
 ### Settings (low-Level interceptor)
 The low-level command interceptor can be configured by setting the `AuditCommandInterceptor` properties, for example:
@@ -219,6 +221,7 @@ optionsBuilder.AddInterceptors(new AuditCommandInterceptor()
 - **ExcludeNonQueryEvents**: Boolean value to indicate whether to exclude the events handled by NonQueryExecuting. Default is false to include the NonQueryExecuting events.
 - **ExcludeScalarEvents**: Boolean value to indicate whether to exclude the events handled by ScalarExecuting. Default is false to include the ScalarExecuting events.
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the execute method name). Can contain the following placeholders: 
+    - \{context}: replaced with the Db Context type name.
     - \{database}: Replaced with the database name 
     - \{method}: Replaced with the execute method name (ExecuteReader, ExecuteNonQuery or ExecuteScalar) 
 - **IncludeReaderResults**: Boolean value to indicate whether to include the query results to the audit output. Default is false.

@@ -47,8 +47,9 @@ namespace Audit.EntityFramework.Interceptors
         /// Can contain the following placeholders: 
         /// - {database}: Replaced with the database name 
         /// - {method}: Replaced with the execute method name (ExecuteReader, ExecuteNonQuery or ExecuteScalar) 
+        /// - {context}: Replaced with the DbContext type name
         /// </summary>
-        public string AuditEventType { get; set; } = "{method}";
+        public string AuditEventType { get; set; }
 
         /// <summary>
         /// Boolean value to indicate whether to include the query results to the audit output. Default is false.
@@ -67,7 +68,7 @@ namespace Audit.EntityFramework.Interceptors
             }
             var auditEvent = new AuditEventCommandEntityFramework
             {
-                CommandEvent = CreateEvent(command, eventData)
+                CommandEvent = CreateAuditEvent(command, eventData)
             };
             _currentScope = CreateAuditScope(auditEvent);
             return result;
@@ -91,7 +92,7 @@ namespace Audit.EntityFramework.Interceptors
 #if EF_CORE_3
         public override async Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
 #else
-        public async override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+        public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
 #endif
         {
             if (Core.Configuration.AuditDisabled || ExcludeReaderEvents)
@@ -100,7 +101,7 @@ namespace Audit.EntityFramework.Interceptors
             }
             var auditEvent = new AuditEventCommandEntityFramework
             {
-                CommandEvent = CreateEvent(command, eventData)
+                CommandEvent = CreateAuditEvent(command, eventData)
             };
             _currentScope = await CreateAuditScopeAsync(auditEvent);
             return await base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
@@ -109,7 +110,7 @@ namespace Audit.EntityFramework.Interceptors
 #if EF_CORE_3
         public override async Task<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
 #else
-        public async override ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
+        public override async ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
 #endif
         {
             if (ExcludeReaderEvents)
@@ -136,7 +137,7 @@ namespace Audit.EntityFramework.Interceptors
             }
             var auditEvent = new AuditEventCommandEntityFramework
             {
-                CommandEvent = CreateEvent(command, eventData)
+                CommandEvent = CreateAuditEvent(command, eventData)
             };
             _currentScope = CreateAuditScope(auditEvent);
             return result;
@@ -155,7 +156,7 @@ namespace Audit.EntityFramework.Interceptors
 #if EF_CORE_3
         public override async Task<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
 #else
-        public async override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
 #endif
         {
             if (Core.Configuration.AuditDisabled || ExcludeNonQueryEvents)
@@ -164,7 +165,7 @@ namespace Audit.EntityFramework.Interceptors
             }
             var auditEvent = new AuditEventCommandEntityFramework
             {
-                CommandEvent = CreateEvent(command, eventData)
+                CommandEvent = CreateAuditEvent(command, eventData)
             };
             _currentScope = await CreateAuditScopeAsync(auditEvent);
             return await base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
@@ -172,7 +173,7 @@ namespace Audit.EntityFramework.Interceptors
 #if EF_CORE_3
         public override async Task<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
 #else
-        public async override ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
+        public override async ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
 #endif
         {
             if (ExcludeNonQueryEvents)
@@ -195,7 +196,7 @@ namespace Audit.EntityFramework.Interceptors
             }
             var auditEvent = new AuditEventCommandEntityFramework
             {
-                CommandEvent = CreateEvent(command, eventData)
+                CommandEvent = CreateAuditEvent(command, eventData)
             };
             _currentScope = CreateAuditScope(auditEvent);
             return result;
@@ -214,7 +215,7 @@ namespace Audit.EntityFramework.Interceptors
 #if EF_CORE_3
         public override async Task<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
 #else
-        public async override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
+        public override async ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
 #endif
         {
             if (Core.Configuration.AuditDisabled || ExcludeScalarEvents)
@@ -223,7 +224,7 @@ namespace Audit.EntityFramework.Interceptors
             }
             var auditEvent = new AuditEventCommandEntityFramework
             {
-                CommandEvent = CreateEvent(command, eventData)
+                CommandEvent = CreateAuditEvent(command, eventData)
             };
             _currentScope = await CreateAuditScopeAsync(auditEvent);
             return await base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
@@ -231,7 +232,7 @@ namespace Audit.EntityFramework.Interceptors
 #if EF_CORE_3
         public override async Task<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
 #else
-        public async override ValueTask<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
+        public override async ValueTask<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
 #endif
         {
             if (ExcludeScalarEvents)
@@ -263,7 +264,7 @@ namespace Audit.EntityFramework.Interceptors
         /// </summary>
         /// <param name="command">The DB command to be executed</param>
         /// <param name="eventData">The event data</param>
-        protected virtual CommandEvent CreateEvent(DbCommand command, CommandEventData eventData)
+        protected virtual CommandEvent CreateAuditEvent(DbCommand command, CommandEventData eventData)
         {
             return new CommandEvent()
             {
@@ -276,7 +277,8 @@ namespace Audit.EntityFramework.Interceptors
                 IsAsync = eventData.IsAsync,
                 Method = eventData.ExecuteMethod, 
                 ContextId = eventData.Context?.ContextId.ToString(),
-                TransactionId = eventData.Context?.Database.CurrentTransaction?.TransactionId.ToString()
+                TransactionId = eventData.Context?.Database.CurrentTransaction?.TransactionId.ToString(),
+                DbContext = eventData.Context
             };
         }
 
@@ -347,19 +349,6 @@ namespace Audit.EntityFramework.Interceptors
                     column => row[column]
                 )).ToList();
         }
-        
-        private void EndScope()
-        {
-            _currentScope?.Dispose();
-        }
-
-        private async Task EndScopeAsync()
-        {
-            if (_currentScope != null)
-            {
-                await _currentScope.DisposeAsync();
-            }
-        }
 
         private Dictionary<string, object> GetParameters(DbCommand command, CommandEventData eventData)
         {
@@ -373,32 +362,98 @@ namespace Audit.EntityFramework.Interceptors
 
         private IAuditScope CreateAuditScope(AuditEventCommandEntityFramework cmdEvent)
         {
-            var eventType = AuditEventType?
+            var context = cmdEvent.CommandEvent.DbContext as IAuditDbContext;
+
+            if (context?.AuditDisabled == true)
+            {
+                return null;
+            }
+
+            var typeName = cmdEvent.CommandEvent.DbContext?.GetType().Name;
+            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{method}")
+                .Replace("{context}", typeName)
                 .Replace("{database}", cmdEvent.CommandEvent.Database)
                 .Replace("{method}", cmdEvent.CommandEvent.Method.ToString());
-            var factory = Core.Configuration.AuditScopeFactory;
+
+            if (context?.ExtraFields?.Count > 0)
+            {
+                cmdEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+            }
+
+            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = cmdEvent,
-                SkipExtraFrames = 3
+                SkipExtraFrames = 3,
+                DataProvider = context?.AuditDataProvider
             };
-            return factory.Create(options);
+            
+            var scope = factory.Create(options);
+            context?.OnScopeCreated(scope);
+            return scope;
         }
 
         private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventCommandEntityFramework cmdEvent)
         {
-            var eventType = AuditEventType?
+            var context = cmdEvent.CommandEvent.DbContext as IAuditDbContext;
+
+            if (context?.AuditDisabled == true)
+            {
+                return null;
+            }
+
+            var typeName = cmdEvent.CommandEvent.DbContext?.GetType().Name;
+            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{method}")
+                .Replace("{context}", typeName)
                 .Replace("{database}", cmdEvent.CommandEvent.Database)
                 .Replace("{method}", cmdEvent.CommandEvent.Method.ToString());
-            var factory = Core.Configuration.AuditScopeFactory;
+            
+            if (context?.ExtraFields?.Count > 0)
+            {
+                cmdEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+            }
+
+            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = cmdEvent,
-                SkipExtraFrames = 3
+                SkipExtraFrames = 3,
+                DataProvider = context?.AuditDataProvider
             };
-            return await factory.CreateAsync(options);
+
+            var scope = await factory.CreateAsync(options);
+            context?.OnScopeCreated(scope);
+            return scope;
+        }
+
+        private void EndScope()
+        {
+            if (_currentScope == null)
+            {
+                return;
+            }
+
+            var context = _currentScope.GetCommandEntityFrameworkEvent()?.DbContext as IAuditDbContext;
+
+            context?.OnScopeSaving(_currentScope);
+            _currentScope.Dispose();
+            context?.OnScopeSaved(_currentScope);
+        }
+
+        private async Task EndScopeAsync()
+        {
+            if (_currentScope == null)
+            {
+                return;
+            }
+
+            var context = _currentScope.GetCommandEntityFrameworkEvent()?.DbContext as IAuditDbContext;
+
+            context?.OnScopeSaving(_currentScope);
+            await _currentScope.DisposeAsync();
+            context?.OnScopeSaved(_currentScope);
         }
     }
 }

@@ -11,12 +11,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Audit.Core.Providers;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture(Category = "EF")]
     public class DbCommandInterceptorTests
     {
+        private static Random _rnd = new Random();
+
         [SetUp]
         public void Setup()
         {
@@ -25,6 +28,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DbCommandInterceptContext>().Reset();
             Audit.Core.Configuration.ResetCustomActions();
+            Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
         }
 
         [Test]
@@ -48,8 +52,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.Database.EnsureDeleted();
                 ctx.Database.EnsureCreated();
             }
-            var interceptor = new AuditCommandInterceptor() { AuditEventType = "{database}:{method}" };
-            int id = new Random().Next();
+            var interceptor = new AuditCommandInterceptor() { AuditEventType = "{context}:{database}:{method}" };
+            int id = _rnd.Next();
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
             {
                 //ReaderExecuting
@@ -72,9 +76,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsNull(inserted[0].CommandEvent.Parameters);
             Assert.IsNull(inserted[0].CommandEvent.Result);
             Assert.IsTrue(inserted[0].CommandEvent.Success);
-            Assert.AreEqual("DbCommandIntercept:ExecuteReader", inserted[0].EventType);
+            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader", inserted[0].EventType);
 
-            Assert.AreEqual("DbCommandIntercept:ExecuteNonQuery", inserted[1].EventType);
+            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteNonQuery", inserted[1].EventType);
             Assert.AreEqual(DbCommandMethod.ExecuteNonQuery, inserted[1].CommandEvent.Method);
             Assert.IsTrue(inserted[1].CommandEvent.CommandText.Contains("INSERT INTO DEPARTMENTS"));
             Assert.AreEqual(CommandType.Text, inserted[1].CommandEvent.CommandType);
@@ -111,8 +115,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.Database.EnsureDeletedAsync();
                 await ctx.Database.EnsureCreatedAsync();
             }
-            int id = new Random().Next();
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditCommandInterceptor()).Options))
+            int id = _rnd.Next();
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditCommandInterceptor() { AuditEventType = "{context}:{database}:{method}" }).Options))
             {
                 //ReaderExecuting
                 var depts = await ctx.Departments.Where(d => d.Comments != null).ToListAsync();
@@ -126,7 +130,6 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual(2, inserted.Count);
             Assert.AreEqual(0, replaced.Count);
 
-            Assert.AreEqual(DbCommandMethod.ExecuteReader.ToString(), inserted[0].EventType);
             Assert.AreEqual(DbCommandMethod.ExecuteReader, inserted[0].CommandEvent.Method);
             Assert.IsTrue(inserted[0].CommandEvent.CommandText.Contains("SELECT"));
             Assert.AreEqual(CommandType.Text, inserted[0].CommandEvent.CommandType);
@@ -136,8 +139,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsNull(inserted[0].CommandEvent.Parameters);
             Assert.IsNull(inserted[0].CommandEvent.Result);
             Assert.IsTrue(inserted[0].CommandEvent.Success);
+            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader", inserted[0].EventType);
 
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery.ToString(), inserted[1].EventType);
+            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteNonQuery", inserted[1].EventType);
             Assert.AreEqual(DbCommandMethod.ExecuteNonQuery, inserted[1].CommandEvent.Method);
             Assert.IsTrue(inserted[1].CommandEvent.CommandText.Contains("INSERT INTO DEPARTMENTS"));
             Assert.AreEqual(CommandType.Text, inserted[1].CommandEvent.CommandType);
@@ -335,7 +339,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.Database.EnsureCreated();
             }
 
-            var id = new Random().Next();
+            var id = _rnd.Next();
             var guid = Guid.NewGuid().ToString();
             var dept = new DbCommandInterceptContext.Department() { Id = id, Name = guid, Comments = "test" };
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder()
@@ -410,7 +414,8 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DbCommandInterceptContext>(_ => _
                     .IncludeEntityObjects(true));
-            int id = new Random().Next();
+
+            int id = _rnd.Next();
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
             {
                 ctx.Database.EnsureCreated();
@@ -426,12 +431,400 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual(1, inserted.Count);
             Assert.AreEqual(1, replaced.Count);
         }
+
+        [Test]
+        public void Test_DbCommandInterceptor_DataProviderFromAuditDbContext()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+            var dynamicDataProvider = new DynamicDataProvider(d => d
+                .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                .OnReplace((eventId, ev) =>
+                    replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+            
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: dynamicDataProvider,
+                       auditDisabled: false,
+                       eventType: "{context} | {database} | {method}",
+                       customFieldValue: null))
+            {
+                //NonQueryExecuting
+                var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.AreEqual(1, result);
+            }
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.AreEqual("DbCommandInterceptContext_InheritingFromAuditDbContext | DbCommandIntercept | ExecuteNonQuery", inserted[0].EventType);
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_DataProviderFromAuditDbContextAsync()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+            var dynamicDataProvider = new DynamicDataProvider(d => d
+                .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                .OnReplace((eventId, ev) =>
+                    replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: dynamicDataProvider,
+                       auditDisabled: false,
+                       eventType: "{context} | {database} | {method}",
+                       customFieldValue: null))
+            {
+                //NonQueryExecuting
+                var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.AreEqual(1, result);
+            }
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.AreEqual("DbCommandInterceptContext_InheritingFromAuditDbContext | DbCommandIntercept | ExecuteNonQuery", inserted[0].EventType);
+        }
+
+        [Test]
+        public void Test_DbCommandInterceptor_AuditDisabledFromAuditDbContext()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                .OnReplace((eventId, ev) =>
+                    replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: null,
+                       auditDisabled: true,
+                       eventType: null,
+                       customFieldValue: null))
+            {
+                //NonQueryExecuting
+                var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.AreEqual(1, result);
+            }
+
+            Assert.AreEqual(0, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_AuditDisabledFromAuditDbContextAsync()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: null,
+                       auditDisabled: true,
+                       eventType: null,
+                       customFieldValue: null))
+            {
+                //NonQueryExecuting
+                var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.AreEqual(1, result);
+            }
+
+            Assert.AreEqual(0, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+        }
+
+        [Test]
+        public void Test_DbCommandInterceptor_CustomFieldFromAuditDbContext()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: null,
+                       auditDisabled: false,
+                       eventType: null,
+                       customFieldValue: id.ToString()))
+            {
+                //NonQueryExecuting
+                var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.AreEqual(1, result);
+            }
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_CustomFieldFromAuditDbContextAsync()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: null,
+                       auditDisabled: false,
+                       eventType: null,
+                       customFieldValue: id.ToString()))
+            {
+                //NonQueryExecuting
+                var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.AreEqual(1, result);
+            }
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+        }
+
+        [Test]
+        public void Test_DbCommandInterceptor_OnScopeXFromAuditDbContext()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            
+            var dbContext = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                opt: optionsWithInterceptor,
+                dataProvider: null,
+                auditDisabled: false,
+                eventType: null,
+                customFieldValue: id.ToString());
+
+            //NonQueryExecuting
+            var result = dbContext.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+            Assert.AreEqual(1, result);
+            
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+            Assert.AreEqual(1, dbContext.ScopeCreatedCommands.Count);
+            Assert.AreEqual(1, dbContext.ScopeSavingCommands.Count);
+            Assert.AreEqual(1, dbContext.ScopeSavedCommands.Count);
+            dbContext.Dispose();
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_OnScopeXFromAuditDbContextAsync()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+
+            var dbContext = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                opt: optionsWithInterceptor,
+                dataProvider: null,
+                auditDisabled: false,
+                eventType: null,
+                customFieldValue: id.ToString());
+
+            //NonQueryExecuting
+            var result = await dbContext.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+            Assert.AreEqual(1, result);
+
+
+            Assert.AreEqual(1, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+            Assert.AreEqual(1, dbContext.ScopeCreatedCommands.Count);
+            Assert.AreEqual(1, dbContext.ScopeSavingCommands.Count);
+            Assert.AreEqual(1, dbContext.ScopeSavedCommands.Count);
+            await dbContext.DisposeAsync();
+        }
+    }
+
+    public class DbCommandInterceptContext_InheritingFromAuditDbContext : AuditDbContext
+    {
+        public DbSet<Department> Departments { get; set; }
+
+        public List<CommandEvent> ScopeCreatedCommands { get; set; } = new List<CommandEvent>();
+        public List<CommandEvent> ScopeSavingCommands { get; set; } = new List<CommandEvent>();
+        public List<CommandEvent> ScopeSavedCommands { get; set; } = new List<CommandEvent>();
+
+        public DbCommandInterceptContext_InheritingFromAuditDbContext(DbContextOptions opt, AuditDataProvider dataProvider, bool auditDisabled, string eventType, string customFieldValue) : base(opt)
+        {
+            base.AuditDataProvider = dataProvider;
+            base.AuditDisabled = auditDisabled;
+            base.AuditEventType = eventType;
+            if (customFieldValue != null)
+            {
+                base.AddAuditCustomField("customField", customFieldValue);
+            }
+        }
+        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=DbCommandIntercept;integrated security=true;Encrypt=False;");
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
+
+        public override void OnScopeCreated(IAuditScope auditScope)
+        {
+            ScopeCreatedCommands.Add(auditScope.GetCommandEntityFrameworkEvent());
+        }
+
+        public override void OnScopeSaving(IAuditScope auditScope)
+        {
+            ScopeSavingCommands.Add(auditScope.GetCommandEntityFrameworkEvent());
+        }
+
+        public override void OnScopeSaved(IAuditScope auditScope)
+        {
+            ScopeSavedCommands.Add(auditScope.GetCommandEntityFrameworkEvent());
+        }
+
+        public class Department
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Comments { get; set; }
+        }
     }
 
     public class DbCommandInterceptContext : DbContext
     {
         public DbSet<Department> Departments { get; set; }
+
         public DbCommandInterceptContext(DbContextOptions opt) : base(opt) { }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("data source=localhost;initial catalog=DbCommandIntercept;integrated security=true;Encrypt=False;");

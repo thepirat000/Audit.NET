@@ -2,6 +2,7 @@
 using Audit.Core;
 using Audit.Core.Extensions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,8 +28,9 @@ namespace Audit.EntityFramework.Interceptors
         /// Can contain the following placeholders: 
         /// - {database}: Replaced with the database name
         /// - {transaction}: Replaced with the transaction ID
+        /// - {context}: Replaced with the DbContext type name
         /// </summary>
-        public string AuditEventType { get; set; } = "{database}:{transaction}";
+        public string AuditEventType { get; set; }
 
         #region "Transaction Start"
 
@@ -42,7 +44,7 @@ namespace Audit.EntityFramework.Interceptors
 
             var auditEvent = new AuditEventTransactionEntityFramework
             {
-                TransactionEvent = CreateEvent(connection, eventData, "Start")
+                TransactionEvent = CreateAuditEvent(connection, eventData, "Start")
             };
             _currentScope = CreateAuditScope(auditEvent);
 
@@ -59,7 +61,7 @@ namespace Audit.EntityFramework.Interceptors
 
             var auditEvent = new AuditEventTransactionEntityFramework
             {
-                TransactionEvent = CreateEvent(connection, eventData, "Start")
+                TransactionEvent = CreateAuditEvent(connection, eventData, "Start")
             };
             _currentScope = await CreateAuditScopeAsync(auditEvent);
 
@@ -107,7 +109,7 @@ namespace Audit.EntityFramework.Interceptors
 
             var auditEvent = new AuditEventTransactionEntityFramework
             {
-                TransactionEvent = CreateEvent(transaction, eventData, "Commit")
+                TransactionEvent = CreateAuditEvent(transaction, eventData, "Commit")
             };
             _currentScope = CreateAuditScope(auditEvent);
 
@@ -124,7 +126,7 @@ namespace Audit.EntityFramework.Interceptors
 
             var auditEvent = new AuditEventTransactionEntityFramework
             {
-                TransactionEvent = CreateEvent(transaction, eventData, "Commit")
+                TransactionEvent = CreateAuditEvent(transaction, eventData, "Commit")
             };
             _currentScope = await CreateAuditScopeAsync(auditEvent);
 
@@ -168,7 +170,7 @@ namespace Audit.EntityFramework.Interceptors
 
             var auditEvent = new AuditEventTransactionEntityFramework
             {
-                TransactionEvent = CreateEvent(transaction, eventData, "Rollback")
+                TransactionEvent = CreateAuditEvent(transaction, eventData, "Rollback")
             };
             _currentScope = CreateAuditScope(auditEvent);
 
@@ -185,7 +187,7 @@ namespace Audit.EntityFramework.Interceptors
 
             var auditEvent = new AuditEventTransactionEntityFramework
             {
-                TransactionEvent = CreateEvent(transaction, eventData, "Rollback")
+                TransactionEvent = CreateAuditEvent(transaction, eventData, "Rollback")
             };
             _currentScope = await CreateAuditScopeAsync(auditEvent);
 
@@ -247,37 +249,7 @@ namespace Audit.EntityFramework.Interceptors
 
         #endregion
 
-        private IAuditScope CreateAuditScope(AuditEventTransactionEntityFramework tranEvent)
-        {
-            var eventType = AuditEventType?
-                .Replace("{database}", tranEvent.TransactionEvent.Database)
-                .Replace("{transaction}", tranEvent.TransactionEvent.TransactionId);
-            var factory = Core.Configuration.AuditScopeFactory;
-            var options = new AuditScopeOptions()
-            {
-                EventType = eventType,
-                AuditEvent = tranEvent,
-                SkipExtraFrames = 3
-            };
-            return factory.Create(options);
-        }
-
-        private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventTransactionEntityFramework tranEvent)
-        {
-            var eventType = AuditEventType?
-                .Replace("{database}", tranEvent.TransactionEvent.Database)
-                .Replace("{transaction}", tranEvent.TransactionEvent.TransactionId);
-            var factory = Core.Configuration.AuditScopeFactory;
-            var options = new AuditScopeOptions()
-            {
-                EventType = eventType,
-                AuditEvent = tranEvent,
-                SkipExtraFrames = 3
-            };
-            return await factory.CreateAsync(options);
-        }
-
-        private TransactionEvent CreateEvent(DbConnection connection, TransactionStartingEventData eventData, string action)
+        private TransactionEvent CreateAuditEvent(DbConnection connection, TransactionStartingEventData eventData, string action)
         {
             return new TransactionEvent()
             {
@@ -289,11 +261,12 @@ namespace Audit.EntityFramework.Interceptors
                 ContextId = eventData.Context?.ContextId.ToString(),
                 TransactionId = eventData.TransactionId.ToString(),
                 EventIdCode = eventData.EventIdCode,
-                Message = eventData.ToString()
+                Message = eventData.ToString(),
+                DbContext = eventData.Context
             };
         }
 
-        private TransactionEvent CreateEvent(DbTransaction transaction, TransactionEventData eventData, string action)
+        private TransactionEvent CreateAuditEvent(DbTransaction transaction, TransactionEventData eventData, string action)
         {
             return new TransactionEvent()
             {
@@ -305,7 +278,8 @@ namespace Audit.EntityFramework.Interceptors
                 ContextId = eventData.Context?.ContextId.ToString(),
                 TransactionId = eventData.TransactionId.ToString(),
                 EventIdCode = eventData.EventIdCode,
-                Message = eventData.ToString()
+                Message = eventData.ToString(),
+                DbContext = eventData.Context
             };
         }
 
@@ -321,17 +295,90 @@ namespace Audit.EntityFramework.Interceptors
             tranEvent.ErrorMessage = null;
         }
 
+        private IAuditScope CreateAuditScope(AuditEventTransactionEntityFramework tranEvent)
+        {
+            var context = tranEvent.TransactionEvent.DbContext as IAuditDbContext;
+
+            var typeName = tranEvent.TransactionEvent.DbContext?.GetType().Name;
+            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{database}:{transaction}")
+                .Replace("{context}", typeName)
+                .Replace("{database}", tranEvent.TransactionEvent.Database)
+                .Replace("{transaction}", tranEvent.TransactionEvent.TransactionId);
+
+            if (context?.ExtraFields?.Count > 0)
+            {
+                tranEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+            }
+
+            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var options = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                AuditEvent = tranEvent,
+                SkipExtraFrames = 3,
+                DataProvider = context?.AuditDataProvider
+            };
+
+            var scope = factory.Create(options);
+            context?.OnScopeCreated(scope);
+            return scope;
+        }
+
+        private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventTransactionEntityFramework tranEvent)
+        {
+            var context = tranEvent.TransactionEvent.DbContext as IAuditDbContext;
+
+            var typeName = tranEvent.TransactionEvent.DbContext?.GetType().Name;
+            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{database}:{transaction}")
+                .Replace("{context}", typeName)
+                .Replace("{database}", tranEvent.TransactionEvent.Database)
+                .Replace("{transaction}", tranEvent.TransactionEvent.TransactionId);
+
+            if (context?.ExtraFields?.Count > 0)
+            {
+                tranEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+            }
+
+            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var options = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                AuditEvent = tranEvent,
+                SkipExtraFrames = 3,
+                DataProvider = context?.AuditDataProvider
+            };
+
+            var scope = await factory.CreateAsync(options);
+            context?.OnScopeCreated(scope);
+            return scope;
+        }
+
         private void EndScope()
         {
-            _currentScope?.Dispose();
+            if (_currentScope == null)
+            {
+                return;
+            }
+
+            var context = _currentScope.GetTransactionEntityFrameworkEvent()?.DbContext as IAuditDbContext;
+
+            context?.OnScopeSaving(_currentScope);
+            _currentScope.Dispose();
+            context?.OnScopeSaved(_currentScope);
         }
 
         private async Task EndScopeAsync()
         {
-            if (_currentScope != null)
+            if (_currentScope == null)
             {
-                await _currentScope.DisposeAsync();
+                return;
             }
+
+            var context = _currentScope.GetTransactionEntityFrameworkEvent()?.DbContext as IAuditDbContext;
+
+            context?.OnScopeSaving(_currentScope);
+            await _currentScope.DisposeAsync();
+            context?.OnScopeSaved(_currentScope);
         }
     }
 }

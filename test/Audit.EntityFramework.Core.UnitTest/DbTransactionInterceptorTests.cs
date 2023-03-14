@@ -11,52 +11,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Audit.Core.Providers;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture(Category = "EF")]
     public class DbTransactionInterceptorTests
     {
-        public class DbTransactionInterceptContext : DbContext
-        {
-            public DbSet<Department> Departments { get; set; }
-            public DbSet<User> Users { get; set; }
-
-            public DbTransactionInterceptContext(DbContextOptions opt) : base(opt)
-            {
-            }
-
-            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            {
-                optionsBuilder.UseSqlServer(
-                    "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;Encrypt=False");
-                optionsBuilder.EnableSensitiveDataLogging();
-
-            }
-
-            public class User
-            {
-                [Key]
-                [DatabaseGenerated(DatabaseGeneratedOption.None)]
-                public int Id { get; set; }
-                public string UserName { get; set; }
-            }
-
-            public class Department
-            {
-                [Key]
-                [DatabaseGenerated(DatabaseGeneratedOption.None)]
-                public int Id { get; set; }
-
-                public string Name { get; set; }
-                public string Comments { get; set; }
-
-                [Required]
-                public int UserId { get; set; }
-                public User User { get; set; }
-            }
-        }
-
         [SetUp]
         public void Setup()
         {
@@ -315,8 +276,223 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual("Rollback", inserted[1].TransactionEvent.Action);
         }
 
+        [Test]
+        public void Test_DbTransactionInterceptor_DataProviderFromAuditDbContext()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+
+            var dynamicDataProvider = new DynamicDataProvider(d => d
+                .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                .OnReplace((eventId, ev) =>
+                    replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))));
+
+            int id = new Random().Next();
+            int uid = new Random().Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                ctx.Database.EnsureCreated();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditTransactionInterceptor())
+                .Options;
+
+            var dbContext = new DbTransactionInterceptContext_InheritingFromAuditDbContext(
+                opt: optionsWithInterceptor,
+                dataProvider: dynamicDataProvider,
+                auditDisabled: false,
+                eventType: "{context} | {database} | {transaction}",
+                customFieldValue: id.ToString());
+
+            dbContext.Departments.Add(new DbTransactionInterceptContext_InheritingFromAuditDbContext.Department()
+            {
+                Id = id,
+                Comments = "Test",
+                Name = "Name",
+                User = new DbTransactionInterceptContext_InheritingFromAuditDbContext.User() { Id = uid, UserName = "test" }
+            });
+            ((IAuditBypass)dbContext).SaveChangesBypassAudit();
+            
+            Assert.AreEqual(2, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[0].TransactionEvent.TransactionId}", inserted[0].EventType);
+            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[1].TransactionEvent.TransactionId}", inserted[1].EventType);
+            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+            Assert.IsTrue(inserted[1].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[1].CustomFields["customField"].ToString());
+            Assert.AreEqual(2, dbContext.ScopeCreatedTransactions.Count);
+            Assert.AreEqual(2, dbContext.ScopeSavingTransactions.Count);
+            Assert.AreEqual(2, dbContext.ScopeSavedTransactions.Count);
+            dbContext.Dispose();
+        }
+
+        [Test]
+        public async Task Test_DbTransactionInterceptor_DataProviderFromAuditDbContextAsync()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+
+            var dynamicDataProvider = new DynamicDataProvider(d => d
+                .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                .OnReplace((eventId, ev) =>
+                    replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))));
+
+            int id = new Random().Next();
+            int uid = new Random().Next();
+
+            // Use the default context to create the database
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditTransactionInterceptor())
+                .Options;
+
+            var dbContext = new DbTransactionInterceptContext_InheritingFromAuditDbContext(
+                opt: optionsWithInterceptor,
+                dataProvider: dynamicDataProvider,
+                auditDisabled: false,
+                eventType: "{context} | {database} | {transaction}",
+                customFieldValue: id.ToString());
+
+            dbContext.Departments.Add(new DbTransactionInterceptContext_InheritingFromAuditDbContext.Department()
+            {
+                Id = id,
+                Comments = "Test",
+                Name = "Name",
+                User = new DbTransactionInterceptContext_InheritingFromAuditDbContext.User() { Id = uid, UserName = "test" }
+            });
+            await ((IAuditBypass)dbContext).SaveChangesBypassAuditAsync();
+
+            Assert.AreEqual(2, inserted.Count);
+            Assert.AreEqual(0, replaced.Count);
+            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[0].TransactionEvent.TransactionId}", inserted[0].EventType);
+            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[1].TransactionEvent.TransactionId}", inserted[1].EventType);
+            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+            Assert.IsTrue(inserted[1].CustomFields.ContainsKey("customField"));
+            Assert.AreEqual(id.ToString(), inserted[1].CustomFields["customField"].ToString());
+            Assert.AreEqual(2, dbContext.ScopeCreatedTransactions.Count);
+            Assert.AreEqual(2, dbContext.ScopeSavingTransactions.Count);
+            Assert.AreEqual(2, dbContext.ScopeSavedTransactions.Count);
+            await dbContext.DisposeAsync();
+        }
 
     }
 
+    public class DbTransactionInterceptContext_InheritingFromAuditDbContext : AuditDbContext
+    {
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        public List<TransactionEvent> ScopeCreatedTransactions { get; set; } = new List<TransactionEvent>();
+        public List<TransactionEvent> ScopeSavingTransactions { get; set; } = new List<TransactionEvent>();
+        public List<TransactionEvent> ScopeSavedTransactions { get; set; } = new List<TransactionEvent>();
+
+        public DbTransactionInterceptContext_InheritingFromAuditDbContext(DbContextOptions opt, AuditDataProvider dataProvider, bool auditDisabled, string eventType, string customFieldValue) : base(opt)
+        {
+            base.AuditDataProvider = dataProvider;
+            base.AuditDisabled = auditDisabled;
+            base.AuditEventType = eventType;
+            if (customFieldValue != null)
+            {
+                base.AddAuditCustomField("customField", customFieldValue);
+            }
+        }
+        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;Encrypt=False");
+            optionsBuilder.EnableSensitiveDataLogging();
+
+        }
+        public override void OnScopeCreated(IAuditScope auditScope)
+        {
+            ScopeCreatedTransactions.Add(auditScope.GetTransactionEntityFrameworkEvent());
+        }
+
+        public override void OnScopeSaving(IAuditScope auditScope)
+        {
+            ScopeSavingTransactions.Add(auditScope.GetTransactionEntityFrameworkEvent());
+        }
+
+        public override void OnScopeSaved(IAuditScope auditScope)
+        {
+            ScopeSavedTransactions.Add(auditScope.GetTransactionEntityFrameworkEvent());
+        }
+
+        public class User
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string UserName { get; set; }
+        }
+
+        public class Department
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Comments { get; set; }
+            [Required]
+            public int UserId { get; set; }
+            public User User { get; set; }
+        }
+    }
+
+    public class DbTransactionInterceptContext : DbContext
+    {
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        public DbTransactionInterceptContext(DbContextOptions opt) : base(opt)
+        {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;Encrypt=False");
+            optionsBuilder.EnableSensitiveDataLogging();
+
+        }
+
+        public class User
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string UserName { get; set; }
+        }
+
+        public class Department
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Comments { get; set; }
+            [Required]
+            public int UserId { get; set; }
+            public User User { get; set; }
+        }
+    }
 }
 #endif

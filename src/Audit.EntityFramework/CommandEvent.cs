@@ -1,7 +1,14 @@
 ﻿#if EF_CORE_3_OR_GREATER
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Collections.Generic;
 using System.Data;
+#if IS_NK_JSON
+using Newtonsoft.Json;
+#else
+using System.Text.Json.Serialization;
+#endif
+
 
 namespace Audit.EntityFramework
 {
@@ -30,6 +37,17 @@ namespace Audit.EntityFramework
         /// The result of the command execution
         /// </summary>
         public object Result { get; set; }
+
+        [JsonIgnore]
+        internal DbContext DbContext { get; set; }
+
+        /// <summary>
+        /// Returns the DbContext associated to this event
+        /// </summary>
+        public DbContext GetDbContext()
+        {
+            return DbContext;
+        }
     }
 }
 #endif
