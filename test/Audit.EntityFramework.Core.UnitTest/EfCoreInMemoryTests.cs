@@ -1016,13 +1016,110 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
-        public void Test_EF_Provider_EntityType_With_MapExplicit()
+        public async Task Test_EF_Provider_Override_Is_Respected_With_Custom_ColumnName()
         {
+            var overrideValue = "Name2_Override";
 
-            // TODO: ADD THE ASYNC VERSION
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsMemoryContext>(config =>
+                {
+                    config.ForEntity<User>(x =>
+                    {
+                        x.Override(u => u.Name2, overrideValue);
+                    });
+                });
 
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
                 .UseInMemoryDatabase(databaseName: "database_override_test")
+                .Options;
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(x => x
+                    .UseDbContext<BlogsMemoryContext>(options)
+                    .AuditTypeNameMapper(name => $"{name}Audit")
+                    .AuditEntityAction<UserAudit>((ev, entry, audit) =>
+                    {
+                        audit.UserId = ((dynamic)entry.GetEntry().Entity).Id;
+                        audit.Action = entry.Action;
+                    }));
+
+            var id = Rnd.Next();
+            UserAudit userAudit = null;
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Name2 = "test2",
+                    Password = "123",
+                    Token = "token"
+                };
+                await ctx.Users.AddAsync(user);
+                await ctx.SaveChangesAsync();
+
+                userAudit = ctx.UserAudits.FirstOrDefault(x => x.UserId == id);
+            }
+
+            Assert.IsNotNull(userAudit);
+            Assert.AreEqual(overrideValue, userAudit.Name2);
+        }
+
+        [Test]
+        public async Task Test_EF_Provider_Override_Is_Respected_With_Custom_ColumnName_And_Factory()
+        {
+            var overrideValue = "Name2_Override";
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsMemoryContext>(config =>
+                {
+                    config.ForEntity<User>(x =>
+                    {
+                        x.Override(u => u.Name2, overrideValue);
+                    });
+                });
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_override_test")
+                .Options;
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(x => x
+                    .UseDbContext<BlogsMemoryContext>(options)
+                    .AuditEntityCreator(_ => new UserAudit())
+                    .AuditEntityAction<UserAudit>((ev, entry, audit) =>
+                    {
+                        audit.UserId = ((dynamic)entry.GetEntry().Entity).Id;
+                        audit.Action = entry.Action;
+                    }));
+
+            var id = Rnd.Next();
+            UserAudit userAudit = null;
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Name2 = "test2",
+                    Password = "123",
+                    Token = "token"
+                };
+                await ctx.Users.AddAsync(user);
+                await ctx.SaveChangesAsync();
+
+                userAudit = ctx.UserAudits.FirstOrDefault(x => x.UserId == id);
+            }
+
+            Assert.IsNotNull(userAudit);
+            Assert.AreEqual(overrideValue, userAudit.Name2);
+        }
+
+        [Test]
+        public void Test_EF_Provider_EntityType_With_MapExplicit()
+        {
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_map_explicit_test")
                 .Options;
 
             Type entityType1 = null;
@@ -1065,11 +1162,8 @@ namespace Audit.EntityFramework.Core.UnitTest
         [Test]
         public async Task Test_EF_Provider_EntityType_With_MapExplicitAsync()
         {
-
-            // TODO: ADD THE ASYNC VERSION
-
             var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
-                .UseInMemoryDatabase(databaseName: "database_override_test")
+                .UseInMemoryDatabase(databaseName: "database_map_explicit_test")
                 .Options;
 
             Type entityType1 = null;

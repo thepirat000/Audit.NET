@@ -125,7 +125,7 @@ namespace Audit.EntityFramework.Providers
                     Type entityType = GetEntityType(entry, localDbContext);
                     entry.EntityType = entityType;
                     // Explicit creator (Entry -> object)
-                    object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
+                    object auditEntity = CreateAuditEntityFromFactory(entityType, entry, auditDbContext);
                     Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
                     if (auditEntity == null)
                     {
@@ -133,18 +133,17 @@ namespace Audit.EntityFramework.Providers
                         if (mappedType != null)
                         {
                             // Explicit mapping (Entry -> Type)
-                            auditEntity = CreateAuditEntityFromType(mappedType, entry);
+                            auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
                         }
                         else
                         {
                             // Implicit mapping (Type -> Type)
                             if (entityType != null)
                             {
-                                entry.EntityType = entityType;
                                 mappedType = _auditTypeMapper?.Invoke(entityType, entry);
                                 if (mappedType != null)
                                 {
-                                    auditEntity = CreateAuditEntityFromType(mappedType, entry);
+                                    auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
                                 }
                             }
                         }
@@ -201,7 +200,7 @@ namespace Audit.EntityFramework.Providers
                     Type entityType = GetEntityType(entry, localDbContext);
                     entry.EntityType = entityType;
                     // Explicit creator (Entry -> object)
-                    object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
+                    object auditEntity = CreateAuditEntityFromFactory(entityType, entry, auditDbContext);
                     Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
                     if (auditEntity == null)
                     {
@@ -209,18 +208,17 @@ namespace Audit.EntityFramework.Providers
                         if (mappedType != null)
                         {
                             // Explicit mapping (Entry -> Type)
-                            auditEntity = CreateAuditEntityFromType(mappedType, entry);
+                            auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
                         }
                         else
                         {
                             // Implicit mapping (Type -> Type)
                             if (entityType != null)
                             {
-                                entry.EntityType = entityType;
                                 mappedType = _auditTypeMapper?.Invoke(entityType, entry);
                                 if (mappedType != null)
                                 {
-                                    auditEntity = CreateAuditEntityFromType(mappedType, entry);
+                                    auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
                                 }
                             }
                         }
@@ -287,21 +285,17 @@ namespace Audit.EntityFramework.Providers
             return type;
         }
 
-        private object CreateAuditEntityFromType(Type auditType, EventEntry entry)
+        private object CreateAuditEntityFromType(Type definingType, Type auditType, EventEntry entry)
         {
             var auditEntity = Activator.CreateInstance(auditType);
             if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
-                var auditFields = GetPropertiesToSet(auditType);
-                foreach (var field in entry.ColumnValues.Where(af => auditFields.ContainsKey(af.Key)))
-                {
-                    auditFields[field.Key].SetValue(auditEntity, field.Value);
-                }
+                SetAuditEntityMatchedProperties(definingType, entry, auditType, auditEntity);
             }
             return auditEntity;
         }
 
-        private object CreateAuditEntityFromFactory(EventEntry entry, DbContext auditDbContext)
+        private object CreateAuditEntityFromFactory(Type definingType, EventEntry entry, DbContext auditDbContext)
         {
             var auditEntity = _auditEntityCreator?.Invoke(auditDbContext, entry);
             if (auditEntity == null)
@@ -311,13 +305,31 @@ namespace Audit.EntityFramework.Providers
             var auditType = GetTypeNoProxy(auditEntity.GetType());
             if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
-                var auditFields = GetPropertiesToSet(auditType);
-                foreach (var field in entry.ColumnValues.Where(cv => auditFields.ContainsKey(cv.Key)))
-                {
-                    auditFields[field.Key].SetValue(auditEntity, field.Value);
-                }
+                SetAuditEntityMatchedProperties(definingType, entry, auditType, auditEntity);
             }
             return auditEntity;
+        }
+
+        private void SetAuditEntityMatchedProperties(Type definingType, EventEntry entry, Type auditType, object auditEntity)
+        {
+            var entity = entry.Entry.Entity;
+            var auditFields = GetPropertiesToSet(auditType);
+#if EF_CORE
+            var entityFields = entry.GetEntry().Metadata.GetProperties();
+            foreach (var prop in entityFields.Where(af => auditFields.ContainsKey(af.Name)))
+            {
+                var colName = DbContextHelper.GetColumnName(prop);
+                var value = entry.ColumnValues.ContainsKey(colName) ? entry.ColumnValues[colName] : prop.PropertyInfo?.GetValue(entity);
+                auditFields[prop.Name].SetValue(auditEntity, value);
+            }
+#else
+            var entityFields = GetPropertiesToGet(definingType);
+            foreach (var prop in entityFields.Where(af => auditFields.ContainsKey(af.Key)))
+            {
+                var value = entry.ColumnValues.ContainsKey(prop.Key) ? entry.ColumnValues[prop.Key] : prop.Value.GetValue(entity);
+                auditFields[prop.Key].SetValue(auditEntity, value);
+            }
+#endif
         }
 
         private Dictionary<string, PropertyInfo> GetPropertiesToSet(Type type)

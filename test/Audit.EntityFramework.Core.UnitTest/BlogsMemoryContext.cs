@@ -26,6 +26,14 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(e =>
+            {
+                e.Property(x => x.Name2)
+                    .HasColumnName("NAME_2");
+            });
+        }
     }
 
     public abstract class EntityBase
@@ -40,6 +48,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Name2 { get; set; }
     }
     [AuditIgnore]
     public class UserAudit 
@@ -48,6 +57,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public int AuditId { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
+        public string Name2 { get; set; }
         public string AuditUser { get; set; }
         public string Action { get; set; }
     }
