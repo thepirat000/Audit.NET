@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.2.3] - (not yet released)
+- Audit.EntityFramework: Fix to honor Override/Ignore/Format in entity properties for any mapper type (#584)
+
 ## [20.2.2] - 2023-03-14
 - Audit.EntityFramework / Audit.EntityFramework.Core: Low-Level interceptors support to use the `.AuditDataProvider` property from the `AuditDbContext` instance (#387)
 

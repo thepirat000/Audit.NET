@@ -131,7 +131,7 @@ namespace Audit.EntityFramework.Providers
                         if (mappedType != null)
                         {
                             // Explicit mapping (Table -> Type)
-                            auditEntity = CreateAuditEntityFromTable(mappedType, entry);
+                            auditEntity = CreateAuditEntityFromType(mappedType, entry);
                         }
                         else
                         {
@@ -143,7 +143,7 @@ namespace Audit.EntityFramework.Providers
                                 mappedType = _auditTypeMapper?.Invoke(type, entry);
                                 if (mappedType != null)
                                 {
-                                    auditEntity = CreateAuditEntityFromType(type, mappedType, entry);
+                                    auditEntity = CreateAuditEntityFromType(mappedType, entry);
                                 }
                             }
                         }
@@ -208,7 +208,7 @@ namespace Audit.EntityFramework.Providers
                         if (mappedType != null)
                         {
                             // Explicit mapping (Entry -> Type)
-                            auditEntity = CreateAuditEntityFromTable(mappedType, entry);
+                            auditEntity = CreateAuditEntityFromType(mappedType, entry);
                         }
                         else
                         {
@@ -219,7 +219,7 @@ namespace Audit.EntityFramework.Providers
                                 mappedType = _auditTypeMapper?.Invoke(entityType, entry);
                                 if (mappedType != null)
                                 {
-                                    auditEntity = CreateAuditEntityFromType(entityType, mappedType, entry);
+                                    auditEntity = CreateAuditEntityFromType(mappedType, entry);
                                 }
                             }
                         }
@@ -286,30 +286,13 @@ namespace Audit.EntityFramework.Providers
             return type;
         }
 
-        private object CreateAuditEntityFromType(Type definingType, Type auditType, EventEntry entry)
-        {
-            var entity = entry.Entry.Entity;
-            var auditEntity = Activator.CreateInstance(auditType);
-            if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
-            {
-                var auditFields = GetPropertiesToSet(auditType);
-                var entityFields = GetPropertiesToGet(definingType);
-                foreach (var field in entityFields.Where(af => auditFields.ContainsKey(af.Key)))
-                {
-                    var value = field.Value.GetValue(entity);
-                    auditFields[field.Key].SetValue(auditEntity, value);
-                }
-            }
-            return auditEntity;
-        }
-        
-        private object CreateAuditEntityFromTable(Type auditType, EventEntry entry)
+        private object CreateAuditEntityFromType(Type auditType, EventEntry entry)
         {
             var auditEntity = Activator.CreateInstance(auditType);
             if (_ignoreMatchedPropertiesFunc == null || !_ignoreMatchedPropertiesFunc(auditType))
             {
                 var auditFields = GetPropertiesToSet(auditType);
-                foreach (var field in entry.ColumnValues.Where(cv => auditFields.ContainsKey(cv.Key)))
+                foreach (var field in entry.ColumnValues.Where(af => auditFields.ContainsKey(af.Key)))
                 {
                     auditFields[field.Key].SetValue(auditEntity, field.Value);
                 }
@@ -339,7 +322,7 @@ namespace Audit.EntityFramework.Providers
         private Dictionary<string, PropertyInfo> GetPropertiesToSet(Type type)
         {
             var result = new Dictionary<string, PropertyInfo>();
-            foreach(var prop in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            foreach (var prop in type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.GetSetMethod() != null)
                 .OrderBy(p => p.DeclaringType == type ? 1 : 0))
             {

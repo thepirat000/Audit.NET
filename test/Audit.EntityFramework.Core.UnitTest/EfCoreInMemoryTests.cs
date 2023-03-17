@@ -965,5 +965,54 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsFalse(entry.ColumnValues.ContainsKey("Password"));
             Assert.AreEqual("***", entry.ColumnValues["Token"]);
         }
+
+        [Test]
+        public async Task Test_EF_Provider_Override_Is_Respected()
+        {
+            var overrideValue = "******";
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsMemoryContext>(config =>
+                {
+                    config.ForEntity<User>(x =>
+                    {
+                        x.Override(u => u.Name, overrideValue);
+                    });
+                });
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_override_test")
+                .Options;
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(x => x
+                    .UseDbContext<BlogsMemoryContext>(options)
+                    .AuditTypeNameMapper(name => $"{name}Audit")
+                    .AuditEntityAction<UserAudit>((ev, entry, audit) =>
+                    {
+                        audit.UserId = ((dynamic)entry.GetEntry().Entity).Id;
+                        audit.Action = entry.Action;
+                    }));
+
+            var id = Rnd.Next();
+            UserAudit userAudit = null;
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "123",
+                    Token = "token"
+                };
+                await ctx.Users.AddAsync(user);
+                await ctx.SaveChangesAsync();
+
+                userAudit = ctx.UserAudits.FirstOrDefault(x => x.UserId == id);
+            }
+
+            Assert.IsNotNull(userAudit);
+            Assert.AreEqual(overrideValue, userAudit.Name);
+        }
     }
 }
