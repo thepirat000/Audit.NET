@@ -122,6 +122,8 @@ namespace Audit.EntityFramework.Providers
             {
                 foreach (var entry in efEvent.EntityFrameworkEvent.Entries)
                 {
+                    Type entityType = GetEntityType(entry, localDbContext);
+                    entry.EntityType = entityType;
                     // Explicit creator (Entry -> object)
                     object auditEntity = CreateAuditEntityFromFactory(entry, auditDbContext);
                     Type mappedType = GetTypeNoProxy(auditEntity?.GetType());
@@ -130,17 +132,16 @@ namespace Audit.EntityFramework.Providers
                         mappedType = _explicitMapper?.Invoke(entry);
                         if (mappedType != null)
                         {
-                            // Explicit mapping (Table -> Type)
+                            // Explicit mapping (Entry -> Type)
                             auditEntity = CreateAuditEntityFromType(mappedType, entry);
                         }
                         else
                         {
                             // Implicit mapping (Type -> Type)
-                            Type type = GetEntityType(entry, localDbContext);
-                            if (type != null)
+                            if (entityType != null)
                             {
-                                entry.EntityType = type;
-                                mappedType = _auditTypeMapper?.Invoke(type, entry);
+                                entry.EntityType = entityType;
+                                mappedType = _auditTypeMapper?.Invoke(entityType, entry);
                                 if (mappedType != null)
                                 {
                                     auditEntity = CreateAuditEntityFromType(mappedType, entry);

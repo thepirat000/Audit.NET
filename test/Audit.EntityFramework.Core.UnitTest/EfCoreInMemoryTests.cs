@@ -1014,5 +1014,98 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsNotNull(userAudit);
             Assert.AreEqual(overrideValue, userAudit.Name);
         }
+
+        [Test]
+        public void Test_EF_Provider_EntityType_With_MapExplicit()
+        {
+
+            // TODO: ADD THE ASYNC VERSION
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_override_test")
+                .Options;
+
+            Type entityType1 = null;
+            Type entityType2 = null;
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(x => x
+                    .UseDbContext<BlogsMemoryContext>(options)
+                    .AuditTypeExplicitMapper(map => map
+                        .MapExplicit<UserAudit>(entry =>
+                        {
+                            entityType1 = entry.EntityType;
+                            return true;
+                        }, (entry, audit) =>
+                        {
+                            entityType2 = entry.EntityType;
+                        })));
+
+            var id = Rnd.Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "123",
+                    Token = "token"
+                };
+                ctx.Users.Add(user);
+                ctx.SaveChanges();
+
+            }
+
+            Assert.IsNotNull(entityType1);
+            Assert.AreEqual(typeof(User), entityType1);
+            Assert.IsNotNull(entityType2);
+            Assert.AreEqual(typeof(User), entityType2);
+        }
+
+        [Test]
+        public async Task Test_EF_Provider_EntityType_With_MapExplicitAsync()
+        {
+
+            // TODO: ADD THE ASYNC VERSION
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_override_test")
+                .Options;
+
+            Type entityType1 = null;
+            Type entityType2 = null;
+
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(x => x
+                    .UseDbContext<BlogsMemoryContext>(options)
+                    .AuditTypeExplicitMapper(map => map
+                        .MapExplicit<UserAudit>(entry =>
+                        {
+                            entityType1 = entry.EntityType;
+                            return true;
+                        }, (entry, audit) =>
+                        {
+                            entityType2 = entry.EntityType;
+                        })));
+
+            var id = Rnd.Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "test",
+                    Password = "123",
+                    Token = "token"
+                };
+                await ctx.Users.AddAsync(user);
+                await ctx.SaveChangesAsync();
+            }
+
+            Assert.IsNotNull(entityType1);
+            Assert.AreEqual(typeof(User), entityType1);
+            Assert.IsNotNull(entityType2);
+            Assert.AreEqual(typeof(User), entityType2);
+        }
     }
 }
