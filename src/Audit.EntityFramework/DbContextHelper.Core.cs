@@ -305,7 +305,7 @@ namespace Audit.EntityFramework
                 }
             }
             // Update ConnectionId
-            var clientConnectionId = GetClientConnectionId(context.DbContext);
+            var clientConnectionId = TryGetClientConnectionId(context.DbContext);
             if (clientConnectionId != null)
             {
                 efEvent.ConnectionId = clientConnectionId;

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [20.2.4] - 2023-03-26
+- Audit.EntityFramework.Core: Fix to allow continuing with the audit process even if the DbContext got disposed within the SaveChanges operation (#589)
+
 ## [20.2.3] - 2023-03-17
 - Audit.EntityFramework: Fix to honor Override/Ignore/Format in entity properties for any mapper type (#584)
 - Audit.EntityFramework: Fix EntityType null in the ExplicitMapper when using sync methods (#585)

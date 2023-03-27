@@ -389,14 +389,21 @@ namespace Audit.EntityFramework
             return string.Format("{0}_{1}", clientConnectionId, tranId ?? 0);
         }
 
-        public string GetClientConnectionId(DbContext dbContext)
+        public string TryGetClientConnectionId(DbContext dbContext)
         {
+            try
+            {
 #if EF_CORE
-            var connection = IsRelational(dbContext) ? dbContext.Database.GetDbConnection() : null;
+                var connection = IsRelational(dbContext) ? dbContext.Database.GetDbConnection() : null;
 #else
-            var connection = dbContext.Database.Connection;
+                var connection = dbContext.Database.Connection;
 #endif
-            return GetClientConnectionId(connection);
+                return GetClientConnectionId(connection);
+            }
+            catch (ObjectDisposedException)
+            {
+                return null;
+            }
         }
 
         public string GetClientConnectionId(DbConnection dbConnection)
