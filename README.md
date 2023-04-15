@@ -455,21 +455,21 @@ public class MyCustomDataProvider : AuditDataProvider
         return JsonConvert.DeserializeObject<T>(File.ReadAllText(fileName));
     }
     // async implementation:
-    public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+    public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
     {
         var fileName = $"Log{Guid.NewGuid()}.json";
-        await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
+        await File.WriteAllTextAsync(fileName, auditEvent.ToJson(), cancellationToken);
         return fileName;
     }
-    public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+    public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
     {
         var fileName = eventId.ToString();
-        await File.WriteAllTextAsync(fileName, auditEvent.ToJson());
+        await File.WriteAllTextAsync(fileName, auditEvent.ToJson(), cancellationToken);
     }
-    public override async Task<T> GetEventAsync<T>(object eventId) 
+    public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
     {
         var fileName = eventId.ToString();
-        return await GetFromFileAsync<T>(fileName);
+        return await GetFromFileAsync<T>(cancellationToken);
     }
 }
 ```
