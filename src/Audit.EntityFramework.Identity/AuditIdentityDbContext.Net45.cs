@@ -250,18 +250,18 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
+            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
 
         int IAuditBypass.SaveChangesBypassAudit()
         {
             return base.SaveChanges();
         }
-        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
         {
-            return await base.SaveChangesAsync();
+            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }

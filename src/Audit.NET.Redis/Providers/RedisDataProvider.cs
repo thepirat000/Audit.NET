@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Audit.Core;
 
 namespace Audit.Redis.Providers
@@ -53,7 +54,8 @@ namespace Audit.Redis.Providers
         /// Stores an event in a redis database asynchronously
         /// </summary>
         /// <param name="auditEvent">The audit event being created.</param>
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             return await _handler.InsertAsync(auditEvent);
         }
@@ -63,7 +65,8 @@ namespace Audit.Redis.Providers
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>
         /// <param name="eventId">The event id being replaced.</param>
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var key = _handler.GetKey(auditEvent);
             await _handler.ReplaceAsync(key, eventId, auditEvent);
@@ -73,7 +76,8 @@ namespace Audit.Redis.Providers
         /// Gets an audit event from a redis database asynchronously
         /// </summary>
         /// <param name="eventId">The event id</param>
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var key = _handler.GetKey(null);
             return await _handler.GetAsync<T>(key, eventId);

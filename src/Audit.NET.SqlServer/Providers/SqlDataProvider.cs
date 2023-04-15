@@ -3,6 +3,7 @@ using System.Linq;
 using Audit.Core;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading;
 #if NET45
 using System.Data.Common;
 #endif
@@ -13,7 +14,6 @@ using System.Data.SqlClient;
 #endif
 #if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 #endif
 
 namespace Audit.SqlServer.Providers
@@ -149,7 +149,7 @@ namespace Audit.SqlServer.Providers
             }
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var parameters = GetParametersForInsert(auditEvent);
             using (var ctx = CreateContext(auditEvent))
@@ -157,13 +157,13 @@ namespace Audit.SqlServer.Providers
                 var cmdText = GetInsertCommandText(auditEvent);
 #if NET45
                 var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
-                return (await result.ToListAsync()).FirstOrDefault();
+                return (await result.ToListAsync(cancellationToken)).FirstOrDefault();
 #elif NETSTANDARD1_3
                 var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
-                return (await result.ToListAsync()).FirstOrDefault()?.Id;
+                return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
 #elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
-                return (await result.ToListAsync()).FirstOrDefault()?.Id;
+                return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
 #endif
             }
         }
@@ -182,18 +182,18 @@ namespace Audit.SqlServer.Providers
             }
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
             using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
 #if NETSTANDARD1_3
-                await ctx.Database.ExecuteSqlCommandAsync(cmdText, default(CancellationToken), parameters);
+                await ctx.Database.ExecuteSqlCommandAsync(cmdText, cancellationToken, parameters);
 #elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
-                await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters);
+                await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters, cancellationToken);
 #else
-                await ctx.Database.ExecuteSqlCommandAsync(cmdText, parameters);
+                await ctx.Database.ExecuteSqlCommandAsync(cmdText, cancellationToken, parameters);
 #endif
             }
         }
@@ -225,8 +225,8 @@ namespace Audit.SqlServer.Providers
             return null;
         }
 
-        public override async Task<T> GetEventAsync<T>(object eventId)
-        {
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
+        {   
             if (JsonColumnNameBuilder == null)
             {
                 return null;
@@ -236,13 +236,13 @@ namespace Audit.SqlServer.Providers
                 var cmdText = GetSelectCommandText(null);
 #if NET45
                 var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("@eventId", eventId));
-                var json = await result.FirstOrDefaultAsync();
+                var json = await result.FirstOrDefaultAsync(cancellationToken);
 #elif NETSTANDARD1_3
                 var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
-                var json = (await result.FirstOrDefaultAsync())?.Id;
+                var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
 #elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0 || NET6_0 || NET7_0
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-                var json = (await result.FirstOrDefaultAsync())?.Id;
+                var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
 #endif
                 if (json != null)
                 {

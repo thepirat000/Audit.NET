@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Core
@@ -21,7 +22,7 @@ namespace Audit.Core
         ValueTask DisposeAsync();
 #endif
         void Save();
-        Task SaveAsync();
+        Task SaveAsync(CancellationToken cancellationToken = default);
         void SetCustomField<TC>(string fieldName, TC value, bool serialize = false);
         void SetTargetGetter(Func<object> targetGetter);
     }

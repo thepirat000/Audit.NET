@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.Reflection;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Audit.Core.Providers;
 
 namespace Audit.WebApi
@@ -39,7 +40,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs before the action method is invoked.
         /// </summary>
-        public async Task BeforeExecutingAsync(HttpActionContext actionContext, IContextWrapper contextWrapper, bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName)
+        public async Task BeforeExecutingAsync(HttpActionContext actionContext, IContextWrapper contextWrapper, bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName, CancellationToken cancellationToken = default)
         {
             var request = actionContext.Request;
 
@@ -77,7 +78,7 @@ namespace Audit.WebApi
                 // the inner ActionDescriptor is of type ReflectedHttpActionDescriptor even when using api versioning:
                 CallingMethod = (actionContext.ActionDescriptor?.ActionBinding?.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
             };
-            var auditScope = await Configuration.AuditScopeFactory.CreateAsync(options);
+            var auditScope = await Configuration.AuditScopeFactory.CreateAsync(options, cancellationToken);
             contextWrapper.Set(AuditApiHelper.AuditApiActionKey, auditAction);
             contextWrapper.Set(AuditApiHelper.AuditApiScopeKey, auditScope);
         }
@@ -85,7 +86,7 @@ namespace Audit.WebApi
         /// <summary>
         /// Occurs after the action method is invoked.
         /// </summary>
-        public async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext, IContextWrapper contextWrapper, bool includeModelState, bool includeResponseBody, bool includeResponseHeaders)
+        public async Task AfterExecutedAsync(HttpActionExecutedContext actionExecutedContext, IContextWrapper contextWrapper, bool includeModelState, bool includeResponseBody, bool includeResponseHeaders, CancellationToken cancellationToken = default)
         {
             var auditAction = contextWrapper.Get<AuditApiAction>(AuditApiHelper.AuditApiActionKey);
             var auditScope = contextWrapper.Get<AuditScope>(AuditApiHelper.AuditApiScopeKey);
@@ -115,7 +116,7 @@ namespace Audit.WebApi
                             var httpContent = actionExecutedContext.Response.Content;
                             auditAction.ResponseBody = new BodyContent
                             {
-                                Value = ignoreValue ? null : httpContent.ReadAsStringAsync().Result
+                                Value = ignoreValue ? null : await httpContent.ReadAsStringAsync()
                             };
 
                             if (httpContent.Headers != null)
@@ -142,7 +143,7 @@ namespace Audit.WebApi
                 }
 
                 // Replace the Action field and save
-                (auditScope.Event as AuditEventWebApi).Action = auditAction;
+                ((AuditEventWebApi)auditScope.Event).Action = auditAction;
                 await auditScope.DisposeAsync();
             }
         }

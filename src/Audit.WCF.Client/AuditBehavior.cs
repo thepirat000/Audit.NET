@@ -7,23 +7,6 @@ namespace Audit.Wcf.Client
 {
     public class AuditBehavior : BehaviorExtensionElement
     {
-        /* // TODO: FDCG: 
-        /// <summary>
-        /// Gets the current audit scope for the running thread.
-        /// Get this property from an audited WCF method to get the current audit scope.
-        /// </summary>
-        public static IAuditScope CurrentAuditScope
-        {
-            get
-            {
-                return CallContext.LogicalGetData(WcfContextScopeKey) as IAuditScope;
-            }
-            internal set
-            {
-                CallContext.LogicalSetData(WcfContextScopeKey, value);
-            }
-        }*/
-
         /// <summary>
         /// Gets or sets the event type.
         /// Can contain the following placeholders:

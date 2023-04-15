@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
+using System.Threading;
 using Microsoft.AspNetCore.Http.Extensions;
 using Audit.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,9 @@ namespace Audit.WebApi
     /// </summary>
     public class AuditMiddleware
     {
+        // Default stream copy buffer size (from System.IO::Stream)
+        private const int DefaultCopyBufferSize = 81920;
+
         private readonly RequestDelegate _next;
 
         private readonly ConfigurationApi.AuditMiddlewareConfigurator _config;
@@ -32,11 +36,11 @@ namespace Audit.WebApi
                 await _next.Invoke(context);
                 return;
             }
-            var includeHeaders = _config._includeRequestHeadersBuilder != null ? _config._includeRequestHeadersBuilder.Invoke(context) : false;
-            var includeResponseHeaders = _config._includeResponseHeadersBuilder != null ? _config._includeResponseHeadersBuilder.Invoke(context) : false;
-            var includeRequest = _config._includeRequestBodyBuilder != null ? _config._includeRequestBodyBuilder.Invoke(context) : false;
+            var includeHeaders = _config._includeRequestHeadersBuilder != null && _config._includeRequestHeadersBuilder.Invoke(context);
+            var includeResponseHeaders = _config._includeResponseHeadersBuilder != null && _config._includeResponseHeadersBuilder.Invoke(context);
+            var includeRequest = _config._includeRequestBodyBuilder != null && _config._includeRequestBodyBuilder.Invoke(context);
             var eventTypeName = _config._eventTypeNameBuilder?.Invoke(context);
-            var includeResponse = _config._includeResponseBodyBuilder != null ? _config._includeResponseBodyBuilder.Invoke(context) : false;
+            var includeResponse = _config._includeResponseBodyBuilder != null && _config._includeResponseBodyBuilder.Invoke(context);
             var originalBody = context.Response.Body;
 
             // pre-filter
@@ -46,7 +50,9 @@ namespace Audit.WebApi
                 return;
             }
 
-            await BeforeInvoke(context, includeHeaders, includeRequest, eventTypeName);
+            var requestCancellationToken = context.RequestAborted;
+
+            await BeforeInvoke(context, includeHeaders, includeRequest, eventTypeName, requestCancellationToken);
 
             if (includeResponse)
             {
@@ -55,7 +61,8 @@ namespace Audit.WebApi
                     context.Response.Body = responseBody;
                     await InvokeNextAsync(context, true, includeResponseHeaders, originalBody);
                     responseBody.Seek(0L, SeekOrigin.Begin);
-                    await responseBody.CopyToAsync(originalBody);
+                    int bufferSize = (int)Math.Min(DefaultCopyBufferSize, responseBody.Length < 2 ? 1 : responseBody.Length);
+                    await responseBody.CopyToAsync(originalBody, bufferSize, requestCancellationToken);
                     context.Response.Body = originalBody;
                 }
             }
@@ -86,7 +93,7 @@ namespace Audit.WebApi
             }
         }
 
-        private async Task BeforeInvoke(HttpContext context, bool includeHeaders, bool includeRequestBody, string eventTypeName)
+        private async Task BeforeInvoke(HttpContext context, bool includeHeaders, bool includeRequestBody, string eventTypeName, CancellationToken cancellationToken)
         {
             var auditAction = new AuditApiAction
             {
@@ -95,7 +102,7 @@ namespace Audit.WebApi
                 IpAddress = context.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = context.Request.GetDisplayUrl(),
                 HttpMethod = context.Request.Method,
-                FormVariables = await AuditApiHelper.GetFormVariables(context),
+                FormVariables = await AuditApiHelper.GetFormVariables(context, cancellationToken),
                 Headers = includeHeaders ? AuditApiHelper.ToDictionary(context.Request.Headers) : null,
                 ActionName = null,
                 ControllerName = null,
@@ -104,7 +111,7 @@ namespace Audit.WebApi
                 {
                     Type = context.Request.ContentType,
                     Length = context.Request.ContentLength,
-                    Value = includeRequestBody ? await AuditApiHelper.GetRequestBody(context) : null
+                    Value = includeRequestBody ? await AuditApiHelper.GetRequestBody(context, cancellationToken) : null
                 },
                 TraceId = context.TraceIdentifier
             };
@@ -121,7 +128,7 @@ namespace Audit.WebApi
                 EventType = eventType, 
                 AuditEvent = auditEventAction,
                 DataProvider = dataProvider
-            });
+            }, cancellationToken);
             context.Items[AuditApiHelper.AuditApiActionKey] = auditAction;
             context.Items[AuditApiHelper.AuditApiScopeKey] = auditScope;
         }
@@ -152,7 +159,7 @@ namespace Audit.WebApi
                         {
                             Type = context.Response.ContentType,
                             Length = context.Response.ContentLength,
-                            Value = await AuditApiHelper.GetResponseBody(context)
+                            Value = await AuditApiHelper.GetResponseBody(context, default)
                         };
                     }
                 }
@@ -161,7 +168,7 @@ namespace Audit.WebApi
                     auditAction.ResponseHeaders = AuditApiHelper.ToDictionary(context.Response.Headers);
                 }
                 // Replace the Action field and save
-                (auditScope.Event as AuditEventWebApi).Action = auditAction;
+                ((AuditEventWebApi)auditScope.Event).Action = auditAction;
                 await auditScope.DisposeAsync();
             }
         }

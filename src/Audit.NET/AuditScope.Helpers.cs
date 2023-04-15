@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.NetworkInformation;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Core
@@ -16,9 +17,11 @@ namespace Audit.Core
         /// <summary>
         /// Shortcut to create an audit scope
         /// </summary>
-        public static async Task<AuditScope> CreateAsync(AuditScopeOptions options)
+        /// <param name="options">The Audit Scope creation options.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public static async Task<AuditScope> CreateAsync(AuditScopeOptions options, CancellationToken cancellationToken = default)
         {
-            return await new AuditScope(options).StartAsync();
+            return await new AuditScope(options).StartAsync(cancellationToken);
         }
         /// <summary>
         /// Creates an audit scope with the given creation options as a Fluent API.
@@ -31,10 +34,12 @@ namespace Audit.Core
         /// <summary>
         /// Creates an audit scope with the given creation options as a Fluent API.
         /// </summary>
-        public static async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config)
+        /// <param name="config">Fluent API to set the Audit Scope options.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public static async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config, CancellationToken cancellationToken = default)
         {
             var options = new AuditScopeOptions(config);
-            return await new AuditScope(options).StartAsync();
+            return await new AuditScope(options).StartAsync(cancellationToken);
         }
         /// <summary>
         /// Shortcut to create an audit scope with the given Event type and Target.
@@ -53,10 +58,11 @@ namespace Audit.Core
         /// <param name="eventType">A string representing the type of the event.</param>
         /// <param name="target">The target object getter.</param>
         /// <param name="extraFields">An anonymous object that contains additional fields to be merged into the audit event.</param>
-        public static async Task<AuditScope> CreateAsync(string eventType, Func<object> target, object extraFields = null)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public static async Task<AuditScope> CreateAsync(string eventType, Func<object> target, object extraFields = null, CancellationToken cancellationToken = default)
         {
             var options = new AuditScopeOptions(eventType: eventType, targetGetter: target, extraFields: extraFields);
-            return await new AuditScope(options).StartAsync();
+            return await new AuditScope(options).StartAsync(cancellationToken);
         }
 
         /// <summary>
@@ -79,7 +85,8 @@ namespace Audit.Core
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="extraFields">An anonymous object that can contain additional fields to be merged into the audit event.</param>
-        public static async Task LogAsync(string eventType, object extraFields)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public static async Task LogAsync(string eventType, object extraFields, CancellationToken cancellationToken = default)
         {
             var options = new AuditScopeOptions()
             {
@@ -87,7 +94,7 @@ namespace Audit.Core
                 ExtraFields = extraFields,
                 IsCreateAndSave = true
             };
-            await new AuditScope(options).StartAsync();
+            await new AuditScope(options).StartAsync(cancellationToken);
         }
     }
 }

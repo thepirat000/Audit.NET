@@ -122,7 +122,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
                 await _doAfterSaveChanges(this);
                 return result;
-            });
+            }, cancellationToken);
         }
 
     }

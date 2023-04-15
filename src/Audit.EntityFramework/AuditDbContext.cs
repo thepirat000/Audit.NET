@@ -161,7 +161,7 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken));
+            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(CancellationToken cancellationToken = default)
         {
-            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(cancellationToken));
+            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
         
         int IAuditBypass.SaveChangesBypassAudit()
@@ -190,9 +190,9 @@ namespace Audit.EntityFramework
             return base.SaveChanges();
         }
         
-        Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
         {
-            return base.SaveChangesAsync(CancellationToken.None);
+            return base.SaveChangesAsync(cancellationToken);
         }
 #else
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -204,7 +204,7 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
+            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
         {
-            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
+            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
         }
        
         int IAuditBypass.SaveChangesBypassAudit()
@@ -236,9 +236,9 @@ namespace Audit.EntityFramework
             return base.SaveChanges(true);
         }
 
-        Task<int> IAuditBypass.SaveChangesBypassAuditAsync()
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
         {
-            return base.SaveChangesAsync(true, default);
+            return base.SaveChangesAsync(true, cancellationToken);
         }
 #endif
         #endregion

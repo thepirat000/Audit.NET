@@ -1,6 +1,7 @@
 ﻿using Audit.Core;
 using Confluent.Kafka;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Kafka.Providers
@@ -21,7 +22,7 @@ namespace Audit.Kafka.Providers
     public class KafkaDataProvider<TKey> : AuditDataProvider
     {
         private readonly ProducerConfig _producerConfig;
-        private readonly static object _producerLocker = new object();
+        private static readonly object _producerLocker = new object();
         private readonly ProducerBuilder<TKey, AuditEvent> _producerBuilder;
         private IProducer<TKey, AuditEvent> _producer;
         /// <summary>
@@ -115,10 +116,10 @@ namespace Audit.Kafka.Providers
             return Produce(auditEvent);
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             EnsureProducer();
-            return await ProduceAsync(auditEvent);
+            return await ProduceAsync(auditEvent, cancellationToken);
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
@@ -127,10 +128,10 @@ namespace Audit.Kafka.Providers
             Produce(auditEvent);
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             EnsureProducer();
-            await ProduceAsync(auditEvent);
+            await ProduceAsync(auditEvent, cancellationToken);
         }
 
         public override T GetEvent<T>(object eventId)
@@ -138,7 +139,7 @@ namespace Audit.Kafka.Providers
             throw new NotImplementedException();
         }
 
-        public override Task<T> GetEventAsync<T>(object eventId)
+        public override Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -160,11 +161,11 @@ namespace Audit.Kafka.Providers
             return result.Key;
         }
 
-        private async Task<TKey> ProduceAsync(AuditEvent auditEvent)
+        private async Task<TKey> ProduceAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
         {
             var key = KeySelector == null ? default : KeySelector.Invoke(auditEvent);
             var message = new Message<TKey, AuditEvent> { Key = key, Value = auditEvent };
-            var result = await _producer.ProduceAsync(GetTopicPartition(auditEvent), message);
+            var result = await _producer.ProduceAsync(GetTopicPartition(auditEvent), message, cancellationToken);
             ResultHandler?.Invoke(result);
             return result.Key;
         }

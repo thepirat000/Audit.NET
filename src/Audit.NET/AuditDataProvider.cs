@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 #if IS_NK_JSON
 using Newtonsoft.Json.Linq;
@@ -64,10 +65,11 @@ namespace Audit.Core
         /// Insert an event to the data source returning the event id generated
         /// </summary>
         /// <param name="auditEvent">The audit event being inserted.</param>
-        public virtual async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public virtual async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             // Default implementation calls the sync operation
-            return await Task.Factory.StartNew(() => InsertEvent(auditEvent));
+            return await Task.Factory.StartNew(() => InsertEvent(auditEvent), cancellationToken);
         }
 
         /// <summary>
@@ -75,10 +77,11 @@ namespace Audit.Core
         /// Override this method to provide a way to access the audit events by id.
         /// </summary>
         /// <param name="eventId">The event id being retrieved.</param>
-        public virtual async Task<T> GetEventAsync<T>(object eventId) where T : AuditEvent
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public virtual async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             // Default implementation calls the sync operation
-            return await Task.Factory.StartNew(() => GetEvent<T>(eventId));
+            return await Task.Factory.StartNew(() => GetEvent<T>(eventId), cancellationToken);
         }
 
         /// <summary>
@@ -88,10 +91,11 @@ namespace Audit.Core
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>
         /// <param name="eventId">The event id being replaced.</param>
-        public virtual async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public virtual async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             // Default implementation calls the sync operation
-            await Task.Factory.StartNew(() => ReplaceEvent(eventId, auditEvent));
+            await Task.Factory.StartNew(() => ReplaceEvent(eventId, auditEvent), cancellationToken);
         }
 
         /// <summary>
@@ -107,9 +111,10 @@ namespace Audit.Core
         /// Asynchronously retrieves a saved audit event from its id.
         /// </summary>
         /// <param name="eventId">The event id being retrieved.</param>
-        public async Task<AuditEvent> GetEventAsync(object eventId)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public async Task<AuditEvent> GetEventAsync(object eventId, CancellationToken cancellationToken = default)
         {
-            return await GetEventAsync<AuditEvent>(eventId);
+            return await GetEventAsync<AuditEvent>(eventId, cancellationToken);
         }
     }
 }

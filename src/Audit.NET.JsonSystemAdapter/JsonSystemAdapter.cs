@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Text;
+using System.Threading;
 
 namespace Audit.Core
 {
@@ -16,7 +17,7 @@ namespace Audit.Core
             Settings = new JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                PropertyNamingPolicy = null
+                PropertyNamingPolicy = null,
                 // TODO: Will be added on .net 6 https://github.com/dotnet/runtime/pull/46101/commits/152db423e06f6d93a560b45b4330fac6507c7aa7
                 //ReferenceHandler = ReferenceHandler.IgnoreCycle
             };
@@ -39,14 +40,14 @@ namespace Audit.Core
             return JsonSerializer.Deserialize(json, type, Settings);
         }
 
-        public async Task SerializeAsync(Stream stream, object value)
+        public async Task SerializeAsync(Stream stream, object value, CancellationToken cancellationToken = default)
         {
-            await JsonSerializer.SerializeAsync(stream, value, value.GetType(), Settings);
+            await JsonSerializer.SerializeAsync(stream, value, value.GetType(), Settings, cancellationToken);
         }
 
-        public async Task<T> DeserializeAsync<T>(Stream stream)
+        public async Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
-            return await JsonSerializer.DeserializeAsync<T>(stream, Settings);
+            return await JsonSerializer.DeserializeAsync<T>(stream, Settings, cancellationToken);
         }
 
         public T ToObject<T>(object value)

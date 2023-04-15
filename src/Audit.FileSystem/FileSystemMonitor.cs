@@ -121,7 +121,7 @@ namespace Audit.FileSystem
 
         private bool IncludeObject(FileSystemEventArgs e)
         {
-            return _options.CustomFilterPredicate != null ? _options.CustomFilterPredicate.Invoke(e) : true;
+            return _options.CustomFilterPredicate == null || _options.CustomFilterPredicate.Invoke(e);
         }
 
         private void ProcessEvent(FileSystemEventArgs e, FileSystemEventType type)

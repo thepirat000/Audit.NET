@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Audit.Core;
 using System.Threading.Tasks;
 using Nest;
@@ -85,11 +86,11 @@ namespace Audit.Elasticsearch.Providers
             return "/";
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var id = IdBuilder?.Invoke(auditEvent);
             var createRequest = new IndexRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
-            var response = await Client.IndexAsync(createRequest);
+            var response = await Client.IndexAsync(createRequest, cancellationToken);
             if (response.IsValid && response.Result != Result.Error)
             {
                 return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
@@ -112,11 +113,11 @@ namespace Audit.Elasticsearch.Providers
             }
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var el = eventId as ElasticsearchAuditEventId;
             var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
-            var response = await Client.IndexAsync(indexRequest);
+            var response = await Client.IndexAsync(indexRequest, cancellationToken);
             if (response.OriginalException != null)
             {
                 throw response.OriginalException;
@@ -144,16 +145,16 @@ namespace Audit.Elasticsearch.Providers
             return default(T);
         }
 
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var el = eventId as ElasticsearchAuditEventId ?? new ElasticsearchAuditEventId() { Id = eventId.ToString() };
-            return await GetEventAsync<T>(el);
+            return await GetEventAsync<T>(el, cancellationToken);
         }
 
-        public async Task<T> GetEventAsync<T>(ElasticsearchAuditEventId eventId) where T : AuditEvent
+        public async Task<T> GetEventAsync<T>(ElasticsearchAuditEventId eventId, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             var request = new GetRequest(eventId.Index, eventId.Id);
-            var response = await Client.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
+            var response = await Client.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index), cancellationToken);
             if (response.IsValid && response.Found)
             {
                 return response.Source;

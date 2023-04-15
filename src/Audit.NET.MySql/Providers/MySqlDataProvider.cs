@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.NET.MySql;
@@ -94,12 +95,12 @@ namespace Audit.MySql.Providers
             }
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (var cnn = new MySqlConnection(_connectionString))
             {
                 var cmd = GetInsertCommand(cnn, auditEvent);
-                object id = await cmd.ExecuteScalarAsync();
+                object id = await cmd.ExecuteScalarAsync(cancellationToken);
                 return id;
             }
         }
@@ -113,12 +114,12 @@ namespace Audit.MySql.Providers
             }
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (var cnn = new MySqlConnection(_connectionString))
             {
                 var cmd = GetReplaceCommand(cnn, eventId, auditEvent);
-                await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
         }
 
@@ -141,18 +142,18 @@ namespace Audit.MySql.Providers
             return null;
         }
 
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var idParam = new MySqlParameter("@id", eventId);
             using (var cnn = new MySqlConnection(_connectionString))
             {
                 var cmd = GetSelectCommand(cnn, idParam);
-                using (var reader = await cmd.ExecuteReaderAsync())
+                using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
                 {
                     if (reader.HasRows)
                     {
-                        await reader.ReadAsync();
-                        var json = await reader.GetFieldValueAsync<string>(0);
+                        await reader.ReadAsync(cancellationToken);
+                        var json = await reader.GetFieldValueAsync<string>(0, cancellationToken);
                         return AuditEvent.FromJson<T>(json);
                     }
                 }
@@ -264,7 +265,5 @@ namespace Audit.MySql.Providers
             }
             return parameters;
         }
-
-
     }
 }

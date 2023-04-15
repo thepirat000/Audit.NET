@@ -29,7 +29,7 @@ namespace Audit.EntityFramework
         {
             _auditContext = new DefaultAuditContext(eventData.Context);
             _helper.SetConfig(_auditContext);
-            _auditScope = await _helper.BeginSaveChangesAsync(_auditContext);
+            _auditScope = await _helper.BeginSaveChangesAsync(_auditContext, cancellationToken);
             return await base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
@@ -41,7 +41,7 @@ namespace Audit.EntityFramework
 
         public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
         {
-            await _helper.EndSaveChangesAsync(_auditContext, _auditScope, result);
+            await _helper.EndSaveChangesAsync(_auditContext, _auditScope, result, null, cancellationToken);
             return await base.SavedChangesAsync(eventData, result, cancellationToken);
         }
 
@@ -53,7 +53,7 @@ namespace Audit.EntityFramework
 
         public override async Task SaveChangesFailedAsync(DbContextErrorEventData eventData, CancellationToken cancellationToken = default)
         {
-            await _helper.EndSaveChangesAsync(_auditContext, _auditScope, 0, eventData.Exception);
+            await _helper.EndSaveChangesAsync(_auditContext, _auditScope, 0, eventData.Exception, cancellationToken);
             await base.SaveChangesFailedAsync(eventData, cancellationToken);
         }
     }

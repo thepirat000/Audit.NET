@@ -1,5 +1,6 @@
 using Audit.Core.Providers;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Core.ConfigurationApi
@@ -21,9 +22,21 @@ namespace Audit.Core.ConfigurationApi
             return this;
         }
 
-        public IDynamicAsyncDataProviderConfigurator OnInsert(Func<AuditEvent, Task<object>> insertFunction)
+        public IDynamicAsyncDataProviderConfigurator OnInsert(Func<AuditEvent, CancellationToken, Task> insertAction)
         {
-            _dynamicAsyncDataProvider.AttachOnInsert(insertFunction);
+            _dynamicAsyncDataProvider.AttachOnInsert(insertAction);
+            return this;
+        }
+
+        public IDynamicAsyncDataProviderConfigurator OnInsert(Func<AuditEvent, Task<object>> insertAction)
+        {
+            _dynamicAsyncDataProvider.AttachOnInsert(insertAction);
+            return this;
+        }
+
+        public IDynamicAsyncDataProviderConfigurator OnInsert(Func<AuditEvent, CancellationToken, Task<object>> insertAction)
+        {
+            _dynamicAsyncDataProvider.AttachOnInsert(insertAction);
             return this;
         }
 
@@ -39,7 +52,25 @@ namespace Audit.Core.ConfigurationApi
             return this;
         }
 
+        public IDynamicAsyncDataProviderConfigurator OnInsertAndReplace(Func<object, AuditEvent, CancellationToken, Task> insertReplaceAction)
+        {
+            _dynamicAsyncDataProvider.AttachOnInsertAndReplace(insertReplaceAction);
+            return this;
+        }
+
+        public IDynamicAsyncDataProviderConfigurator OnInsertAndReplace(Func<AuditEvent, CancellationToken, Task> insertReplaceAction)
+        {
+            _dynamicAsyncDataProvider.AttachOnInsertAndReplace(insertReplaceAction);
+            return this;
+        }
+
         public IDynamicAsyncDataProviderConfigurator OnReplace(Func<object, AuditEvent, Task> replaceAction)
+        {
+            _dynamicAsyncDataProvider.AttachOnReplace(replaceAction);
+            return this;
+        }
+
+        public IDynamicAsyncDataProviderConfigurator OnReplace(Func<object, AuditEvent, CancellationToken, Task> replaceAction)
         {
             _dynamicAsyncDataProvider.AttachOnReplace(replaceAction);
             return this;

@@ -120,7 +120,7 @@ namespace Audit.WebApi.UnitTest
             };
 
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>()))
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
@@ -170,9 +170,9 @@ namespace Audit.WebApi.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
             Assert.AreEqual(typeof(ActionFilterUnitTest).GetMethods().First().Name, action.ActionName);
             Assert.AreEqual(action, actionFromController);
@@ -224,7 +224,7 @@ namespace Audit.WebApi.UnitTest
             };
 
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
             var filter = new AuditApiAttribute()
@@ -256,9 +256,9 @@ namespace Audit.WebApi.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
@@ -300,7 +300,7 @@ namespace Audit.WebApi.UnitTest
             var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
 
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditApiAttribute()
@@ -335,9 +335,9 @@ namespace Audit.WebApi.UnitTest
             var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("header-value", action.Headers["test-header"]);
@@ -379,7 +379,7 @@ namespace Audit.WebApi.UnitTest
             var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
 
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditApiAttribute()
@@ -418,9 +418,9 @@ namespace Audit.WebApi.UnitTest
             var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("header-value", action.Headers["test-header"]);

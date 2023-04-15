@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Audit.JsonNewtonsoftAdapter;
 using Newtonsoft.Json;
@@ -49,7 +51,7 @@ namespace Audit.Core
             return JsonConvert.DeserializeObject(json, type, Settings);
         }
 
-        public async Task SerializeAsync(Stream stream, object value)
+        public async Task SerializeAsync(Stream stream, object value, CancellationToken cancellationToken = default)
         {
             var json = JsonConvert.SerializeObject(value, Settings);
             using (StreamWriter sw = new StreamWriter(stream))
@@ -58,13 +60,13 @@ namespace Audit.Core
             }
         }
 
-        public async Task<T> DeserializeAsync<T>(Stream stream)
+        public async Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
             using (var sr = new StreamReader(stream))
             {
                 using (var jr = new JsonTextReader(sr))
                 {
-                    var jObject = await JObject.LoadAsync(jr);
+                    var jObject = await JObject.LoadAsync(jr, cancellationToken);
                     return jObject.ToObject<T>(JsonSerializer.Create(Settings));
                 }
             }

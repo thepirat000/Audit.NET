@@ -103,7 +103,7 @@ namespace Audit.EntityFramework.Interceptors
             {
                 CommandEvent = CreateAuditEvent(command, eventData)
             };
-            _currentScope = await CreateAuditScopeAsync(auditEvent);
+            _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
             return await base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
         }
 
@@ -167,7 +167,7 @@ namespace Audit.EntityFramework.Interceptors
             {
                 CommandEvent = CreateAuditEvent(command, eventData)
             };
-            _currentScope = await CreateAuditScopeAsync(auditEvent);
+            _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
             return await base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
         }
 #if EF_CORE_3
@@ -226,7 +226,7 @@ namespace Audit.EntityFramework.Interceptors
             {
                 CommandEvent = CreateAuditEvent(command, eventData)
             };
-            _currentScope = await CreateAuditScopeAsync(auditEvent);
+            _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
             return await base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
         }
 #if EF_CORE_3
@@ -394,7 +394,7 @@ namespace Audit.EntityFramework.Interceptors
             return scope;
         }
 
-        private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventCommandEntityFramework cmdEvent)
+        private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventCommandEntityFramework cmdEvent, CancellationToken cancellationToken)
         {
             var context = cmdEvent.CommandEvent.DbContext as IAuditDbContext;
 
@@ -423,7 +423,7 @@ namespace Audit.EntityFramework.Interceptors
                 DataProvider = context?.AuditDataProvider
             };
 
-            var scope = await factory.CreateAsync(options);
+            var scope = await factory.CreateAsync(options, cancellationToken);
             context?.OnScopeCreated(scope);
             return scope;
         }

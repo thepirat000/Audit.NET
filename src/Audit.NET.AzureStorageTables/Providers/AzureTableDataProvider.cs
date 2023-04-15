@@ -5,6 +5,7 @@ using Azure.Core;
 using Azure.Data.Tables;
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.AzureStorageTables.Providers
@@ -93,11 +94,11 @@ namespace Audit.AzureStorageTables.Providers
             return new [] { entity.PartitionKey, entity.RowKey };
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var client = await GetTableClientAsync(auditEvent);
+            var client = await GetTableClientAsync(auditEvent, cancellationToken);
             var entity = CreateTableEntity(auditEvent);
-            await client.AddEntityAsync(entity);
+            await client.AddEntityAsync(entity, cancellationToken);
             return new[] { entity.PartitionKey, entity.RowKey };
         }
 
@@ -115,18 +116,18 @@ namespace Audit.AzureStorageTables.Providers
             client.UpdateEntity(entity, ETag.All, TableUpdateMode.Replace);
         }
         
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var fields = eventId as string[];
             var partKey = fields[0];
             var rowKey = fields[1];
 
-            var client = await GetTableClientAsync(auditEvent);
+            var client = await GetTableClientAsync(auditEvent, cancellationToken);
             var entity = CreateTableEntity(auditEvent);
 
             entity.PartitionKey = partKey;
             entity.RowKey = rowKey;
-            await client.UpdateEntityAsync(entity, ETag.All, TableUpdateMode.Replace);
+            await client.UpdateEntityAsync(entity, ETag.All, TableUpdateMode.Replace, cancellationToken);
         }
 
         private ITableEntity CreateTableEntity(AuditEvent auditEvent)
@@ -165,7 +166,8 @@ namespace Audit.AzureStorageTables.Providers
         /// Returns a cached instance of a TableClient for the table related to the Audit Event. Creates the Table if it does not exists.
         /// </summary>
         /// <param name="auditEvent">The audit event</param>
-        public async Task<TableClient> GetTableClientAsync(AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public async Task<TableClient> GetTableClientAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             // From custom factory
             if (TableClientFactory != null)
@@ -183,7 +185,7 @@ namespace Audit.AzureStorageTables.Providers
 
             // New client
             var newClient = CreateTableclient(tableName);
-            await newClient.CreateIfNotExistsAsync();
+            await newClient.CreateIfNotExistsAsync(cancellationToken);
             TableClientCache[tableName] = newClient;
             return newClient;
         }

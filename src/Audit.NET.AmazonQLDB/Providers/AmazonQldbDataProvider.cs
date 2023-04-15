@@ -8,6 +8,7 @@ using Audit.NET.AmazonQLDB.ConfigurationApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -102,7 +103,7 @@ namespace Audit.NET.AmazonQLDB.Providers
         /// <summary>
         /// Asynchronously inserts an event into AmazonQLDB
         /// </summary>
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var driver = QldbDriver.Value;
             var tableName = GetTableName(auditEvent);
@@ -113,16 +114,16 @@ namespace Audit.NET.AmazonQLDB.Providers
                 var insertInto = $@"INSERT INTO {tableName} VALUE ?";
                 try
                 {
-                    inserted = await (await txn.Execute(insertInto, IonLoader.Default.Load(json))).FirstAsync();
+                    inserted = await (await txn.Execute(insertInto, IonLoader.Default.Load(json))).FirstAsync(cancellationToken);
                 }
                 catch (BadRequestException e) when (e.Message.Contains($"No such variable named '{tableName}'"))
                 {
                     await txn.Execute($"CREATE TABLE {tableName}");
-                    inserted = await(await txn.Execute(insertInto, IonLoader.Default.Load(json))).FirstAsync();
+                    inserted = await(await txn.Execute(insertInto, IonLoader.Default.Load(json))).FirstAsync(cancellationToken);
                 }
-            });
+            }, cancellationToken);
 
-            var insertDocumentId = inserted.GetField("documentId").StringValue;
+            var insertDocumentId = inserted?.GetField("documentId").StringValue;
             return (insertDocumentId, tableName);
         }
 
@@ -134,7 +135,7 @@ namespace Audit.NET.AmazonQLDB.Providers
         /// <summary>
         /// Asynchronously replaces an event into AmazonQLDB
         /// </summary>
-        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var driver = QldbDriver.Value;
             var (insertDocumentId, tableName) = (ValueTuple<string, string>)eventId;
@@ -142,7 +143,7 @@ namespace Audit.NET.AmazonQLDB.Providers
                 $@"UPDATE {tableName} AS e BY eid
                       SET e = ?
                       WHERE eid = ?",
-                IonLoader.Default.Load(JsonConvert.SerializeObject(auditEvent, JsonSettings)), new ValueFactory().NewString(insertDocumentId)));
+                IonLoader.Default.Load(JsonConvert.SerializeObject(auditEvent, JsonSettings)), new ValueFactory().NewString(insertDocumentId)), cancellationToken);
         }
 
         /// <summary>
@@ -161,9 +162,10 @@ namespace Audit.NET.AmazonQLDB.Providers
         /// <param name="eventId">The event ID to retrieve. 
         /// Must be a Primitive, a AmazonQLDBEntry or an array of any of these two types. The first (or only) element must be the Hash key, and the second element is the range key.
         /// </param>
-        public override Task<T> GetEventAsync<T>(object eventId) => GetFromQldb<T>(eventId);
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public override Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default) => GetFromQldb<T>(eventId, cancellationToken);
 
-        private async Task<T> GetFromQldb<T>(object eventId) where T : AuditEvent
+        private async Task<T> GetFromQldb<T>(object eventId, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             var driver = QldbDriver.Value;
             var (insertDocumentId, tableName) = (ValueTuple<string, string>)eventId;
@@ -174,8 +176,8 @@ namespace Audit.NET.AmazonQLDB.Providers
                     $@"SELECT e.*
                       FROM {tableName} AS e BY eid                      
                       WHERE eid = ?",
-                    new ValueFactory().NewString(insertDocumentId))).FirstAsync();
-            });
+                    new ValueFactory().NewString(insertDocumentId))).FirstAsync(cancellationToken);
+            }, cancellationToken);
             var json = selectedEvent.ToPrettyString();
             var selectedAuditEvent = JsonConvert.DeserializeObject<T>(json, JsonSettings);
             return selectedAuditEvent;

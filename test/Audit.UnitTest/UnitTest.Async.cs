@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace Audit.UnitTest
 {
@@ -569,9 +570,9 @@ namespace Audit.UnitTest
             await new AuditScopeFactory().LogAsync(eventType, new { ExtraField = "extra value" });
 
             await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(eventType, extraFields: new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, dataProvider: provider.Object, isCreateAndSave: true));
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
 
         }
 
@@ -604,9 +605,9 @@ namespace Audit.UnitTest
             Core.Configuration.ResetCustomActions();
             Assert.True(ev.CustomFields.ContainsKey("custom field"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test]
@@ -630,7 +631,7 @@ namespace Audit.UnitTest
             }
             Core.Configuration.ResetCustomActions();
             Assert.True(ev.Comments.Contains(comment));
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -652,7 +653,7 @@ namespace Audit.UnitTest
             }
             Core.Configuration.ResetCustomActions();
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test]
@@ -682,9 +683,9 @@ namespace Audit.UnitTest
             Assert.False(ev.CustomFields.ContainsKey(key1));
             Assert.True(ev.CustomFields.ContainsKey(key2));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test]
@@ -703,11 +704,11 @@ namespace Audit.UnitTest
                 scope.SetCustomField<string>("custom", "value");
                 target = "final";
                 await scope.SaveAsync(); // this should do nothing because of the creation policy (this no more true since v4.6.2)
-                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             }
             Assert.AreEqual(eventType, ev.EventType);
             Assert.True(ev.Comments.Contains("test"));
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
@@ -721,7 +722,7 @@ namespace Audit.UnitTest
             {               
             }
 
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
         }
 #endif
 
@@ -746,7 +747,7 @@ namespace Audit.UnitTest
             Assert.True(ev.Comments.Contains("test"));
             Assert.Null(ev.Target.New);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test]
@@ -760,8 +761,8 @@ namespace Audit.UnitTest
                 await scope.SaveAsync(); // this should do nothing because of the creation policy (this is no more true, since v 4.6.2)
             }
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
@@ -769,15 +770,15 @@ namespace Audit.UnitTest
         public async Task Test_EventCreationPolicy_InsertOnStartReplaceOnEnd_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
             {
                 scope.Comment("test");
                 await scope.DisposeAsync();
             }
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -785,15 +786,15 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
-            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd, null))
             {
                 scope.Comment("test");
             }
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(1));
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
         }
 
@@ -801,14 +802,14 @@ namespace Audit.UnitTest
         public async Task Test_EventCreationPolicy_Manual_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
             {
                 scope.Comment("test");
             }
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
 
             using (var scope = await new AuditScopeFactory().CreateAsync("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
             {
@@ -817,8 +818,8 @@ namespace Audit.UnitTest
                 scope.Comment("test2");
                 await scope.SaveAsync();
             }
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
-            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+            provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -838,7 +839,7 @@ namespace Audit.UnitTest
         {
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
-            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
+            provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
             var scope1 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, null, EventCreationPolicy.Manual));
             await scope1.SaveAsync();
@@ -847,7 +848,7 @@ namespace Audit.UnitTest
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);
             Assert.AreNotEqual(scope1.EventId, scope2.EventId);
-            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Exactly(2));
+            provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
 
         [AuditDbContext(AuditEventType = "FromAttr")]

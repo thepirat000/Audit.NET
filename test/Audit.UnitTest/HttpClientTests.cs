@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.UnitTest
@@ -431,8 +432,8 @@ namespace Audit.UnitTest
             });
 
             var factory = new Mock<IAuditScopeFactory>();
-            factory.Setup(_ => _.Create(It.IsAny<AuditScopeOptions>()))
-                .Returns(new AuditScope(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventHttpClient() }));
+            factory.Setup(_ => _.CreateAsync(It.IsAny<AuditScopeOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new AuditScope(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventHttpClient() }));
             var url = "http://google.com/?q=test";
             using (var cli = new HttpClient(new AuditHttpClientHandler() { RequestFilter = _ => true, AuditScopeFactory = factory.Object }))
             {

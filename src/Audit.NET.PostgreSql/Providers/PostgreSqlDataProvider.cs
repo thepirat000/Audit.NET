@@ -4,6 +4,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.PostgreSql.Providers
@@ -155,12 +156,12 @@ namespace Audit.PostgreSql.Providers
             }
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
             {
                 var cmd = GetInsertCommand(cnn, auditEvent);
-                var id = await cmd.ExecuteScalarAsync();
+                var id = await cmd.ExecuteScalarAsync(cancellationToken);
                 return id;
             }
         }
@@ -174,12 +175,12 @@ namespace Audit.PostgreSql.Providers
             }
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
             {
                 var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
-                await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
         }
 
@@ -201,16 +202,16 @@ namespace Audit.PostgreSql.Providers
             return null;
         }
 
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
             {
                 var cmd = GetSelectCommand(cnn, eventId);
-                using (var reader = await cmd.ExecuteReaderAsync())
+                using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
                 {
                     if (reader.HasRows)
                     {
-                        await reader.ReadAsync();
+                        await reader.ReadAsync(cancellationToken);
                         var json = reader.GetString(0);
                         return AuditEvent.FromJson<T>(json);
                     }

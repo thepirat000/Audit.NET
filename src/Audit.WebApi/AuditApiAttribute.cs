@@ -13,7 +13,7 @@ namespace Audit.WebApi
 {
     public class AuditApiAttribute : ActionFilterAttribute
     {
-        private AuditApiAdapter _adapter = new AuditApiAdapter();
+        private readonly AuditApiAdapter _adapter = new AuditApiAdapter();
 
         /// <summary>
         /// Gets or sets a value indicating whether the output should include the Http Response Headers.
@@ -87,7 +87,7 @@ namespace Audit.WebApi
             {
                 return;
             }
-            await _adapter.BeforeExecutingAsync(actionContext, GetContextWrapper(actionContext.Request), IncludeHeaders, IncludeRequestBody, SerializeActionParameters, EventTypeName);
+            await _adapter.BeforeExecutingAsync(actionContext, GetContextWrapper(actionContext.Request), IncludeHeaders, IncludeRequestBody, SerializeActionParameters, EventTypeName, cancellationToken);
         }
 
         public override async Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
@@ -96,7 +96,7 @@ namespace Audit.WebApi
             {
                 return;
             }
-            await _adapter.AfterExecutedAsync(actionExecutedContext, GetContextWrapper(actionExecutedContext.Request), IncludeModelState, ShouldIncludeResponseBody(actionExecutedContext), IncludeResponseHeaders);
+            await _adapter.AfterExecutedAsync(actionExecutedContext, GetContextWrapper(actionExecutedContext.Request), IncludeModelState, ShouldIncludeResponseBody(actionExecutedContext), IncludeResponseHeaders, cancellationToken);
         }
 
         private bool ShouldIncludeResponseBody(HttpActionExecutedContext context)

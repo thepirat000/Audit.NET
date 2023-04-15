@@ -6,6 +6,7 @@ using Microsoft.Azure.Cosmos;
 using Audit.AzureCosmos.ConfigurationApi;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Audit.AzureCosmos.Providers
 {
@@ -89,15 +90,15 @@ namespace Audit.AzureCosmos.Providers
         {
             var container = GetContainer();
             var id = GetSetId(auditEvent);
-            var response = container.CreateItemAsync(auditEvent).GetAwaiter().GetResult();
+            container.CreateItemAsync(auditEvent).GetAwaiter().GetResult();
             return id;
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var container = GetContainer();
             var id = GetSetId(auditEvent);
-            var response = await container.CreateItemAsync(auditEvent);
+            await container.CreateItemAsync(auditEvent, cancellationToken: cancellationToken);
             return id;
         }
 
@@ -108,11 +109,11 @@ namespace Audit.AzureCosmos.Providers
             container.ReplaceItemAsync(auditEvent, id).GetAwaiter().GetResult();
         }
 
-        public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var container = GetContainer();
             var id = docId.ToString();
-            await container.ReplaceItemAsync(auditEvent, id);
+            await container.ReplaceItemAsync(auditEvent, id, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -134,17 +135,17 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
         /// </summary>
-        public override async Task<T> GetEventAsync<T>(object id)
+        public override async Task<T> GetEventAsync<T>(object id, CancellationToken cancellationToken = default)
         {
             if (id is ValueTuple<string, string> vt)
             {
-                return await GetEventAsync<T>(vt.Item1, vt.Item2);
+                return await GetEventAsync<T>(vt.Item1, vt.Item2, cancellationToken);
             }
             if (id is Tuple<string, string> t)
             {
-                return await GetEventAsync<T>(t.Item1, t.Item2);
+                return await GetEventAsync<T>(t.Item1, t.Item2, cancellationToken);
             }
-            return await GetEventAsync<T>(id?.ToString(), null);
+            return await GetEventAsync<T>(id?.ToString(), null, cancellationToken);
         }
 
         /// <summary>
@@ -159,10 +160,10 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// Gets an event stored on cosmos DB from its id and partition key.
         /// </summary>
-        public async Task<T> GetEventAsync<T>(string id, string partitionKey)
+        public async Task<T> GetEventAsync<T>(string id, string partitionKey, CancellationToken cancellationToken = default)
         {
             var container = GetContainer();
-            return await container.ReadItemAsync<T>(id, partitionKey == null ? PartitionKey.None : new PartitionKey(partitionKey));
+            return await container.ReadItemAsync<T>(id, partitionKey == null ? PartitionKey.None : new PartitionKey(partitionKey), cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -176,9 +177,9 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// Gets an event stored on cosmos DB from its id and partition key.
         /// </summary>
-        public async Task<AuditEvent> GetEventAsync(string docId, string partitionKey)
+        public async Task<AuditEvent> GetEventAsync(string docId, string partitionKey, CancellationToken cancellationToken = default)
         {
-            return await GetEventAsync<AuditEvent>(docId, partitionKey);
+            return await GetEventAsync<AuditEvent>(docId, partitionKey, cancellationToken);
         }
 
         private CosmosClient GetClient()
@@ -266,13 +267,14 @@ namespace Audit.AzureCosmos.Providers
         /// <typeparam name="T">The AuditEvent type</typeparam>
         /// <param name="sqlExpression">The Azure Cosmos SQL expression</param>
         /// <param name="queryOptions">The options for processing the query results feed.</param>
-        public async IAsyncEnumerable<T> EnumerateEvents<T>(string sqlExpression, QueryRequestOptions queryOptions = null) where T : AuditEvent
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public async IAsyncEnumerable<T> EnumerateEvents<T>(string sqlExpression, QueryRequestOptions queryOptions = null, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             var container = GetContainer();
             var feed = container.GetItemQueryIterator<T>(sqlExpression, null, queryOptions);
             while (feed.HasMoreResults)
             {
-                foreach (var auditEvent in await feed.ReadNextAsync())
+                foreach (var auditEvent in await feed.ReadNextAsync(cancellationToken))
                 {
                     yield return auditEvent;
                 }

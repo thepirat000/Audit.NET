@@ -120,7 +120,7 @@ namespace Audit.WebApi
                 return;
             }
             await _adapter.BeforeExecutingAsync(actionContext, ContextWrapper(actionContext.Request), IncludeRequestHeaders(actionContext), 
-                IncludeRequestBody(actionContext), _serializeActionParameters, EventTypeName(actionContext));
+                IncludeRequestBody(actionContext), _serializeActionParameters, EventTypeName(actionContext), cancellationToken);
         }
 
         public override async Task OnActionExecutedAsync(ActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
@@ -132,7 +132,7 @@ namespace Audit.WebApi
                 return;
             }
             await _adapter.AfterExecutedAsync(actionExecutedContext, ContextWrapper(actionExecutedContext.Request), 
-                IncludeModelState(actionExecutedContext), IncludeResponseBody(actionExecutedContext), IncludeResponseHeaders(actionExecutedContext));
+                IncludeModelState(actionExecutedContext), IncludeResponseBody(actionExecutedContext), IncludeResponseHeaders(actionExecutedContext), cancellationToken);
         }
 #endif
 

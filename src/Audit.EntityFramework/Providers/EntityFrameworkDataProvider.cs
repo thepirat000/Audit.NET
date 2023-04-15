@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Audit.EntityFramework.ConfigurationApi;
+using System.Threading;
 #if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -184,7 +185,7 @@ namespace Audit.EntityFramework.Providers
             return auditEvent;
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             bool save = false;
             if (!(auditEvent is AuditEventEntityFramework efEvent))
@@ -230,7 +231,7 @@ namespace Audit.EntityFramework.Providers
 #if EF_FULL
                             auditDbContext.Set(mappedType).Add(auditEntity);
 #else
-                            await auditDbContext.AddAsync(auditEntity);
+                            await auditDbContext.AddAsync(auditEntity, cancellationToken);
 #endif
                             save = true;
                         }
@@ -238,13 +239,13 @@ namespace Audit.EntityFramework.Providers
                 }
                 if (save)
                 {
-                    if (auditDbContext is IAuditBypass)
+                    if (auditDbContext is IAuditBypass bypass)
                     {
-                        await (auditDbContext as IAuditBypass).SaveChangesBypassAuditAsync();
+                        await bypass.SaveChangesBypassAuditAsync(cancellationToken);
                     }
                     else
                     {
-                        await auditDbContext.SaveChangesAsync();
+                        await auditDbContext.SaveChangesAsync(cancellationToken);
                     }
                 }
             }
@@ -344,6 +345,7 @@ namespace Audit.EntityFramework.Providers
             return result;
         }
 
+#if EF_FULL
         private Dictionary<string, PropertyInfo> GetPropertiesToGet(Type type)
         {
             var result = new Dictionary<string, PropertyInfo>();
@@ -355,7 +357,7 @@ namespace Audit.EntityFramework.Providers
             }
             return result;
         }
-
+#endif
         private Type GetTypeNoProxy(Type type)
         {
             if (type == null)
@@ -374,7 +376,7 @@ namespace Audit.EntityFramework.Providers
             return;
         }
 
-        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
 #if NET45
             return Task.FromResult(0);

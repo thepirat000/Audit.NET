@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Udp.Providers
@@ -62,10 +63,11 @@ namespace Audit.Udp.Providers
         }
 
         /// <summary>
-        /// Sends an event to the network asychronously as an UDP datagram
+        /// Sends an event to the network asynchronously as an UDP datagram
         /// </summary>
         /// <param name="auditEvent">The audit event being created.</param>
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var eventId = Guid.NewGuid();
             await SendAsync(eventId, auditEvent);
@@ -83,11 +85,12 @@ namespace Audit.Udp.Providers
         }
 
         /// <summary>
-        /// Sends an event to the network asychronously as an UDP datagram, related to a previous event
+        /// Sends an event to the network asynchronously as an UDP datagram, related to a previous event
         /// </summary>
         /// <param name="auditEvent">The audit event.</param>
         /// <param name="eventId">The event id being replaced.</param>
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             await SendAsync(eventId, auditEvent);
         }

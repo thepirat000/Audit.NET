@@ -22,6 +22,7 @@ using System.Data.SqlClient;
 // see this why https://github.com/dotnet/efcore/issues/18220 and https://github.com/googleapis/google-cloud-dotnet/issues/6315
 using static System.Linq.Queryable;
 using static System.Linq.Enumerable; // You only need this if you're using LINQ to Objects
+using System.Threading;
 
 namespace Audit.IntegrationTest
 {
@@ -996,7 +997,7 @@ SET IDENTITY_INSERT Posts OFF
         {
             var provider = new Mock<AuditDataProvider>();
             AuditEvent auditEvent = null;
-            provider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync((AuditEvent ev) =>
+            provider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync((AuditEvent ev, CancellationToken ct) =>
             {
                 auditEvent = ev;
                 return Guid.NewGuid();
@@ -1052,7 +1053,7 @@ SET IDENTITY_INSERT Posts OFF
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && (e.Entity as Post)?.Id == 5));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Delete" && e.ColumnValues["Id"].Equals(5) && (e.Entity as Post)?.Id == 5));
                 provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+                provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
 
             }
         }

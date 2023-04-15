@@ -237,20 +237,20 @@ namespace Audit.IntegrationTest
             _inserted.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
             return base.InsertEvent(auditEvent);
         }
-        public override Task<object> InsertEventAsync(Core.AuditEvent auditEvent)
+        public override Task<object> InsertEventAsync(Core.AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             _inserted.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.InsertEventAsync(auditEvent);
+            return base.InsertEventAsync(auditEvent, cancellationToken);
         }
         public override void ReplaceEvent(object eventId, Core.AuditEvent auditEvent)
         {
             _replaced.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
             base.ReplaceEvent(eventId, auditEvent);
         }
-        public override Task ReplaceEventAsync(object eventId, Core.AuditEvent auditEvent)
+        public override Task ReplaceEventAsync(object eventId, Core.AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             _replaced.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.ReplaceEventAsync(eventId, auditEvent);
+            return base.ReplaceEventAsync(eventId, auditEvent, cancellationToken);
         }
     }
 }

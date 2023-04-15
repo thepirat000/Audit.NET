@@ -13,12 +13,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Mvc
 {
     public class AuditPageFilter : IAsyncPageFilter
     {
+        // Default stream copy buffer size (from System.IO::Stream)
+        private const int DefaultCopyBufferSize = 81920;
+
         private const string AuditActionKey = "__private_AuditAction__";
         private const string AuditScopeKey = "__private_AuditScope__";
 
@@ -84,22 +88,28 @@ namespace Audit.Mvc
         {
             var httpContext = context.HttpContext;
             var request = httpContext.Request;
-            var actionDescriptior = context.ActionDescriptor;
+            var actionDescriptor = context.ActionDescriptor;
+            var requestCancellationToken = httpContext.RequestAborted;
 
             var auditAction = new AuditAction()
             {
-                UserName = httpContext.User?.Identity.Name,
+                UserName = httpContext.User?.Identity?.Name,
                 IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = string.Format("{0}://{1}{2}{3}", request.Scheme, request.Host, request.Path, request.QueryString),
                 HttpMethod = request.Method,
                 FormVariables = request.HasFormContentType ? AuditHelper.ToDictionary(request.Form) : null,
                 Headers = IncludeHeaders ? AuditHelper.ToDictionary(request.Headers) : null,
-                ActionName = actionDescriptior?.DisplayName,
-                ControllerName = actionDescriptior?.AreaName,
+                ActionName = actionDescriptor?.DisplayName,
+                ControllerName = actionDescriptor?.AreaName,
                 ActionParameters = GetActionParameters(context),
-                RequestBody = new BodyContent { Type = request.ContentType, Length = request.ContentLength, Value = IncludeRequestBody ? await GetRequestBody(context) : null },
+                RequestBody = new BodyContent
+                {
+                    Type = request.ContentType, 
+                    Length = request.ContentLength, 
+                    Value = IncludeRequestBody ? await GetRequestBody(context, requestCancellationToken) : null
+                },
                 TraceId = httpContext.TraceIdentifier,
-                ViewPath = actionDescriptior?.ViewEnginePath,
+                ViewPath = actionDescriptor?.ViewEnginePath,
                 PageHandlerExecutingContext = context
             };
 
@@ -114,7 +124,13 @@ namespace Audit.Mvc
             {
                 Action = auditAction
             };
-            var auditScope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = context.HandlerMethod?.MethodInfo });
+            var auditScopeOptions = new AuditScopeOptions()
+            {
+                EventType = eventType, 
+                AuditEvent = auditEventAction, 
+                CallingMethod = context.HandlerMethod?.MethodInfo
+            };
+            var auditScope = await AuditScope.CreateAsync(auditScopeOptions, requestCancellationToken);
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
         }
@@ -123,6 +139,7 @@ namespace Audit.Mvc
         {
             var httpContext = context.HttpContext;
             var auditAction = httpContext.Items[AuditActionKey] as AuditAction;
+
             if (auditAction != null)
             {
                 auditAction.ModelStateErrors = IncludeModel ? AuditHelper.GetModelStateErrors(context.ModelState) : null;
@@ -148,24 +165,26 @@ namespace Audit.Mvc
             if (auditScope != null)
             {
                 // Replace the Action field
-                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
+                ((AuditEventMvcAction)auditScope.Event).Action = auditAction;
                 // Save the event and dispose the scope
                 await auditScope.DisposeAsync();
             }
         }
 
-        private async Task<string> GetRequestBody(PageHandlerExecutingContext context)
+        private async Task<string> GetRequestBody(PageHandlerExecutingContext context, CancellationToken cancellationToken)
         {
             var body = context.HttpContext.Request.Body;
             if (body != null && body.CanRead)
             {
                 using (var stream = new MemoryStream())
                 {
+                    int bufferSize = DefaultCopyBufferSize;
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);
+                        bufferSize = (int)Math.Min(bufferSize, body.Length < 2 ? 1 : body.Length);
                     }
-                    await body.CopyToAsync(stream);
+                    await body.CopyToAsync(stream, bufferSize, cancellationToken);
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);

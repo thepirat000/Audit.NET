@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [21.0.0] - 2023-04-15
+- Audit.NET and all its extensions: Adding CancellationToken support for all the Async methods (#597)
+
 ## [20.2.4] - 2023-03-26
 - Audit.EntityFramework.Core: Fix to allow continuing with the audit process even if the DbContext got disposed within the SaveChanges operation (#589)
 
