@@ -10,19 +10,18 @@ namespace Audit.UnitTest
 {
     public class FileSystemTests
     {
-        private const string folder = @"C:\temp";
-
-        [SetUp]
-        public void Setup()
-        {
-            System.IO.Directory.CreateDirectory(folder);
-        }
+        private static Random random = new Random();
 
         [Test]
         public void Test_FileSystem_1()
         {
-            var t1path = Path.Combine(folder, "test.txt");
-            var t2path = Path.Combine(folder, "test2.txt");
+            var folder = Path.Combine(Path.GetTempPath(), random.Next(1000, 9999).ToString());
+            System.IO.Directory.CreateDirectory(folder);
+            
+            var filename1 = $"test_{random.Next(1000, 9999)}.txt";
+            var filename2 = $"test_{random.Next(1000, 9999)}.txt";
+            var t1path = Path.Combine(folder, filename1);
+            var t2path = Path.Combine(folder, filename2);
             File.Delete(t1path);
             File.Delete(t2path);
             var locker = new object();
@@ -51,19 +50,21 @@ namespace Audit.UnitTest
             var create = evs.Single(x => x.Event == FileSystemEventType.Create);
             Assert.IsTrue(evs.Count >= 3);
             Assert.AreEqual(FileSystemEventType.Create, create.Event);
-            Assert.AreEqual("test.txt", create.Name);
+            Assert.AreEqual(filename1, create.Name);
             Assert.AreEqual(14, create.Length);
             Assert.AreEqual(ContentType.Text, create.FileContent.Type);
             Assert.AreEqual("this is a test", (create.FileContent as FileTextualContent).Value);
             Assert.IsNotNull(create.MD5);
 
             var rename = evs.Single(x => x.Event == FileSystemEventType.Rename);
-            Assert.AreEqual("test.txt", rename.OldName);
-            Assert.AreEqual("test2.txt", rename.Name);
+            Assert.AreEqual(filename1, rename.OldName);
+            Assert.AreEqual(filename2, rename.Name);
             Assert.IsNotNull(rename.MD5);
 
             var delete = evs.Single(x => x.Event == FileSystemEventType.Delete);
-            Assert.AreEqual("test2.txt", delete.Name);
+            Assert.AreEqual(filename2, delete.Name);
+
+            System.IO.Directory.Delete(folder, true);
         }
 
     }
