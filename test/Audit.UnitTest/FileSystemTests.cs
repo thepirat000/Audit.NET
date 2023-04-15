@@ -47,8 +47,8 @@ namespace Audit.UnitTest
             File.Delete(t2path);
             Thread.Sleep(500);
 
+            Assert.IsTrue(evs.Count >= 3, "Events: {0}", evs.Count);
             var create = evs.Single(x => x.Event == FileSystemEventType.Create);
-            Assert.IsTrue(evs.Count >= 3);
             Assert.AreEqual(FileSystemEventType.Create, create.Event);
             Assert.AreEqual(filename1, create.Name);
             Assert.AreEqual(14, create.Length);

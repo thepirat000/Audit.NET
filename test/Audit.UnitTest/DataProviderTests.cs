@@ -59,26 +59,32 @@ namespace Audit.UnitTest
             bool tokenCancelled_inserted = !cancel;
             bool tokenCancelled_replaced = !cancel;
 
-            Audit.Core.Configuration.Setup()
-                .UseDynamicAsyncProvider(c => c.OnInsert(async (ev, ct) =>
-                {
-                    events_inserted.Add(AuditEvent.FromJson(ev.ToJson()));
-                    tokenCancelled_inserted = ct.IsCancellationRequested;
-                    await Task.CompletedTask;
-                }).OnReplace(async (id, ev, ct) =>
-                {
-                    events_replaced.Add(AuditEvent.FromJson(ev.ToJson()));
-                    tokenCancelled_replaced = ct.IsCancellationRequested;
-                    await Task.CompletedTask;
-                }))
-                .WithCreationPolicy(EventCreationPolicy.Manual);
+            var dp = new DynamicAsyncDataProvider(c => c.OnInsert(async (ev, ct) =>
+            {
+                events_inserted.Add(AuditEvent.FromJson(ev.ToJson()));
+                tokenCancelled_inserted = ct.IsCancellationRequested;
+                await Task.CompletedTask;
+            }).OnReplace(async (id, ev, ct) =>
+            {
+                events_replaced.Add(AuditEvent.FromJson(ev.ToJson()));
+                tokenCancelled_replaced = ct.IsCancellationRequested;
+                await Task.CompletedTask;
+            }));
 
             if (cancel)
             {
                 cs.Cancel();
             }
 
-            var scope = await AuditScope.CreateAsync("Test", null, new { f = 1 }, cs.Token);
+            var options = new AuditScopeOptions()
+            {
+                DataProvider = dp,
+                CreationPolicy = EventCreationPolicy.Manual,
+                EventType = "Test",
+                ExtraFields = new { f = 1 }
+            };
+
+            var scope = await AuditScope.CreateAsync(options, cs.Token);
             await scope.SaveAsync(cs.Token);
 
             scope.SetCustomField("f", 2);
