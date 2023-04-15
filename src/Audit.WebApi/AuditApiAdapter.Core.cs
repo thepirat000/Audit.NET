@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Extensions;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Audit.Core.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,8 +64,9 @@ namespace Audit.WebApi
         {
             var httpContext = actionContext.HttpContext;
             var actionDescriptor = actionContext.ActionDescriptor as ControllerActionDescriptor;
+            var requestCancellationToken = httpContext.RequestAborted;
 
-            var auditAction = await CreateOrUpdateAction(actionContext, includeHeaders, includeRequestBody, serializeParams, eventTypeName);
+            var auditAction = await CreateOrUpdateAction(actionContext, includeHeaders, includeRequestBody, serializeParams, requestCancellationToken);
 
             var eventType = (eventTypeName ?? "{verb} {controller}/{action}").Replace("{verb}", auditAction.HttpMethod)
                 .Replace("{controller}", auditAction.ControllerName)
@@ -82,13 +84,13 @@ namespace Audit.WebApi
                 AuditEvent = auditEventAction, 
                 DataProvider = dataProvider, 
                 CallingMethod = actionDescriptor?.MethodInfo
-            });
+            }, requestCancellationToken);
             httpContext.Items[AuditApiHelper.AuditApiActionKey] = auditAction;
             httpContext.Items[AuditApiHelper.AuditApiScopeKey] = auditScope;
         }
 
         private async Task<AuditApiAction> CreateOrUpdateAction(ActionExecutingContext actionContext,
-            bool includeHeaders, bool includeRequestBody, bool serializeParams, string eventTypeName)
+            bool includeHeaders, bool includeRequestBody, bool serializeParams, CancellationToken cancellationToken)
         {
             var httpContext = actionContext.HttpContext;
             var actionDescriptor = actionContext.ActionDescriptor as ControllerActionDescriptor;
@@ -104,7 +106,7 @@ namespace Audit.WebApi
                     UserName = httpContext.User?.Identity.Name,
                     IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                     HttpMethod = httpContext.Request.Method,
-                    FormVariables = await AuditApiHelper.GetFormVariables(httpContext),
+                    FormVariables = await AuditApiHelper.GetFormVariables(httpContext, cancellationToken),
                     TraceId = httpContext.TraceIdentifier,
                     ActionExecutingContext = actionContext
                 };
@@ -123,7 +125,7 @@ namespace Audit.WebApi
                 {
                     Type = httpContext.Request.ContentType,
                     Length = httpContext.Request.ContentLength,
-                    Value = await AuditApiHelper.GetRequestBody(httpContext)
+                    Value = await AuditApiHelper.GetRequestBody(httpContext, cancellationToken)
                 };
             }
             return action;
@@ -166,7 +168,7 @@ namespace Audit.WebApi
                 }
 
                 // Replace the Action field
-                (auditScope.Event as AuditEventWebApi).Action = auditAction;
+                ((AuditEventWebApi)auditScope.Event).Action = auditAction;
                 // Save, if action was not created by middleware
                 if (!auditAction.IsMiddleware)
                 {

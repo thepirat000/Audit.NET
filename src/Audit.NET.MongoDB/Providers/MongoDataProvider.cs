@@ -6,7 +6,11 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Audit.Core;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Driver.Core.Clusters;
+using MongoDB.Driver.Core.Connections;
+using MongoDB.Driver.Core.Servers;
 
 namespace Audit.MongoDB.Providers
 {
@@ -113,7 +117,7 @@ namespace Audit.MongoDB.Providers
             return (BsonObjectId)doc["_id"];
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(Collection);
@@ -123,7 +127,7 @@ namespace Audit.MongoDB.Providers
             {
                 FixDocumentElementNames(doc);
             }
-            await col.InsertOneAsync(doc);
+            await col.InsertOneAsync(doc, null, cancellationToken);
             return (BsonObjectId)doc["_id"];
         }
 
@@ -141,7 +145,7 @@ namespace Audit.MongoDB.Providers
             col.ReplaceOne(filter, doc);
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var db = GetDatabase();
             var col = db.GetCollection<BsonDocument>(Collection);
@@ -152,7 +156,7 @@ namespace Audit.MongoDB.Providers
                 FixDocumentElementNames(doc);
             }
             var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
-            await col.ReplaceOneAsync(filter, doc);
+            await col.ReplaceOneAsync(filter, doc, (ReplaceOptions)null, cancellationToken);
         }
 
         private void SerializeExtraFields(AuditEvent auditEvent)
@@ -249,7 +253,7 @@ namespace Audit.MongoDB.Providers
             
             if (test["ok"].ToInt64() != 1)
             {
-                throw new Exception("Can't connect to Audit Mongo Database.");
+                throw new MongoException("Can't connect to Audit Mongo Database.");
             }
         }
 
@@ -269,12 +273,12 @@ namespace Audit.MongoDB.Providers
             return doc == null ? null : BsonSerializer.Deserialize<T>(doc);
         }
 
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var client = new MongoClient(ConnectionString);
             var db = client.GetDatabase(Database);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
-            var doc = await (await db.GetCollection<BsonDocument>(Collection).FindAsync(filter)).FirstOrDefaultAsync();
+            var doc = await (await db.GetCollection<BsonDocument>(Collection).FindAsync(filter, null, cancellationToken)).FirstOrDefaultAsync(cancellationToken);
             return doc == null ? null : BsonSerializer.Deserialize<T>(doc);
         }
 

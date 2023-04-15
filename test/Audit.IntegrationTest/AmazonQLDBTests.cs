@@ -6,6 +6,7 @@ using Audit.NET.AmazonQLDB.Providers;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
@@ -64,16 +65,16 @@ namespace Audit.IntegrationTest
             _replaced = repl;
         }
 
-        public override Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             _inserted.Add(AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.InsertEventAsync(auditEvent);
+            return base.InsertEventAsync(auditEvent, cancellationToken);
         }
 
-        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             _replaced.Add(AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.ReplaceEventAsync(eventId, auditEvent);
+            return base.ReplaceEventAsync(eventId, auditEvent, cancellationToken);
         }
     }
 }

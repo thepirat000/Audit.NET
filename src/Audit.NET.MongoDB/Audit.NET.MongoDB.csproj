@@ -5,7 +5,7 @@
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.MongoDB</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.5;net452;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;net452;net472;netstandard2.0;net5.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Audit.NET.MongoDB</AssemblyName>
@@ -25,11 +25,11 @@
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net472' And '$(TargetFramework)' != 'netstandard2.0' And '$(TargetFramework)' != 'net5.0' ">
     <PackageReference Include="MongoDB.Driver" Version="2.13.3" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net5.0' ">
 	<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
   </ItemGroup>
 

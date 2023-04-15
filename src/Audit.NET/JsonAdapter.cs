@@ -5,6 +5,7 @@ using Audit.Core;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
+using System.Threading;
 #if IS_NK_JSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -45,7 +46,7 @@ namespace Audit.Core
         }
 #endif
 
-        public async Task SerializeAsync(Stream stream, object value)
+        public async Task SerializeAsync(Stream stream, object value, CancellationToken cancellationToken = default)
         {
 #if IS_NK_JSON
             var json = JsonConvert.SerializeObject(value, Configuration.JsonSettings);
@@ -54,23 +55,23 @@ namespace Audit.Core
                 await sw.WriteAsync(json);
             }
 #else
-            await JsonSerializer.SerializeAsync(stream, value, value.GetType(), Configuration.JsonSettings);
+            await JsonSerializer.SerializeAsync(stream, value, value.GetType(), Configuration.JsonSettings, cancellationToken);
 #endif
         }
 
-        public async Task<T> DeserializeAsync<T>(Stream stream)
+        public async Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
 #if IS_NK_JSON
             using (var sr = new StreamReader(stream))
             {
                 using (var jr = new JsonTextReader(sr))
                 {
-                    var jObject = await JObject.LoadAsync(jr);
+                    var jObject = await JObject.LoadAsync(jr, cancellationToken);
                     return jObject.ToObject<T>(JsonSerializer.Create(Configuration.JsonSettings));
                 }
             }
 #else
-            return await JsonSerializer.DeserializeAsync<T>(stream, Configuration.JsonSettings);
+            return await JsonSerializer.DeserializeAsync<T>(stream, Configuration.JsonSettings, cancellationToken);
 #endif
         }
 

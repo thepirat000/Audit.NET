@@ -102,7 +102,7 @@ namespace Audit.Http
             }
         }
         
-        protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (Configuration.AuditDisabled
                 || (_config._requestFilter != null && !_config._requestFilter.Invoke(request)))
@@ -119,7 +119,7 @@ namespace Audit.Http
                 Method = request.Method.Method,
                 Url = request.RequestUri.ToString(),
                 Version = request.Version?.ToString(),
-                Request = await GetRequestAudit(request)
+                Request = await GetRequestAudit(request, cancellationToken)
             };
             var auditEvent = new AuditEventHttpClient() { Action = action };
             var options = new AuditScopeOptions()
@@ -131,7 +131,7 @@ namespace Audit.Http
             };
             HttpResponseMessage response;
             var auditScopeFactory = _config._auditScopeFactory ?? Configuration.AuditScopeFactory;
-            var scope = auditScopeFactory.Create(options);
+            var scope = await auditScopeFactory.CreateAsync(options, cancellationToken);
             try
             {
                 response = await base.SendAsync(request, cancellationToken);
@@ -139,7 +139,7 @@ namespace Audit.Http
             catch (Exception ex)
             {
                 action.Exception = ex.GetExceptionInfo();
-                await SaveDispose(scope);
+                await SaveDispose(scope, cancellationToken);
                 throw;
             }
             if (_config._responseFilter != null && !_config._responseFilter.Invoke(response))
@@ -150,23 +150,23 @@ namespace Audit.Http
             else
             {
                 // Update the response and save
-                action.Response = await GetResponseAudit(response);
-                (scope.Event as AuditEventHttpClient).Action = action;
-                await SaveDispose(scope);
+                action.Response = await GetResponseAudit(response, cancellationToken);
+                ((AuditEventHttpClient)scope.Event).Action = action;
+                await SaveDispose(scope, cancellationToken);
             }
             return response;
         }
 
-        private async Task SaveDispose(IAuditScope scope)
+        private async Task SaveDispose(IAuditScope scope, CancellationToken cancellationToken)
         {
             if (scope.EventCreationPolicy == Core.EventCreationPolicy.Manual)
             {
-                await scope.SaveAsync();
+                await scope.SaveAsync(cancellationToken);
             }
             await scope.DisposeAsync();
         }
 
-        private async Task<Request> GetRequestAudit(HttpRequestMessage request)
+        private async Task<Request> GetRequestAudit(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var requestInfo = new Request()
             {
@@ -176,12 +176,12 @@ namespace Audit.Http
                 Headers = _config._includeRequestHeaders != null && _config._includeRequestHeaders.Invoke(request)
                             ? GetHeaders(request.Headers)
                             : null,
-                Content = await GetRequestContent(request)
+                Content = await GetRequestContent(request, cancellationToken)
             };
             return requestInfo;
         }
 
-        private async Task<Response> GetResponseAudit(HttpResponseMessage response)
+        private async Task<Response> GetResponseAudit(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             var responseInfo = new Response()
             {
@@ -192,17 +192,17 @@ namespace Audit.Http
                 Headers = _config._includeResponseHeaders != null && _config._includeResponseHeaders.Invoke(response)
                     ? GetHeaders(response.Headers)
                     : null,
-                Content = await GetResponseContent(response)
+                Content = await GetResponseContent(response, cancellationToken)
             };
             return responseInfo;
         }
 
-        private async Task<Content> GetRequestContent(HttpRequestMessage request)
+        private async Task<Content> GetRequestContent(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var content = new Content()
             {
                 Body = _config._includeRequestBody != null && _config._includeRequestBody.Invoke(request)
-                            ? await GetContentBody(request.Content)
+                            ? await GetContentBody(request.Content, cancellationToken)
                             : null,
                 Headers = _config._includeContentHeaders != null && _config._includeContentHeaders.Invoke(request)
                     ? GetHeaders(request.Content?.Headers)
@@ -211,12 +211,12 @@ namespace Audit.Http
             return content.Body == null && content.Headers == null ? null : content;
         }
 
-        private async Task<Content> GetResponseContent(HttpResponseMessage response)
+        private async Task<Content> GetResponseContent(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             var content = new Content()
             {
                 Body = _config._includeResponseBody != null && _config._includeResponseBody.Invoke(response)
-                    ? await GetContentBody(response.Content)
+                    ? await GetContentBody(response.Content, cancellationToken)
                     : null,
                 Headers = _config._includeContentHeaders != null && _config._includeContentHeaders.Invoke(response.RequestMessage)
                     ? GetHeaders(response.Content?.Headers)
@@ -225,13 +225,17 @@ namespace Audit.Http
             return content.Body == null && content.Headers == null ? null : content;
         }
 
-        private async Task<object> GetContentBody(System.Net.Http.HttpContent content)
+        private async Task<object> GetContentBody(System.Net.Http.HttpContent content, CancellationToken cancellationToken)
         {
             if (content == null)
             {
                 return null;
             }
+#if NET5_0_OR_GREATER
+            return await content.ReadAsStringAsync(cancellationToken);
+#else
             return await content.ReadAsStringAsync();
+#endif
         }
 
         private Dictionary<string, string> GetHeaders(HttpHeaders headers)

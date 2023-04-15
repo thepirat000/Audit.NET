@@ -3,6 +3,7 @@ using Audit.Core;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,7 +75,7 @@ namespace Audit.SignalR
 
             if (AuditEventEnabled(ev))
             {
-                await using (await CreateAuditScopeAsync(ev))
+                await using (await CreateAuditScopeAsync(ev, invocationContext.Context.ConnectionAborted))
                 {
                     try
                     {
@@ -110,7 +111,7 @@ namespace Audit.SignalR
 
             if (AuditEventEnabled(ev))
             {
-                var scope = await CreateAuditScopeAsync(ev);
+                var scope = await CreateAuditScopeAsync(ev, context.Context.ConnectionAborted);
                 await scope.DisposeAsync();
             }
 
@@ -136,7 +137,7 @@ namespace Audit.SignalR
 
             if (AuditEventEnabled(ev))
             {
-                await using (await CreateAuditScopeAsync(ev))
+                await using (await CreateAuditScopeAsync(ev, context.Context.ConnectionAborted))
                 {
                     await next.Invoke(context, exception);
                     return;
@@ -161,7 +162,7 @@ namespace Audit.SignalR
             }
         }
 
-        private async Task<IAuditScope> CreateAuditScopeAsync(SignalrEventBase signalrEvent)
+        private async Task<IAuditScope> CreateAuditScopeAsync(SignalrEventBase signalrEvent, CancellationToken cancellationToken)
         {
             var auditEvent = new AuditEventSignalr()
             {
@@ -182,7 +183,7 @@ namespace Audit.SignalR
                 AuditEvent = auditEvent,
                 DataProvider = dataProvider,
                 CreationPolicy = CreationPolicy
-            });
+            }, cancellationToken);
 
             if (httpContext != null)
             {

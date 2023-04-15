@@ -150,13 +150,10 @@ namespace Audit.DynamicProxy
                 // operation is an event attach/detach and should be ignored
                 return null;
             }
-            if (Settings.MethodFilter != null)
+            if (Settings.MethodFilter != null && !Settings.MethodFilter.Invoke(method))
             {
-                if (!Settings.MethodFilter.Invoke(method))
-                {
-                    // operation was filtered out
-                    return null;
-                }
+                // operation was filtered out
+                return null;
             }
             var intEvent = new InterceptEvent()
             {
@@ -188,7 +185,7 @@ namespace Audit.DynamicProxy
                 }
                 i++;
             }
-            return result.Count == 0 ? null : result;
+            return result;
         }
         #endregion
 
@@ -236,13 +233,10 @@ namespace Audit.DynamicProxy
             }
             // Handle async calls
             var returnType = method.ReturnType;
-            if (isAsync)
+            if (isAsync && typeof(Task).IsAssignableFrom(returnType))
             {
-                if (typeof(Task).IsAssignableFrom(returnType))
-                {
-                    invocation.ReturnValue = InterceptAsync((dynamic)invocation.ReturnValue, invocation, intEvent, scope);
-                    return;
-                }
+                invocation.ReturnValue = InterceptAsync((dynamic)invocation.ReturnValue, invocation, intEvent, scope);
+                return;
             }
             // Is a Sync method (or an Async method that does not returns a Task or Task<>).
             // Avoid Task and Task<T> serialization (i.e. when a sync method returns a Task)

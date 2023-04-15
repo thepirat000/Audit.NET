@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using System.Threading;
 #if IS_TEXT_JSON
 using Audit.JsonNewtonsoftAdapter;
 #endif
@@ -126,12 +127,12 @@ namespace Audit.NET.RavenDB.Providers
         /// </summary>
         /// <param name="auditEvent">The audit event being inserted.</param>
         /// <returns></returns>
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (var session = _documentStore.OpenAsyncSession(GetDatabaseName(auditEvent)))
             {
-                await session.StoreAsync(auditEvent);
-                await session.SaveChangesAsync();
+                await session.StoreAsync(auditEvent, cancellationToken);
+                await session.SaveChangesAsync(cancellationToken);
 
                 return session.Advanced.GetDocumentId(auditEvent);
             }
@@ -153,17 +154,17 @@ namespace Audit.NET.RavenDB.Providers
         }
 
         /// <summary>
-        /// Asychronously retrieves a saved audit event from its id. Override this method
+        /// Asynchronously retrieves a saved audit event from its id. Override this method
         /// to provide a way to access the audit events by id.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="eventId">The event id being retrieved.</param>
         /// <returns></returns>
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             using (var session = _documentStore.OpenAsyncSession(GetDatabaseName()))
             {
-                var auditEvent = await session.LoadAsync<T>(eventId.ToString());
+                var auditEvent = await session.LoadAsync<T>(eventId.ToString(), cancellationToken);
                 return auditEvent;
             }
         }
@@ -190,12 +191,12 @@ namespace Audit.NET.RavenDB.Providers
         /// <param name="eventId">The event id being replaced.</param>
         /// <param name="auditEvent">The audit event.</param>
         /// <returns></returns>
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (var session = _documentStore.OpenAsyncSession(GetDatabaseName(auditEvent)))
             {
-                await session.StoreAsync(auditEvent, eventId.ToString());
-                await session.SaveChangesAsync();
+                await session.StoreAsync(auditEvent, eventId.ToString(), cancellationToken);
+                await session.SaveChangesAsync(cancellationToken);
             }
         }
 

@@ -5,6 +5,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.AzureTableStorage.Providers
@@ -68,11 +69,11 @@ namespace Audit.AzureTableStorage.Providers
             return new [] { entity.PartitionKey, entity.RowKey };
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var table = await EnsureTableAsync(auditEvent);
+            var table = await EnsureTableAsync(auditEvent, cancellationToken);
             var entity = GetTableEntity(auditEvent);
-            await table.ExecuteAsync(TableOperation.InsertOrMerge(entity));
+            await table.ExecuteAsync(TableOperation.InsertOrMerge(entity), null, null, cancellationToken);
             return new [] { entity.PartitionKey, entity.RowKey };
         }
                 
@@ -89,17 +90,17 @@ namespace Audit.AzureTableStorage.Providers
             table.ExecuteAsync(TableOperation.Replace(entity)).GetAwaiter().GetResult();
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var fields = eventId as string[];
             var partKey = fields[0];
             var rowKey = fields[1];
-            var table = await EnsureTableAsync(auditEvent);
+            var table = await EnsureTableAsync(auditEvent, cancellationToken);
             var entity = GetTableEntity(auditEvent);
             entity.PartitionKey = partKey;
             entity.RowKey = rowKey;
             entity.ETag = "*";
-            await table.ExecuteAsync(TableOperation.Replace(entity));
+            await table.ExecuteAsync(TableOperation.Replace(entity), null, null, cancellationToken);
         }
 
         #endregion
@@ -139,18 +140,17 @@ namespace Audit.AzureTableStorage.Providers
             return EnsureTable(cnnString, tableName);
         }
 
-        internal async Task<CloudTable> EnsureTableAsync(AuditEvent auditEvent)
+        internal async Task<CloudTable> EnsureTableAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
         {
             var cnnString = GetConnectionString(auditEvent);
             var tableName = GetTableName(auditEvent);
-            return await EnsureTableAsync(cnnString, tableName);
+            return await EnsureTableAsync(cnnString, tableName, cancellationToken);
         }
 
         internal CloudTable EnsureTable(string cnnString, string tableName)
         {
-            CloudTable result;
             var cacheKey = cnnString + "|" + tableName;
-            if (TableCache.TryGetValue(cacheKey, out result))
+            if (TableCache.TryGetValue(cacheKey, out var result))
             {
                 return result;
             }
@@ -162,18 +162,17 @@ namespace Audit.AzureTableStorage.Providers
             return table;
         }
 
-        internal async Task<CloudTable> EnsureTableAsync(string cnnString, string tableName)
+        internal async Task<CloudTable> EnsureTableAsync(string cnnString, string tableName, CancellationToken cancellationToken)
         {
-            CloudTable result;
             var cacheKey = cnnString + "|" + tableName;
-            if (TableCache.TryGetValue(cacheKey, out result))
+            if (TableCache.TryGetValue(cacheKey, out var result))
             {
                 return result;
             }
             var storageAccount = CloudStorageAccount.Parse(cnnString);
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(tableName);
-            await table.CreateIfNotExistsAsync();
+            await table.CreateIfNotExistsAsync(null, null, cancellationToken);
             TableCache[cacheKey] = table;
             return table;
         }

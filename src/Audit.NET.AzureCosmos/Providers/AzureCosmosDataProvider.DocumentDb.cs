@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using Audit.AzureCosmos.ConfigurationApi;
+using System.Threading;
 
 namespace Audit.AzureCosmos.Providers
 {
@@ -97,16 +98,17 @@ namespace Audit.AzureCosmos.Providers
             var client = GetClient();
             var collectionUri = GetCollectionUri();
             SetId(auditEvent);
-            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }).Result;
+            Document doc = client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings })
+                .GetAwaiter().GetResult();
             return doc.Id;
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
             SetId(auditEvent);
-            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
+            Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }, cancellationToken: cancellationToken);
             return doc.Id;
         }
 
@@ -123,7 +125,7 @@ namespace Audit.AzureCosmos.Providers
             client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }).Wait();
         }
         
-        public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var client = GetClient();
             var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
@@ -133,7 +135,7 @@ namespace Audit.AzureCosmos.Providers
                 doc = JsonSerializable.LoadFrom<Document>(ms);
             }
             doc.Id = docId.ToString();
-            await client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
+            await client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -157,19 +159,19 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
         /// </summary>
-        public override async Task<T> GetEventAsync<T>(object id)
+        public override async Task<T> GetEventAsync<T>(object id, CancellationToken cancellationToken = default)
         {
 #if !NET45
             if (id is ValueTuple<string, string> vt)
             {
-                return await GetEventAsync<T>(vt.Item1, vt.Item2);
+                return await GetEventAsync<T>(vt.Item1, vt.Item2, cancellationToken);
             }
 #endif
             if (id is Tuple<string, string> t)
             {
-                return await GetEventAsync<T>(t.Item1, t.Item2);
+                return await GetEventAsync<T>(t.Item1, t.Item2, cancellationToken);
             }
-            return await GetEventAsync<T>(id?.ToString(), null);
+            return await GetEventAsync<T>(id?.ToString(), null, cancellationToken);
         }
 
         /// <summary>
@@ -199,7 +201,7 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// Gets an event stored on cosmos DB from its id and partition key.
         /// </summary>
-        public async Task<T> GetEventAsync<T>(string docId, string partitionKey)
+        public async Task<T> GetEventAsync<T>(string docId, string partitionKey, CancellationToken cancellationToken = default)
         {
             var client = GetClient();
             var collectionUri = GetCollectionUri();
@@ -209,7 +211,7 @@ namespace Audit.AzureCosmos.Providers
 #else
             var pk = partitionKey == null ? PartitionKey.None : new PartitionKey(partitionKey);
 #endif
-            return (await client.ReadDocumentAsync<T>(docUri, new RequestOptions() { PartitionKey = pk })).Document;
+            return (await client.ReadDocumentAsync<T>(docUri, new RequestOptions() { PartitionKey = pk }, cancellationToken)).Document;
         }
 
         private IDocumentClient GetClient()

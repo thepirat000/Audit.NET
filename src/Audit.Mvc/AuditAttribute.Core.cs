@@ -14,6 +14,7 @@ using Audit.Core.Extensions;
 using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using System.Threading;
 
 namespace Audit.Mvc
 {
@@ -22,6 +23,9 @@ namespace Audit.Mvc
     /// </summary>
     public class AuditAttribute : ActionFilterAttribute
     {
+        // Default stream copy buffer size (from System.IO::Stream)
+        private const int DefaultCopyBufferSize = 81920;
+
         /// <summary>
         /// Gets or sets a value indicating whether the output should include the serialized model.
         /// </summary>
@@ -64,20 +68,26 @@ namespace Audit.Mvc
         {
             var httpContext = filterContext.HttpContext;
             var request = httpContext.Request;
-            var actionDescriptior = filterContext.ActionDescriptor as ControllerActionDescriptor;
+            var actionDescriptor = filterContext.ActionDescriptor as ControllerActionDescriptor;
+            var requestCancellationToken = httpContext.RequestAborted;
 
             var auditAction = new AuditAction()
             {
                 UserName = httpContext.User?.Identity.Name,
                 IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
-                RequestUrl = string.Format("{0}://{1}{2}", httpContext.Request.Scheme, httpContext.Request.Host, httpContext.Request.Path),
-                HttpMethod = httpContext.Request.Method,
-                FormVariables = httpContext.Request.HasFormContentType ? ToDictionary(httpContext.Request.Form) : null,
-                Headers = IncludeHeaders ? ToDictionary(httpContext.Request.Headers) : null,
-                ActionName = actionDescriptior?.ActionName ?? actionDescriptior?.DisplayName,
-                ControllerName = actionDescriptior?.ControllerName,
+                RequestUrl = string.Format("{0}://{1}{2}", request.Scheme, request.Host, request.Path),
+                HttpMethod = request.Method,
+                FormVariables = request.HasFormContentType ? ToDictionary(request.Form) : null,
+                Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
+                ActionName = actionDescriptor?.ActionName ?? actionDescriptor?.DisplayName,
+                ControllerName = actionDescriptor?.ControllerName,
                 ActionParameters = GetActionParameters(filterContext),
-                RequestBody = new BodyContent { Type = httpContext.Request.ContentType, Length = httpContext.Request.ContentLength, Value = IncludeRequestBody ? await GetRequestBody(filterContext) : null },
+                RequestBody = new BodyContent
+                {
+                    Type = request.ContentType, 
+                    Length = request.ContentLength, 
+                    Value = IncludeRequestBody ? await GetRequestBody(filterContext, requestCancellationToken) : null
+                },
                 TraceId = httpContext.TraceIdentifier
             };
 
@@ -90,7 +100,13 @@ namespace Audit.Mvc
             {
                 Action = auditAction
             };
-            var auditScope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = eventType, AuditEvent = auditEventAction, CallingMethod = actionDescriptior?.MethodInfo });
+            var auditScopeOptions = new AuditScopeOptions()
+            {
+                EventType = eventType,
+                AuditEvent = auditEventAction,
+                CallingMethod = actionDescriptor?.MethodInfo
+            };
+            var auditScope = await AuditScope.CreateAsync(auditScopeOptions, requestCancellationToken);
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
         }
@@ -100,6 +116,7 @@ namespace Audit.Mvc
             var httpContext = filterContext.HttpContext;
             var viewResult = filterContext.Result as ViewResult;
             var auditAction = httpContext.Items[AuditActionKey] as AuditAction;
+
             if (auditAction != null)
             {
                 auditAction.ModelStateErrors = IncludeModel ? GetModelStateErrors(filterContext.ModelState) : null;
@@ -110,7 +127,11 @@ namespace Audit.Mvc
                 var bodyType = filterContext.Result?.GetType().GetFullTypeName();
                 if (bodyType != null)
                 {
-                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(filterContext.ActionDescriptor, filterContext.Result) : null };
+                    auditAction.ResponseBody = new BodyContent
+                    {
+                        Type = bodyType, 
+                        Value = IncludeResponseBody ? GetResponseBody(filterContext.ActionDescriptor, filterContext.Result) : null
+                    };
                 }
             }
 
@@ -118,7 +139,7 @@ namespace Audit.Mvc
             if (auditScope != null)
             {
                 // Replace the Action field
-                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
+                ((AuditEventMvcAction)auditScope.Event).Action = auditAction;
                 if (auditAction?.Exception != null)
                 {
                     // An exception was thrown, save the event since OnResultExecutionAsync will not be triggered.
@@ -131,6 +152,7 @@ namespace Audit.Mvc
         {
             var httpContext = filterContext.HttpContext;
             var auditAction = httpContext.Items[AuditActionKey] as AuditAction;
+
             if (auditAction != null)
             {
                 var viewResult = filterContext.Result as ViewResult;
@@ -142,14 +164,18 @@ namespace Audit.Mvc
                 var bodyType = filterContext.Result?.GetType().GetFullTypeName();
                 if (bodyType != null)
                 {
-                    auditAction.ResponseBody = new BodyContent { Type = bodyType, Value = IncludeResponseBody ? GetResponseBody(filterContext.ActionDescriptor, filterContext.Result) : null };
+                    auditAction.ResponseBody = new BodyContent
+                    {
+                        Type = bodyType, 
+                        Value = IncludeResponseBody ? GetResponseBody(filterContext.ActionDescriptor, filterContext.Result) : null
+                    };
                 }
             }
             var auditScope = httpContext.Items[AuditScopeKey] as AuditScope;
             if (auditScope != null)
             {
                 // Replace the Action field
-                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
+                ((AuditEventMvcAction)auditScope.Event).Action = auditAction;
                 if (auditScope.EventCreationPolicy == EventCreationPolicy.Manual)
                 {
                     await auditScope.SaveAsync();
@@ -225,18 +251,20 @@ namespace Audit.Mvc
             return dict.Count > 0 ? dict : null;
         }
 
-        private async Task<string> GetRequestBody(ActionExecutingContext actionContext)
+        private async Task<string> GetRequestBody(ActionExecutingContext actionContext, CancellationToken cancellationToken)
         {
             var body = actionContext.HttpContext.Request.Body;
             if (body != null && body.CanRead)
             {
                 using (var stream = new MemoryStream())
                 {
+                    int bufferSize = DefaultCopyBufferSize;
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);
+                        bufferSize = (int)Math.Min(bufferSize, body.Length < 2 ? 1 : body.Length);
                     }
-                    await body.CopyToAsync(stream);
+                    await body.CopyToAsync(stream, bufferSize, cancellationToken);
                     if (body.CanSeek)
                     {
                         body.Seek(0, SeekOrigin.Begin);
@@ -354,7 +382,5 @@ namespace Audit.Mvc
             return httpContext?.Items[AuditScopeKey] as AuditScope;
         }
     }
-
-
 }
 #endif

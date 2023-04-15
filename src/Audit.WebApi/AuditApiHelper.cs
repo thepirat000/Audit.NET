@@ -13,14 +13,18 @@ using Audit.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System;
 
 namespace Audit.WebApi
 {
     internal static class AuditApiHelper
     {
+        // Default stream copy buffer size (from System.IO::Stream)
+        private const int DefaultCopyBufferSize = 81920;
+
         internal const string AuditApiActionKey = "__private_AuditApiAction__";
         internal const string AuditApiScopeKey = "__private_AuditApiScope__";
-
 
         internal static IDictionary<string, object> SerializeParameters(IDictionary<string, object> parameters)
         {
@@ -65,7 +69,7 @@ namespace Audit.WebApi
             return dict;
         }
 
-        internal static async Task<IDictionary<string, string>> GetFormVariables(HttpContext context)
+        internal static async Task<IDictionary<string, string>> GetFormVariables(HttpContext context, CancellationToken cancellationToken)
         {
             if (!context.Request.HasFormContentType)
             {
@@ -74,7 +78,7 @@ namespace Audit.WebApi
             IFormCollection formCollection;
             try
             {
-                formCollection = await context.Request.ReadFormAsync();
+                formCollection = await context.Request.ReadFormAsync(cancellationToken);
             }
             catch (InvalidDataException)
             {
@@ -84,7 +88,7 @@ namespace Audit.WebApi
             return ToDictionary(formCollection);
         }
 
-        internal static async Task<string> GetRequestBody(HttpContext httpContext)
+        internal static async Task<string> GetRequestBody(HttpContext httpContext, CancellationToken cancellationToken)
         {
             var body = httpContext.Request.Body;
             if (body != null && body.CanRead && body.CanSeek)
@@ -92,7 +96,8 @@ namespace Audit.WebApi
                 using (var stream = new MemoryStream())
                 {
                     body.Seek(0, SeekOrigin.Begin);
-                    await body.CopyToAsync(stream);
+                    int bufferSize = (int)Math.Min(DefaultCopyBufferSize, body.Length < 2 ? 1 : body.Length);
+                    await body.CopyToAsync(stream, bufferSize, cancellationToken);
                     body.Seek(0, SeekOrigin.Begin);
                     return Encoding.UTF8.GetString(stream.ToArray());
                 }
@@ -100,7 +105,7 @@ namespace Audit.WebApi
             return null;
         }
 
-        internal static async Task<string> GetResponseBody(HttpContext httpContext)
+        internal static async Task<string> GetResponseBody(HttpContext httpContext, CancellationToken cancellationToken)
         {
             var body = httpContext.Response.Body;
             if (body != null && body.CanRead && body.CanSeek)
@@ -108,7 +113,8 @@ namespace Audit.WebApi
                 using (var stream = new MemoryStream())
                 {
                     body.Seek(0, SeekOrigin.Begin);
-                    await body.CopyToAsync(stream);
+                    int bufferSize = (int)Math.Min(DefaultCopyBufferSize, body.Length < 2 ? 1 : body.Length);
+                    await body.CopyToAsync(stream, bufferSize, cancellationToken);
                     body.Seek(0, SeekOrigin.Begin);
                     return Encoding.UTF8.GetString(stream.ToArray());
                 }

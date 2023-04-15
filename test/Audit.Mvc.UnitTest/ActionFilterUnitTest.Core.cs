@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Mvc.UnitTest
@@ -58,7 +59,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
@@ -86,9 +87,9 @@ namespace Audit.Mvc.UnitTest
             
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             Assert.AreEqual(action, actionFromController);
             Assert.AreEqual(scope, scopeFromController);
             Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
@@ -132,7 +133,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditAttribute()
@@ -161,9 +162,9 @@ namespace Audit.Mvc.UnitTest
             //Assert
             Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);
@@ -209,7 +210,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditAttribute()
@@ -233,9 +234,9 @@ namespace Audit.Mvc.UnitTest
             Assert.IsFalse(itemsDict.ContainsKey("__private_AuditAction__"));
             Assert.IsFalse(itemsDict.ContainsKey("__private_AuditScope__"));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
 
         }
 
@@ -274,7 +275,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             var filter = new AuditAttribute()
@@ -301,9 +302,9 @@ namespace Audit.Mvc.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.AreEqual(1, action.ActionParameters.Count);
             Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
             Assert.AreEqual(200, action.ResponseStatusCode);
@@ -345,7 +346,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
             var filter = new AuditAttribute()
@@ -373,9 +374,9 @@ namespace Audit.Mvc.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);
@@ -425,7 +426,7 @@ namespace Audit.Mvc.UnitTest
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
             var dataProvider = new Mock<AuditDataProvider>();
-            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
+            dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
             var filter = new AuditAttribute()
@@ -455,9 +456,9 @@ namespace Audit.Mvc.UnitTest
 
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>()), Times.Once);
+            dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
+            dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
 
             Assert.AreEqual(action, actionFromController);

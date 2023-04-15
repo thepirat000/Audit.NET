@@ -13,6 +13,7 @@ using Azure.Core;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using Azure.Storage.Blobs.Models;
+using System.Threading;
 
 namespace Audit.AzureStorageBlobs.Providers
 {
@@ -122,7 +123,7 @@ namespace Audit.AzureStorageBlobs.Providers
             return containerClient;
         }
 
-        private async Task<BlobContainerClient> EnsureContainerClientAsync(string containerName)
+        private async Task<BlobContainerClient> EnsureContainerClientAsync(string containerName, CancellationToken cancellationToken)
         {
             var cacheKey = $"{ConnectionString ?? ServiceUrl}|{containerName}";
             if (ContainerClientCache.TryGetValue(cacheKey, out BlobContainerClient result))
@@ -133,7 +134,7 @@ namespace Audit.AzureStorageBlobs.Providers
             // Cache miss
             var serviceClient = CreateBlobServiceClient();
             var containerClient = serviceClient.GetBlobContainerClient(containerName);
-            await containerClient.CreateIfNotExistsAsync();
+            await containerClient.CreateIfNotExistsAsync(default, default, default, cancellationToken);
             ContainerClientCache[cacheKey] = containerClient;
             return containerClient;
         }
@@ -188,7 +189,7 @@ namespace Audit.AzureStorageBlobs.Providers
             return blobName;
         }
 
-        private async Task<string> UploadAsync(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName)
+        private async Task<string> UploadAsync(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName, CancellationToken cancellationToken)
         {
             var blobName = existingBlobName ?? BlobNameBuilder?.Invoke(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
             var blob = client.GetBlobClient(blobName);
@@ -198,9 +199,9 @@ namespace Audit.AzureStorageBlobs.Providers
                 AccessTier = AccessTierBuilder?.Invoke(auditEvent)
             };
 #if NETSTANDARD2_0
-            await blob.UploadAsync(new BinaryData(auditEvent, JsonSettings), options);
+            await blob.UploadAsync(new BinaryData(auditEvent, JsonSettings), options, cancellationToken);
 #else
-            await blob.UploadAsync(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options);
+            await blob.UploadAsync(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options, cancellationToken);
 #endif
             return blobName;
         }
@@ -215,11 +216,11 @@ namespace Audit.AzureStorageBlobs.Providers
             return blobName;
         }
 
-        public async override Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var containerName = ContainerNameBuilder.Invoke(auditEvent);
-            var client = await EnsureContainerClientAsync(containerName);
-            var blobName = await UploadAsync(client, auditEvent, null);
+            var client = await EnsureContainerClientAsync(containerName, cancellationToken);
+            var blobName = await UploadAsync(client, auditEvent, null, cancellationToken);
             return blobName;
         }
 
@@ -229,11 +230,11 @@ namespace Audit.AzureStorageBlobs.Providers
             var client = EnsureContainerClient(containerName);
             Upload(client, auditEvent, eventId.ToString());
         }
-        public async override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var containerName = ContainerNameBuilder.Invoke(auditEvent);
-            var client = await EnsureContainerClientAsync(containerName);
-            await UploadAsync(client, auditEvent, eventId.ToString());
+            var client = await EnsureContainerClientAsync(containerName, cancellationToken);
+            await UploadAsync(client, auditEvent, eventId.ToString(), cancellationToken);
         }
 
         public override T GetEvent<T>(object blobName)
@@ -242,10 +243,10 @@ namespace Audit.AzureStorageBlobs.Providers
             return GetEvent<T>(containerName, blobName.ToString());
         }
 
-        public async override Task<T> GetEventAsync<T>(object blobName)
+        public override async Task<T> GetEventAsync<T>(object blobName, CancellationToken cancellationToken = default)
         {
             var containerName = ContainerNameBuilder.Invoke(null);
-            return await GetEventAsync<T>(containerName, blobName.ToString());
+            return await GetEventAsync<T>(containerName, blobName.ToString(), cancellationToken);
         }
 
         public T GetEvent<T>(string containerName, string blobName)
@@ -264,13 +265,13 @@ namespace Audit.AzureStorageBlobs.Providers
             return default;
         }
 
-        public async Task<T> GetEventAsync<T>(string containerName, string blobName)
+        public async Task<T> GetEventAsync<T>(string containerName, string blobName, CancellationToken cancellationToken = default)
         {
-            var client = await EnsureContainerClientAsync(containerName);
+            var client = await EnsureContainerClientAsync(containerName, cancellationToken);
             var blobClient = client.GetBlobClient(blobName);
-            if (await blobClient.ExistsAsync())
+            if (await blobClient.ExistsAsync(cancellationToken))
             {
-                var result = await blobClient.DownloadContentAsync();
+                var result = await blobClient.DownloadContentAsync(cancellationToken);
 #if NETSTANDARD2_0
                 return result.Value.Content.ToObjectFromJson<T>(JsonSettings);
 #else

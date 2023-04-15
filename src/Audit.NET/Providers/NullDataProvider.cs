@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.Core.Providers
 {
@@ -11,7 +12,7 @@ namespace Audit.Core.Providers
         {
             return null;
         }
-        public override Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<object>(null);
         }
@@ -19,7 +20,7 @@ namespace Audit.Core.Providers
         {
             return;
         }
-        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             return Task.Delay(0);
         }
@@ -27,7 +28,7 @@ namespace Audit.Core.Providers
         {
             return default(T);
         }
-        public override Task<T> GetEventAsync<T>(object eventId)
+        public override Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(default(T));
         }

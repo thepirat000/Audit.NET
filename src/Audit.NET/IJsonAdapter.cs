@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
 #if IS_NK_JSON
 using Newtonsoft.Json;
 #else
@@ -38,14 +39,16 @@ namespace Audit.Core
         /// </summary>
         /// <param name="stream">The stream to serialize into.</param>
         /// <param name="value">The value.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
         /// <returns>The serialized JSON string</returns>
-        Task SerializeAsync(Stream stream, object value);
+        Task SerializeAsync(Stream stream, object value, CancellationToken cancellationToken = default);
         /// <summary>
         /// Asynchronously deserializes the specified JSON stream to an object of type <typeparamref name="T"/>.
         /// </summary>
         /// <param name="stream">The stream to read the JSON input.</param>
         /// <returns>The deserialized object</returns>
-        Task<T> DeserializeAsync<T>(Stream stream);
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default);
 
         T ToObject<T>(object value);
     }

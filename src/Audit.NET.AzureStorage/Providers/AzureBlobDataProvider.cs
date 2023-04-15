@@ -7,6 +7,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.AzureTableStorage.Providers
@@ -114,10 +115,10 @@ namespace Audit.AzureTableStorage.Providers
             return AuditEvent.FromJson<T>(json);
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var name = GetBlobName(auditEvent);
-            await UploadAsync(name, auditEvent);
+            await UploadAsync(name, auditEvent, cancellationToken);
             return name;
         }
 
@@ -127,18 +128,18 @@ namespace Audit.AzureTableStorage.Providers
             Upload(name, auditEvent);
         }
 
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var name = eventId as string;
-            await UploadAsync(name, auditEvent);
+            await UploadAsync(name, auditEvent, cancellationToken);
         }
 
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var name = eventId.ToString();
-            var container = await EnsureContainerAsync(null);
+            var container = await EnsureContainerAsync(null, cancellationToken);
             var blob = container.GetBlockBlobReference(name);
-            var json = await blob.DownloadTextAsync();
+            var json = await blob.DownloadTextAsync(null, null, null, null, cancellationToken);
             return AuditEvent.FromJson<T>(json);
         }
 
@@ -172,9 +173,9 @@ namespace Audit.AzureTableStorage.Providers
             }
         }
 
-        private async Task UploadAsync(string name, AuditEvent auditEvent)
+        private async Task UploadAsync(string name, AuditEvent auditEvent, CancellationToken cancellationToken)
         {
-            var container = await EnsureContainerAsync(auditEvent);
+            var container = await EnsureContainerAsync(auditEvent, cancellationToken);
             var blob = container.GetBlockBlobReference(name);
             var json = Configuration.JsonAdapter.Serialize(auditEvent);
             if (MetadataBuilder != null)
@@ -188,13 +189,13 @@ namespace Audit.AzureTableStorage.Providers
                     }
                 }
             }
-            await blob.UploadTextAsync(json);
+            await blob.UploadTextAsync(json, null, null, null, null, cancellationToken);
             if (AccessTierBuilder != null)
             {
                 var accessTier = AccessTierBuilder.Invoke(auditEvent);
                 if (accessTier.HasValue)
                 {
-                    await blob.SetStandardBlobTierAsync(accessTier.Value);
+                    await blob.SetStandardBlobTierAsync(accessTier.Value, null, null, null, cancellationToken);
                 }
             }
         }
@@ -232,7 +233,7 @@ namespace Audit.AzureTableStorage.Providers
             return AccountNameBuilder?.Invoke(auditEvent);
         }
 
-        protected virtual async Task<string> GetAccessTokenAsync(AuditEvent auditEvent)
+        protected virtual async Task<string> GetAccessTokenAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
         {
             var authCnnString = GetConnectionString(auditEvent);
             var tenantId = GetTenantId(auditEvent);
@@ -247,7 +248,7 @@ namespace Audit.AzureTableStorage.Providers
             if (UseActiveDirectory)
             {
                 var accountName = GetAccountName(auditEvent);
-                var token = GetAccessTokenAsync(auditEvent).GetAwaiter().GetResult();
+                var token = GetAccessTokenAsync(auditEvent, default).GetAwaiter().GetResult();
                 return EnsureContainerActiveDirectory(accountName, token, containerName);
             }
             else
@@ -258,19 +259,19 @@ namespace Audit.AzureTableStorage.Providers
             }
         }
 
-        internal async Task<CloudBlobContainer> EnsureContainerAsync(AuditEvent auditEvent)
+        internal async Task<CloudBlobContainer> EnsureContainerAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
         {
             var containerName = GetContainerName(auditEvent);
             if (UseActiveDirectory)
             {
                 var accountName = GetAccountName(auditEvent);
-                var token = await GetAccessTokenAsync(auditEvent);
-                return await EnsureContainerActiveDirectoryAsync(accountName, token, containerName);
+                var token = await GetAccessTokenAsync(auditEvent, cancellationToken);
+                return await EnsureContainerActiveDirectoryAsync(accountName, token, containerName, cancellationToken);
             }
             else
             {
                 var cnnString = GetConnectionString(auditEvent);
-                return await EnsureContainerAsync(cnnString, containerName);
+                return await EnsureContainerAsync(cnnString, containerName, cancellationToken);
             }
         }
 
@@ -290,18 +291,17 @@ namespace Audit.AzureTableStorage.Providers
             return container;
         }
 
-        internal async Task<CloudBlobContainer> EnsureContainerAsync(string cnnString, string containerName)
+        internal async Task<CloudBlobContainer> EnsureContainerAsync(string cnnString, string containerName, CancellationToken cancellationToken)
         {
-            CloudBlobContainer result;
             var cacheKey = cnnString + "|" + containerName;
-            if (ContainerCache.TryGetValue(cacheKey, out result))
+            if (ContainerCache.TryGetValue(cacheKey, out var result))
             {
                 return result;
             }
             var storageAccount = CloudStorageAccount.Parse(cnnString);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
-            await container.CreateIfNotExistsAsync();
+            await container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Off, null, null, cancellationToken);
             ContainerCache[cacheKey] = container;
             return container;
         }
@@ -324,11 +324,10 @@ namespace Audit.AzureTableStorage.Providers
             return container;
         }
 
-        internal async Task<CloudBlobContainer> EnsureContainerActiveDirectoryAsync(string accountName, string token, string containerName)
+        internal async Task<CloudBlobContainer> EnsureContainerActiveDirectoryAsync(string accountName, string token, string containerName, CancellationToken cancellationToken)
         {
-            CloudBlobContainer result;
             var cacheKey = accountName + "." + EndpointSuffix + "|" + containerName + "|" + token;
-            if (ContainerCache.TryGetValue(cacheKey, out result))
+            if (ContainerCache.TryGetValue(cacheKey, out var result))
             {
                 return result;
             }
@@ -337,7 +336,7 @@ namespace Audit.AzureTableStorage.Providers
             var storageAccount = new CloudStorageAccount(storageCredentials, accountName, EndpointSuffix, UseHttps);
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
-            await container.CreateIfNotExistsAsync();
+            await container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Off, null, null, cancellationToken);
             ContainerCache[cacheKey] = container;
             return container;
         }

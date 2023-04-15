@@ -49,12 +49,12 @@ namespace Audit.WebApi
         /// </summary>
         public HttpStatusCode[] ExcludeResponseBodyFor { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether the Request Body should be read and incuded on the event.
+        /// Gets or sets a value indicating whether the Request Body should be read and included on the event.
         /// </summary>
         /// <remarks>
-        /// When IncludeResquestBody is set to true and you are not using a [FromBody] parameter (i.e.reading the request body directly from the Request)
+        /// When IncludeRequestBody is set to true and you are not using a [FromBody] parameter (i.e.reading the request body directly from the Request)
         /// make sure you enable rewind on the request body stream, otherwise the controller won't be able to read the request body since, by default, 
-        /// it's a forwand-only stream that can be read only once. 
+        /// it's a forward-only stream that can be read only once. 
         /// </remarks>
         public bool IncludeRequestBody { get; set; }
         /// <summary>

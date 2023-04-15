@@ -63,7 +63,7 @@ namespace Audit.EntityFramework.Interceptors
             {
                 TransactionEvent = CreateAuditEvent(connection, eventData, "Start")
             };
-            _currentScope = await CreateAuditScopeAsync(auditEvent);
+            _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
 
             return await base.TransactionStartingAsync(connection, eventData, result, cancellationToken);
         }
@@ -128,7 +128,7 @@ namespace Audit.EntityFramework.Interceptors
             {
                 TransactionEvent = CreateAuditEvent(transaction, eventData, "Commit")
             };
-            _currentScope = await CreateAuditScopeAsync(auditEvent);
+            _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
 
             return await base.TransactionCommittingAsync(transaction, eventData, result, cancellationToken);
         }
@@ -189,7 +189,7 @@ namespace Audit.EntityFramework.Interceptors
             {
                 TransactionEvent = CreateAuditEvent(transaction, eventData, "Rollback")
             };
-            _currentScope = await CreateAuditScopeAsync(auditEvent);
+            _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
 
             return await base.TransactionRollingBackAsync(transaction, eventData, result, cancellationToken);
         }
@@ -324,7 +324,7 @@ namespace Audit.EntityFramework.Interceptors
             return scope;
         }
 
-        private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventTransactionEntityFramework tranEvent)
+        private async Task<IAuditScope> CreateAuditScopeAsync(AuditEventTransactionEntityFramework tranEvent, CancellationToken cancellationToken)
         {
             var context = tranEvent.TransactionEvent.DbContext as IAuditDbContext;
 
@@ -348,7 +348,7 @@ namespace Audit.EntityFramework.Interceptors
                 DataProvider = context?.AuditDataProvider
             };
 
-            var scope = await factory.CreateAsync(options);
+            var scope = await factory.CreateAsync(options, cancellationToken);
             context?.OnScopeCreated(scope);
             return scope;
         }

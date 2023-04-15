@@ -6,13 +6,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Audit.Core
 {
     /// <summary>
     /// Makes a code block auditable.
     /// </summary>
-    public partial class AuditScope : IAuditScope
+    public sealed partial class AuditScope : IAuditScope
     {
         #region Constructors
 
@@ -75,7 +76,7 @@ namespace Audit.Core
         /// Starts an audit scope
         /// </summary>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        protected internal AuditScope Start()
+        internal AuditScope Start()
         {
             _saveMode = SaveMode.InsertOnStart;
             // Execute custom on scope created actions
@@ -107,23 +108,24 @@ namespace Audit.Core
         /// <summary>
         /// Starts an audit scope asynchronously
         /// </summary>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        protected internal async Task<AuditScope> StartAsync()
+        internal async Task<AuditScope> StartAsync(CancellationToken cancellationToken = default)
         {
             _saveMode = SaveMode.InsertOnStart;
             // Execute custom on scope created actions
-            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeCreated, this);
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeCreated, this, cancellationToken);
 
             // Process the event insertion (if applies)
             if (_options.IsCreateAndSave)
             {
                 EndEvent();
-                await SaveEventAsync();
+                await SaveEventAsync(false, cancellationToken);
                 _ended = true;
             }
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
             {
-                await SaveEventAsync();
+                await SaveEventAsync(false, cancellationToken);
                 _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
             }
             else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
@@ -336,7 +338,7 @@ namespace Audit.Core
             }
             else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
             {
-                await SaveEventAsync();
+                await SaveEventAsync(false);
             }
             _ended = true;
         }
@@ -359,14 +361,15 @@ namespace Audit.Core
         /// Manually Saves (insert/replace) the Event asynchronously.
         /// Use this method to save (insert/replace) the event when CreationPolicy is set to Manual.
         /// </summary>
-        public async Task SaveAsync()
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public async Task SaveAsync(CancellationToken cancellationToken = default)
         {
             if (IsEndedOrDisabled())
             {
                 return;
             }
             EndEvent();
-            await SaveEventAsync();
+            await SaveEventAsync(false, cancellationToken);
         }
         #endregion
 
@@ -384,7 +387,7 @@ namespace Audit.Core
         private void EndEvent()
         {
             var exception = GetCurrentException();
-            _event.Environment.Exception = exception != null ? string.Format("{0}: {1}", exception.GetType().Name, exception.Message) : null;
+            _event.Environment.Exception = exception != null ? $"{exception.GetType().Name}: {exception.Message}" : null;
             _event.EndDate = Configuration.SystemClock.UtcNow;
             _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
             if (_targetGetter != null)
@@ -446,28 +449,28 @@ namespace Audit.Core
             Configuration.InvokeScopeCustomActions(ActionType.OnEventSaved, this);
         }
 
-        private async Task SaveEventAsync(bool forceInsert = false)
+        private async Task SaveEventAsync(bool forceInsert = false, CancellationToken cancellationToken = default)
         {
             if (IsEndedOrDisabled())
             {
                 return;
             }
             // Execute custom on event saving actions
-            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaving, this);
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaving, this, cancellationToken);
             if (IsEndedOrDisabled())
             {
                 return;
             }
             if (_eventId != null && !forceInsert)
             {
-                await _dataProvider.ReplaceEventAsync(_eventId, _event);
+                await _dataProvider.ReplaceEventAsync(_eventId, _event, cancellationToken);
             }
             else
             {
-                _eventId = await _dataProvider.InsertEventAsync(_event);
+                _eventId = await _dataProvider.InsertEventAsync(_event, cancellationToken);
             }
             // Execute custom after saving actions
-            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaved, this);
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnEventSaved, this, cancellationToken);
         }
         #endregion
     }

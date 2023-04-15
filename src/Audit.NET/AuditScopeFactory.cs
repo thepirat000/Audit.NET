@@ -1,6 +1,7 @@
 ﻿using Audit.Core.Providers;
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audit.Core
@@ -11,28 +12,25 @@ namespace Audit.Core
     public class AuditScopeFactory : IAuditScopeFactory
     {
         #region IAuditScopeFactory implementation
-        /// <summary>
-        /// Creates an audit scope with the given creation options.
-        /// </summary>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.NoInlining)]
         public IAuditScope Create(AuditScopeOptions options)
         {
             return new AuditScope(options).Start();
         }
 
-        /// <summary>
-        /// Creates an audit scope with the given creation options.
-        /// </summary>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(AuditScopeOptions options)
+        public async Task<IAuditScope> CreateAsync(AuditScopeOptions options, CancellationToken cancellationToken = default)
         {
-            return await new AuditScope(options).StartAsync();
+            return await new AuditScope(options).StartAsync(cancellationToken);
         }
         #endregion
 
         /// <summary>
         /// Creates an audit scope with the given creation options as a Fluent API.
         /// </summary>
+        /// <param name="config">Fluent API to configure the Audit Scope creation options</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
         public IAuditScope Create(Action<IAuditScopeOptionsConfigurator> config)
         {
@@ -43,11 +41,13 @@ namespace Audit.Core
         /// <summary>
         /// Creates an audit scope with the given creation options as a Fluent API.
         /// </summary>
+        /// <param name="config">Fluent API to configure the Audit Scope creation options</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config)
+        public async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config, CancellationToken cancellationToken = default)
         {
             var options = new AuditScopeOptions(config);
-            return await new AuditScope(options).StartAsync();
+            return await new AuditScope(options).StartAsync(cancellationToken);
         }
 
         /// <summary>
@@ -68,12 +68,13 @@ namespace Audit.Core
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="extraFields">An anonymous object that can contain additional fields to be merged into the audit event.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task LogAsync(string eventType, object extraFields)
+        public async Task LogAsync(string eventType, object extraFields, CancellationToken cancellationToken = default)
         {
             using (var scope = new AuditScope(new AuditScopeOptions(eventType, null, extraFields, null, null, true)))
             {
-                await scope.StartAsync();
+                await scope.StartAsync(cancellationToken);
             }
         }
 
@@ -92,14 +93,15 @@ namespace Audit.Core
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="target">The reference object getter.</param>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target)
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)] 
+        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, CancellationToken cancellationToken = default)
         {
-            return await new AuditScope(new AuditScopeOptions(eventType, target, null, null, null)).StartAsync();
+            return await new AuditScope(new AuditScopeOptions(eventType, target, null, null, null)).StartAsync(cancellationToken);
         }
 
         /// <summary>
-        /// Creates an audit scope for a targer object and an event type, providing the creation policy and optionally the Data Provider.
+        /// Creates an audit scope for a target object and an event type, providing the creation policy and optionally the Data Provider.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="target">The reference object getter.</param>
@@ -111,16 +113,17 @@ namespace Audit.Core
             return new AuditScope(new AuditScopeOptions(eventType, target, null, dataProvider, creationPolicy)).Start();
         }
         /// <summary>
-        /// Creates an audit scope for a targer object and an event type, providing the creation policy and optionally the Data Provider.
+        /// Creates an audit scope for a target object and an event type, providing the creation policy and optionally the Data Provider.
         /// </summary>
         /// <param name="eventType">Type of the event.</param>
         /// <param name="target">The reference object getter.</param>
         /// <param name="creationPolicy">The event creation policy to use. NULL to use the configured default policy.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider)
+        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider, CancellationToken cancellationToken = default)
         {
-            return await new AuditScope(new AuditScopeOptions(eventType, target, null, dataProvider, creationPolicy)).StartAsync();
+            return await new AuditScope(new AuditScopeOptions(eventType, target, null, dataProvider, creationPolicy)).StartAsync(cancellationToken);
         }
 
         /// <summary>
@@ -144,10 +147,11 @@ namespace Audit.Core
         /// <param name="extraFields">An anonymous object that can contain additional fields to be merged into the audit event.</param>
         /// <param name="creationPolicy">The event creation policy to use. NULL to use the configured default policy.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, object extraFields, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider)
+        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, object extraFields, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider, CancellationToken cancellationToken = default)
         {
-            return await new AuditScope(new AuditScopeOptions(eventType, target, extraFields, dataProvider, creationPolicy)).StartAsync();
+            return await new AuditScope(new AuditScopeOptions(eventType, target, extraFields, dataProvider, creationPolicy)).StartAsync(cancellationToken);
         }
 
     }

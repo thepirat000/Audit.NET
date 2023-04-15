@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Dynamic;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 #if NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -44,6 +46,19 @@ namespace Audit.IntegrationTest
         [TestFixture]
         public class AuditTests
         {
+            [OneTimeSetUp]
+            public void Setup()
+            {
+#if NETCOREAPP2_0_OR_GREATER || NET5_0_OR_GREATER
+                // Allow BSON serialization on any type starting with Audit
+                var objectSerializer = new ObjectSerializer(type =>
+                    ObjectSerializer.DefaultAllowedTypes(type) 
+                    || type.FullName.StartsWith("Audit") 
+                    || type.FullName.StartsWith("MongoDB"));
+                BsonSerializer.RegisterSerializer(objectSerializer);
+#endif
+            }
+
             [Test]
             [Category("Mongo")]
             public void Test_Mongo_ObjectId()

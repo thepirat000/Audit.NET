@@ -6,11 +6,21 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Newtonsoft.Json;
 
 namespace Audit.DynamicProxy.UnitTest
 {
     public class DynamicProxyTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseNullProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+                .ResetActions();
+        }
+
         [Test]
         public async Task Test_CreationPolicyAync()
         {
@@ -40,6 +50,11 @@ namespace Audit.DynamicProxy.UnitTest
             Assert.AreEqual("ok", replaces[0].GetAuditInterceptEvent().Result.Value.ToString());
         }
 
+        private static string ToJson(object obj)
+        {
+            return obj == null ? null : JsonConvert.SerializeObject(obj);
+        }
+        
         [Test]
         public async Task Test_Async()
         {
@@ -81,6 +96,20 @@ namespace Audit.DynamicProxy.UnitTest
             });
             
             Assert.AreEqual(6, logs.Count);
+            
+            Audit.Core.Configuration.AddOnSavingAction(scope =>
+            {
+                var interceptEvent = scope.GetAuditInterceptEvent();
+                foreach (var arg in interceptEvent.Arguments)
+                {
+                    arg.Value = ToJson(arg.Value);
+                }
+
+                if (interceptEvent.Result != null)
+                {
+                    interceptEvent.Result.Value = ToJson(interceptEvent.Result.Value);
+                }
+            });
 
 
             // Aync returning void cannot be continued

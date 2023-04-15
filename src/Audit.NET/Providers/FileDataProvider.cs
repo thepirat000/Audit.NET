@@ -86,10 +86,10 @@ namespace Audit.Core.Providers
             return fullPath;
         }
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var fullPath = GetFilePath(auditEvent);
-            await SaveFileAsync(fullPath, auditEvent);
+            await SaveFileAsync(fullPath, auditEvent, cancellationToken);
             return fullPath;
         }
 
@@ -107,31 +107,31 @@ namespace Audit.Core.Providers
             return Configuration.JsonAdapter.Deserialize<T>(json);
         }
 
-        public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var fullPath = path.ToString();
-            await SaveFileAsync(fullPath, auditEvent);
+            await SaveFileAsync(fullPath, auditEvent, cancellationToken);
         }
 
-        public override async Task<T> GetEventAsync<T>(object path) 
+        public override async Task<T> GetEventAsync<T>(object path, CancellationToken cancellationToken = default) 
         {
             var fullPath = path.ToString();
-            return await GetFromFileAsync<T>(fullPath);
+            return await GetFromFileAsync<T>(fullPath, cancellationToken);
         }
 
-        private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent)
+        private async Task SaveFileAsync(string fullPath, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             using (FileStream stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
             {
-                await Configuration.JsonAdapter.SerializeAsync(stream, auditEvent);
+                await Configuration.JsonAdapter.SerializeAsync(stream, auditEvent, cancellationToken);
             }
         }
 
-        private async Task<T> GetFromFileAsync<T>(string fullPath) where T : AuditEvent
+        private async Task<T> GetFromFileAsync<T>(string fullPath, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             using (var stream = File.OpenRead(fullPath))
             {
-                return await Configuration.JsonAdapter.DeserializeAsync<T>(stream);
+                return await Configuration.JsonAdapter.DeserializeAsync<T>(stream, cancellationToken);
             }
         }
 

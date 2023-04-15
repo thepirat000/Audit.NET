@@ -5,6 +5,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Audit.DynamoDB.Providers
 {
@@ -84,11 +85,11 @@ namespace Audit.DynamoDB.Providers
         /// <summary>
         /// Asynchronously inserts an event into DynamoDB
         /// </summary>
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent)
+        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var table = GetTable(auditEvent);
             var document = CreateDocument(auditEvent, true);
-            await table.PutItemAsync(document);
+            await table.PutItemAsync(document, cancellationToken);
             return GetKeyValues(document, table);
         }
 
@@ -105,11 +106,11 @@ namespace Audit.DynamoDB.Providers
         /// <summary>
         /// Asynchronously replaces an event into DynamoDB
         /// </summary>
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var table = GetTable(auditEvent);
             var document = CreateDocument(auditEvent, false);
-            await table.PutItemAsync(document);
+            await table.PutItemAsync(document, cancellationToken);
         }
 
         /// <summary>
@@ -139,17 +140,18 @@ namespace Audit.DynamoDB.Providers
         /// <typeparam name="T">The audit event type</typeparam>
         /// <param name="hashKey">The primary key Hash portion</param>
         /// <param name="rangeKey">The primary key Range portion, if any. Otherwise NULL.</param>
-        public async Task<T> GetEventAsync<T>(Primitive hashKey, Primitive rangeKey) where T : AuditEvent
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public async Task<T> GetEventAsync<T>(Primitive hashKey, Primitive rangeKey, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             var table = GetTable(null);
             Document doc;
             if (rangeKey == null)
             {
-                doc = await table.GetItemAsync(hashKey);
+                doc = await table.GetItemAsync(hashKey, cancellationToken);
             }
             else
             {
-                doc = await table.GetItemAsync(hashKey, rangeKey);
+                doc = await table.GetItemAsync(hashKey, rangeKey, cancellationToken);
             }
             return AuditEvent.FromJson<T>(doc.ToJson());
         }
@@ -171,9 +173,10 @@ namespace Audit.DynamoDB.Providers
         /// <typeparam name="T">The audit event type</typeparam>
         /// <param name="hashKey">The primary key Hash portion</param>
         /// <param name="rangeKey">The primary key Range portion, if any. Otherwise NULL.</param>
-        public async Task<T> GetEventAsync<T>(DynamoDBEntry hashKey, DynamoDBEntry rangeKey) where T : AuditEvent
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public async Task<T> GetEventAsync<T>(DynamoDBEntry hashKey, DynamoDBEntry rangeKey, CancellationToken cancellationToken = default) where T : AuditEvent
         {
-            return await GetEventAsync<T>(hashKey?.AsPrimitive(), rangeKey?.AsPrimitive());
+            return await GetEventAsync<T>(hashKey?.AsPrimitive(), rangeKey?.AsPrimitive(), cancellationToken);
         }
 
         /// <summary>
@@ -215,7 +218,7 @@ namespace Audit.DynamoDB.Providers
         /// <param name="eventId">The event ID to retrieve. 
         /// Must be a Primitive, a DynamoDBEntry or an array of any of these two types. The first (or only) element must be the Hash key, and the second element is the range key.
         /// </param>
-        public override async Task<T> GetEventAsync<T>(object eventId)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             if (eventId == null)
             {
@@ -223,19 +226,19 @@ namespace Audit.DynamoDB.Providers
             }
             if (eventId is Primitive[] keys)
             {
-                return await GetEventAsync<T>(keys[0], keys.Length > 1 ? keys[1] : null);
+                return await GetEventAsync<T>(keys[0], keys.Length > 1 ? keys[1] : null, cancellationToken);
             }
             if (eventId is Primitive key)
             {
-                return await GetEventAsync<T>(key, null);
+                return await GetEventAsync<T>(key, null, cancellationToken);
             }
             if (eventId is DynamoDBEntry[] ekeys)
             {
-                return await GetEventAsync<T>(ekeys[0], ekeys.Length > 1 ? ekeys[1] : null);
+                return await GetEventAsync<T>(ekeys[0], ekeys.Length > 1 ? ekeys[1] : null, cancellationToken);
             }
             if (eventId is DynamoDBEntry ekey)
             {
-                return await GetEventAsync<T>(ekey, null);
+                return await GetEventAsync<T>(ekey, null, cancellationToken);
             }
             throw new ArgumentException("Parameter must be convertible to Primitive, Primitive[], DynamoDBEntry or DynamoDBEntry[]", "eventId");
         }
