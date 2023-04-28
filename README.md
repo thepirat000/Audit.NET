@@ -49,7 +49,7 @@ PM> Install-Package Audit.NET
 ## Changelog
 Check the [CHANGELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md) file.
 
-## <span style="color:red">Breaking change in version 18</span>
+## Default Serialization Mechanism 
 
 Starting on version 18, Audit.NET will default to diferent serialization mechanism depending on the target framework of the client application, 
 as shown on the following table:
