@@ -51,7 +51,7 @@ Check the [CHANGELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CH
 
 ## Default Serialization Mechanism 
 
-StartAudit.NET will default to diferent serialization mechanism depending on the target framework of the client application, 
+Audit.NET will default to diferent serialization mechanism depending on the target framework of the client application, 
 as shown on the following table:
 
 | Target | Serialization |
