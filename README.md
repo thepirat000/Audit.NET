@@ -694,7 +694,6 @@ Include the stack trace in the event. Default is `false`.
 Audit.Core.Configuration.IncludeStackTrace = true;
 ```
 
-
 ### Global switch off
 
 You can disable audit logging by setting the static property `Configuration.AuditDisabled` to `true`. 
