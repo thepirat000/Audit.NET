@@ -192,7 +192,7 @@ You can mix the **Audit Middleware** together with the **Global Action Filter** 
 - Middleware will log any request regardless if an MVC action is reached or not.
 - If an action is reached, the Action Filter will include specific MVC context info to the Audit Event.
 - Only one Audit Event is generated per request, regardless of an action being processed by the Middleware and multiple Action Filters.
-- The `AuditIgnore` atribute is handled by the Action Filters, there is no need to add the `AuditIgnoreActionFilter` to the MVC filters when using a mixed approach.
+- The `AuditIgnore` attribute is handled by the Action Filters, there is no need to add the `AuditIgnoreActionFilter` to the MVC filters when using a mixed approach.
 
 ## Configuration
 
