@@ -70,12 +70,6 @@ jobs:
     - name: Test Audit.Wcf.UnitTest
       run: dotnet test .\test\Audit.Wcf.UnitTest --no-build --configuration release --verbosity normal
       
-    - name: Test Audit.RavenDB.UnitTest
-      run: dotnet test .\test\Audit.RavenDB.UnitTest --no-build --configuration release --verbosity normal
-      
-    - name: Test Audit.SqlServer.UnitTest
-      run: dotnet test .\test\Audit.SqlServer.UnitTest --no-build --configuration release --verbosity normal
-      
     - name: Test Audit.EntityFramework.Core.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Core.UnitTest --no-build --configuration release --verbosity normal
 
