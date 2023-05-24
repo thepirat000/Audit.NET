@@ -17,10 +17,13 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - name: Set ACTIONS_ALLOW_UNSECURE_COMMANDS to true
-      run: |
-        echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> "$GITHUB_ENV"
-          
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'      
+      with:
+        nuget-version: '6.x'      
+
     - name: Checkout
       uses: actions/checkout@v3
       
@@ -33,10 +36,6 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
-      with:
-        nuget-version: '6.x'      
       
     - name: Nuget Restore
       run: nuget restore Audit.NET.sln
