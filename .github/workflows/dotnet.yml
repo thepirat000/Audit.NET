@@ -25,6 +25,7 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
+          1.0.4
           7.0.x
           
     - name: Setup MSBuild
