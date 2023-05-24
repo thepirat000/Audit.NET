@@ -17,12 +17,6 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'      
-      with:
-        nuget-version: '6.x'      
 
     - name: Checkout
       uses: actions/checkout@v3
@@ -35,7 +29,13 @@ jobs:
           
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
-
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'      
+      with:
+        nuget-version: '6.x'      
       
     - name: Nuget Restore
       run: nuget restore Audit.NET.sln
@@ -45,7 +45,7 @@ jobs:
       
     - name: MsBuild Audit.EntityFramework.UnitTest
       run: |
-        msbuild.exe .\src\Audit.EntityFramework.UnitTest -p:Configuration=Release
+        msbuild.exe .\test\Audit.EntityFramework.UnitTest -p:Configuration=Release
 
     - name: Dotnet Build Audit.NET.sln
       run: dotnet build .\Audit.NET.sln --no-restore --configuration release
