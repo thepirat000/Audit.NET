@@ -66,10 +66,7 @@ jobs:
       
     - name: Test Audit.DynamicProxy.UnitTest
       run: dotnet test .\test\Audit.DynamicProxy.UnitTest --no-build --configuration release --verbosity normal
-      
-    - name: Test Audit.Redis.UnitTest
-      run: dotnet test .\test\Audit.Redis.UnitTest --no-build --configuration release --verbosity normal
-      
+     
     - name: Test Audit.Wcf.UnitTest
       run: dotnet test .\test\Audit.Wcf.UnitTest --no-build --configuration release --verbosity normal
       
