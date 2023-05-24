@@ -24,10 +24,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          2.1.x
-          3.1.x
-          5.0.x
-          6.0.x
           7.0.x
           
     - name: Setup MSBuild
@@ -35,6 +31,8 @@ jobs:
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.2
+      with:
+        nuget-version: '6.x'      
       
     - name: Nuget Restore
       run: nuget restore Audit.NET.sln
