@@ -32,16 +32,22 @@ jobs:
           
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
       
-    - name: Restore dependencies
+    - name: Nuget Restore
+      run: nuget restore Audit.NET.sln
+      
+    - name: Dotnet Restore 
       run: dotnet restore
-      
-    - name: Dotnet Build Audit.NET.sln
-      run: dotnet build .\Audit.NET.sln --no-restore --configuration release
       
     - name: MsBuild Audit.EntityFramework.UnitTest
       run: |
         msbuild.exe .\src\Audit.EntityFramework.UnitTest -p:Configuration=Release
+
+    - name: Dotnet Build Audit.NET.sln
+      run: dotnet build .\Audit.NET.sln --no-restore --configuration release
       
     - name: Test
       run: dotnet test --no-build --configuration release --verbosity normal
