@@ -124,9 +124,10 @@ namespace Audit.SqlServer.UnitTest
         [Test]
         public void Test_Sql_DbContextOptions()
         {
+            var cnnString = TestHelper.GetConnectionString("Audit");
             TestInterceptor.Count = 0;
             var sqlProvider = new SqlDataProvider(config => config
-                    .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
+                    .ConnectionString(cnnString)
                     .DbContextOptions(new DbContextOptionsBuilder().AddInterceptors(new TestInterceptor()).Options)
                     .TableName(ev => "Event")
                     .IdColumnName(ev => "EventId")

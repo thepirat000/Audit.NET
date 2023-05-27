@@ -10,7 +10,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     [AuditDbContext(Mode = AuditOptionMode.OptIn)]
     public class BlogsContext : AuditDbContext
     {
-        public const string CnnString = "data source=localhost;initial catalog=Blogs3;integrated security=true;Encrypt=False";
+        public static string CnnString = TestHelper.GetConnectionString("Blogs3");
 
         public override bool AuditDisabled { get; set; }
 

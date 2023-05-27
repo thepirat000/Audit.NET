@@ -9,18 +9,20 @@ namespace Audit.SqlServer.UnitTest
 {
     internal static class SqlTestHelper
     {
-        internal const string SqlConnectionStringTemplate = "data source=localhost;initial catalog={0};integrated security=true;Encrypt=False;";
+        internal static string CnnStringAudit = TestHelper.GetConnectionString("Audit");
+        internal static string CnnStringMaster = TestHelper.GetConnectionString("master");
+
         internal const string DatabaseName = "AuditSqlServerTests";
         internal const string TableName = "AuditEvent";
 
         internal static string GetConnectionString()
         {
-            return string.Format(SqlConnectionStringTemplate, DatabaseName);
+            return CnnStringAudit;
         }
 
         internal static void EnsureDatabaseCreated()
         {
-            using (var cnn = new SqlConnection(string.Format(SqlConnectionStringTemplate, "master")))
+            using (var cnn = new SqlConnection(CnnStringMaster))
             using (var cmd = new SqlCommand($"IF DB_ID('{DatabaseName}') IS NULL CREATE DATABASE {DatabaseName}", cnn))
             {
                 cnn.Open();
@@ -48,7 +50,7 @@ namespace Audit.SqlServer.UnitTest
 	                CONSTRAINT PK_Event PRIMARY KEY (EventId)
                 )";
 
-            using (var cnn = new SqlConnection(string.Format(SqlConnectionStringTemplate, DatabaseName)))
+            using (var cnn = new SqlConnection(CnnStringAudit))
             using (var cmd = new SqlCommand(tableCreate, cnn))
             {
                 cnn.Open();

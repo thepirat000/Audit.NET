@@ -274,7 +274,6 @@ namespace Audit.EntityFramework.Core.UnitTest
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseInMemoryDatabase("InterceptDb");
-            //optionsBuilder.UseSqlServer("data source=localhost;initial catalog=InterceptDb;integrated security=true;Encrypt=False;");
         }
 
         public class Department

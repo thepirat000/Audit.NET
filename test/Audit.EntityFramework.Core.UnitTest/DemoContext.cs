@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.SqlClient;
 using System.Text;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     public class DemoContext : AuditDbContext
     {
-        public const string CnnString = "data source=localhost;initial catalog=Demo;integrated security=true;Encrypt=False;";
+        public static string CnnString = TestHelper.GetConnectionString("Demo");
 
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<Employee> Employees { get; set; }

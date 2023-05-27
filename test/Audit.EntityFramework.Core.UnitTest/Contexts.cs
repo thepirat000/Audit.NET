@@ -145,9 +145,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-            //.UseSqlServer("data source=localhost;initial catalog=OwnedSingleMultiple;integrated security=true;Encrypt=False;");
             .UseInMemoryDatabase("testing-db");
-            //.UseLazyLoadingProxies();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

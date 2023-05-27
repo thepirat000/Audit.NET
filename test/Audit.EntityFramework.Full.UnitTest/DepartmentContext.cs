@@ -6,9 +6,10 @@ namespace Audit.EntityFramework.Full.UnitTest
     {
         private static DbContextHelper helper = new DbContextHelper();
         private readonly IAuditDbContext auditDbContext;
+        public static string CnnString = TestHelper.GetConnectionString("DepartmentDatabase1");
 
         public DepartmentContext1()
-            : base("Data Source=localhost;Initial Catalog=DepartmentDatabase1;Integrated Security=True;Encrypt=False;")
+            : base(CnnString)
         {
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;
@@ -31,9 +32,10 @@ namespace Audit.EntityFramework.Full.UnitTest
     {
         private static DbContextHelper helper = new DbContextHelper();
         private readonly IAuditDbContext auditDbContext;
+        public static string CnnString = TestHelper.GetConnectionString("DepartmentDatabase2");
 
         public DepartmentContext2()
-            : base("Data Source=localhost;Initial Catalog=DepartmentDatabase2;Integrated Security=True;Encrypt=False;")
+            : base(CnnString)
         {
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;

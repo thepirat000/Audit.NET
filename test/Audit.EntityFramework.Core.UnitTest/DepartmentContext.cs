@@ -6,7 +6,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     {
         private static DbContextHelper helper = new DbContextHelper();
         private readonly IAuditDbContext auditDbContext;
-        public const string CnnString = "Data Source=localhost;Initial Catalog=DepartmentDatabase1;Integrated Security=True;Encrypt=False;";
+        public static string CnnString = TestHelper.GetConnectionString("DepartmentDatabase1");
 
         public DbSet<Department> Departments { get; set; }
 
@@ -36,7 +36,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     {
         private static DbContextHelper helper = new DbContextHelper();
         private readonly IAuditDbContext auditDbContext;
-        public const string CnnString = "Data Source=localhost;Initial Catalog=DepartmentDatabase2;Integrated Security=True;Encrypt=False;";
+        public static string CnnString = TestHelper.GetConnectionString("DepartmentDatabase2");
 
         public DbSet<Department> Departments { get; set; }
 

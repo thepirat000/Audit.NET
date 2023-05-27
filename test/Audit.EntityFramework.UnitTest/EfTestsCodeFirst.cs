@@ -9,6 +9,7 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Audit.EntityFramework.UnitTest;
 
 namespace Audit.EntityFramework.CodeFirst.UnitTest
 {
@@ -43,7 +44,9 @@ namespace Audit.EntityFramework.CodeFirst.UnitTest
     }
     public class BlogContext : AuditDbContext
     {
-        public BlogContext() : base("data source=localhost;initial catalog=Blogs2;integrated security=true;Encrypt=False;")
+        public static string CnnString = TestHelper.GetConnectionString("Blogs2");
+
+        public BlogContext() : base(CnnString)
         {
         }
 

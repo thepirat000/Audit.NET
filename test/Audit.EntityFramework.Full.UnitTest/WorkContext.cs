@@ -9,9 +9,10 @@ namespace Audit.EntityFramework.Full.UnitTest
     {
         private static DbContextHelper helper = new DbContextHelper();
         private readonly IAuditDbContext auditDbContext;
+        public static string CnnString = TestHelper.GetConnectionString("WorkDatabase");
 
         public WorkContext()
-            : base("Data Source=localhost;Initial Catalog=WorkDatabase;Integrated Security=True;Encrypt=False;")
+            : base(CnnString)
         {
             auditDbContext = new DefaultAuditContext(this);
             auditDbContext.IncludeEntityObjects = true;

@@ -37,11 +37,13 @@ namespace Audit.EntityFramework.Core.UnitTest
 
         class TestContext : AuditDbContext
         {
+            public static string CnnString = TestHelper.GetConnectionString("TransactionTestEfCore");
+
             public DbSet<Message> Messages { get; set; }
             public DbSet<MessageAudit> MessageAudits { get; set; }
 
             protected override void OnConfiguring(DbContextOptionsBuilder options)
-                => options.UseSqlServer("data source=localhost;initial catalog=TransactionTestEfCore;integrated security=true;Encrypt=False;");
+                => options.UseSqlServer(CnnString);
         }
 
         [OneTimeSetUp]

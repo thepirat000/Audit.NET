@@ -6,6 +6,8 @@ namespace Audit.EntityFramework.Full.UnitTest
 {
     public class SimpleContext : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("SimpleContext");
+
         [AuditInclude]
         public class Car
         {
@@ -31,7 +33,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         public DbSet<Car> Cars { get; set; }
         public DbSet<Brand> Brands { get; set; }
 
-        public SimpleContext() : base("data source=localhost;initial catalog=SimpleContext;integrated security=true;Encrypt=False;") { } 
+        public SimpleContext() : base(CnnString) { } 
        
     }
 }

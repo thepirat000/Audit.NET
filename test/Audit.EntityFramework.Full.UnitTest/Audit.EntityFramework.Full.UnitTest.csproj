@@ -17,9 +17,6 @@
     <DebugType>Full</DebugType>
   </PropertyGroup>
 
-  <ItemGroup>
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
     <PackageReference Include="EntityFramework" Version="6.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />

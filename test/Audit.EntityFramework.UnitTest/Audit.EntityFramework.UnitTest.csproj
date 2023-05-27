@@ -121,6 +121,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelper.cs" />
     <Compile Include="TestInitializerInNoNamespace.cs" />
   </ItemGroup>
   <ItemGroup>

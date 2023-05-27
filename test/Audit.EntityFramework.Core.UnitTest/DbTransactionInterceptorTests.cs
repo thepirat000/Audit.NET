@@ -396,6 +396,8 @@ namespace Audit.EntityFramework.Core.UnitTest
 
     public class DbTransactionInterceptContext_InheritingFromAuditDbContext : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("DbTransactionIntercept");
+
         public DbSet<Department> Departments { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -416,8 +418,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-                "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;Encrypt=False");
+            optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
 
         }
@@ -459,6 +460,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 
     public class DbTransactionInterceptContext : DbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("DbTransactionIntercept");
         public DbSet<Department> Departments { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -468,8 +470,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-                "data source=localhost;initial catalog=DbTransactionIntercept;integrated security=true;Encrypt=False");
+            optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
 
         }

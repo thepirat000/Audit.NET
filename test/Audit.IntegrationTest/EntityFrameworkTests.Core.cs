@@ -1061,10 +1061,12 @@ SET IDENTITY_INSERT Posts OFF
 
     public class OtherContextFromDbContext : DbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Blogs");
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // from dbcontext
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;");
+            optionsBuilder.UseSqlServer(CnnString);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1100,11 +1102,13 @@ SET IDENTITY_INSERT Posts OFF
 
     public class MyBaseContext : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Blogs");
+
         public override bool AuditDisabled { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;");
+            optionsBuilder.UseSqlServer(CnnString);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1233,18 +1237,22 @@ SET IDENTITY_INSERT Posts OFF
 
     public class AuditedContextNoAuditTables : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Audit");
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;");
+            optionsBuilder.UseSqlServer(CnnString);
         }
         public DbSet<Order> Order { get; set; }
         public DbSet<Orderline> Orderline { get; set; }
     }
     public class AuditInDifferentContext : DbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Audit");
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;");
+            optionsBuilder.UseSqlServer(CnnString);
         }
         public DbSet<OrderAudit> OrderAudit { get; set; }
         public DbSet<OrderlineAudit> OrderlineAudit { get; set; }
@@ -1252,9 +1260,11 @@ SET IDENTITY_INSERT Posts OFF
 
     public class AuditPerTableContext : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Audit");
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;");
+            optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.UseLazyLoadingProxies();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -1284,9 +1294,10 @@ SET IDENTITY_INSERT Posts OFF
 #if NETCOREAPP3_0 || NET5_0_OR_GREATER
     public class AuditNetTestContext : Audit.EntityFramework.AuditIdentityDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("FooBar");
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("data source=localhost;initial catalog=FooBar;integrated security=true;Encrypt=False;");
+            optionsBuilder.UseSqlServer(CnnString);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

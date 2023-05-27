@@ -103,13 +103,15 @@ namespace Audit.EntityFramework.Full.UnitTest
                 }));
 
 
-            using (var ctx = new ProjectContext("data source=localhost;initial catalog=inheritance_test;integrated security=true;Encrypt=False;"))
+            var cnnString = TestHelper.GetConnectionString("inheritance_test");
+
+            using (var ctx = new ProjectContext(cnnString))
             {
                 ctx.Database.CreateIfNotExists();
             }
 
             var cm = new ClientMapping();
-            using (var db = new ProjectContext("data source=localhost;initial catalog=inheritance_test;integrated security=true;Encrypt=False;"))
+            using (var db = new ProjectContext(cnnString))
             {
                 cm.PropertyOne = "one";
                 cm.PropertyTwo = "two";
@@ -117,7 +119,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 db.SaveChanges();
             }
 
-            using (var ctx = new ProjectContext("data source=localhost;initial catalog=inheritance_test;integrated security=true;Encrypt=False;"))
+            using (var ctx = new ProjectContext(cnnString))
             {
                 ctx.Database.Delete();
             }

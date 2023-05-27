@@ -1109,9 +1109,11 @@ namespace Audit.IntegrationTest
 
             public void SetSqlSettings()
             {
+                var cnnString = TestHelper.GetConnectionString("Audit");
+
                 Audit.Core.Configuration.Setup()
                     .UseSqlServer(config => config
-                        .ConnectionString("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
+                        .ConnectionString(cnnString)
                         .TableName(ev => "Event")
                         .IdColumnName(ev => "EventId")
                         .JsonColumnName(ev => "Data")

@@ -58,8 +58,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             public ICollection<Post> Posts { get; set; }
         }
 
-
-        public const string CnnString = "data source=localhost;initial catalog=ManyToMany;integrated security=true;Encrypt=False;";
+        public static string CnnString = TestHelper.GetConnectionString("ManyToMany");
 
         public DbSet<Audit_PostTag> Audit_PostTags { get; set; }
         public DbSet<Audit_Post> Audit_Posts { get; set; }

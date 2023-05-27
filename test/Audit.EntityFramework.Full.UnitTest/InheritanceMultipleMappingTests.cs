@@ -86,8 +86,9 @@ namespace Audit.EntityFramework.Full.UnitTest
     {
         private static DbContextHelper _helper = new DbContextHelper();
         private readonly IAuditDbContext _auditContext;
+        public static string CnnString = TestHelper.GetConnectionString("inheritance_test_multi");
 
-        public DataBaseContext() : base("data source=localhost;initial catalog=inheritance_test_multi;integrated security=true;Encrypt=False;")
+        public DataBaseContext() : base(CnnString)
         {
             _auditContext = new DefaultAuditContext(this);
             _helper.SetConfig(_auditContext);

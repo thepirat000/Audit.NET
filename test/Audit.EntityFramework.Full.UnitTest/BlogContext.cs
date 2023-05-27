@@ -8,7 +8,9 @@ namespace Audit.EntityFramework.Full.UnitTest
 {
     public class BlogContext : AuditDbContext
     {
-        public BlogContext() : base("data source=localhost;initial catalog=Blogs2;integrated security=true;Encrypt=False;")
+        public static string CnnString = TestHelper.GetConnectionString("Blogs2");
+
+        public BlogContext() : base(CnnString)
         {
         }
         public BlogContext(string connectionString) : base(connectionString)

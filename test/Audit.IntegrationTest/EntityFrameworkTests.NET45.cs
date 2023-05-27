@@ -407,8 +407,9 @@ SET IDENTITY_INSERT Posts OFF
 
     public class OtherContextFromDbContext : DbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Blogs");
         public OtherContextFromDbContext()
-            : base("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;")
+            : base(CnnString)
         { }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -437,10 +438,11 @@ SET IDENTITY_INSERT Posts OFF
 
     public class MyBaseContext : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Blogs");
         public override bool AuditDisabled { get; set; }
 
         public MyBaseContext()
-            : base("data source=localhost;initial catalog=Blogs;integrated security=true;Encrypt=False;")
+            : base(CnnString)
         {
         }
 
@@ -552,8 +554,10 @@ SET IDENTITY_INSERT Posts OFF
     [AuditDbContext(IncludeEntityObjects = true)]
     public class AuditPerTableContext : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Audit");
+
         public AuditPerTableContext()
-            : base("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
+            : base(CnnString)
         {
         }
 
@@ -631,8 +635,10 @@ SET IDENTITY_INSERT Posts OFF
     [AuditDbContext(IncludeEntityObjects = false, IncludeIndependantAssociations = true)]
     public class Issue78Context : AuditDbContext
     {
+        public static string CnnString = TestHelper.GetConnectionString("Audit");
+
         public Issue78Context()
-            : base("data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;")
+            : base(CnnString)
         {
         }
 

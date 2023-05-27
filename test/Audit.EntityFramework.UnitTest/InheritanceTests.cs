@@ -14,13 +14,15 @@ namespace Audit.EntityFramework.UnitTest
     [Category("Sql")]
     public class InheritanceTests
     {
+        public static string CnnString = TestHelper.GetConnectionString("AuditTest");
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             DbConfiguration.Loaded += (_, a) =>
             {
                 a.ReplaceService<DbProviderServices>((s, k) => SqlProviderServices.Instance);
-                a.ReplaceService<IDbConnectionFactory>((s, k) => new SqlConnectionFactory("data source=(local);Initial Catalog=AuditTest;Integrated Security=True;Encrypt=False;"));
+                a.ReplaceService<IDbConnectionFactory>((s, k) => new SqlConnectionFactory(CnnString));
             };
         }
 
