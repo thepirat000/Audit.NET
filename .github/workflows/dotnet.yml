@@ -57,7 +57,9 @@ jobs:
           7.0.x          
           
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        vs-version: '[17.5,18.0)'      
       
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.2
