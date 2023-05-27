@@ -30,35 +30,35 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// A func that returns the endpoint URL to use.
         /// </summary>
-        public Func<string> EndpointBuilder { get; set; }
+        public Func<AuditEvent, string> EndpointBuilder { get; set; }
         /// <summary>
         /// Sets the endpoint URL.
         /// </summary>
-        public string Endpoint { set { EndpointBuilder = () => value; } }
+        public string Endpoint { set { EndpointBuilder = _ => value; } }
         /// <summary>
         /// A func that returns the AuthKey to use for a given audit event.
         /// </summary>
-        public Func<string> AuthKeyBuilder { get; set; }
+        public Func<AuditEvent, string> AuthKeyBuilder { get; set; }
         /// <summary>
         /// Sets the AuthKey to use.
         /// </summary>
-        public string AuthKey { set { AuthKeyBuilder = () => value; } }
+        public string AuthKey { set { AuthKeyBuilder = _ => value; } }
         /// <summary>
         /// A func that returns the Database to use for a given audit event.
         /// </summary>
-        public Func<string> DatabaseBuilder { get; set; }
+        public Func<AuditEvent, string> DatabaseBuilder { get; set; }
         /// <summary>
         /// Sets the Database to use.
         /// </summary>
-        public string Database { set { DatabaseBuilder = () => value; } }
+        public string Database { set { DatabaseBuilder = _ => value; } }
         /// <summary>
         /// A func that returns the Container to use for a given audit event.
         /// </summary>
-        public Func<string> ContainerBuilder { get; set; }
+        public Func<AuditEvent, string> ContainerBuilder { get; set; }
         /// <summary>
         /// Sets the Container to use.
         /// </summary>
-        public string Container { set { ContainerBuilder = () => value; } }
+        public string Container { set { ContainerBuilder = _ => value; } }
         /// <summary>
         /// A func that returns the ConnectionPolicy to use for a given audit event.
         /// </summary>
@@ -95,8 +95,8 @@ namespace Audit.AzureCosmos.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
+            var client = GetClient(auditEvent);
+            var collectionUri = GetCollectionUri(auditEvent);
             SetId(auditEvent);
             Document doc = client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings })
                 .GetAwaiter().GetResult();
@@ -105,8 +105,8 @@ namespace Audit.AzureCosmos.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
+            var client = GetClient(auditEvent);
+            var collectionUri = GetCollectionUri(auditEvent);
             SetId(auditEvent);
             Document doc = await client.CreateDocumentAsync(collectionUri, auditEvent, new RequestOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings }, cancellationToken: cancellationToken);
             return doc.Id;
@@ -114,8 +114,8 @@ namespace Audit.AzureCosmos.Providers
 
         public override void ReplaceEvent(object docId, AuditEvent auditEvent)
         {
-            var client = GetClient();
-            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
+            var client = GetClient(auditEvent);
+            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder?.Invoke(auditEvent), docId.ToString());
             Document doc;
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
@@ -127,8 +127,8 @@ namespace Audit.AzureCosmos.Providers
         
         public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var client = GetClient();
-            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
+            var client = GetClient(auditEvent);
+            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder?.Invoke(auditEvent), docId.ToString());
             Document doc;
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
@@ -203,9 +203,8 @@ namespace Audit.AzureCosmos.Providers
         /// </summary>
         public async Task<T> GetEventAsync<T>(string docId, string partitionKey, CancellationToken cancellationToken = default)
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
-            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke(), docId.ToString());
+            var client = GetClient(null);
+            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(null), ContainerBuilder?.Invoke(null), docId);
 #if NET45
             var pk = new PartitionKey(partitionKey);
 #else
@@ -214,12 +213,12 @@ namespace Audit.AzureCosmos.Providers
             return (await client.ReadDocumentAsync<T>(docUri, new RequestOptions() { PartitionKey = pk }, cancellationToken)).Document;
         }
 
-        private IDocumentClient GetClient()
+        private IDocumentClient GetClient(AuditEvent auditEvent)
         {
-            return DocumentClient ?? InitializeClient();
+            return DocumentClient ?? InitializeClient(auditEvent);
         }
 
-        private IDocumentClient InitializeClient()
+        private IDocumentClient InitializeClient(AuditEvent auditEvent)
         {
             var policy = ConnectionPolicyBuilder?.Invoke()
                 ?? new ConnectionPolicy
@@ -227,15 +226,15 @@ namespace Audit.AzureCosmos.Providers
                     ConnectionMode = ConnectionMode.Direct,
                     ConnectionProtocol = Protocol.Tcp
                 };
-            DocumentClient = new DocumentClient(new Uri(EndpointBuilder?.Invoke()), AuthKeyBuilder?.Invoke(), policy);
+            DocumentClient = new DocumentClient(new Uri(EndpointBuilder!.Invoke(auditEvent)), AuthKeyBuilder?.Invoke(auditEvent), policy);
             Task.Run(() => { ((DocumentClient)DocumentClient).OpenAsync(); });
 
             return DocumentClient;
         }
 
-        private Uri GetCollectionUri()
+        private Uri GetCollectionUri(AuditEvent auditEvent)
         {
-            return UriFactory.CreateDocumentCollectionUri(DatabaseBuilder?.Invoke(), ContainerBuilder.Invoke());
+            return UriFactory.CreateDocumentCollectionUri(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder.Invoke(auditEvent));
         }
 
         private void SetId(AuditEvent auditEvent)
@@ -253,8 +252,8 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="feedOptions">The options for processing the query results feed.</param>
         public IQueryable<AuditEvent> QueryEvents(FeedOptions feedOptions = null)
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
+            var client = GetClient(null);
+            var collectionUri = GetCollectionUri(null);
             return client.CreateDocumentQuery<AuditEvent>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
 
@@ -265,8 +264,8 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="feedOptions">The options for processing the query results feed.</param>
         public IQueryable<T> QueryEvents<T>(FeedOptions feedOptions = null) where T : AuditEvent
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
+            var client = GetClient(null);
+            var collectionUri = GetCollectionUri(null);
             return client.CreateDocumentQuery<T>(collectionUri, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
 
@@ -277,8 +276,8 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="feedOptions">The options for processing the query results feed.</param>
         public IEnumerable<AuditEvent> EnumerateEvents(string sqlExpression, FeedOptions feedOptions = null)
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
+            var client = GetClient(null);
+            var collectionUri = GetCollectionUri(null);
             return client.CreateDocumentQuery<AuditEvent>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
         /// <summary>
@@ -289,8 +288,8 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="feedOptions">The options for processing the query results feed.</param>
         public IEnumerable<T> EnumerateEvents<T>(string sqlExpression, FeedOptions feedOptions = null) where T : AuditEvent
         {
-            var client = GetClient();
-            var collectionUri = GetCollectionUri();
+            var client = GetClient(null);
+            var collectionUri = GetCollectionUri(null);
             return client.CreateDocumentQuery<T>(collectionUri, sqlExpression, feedOptions ?? new FeedOptions() { JsonSerializerSettings = Core.Configuration.JsonSettings });
         }
     }

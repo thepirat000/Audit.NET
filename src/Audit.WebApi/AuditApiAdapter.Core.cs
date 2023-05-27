@@ -108,9 +108,10 @@ namespace Audit.WebApi
                     HttpMethod = httpContext.Request.Method,
                     FormVariables = await AuditApiHelper.GetFormVariables(httpContext, cancellationToken),
                     TraceId = httpContext.TraceIdentifier,
-                    ActionExecutingContext = actionContext
                 };
             }
+
+            action.ActionExecutingContext = actionContext;
             action.RequestUrl = httpContext.Request.GetDisplayUrl();
             action.ActionName = actionDescriptor != null ? actionDescriptor.ActionName : actionContext.ActionDescriptor.DisplayName;
             action.ControllerName = actionDescriptor?.ControllerName;

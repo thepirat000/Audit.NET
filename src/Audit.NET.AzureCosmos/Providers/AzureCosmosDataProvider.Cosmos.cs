@@ -27,35 +27,35 @@ namespace Audit.AzureCosmos.Providers
         /// <summary>
         /// A func that returns the endpoint URL to use.
         /// </summary>
-        public Func<string> EndpointBuilder { get; set; }
+        public Func<AuditEvent, string> EndpointBuilder { get; set; }
         /// <summary>
         /// Sets the endpoint URL.
         /// </summary>
-        public string Endpoint { set { EndpointBuilder = () => value; } }
+        public string Endpoint { set { EndpointBuilder = _ => value; } }
         /// <summary>
         /// A func that returns the AuthKey to use
         /// </summary>
-        public Func<string> AuthKeyBuilder { get; set; }
+        public Func<AuditEvent, string> AuthKeyBuilder { get; set; }
         /// <summary>
         /// Sets the AuthKey to use.
         /// </summary>
-        public string AuthKey { set { AuthKeyBuilder = () => value; } }
+        public string AuthKey { set { AuthKeyBuilder = _ => value; } }
         /// <summary>
         /// A func that returns the Database name to use for a given audit event.
         /// </summary>
-        public Func<string> DatabaseBuilder { get; set; }
+        public Func<AuditEvent, string> DatabaseBuilder { get; set; }
         /// <summary>
         /// Sets the Database name to use.
         /// </summary>
-        public string Database { set { DatabaseBuilder = () => value; } }
+        public string Database { set { DatabaseBuilder = _ => value; } }
         /// <summary>
         /// A function that returns the Container name to use for a given audit event.
         /// </summary>
-        public Func<string> ContainerBuilder { get; set; }
+        public Func<AuditEvent, string> ContainerBuilder { get; set; }
         /// <summary>
         /// Sets the Container name to use.
         /// </summary>
-        public string Container { set { ContainerBuilder = () => value; } }
+        public string Container { set { ContainerBuilder = _ => value; } }
         /// <summary>
         /// Allows to change the CosmosClientOptions when using the default cosmos client
         /// </summary>
@@ -88,7 +88,7 @@ namespace Audit.AzureCosmos.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var container = GetContainer();
+            var container = GetContainer(auditEvent);
             var id = GetSetId(auditEvent);
             container.CreateItemAsync(auditEvent).GetAwaiter().GetResult();
             return id;
@@ -96,7 +96,7 @@ namespace Audit.AzureCosmos.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var container = GetContainer();
+            var container = GetContainer(auditEvent);
             var id = GetSetId(auditEvent);
             await container.CreateItemAsync(auditEvent, cancellationToken: cancellationToken);
             return id;
@@ -104,14 +104,14 @@ namespace Audit.AzureCosmos.Providers
 
         public override void ReplaceEvent(object docId, AuditEvent auditEvent)
         {
-            var container = GetContainer();
+            var container = GetContainer(auditEvent);
             var id = docId.ToString();
             container.ReplaceItemAsync(auditEvent, id).GetAwaiter().GetResult();
         }
 
         public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var container = GetContainer();
+            var container = GetContainer(auditEvent);
             var id = docId.ToString();
             await container.ReplaceItemAsync(auditEvent, id, cancellationToken: cancellationToken);
         }
@@ -153,7 +153,7 @@ namespace Audit.AzureCosmos.Providers
         /// </summary>
         public T GetEvent<T>(string id, string partitionKey)
         {
-            var container = GetContainer();
+            var container = GetContainer(null);
             return container.ReadItemAsync<T>(id, partitionKey == null ? PartitionKey.None : new PartitionKey(partitionKey)).GetAwaiter().GetResult();
         }
 
@@ -162,7 +162,7 @@ namespace Audit.AzureCosmos.Providers
         /// </summary>
         public async Task<T> GetEventAsync<T>(string id, string partitionKey, CancellationToken cancellationToken = default)
         {
-            var container = GetContainer();
+            var container = GetContainer(null);
             return await container.ReadItemAsync<T>(id, partitionKey == null ? PartitionKey.None : new PartitionKey(partitionKey), cancellationToken: cancellationToken);
         }
 
@@ -182,12 +182,12 @@ namespace Audit.AzureCosmos.Providers
             return await GetEventAsync<AuditEvent>(docId, partitionKey, cancellationToken);
         }
 
-        private CosmosClient GetClient()
+        private CosmosClient GetClient(AuditEvent auditEvent)
         {
-            return CosmosClient ?? InitializeClient();
+            return CosmosClient ?? InitializeClient(auditEvent);
         }
 
-        private CosmosClient InitializeClient()
+        private CosmosClient InitializeClient(AuditEvent auditEvent)
         {
             var options = new CosmosClientOptions
             {
@@ -197,14 +197,14 @@ namespace Audit.AzureCosmos.Providers
             {
                 CosmosClientOptionsAction.Invoke(options);
             }
-            CosmosClient = new CosmosClient(EndpointBuilder?.Invoke(), AuthKeyBuilder?.Invoke(), options);
+            CosmosClient = new CosmosClient(EndpointBuilder?.Invoke(auditEvent), AuthKeyBuilder?.Invoke(auditEvent), options);
             return CosmosClient;
         }
 
-        private Container GetContainer()
+        private Container GetContainer(AuditEvent auditEvent)
         {
-            var client = GetClient();
-            return client.GetContainer(DatabaseBuilder?.Invoke(), ContainerBuilder?.Invoke());
+            var client = GetClient(auditEvent);
+            return client.GetContainer(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder?.Invoke(auditEvent));
         }
 
         private string GetSetId(AuditEvent auditEvent)
@@ -236,7 +236,7 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="options">The options for processing the query.</param>
         public IQueryable<AuditEvent> QueryEvents(QueryRequestOptions options = null)
         {
-            var container = GetContainer();
+            var container = GetContainer(null);
             return container.GetItemLinqQueryable<AuditEvent>(true, null, options);
         }
 
@@ -247,7 +247,7 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="options">The options for processing the query.</param>
         public IQueryable<T> QueryEvents<T>(QueryRequestOptions options = null) where T : AuditEvent
         {
-            var container = GetContainer();
+            var container = GetContainer(null);
             return container.GetItemLinqQueryable<T>(true, null, options);
         }
 
@@ -270,7 +270,7 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="cancellationToken">The Cancellation Token.</param>
         public async IAsyncEnumerable<T> EnumerateEvents<T>(string sqlExpression, QueryRequestOptions queryOptions = null, CancellationToken cancellationToken = default) where T : AuditEvent
         {
-            var container = GetContainer();
+            var container = GetContainer(null);
             var feed = container.GetItemQueryIterator<T>(sqlExpression, null, queryOptions);
             while (feed.HasMoreResults)
             {

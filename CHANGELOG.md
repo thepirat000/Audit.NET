@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [21.0.1] - 2023-05-28
+- Audit.NET.AzureCosmos: Adding support to dynamically configure the Endpoint, AuthKey, Database and Container from the AuditEvent data.
+
 ## [21.0.0] - 2023-04-15
 - Audit.NET and all its extensions: Adding CancellationToken support for all the Async methods (#597)
 

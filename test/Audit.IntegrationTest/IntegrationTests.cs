@@ -238,20 +238,20 @@ namespace Audit.IntegrationTest
             public void Test_AzureCosmos_FluentApi()
             {
                 var x = new AzureCosmos.Providers.AzureCosmosDataProvider(_ => _
-                    .Endpoint(() => "Endpoint")
-                    .AuthKey(() => "AuthKey")
-                    .Container(() => "Container")
-                    .Database(() => "Database")
+                    .Endpoint(ev => "Endpoint")
+                    .AuthKey(ev => "AuthKey")
+                    .Container(ev => "Container")
+                    .Database(ev => "Database")
 #if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
                     .ClientOptions(o => o.MaxRequestsPerTcpConnection = 123)
 #else
                     .ConnectionPolicy(new Microsoft.Azure.Documents.Client.ConnectionPolicy() { ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol.Tcp })
 #endif
                     .WithId(ev => "Id"));
-                Assert.AreEqual("Endpoint", x.EndpointBuilder?.Invoke());
-                Assert.AreEqual("AuthKey", x.AuthKeyBuilder?.Invoke());
-                Assert.AreEqual("Database", x.DatabaseBuilder?.Invoke());
-                Assert.AreEqual("Container", x.ContainerBuilder?.Invoke());
+                Assert.AreEqual("Endpoint", x.EndpointBuilder?.Invoke(null));
+                Assert.AreEqual("AuthKey", x.AuthKeyBuilder?.Invoke(null));
+                Assert.AreEqual("Database", x.DatabaseBuilder?.Invoke(null));
+                Assert.AreEqual("Container", x.ContainerBuilder?.Invoke(null));
                 Assert.AreEqual("Id", x.IdBuilder?.Invoke(null));
 #if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
                 var opt = new Microsoft.Azure.Cosmos.CosmosClientOptions();
