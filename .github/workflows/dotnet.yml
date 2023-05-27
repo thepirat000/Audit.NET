@@ -1,0 +1,83 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Build and Run Tests
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    #runs-on: ubuntu-latest
+    #runs-on: windows-latest
+    runs-on: windows-2019
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          1.0.4
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
+          7.0.x          
+          
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'      
+      with:
+        nuget-version: '6.x'      
+      
+    - name: Nuget Restore
+      run: nuget restore Audit.NET.sln
+      
+    - name: Dotnet Restore 
+      run: dotnet restore
+      
+    - name: MsBuild Audit.EntityFramework.UnitTest
+      run: |
+        msbuild.exe .\test\Audit.EntityFramework.UnitTest -p:Configuration=Release
+
+    - name: Dotnet Build Audit.NET.sln
+      run: dotnet build .\Audit.NET.sln --no-restore --configuration release
+      
+    - name: Test Audit.Mvc.UnitTest
+      run: dotnet test .\test\Audit.Mvc.UnitTest --no-build --configuration release --verbosity normal
+
+    - name: Test Audit.JsonAdapter.UnitTest
+      run: dotnet test .\test\Audit.JsonAdapter.UnitTest --no-build --configuration release --verbosity normal
+      
+    - name: Test Audit.WebApi.UnitTest
+      run: dotnet test .\test\Audit.WebApi.UnitTest --no-build --configuration release --verbosity normal
+      
+    - name: Test Audit.DynamicProxy.UnitTest
+      run: dotnet test .\test\Audit.DynamicProxy.UnitTest --no-build --configuration release --verbosity normal
+     
+    - name: Test Audit.Wcf.UnitTest
+      run: dotnet test .\test\Audit.Wcf.UnitTest --no-build --configuration release --verbosity normal
+      
+    - name: Test Audit.EntityFramework.Core.UnitTest
+      run: dotnet test .\test\Audit.EntityFramework.Core.UnitTest --no-build --configuration release --verbosity normal
+
+    - name: Test Audit.EntityFramework.Core.v3.UnitTest
+      run: dotnet test .\test\Audit.EntityFramework.Core.v3.UnitTest --no-build --configuration release --verbosity normal
+
+    - name: Test Audit.EntityFramework.Full.UnitTest
+      run: dotnet test .\test\Audit.EntityFramework.Full.UnitTest --no-build --configuration release --verbosity normal
+      
+    - name: Test Audit.UnitTest
+      run: dotnet test .\test\Audit.UnitTest --no-build --configuration release --verbosity normal
