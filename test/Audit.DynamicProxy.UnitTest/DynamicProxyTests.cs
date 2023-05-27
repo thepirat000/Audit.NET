@@ -79,7 +79,7 @@ namespace Audit.DynamicProxy.UnitTest
             t1.Start();
             var s = t1.Result;
 
-            var task = audited.AsyncMethodAsync("500");
+            var task = audited.AsyncMethodAsync("600");
             task.Wait();
 
             Assert.Throws<AggregateException>(() =>
