@@ -47,7 +47,7 @@ namespace Audit.SqlServer.UnitTest
 	                LastUpdatedDate datetimeoffset NOT NULL DEFAULT(GETDATE()),
 	                EventType NVARCHAR(MAX),
 	                [Data] NVARCHAR(MAX) NOT NULL,
-	                CONSTRAINT PK_Event PRIMARY KEY (EventId)
+	                CONSTRAINT PK_AuditEvent PRIMARY KEY (EventId)
                 )";
 
             using (var cnn = new SqlConnection(CnnStringAudit))
