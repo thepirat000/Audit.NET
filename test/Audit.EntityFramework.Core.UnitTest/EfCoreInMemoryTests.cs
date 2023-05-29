@@ -21,6 +21,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
             new BlogsMemoryContext().Database.EnsureCreated();
+            new BlogsContext().Database.EnsureCreated();
             Audit.Core.Configuration.ResetCustomActions();
         }
 

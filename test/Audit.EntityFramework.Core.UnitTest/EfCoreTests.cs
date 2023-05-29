@@ -23,6 +23,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
             new BlogsContext().Database.EnsureCreated();
+            new DemoContext().Database.EnsureCreated();
         }
 
 #if EF_CORE_5_OR_GREATER
