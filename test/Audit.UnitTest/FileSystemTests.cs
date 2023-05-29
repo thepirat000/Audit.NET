@@ -45,7 +45,7 @@ namespace Audit.UnitTest
             Thread.Sleep(500);
 
             File.Delete(t2path);
-            Thread.Sleep(500);
+            Thread.Sleep(1500);
 
             Assert.IsTrue(evs.Count >= 3, "Events: {0}", evs.Count);
             var create = evs.Single(x => x.Event == FileSystemEventType.Create);
