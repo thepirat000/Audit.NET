@@ -90,7 +90,7 @@ namespace Audit.IntegrationTest
                 Container = "AuditTest",
                 AuthKey = AzureSettings.AzureDocDbAuthKey
             };
-            var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
+            var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(10000, 99999);
 
             using (var scope = AuditScope.Create(new AuditScopeOptions()
             {
@@ -111,9 +111,8 @@ namespace Audit.IntegrationTest
                 scope.SetCustomField("value", 200);
             };
 
-            var evs = dp.QueryEvents<AuditEventWithId>(new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true })
+            var evs = dp.QueryEvents<AuditEventWithId>(new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = Core.Configuration.JsonSettings })
                 .Where(x => x.EventType == eventType
-                    && x.Environment.AssemblyName.StartsWith("Audit.IntegrationTest")
                     && x.Duration >= 0)
                 .OrderByDescending(x => x.StartDate)
                 .ToList();
@@ -154,9 +153,9 @@ namespace Audit.IntegrationTest
             }))
             {
                 scope.SetCustomField("value", 200);
-            };
+            }
 
-            var evs = dp.EnumerateEvents<AuditEventWithId>($"SELECT * FROM c WHERE c.EventType LIKE '{eventType}%' ORDER BY c.StartDate DESC", new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true })
+            var evs = dp.EnumerateEvents<AuditEventWithId>($"SELECT * FROM c WHERE c.EventType = '{eventType}' ORDER BY c.StartDate DESC", new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = Core.Configuration.JsonSettings })
                 .ToList();
 
             Assert.AreEqual(3, evs.Count);
