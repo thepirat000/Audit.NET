@@ -157,7 +157,7 @@ using (var ctx = new MyContext(options))
 Or using DI, such as with ASP.NET Core:
 
 ```c#
-builder.Services.AddDbContext<MyContext>(_ => _
+builder.Services.AddDbContext<MyContext>(c => c
     .UseSqlServer(CONNECTION_STRING)
     .AddInterceptors(new AuditSaveChangesInterceptor())
 ```
@@ -177,7 +177,7 @@ A low-level command interceptor is also provided for EF Core ≥ 3.0.
 In order to audit low-level operations like *reads*, *stored procedure calls* and *non-query commands*, you can attach the provided `AuditCommandInterceptor` to 
 your `DbContext` configuration. 
 
-#### 1. On DbContext instantiation:
+For example:
 
 ```c#
 var options = new DbContextOptionsBuilder()
@@ -189,7 +189,7 @@ using (var ctx = new MyContext(options))
 }
 ```
 
-#### 2. Or inside DbContext configuration:
+Or inside DbContext configuration:
 
 ```c#
 public class MyDbContext : DbContext
@@ -201,6 +201,14 @@ public class MyDbContext : DbContext
 
     // ...
 }
+```
+
+Or using DI, such as with ASP.NET Core:
+
+```c#
+builder.Services.AddDbContext<MyContext>(c => c
+    .UseSqlServer(CONNECTION_STRING)
+    .AddInterceptors(new AuditCommandInterceptor())
 ```
 
 > **Note**
