@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.SqlClient;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -46,11 +47,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .HasOne(t => t.Trustee)
                 .WithMany()
                 .HasForeignKey(t => new { t.TrusteeId, t.TenantId })
-#if EF_CORE_3_OR_GREATER
-                .OnDelete(DeleteBehavior.NoAction);
-#else
-                ;
-#endif
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 
