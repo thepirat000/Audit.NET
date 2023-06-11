@@ -22,30 +22,35 @@ namespace Audit.EntityFramework.Core.UnitTest
             optionsBuilder.EnableSensitiveDataLogging();
         }
 
-        protected override void OnModelCreating(ModelBuilder _)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            _.Entity<Tenant>().ToTable("Tenant");
-            _.Entity<Employee>().ToTable("Employee");
-            _.Entity<PettyCashTransaction>().ToTable("PettyCashTransaction");
+            builder.Entity<Tenant>().ToTable("Tenant");
+            builder.Entity<Employee>().ToTable("Employee");
+            builder.Entity<PettyCashTransaction>().ToTable("PettyCashTransaction");
 
-            _.Entity<Tenant>()
+            builder.Entity<Tenant>()
                 .HasKey(t => t.Id);
 
-            _.Entity<Employee>()
+            builder.Entity<Employee>()
                 .HasKey(t => new { t.Id, t.TenantId });
 
-            _.Entity<PettyCashTransaction>()
+            builder.Entity<PettyCashTransaction>()
                 .HasKey(t => new { t.Id });
 
-            _.Entity<PettyCashTransaction>()
+            builder.Entity<PettyCashTransaction>()
                 .HasOne(t => t.Employee)
                 .WithMany()
                 .HasForeignKey(t => new { t.EmployeeId, t.TenantId });
 
-            _.Entity<PettyCashTransaction>()
+            builder.Entity<PettyCashTransaction>()
                 .HasOne(t => t.Trustee)
                 .WithMany()
-                .HasForeignKey(t => new { t.TrusteeId, t.TenantId });
+                .HasForeignKey(t => new { t.TrusteeId, t.TenantId })
+#if EF_CORE_3_OR_GREATER
+                .OnDelete(DeleteBehavior.NoAction);
+#else
+                ;
+#endif
         }
     }
 
