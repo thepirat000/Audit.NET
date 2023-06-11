@@ -119,6 +119,10 @@ public class MyContext : DbContext
 }
 ```
 
+> **Note**
+> 
+> No other `SaveChanges` override is needed, since all the other overloads will call one of these two.
+
 #### 3. With the provided save changes interceptor
 
 [Save Changes Interceptors](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.diagnostics.savechangesinterceptor?view=efcore-5.0) were introduced in EF Core 5.0. 
