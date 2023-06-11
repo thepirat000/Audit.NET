@@ -31,15 +31,16 @@ StartDotnetUnitTests 'Audit.SqlServer.UnitTest' 'SqlServer';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Integration' '--filter=TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=AzureStorageBlobs&TestCategory!=WCF&TestCategory!=Elasticsearch&TestCategory!=Dynamo&TestCategory!=PostgreSQL&TestCategory!=Kafka&TestCategory!=AmazonQLDB&TestCategory!=Mongo&TestCategory!=MySql';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Mongo' '--filter=TestCategory=Mongo';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'MySql' '--filter=TestCategory=MySql';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'Kafka' '--filter=TestCategory=Kafka';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'PostgreSQL' '--filter=TestCategory=PostgreSQL';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureDocDb' '--filter=TestCategory=AzureDocDb';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureStorage' '--filter=TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables';
 StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';
+StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
+
+StartDotnetUnitTests 'Audit.IntegrationTest' 'Kafka' '--filter=TestCategory=Kafka';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dynamo';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
-StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
 
 # Run sequential tests
 $hasFailed = $false;
