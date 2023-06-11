@@ -55,6 +55,7 @@ jobs:
       with:
         connection-string-env-var: SQL_SERVER_CONNECTION_STRING
         catalog: Audit
+        extra-params: "Encrypt=False;"
         
 #    - name: Create SQL tables
 #      shell: pwsh
