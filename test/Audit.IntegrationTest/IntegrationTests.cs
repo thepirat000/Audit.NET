@@ -438,6 +438,7 @@ namespace Audit.IntegrationTest
 
             [Test]
             [Category("AzureBlob")]
+            [Ignore("Ignored until AD is configured in the test Azure account")]
             public void TestAzureBlob_ActiveDirectory()
             {
                 SetAzureBlobSettings_ActiveDirectory();
@@ -448,6 +449,7 @@ namespace Audit.IntegrationTest
 
             [Test]
             [Category("AzureBlob")]
+            [Ignore("Ignored until AD is configured in the test Azure account")]
             public async Task TestAzureBlobAsync_ActiveDirectory()
             {
                 SetAzureBlobSettings_ActiveDirectory();
