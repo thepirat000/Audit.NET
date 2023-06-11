@@ -10,20 +10,11 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
-    #runs-on: ubuntu-latest
+  build_and_test:
     runs-on: windows-latest
-    #runs-on: windows-2019
 
     steps:
-         
-    - uses: actions/upload-artifact@v3
-      name: Upload Artifact
-      with:
-        name: Connection
-        path: "cnn.txt"
-        
+       
     - name: Checkout
       uses: actions/checkout@v3
       
@@ -56,17 +47,6 @@ jobs:
         connection-string-env-var: SQL_SERVER_CONNECTION_STRING
         catalog: Audit
         extra-params: "Encrypt=False;"
-        
-#    - name: Create SQL tables
-#      shell: pwsh
-#      run: |
-#          echo "Create additional tables"
-#          sqlcmd -Q "CREATE TABLE [Event] ( EventId BIGINT IDENTITY(1,1) NOT NULL, InsertedDate datetimeoffset NOT NULL DEFAULT(GETDATE()), LastUpdatedDate datetimeoffset NOT NULL DEFAULT(GETDATE()), EventType NVARCHAR(MAX), [Data] NVARCHAR(MAX) NOT NULL, CONSTRAINT PK_Event PRIMARY KEY (EventId) )" -d "Audit" -I
-#          sqlcmd -Q "CREATE VIEW dbo.[v_Event] WITH SCHEMABINDING AS SELECT EventId, InsertedDate, LastUpdatedDate, CAST(JSON_VALUE(Data, '$.EventType') AS NVARCHAR(255)) AS [EventType], CAST(JSON_VALUE(Data, '$.ReferenceId') AS NVARCHAR(255)) AS [ReferenceId], JSON_VALUE(Data, '$.Environment.Exception') As [Exception], JSON_VALUE(Data, '$.Environment.MachineName') AS [MachineName], CAST(JSON_VALUE(Data, '$.Environment.UserName') AS NVARCHAR(50)) AS [UserName], JSON_VALUE(Data, '$.Environment.CallingMethodName') AS [CallingMethodName], CAST(JSON_VALUE(Data, '$.StartDate') AS NVARCHAR(35)) AS [CreatedDate], CAST(JSON_VALUE(Data, '$.EndDate') AS NVARCHAR(35)) As [CommitDate], CAST(JSON_VALUE(Data, '$.Duration') AS INT) As [Duration], JSON_VALUE(Data, '$.Target.Type') As [TargetType], COALESCE(JSON_VALUE(Data, '$.Target.Old'), JSON_QUERY(Data, '$.Target.Old')) AS [TargetOld], COALESCE(JSON_VALUE(Data, '$.Target.New'), JSON_QUERY(Data, '$.Target.New')) AS [TargetNew], JSON_QUERY(Data, '$.Comments') AS [Comments], [Data] As [Data] FROM dbo.[Event]" -d "Audit" -I
-#          sqlcmd -Q "CREATE UNIQUE CLUSTERED INDEX PK_V_EVENT ON [v_Event] (EventId)" -d "Audit" -I
-#          sqlcmd -Q "CREATE INDEX IX_V_EVENT_EventType_ReferenceId ON [v_Event] (EventType, ReferenceId)" -d "Audit" -I
-#          sqlcmd -Q "CREATE INDEX IX_V_EVENT_CreatedDate ON [v_Event] (CreatedDate)" -d "Audit" -I
-#          sqlcmd -Q "CREATE INDEX IX_V_EVENT_CommitDate ON [v_Event] (CommitDate)" -d "Audit" -I
 
     - name: Extra SQL 
       shell: pwsh
@@ -89,6 +69,12 @@ jobs:
     - name: Dotnet Build Audit.NET.sln
       run: dotnet build .\Audit.NET.sln --no-restore --configuration release
 
+    - name: Test Audit.IntegrationTest (AzureDocDb)
+      run: dotnet test .\test\Audit.IntegrationTest --no-build --configuration release --verbosity normal --filter="TestCategory=AzureDocDb"
+      env:
+        AUDIT_NET_AZUREDOCDBAUTHKEY: ${{ secrets.AUDIT_NET_AZUREDOCDBAUTHKEY }}
+        AUDIT_NET_AZUREDOCDBURL: ${{ secrets.AUDIT_NET_AZUREDOCDBURL }}
+        AUDIT_NET_AZURETABLECNNSTRING: ${{ secrets.AUDIT_NET_AZURETABLECNNSTRING }}
 
     - name: Test Audit.EntityFramework.Core.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Core.UnitTest --no-build --configuration release --verbosity normal
@@ -99,7 +85,6 @@ jobs:
     - name: Test Audit.EntityFramework.Full.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Full.UnitTest --no-build --configuration release --verbosity normal
       
-
     - name: Test Audit.Mvc.UnitTest
       run: dotnet test .\test\Audit.Mvc.UnitTest --no-build --configuration release --verbosity normal
 
