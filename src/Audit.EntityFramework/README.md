@@ -150,6 +150,14 @@ using (var ctx = new MyContext(options))
 }
 ```
 
+Or using DI, such as with ASP.NET Core:
+
+```c#
+builder.Services.AddDbContext<MyContext>(_ => _
+    .UseSqlServer(CONNECTION_STRING)
+    .AddInterceptors(new AuditSaveChangesInterceptor())
+```
+
 > **Note**
 > 
 > Notice that a new instance of the interceptor is registered for each DbContext instance. This is because the auditing interceptor contains state linked to the current context instance.
