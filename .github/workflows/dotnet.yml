@@ -71,9 +71,9 @@ jobs:
       shell: pwsh
       run: |
           echo "Execute SqlScript.sql"
-          sqlcmd -i "Audit.NET\src\Audit.NET.SqlServer\SqlScript.sql" -d "master" -I
+          sqlcmd -i ".\src\Audit.NET.SqlServer\SqlScript.sql" -d "master" -I
           echo "Execute Demo.sql"
-          sqlcmd -i "Audit.NET\test\Audit.EntityFramework.Core.UnitTest\Demo.sql" -d "master" -I
+          sqlcmd -i ".\test\Audit.EntityFramework.Core.UnitTest\Demo.sql" -d "master" -I
 
     - name: Nuget Restore
       run: nuget restore Audit.NET.sln
