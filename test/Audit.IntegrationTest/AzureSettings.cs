@@ -4,18 +4,17 @@ namespace Audit.IntegrationTest
 {
     public static class AzureSettings
     {
-        public static readonly string AzureBlobServiceUrl = GetFromEnv("AZUREBLOBSERVICEURL");
-        public static readonly string AzureBlobAccountName = GetFromEnv("AZUREBLOBACCOUNTNAME");
-        public static readonly string AzureBlobAccountKey = GetFromEnv("AZUREBLOBACCOUNTKEY");
-        public static readonly string AzureBlobCnnString = GetFromEnv("AZUREBLOBCNNSTRING");
-        public static readonly string AzureTableCnnString = GetFromEnv("AZURETABLECNNSTRING");
-        public static readonly string AzureDocDbUrl = GetFromEnv("AZUREDOCDBURL");
-        public static readonly string AzureDocDbAuthKey = GetFromEnv("AZUREDOCDBAUTHKEY");
-        public static readonly string BlobAccountName = GetFromEnv("BLOBACCOUNTNAME");
-        public static readonly string BlobTenantId = GetFromEnv("BLOBTENANTID");
-        
-        public static readonly string ElasticSearchUrl = "http://127.0.0.1:9200";
-        public static readonly string PostgreSqlConnectionString = "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        public static string AzureBlobServiceUrl => GetFromEnv("AZUREBLOBSERVICEURL");
+        public static string AzureBlobAccountName => GetFromEnv("AZUREBLOBACCOUNTNAME");
+        public static string AzureBlobAccountKey => GetFromEnv("AZUREBLOBACCOUNTKEY");
+        public static string AzureBlobCnnString => GetFromEnv("AZUREBLOBCNNSTRING");
+        public static string AzureTableCnnString => GetFromEnv("AZURETABLECNNSTRING");
+        public static string AzureDocDbUrl => GetFromEnv("AZUREDOCDBURL");
+        public static string AzureDocDbAuthKey => GetFromEnv("AZUREDOCDBAUTHKEY");
+        public static string BlobAccountName => GetFromEnv("BLOBACCOUNTNAME");
+        public static string BlobTenantId => GetFromEnv("BLOBTENANTID");
+        public static string ElasticSearchUrl => "http://127.0.0.1:9200";
+        public static string PostgreSqlConnectionString => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
 
         private static string GetFromEnv(string key, string @default = null)
         {
