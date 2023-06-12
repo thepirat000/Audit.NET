@@ -78,7 +78,16 @@ jobs:
         AUDIT_NET_AZUREBLOBSERVICEURL: ${{ secrets.AUDIT_NET_AZUREBLOBSERVICEURL }}
         AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
         AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
-        
+
+    - name: Test Audit.IntegrationTest (AzureStorage)
+      run: dotnet test .\test\Audit.IntegrationTest --no-build --configuration release --verbosity normal --filter="TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables"
+      env:
+        AUDIT_NET_AZUREDOCDBAUTHKEY: ${{ secrets.AUDIT_NET_AZUREDOCDBAUTHKEY }}
+        AUDIT_NET_AZUREDOCDBURL: ${{ secrets.AUDIT_NET_AZUREDOCDBURL }}
+        AUDIT_NET_AZURETABLECNNSTRING: ${{ secrets.AUDIT_NET_AZURETABLECNNSTRING }}
+        AUDIT_NET_AZUREBLOBSERVICEURL: ${{ secrets.AUDIT_NET_AZUREBLOBSERVICEURL }}
+        AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
+        AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
 
     - name: Test Audit.EntityFramework.Core.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Core.UnitTest --no-build --configuration release --verbosity normal
