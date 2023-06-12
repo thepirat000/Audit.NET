@@ -92,6 +92,9 @@ jobs:
     - name: Test Audit.EntityFramework.Core.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Core.UnitTest --no-build --configuration release --verbosity normal
 
+    - name: Test Audit.AzureStorageTables.UnitTest
+      run: dotnet test .\test\Audit.AzureStorageTables.UnitTest --no-build --configuration release --verbosity normal
+
     - name: Test Audit.EntityFramework.Core.v3.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Core.v3.UnitTest --no-build --configuration release --verbosity normal
 
