@@ -4,7 +4,7 @@
     <Copyright>Copyright 2016</Copyright>
     <AssemblyTitle>Audit.NET</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1;net45;net461;net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net7.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -67,6 +67,6 @@
 
 
   <ItemGroup>
-    <None Include="images\icon.png" Pack="true" PackagePath="\"/>
+    <None Include="images\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
