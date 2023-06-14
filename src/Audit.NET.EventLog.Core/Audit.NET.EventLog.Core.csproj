@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-	<PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" /> 
+	<PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.6" /> 
   </ItemGroup>
 
   <ItemGroup>
