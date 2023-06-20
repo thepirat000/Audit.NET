@@ -33,14 +33,14 @@ namespace Audit.Core
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
-            if (callingMethod == null)
-            {
-                callingMethod = new StackFrame(2 + options.SkipExtraFrames).GetMethod();
-            }
+
             if (options.IncludeStackTrace)
             {
                 environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
             }
+
+            environment.AssemblyName = options.TargetGetter.Method.DeclaringType.Assembly.FullName;
+            environment.CallingMethodName = this._targetGetter.Target.ToString();
 #else
             environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
             environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
