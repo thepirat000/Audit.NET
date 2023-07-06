@@ -89,5 +89,10 @@ namespace Audit.EntityFramework
         bool IncludeIndependantAssociations { get; set; }
 #endif
 
+        /// <summary>
+        /// Value to indicate if the original values of the audited entities should be queried from database explicitly, before any modification or delete operation.
+        /// Default is false.
+        /// </summary>
+        bool ReloadDatabaseValues { get; set; }
     }
 }

@@ -122,6 +122,9 @@ namespace Audit.EntityFramework
 #endif
         /// <inheritdoc/>
         public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
+
+        /// <inheritdoc/>
+        public bool ReloadDatabaseValues { get; set; }
         #endregion
 
         #region Public methods

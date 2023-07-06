@@ -33,6 +33,7 @@ namespace Audit.EntityFramework
 #if EF_FULL
         public virtual bool IncludeIndependantAssociations { get; set; }
 #endif
+        public bool ReloadDatabaseValues { get; set; }
         public DefaultAuditContext()
         {
         }

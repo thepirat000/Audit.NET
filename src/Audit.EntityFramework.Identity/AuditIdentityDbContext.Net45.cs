@@ -200,6 +200,12 @@ namespace Audit.EntityFramework
         public bool EarlySavingAudit { get; set; }
 
         /// <summary>
+        /// Value to indicate if the original values of the audited entities should be queried from database explicitly, before any modification or delete operation.
+        /// Default is false.
+        /// </summary>
+        public bool ReloadDatabaseValues { get; set; }
+
+        /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.
         /// </summary>

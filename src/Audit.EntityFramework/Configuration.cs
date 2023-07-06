@@ -62,6 +62,12 @@ namespace Audit.EntityFramework
             EnsureConfigFor<T>().IncludeIndependantAssociations = include;
         }
 #endif
+
+        internal static void SetReloadDatabaseValues<T>(bool reloadDatabaseValues)
+        {
+            EnsureConfigFor<T>().ReloadDatabaseValues = reloadDatabaseValues;
+        }
+
         internal static void SetMode<T>(AuditOptionMode mode)
         {
             EnsureConfigFor<T>().Mode = mode;

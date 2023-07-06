@@ -199,12 +199,22 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-
+            
             foreach (var entry in modifiedEntries)
             {
                 var entity = entry.Entity;
                 var validationResults = context.ExcludeValidationResults ? null : entry.GetValidationResult();
                 var entityName = GetEntityName(dbContext, entity);
+
+                if (context.ReloadDatabaseValues && (entry.State == EntityState.Modified || entry.State == EntityState.Deleted))
+                {
+                    var dbValues = entry.GetDatabaseValues();
+                    if (dbValues != null)
+                    {
+                        entry.OriginalValues.SetValues(dbValues);
+                    }
+                }
+
                 efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults?.IsValid ?? true,

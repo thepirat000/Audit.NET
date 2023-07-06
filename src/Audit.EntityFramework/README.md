@@ -263,7 +263,9 @@ The following settings for the high-level interceptor can be configured per DbCo
 - **ExcludeTransactionId**: Value to indicate if the Transaction IDs should be excluded from the output and not be retrieved (default is false to include the Transaction IDs).
 - **ExcludeValidationResults**: Value to indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
 - **EarlySavingAudit**: Value to indicate if the audit event should be saved *before* the entity saving operation takes place. (Default is false to save the audit event after the entity saving operation completes or fails)
-
+- **ReloadDatabaseValues**: Value to indicate if the original values of the audited entities should be queried from database before saving the audit event.
+> The *ReloadDatabaseValues* configuration is beneficial for making modifications without explicitly retrieving the entity first. 
+It can be enabled when using DbSet.Update or DbSet.Remove with an object that wasn't retrieved from the database. When enabled, it queries the database prior to any entity modification to record the original values in the audit event.
 
 The following settings can be configured per entity type:
 
@@ -283,7 +285,6 @@ public class MyEntitites : Audit.EntityFramework.AuditDbContext
 ```
 
 You can also use the [Fluent API](#fluent-api) to configure the high-level interceptor settings globally.
-
 
 #### Include/Ignore entities (tables)
 

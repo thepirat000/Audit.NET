@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
+using Audit.Core.Providers;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
 namespace Audit.EntityFramework.Core.UnitTest
@@ -61,6 +63,61 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsNotNull(evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").NewValue);
             Assert.IsTrue(car.BrandId > 0);
             Assert.AreEqual(car.BrandId, evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").NewValue);
+        }
+
+        [Test]
+        public async Task EF_Update_ReloadFromDatabase()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<SimpleMemoryContext>(x => x
+                    .ReloadDatabaseValues(true)
+                    .IncludeEntityObjects());
+
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseInMemoryProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var evs = ((InMemoryDataProvider)Audit.Core.Configuration.DataProvider).GetAllEvents();
+
+            var car = new SimpleMemoryContext.Car()
+            {
+                Name = "OriginalName"
+            };
+
+            using (var context = new SimpleMemoryContext())
+            {
+                await context.Cars.AddAsync(car);
+                await context.SaveChangesAsync();
+            }
+
+            Assert.AreEqual(1, evs.Count);
+            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent()?.Entries.Count);
+            Assert.AreEqual("Insert", evs[0].GetEntityFrameworkEvent()?.Entries[0].Action);
+            Assert.AreEqual("OriginalName", evs[0].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]);
+
+            using (var context = new SimpleMemoryContext())
+            {
+                context.Cars.Update(new SimpleMemoryContext.Car() { Id = car.Id, Name = "UpdatedName" });
+                await context.SaveChangesAsync();
+            }
+
+            Assert.AreEqual(2, evs.Count);
+            Assert.AreEqual(1, evs[1].GetEntityFrameworkEvent()?.Entries.Count);
+            Assert.AreEqual("Update", evs[1].GetEntityFrameworkEvent()?.Entries[0].Action);
+            Assert.AreEqual("OriginalName", evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Name")?.OriginalValue?.ToString());
+            Assert.AreEqual("UpdatedName", evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Name")?.NewValue?.ToString());
+
+            using (var context = new SimpleMemoryContext())
+            {
+                context.Cars.Remove(new SimpleMemoryContext.Car() { Id = car.Id });
+                await context.SaveChangesAsync();
+            }
+
+            Assert.AreEqual(3, evs.Count);
+            Assert.AreEqual(1, evs[2].GetEntityFrameworkEvent()?.Entries.Count);
+            Assert.AreEqual("Delete", evs[2].GetEntityFrameworkEvent()?.Entries[0].Action);
+            Assert.AreEqual("UpdatedName", evs[2].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]?.ToString());
         }
     }
 }

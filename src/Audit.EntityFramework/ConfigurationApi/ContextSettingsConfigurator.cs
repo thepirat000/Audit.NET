@@ -46,5 +46,11 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 #endif
+
+        public IContextSettingsConfigurator<T> ReloadDatabaseValues(bool reloadDatabaseValues = true)
+        {
+            Configuration.SetReloadDatabaseValues<T>(reloadDatabaseValues);
+            return this;
+        }
     }
 }

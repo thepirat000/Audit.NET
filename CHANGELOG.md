@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [21.0.2] - 2023-07-06
+- Audit.EntityFramework / Audit.EntityFramework.Core: Adding `ReloadDatabaseValues` configuration setting to query the original values of the entities from the database explicitly to properly set the Original values when using DbContext's `Update` or `Remove` methods. (#53, #167, #291, #335, #345, #606, #607)
+
 ## [21.0.1] - 2023-05-28
 - Audit.NET.AzureCosmos: Adding support to dynamically configure the Endpoint, AuthKey, Database and Container from the AuditEvent data.
 

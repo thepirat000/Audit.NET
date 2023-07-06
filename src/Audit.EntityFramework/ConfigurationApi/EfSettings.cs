@@ -28,5 +28,6 @@ namespace Audit.EntityFramework.ConfigurationApi
 #if EF_FULL
         public bool? IncludeIndependantAssociations { get; set; }
 #endif
+        public bool? ReloadDatabaseValues { get; set; }
     }
 }

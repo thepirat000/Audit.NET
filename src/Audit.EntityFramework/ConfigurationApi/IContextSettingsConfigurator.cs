@@ -53,6 +53,11 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <param name="include">if set to <c>true</c> the serialized entities will be included.</param>
         IContextSettingsConfigurator<T> IncludeIndependantAssociations(bool include = true);
 #endif
+        /// <summary>
+        /// Value to indicate if the original values of the audited entities should be queried from database explicitly, before saving the audit event.
+        /// </summary>
+        /// <param name="reloadDatabaseValues">if set to <c>true</c> the original values will be queried from database.</param>
+        IContextSettingsConfigurator<T> ReloadDatabaseValues(bool reloadDatabaseValues = true);
     }
 }
  

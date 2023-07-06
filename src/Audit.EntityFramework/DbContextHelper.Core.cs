@@ -24,19 +24,22 @@ namespace Audit.EntityFramework
         private List<EventEntryChange> GetChanges(IAuditDbContext context, EntityEntry entry)
         {
             var result = new List<EventEntryChange>();
+
             var props = entry.Metadata.GetProperties();
+
             foreach (var prop in props)
             {
                 PropertyEntry propEntry = entry.Property(prop.Name);
                 if (propEntry.IsModified)
                 {
+                    
                     if (IncludeProperty(context, entry, prop.Name))
                     {
                         result.Add(new EventEntryChange()
                         {
                             ColumnName = GetColumnName(prop),
-                            NewValue = HasPropertyValue(context, entry, prop.Name, propEntry.CurrentValue, out object currValue) ? currValue : propEntry.CurrentValue,
-                            OriginalValue = HasPropertyValue(context, entry, prop.Name, propEntry.OriginalValue, out object origValue) ? origValue : propEntry.OriginalValue
+                            NewValue = HasPropertyValue(context, entry, prop.Name, propEntry.CurrentValue, out var overridenCurrentValue) ? overridenCurrentValue : propEntry.CurrentValue,
+                            OriginalValue = HasPropertyValue(context, entry, prop.Name, propEntry.OriginalValue, out var overridenOriginalValue) ? overridenOriginalValue : propEntry.OriginalValue
                         });
                     }
                 }
@@ -253,6 +256,16 @@ namespace Audit.EntityFramework
                 var validationResults = context.ExcludeValidationResults ? null : DbContextHelper.GetValidationResults(entity);
 
                 var entityName = GetEntityName(dbContext, entry);
+
+                if (context.ReloadDatabaseValues && (entry.State == EntityState.Modified || entry.State == EntityState.Deleted))
+                {
+                    var dbValues = entry.GetDatabaseValues();
+                    if (dbValues != null)
+                    {
+                        entry.OriginalValues.SetValues(dbValues);
+                    }
+                }
+
                 efEvent.Entries.Add(new EventEntry()
                 {
                     Valid = validationResults == null,

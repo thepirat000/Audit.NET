@@ -57,6 +57,7 @@ namespace Audit.EntityFramework
 #if EF_FULL
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
+            context.ReloadDatabaseValues = attrConfig?.ReloadDatabaseValues ?? localConfig?.ReloadDatabaseValues ?? globalConfig?.ReloadDatabaseValues ?? false;
         }
 
         internal Dictionary<Type, EfEntitySettings> MergeEntitySettings(Dictionary<Type, EfEntitySettings> attr, Dictionary<Type, EfEntitySettings> local, Dictionary<Type, EfEntitySettings> global)
