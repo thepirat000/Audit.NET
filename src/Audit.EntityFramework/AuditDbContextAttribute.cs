@@ -85,6 +85,7 @@ namespace Audit.EntityFramework
                 InternalConfig.Mode = value;
             }
         }
+
         /// <summary>
         /// To indicate the event type to use on the audit event. (Default is the context name). 
         /// Can contain the following placeholders: 
@@ -102,5 +103,22 @@ namespace Audit.EntityFramework
                 InternalConfig.AuditEventType = value;
             }
         }
+
+        /// <summary>
+        /// To indicate if the original values of the audited entities should be queried from database explicitly, before any modification or delete operation.
+        /// Default is false.
+        /// </summary>
+        public bool ReloadDatabaseValues
+        {
+            get
+            {
+                return InternalConfig.ReloadDatabaseValues.GetValueOrDefault();
+            }
+            set
+            {
+                InternalConfig.ReloadDatabaseValues = value;
+            }
+        }
+
     }
 }

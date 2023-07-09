@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Dynamic;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver;
 #if NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -81,6 +82,38 @@ namespace Audit.IntegrationTest
                 object eventId = scope.EventId;
                 up.UserName = "user2";
                 scope.Dispose();
+
+                var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
+
+                Assert.AreEqual("user1", (eventRead.Target.Old as BsonDocument)["UserName"].ToString());
+                Assert.AreEqual("user2", (eventRead.Target.New as BsonDocument)["UserName"].ToString());
+            }
+
+            [Test]
+            [Category("Mongo")]
+            public void Test_Mongo_ClientSettings()
+            {
+                Audit.Core.Configuration.Setup()
+                    .UseMongoDB(config => config
+                        .ClientSettings(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) })
+                        .ConnectionString("mongodb://WRONG_HOST:10001")
+                        .Database("Audit")
+                        .Collection("Event")
+                        .SerializeAsBson())
+                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                    .ResetActions();
+
+                var up = new UserProfiles()
+                {
+                    UserName = "user1"
+                };
+
+                object eventId = null;
+                using (var scope = AuditScope.Create("test", () => up))
+                {
+                    eventId = scope.EventId;
+                    up.UserName = "user2";
+                }
 
                 var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
 
@@ -224,13 +257,18 @@ namespace Audit.IntegrationTest
             {
                 var x = new MongoDB.Providers.MongoDataProvider(_ => _
                     .ConnectionString("c")
+                    .ClientSettings(new MongoClientSettings() { ReadConcern = ReadConcern.Linearizable })
                     .Collection("col")
                     .Database("db")
-                    .SerializeAsBson(true));
+                    .SerializeAsBson(true)
+                    .DatabaseSettings(new MongoDatabaseSettings() { ReadConcern = ReadConcern.Majority }));
+                
                 Assert.AreEqual("c", x.ConnectionString);
                 Assert.AreEqual("col", x.Collection);
                 Assert.AreEqual("db", x.Database);
                 Assert.AreEqual(true, x.SerializeAsBson);
+                Assert.AreEqual(ReadConcern.Majority, x.DatabaseSettings.ReadConcern);
+                Assert.AreEqual(ReadConcern.Linearizable, x.ClientSettings.ReadConcern);
             }
 
             [Test]

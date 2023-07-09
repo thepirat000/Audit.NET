@@ -1,3 +1,5 @@
+using MongoDB.Driver;
+
 namespace Audit.MongoDB.ConfigurationApi
 {
     public class MongoProviderConfigurator : IMongoProviderConfigurator
@@ -6,10 +8,24 @@ namespace Audit.MongoDB.ConfigurationApi
         internal string _database = "Audit";
         internal string _collection = "Event";
         internal bool _serializeAsBson = false;
+        internal MongoClientSettings _clientSettings = null;
+        internal MongoDatabaseSettings _databaseSettings = null;
 
         public IMongoProviderConfigurator ConnectionString(string connectionString)
         {
             _connectionString = connectionString;
+            return this;
+        }
+
+        public IMongoProviderConfigurator ClientSettings(MongoClientSettings mongoClientSettings)
+        {
+            _clientSettings = mongoClientSettings;
+            return this;
+        }
+
+        public IMongoProviderConfigurator DatabaseSettings(MongoDatabaseSettings mongoDatabaseSettings)
+        {
+            _databaseSettings = mongoDatabaseSettings;
             return this;
         }
 

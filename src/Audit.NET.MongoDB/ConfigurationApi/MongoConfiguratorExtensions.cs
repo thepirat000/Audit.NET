@@ -2,7 +2,6 @@
 using Audit.MongoDB.Providers;
 using Audit.Core.ConfigurationApi;
 using Audit.MongoDB.ConfigurationApi;
-using System.Collections.Generic;
 
 namespace Audit.Core
 {
@@ -26,8 +25,10 @@ namespace Audit.Core
                 Database = database,
                 SerializeAsBson = serializeAsBson
             };
+
             return new CreationPolicyConfigurator();
         }
+
         /// <summary>
         /// Store the events in a MongoDB database.
         /// </summary>
@@ -37,8 +38,18 @@ namespace Audit.Core
         {
             var mongoConfig = new MongoProviderConfigurator();
             config.Invoke(mongoConfig);
-            return UseMongoDB(configurator, mongoConfig._connectionString, mongoConfig._database, 
-                mongoConfig._collection, mongoConfig._serializeAsBson);
+
+            Configuration.DataProvider = new MongoDataProvider()
+            {
+                ConnectionString = mongoConfig._connectionString,
+                ClientSettings = mongoConfig._clientSettings,
+                DatabaseSettings = mongoConfig._databaseSettings,
+                Collection = mongoConfig._collection,
+                Database = mongoConfig._database,
+                SerializeAsBson = mongoConfig._serializeAsBson
+            };
+
+            return new CreationPolicyConfigurator();
         }
     }
 }

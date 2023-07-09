@@ -39,11 +39,30 @@ Audit.Core.Configuration.Setup()
         .Collection("Event"));
 ```
 
+Instead of using the connection string, you have the option to supply the `MongoClientSettings` instead:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseMongoDB(config => config
+        .ClientSettings(new MongoClientSettings() 
+        { 
+            Server = new MongoServerAddress("localhost", 27017), 
+            UseTls = true 
+        })
+        .Database("Audit")
+        .Collection("Event"));
+```
+
+You can find more information about MongoClientSettings [here](https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/connection/connection-options/#using-mongoclientsettings).
+
+
 ### Provider options
 
 Mandatory:
 - **ConnectionString**: The [Mongo DB connection string](http://mongodb.github.io/mongo-csharp-driver/2.0/reference/driver/connecting/).
+- **ClientSettings**: The [Mongo DB client settings](https://www.mongodb.com/docs/drivers/csharp/current/fundamentals/connection/connection-options/#using-mongoclientsettings).
 - **Database**: The audit Mongo Database name.
+- **DatabaseSettings**: The audit Mongo Database settings (optional).
 - **Collection**: The events Mongo Collection name.
 - **SerializeAsBson**: A value indicating whether the target object and extra fields should be serialized as Bson. Default is false to serialize as Json.
 

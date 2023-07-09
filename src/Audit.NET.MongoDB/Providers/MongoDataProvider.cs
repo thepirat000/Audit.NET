@@ -8,9 +8,6 @@ using Audit.Core;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoDB.Driver.Core.Clusters;
-using MongoDB.Driver.Core.Connections;
-using MongoDB.Driver.Core.Servers;
 
 namespace Audit.MongoDB.Providers
 {
@@ -63,6 +60,17 @@ namespace Audit.MongoDB.Providers
         public string ConnectionString { get; set; } = "mongodb://localhost:27017";
 
         /// <summary>
+        /// Gets or sets the Settings for constructing the Mongo Client object.
+        /// When this property is not null, the ConnectionString setting is ignored.
+        /// </summary>
+        public MongoClientSettings ClientSettings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional settings to use when getting the Database object.
+        /// </summary>
+        public MongoDatabaseSettings DatabaseSettings { get; set; }
+
+        /// <summary>
         /// Gets or sets the MongoDB Database name.
         /// </summary>
         public string Database { get; set; } = "Audit";
@@ -92,14 +100,16 @@ namespace Audit.MongoDB.Providers
 
         public MongoDataProvider(Action<ConfigurationApi.IMongoProviderConfigurator> config)
         {
-            var mongoConfig = new ConfigurationApi.MongoProviderConfigurator();
             if (config != null)
             {
+                var mongoConfig = new ConfigurationApi.MongoProviderConfigurator();
                 config.Invoke(mongoConfig);
                 Collection = mongoConfig._collection;
                 ConnectionString = mongoConfig._connectionString;
                 Database = mongoConfig._database;
                 SerializeAsBson = mongoConfig._serializeAsBson;
+                ClientSettings = mongoConfig._clientSettings;
+                DatabaseSettings = mongoConfig._databaseSettings;
             }
         }
 
@@ -246,6 +256,13 @@ namespace Audit.MongoDB.Providers
             }
         }
 
+        protected virtual IMongoDatabase GetDatabase()
+        {
+            var client = ClientSettings != null ? new MongoClient(ClientSettings) : new MongoClient(ConnectionString);
+            var db = client.GetDatabase(Database, DatabaseSettings);
+            return db;
+        }
+
         public void TestConnection()
         {
             var db = GetDatabase();
@@ -257,17 +274,9 @@ namespace Audit.MongoDB.Providers
             }
         }
 
-        private IMongoDatabase GetDatabase()
-        {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
-            return db;
-        }
-
         public override T GetEvent<T>(object eventId)
         {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
+            var db = GetDatabase();
             var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
             var doc = db.GetCollection<BsonDocument>(Collection).Find(filter).FirstOrDefault();
             return doc == null ? null : BsonSerializer.Deserialize<T>(doc);
@@ -275,8 +284,7 @@ namespace Audit.MongoDB.Providers
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
+            var db = GetDatabase();
             var filter = Builders<BsonDocument>.Filter.Eq("_id", (BsonObjectId)eventId);
             var doc = await (await db.GetCollection<BsonDocument>(Collection).FindAsync(filter, null, cancellationToken)).FirstOrDefaultAsync(cancellationToken);
             return doc == null ? null : BsonSerializer.Deserialize<T>(doc);
@@ -288,8 +296,7 @@ namespace Audit.MongoDB.Providers
         /// </summary>
         public IQueryable<AuditEvent> QueryEvents()
         {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
+            var db = GetDatabase();
             return db.GetCollection<AuditEvent>(Collection).AsQueryable();
         }
         /// <summary>
@@ -298,8 +305,7 @@ namespace Audit.MongoDB.Providers
         /// <typeparam name="T">The AuditEvent type</typeparam>
         public IQueryable<T> QueryEvents<T>() where T : AuditEvent
         {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
+            var db = GetDatabase();
             return db.GetCollection<T>(Collection).AsQueryable();
         }
         /// <summary>
@@ -307,8 +313,7 @@ namespace Audit.MongoDB.Providers
         /// </summary>
         public IMongoCollection<AuditEvent> GetMongoCollection()
         {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
+            var db = GetDatabase();
             return db.GetCollection<AuditEvent>(Collection);
         }
         /// <summary>
@@ -316,8 +321,7 @@ namespace Audit.MongoDB.Providers
         /// </summary>
         public IMongoCollection<T> GetMongoCollection<T>() where T : AuditEvent
         {
-            var client = new MongoClient(ConnectionString);
-            var db = client.GetDatabase(Database);
+            var db = GetDatabase();
             return db.GetCollection<T>(Collection);
         }
         #endregion

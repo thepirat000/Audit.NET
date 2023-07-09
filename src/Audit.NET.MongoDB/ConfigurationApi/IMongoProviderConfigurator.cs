@@ -1,3 +1,5 @@
+using MongoDB.Driver;
+
 namespace Audit.MongoDB.ConfigurationApi
 {
     /// <summary>
@@ -10,6 +12,17 @@ namespace Audit.MongoDB.ConfigurationApi
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         IMongoProviderConfigurator ConnectionString(string connectionString);
+        /// <summary>
+        /// Specifies the Mongo DB client settings to use.
+        /// This setting takes precedence over the ConnectionString.
+        /// </summary>
+        /// <param name="mongoClientSettings">The Mongo client settings.</param>
+        IMongoProviderConfigurator ClientSettings(MongoClientSettings mongoClientSettings);
+        /// <summary>
+        /// Specifies the Mongo DB database settings to use (optional).
+        /// </summary>
+        /// <param name="mongoDatabaseSettings">The Mongo database settings.</param>
+        IMongoProviderConfigurator DatabaseSettings(MongoDatabaseSettings mongoDatabaseSettings);
         /// <summary>
         /// Specifies the Mongo DB database name.
         /// </summary>
