@@ -466,7 +466,7 @@ The following tables describes the output fields for the SaveChanges interceptio
 | **ColumnValues** | Object | Object with the affected entity's column values  |
 | **Changes** | Array of [ChangeObject](#changeobject) | An array containing the modified columns with the original and new values (only available for Update operations) |
 | **Entity** | Object | The object representation of the .NET entity affected (optional) |
-| **Valid** | boolean | Bolean indicating if the entity passes the validations |
+| **Valid** | boolean | Boolean indicating if the entity passes the validations |
 | **ValidationResults** | Array of string | The validation messages when the entity validation fails |
 
 - #### [ChangeObject](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/EventEntryChange.cs)
