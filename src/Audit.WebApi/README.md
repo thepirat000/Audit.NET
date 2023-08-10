@@ -255,8 +255,8 @@ To configure the output persistence mechanism please see [Event Output Configura
 
 ### NOTE
 When **IncludeRequestBody** is set to true (or when using **IncludeRequestBodyFor**/**ExcludeRequestBodyFor**), 
-you must enable rewind on the request body stream, otherwise the controller won't be able to read
-the request body since by default, it's a forwand-only stream that can be read only once. You can enable rewind on your startup logic with the following code:
+you must enable rewind on the request body stream, otherwise, the controller won't be able to read
+the request body since by default, it's a forward-only stream that can be read only once. You can enable rewind on your startup logic with the following code:
 
 ```c#
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
