@@ -852,7 +852,7 @@ Audit.Core.Configuration.Setup()
         .IgnoreMatchedProperties());
 ```
 
-Another example of an andit Entity factory, but mapping to different entity types depending on the audited table:
+Another example of an audit Entity factory, but mapping to different entity types depending on the audited table:
 
 ```c#
 Audit.Core.Configuration.Setup()
