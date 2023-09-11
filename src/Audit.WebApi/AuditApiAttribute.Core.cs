@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Threading.Tasks;
+using System;
 
 namespace Audit.WebApi
 {
@@ -69,6 +70,11 @@ namespace Audit.WebApi
         /// Gets or sets a value indicating whether the action arguments should be pre-serialized to the audit event.
         /// </summary>
         public bool SerializeActionParameters { get; set; }
+        /// <summary>
+        /// Gets or sets an array of status codes that conditionally indicates when the Audit scope should be discarded.
+        /// The Audit action is triggered only when the request return a status code not in this array.
+        /// </summary>
+        public HttpStatusCode[] DiscardFor { get; set; }
 
         public AuditApiAttribute()
         {
@@ -84,8 +90,18 @@ namespace Audit.WebApi
             }
             await _adapter.BeforeExecutingAsync(context, IncludeHeaders, IncludeRequestBody, SerializeActionParameters, EventTypeName);
             var actionExecutedContext = await next.Invoke();
+
+            if (ShouldDiscardForResponseStatus(actionExecutedContext))
+            {
+                AuditApiAdapter.DiscardCurrentScope(actionExecutedContext.HttpContext);
+                return;
+            }
             await _adapter.AfterExecutedAsync(actionExecutedContext, IncludeModelState, ShouldIncludeResponseBody(actionExecutedContext), IncludeResponseHeaders);
         }
+
+        private bool ShouldDiscardForResponseStatus(ActionExecutedContext context) => ShouldDiscardForResponseStatus(GetStatusCode(context));
+
+        private bool ShouldDiscardForResponseStatus(HttpStatusCode statusCode) => DiscardFor != null && DiscardFor.Contains(statusCode);
 
         private bool ShouldIncludeResponseBody(ActionExecutedContext context)
         {
