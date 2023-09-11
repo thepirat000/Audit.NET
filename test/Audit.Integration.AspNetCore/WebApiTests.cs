@@ -647,7 +647,7 @@ namespace Audit.Integration.AspNetCore
         }
 
         [Test]
-        public async Task Test_WebApi_Audit_Action_DiscardIf()
+        public async Task Test_WebApi_Audit_Action_DiscardIfNot()
         {
             var insertEvs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()

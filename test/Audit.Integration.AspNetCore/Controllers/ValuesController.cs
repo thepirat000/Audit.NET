@@ -116,7 +116,7 @@ namespace Audit.Integration.AspNetCore.Controllers
         }
 
         [HttpPost("TestDiscardStatusCode")]
-        [AuditApi(DiscardFor = new[] { HttpStatusCode.BadRequest })]
+        [AuditApi(DiscardIfNot = new[] { HttpStatusCode.OK })]
         [return: AuditIgnore]
         public async Task<IActionResult> TestIgnoreResponseFilter()
         {

@@ -72,9 +72,10 @@ namespace Audit.WebApi
         public bool SerializeActionParameters { get; set; }
         /// <summary>
         /// Gets or sets an array of status codes that conditionally indicates when the Audit scope should be discarded.
-        /// The Audit action is triggered only when the request return a status code not in this array.
+        /// The Audit action is triggered only when the request return a status code in this array. 
+        /// If the array is left empty, it means that audit happens regardless of status code.
         /// </summary>
-        public HttpStatusCode[] DiscardFor { get; set; }
+        public HttpStatusCode[] DiscardIfNot { get; set; }
 
         public AuditApiAttribute()
         {
@@ -101,7 +102,7 @@ namespace Audit.WebApi
 
         private bool ShouldDiscardForResponseStatus(ActionExecutedContext context) => ShouldDiscardForResponseStatus(GetStatusCode(context));
 
-        private bool ShouldDiscardForResponseStatus(HttpStatusCode statusCode) => DiscardFor != null && DiscardFor.Contains(statusCode);
+        private bool ShouldDiscardForResponseStatus(HttpStatusCode statusCode) => DiscardIfNot != null && !DiscardIfNot.Contains(statusCode);
 
         private bool ShouldIncludeResponseBody(ActionExecutedContext context)
         {
