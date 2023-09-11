@@ -647,6 +647,28 @@ namespace Audit.Integration.AspNetCore
         }
 
         [Test]
+        public async Task Test_WebApi_Audit_Action_DiscardIf()
+        {
+            var insertEvs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicAsyncProvider(_ => _.OnInsert(async ev =>
+                {
+                    await Task.Delay(1);
+                    insertEvs.Add(ev);
+                    return Guid.NewGuid();
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var url = $"api/values/TestDiscardStatusCode";
+
+            var req = new HttpRequestMessage(HttpMethod.Post, url);
+            var res = await _httpClient.SendAsync(req);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, res.StatusCode);
+            Assert.AreEqual(0, insertEvs.Count);
+        }
+
+        [Test]
         public async Task Test_WebApi_FormCollectionLimit_Async()
         {
             var insertEvs = new List<AuditEvent>();

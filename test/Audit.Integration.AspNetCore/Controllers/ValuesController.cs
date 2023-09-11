@@ -115,6 +115,15 @@ namespace Audit.Integration.AspNetCore.Controllers
             return Ok("hi from filter");
         }
 
+        [HttpPost("TestDiscardStatusCode")]
+        [AuditApi(DiscardFor = new[] { HttpStatusCode.BadRequest })]
+        [return: AuditIgnore]
+        public async Task<IActionResult> TestIgnoreResponseFilter()
+        {
+            await Task.Delay(0);
+            return BadRequest("This is a bad request to test filter response");
+        }
+
         [AuditIgnore] // ignored here but will be picked up by the middleware
         [HttpPost("TestResponseHeaders")]
         public async Task<IActionResult> TestResponseHeaders(string id)
