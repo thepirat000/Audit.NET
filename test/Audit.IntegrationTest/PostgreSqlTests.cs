@@ -76,6 +76,38 @@ namespace Audit.IntegrationTest
             Assert.IsNotNull(realizedEvents);
         }
         
+        [Test]
+        public void Test_EnumerateEvents_WhereExpression()
+        {
+            var overrideEventType = Guid.NewGuid().ToString();
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+
+            var whereExpression = @"""" + GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
+            var events = dp?.EnumerateEvents(whereExpression);
+            var ev = events?.FirstOrDefault();
+
+            Assert.IsNotNull(ev);
+        }
+
+        [Test]
+        public void Test_EnumerateEvents_WhereSortByExpression()
+        {
+            var overrideEventType = Guid.NewGuid().ToString();
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+
+            var whereExpression = @"""" + GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
+            var events = dp?.EnumerateEvents<AuditEvent>(whereExpression, GetLastUpdatedColumnNameColumnName(), "1");
+            var ev = events?.FirstOrDefault();
+
+            Assert.IsNotNull(ev);
+        }
+        
         private static string GetLastUpdatedColumnNameColumnName()
         {
             /* this value is encapsulated so both RunLocalAuditConfiguration and Test_PostgreDataProvider_Paging_With_Where use the same value */

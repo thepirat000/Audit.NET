@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [21.0.4] - 2023-09-15
+- Audit.NET.PostgreSql: Fixing postgres double quote issue. (#623) 
+
 ## [21.0.3] - 2023-07-09
 - Audit.EntityFramework / Audit.EntityFramework.Core: Adding `ReloadDatabaseValues` configuration to AuditDbContextAttribute. (#53, #607)
 - Audit.NET.MongoDB: Exposing API to provide the entire MongoDB.Driver.MongoClientSettings instead of the connection string. (#614)

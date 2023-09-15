@@ -248,7 +248,7 @@ namespace Audit.PostgreSql.Providers
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
         {
             var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
-            var sql = $@"SELECT ""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}"" {where}";
+            var sql = $@"SELECT ""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)} {where}";
             return EnumerateEventsByFullSql<T>(sql);
         }
 
@@ -266,7 +266,7 @@ namespace Audit.PostgreSql.Providers
         /// </remarks>
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
         {
-            var selectExpression = $@"""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}""";
+            var selectExpression = $@"""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}";
             var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
             var orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
             var limit = string.IsNullOrWhiteSpace(limitExpression) ? "" : $" LIMIT {limitExpression}";
