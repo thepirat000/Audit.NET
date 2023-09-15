@@ -20,6 +20,29 @@ namespace Audit.IntegrationTest
         }
         
         [Test]
+        public void Test_PostgreDataProvider_Where_With_Custom_DateColumn()
+        {
+            /* this is also a "covering test" for https://github.com/thepirat000/Audit.NET/issues/623 */
+            string whereExpression = @""""+ GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
+            var dp = SetupConfiguredPostgreSqlDataProvider();
+
+            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(whereExpression);
+            ICollection<AuditEvent> realizedEvents = events.ToList();
+            Assert.IsNotNull(realizedEvents);
+        }
+        
+        [Test]
+        public void Test_PostgreDataProvider_Where_Empty()
+        {
+            /* this is also a "covering test" for https://github.com/thepirat000/Audit.NET/issues/623 */
+            var dp = SetupConfiguredPostgreSqlDataProvider();
+
+            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(string.Empty);
+            ICollection<AuditEvent> realizedEvents = events.ToList();
+            Assert.IsNotNull(realizedEvents);
+        }
+      
+        [Test]
         public void Test_PostgreDataProvider_CustomDataColumn()
         {
             var overrideEventType = Guid.NewGuid().ToString();
