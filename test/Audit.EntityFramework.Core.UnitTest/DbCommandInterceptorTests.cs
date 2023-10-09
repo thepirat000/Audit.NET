@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +20,17 @@ namespace Audit.EntityFramework.Core.UnitTest
     public class DbCommandInterceptorTests
     {
         private static Random _rnd = new Random();
+
+        [OneTimeSetUp]
+        public void OneTimeSetup()
+        {
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+            }
+        }
 
         [SetUp]
         public void Setup()
@@ -46,12 +58,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForContext<DbCommandInterceptContext>(_ => _
                     .IncludeEntityObjects(true));
 
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                // not intercepted
-                ctx.Database.EnsureDeleted();
-                ctx.Database.EnsureCreated();
-            }
             var interceptor = new AuditCommandInterceptor() { AuditEventType = "{context}:{database}:{method}" };
             int id = _rnd.Next();
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
@@ -109,12 +115,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForContext<DbCommandInterceptContext>(_ => _
                     .IncludeEntityObjects(true));
 
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                // not intercepted
-                await ctx.Database.EnsureDeletedAsync();
-                await ctx.Database.EnsureCreatedAsync();
-            }
             int id = _rnd.Next();
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditCommandInterceptor() { AuditEventType = "{context}:{database}:{method}" }).Options))
             {
@@ -250,28 +250,31 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .OnInsert(ev => inserted.Add(ev.GetCommandEntityFrameworkEvent())))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
+            int newId = 24;
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
             {
-                ctx.Database.EnsureCreated();
+                // not intercepted
+                var dept = new DbCommandInterceptContext.Department() { Id = newId, Name = "Test", Comments = "Comment" };
+                ctx.Departments.Add(dept);
+                ctx.SaveChanges();
             }
+
             var interceptor = new AuditCommandInterceptor() { LogParameterValues = true, IncludeReaderResults = true };
-            DbCommandInterceptContext.Department dept;
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
             {
-                int i = 22;
-                dept = ctx.Departments.FirstOrDefault(d => d.Id != i);
+                var dept = ctx.Departments.FirstOrDefault(d => d.Id == newId);
             }
 
             Assert.AreEqual(1, inserted.Count);
             Assert.IsNotNull(inserted[0].Parameters);
             Assert.IsTrue(inserted[0].Parameters.Any());
-            Assert.AreEqual(22, inserted[0].Parameters.First().Value);
+            Assert.AreEqual(newId, inserted[0].Parameters.First().Value);
             Assert.IsNotNull(inserted[0].Result);
-            var resultList = inserted[0].Result as List<Dictionary<string, object>>;
+            var resultList = inserted[0].Result as Dictionary<string, List<Dictionary<string, object>>>;
             Assert.AreEqual(1, resultList.Count);
-            Assert.AreEqual(dept.Id, (int)resultList[0]["Id"]);
-            Assert.AreEqual(dept.Comments, resultList[0]["Comments"]);
-            Assert.AreEqual(dept.Name, resultList[0]["Name"]);
+            Assert.AreEqual(newId, (int)resultList.Values.First()[0]["Id"]);
+            Assert.AreEqual("Comment", resultList.Values.First()[0]["Comments"]);
+            Assert.AreEqual("Test", resultList.Values.First()[0]["Name"]);
         }
 
         [Test]
@@ -283,28 +286,66 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .OnInsert(ev => inserted.Add(ev.GetCommandEntityFrameworkEvent())))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
+            int newId = 23;
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
             {
-                ctx.Database.EnsureCreated();
+                // not intercepted
+                var dept = new DbCommandInterceptContext.Department() { Id = newId, Name = "Test", Comments = "Comment" };
+                await ctx.Departments.AddAsync(dept);
+                await ctx.SaveChangesAsync();
             }
+
             var interceptor = new AuditCommandInterceptor() { LogParameterValues = true, IncludeReaderResults = true };
-            DbCommandInterceptContext.Department dept;
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
             {
-                int i = 22;
-                dept = await ctx.Departments.FirstOrDefaultAsync(d => d.Id != i);
+                var dept = ctx.Departments.FirstOrDefault(d => d.Id == newId);
             }
 
             Assert.AreEqual(1, inserted.Count);
             Assert.IsNotNull(inserted[0].Parameters);
             Assert.IsTrue(inserted[0].Parameters.Any());
-            Assert.AreEqual(22, inserted[0].Parameters.First().Value);
+            Assert.AreEqual(newId, inserted[0].Parameters.First().Value);
             Assert.IsNotNull(inserted[0].Result);
-            var resultList = inserted[0].Result as List<Dictionary<string, object>>;
+            var resultList = inserted[0].Result as Dictionary<string, List<Dictionary<string, object>>>;
             Assert.AreEqual(1, resultList.Count);
-            Assert.AreEqual(dept.Id, (int)resultList[0]["Id"]);
-            Assert.AreEqual(dept.Comments, resultList[0]["Comments"]);
-            Assert.AreEqual(dept.Name, resultList[0]["Name"]);
+            Assert.AreEqual(newId, (int)resultList.Values.First()[0]["Id"]);
+            Assert.AreEqual("Comment", resultList.Values.First()[0]["Comments"]);
+            Assert.AreEqual("Test", resultList.Values.First()[0]["Name"]);
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_IncludeReaderResult_MultipleResultSets_Async()
+        {
+            var inserted = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => inserted.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var interceptor = new AuditCommandInterceptor() { LogParameterValues = true, IncludeReaderResults = true };
+            
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
+            {
+                var dept = new DbCommandInterceptContext.Department()
+                {
+                    Name = "Dept1",
+                    Address = new DbCommandInterceptContext.Address()
+                    {
+                        Text = "Addr1"
+                    }
+                };
+                await ctx.Departments.AddAsync(dept);
+                await ctx.SaveChangesAsync();
+                inserted.Clear();
+
+                dept.Name = "DeptUpdated";
+                dept.Address.Text = "AddrUpdated";
+                await ctx.SaveChangesAsync();
+            }
+            
+            Assert.AreEqual(1, inserted.Count);
+            
+            Assert.AreEqual(2, (inserted[0].Result as ICollection)?.Count); // Two result sets
         }
 
 #if EF_CORE_5_OR_GREATER
@@ -332,12 +373,6 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DbCommandInterceptContext>(_ => _
                     .IncludeEntityObjects(true));
-
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                // not intercepted
-                ctx.Database.EnsureCreated();
-            }
 
             var id = _rnd.Next();
             var guid = Guid.NewGuid().ToString();
@@ -384,10 +419,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForContext<DbCommandInterceptContext>(_ => _
                     .IncludeEntityObjects(true));
 
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                ctx.Database.EnsureCreated();
-            }
             var interceptor = new AuditCommandInterceptor() { LogParameterValues = false };
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
             {
@@ -416,10 +447,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                     .IncludeEntityObjects(true));
 
             int id = _rnd.Next();
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                ctx.Database.EnsureCreated();
-            }
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor()).Options))
             {
@@ -447,12 +474,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                     replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
             
             int id = _rnd.Next();
-
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                ctx.Database.EnsureCreated();
-            }
 
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
@@ -490,12 +511,6 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             int id = _rnd.Next();
 
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                await ctx.Database.EnsureCreatedAsync();
-            }
-
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
                 .Options;
@@ -530,12 +545,6 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             int id = _rnd.Next();
 
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                ctx.Database.EnsureCreated();
-            }
-
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
                 .Options;
@@ -569,12 +578,6 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             int id = _rnd.Next();
 
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                await ctx.Database.EnsureCreatedAsync();
-            }
-
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
                 .Options;
@@ -607,12 +610,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                         replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
 
             int id = _rnd.Next();
-
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                ctx.Database.EnsureCreated();
-            }
 
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
@@ -649,12 +646,6 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             int id = _rnd.Next();
 
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                await ctx.Database.EnsureCreatedAsync();
-            }
-
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
                 .Options;
@@ -689,12 +680,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                         replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
 
             int id = _rnd.Next();
-
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                ctx.Database.EnsureCreated();
-            }
 
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
@@ -735,12 +720,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                         replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
 
             int id = _rnd.Next();
-
-            // Use the default context to create the database
-            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().Options))
-            {
-                await ctx.Database.EnsureCreatedAsync();
-            }
 
             var optionsWithInterceptor = new DbContextOptionsBuilder()
                 .AddInterceptors(new AuditCommandInterceptor())
@@ -842,6 +821,15 @@ namespace Audit.EntityFramework.Core.UnitTest
             public int Id { get; set; }
             public string Name { get; set; }
             public string Comments { get; set; }
+            public Address Address { get; set; }
+        }
+
+        public class Address
+        {
+            [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Text { get; set; }
         }
     }
 }

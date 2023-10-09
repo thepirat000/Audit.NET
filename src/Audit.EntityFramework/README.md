@@ -491,7 +491,7 @@ The following table describes the output fields for the low-level command interc
 | **CommandText** | string | The command text |
 | **Parameters** | Dictionary | The parameter values, if any, when `EnableSensitiveDataLogging` is enabled |
 | **IsAsync** | boolean | Indicates whether the call was asynchronous |
-| **Result** | object | Result of the operation, only for Scalar and NonQuery methods. Reader methods does not include the result on the output. |
+| **Result** | object | Result of the operation. Query results are only included when IncludeReaderResults is set to true. |
 | **Success** | boolean | Boolean to indicate if the operation was successful |
 | **ErrorMessage** | string | The exception thrown details (if any) |
 

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [21.1.0] - 2023-10-09:
+- Audit.EntityFramework.Core: Fixing bug in the `AuditCommandInterceptor` when multiple result sets are returned. (#521, #628)
+- Audit.NET.MongoDB: Upgrade MongoDB.Driver reference to the latest version (#627)
+
 ## [21.0.4] - 2023-09-15
 - Audit.NET.PostgreSql: Fixing postgres double quote issue. (#623) 
 

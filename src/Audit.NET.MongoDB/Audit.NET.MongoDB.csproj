@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net5.0' ">
-	<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+	<PackageReference Include="MongoDB.Driver" Version="2.21.0" />
   </ItemGroup>
 
   <ItemGroup>

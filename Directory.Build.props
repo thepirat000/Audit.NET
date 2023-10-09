@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-	 <Version>21.0.4</Version>
+	 <Version>21.1.0</Version>
 	 <PackageReleaseNotes></PackageReleaseNotes>
 	 <CheckEolTargetFramework>false</CheckEolTargetFramework>
  </PropertyGroup>

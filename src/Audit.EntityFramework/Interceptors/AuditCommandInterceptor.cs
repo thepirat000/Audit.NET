@@ -331,23 +331,30 @@ namespace Audit.EntityFramework.Interceptors
         /// <summary>
         /// Serializes the result DB data reader and returns a new data reader to be overriden to the EF result.
         /// </summary>
-        protected virtual List<Dictionary<string, object>> SerializeDataReader(DbDataReader reader, out DbDataReader newDataReader)
+        protected virtual Dictionary<string, List<Dictionary<string, object>>> SerializeDataReader(DbDataReader reader, out DbDataReader newDataReader)
         {
             if (reader == null)
             {
                 newDataReader = null;
                 return null;
             }
+            
+            // Create the data table from the original reader
+            var dataSet = new DataSet();
+            do
+            {
+                var table = new DataTable();
+                table.Load(reader);
+                dataSet.Tables.Add(table);
+            } while (!reader.IsClosed);
+            
+            newDataReader = dataSet.CreateDataReader();
 
-            var dataTable = new DataTable();
-            dataTable.Load(reader);
-            newDataReader = dataTable.CreateDataReader();
+            var resultData = dataSet.Tables.Cast<DataTable>().ToDictionary(k => k.TableName, t =>
+                t.AsEnumerable()
+                    .Select(row => t.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName, c => row[c])).ToList());
 
-            return dataTable.AsEnumerable().Select(
-                row => dataTable.Columns.Cast<DataColumn>().ToDictionary(
-                    column => column.ColumnName,
-                    column => row[column]
-                )).ToList();
+            return resultData;
         }
 
         private Dictionary<string, object> GetParameters(DbCommand command, CommandEventData eventData)
