@@ -313,8 +313,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.AreEqual("Test", resultList.Values.First()[0]["Name"]);
         }
 
+#if EF_CORE_7_OR_GREATER
         [Test]
-        public async Task Test_DbCommandInterceptor_IncludeReaderResult_MultipleResultSets_Async()
+        public async Task Test_DbCommandInterceptor_IncludeReaderResult_MultipleResultSets_EfCore7_Async()
         {
             var inserted = new List<CommandEvent>();
             Audit.Core.Configuration.Setup()
@@ -347,6 +348,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             
             Assert.AreEqual(2, (inserted[0].Result as ICollection)?.Count); // Two result sets
         }
+#endif
 
 #if EF_CORE_5_OR_GREATER
         [Test]
