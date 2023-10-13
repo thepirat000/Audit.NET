@@ -20,9 +20,9 @@ namespace Audit.Http
         /// <param name="auditEvent">The audit event.</param>
         public static HttpAction GetHttpAction(this AuditEvent auditEvent)
         {
-            if (auditEvent is AuditEventHttpClient)
+            if (auditEvent is AuditEventHttpClient client)
             {
-                return (auditEvent as AuditEventHttpClient).Action;
+                return client.Action;
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("Action")

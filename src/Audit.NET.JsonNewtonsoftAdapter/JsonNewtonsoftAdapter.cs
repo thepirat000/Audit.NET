@@ -82,9 +82,9 @@ namespace Audit.Core
             {
                 return (T)value;
             }
-			if (value is JContainer)
+			if (value is JContainer container)
 			{
-				return (value as JContainer).ToObject<T>();
+				return container.ToObject<T>();
 			}
             return default(T);
         }

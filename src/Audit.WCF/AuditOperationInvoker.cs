@@ -215,10 +215,9 @@ namespace Audit.WCF
         {
             var result = new AuditWcfEventFault();
             result.Exception = ex.GetExceptionInfo();
-            if (ex is FaultException)
+            if (ex is FaultException fault)
             {
                 result.FaultType = "Fault";
-                var fault = ex as FaultException;
                 if (fault.GetType().GetProperty("Detail") != null)
                 {
                     var detail = fault.GetType().GetProperty("Detail").GetGetMethod().Invoke(fault, null);

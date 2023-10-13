@@ -164,9 +164,9 @@ namespace Audit.EntityFramework.Providers
                 }
                 if (save)
                 {
-                    if (auditDbContext is IAuditBypass)
+                    if (auditDbContext is IAuditBypass bypass)
                     {
-                        (auditDbContext as IAuditBypass).SaveChangesBypassAudit();
+                        bypass.SaveChangesBypassAudit();
                     }
                     else
                     {

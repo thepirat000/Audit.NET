@@ -61,9 +61,8 @@ namespace Audit.Core
                 return (T)value;
             }
             // TODO: Workaround to convert from JsonElement to Object, until https://github.com/dotnet/runtime/issues/31274 fixed
-            if (value is JsonElement)
+            if (value is JsonElement element)
             {
-                var element = (JsonElement)value;
                 using (var bufferWriter = new MemoryStream())
                 {
                     using (var writer = new Utf8JsonWriter(bufferWriter))

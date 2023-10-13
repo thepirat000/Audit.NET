@@ -19,9 +19,9 @@ namespace Audit.WebApi
         /// <param name="auditEvent">The audit event.</param>
         public static AuditApiAction GetWebApiAuditAction(this AuditEvent auditEvent)
         {
-            if (auditEvent is AuditEventWebApi)
+            if (auditEvent is AuditEventWebApi api)
             {
-                return (auditEvent as AuditEventWebApi).Action;
+                return api.Action;
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("Action")

@@ -149,8 +149,8 @@ namespace Audit.Mvc
                 auditAction.RedirectLocation = httpContext.Response.Headers?["Location"];
                 auditAction.ResponseStatusCode = context.Result == null && context.Exception != null && !context.ExceptionHandled
                     ? 500
-                    : context.Result is StatusCodeResult
-                        ? (context.Result as StatusCodeResult).StatusCode
+                    : context.Result is StatusCodeResult result
+                        ? result.StatusCode
                         : httpContext.Response.StatusCode;
 
                 var bodyType = context.Result?.GetType().GetFullTypeName();

@@ -116,10 +116,11 @@ namespace Audit.WebApi
 
         private HttpStatusCode GetStatusCode(ActionExecutedContext context)
         {
-            var statusCode = context.Result is ObjectResult && (context.Result as ObjectResult).StatusCode.HasValue
-                ? (context.Result as ObjectResult).StatusCode.Value
-                : context.Result is StatusCodeResult
-                    ? (context.Result as StatusCodeResult).StatusCode
+            var result = context.Result;
+            var statusCode = result is ObjectResult objectResult && objectResult.StatusCode.HasValue
+                ? objectResult.StatusCode.Value
+                : result is StatusCodeResult statusCodeResult
+                    ? statusCodeResult.StatusCode
                     : context.HttpContext.Response.StatusCode;
             return (HttpStatusCode)statusCode;
         }

@@ -19,9 +19,9 @@ namespace Audit.WCF
         /// <param name="auditEvent">The audit event.</param>
         public static WcfEvent GetWcfAuditAction(this AuditEvent auditEvent)
         {
-            if (auditEvent is AuditEventWcfAction)
+            if (auditEvent is AuditEventWcfAction action)
             {
-                return (auditEvent as AuditEventWcfAction).WcfEvent;
+                return action.WcfEvent;
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("WcfEvent") 
