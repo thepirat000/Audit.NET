@@ -24,8 +24,8 @@ namespace Audit.EntityFramework
                 return (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
             }
             // For backwards compatibility
-            return auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent")
-                ? Core.Configuration.JsonAdapter.ToObject<EntityFrameworkEvent>(auditEvent.CustomFields["EntityFrameworkEvent"])
+            return auditEvent.CustomFields.TryGetValue("EntityFrameworkEvent", out var field)
+                ? Core.Configuration.JsonAdapter.ToObject<EntityFrameworkEvent>(field)
                 : null;
         }
 
@@ -49,8 +49,8 @@ namespace Audit.EntityFramework
             {
                 return (auditEvent as AuditEventCommandEntityFramework).CommandEvent;
             }
-            return auditEvent.CustomFields.ContainsKey("CommandEvent")
-                ? Core.Configuration.JsonAdapter.ToObject<CommandEvent>(auditEvent.CustomFields["CommandEvent"])
+            return auditEvent.CustomFields.TryGetValue("CommandEvent", out var field)
+                ? Core.Configuration.JsonAdapter.ToObject<CommandEvent>(field)
                 : null;
         }
 #endif

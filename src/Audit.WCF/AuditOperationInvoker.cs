@@ -180,7 +180,7 @@ namespace Audit.WCF
             var securityContext = ServiceSecurityContext.Current;
             var operationContext = OperationContext.Current;
             var imProps = OperationContext.Current.IncomingMessageProperties;
-            var endpoint = imProps.ContainsKey(RemoteEndpointMessageProperty.Name) ? imProps[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty : null;
+            var endpoint = imProps.TryGetValue(RemoteEndpointMessageProperty.Name, out var prop) ? prop as RemoteEndpointMessageProperty : null;
             return new WcfEvent()
             {
                 Action = _operation.Action,

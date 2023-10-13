@@ -107,10 +107,10 @@ namespace Audit.EntityFramework
                 return false;
             }
             var overrideProperties = EnsurePropertiesOverrideAttrCache(entityType);
-            if (overrideProperties != null && overrideProperties.ContainsKey(propName))
+            if (overrideProperties != null && overrideProperties.TryGetValue(propName, out var property))
             {
                 // Property overriden with AuditOverride attribute
-                value = overrideProperties[propName].Value;
+                value = property.Value;
                 return true;
             }
             if (context.EntitySettings != null && context.EntitySettings.TryGetValue(entityType, out EfEntitySettings settings))
