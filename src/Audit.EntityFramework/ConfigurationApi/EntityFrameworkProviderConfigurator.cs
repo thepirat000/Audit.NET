@@ -121,9 +121,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             _auditEntityAction = (ev, ent, obj) =>
             {
-                if (obj is T)
+                if (obj is T t)
                 {
-                    action.Invoke(ev, ent, (T)obj);
+                    action.Invoke(ev, ent, t);
                 }
                 return Task.FromResult(true);
             };
@@ -134,9 +134,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             _auditEntityAction = async (ev, ent, obj) =>
             {
-                if (obj is T)
+                if (obj is T t)
                 {
-                    await asyncAction.Invoke(ev, ent, (T)obj);
+                    await asyncAction.Invoke(ev, ent, t);
                 }
                 return true;
             };
@@ -147,9 +147,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             _auditEntityAction = (ev, ent, obj) =>
             {
-                if (obj is T)
+                if (obj is T t)
                 {
-                    return Task.FromResult(function.Invoke(ev, ent, (T)obj));
+                    return Task.FromResult(function.Invoke(ev, ent, t));
                 }
                 return Task.FromResult(true);
             };
@@ -160,9 +160,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         {
             _auditEntityAction = async (ev, ent, obj) =>
             {
-                if (obj is T)
+                if (obj is T t)
                 {
-                    return await asyncFunction.Invoke(ev, ent, (T)obj);
+                    return await asyncFunction.Invoke(ev, ent, t);
                 }
                 return true;
             };

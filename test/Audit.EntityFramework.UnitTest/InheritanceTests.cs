@@ -70,10 +70,8 @@ namespace Audit.EntityFramework.UnitTest
             {
                 DBEntityBase bse = context.Entities.First(x => x.ID == id);
 
-                if (!(bse is DBEntity))
+                if (!(bse is DBEntity ent))
                     throw new Exception("1");
-
-                DBEntity ent = (DBEntity) bse;
 
                 ent.Name = "Base 2";
                 ent.Name2 = "Inherited 2";

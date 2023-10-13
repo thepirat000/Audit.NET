@@ -19,9 +19,9 @@ namespace Audit.Wcf.Client
         /// <param name="auditEvent">The audit event.</param>
         public static WcfClientAction GetWcfClientAction(this AuditEvent auditEvent)
         {
-            if (auditEvent is AuditEventWcfClient)
+            if (auditEvent is AuditEventWcfClient client)
             {
-                return (auditEvent as AuditEventWcfClient).WcfClientEvent;
+                return client.WcfClientEvent;
             }
             return auditEvent.CustomFields.ContainsKey("WcfClientEvent") 
                 ? Configuration.JsonAdapter.ToObject<WcfClientAction>(auditEvent.CustomFields["WcfClientEvent"])

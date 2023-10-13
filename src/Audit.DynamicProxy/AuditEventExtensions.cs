@@ -19,9 +19,9 @@ namespace Audit.DynamicProxy
         /// <param name="auditEvent">The audit event.</param>
         public static InterceptEvent GetAuditInterceptEvent(this AuditEvent auditEvent)
         {
-            if (auditEvent is AuditEventIntercept)
+            if (auditEvent is AuditEventIntercept intercept)
             {
-                return (auditEvent as AuditEventIntercept).InterceptEvent;
+                return intercept.InterceptEvent;
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("InterceptEvent")

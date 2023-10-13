@@ -19,9 +19,9 @@ namespace Audit.Mvc
         /// <param name="auditEvent">The audit event.</param>
         public static AuditAction GetMvcAuditAction(this AuditEvent auditEvent)
         {
-            if (auditEvent is AuditEventMvcAction)
+            if (auditEvent is AuditEventMvcAction action)
             {
-                return (auditEvent as AuditEventMvcAction).Action;
+                return action.Action;
             }
             // For backwards compatibility
             return auditEvent.CustomFields.ContainsKey("Action") 

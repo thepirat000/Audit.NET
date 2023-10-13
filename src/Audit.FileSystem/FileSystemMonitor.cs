@@ -132,7 +132,7 @@ namespace Audit.FileSystem
                 Extension = System.IO.Path.GetExtension(e.FullPath),
                 FullPath = e.FullPath,
                 Event = type,
-                OldName = (e is RenamedEventArgs) ? System.IO.Path.GetFileName((e as RenamedEventArgs).OldFullPath) : null
+                OldName = (e is RenamedEventArgs args) ? System.IO.Path.GetFileName(args.OldFullPath) : null
             };
             var fsAuditEvent = new AuditEventFileSystem()
             {
