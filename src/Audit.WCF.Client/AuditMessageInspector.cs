@@ -61,9 +61,9 @@ namespace Audit.Wcf.Client
             auditWcfEvent.IsFault = reply.IsFault;
             auditWcfEvent.ResponseAction = reply.Headers?.Action;
             auditWcfEvent.ResponseBody = reply.ToString();
-            if (reply.Properties.ContainsKey("httpResponse"))
+            if (reply.Properties.TryGetValue("httpResponse", out var property))
             {
-                var res = reply.Properties["httpResponse"] as HttpResponseMessageProperty;
+                var res = property as HttpResponseMessageProperty;
                 auditWcfEvent.ResponseStatuscode = res?.StatusCode;
                 auditWcfEvent.ResponseHeaders = _includeResponseHeaders ? GetHeaders(res?.Headers?.ToString()) : null;
             }
@@ -94,9 +94,9 @@ namespace Audit.Wcf.Client
                 RequestBody = request.ToString(),
                 MessageId = request.Headers?.MessageId?.ToString()
             };
-            if (request.Properties.ContainsKey("httpRequest"))
+            if (request.Properties.TryGetValue("httpRequest", out var property))
             {
-                var req = request.Properties["httpRequest"] as HttpRequestMessageProperty;
+                var req = property as HttpRequestMessageProperty;
                 action.HttpMethod = req?.Method;
                 action.RequestHeaders = _includeRequestHeaders ? GetHeaders(req?.Headers?.ToString()) : null;
             }

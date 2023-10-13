@@ -23,8 +23,8 @@ namespace Audit.Wcf.Client
             {
                 return (auditEvent as AuditEventWcfClient).WcfClientEvent;
             }
-            return auditEvent.CustomFields.ContainsKey("WcfClientEvent") 
-                ? Configuration.JsonAdapter.ToObject<WcfClientAction>(auditEvent.CustomFields["WcfClientEvent"])
+            return auditEvent.CustomFields.TryGetValue("WcfClientEvent", out var field)
+                ? Configuration.JsonAdapter.ToObject<WcfClientAction>(field)
                 : null;
         }
     }

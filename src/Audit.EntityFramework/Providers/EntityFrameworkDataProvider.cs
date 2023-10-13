@@ -315,19 +315,20 @@ namespace Audit.EntityFramework.Providers
         {
             var entity = entry.Entry.Entity;
             var auditFields = GetPropertiesToSet(auditType);
+            var columnValues = entry.ColumnValues;
 #if EF_CORE
             var entityFields = entry.GetEntry().Metadata.GetProperties();
             foreach (var prop in entityFields.Where(af => auditFields.ContainsKey(af.Name)))
             {
                 var colName = DbContextHelper.GetColumnName(prop);
-                var value = entry.ColumnValues.ContainsKey(colName) ? entry.ColumnValues[colName] : prop.PropertyInfo?.GetValue(entity);
+                var value = columnValues.TryGetValue(colName, out var columnValue) ? columnValue : prop.PropertyInfo?.GetValue(entity);
                 auditFields[prop.Name].SetValue(auditEntity, value);
             }
 #else
             var entityFields = GetPropertiesToGet(definingType);
             foreach (var prop in entityFields.Where(af => auditFields.ContainsKey(af.Key)))
             {
-                var value = entry.ColumnValues.ContainsKey(prop.Key) ? entry.ColumnValues[prop.Key] : prop.Value.GetValue(entity);
+                var value = columnValues.TryGetValue(prop.Key, out var columnValue) ? columnValue : prop.Value.GetValue(entity);
                 auditFields[prop.Key].SetValue(auditEntity, value);
             }
 #endif
