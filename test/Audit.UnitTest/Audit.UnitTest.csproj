@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;netcoreapp1.0;net461;net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;netcoreapp1.0;net461;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
@@ -33,20 +33,20 @@
   <ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp1.0' ">
     <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' ">
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
 	<PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' OR '$(TargetFramework)' == 'net8.0' ">
     <ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.2" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' ">
     <DefineConstants>$(DefineConstants);NK_JSON</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' OR '$(TargetFramework)' == 'net8.0' ">
     <DefineConstants>$(DefineConstants);TEXT_JSON</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
