@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [22.0.0] - 2023-11-14:
+- Audit.NET / Audit.EntityFramework.Core / Audit.NET.SqlServer: Adding support for NET8 (#632)
+
 ## [21.1.0] - 2023-10-09:
 - Audit.EntityFramework.Core: Fixing bug in the `AuditCommandInterceptor` when multiple result sets are returned. (#521, #628)
 - Audit.NET.MongoDB: Upgrade MongoDB.Driver reference to the latest version (#627)
