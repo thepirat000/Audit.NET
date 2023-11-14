@@ -24,6 +24,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0' ">
@@ -40,6 +41,7 @@
 
 	<ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
   <ItemGroup>

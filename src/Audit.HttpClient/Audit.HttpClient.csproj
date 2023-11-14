@@ -23,8 +23,14 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>Audit.Http</RootNamespace>
 	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+	<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+	<None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>

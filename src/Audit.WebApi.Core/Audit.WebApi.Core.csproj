@@ -23,6 +23,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +32,7 @@
   
   <ItemGroup>
     <Compile Include="..\Audit.WebApi\**\*.cs" Exclude="..\Audit.WebApi\obj\**\*.*;..\**\AssemblyInfo.cs" />
+    <None Include="..\Audit.WebApi\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
   <ItemGroup>

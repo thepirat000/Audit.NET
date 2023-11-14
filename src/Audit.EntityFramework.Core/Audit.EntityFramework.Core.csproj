@@ -23,6 +23,7 @@
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
@@ -53,6 +54,7 @@
 
 	<ItemGroup>
 		<Compile Include="..\Audit.EntityFramework\**\*.cs" Exclude="..\Audit.EntityFramework\obj\**\*.*;..\**\AssemblyInfo.cs" />
+		<None Include="..\Audit.EntityFramework\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>

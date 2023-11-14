@@ -2,7 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+	
+  <ItemGroup>
+	<None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Audit.Mvc.Core" Version="18.1.6" />
