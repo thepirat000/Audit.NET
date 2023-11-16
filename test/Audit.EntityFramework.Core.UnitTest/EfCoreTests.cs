@@ -6,6 +6,7 @@ using System.Linq;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Threading.Tasks;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -25,6 +26,67 @@ namespace Audit.EntityFramework.Core.UnitTest
             new BlogsContext().Database.EnsureCreated();
             new DemoContext().Database.EnsureCreated();
         }
+
+#if EF_CORE_8_OR_GREATER
+        [Test]
+        public void Test_EF_ComplexType()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexTypes>(c => c
+                    .ForEntity<Context_ComplexTypes.Address>(a => a.Format(p => p.City, city => $"*{city}*"))
+                    .ForEntity<Context_ComplexTypes.Country>(a => a.Format(p => p.Alias, alias => alias?.ToUpperInvariant())));
+
+            using var context = new Context_ComplexTypes();
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var person = new Context_ComplexTypes.Person()
+            {
+                Id = 1,
+                Name = "Development",
+                Address = new Context_ComplexTypes.Address()
+                {
+                    Country = new Context_ComplexTypes.Country() { Name = "Austria", Alias = "Au" },
+                    City = "Vienna",
+                    Line1 = "Street",
+                    PostCode = "1234"
+                }
+            };
+
+            context.People.Add(person);
+            context.SaveChanges();
+
+            person.Name = "New Name";
+            person.Address = person.Address with { City = "NewCity", Country = person.Address.Country with { Alias = "newalias" } };
+            context.SaveChanges();
+
+            Assert.AreEqual(2, evs.Count);
+            Assert.AreEqual(1, evs[0].Entries.Count);
+            Assert.AreEqual(1, evs[1].Entries.Count);
+
+            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
+            Assert.AreEqual("Update", evs[1].Entries[0].Action);
+
+            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+            Assert.AreEqual("New Name", evs[1].Entries[0].ColumnValues["Name"]);
+
+            Assert.AreEqual("*Vienna*", evs[0].Entries[0].ColumnValues["Address_City"]);
+            Assert.AreEqual("*NewCity*", evs[1].Entries[0].ColumnValues["Address_City"]);
+
+            Assert.AreEqual("AU", evs[0].Entries[0].ColumnValues["Address_Country_Alias"]);
+            Assert.AreEqual("NEWALIAS", evs[1].Entries[0].ColumnValues["Address_Country_Alias"]);
+
+            Assert.AreEqual("AU", evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.OriginalValue);
+            Assert.AreEqual("NEWALIAS", evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.NewValue);
+        }
+#endif
 
 #if EF_CORE_5_OR_GREATER
 

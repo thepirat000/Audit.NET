@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.3.0" />
     <Reference Include="System.Web" />
     <Reference Include="System" />
@@ -60,7 +60,7 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.3.0" />
     <Reference Include="System.Web" />
   </ItemGroup>

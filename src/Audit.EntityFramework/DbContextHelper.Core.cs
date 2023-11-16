@@ -8,9 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 
 namespace Audit.EntityFramework
 {
@@ -32,7 +30,6 @@ namespace Audit.EntityFramework
                 PropertyEntry propEntry = entry.Property(prop.Name);
                 if (propEntry.IsModified)
                 {
-                    
                     if (IncludeProperty(context, entry, prop.Name))
                     {
                         result.Add(new EventEntryChange()
@@ -44,15 +41,110 @@ namespace Audit.EntityFramework
                     }
                 }
             }
+            
+#if EF_CORE_8_OR_GREATER
+            AddChangesFromComplexProperties(context, entry, entry.ComplexProperties, result);
+#endif
+
             return result;
         }
+
+#if EF_CORE_8_OR_GREATER
+        /// <summary>
+        /// Adds the change values from the complex properties recursively
+        /// </summary>
+        private void AddChangesFromComplexProperties(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexPropertyEntry> complexProperties, List<EventEntryChange> result)
+        {
+            foreach (var complexEntry in complexProperties)
+            {
+                // Process the primitive properties
+                foreach (var propEntry in complexEntry.Properties)
+                {
+                    if (propEntry.IsModified && IncludeProperty(context, complexEntry.Metadata.ClrType, propEntry.Metadata.Name))
+                    {
+                        result.Add(new EventEntryChange()
+                        {
+                            ColumnName = GetColumnName(propEntry.Metadata),
+                            NewValue = HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, propEntry.CurrentValue, out var overridenCurrentValue) ? overridenCurrentValue : propEntry.CurrentValue,
+                            OriginalValue = HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, propEntry.OriginalValue, out var overridenOriginalValue) ? overridenOriginalValue : propEntry.OriginalValue
+                        });
+                    }
+                }
+
+                // Recursively process complex properties
+                AddChangesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result);
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Gets the column values for an insert/delete operation.
+        /// </summary>
+        private Dictionary<string, object> GetColumnValues(IAuditDbContext context, EntityEntry entry)
+        {
+            var result = new Dictionary<string, object>();
+            var props = entry.Metadata.GetProperties();
+            foreach (var prop in props)
+            {
+                var propEntry = entry.Property(prop.Name);
+                if (IncludeProperty(context, entry, prop.Name))
+                {
+                    object value = entry.State != EntityState.Deleted ? propEntry.CurrentValue : propEntry.OriginalValue;
+                    if (HasPropertyValue(context, entry, prop.Name, value, out object overrideValue))
+                    {
+                        value = overrideValue;
+                    }
+                    result.Add(GetColumnName(prop), value);
+                }
+            }
+
+#if EF_CORE_8_OR_GREATER
+            AddColumnValuesFromComplexProperties(context, entry, entry.ComplexProperties, result);
+#endif
+            return result;
+        }
+        
+#if EF_CORE_8_OR_GREATER
+        /// <summary>
+        /// Adds the column values from the complex properties recursively
+        /// </summary>
+        private void AddColumnValuesFromComplexProperties(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexPropertyEntry> complexProperties, Dictionary<string, object> result)
+        {
+            foreach (var complexEntry in complexProperties)
+            {
+                // Process the primitive properties
+                foreach (var propEntry in complexEntry.Properties)
+                {
+                    if (IncludeProperty(context, complexEntry.Metadata.ClrType, propEntry.Metadata.Name))
+                    {
+                        var value = propEntry.CurrentValue;
+                        if (HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, value, out object overrideValue))
+                        {
+                            value = overrideValue;
+                        }
+
+                        var columnName = GetColumnName(propEntry.Metadata);
+                        result.Add(columnName, value);
+                    }
+                }
+
+                // Recursively process complex properties
+                AddColumnValuesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result);
+            }
+        }
+#endif
 
         /// <summary>
         /// Gets the name of the column.
         /// </summary>
         internal static string GetColumnName(IProperty prop)
         {
-#if EF_CORE_7_OR_GREATER
+#if EF_CORE_8_OR_GREATER
+            var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringType, StoreObjectType.Table);
+            return storeObjectIdentifier.HasValue
+                ? (prop.GetColumnName(storeObjectIdentifier.Value) ?? prop.GetDefaultColumnName())
+                : prop.GetDefaultColumnName();
+#elif EF_CORE_7_OR_GREATER
             var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringEntityType, StoreObjectType.Table);
             return storeObjectIdentifier.HasValue
                 ? (prop.GetColumnName(storeObjectIdentifier.Value) ?? prop.GetDefaultColumnName())
@@ -69,29 +161,6 @@ namespace Audit.EntityFramework
 #endif
         }
 
-        /// <summary>
-        /// Gets the column values for an insert/delete operation.
-        /// </summary>
-        private Dictionary<string, object> GetColumnValues(IAuditDbContext context, EntityEntry entry)
-        {
-            var result = new Dictionary<string, object>();
-            var props = entry.Metadata.GetProperties();
-            foreach (var prop in props)
-            {
-                PropertyEntry propEntry = entry.Property(prop.Name);
-                if (IncludeProperty(context, entry, prop.Name))
-                {
-                    object value = entry.State != EntityState.Deleted ? propEntry.CurrentValue : propEntry.OriginalValue;
-                    if (HasPropertyValue(context, entry, prop.Name, value, out object overrideValue))
-                    {
-                        value = overrideValue;
-                    }
-                    result.Add(GetColumnName(prop), value);
-                }
-            }
-            return result;
-        }
-
         // Determines if the property should be included or is ignored
         private bool IncludeProperty(IAuditDbContext context, EntityEntry entry, string propName)
         {
@@ -100,7 +169,14 @@ namespace Audit.EntityFramework
             {
                 return true;
             }
-            var ignoredProperties = EnsurePropertiesIgnoreAttrCache(entityType); 
+
+            return IncludeProperty(context, entityType, propName);
+        }
+
+        // Determines if the property should be included or is ignored
+        private bool IncludeProperty(IAuditDbContext context, Type entityType, string propName)
+        {
+            var ignoredProperties = EnsurePropertiesIgnoreAttrCache(entityType);
             if (ignoredProperties != null && ignoredProperties.Contains(propName))
             {
                 // Property marked with AuditIgnore attribute
@@ -123,6 +199,13 @@ namespace Audit.EntityFramework
             {
                 return false;
             }
+
+            return HasPropertyValue(context, entry, entityType, propName, currentValue, out value);
+        }
+
+        private bool HasPropertyValue(IAuditDbContext context, EntityEntry entry, Type entityType, string propName, object currentValue, out object value)
+        {
+            value = null;
             var overrideProperties = EnsurePropertiesOverrideAttrCache(entityType);
             if (overrideProperties != null && overrideProperties.TryGetValue(propName, out var property))
             {
@@ -147,7 +230,7 @@ namespace Audit.EntityFramework
             }
             return false;
         }
-
+        
         /// <summary>
         /// Gets the name of the entity.
         /// </summary>
