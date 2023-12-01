@@ -32,6 +32,10 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         IConfigurator IncludeStackTrace(bool includeStackTrace = true);
         /// <summary>
+        /// Globally include the activity trace in the audit events.
+        /// </summary>
+        IConfigurator IncludeActivityTrace(bool includeActivityTrace = true);
+        /// <summary>
         /// Use a null provider. No audit events will be saved. Useful for testing purposes or to disable the audit logs.
         /// </summary>
         ICreationPolicyConfigurator UseNullProvider();

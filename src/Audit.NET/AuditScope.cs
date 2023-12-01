@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Threading;
+using System.Linq;
 
 namespace Audit.Core
 {
@@ -24,34 +25,17 @@ namespace Audit.Core
             _creationPolicy = options.CreationPolicy ?? Configuration.CreationPolicy;
             _dataProvider = options.DataProvider ?? Configuration.DataProvider;
             _targetGetter = options.TargetGetter;
-            var environment = new AuditEventEnvironment()
-            {
-                Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
-            };
-            MethodBase callingMethod = options.CallingMethod;
-#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0_OR_GREATER
-            environment.UserName = Environment.UserName;
-            environment.MachineName = Environment.MachineName;
-            environment.DomainName = Environment.UserDomainName;
-            if (callingMethod == null)
-            {
-                callingMethod = new StackFrame(2 + options.SkipExtraFrames).GetMethod();
-            }
-            if (options.IncludeStackTrace)
-            {
-                environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
-            }
-#else
-            environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
-            environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
-#endif
-            if (callingMethod != null)
-            {
-                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()";
-                environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
-            }
+
             _event = options.AuditEvent ?? new AuditEvent();
-            _event.Environment = environment;
+
+            _event.Environment = GetEnvironmentInfo(options);
+            
+#if NET5_0_OR_GREATER
+            if (options.IncludeActivityTrace)
+            {
+                _event.Activity = GetActivityTrace();
+            }
+#endif
             _event.StartDate = Configuration.SystemClock.UtcNow;
             if (options.EventType != null)
             {
@@ -72,6 +56,103 @@ namespace Audit.Core
             }
             ProcessExtraFields(options.ExtraFields);
         }
+
+#if NET5_0_OR_GREATER
+        private AuditActivityTrace GetActivityTrace()
+        {
+            var activity = Activity.Current;
+
+            if (activity == null)
+            {
+                return null;
+            }
+
+            var spanId = activity.IdFormat switch
+            {
+                ActivityIdFormat.Hierarchical => activity.Id,
+                ActivityIdFormat.W3C => activity.SpanId.ToHexString(),
+                _ => null
+            };
+
+            var traceId = activity.IdFormat switch
+            {
+                ActivityIdFormat.Hierarchical => activity.RootId,
+                ActivityIdFormat.W3C => activity.TraceId.ToHexString(),
+                _ => null
+            };
+
+            var parentId = activity.IdFormat switch
+            {
+                ActivityIdFormat.Hierarchical => activity.ParentId,
+                ActivityIdFormat.W3C => activity.ParentSpanId.ToHexString(),
+                _ => null
+            };
+
+            
+            var result = new AuditActivityTrace()
+            {
+                StartTimeUtc = activity.StartTimeUtc,
+                SpanId = spanId,
+                TraceId = traceId,
+                ParentId = parentId,
+                Operation = activity.OperationName
+            };
+
+            if (activity.Tags.Any())
+            {
+                result.Tags = new List<AuditActivityTag>();
+                foreach (var tag in activity.Tags)
+                {
+                    result.Tags.Add(new AuditActivityTag() { Key = tag.Key, Value = tag.Value });
+                }
+            }
+
+            if (activity.Events.Any())
+            {
+                result.Events = new List<AuditActivityEvent>();
+                foreach (var ev in activity.Events)
+                {
+                    result.Events.Add(new AuditActivityEvent() { Timestamp = ev.Timestamp, Name = ev.Name });
+                }
+            }
+
+            return result;
+        }
+#endif
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private AuditEventEnvironment GetEnvironmentInfo(AuditScopeOptions options)
+        {
+            var environment = new AuditEventEnvironment()
+            {
+                Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
+            };
+            MethodBase callingMethod = options.CallingMethod;
+#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0_OR_GREATER
+            environment.UserName = Environment.UserName;
+            environment.MachineName = Environment.MachineName;
+            environment.DomainName = Environment.UserDomainName;
+            if (callingMethod == null)
+            {
+                callingMethod = new StackFrame(3 + options.SkipExtraFrames).GetMethod();
+            }
+            if (options.IncludeStackTrace)
+            {
+                environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
+            }
+#else
+            environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
+            environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
+#endif
+            if (callingMethod != null)
+            {
+                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()";
+                environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
+            }
+
+            return environment;
+        }
+
         /// <summary>
         /// Starts an audit scope
         /// </summary>
@@ -138,7 +219,7 @@ namespace Audit.Core
             }
             return this;
         }
-        #endregion
+#endregion
 
         #region Public Properties
         /// <summary>

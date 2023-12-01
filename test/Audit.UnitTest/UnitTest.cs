@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using Audit.EntityFramework.ConfigurationApi;
 using System.Reflection;
+using Configuration = Audit.Core.Configuration;
 #if NETCOREAPP3_0_OR_GREATER || NET20_OR_GREATER
 using System.Data.Entity.Infrastructure;
 #endif
@@ -29,8 +30,29 @@ namespace Audit.UnitTest
         [SetUp]
         public void Setup()
         {
-            Audit.Core.Configuration.AuditDisabled = false;
-            Audit.Core.Configuration.ResetCustomActions();
+            Audit.Core.Configuration.Reset();
+        }
+
+        [Test]
+        public void Test_Configuration_Reset()
+        {
+            Configuration.IncludeTypeNamespaces = true;
+            Configuration.IncludeStackTrace = true;
+            Configuration.IncludeActivityTrace = true;
+            Configuration.DataProvider = new InMemoryDataProvider();
+            Configuration.AuditDisabled = true;
+            Configuration.AddOnCreatedAction(s => { });
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            
+            Configuration.Reset();
+
+            Assert.AreEqual(false, Configuration.IncludeTypeNamespaces);
+            Assert.AreEqual(false, Configuration.IncludeStackTrace);
+            Assert.AreEqual(false, Configuration.IncludeActivityTrace);
+            Assert.IsInstanceOf<FileDataProvider>(Configuration.DataProvider);
+            Assert.AreEqual(false, Configuration.AuditDisabled);
+            Assert.AreEqual(0, Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count);
+            Assert.AreEqual(EventCreationPolicy.InsertOnEnd, Configuration.CreationPolicy);
         }
 
         [Test]

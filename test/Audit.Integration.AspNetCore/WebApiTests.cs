@@ -23,6 +23,12 @@ namespace Audit.Integration.AspNetCore
         private HttpClient _httpClient;
         private WebApplicationFactory<Program> _application;
 
+        [SetUp]
+        public void SetUp()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
@@ -56,6 +62,7 @@ namespace Audit.Integration.AspNetCore
             var insertEvs = new List<AuditEventWebApi>();
             var updatedEvs = new List<AuditEventWebApi>();
             Audit.Core.Configuration.Setup()
+                .IncludeActivityTrace()
                 .UseDynamicProvider(_ => _.OnInsert(ev =>
                 {
                     insertEvs.Add(AuditEvent.FromJson<AuditEventWebApi>(ev.ToJson()));
@@ -74,6 +81,11 @@ namespace Audit.Integration.AspNetCore
             Assert.IsNotNull(await res.Content.ReadAsStringAsync());
             Assert.IsNull(insertEvs[0].Action.ResponseStatus);
             Assert.AreEqual("OK", insertEvs[1].Action.ResponseStatus);
+            Assert.IsNotNull(insertEvs[0].Activity);
+            Assert.IsNotNull(insertEvs[1].Activity);
+            Assert.IsNotEmpty(insertEvs[0].Activity.TraceId);
+            Assert.IsNotEmpty(insertEvs[1].Activity.TraceId);
+            Assert.AreEqual(insertEvs[0].Activity.TraceId, insertEvs[1].Activity.TraceId);
         }
 
         [Test]

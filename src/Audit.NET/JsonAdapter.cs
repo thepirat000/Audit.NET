@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
 using System.Threading;
+
 #if IS_NK_JSON
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -79,7 +80,7 @@ namespace Audit.Core
         {
 			if (value == null)
 			{
-				return default(T);
+				return default;
 			}
 			if (value is T || typeof(T).GetTypeInfo().IsAssignableFrom(value.GetType().GetTypeInfo()))
 			{
@@ -90,19 +91,24 @@ namespace Audit.Core
 			{
 				return container.ToObject<T>(JsonSerializer.Create(Configuration.JsonSettings));
 			}
+#elif NET6_0_OR_GREATER
+            if (value is JsonElement element)
+            {
+                return element.Deserialize<T>(Configuration.JsonSettings);
+            }
 #else
-			// TODO: Workaround to convert from JsonElement to Object, until https://github.com/dotnet/runtime/issues/31274 fixed
-			if (value is JsonElement element)
-			{
-				var bufferWriter = new ArrayBufferWriter<byte>();
-				using (var writer = new Utf8JsonWriter(bufferWriter))
-				{
-					element.WriteTo(writer);
-				}
-				return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan, Configuration.JsonSettings);
-			}
+            // Workaround for to convert from JsonElement to Object (https://github.com/dotnet/runtime/issues/31274)
+            if (value is JsonElement element)
+            {
+			    var bufferWriter = new ArrayBufferWriter<byte>();
+			    using (var writer = new Utf8JsonWriter(bufferWriter))
+			    {
+    				element.WriteTo(writer);
+			    }
+			    return JsonSerializer.Deserialize<T>(bufferWriter.WrittenSpan, Configuration.JsonSettings);
+            }
 #endif
-			return default(T);
+            return default;
 		}
 
     }

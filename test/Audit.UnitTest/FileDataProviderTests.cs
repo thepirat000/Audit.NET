@@ -28,9 +28,7 @@ namespace Audit.UnitTest
         [SetUp]
         public void Setup()
         {
-            Audit.Core.Configuration.DataProvider = new FileDataProvider();
-            Audit.Core.Configuration.AuditDisabled = false;
-            Audit.Core.Configuration.ResetCustomActions();
+            Audit.Core.Configuration.Reset();
             _directory = Path.Combine(Path.GetTempPath(), "events");
         }
 

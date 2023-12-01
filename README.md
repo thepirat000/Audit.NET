@@ -240,8 +240,15 @@ An example of the output in JSON:
         "Exception": null,
         "Culture": "en-GB"
     },
-    "StartDate": "2016-08-23T11:33:14.653191-05:00",
-    "EndDate": "2016-08-23T11:33:23.1820786-05:00",
+    "Activity": {
+        "StartTimeUtc": "2023-12-01T17:36:52.2256288Z",
+		"SpanId": "23a93b9e8cbc457f",
+		"TraceId": "2d3e5e90f790c7d2274d9bb047531f66",
+		"ParentId": "0000000000000000",
+		"Operation": "Update"
+    },
+    "StartDate": "2016-08-23T11:33:14.653191Z",
+    "EndDate": "2016-08-23T11:33:23.1820786Z",
     "Duration": 8529,
     "Target": {
         "Type": "Order",
@@ -685,12 +692,37 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 - `OnEventSaved`: After an Audit Scope's Event is saved. 
 
-### IncludeStackTrace
+### Stack Trace
 
-Include the stack trace in the event. Default is `false`.
+To include the stack trace details into the event environment, ensure that the `IncludeStackTrace` configuration is set to `true`. Default is `false`.
 
 ```c#
 Audit.Core.Configuration.IncludeStackTrace = true;
+```
+
+or 
+
+```c#
+Audit.Core.Configuration.Setup()
+    .IncludeStackTrace();
+```
+
+### Activity Trace
+
+To include the activy trace details from [System.Diagnostics.Activity](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activity?view=net-8.0) 
+API into the event, ensure that the `IncludeActivityTrace` configuration is set to `true`. Default is `false`.
+
+It will include the current `Activity` operation name, ID, StartTime, along with associated Tags and Events.
+
+```c#
+Audit.Core.Configuration.IncludeActivityTrace = true;
+```
+
+or 
+
+```c#
+Audit.Core.Configuration.Setup()
+    .IncludeActivityTrace();
 ```
 
 ### Global switch off
@@ -817,7 +849,9 @@ Alternatively to the properties/methods mentioned before, you can configure the 
 
 For example, to set the FileLog Provider with its default settings using a Manual creation policy:
 ```c#
-Audit.Core.Configuration.Setup()
+Audit.Core.Configuration.Setup
+    .IncludeStackTrace()
+    .IncludeActivityTrace()
     .UseFileLogProvider()
     .WithCreationPolicy(EventCreationPolicy.Manual);
 ```

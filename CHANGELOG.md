@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [22.0.2] - 2023-12-01:
+- Audit.NET: Support to include the [Activity](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs) distributed trace information into the Audit Event.
+- Audit.NET: Adding `Configuration.Reset()` method to reset the global settings to the default. 
+
 ## [22.0.1] - 2023-11-15:
 - Audit.EntityFramework.Core: Adding support for [Complex Types](https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-8.0/whatsnew#value-objects-using-complex-types) in EF Core 8. 
 Complex types are now included in the `ColumnValues` and `Changes` collections of the EF audit entity.

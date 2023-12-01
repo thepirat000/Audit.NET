@@ -24,44 +24,51 @@ namespace Audit.Core
         /// Gets or Sets the System Clock implementation. By default DateTime.UtcNow is used to get the current date and time.
         /// </summary>
         public static ISystemClock SystemClock { get; set; }
+
         /// <summary>
         /// Gets or Sets the Default creation policy.
         /// </summary>
         public static EventCreationPolicy CreationPolicy { get; set; }
+
         /// <summary>
         /// Gets or Sets the Default data provider factory.
         /// </summary>
         public static Func<AuditDataProvider> DataProviderFactory { get; set; }
+
         /// <summary>
         /// Gets or Sets the Default data provider instance.
         /// </summary>
         public static AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
+
         /// <summary>
         /// Gets or Sets a value that indicates if the logged Type Names should include the namespace. Default is false.
         /// </summary>
         public static bool IncludeTypeNamespaces { get; set; }
+
         /// <summary>
         /// Gets or Sets the value used to indicate whether the audit event's environment should include the full stack trace
         /// </summary>
         public static bool IncludeStackTrace { get; set; }
+
+        /// <summary>
+        /// Gets or Sets the value used to indicate whether the audit event should include the activity trace
+        /// </summary>
+        public static bool IncludeActivityTrace { get; set; }
+
         /// <summary>
         /// Gets or Sets the Default audit scope factory.
         /// </summary>
         public static IAuditScopeFactory AuditScopeFactory
         {
-            get
-            {
-                return _auditScopeFactory;
-            }
-            set
-            {
-                _auditScopeFactory = value ?? new AuditScopeFactory();
-            }
+            get => _auditScopeFactory;
+            set => _auditScopeFactory = value ?? new AuditScopeFactory();
         }
+
         /// <summary>
         /// Global switch to disable audit logging. Default is false.
         /// </summary>
         public static bool AuditDisabled { get; set; }
+
         /// <summary>
         /// Global json serializer settings for serializing the audit event on the data providers or by calling the ToJson() method on the AuditEvent.
         /// </summary>
@@ -70,6 +77,7 @@ namespace Audit.Core
 #else
         public static JsonSerializerOptions JsonSettings { get; set; }
 #endif
+
         // Custom actions
         internal static Dictionary<ActionType, List<Func<AuditScope, CancellationToken, Task>>> AuditScopeActions { get; private set; }
 
@@ -83,6 +91,14 @@ namespace Audit.Core
         public static IJsonAdapter JsonAdapter { get; set; } = new JsonAdapter();
 
         static Configuration()
+        {
+            Reset();
+        }
+
+        /// <summary>
+        /// Resets all the global configurations to its default values. Will also remove all the custom actions. 
+        /// </summary>
+        public static void Reset()
         {
             AuditDisabled = false;
             DataProvider = new FileDataProvider();
@@ -104,8 +120,11 @@ namespace Audit.Core
             };
 #endif
             SystemClock = new DefaultSystemClock();
-            ResetCustomActions();
             _auditScopeFactory = new AuditScopeFactory();
+            IncludeTypeNamespaces = false;
+            IncludeStackTrace = false;
+            IncludeActivityTrace = false;
+            ResetCustomActions();
         }
 
         /// <summary>

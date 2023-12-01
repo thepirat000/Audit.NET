@@ -16,8 +16,7 @@ namespace Audit.UnitTest
         [SetUp]
         public void Setup()
         {
-            Audit.Core.Configuration.AuditDisabled = false;
-            Audit.Core.Configuration.ResetCustomActions();
+            Audit.Core.Configuration.Reset();
         }
 
         [TestCase(EventCreationPolicy.InsertOnEnd)]

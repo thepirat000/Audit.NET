@@ -12,46 +12,62 @@ namespace Audit.Core
         /// Gets or sets the string representing the type of the event.
         /// </summary>
         public string EventType { get; set; }
+
         /// <summary>
         /// Gets or sets the target object getter (a getter to the object to track)
         /// </summary>
         public Func<object> TargetGetter { get; set; }
+
         /// <summary>
         /// Gets or sets the anonymous object that contains additional fields to be merged into the audit event.
         /// </summary>
         public object ExtraFields { get; set; }
+
         /// <summary>
         /// Gets or Sets the data provider builder.
         /// </summary>
         public Func<AuditDataProvider> DataProviderFactory { get; set; }
+
         /// <summary>
         /// Gets or sets the data provider to use.
         /// </summary>
         public AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
+
         /// <summary>
         /// Gets or sets the event creation policy to use.
         /// </summary>
         public EventCreationPolicy? CreationPolicy { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this scope should be immediately saved after creation
         /// </summary>
         public bool IsCreateAndSave { get; set; }
+
         /// <summary>
         /// Gets or sets the initial audit event to use, or NULL to create a new instance of AuditEvent
         /// </summary>
         public AuditEvent AuditEvent { get; set; }
+
         /// <summary>
         /// Gets or sets the value used to indicate how many frames in the stack should be skipped to determine the calling method
         /// </summary>
         public int SkipExtraFrames { get; set; }
+
         /// <summary>
         /// Gets or sets a specific calling method to store on the event. NULL to use the calling stack to determine the calling method.
         /// </summary>
         public MethodBase CallingMethod { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether the audit event's environment should include the full stack trace.
         /// </summary>
         public bool IncludeStackTrace { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the audit event should include the Distributed Tracing Activity data (ID, .
+        /// </summary>
+        public bool IncludeActivityTrace { get; set; }
+
         /// <summary>
         /// Creates an instance of options for an audit scope creation.
         /// </summary>
@@ -64,6 +80,7 @@ namespace Audit.Core
         /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
         /// <param name="skipExtraFrames">Used to indicate how many frames in the stack should be skipped to determine the calling method.</param>
         /// <param name="includeStackTrace">Used to indicate whether the audit event's environment should include the full stack trace.</param>
+        /// <param name="includeActivityTrace">Used to indicate whether the audit event should include the activity trace.</param>
         public AuditScopeOptions(
             string eventType = null,
             Func<object> targetGetter = null,
@@ -73,7 +90,8 @@ namespace Audit.Core
             bool isCreateAndSave = false,
             AuditEvent auditEvent = null,
             int skipExtraFrames = 0,
-            bool? includeStackTrace = null)
+            bool? includeStackTrace = null,
+            bool? includeActivityTrace = null)
         {
             EventType = eventType;
             TargetGetter = targetGetter;
@@ -85,6 +103,7 @@ namespace Audit.Core
             SkipExtraFrames = skipExtraFrames;
             CallingMethod = null;
             IncludeStackTrace = includeStackTrace ?? Configuration.IncludeStackTrace;
+            IncludeActivityTrace = includeActivityTrace ?? Configuration.IncludeActivityTrace;
         }
 
         /// <summary>
@@ -113,6 +132,7 @@ namespace Audit.Core
                 SkipExtraFrames = scopeConfig._options.SkipExtraFrames;
                 CallingMethod = scopeConfig._options.CallingMethod;
                 IncludeStackTrace = scopeConfig._options.IncludeStackTrace;
+                IncludeActivityTrace = scopeConfig._options.IncludeActivityTrace;
             }
 
         }

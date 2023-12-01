@@ -34,6 +34,12 @@ namespace Audit.Core.ConfigurationApi
             return this;
         }
 
+        public IConfigurator IncludeActivityTrace(bool includeActivityTrace = true)
+        {
+            Configuration.IncludeActivityTrace = includeActivityTrace;
+            return this;
+        }
+
         public ICreationPolicyConfigurator UseNullProvider()
         {
             var dataProvider = new NullDataProvider();
