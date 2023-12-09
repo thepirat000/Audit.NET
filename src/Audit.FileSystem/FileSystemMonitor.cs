@@ -157,7 +157,7 @@ namespace Audit.FileSystem
                     {
                         fsEvent.Errors = null;
                     }
-                    (auditScope.Event as AuditEventFileSystem).FileSystemEvent = fsEvent;
+                    auditScope.EventAs<AuditEventFileSystem>().FileSystemEvent = fsEvent;
                 }
             }
         }

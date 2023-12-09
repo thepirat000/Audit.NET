@@ -143,7 +143,7 @@ namespace Audit.WebApi
                 }
 
                 // Replace the Action field and save
-                ((AuditEventWebApi)auditScope.Event).Action = auditAction;
+                auditScope.EventAs<AuditEventWebApi>().Action = auditAction;
                 await auditScope.DisposeAsync();
             }
         }

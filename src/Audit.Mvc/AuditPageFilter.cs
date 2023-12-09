@@ -161,11 +161,10 @@ namespace Audit.Mvc
                 }
             }
 
-            var auditScope = httpContext.Items[AuditScopeKey] as AuditScope;
-            if (auditScope != null)
+            if (httpContext.Items[AuditScopeKey] is AuditScope auditScope)
             {
                 // Replace the Action field
-                ((AuditEventMvcAction)auditScope.Event).Action = auditAction;
+                auditScope.EventAs<AuditEventMvcAction>().Action = auditAction;
                 // Save the event and dispose the scope
                 await auditScope.DisposeAsync();
             }

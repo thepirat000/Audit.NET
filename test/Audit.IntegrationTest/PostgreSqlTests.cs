@@ -139,7 +139,7 @@ namespace Audit.IntegrationTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                 .ResetActions();
             
-            var dp = (CustomPostgreSqlDataProvider)Configuration.DataProvider;
+            var dp = Configuration.DataProviderAs<CustomPostgreSqlDataProvider>();
             return dp;
         }
     }

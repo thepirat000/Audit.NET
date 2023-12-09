@@ -82,13 +82,13 @@ namespace Audit.WCF
                     AuditBehavior.CurrentAuditScope = null;
                     auditWcfEvent.Fault = GetWcfFaultData(ex);
                     auditWcfEvent.Success = false;
-                    (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                    auditScope.EventAs<AuditEventWcfAction>().WcfEvent = auditWcfEvent;
                     throw;
                 }
                 AuditBehavior.CurrentAuditScope = null;
                 auditWcfEvent.OutputParameters = GetEventElements(outputs);
                 auditWcfEvent.Result = new AuditWcfEventElement(result);
-                (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                auditScope.EventAs<AuditEventWcfAction>().WcfEvent = auditWcfEvent;
             }
             return result;
         }
@@ -134,7 +134,7 @@ namespace Audit.WCF
                 AuditBehavior.CurrentAuditScope = null;
                 auditWcfEvent.Fault = GetWcfFaultData(ex);
                 auditWcfEvent.Success = false;
-                (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                auditScope.EventAs<AuditEventWcfAction>().WcfEvent = auditWcfEvent;
                 auditScope.Dispose();
                 throw;
             }
@@ -151,7 +151,7 @@ namespace Audit.WCF
             var auditScopeState = auditAsyncResult.AuditScopeState;
             object callResult;
             var auditScope = auditScopeState.AuditScope;
-            var auditWcfEvent = (auditScope.Event as AuditEventWcfAction).WcfEvent;
+            var auditWcfEvent = auditScope.EventAs<AuditEventWcfAction>().WcfEvent;
             try
             {
                 callResult = _baseInvoker.InvokeEnd(instance, out outputs, auditAsyncResult.OriginalAsyncResult);
@@ -161,14 +161,14 @@ namespace Audit.WCF
                 AuditBehavior.CurrentAuditScope = null;
                 auditWcfEvent.Fault = GetWcfFaultData(ex);
                 auditWcfEvent.Success = false;
-                (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+                auditScope.EventAs<AuditEventWcfAction>().WcfEvent = auditWcfEvent;
                 auditScope.Dispose();
                 throw;
             }
             AuditBehavior.CurrentAuditScope = null;
             auditWcfEvent.OutputParameters = GetEventElements(outputs);
             auditWcfEvent.Result = new AuditWcfEventElement(callResult);
-            (auditScope.Event as AuditEventWcfAction).WcfEvent = auditWcfEvent;
+            auditScope.EventAs<AuditEventWcfAction>().WcfEvent = auditWcfEvent;
             auditScope.Dispose();
             return callResult;
         }

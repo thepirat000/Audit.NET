@@ -39,6 +39,7 @@ del "Audit.NET.AmazonQLDB\bin\release\*.symbols.nupkg"
 del "Audit.NET.Kafka\bin\release\*.symbols.nupkg"
 del "Audit.NET.AzureStorageTables\bin\release\*.symbols.nupkg"
 del "Audit.NET.Serilog\bin\release\*.symbols.nupkg"
+del "Audit.MongoClient\bin\release\*.symbols.nupkg"
 
 nuget push "audit.net\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.nupkg" -NoSymbols -source %1
@@ -78,3 +79,4 @@ nuget push "Audit.NET.AmazonQLDB\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Kafka\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureStorageTables\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Serilog\bin\release\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.MongoClient\bin\release\*.nupkg" -NoSymbols -source %1

@@ -25,5 +25,6 @@ namespace Audit.Core
         Task SaveAsync(CancellationToken cancellationToken = default);
         void SetCustomField<TC>(string fieldName, TC value, bool serialize = false);
         void SetTargetGetter(Func<object> targetGetter);
+        T EventAs<T>() where T : AuditEvent;
     }
 }

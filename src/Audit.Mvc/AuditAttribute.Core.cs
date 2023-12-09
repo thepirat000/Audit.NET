@@ -139,7 +139,7 @@ namespace Audit.Mvc
             if (auditScope != null)
             {
                 // Replace the Action field
-                ((AuditEventMvcAction)auditScope.Event).Action = auditAction;
+                auditScope.EventAs<AuditEventMvcAction>().Action = auditAction;
                 if (auditAction?.Exception != null)
                 {
                     // An exception was thrown, save the event since OnResultExecutionAsync will not be triggered.
@@ -175,7 +175,7 @@ namespace Audit.Mvc
             if (auditScope != null)
             {
                 // Replace the Action field
-                ((AuditEventMvcAction)auditScope.Event).Action = auditAction;
+                auditScope.EventAs<AuditEventMvcAction>().Action = auditAction;
                 if (auditScope.EventCreationPolicy == EventCreationPolicy.Manual)
                 {
                     await auditScope.SaveAsync();

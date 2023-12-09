@@ -57,7 +57,7 @@ namespace Audit.Wcf.Client
             }
 
             // Update the WCF audit event with results
-            var auditWcfEvent = (auditScope.Event as AuditEventWcfClient).WcfClientEvent;
+            var auditWcfEvent = auditScope.EventAs<AuditEventWcfClient>().WcfClientEvent;
             auditWcfEvent.IsFault = reply.IsFault;
             auditWcfEvent.ResponseAction = reply.Headers?.Action;
             auditWcfEvent.ResponseBody = reply.ToString();

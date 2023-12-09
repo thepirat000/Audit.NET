@@ -121,11 +121,11 @@ namespace Audit.Mvc
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
                 auditAction.ResponseBody = IncludeResponseBody ? GetResponseBody(filterContext.Result) : null;
             }
-            var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
-            if (auditScope != null)
+
+            if (filterContext.HttpContext.Items[AuditScopeKey] is AuditScope auditScope)
             {
                 // Replace the Action field
-                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
+                auditScope.EventAs<AuditEventMvcAction>().Action = auditAction;
                 if (auditAction?.Exception != null)
                 {
                     // An exception was thrown, save the event since OnResultExecuted will not be triggered.
@@ -155,11 +155,11 @@ namespace Audit.Mvc
                 auditAction.Exception = filterContext.Exception.GetExceptionInfo();
                 auditAction.ResponseBody = IncludeResponseBody ? GetResponseBody(filterContext.Result) : null;
             }
-            var auditScope = filterContext.HttpContext.Items[AuditScopeKey] as AuditScope;
-            if (auditScope != null)
+
+            if (filterContext.HttpContext.Items[AuditScopeKey] is AuditScope auditScope)
             {
                 // Replace the Action field 
-                (auditScope.Event as AuditEventMvcAction).Action = auditAction;
+                auditScope.EventAs<AuditEventMvcAction>().Action = auditAction;
                 if (auditScope.EventCreationPolicy == EventCreationPolicy.Manual)
                 {
                     auditScope.Save(); // for backwards compatibility

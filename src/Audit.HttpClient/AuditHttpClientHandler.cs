@@ -151,7 +151,7 @@ namespace Audit.Http
             {
                 // Update the response and save
                 action.Response = await GetResponseAudit(response, cancellationToken);
-                ((AuditEventHttpClient)scope.Event).Action = action;
+                scope.EventAs<AuditEventHttpClient>().Action = action;
                 await SaveDispose(scope, cancellationToken);
             }
             return response;

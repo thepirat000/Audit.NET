@@ -45,7 +45,7 @@ namespace Audit.SqlServer.UnitTest
             var guid = Guid.NewGuid();
             AuditScope.Log(nameof(Test_SqlServer_Provider), new { guid });
 
-            var sqlDp = (SqlDataProvider)Audit.Core.Configuration.DataProvider;
+            var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
 
             Assert.AreEqual(1, ids.Count);
 
@@ -82,7 +82,7 @@ namespace Audit.SqlServer.UnitTest
                 scope.SetCustomField("field", "final");
             }
 
-            var sqlDp = (SqlDataProvider)Audit.Core.Configuration.DataProvider;
+            var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
 
             Assert.AreEqual(2, ids.Count);
             Assert.AreEqual(ids[0], ids[1]);

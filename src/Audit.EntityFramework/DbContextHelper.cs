@@ -139,7 +139,7 @@ namespace Audit.EntityFramework
         public void SaveScope(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event)
         {
             UpdateAuditEvent(@event, context);
-            ((AuditEventEntityFramework)scope.Event).EntityFrameworkEvent = @event;
+            scope.EventAs<AuditEventEntityFramework>().EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             scope.Save();
             context.OnScopeSaved(scope);
@@ -151,7 +151,7 @@ namespace Audit.EntityFramework
         public async Task SaveScopeAsync(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event, CancellationToken cancellationToken = default)
         {
             UpdateAuditEvent(@event, context);
-            ((AuditEventEntityFramework)scope.Event).EntityFrameworkEvent = @event;
+            scope.EventAs<AuditEventEntityFramework>().EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             await scope.SaveAsync(cancellationToken);
             context.OnScopeSaved(scope);

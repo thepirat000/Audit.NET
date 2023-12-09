@@ -31,7 +31,8 @@ With Audit.NET you can generate tracking information about operations being exec
 [WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), 
 [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
 [File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
-[SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md) 
+[SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md),
+[MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md) 
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
 ## [NuGet](https://www.nuget.org/packages/Audit.NET/)
@@ -910,6 +911,7 @@ The following packages are extensions to log interactions with different systems
 <img src="https://i.imgur.com/p6knit4.png" alt="icon" width="90" /> | **[Audit.WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md)** | Generate detailed **server-side** audit logs for **Windows Communication Foundation (WCF)** service calls, by configuring a provided behavior.
 <img src="https://i.imgur.com/p6knit4.png" alt="icon" width="90" /> | **[Audit.WCF.Client](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF.Client/README.md)** | Generate detailed **client-side** audit logs for **Windows Communication Foundation (WCF)** service calls, by configuring a provided behavior.
 <img src="https://i.imgur.com/9go2b0f.png" alt="icon" width="90"/> | **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)** | Generate detailed audit logs by decorating **Web API** Methods and Controllers with an action filter attribute, or by using a middleware. Includes support for ASP.NET Core.
+<img src="https://i.imgur.com/1nMVLQo.png" alt="icon" width="90"/> | **[Audit.MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md)** | Generate detailed audit logs by adding a [Command Event Subscriber](https://mongodb.github.io/mongo-csharp-driver/2.8/reference/driver_core/events/) into the configuration of the MongoDB Driver.
 
 # Storage providers
 

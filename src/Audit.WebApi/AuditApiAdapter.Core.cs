@@ -169,7 +169,7 @@ namespace Audit.WebApi
                 }
 
                 // Replace the Action field
-                ((AuditEventWebApi)auditScope.Event).Action = auditAction;
+                auditScope.EventAs<AuditEventWebApi>().Action = auditAction;
                 // Save, if action was not created by middleware
                 if (!auditAction.IsMiddleware)
                 {

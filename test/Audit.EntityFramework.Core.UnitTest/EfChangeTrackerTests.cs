@@ -78,7 +78,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .UseInMemoryProvider()
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
-            var evs = ((InMemoryDataProvider)Audit.Core.Configuration.DataProvider).GetAllEvents();
+            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEvents();
 
             var car = new SimpleMemoryContext.Car()
             {

@@ -41,6 +41,12 @@ namespace Audit.Core
         public static AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
 
         /// <summary>
+        /// Gets the Default data provider instance as the specified type. Returns null if the data provider is not of the given type.
+        /// </summary>
+        /// <typeparam name="T">The AuditDataProvider type</typeparam>
+        public static T DataProviderAs<T>() where T : AuditDataProvider { return DataProviderFactory?.Invoke() as T; } 
+
+        /// <summary>
         /// Gets or Sets a value that indicates if the logged Type Names should include the namespace. Default is false.
         /// </summary>
         public static bool IncludeTypeNamespaces { get; set; }

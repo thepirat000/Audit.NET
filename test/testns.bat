@@ -156,6 +156,11 @@ dotnet test --logger:"console;verbosity=normal"
 
 cd ..
 
+echo ---------------------------------------------- RUNNING MONGO CLIENT INTEGRATION TEST (21) ----------------------------------------------
+TITLE RUNNING MONGO CLIENT INTEGRATION TEST (21)
+cd Audit.MongoClient.UnitTest
+dotnet test --logger:"console;verbosity=normal"
+
 title Audit.NET Unit Tests Runner
 
 ECHO.

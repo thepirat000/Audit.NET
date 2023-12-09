@@ -102,7 +102,7 @@ namespace Audit.SignalR
             object @return;
             using (var scope = context.Hub.Context.Request.Environment[AuditScopeIncomingEnvironmentKey] as AuditScope)
             {
-                ((scope.Event as AuditEventSignalr).Event as SignalrEventIncoming).Result = result;
+                (scope.EventAs<AuditEventSignalr>().Event as SignalrEventIncoming).Result = result;
                 @return = base.OnAfterIncoming(result, context);
             }
             context.Hub.Context.Request.Environment.Remove(AuditScopeIncomingEnvironmentKey);
@@ -173,7 +173,7 @@ namespace Audit.SignalR
             }
             using (var scope = hub.Context.Request.Environment[AuditScopeConnectEnvironmentKey] as AuditScope)
             {
-                ((scope.Event as AuditEventSignalr).Event as SignalrEventConnect).ConnectionId = hub.Context.ConnectionId;
+                (scope.EventAs<AuditEventSignalr>().Event as SignalrEventConnect).ConnectionId = hub.Context.ConnectionId;
                 base.OnAfterConnect(hub);
             }
             hub.Context.Request.Environment.Remove(AuditScopeConnectEnvironmentKey);
@@ -211,7 +211,7 @@ namespace Audit.SignalR
             }
             using (var scope = hub.Context.Request.Environment[AuditScopeDisconnectEnvironmentKey] as AuditScope)
             {
-                ((scope.Event as AuditEventSignalr).Event as SignalrEventDisconnect).ConnectionId = hub.Context.ConnectionId;
+                (scope.EventAs<AuditEventSignalr>().Event as SignalrEventDisconnect).ConnectionId = hub.Context.ConnectionId;
                 base.OnAfterDisconnect(hub, stopCalled);
             }
             hub.Context.Request.Environment.Remove(AuditScopeDisconnectEnvironmentKey);
@@ -248,7 +248,7 @@ namespace Audit.SignalR
             }
             using (var scope = hub.Context.Request.Environment[AuditScopeReconnectEnvironmentKey] as AuditScope)
             {
-                ((scope.Event as AuditEventSignalr).Event as SignalrEventReconnect).ConnectionId = hub.Context.ConnectionId;
+                (scope.EventAs<AuditEventSignalr>().Event as SignalrEventReconnect).ConnectionId = hub.Context.ConnectionId;
                 base.OnAfterReconnect(hub);
             }
             hub.Context.Request.Environment.Remove(AuditScopeReconnectEnvironmentKey);

@@ -168,7 +168,7 @@ namespace Audit.WebApi
                     auditAction.ResponseHeaders = AuditApiHelper.ToDictionary(context.Response.Headers);
                 }
                 // Replace the Action field and save
-                ((AuditEventWebApi)auditScope.Event).Action = auditAction;
+                auditScope.EventAs<AuditEventWebApi>().Action = auditAction;
                 await auditScope.DisposeAsync();
             }
         }

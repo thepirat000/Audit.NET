@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [22.1.0] - 2023-12-09:
+- Audit.MongoClient: New extension to audit `MongoClient` instances. 
+Generate Audit Logs by adding a Command Event Subscriber into the configuration of the MongoDB Driver (#640, #641)
+
 ## [22.0.2] - 2023-12-01:
 - Audit.NET: Support to include the [Activity](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs) distributed trace information into the Audit Event.
 - Audit.NET: Adding `Configuration.Reset()` method to reset the global settings to the default. 

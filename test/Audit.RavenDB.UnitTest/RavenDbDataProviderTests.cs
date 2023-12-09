@@ -169,7 +169,7 @@ namespace Audit.RavenDB.UnitTest
                         .DatabaseDefault(databaseName)))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
-            var rdb = (RavenDbDataProvider)Configuration.DataProvider;
+            var rdb = Configuration.DataProviderAs<RavenDbDataProvider>();
             TryCreateDatabase(rdb.DocumentStore, databaseName);
 
             var target = new DailyTemperature() { LowTemp = 20, HighTemp = 100 };

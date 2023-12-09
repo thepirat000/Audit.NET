@@ -27,6 +27,7 @@ namespace Audit.Core
             _targetGetter = options.TargetGetter;
 
             _event = options.AuditEvent ?? new AuditEvent();
+            _event.StartDate = Configuration.SystemClock.UtcNow;
 
             _event.Environment = GetEnvironmentInfo(options);
             
@@ -36,7 +37,6 @@ namespace Audit.Core
                 _event.Activity = GetActivityTrace();
             }
 #endif
-            _event.StartDate = Configuration.SystemClock.UtcNow;
             if (options.EventType != null)
             {
                 _event.EventType = options.EventType;
@@ -55,169 +55,6 @@ namespace Audit.Core
                 };
             }
             ProcessExtraFields(options.ExtraFields);
-        }
-
-#if NET5_0_OR_GREATER
-        private AuditActivityTrace GetActivityTrace()
-        {
-            var activity = Activity.Current;
-
-            if (activity == null)
-            {
-                return null;
-            }
-
-            var spanId = activity.IdFormat switch
-            {
-                ActivityIdFormat.Hierarchical => activity.Id,
-                ActivityIdFormat.W3C => activity.SpanId.ToHexString(),
-                _ => null
-            };
-
-            var traceId = activity.IdFormat switch
-            {
-                ActivityIdFormat.Hierarchical => activity.RootId,
-                ActivityIdFormat.W3C => activity.TraceId.ToHexString(),
-                _ => null
-            };
-
-            var parentId = activity.IdFormat switch
-            {
-                ActivityIdFormat.Hierarchical => activity.ParentId,
-                ActivityIdFormat.W3C => activity.ParentSpanId.ToHexString(),
-                _ => null
-            };
-
-            
-            var result = new AuditActivityTrace()
-            {
-                StartTimeUtc = activity.StartTimeUtc,
-                SpanId = spanId,
-                TraceId = traceId,
-                ParentId = parentId,
-                Operation = activity.OperationName
-            };
-
-            if (activity.Tags.Any())
-            {
-                result.Tags = new List<AuditActivityTag>();
-                foreach (var tag in activity.Tags)
-                {
-                    result.Tags.Add(new AuditActivityTag() { Key = tag.Key, Value = tag.Value });
-                }
-            }
-
-            if (activity.Events.Any())
-            {
-                result.Events = new List<AuditActivityEvent>();
-                foreach (var ev in activity.Events)
-                {
-                    result.Events.Add(new AuditActivityEvent() { Timestamp = ev.Timestamp, Name = ev.Name });
-                }
-            }
-
-            return result;
-        }
-#endif
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private AuditEventEnvironment GetEnvironmentInfo(AuditScopeOptions options)
-        {
-            var environment = new AuditEventEnvironment()
-            {
-                Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
-            };
-            MethodBase callingMethod = options.CallingMethod;
-#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0_OR_GREATER
-            environment.UserName = Environment.UserName;
-            environment.MachineName = Environment.MachineName;
-            environment.DomainName = Environment.UserDomainName;
-            if (callingMethod == null)
-            {
-                callingMethod = new StackFrame(3 + options.SkipExtraFrames).GetMethod();
-            }
-            if (options.IncludeStackTrace)
-            {
-                environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
-            }
-#else
-            environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
-            environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
-#endif
-            if (callingMethod != null)
-            {
-                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()";
-                environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
-            }
-
-            return environment;
-        }
-
-        /// <summary>
-        /// Starts an audit scope
-        /// </summary>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        internal AuditScope Start()
-        {
-            _saveMode = SaveMode.InsertOnStart;
-            // Execute custom on scope created actions
-            Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
-
-            // Process the event insertion (if applies)
-            if (_options.IsCreateAndSave)
-            {
-                EndEvent();
-                SaveEvent();
-                _ended = true;
-            }
-            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
-            {
-                SaveEvent();
-                _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
-            }
-            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
-            {
-                _saveMode = SaveMode.InsertOnEnd;
-            }
-            else if (_creationPolicy == EventCreationPolicy.Manual)
-            {
-                _saveMode = SaveMode.Manual;
-            }
-            return this;
-        }
-
-        /// <summary>
-        /// Starts an audit scope asynchronously
-        /// </summary>
-        /// <param name="cancellationToken">The Cancellation Token.</param>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        internal async Task<AuditScope> StartAsync(CancellationToken cancellationToken = default)
-        {
-            _saveMode = SaveMode.InsertOnStart;
-            // Execute custom on scope created actions
-            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeCreated, this, cancellationToken);
-
-            // Process the event insertion (if applies)
-            if (_options.IsCreateAndSave)
-            {
-                EndEvent();
-                await SaveEventAsync(false, cancellationToken);
-                _ended = true;
-            }
-            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
-            {
-                await SaveEventAsync(false, cancellationToken);
-                _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
-            }
-            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
-            {
-                _saveMode = SaveMode.InsertOnEnd;
-            }
-            else if (_creationPolicy == EventCreationPolicy.Manual)
-            {
-                _saveMode = SaveMode.Manual;
-            }
-            return this;
         }
 #endregion
 
@@ -452,10 +289,182 @@ namespace Audit.Core
             EndEvent();
             await SaveEventAsync(false, cancellationToken);
         }
+
+        /// <summary>
+        /// Gets the event related to this scope of a known AuditEvent derived type. Returns null if the event is not of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The AuditEvent derived type</typeparam>
+        public T EventAs<T>() where T : AuditEvent
+        {
+            return _event as T;
+        }
+        
         #endregion
 
         #region Private Methods
 
+#if NET5_0_OR_GREATER
+        private AuditActivityTrace GetActivityTrace()
+        {
+            var activity = Activity.Current;
+
+            if (activity == null)
+            {
+                return null;
+            }
+
+            var spanId = activity.IdFormat switch
+            {
+                ActivityIdFormat.Hierarchical => activity.Id,
+                ActivityIdFormat.W3C => activity.SpanId.ToHexString(),
+                _ => null
+            };
+
+            var traceId = activity.IdFormat switch
+            {
+                ActivityIdFormat.Hierarchical => activity.RootId,
+                ActivityIdFormat.W3C => activity.TraceId.ToHexString(),
+                _ => null
+            };
+
+            var parentId = activity.IdFormat switch
+            {
+                ActivityIdFormat.Hierarchical => activity.ParentId,
+                ActivityIdFormat.W3C => activity.ParentSpanId.ToHexString(),
+                _ => null
+            };
+
+            
+            var result = new AuditActivityTrace()
+            {
+                StartTimeUtc = activity.StartTimeUtc,
+                SpanId = spanId,
+                TraceId = traceId,
+                ParentId = parentId,
+                Operation = activity.OperationName
+            };
+
+            if (activity.Tags.Any())
+            {
+                result.Tags = new List<AuditActivityTag>();
+                foreach (var tag in activity.Tags)
+                {
+                    result.Tags.Add(new AuditActivityTag() { Key = tag.Key, Value = tag.Value });
+                }
+            }
+
+            if (activity.Events.Any())
+            {
+                result.Events = new List<AuditActivityEvent>();
+                foreach (var ev in activity.Events)
+                {
+                    result.Events.Add(new AuditActivityEvent() { Timestamp = ev.Timestamp, Name = ev.Name });
+                }
+            }
+
+            return result;
+        }
+#endif
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private AuditEventEnvironment GetEnvironmentInfo(AuditScopeOptions options)
+        {
+            var environment = new AuditEventEnvironment()
+            {
+                Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
+            };
+            MethodBase callingMethod = options.CallingMethod;
+#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0_OR_GREATER
+            environment.UserName = Environment.UserName;
+            environment.MachineName = Environment.MachineName;
+            environment.DomainName = Environment.UserDomainName;
+            if (callingMethod == null)
+            {
+                callingMethod = new StackFrame(3 + options.SkipExtraFrames).GetMethod();
+            }
+            if (options.IncludeStackTrace)
+            {
+                environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
+            }
+#else
+            environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
+            environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
+#endif
+            if (callingMethod != null)
+            {
+                environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()";
+                environment.AssemblyName = callingMethod.DeclaringType?.GetTypeInfo().Assembly.FullName;
+            }
+
+            return environment;
+        }
+
+        /// <summary>
+        /// Starts an audit scope
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal AuditScope Start()
+        {
+            _saveMode = SaveMode.InsertOnStart;
+            // Execute custom on scope created actions
+            Configuration.InvokeScopeCustomActions(ActionType.OnScopeCreated, this);
+
+            // Process the event insertion (if applies)
+            if (_options.IsCreateAndSave)
+            {
+                EndEvent();
+                SaveEvent();
+                _ended = true;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            {
+                SaveEvent();
+                _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            {
+                _saveMode = SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.Manual)
+            {
+                _saveMode = SaveMode.Manual;
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Starts an audit scope asynchronously
+        /// </summary>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal async Task<AuditScope> StartAsync(CancellationToken cancellationToken = default)
+        {
+            _saveMode = SaveMode.InsertOnStart;
+            // Execute custom on scope created actions
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeCreated, this, cancellationToken);
+
+            // Process the event insertion (if applies)
+            if (_options.IsCreateAndSave)
+            {
+                EndEvent();
+                await SaveEventAsync(false, cancellationToken);
+                _ended = true;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || _creationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd)
+            {
+                await SaveEventAsync(false, cancellationToken);
+                _saveMode = _creationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? SaveMode.ReplaceOnEnd : SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.InsertOnEnd)
+            {
+                _saveMode = SaveMode.InsertOnEnd;
+            }
+            else if (_creationPolicy == EventCreationPolicy.Manual)
+            {
+                _saveMode = SaveMode.Manual;
+            }
+            return this;
+        }
         private bool IsEndedOrDisabled()
         {
             if (!_ended && Configuration.AuditDisabled)

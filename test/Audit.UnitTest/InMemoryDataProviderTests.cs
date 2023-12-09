@@ -34,7 +34,7 @@ namespace Audit.UnitTest
                 target.Add("final");
             }
 
-            var dp = (InMemoryDataProvider)Configuration.DataProvider;
+            var dp = Configuration.DataProviderAs<InMemoryDataProvider>();
             var event0 = dp.GetEvent(0);
             var allEvents = dp.GetAllEvents();
             var allCustomEvents = dp.GetAllEventsOfType<CustomAuditEvent>();
@@ -81,7 +81,7 @@ namespace Audit.UnitTest
                 target.Add("final");
             }
 
-            var dp = (InMemoryDataProvider)Configuration.DataProvider;
+            var dp = Configuration.DataProviderAs<InMemoryDataProvider>();
             var event0 = await dp.GetEventAsync(0);
             var allEvents = dp.GetAllEvents();
             var allCustomEvents = dp.GetAllEventsOfType<CustomAuditEvent>();
