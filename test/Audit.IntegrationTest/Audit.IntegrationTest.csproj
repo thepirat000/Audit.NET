@@ -27,7 +27,6 @@
     <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureStorage\Audit.NET.AzureStorage.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.MySql\Audit.NET.MySql.csproj" />
-    <ProjectReference Include="..\..\src\Audit.DynamicProxy\Audit.DynamicProxy.csproj" />
     <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
     <ProjectReference Include="..\..\src\Audit.WebApi\Audit.WebApi.csproj" />
   </ItemGroup>

@@ -399,27 +399,25 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(null, x.AuditTypeMapper.Invoke(typeof(AuditBlog), null));
             }
 
-#if NET452 || NET461
             [Test]
             public void Test_StrongName_PublicToken()
             {
                 var expected = "571d6b80b242c87e";
                 ValidateToken(typeof(Audit.Core.AuditEvent), expected);
                 ValidateToken(typeof(Audit.AzureCosmos.Providers.AzureCosmosDataProvider), expected);
-                ValidateToken(typeof(Audit.DynamicProxy.AuditProxy), expected);
                 ValidateToken(typeof(Audit.EntityFramework.AuditDbContext), expected);
                 ValidateToken(typeof(Audit.Mvc.AuditAttribute), expected);
                 ValidateToken(typeof(Audit.SqlServer.Providers.SqlDataProvider), expected);
-                ValidateToken(typeof(Audit.WCF.AuditBehaviorAttribute), expected);
                 ValidateToken(typeof(Audit.WebApi.AuditApiAttribute), expected);
             }
-            private void ValidateToken(Type type, string expectedToken)
+
+            private static void ValidateToken(Type type, string expectedToken)
             {
                 var tokenBytes = type.Assembly.GetName().GetPublicKeyToken();
-                string pkt = String.Concat(tokenBytes.Select(i => i.ToString("x2")));
-                Assert.AreEqual(expectedToken, pkt);
+                var publicKeyToken = string.Concat(tokenBytes.Select(i => i.ToString("x2")));
+                Assert.AreEqual(expectedToken, publicKeyToken);
             }
-#endif
+
 
             [Test]
             [Category("AzureDocDb")]

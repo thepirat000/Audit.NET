@@ -21,7 +21,7 @@ namespace Audit.DynamicProxy
     /// No async support:
     /// https://github.com/castleproject/Core/issues/145
     /// </remarks>
-#if NET45
+#if NET462
     [Serializable]
 #endif
     public class AuditInterceptor : IInterceptor

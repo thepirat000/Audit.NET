@@ -12,6 +12,7 @@ using System.Linq;
 using Audit.EntityFramework.ConfigurationApi;
 using System.Reflection;
 using Configuration = Audit.Core.Configuration;
+using InMemoryDataProvider = Audit.Core.Providers.InMemoryDataProvider;
 #if NETCOREAPP3_0_OR_GREATER || NET20_OR_GREATER
 using System.Data.Entity.Infrastructure;
 #endif
@@ -922,16 +923,14 @@ namespace Audit.UnitTest
         [Test]
         public void Test_StartAndSave()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<InMemoryDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            new AuditScopeFactory().Log(eventType, new { ExtraField = "extra value" });
 
             new AuditScopeFactory().Create(new AuditScopeOptions(eventType, null, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object, null, true));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
-
         }
 
         [Test]

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using InMemoryDataProvider = Audit.Core.Providers.InMemoryDataProvider;
 
 namespace Audit.UnitTest
 {
@@ -563,17 +564,15 @@ namespace Audit.UnitTest
         [Test]
         public async Task Test_StartAndSave_Async()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<InMemoryDataProvider>();
             provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
 
             var eventType = "event type";
-            await new AuditScopeFactory().LogAsync(eventType, new { ExtraField = "extra value" });
 
             await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(eventType, extraFields: new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, dataProvider: provider.Object, isCreateAndSave: true));
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-
         }
 
         [Test]

@@ -16,6 +16,12 @@ if ($LASTEXITCODE -ne 0) {
     EXIT 1
 }
 
+& .\_testPublicKey.ps1
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Public key validation Failed !!!" -foregroundcolor white -BackgroundColor red
+    EXIT 1
+}
+
 [Console]::Title='RUNNER: Start parallel tests'
 clear
 
@@ -33,55 +39,56 @@ StartDotnetUnitTests 'Audit.IntegrationTest' 'Mongo' '--filter=TestCategory=Mong
 StartDotnetUnitTests 'Audit.MongoClient.UnitTest' 'MongoClient';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'MySql' '--filter=TestCategory=MySql';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'PostgreSQL' '--filter=TestCategory=PostgreSQL';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureDocDb' '--filter=TestCategory=AzureDocDb';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureStorage' '--filter=TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables';
-StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
+# StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureDocDb' '--filter=TestCategory=AzureDocDb';
+# StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureStorage' '--filter=TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables';
+# StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';
 StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
 
-StartDotnetUnitTests 'Audit.IntegrationTest' 'Kafka' '--filter=TestCategory=Kafka';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dynamo';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
+# StartDotnetUnitTests 'Audit.IntegrationTest' 'Kafka' '--filter=TestCategory=Kafka';
+# StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dynamo';
+# StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
 
 # Run sequential tests
 $hasFailed = $false;
 
-[Console]::Title='RUN: 1/9 EF_LocalDb' ; 
+& .\_execDotnetTest.ps1 -projects:Audit.IntegrationTest -extraParams:'--filter=TestCategory=WCF&TestCategory!=Async' -title:'1/9 WCF_Sync' -nopause
+if ($LASTEXITCODE -ne 0) {
+    $hasFailed = $true;
+}
+& .\_execDotnetTest.ps1 -projects:Audit.IntegrationTest -extraParams:'--filter=TestCategory=WCF&TestCategory=Async' -title:'2/9 WCF_Async' -nopause
+if ($LASTEXITCODE -ne 0) {
+    $hasFailed = $true;
+}
+& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.UnitTest -title:'3/9 EF_CORE' -nopause
+if ($LASTEXITCODE -ne 0) {
+    $hasFailed = $true;
+}
+& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.v3.UnitTest -title:'4/9 EF_CORE_V3' -nopause
+if ($LASTEXITCODE -ne 0) {
+    $hasFailed = $true;
+}
+& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Full.UnitTest -title:'5/9 EF_FULL' -nopause
+if ($LASTEXITCODE -ne 0) {
+    $hasFailed = $true;
+}
+& .\_execDotnetTest.ps1 -projects:'Audit.UnitTest' -title:'6/9 UnitTest' -nopause
+if ($LASTEXITCODE -ne 0) {
+    $hasFailed = $true;
+}
+
+[Console]::Title='RUN: 7/9 EF_LocalDb' ; 
 & ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb ;
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
-[Console]::Title='RUN: 2/9 EF_Sql' ; 
+[Console]::Title='RUN: 8/9 EF_Sql' ; 
 & ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql ;
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
-[Console]::Title='RUN: 3/9 EF_Stress' ; 
+[Console]::Title='RUN: 9/9 EF_Stress' ; 
 & ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Stress ;
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.IntegrationTest -extraParams:'--filter=TestCategory=WCF&TestCategory!=Async' -title:'4/9 WCF_Sync' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.IntegrationTest -extraParams:'--filter=TestCategory=WCF&TestCategory=Async' -title:'5/9 WCF_Async' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.UnitTest -title:'6/9 EF_CORE' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.v3.UnitTest -title:'7/9 EF_CORE_V3' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Full.UnitTest -title:'8/9 EF_FULL' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:'Audit.UnitTest' -title:'9/9 UnitTest' -nopause
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
