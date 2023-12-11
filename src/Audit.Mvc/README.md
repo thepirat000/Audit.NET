@@ -29,9 +29,6 @@ To install the Asp Net Core package:
 PM> Install-Package Audit.Mvc.Core
 ```
 
-
-
-
 # IMPORTANT NOTE
 
 Previously, it was possible to employ the `Audit.Mvc` package for ASP.NET Core MVC or vice versa.

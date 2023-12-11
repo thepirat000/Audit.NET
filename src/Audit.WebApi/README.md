@@ -8,27 +8,34 @@ Generate Audit Trails for ASP.NET MVC Web API calls. This library provides a con
 
 **NuGet Package** 
 
-To install the package run the following command on the Package Manager Console:
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.WebApi.svg?style=flat&label=Audit.WebApi)](https://www.nuget.org/packages/Audit.WebApi/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.WebApi.svg)](https://www.nuget.org/packages/Audit.WebApi/)
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.WebApi.Core.svg?style=flat&label=Audit.WebApi.Core)](https://www.nuget.org/packages/Audit.WebApi.Core/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.WebApi.Core.svg)](https://www.nuget.org/packages/Audit.WebApi.Core/)
+
+To install the ASP.NET package run the following command on the Package Manager Console:
 
 ```
 PM> Install-Package Audit.WebApi
 ```
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.WebApi.svg?style=flat)](https://www.nuget.org/packages/Audit.WebApi/)
-[![NuGet Count](https://img.shields.io/nuget/dt/Audit.WebApi.svg)](https://www.nuget.org/packages/Audit.WebApi/)
-
-# IMPORTANT NOTE
-
-If your project targets the full .NET framework, but you are using AspNet Core (`Microsoft.AspNetCore.Mvc.*`) 
-you should install and reference the `Audit.WebApi.Core` package instead, otherwise it will assume you are targeting
-the old generation of ASP.NET:
+To install the Asp Net Core package:
 
 ```
 PM> Install-Package Audit.WebApi.Core
 ```
 
-If your project targets the NET Core framework (NetStandard >= 1.6), there is no difference between using `Audit.WebApi` or `Audit.WebApi.Core` 
-since both assumes AspNet Core.
+
+# IMPORTANT NOTE
+
+Previously, it was possible to reference the `Audit.WebApi` package for ASP.NET Core MVC.
+
+However, starting from version 23, the `Audit.WebApi` package is now exclusively designed for ASP.NET Framework MVC, 
+whereas the `Audit.WebApi.Core` package is exclusively tailored for ASP.NET Core MVC.
+
+Please upgrade your references accordingly.
+
 
 ## How it works
 

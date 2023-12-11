@@ -5,11 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 #else
 using System.Web.Http.Controllers;
 #endif
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.WebApi
 {

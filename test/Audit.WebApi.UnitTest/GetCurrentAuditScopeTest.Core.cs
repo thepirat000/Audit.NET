@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_1 || NETCOREAPP1_0 || NETCOREAPP2_0 || NET451 || NET5_0
+﻿#if ASP_CORE
 using Audit.Core;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
@@ -29,7 +29,7 @@ namespace Audit.WebApi.UnitTest
             Action act = () => sut.TestAction();
 
             Assert.DoesNotThrow(new TestDelegate(act));
-            Assert.AreEqual(0, evs.Count);
+            Assert.That(evs.Count, Is.Zero);
         }
     }
 }

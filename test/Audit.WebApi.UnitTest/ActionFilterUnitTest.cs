@@ -1,4 +1,4 @@
-﻿#if NET45 || NET461
+﻿#if ASP_NET
 using Moq;
 using System.Collections.Generic;
 using System.Web;
@@ -14,8 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Specialized;
-using System.Web.Http;
-using System.Web.Http.Dependencies;
 
 namespace Audit.WebApi.UnitTest
 {

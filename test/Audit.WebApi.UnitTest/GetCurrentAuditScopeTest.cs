@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if ASP_NET
 using Audit.Core;
 using NUnit.Framework;
 using System;
