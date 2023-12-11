@@ -231,7 +231,7 @@ namespace Audit.Http
             {
                 return null;
             }
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
             return await content.ReadAsStringAsync(cancellationToken);
 #else
             return await content.ReadAsStringAsync();

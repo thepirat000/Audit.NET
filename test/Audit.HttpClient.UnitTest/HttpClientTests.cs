@@ -13,7 +13,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Audit.UnitTest
+// ReSharper disable once CheckNamespace
+namespace Audit.HttpClientUnitTest
 {
     public class HttpClientTests
     {
@@ -432,7 +433,8 @@ namespace Audit.UnitTest
 
             var factory = new Mock<IAuditScopeFactory>();
             factory.Setup(_ => _.CreateAsync(It.IsAny<AuditScopeOptions>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new AuditScope(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventHttpClient() }));
+                .Returns(async () => await AuditScope.CreateAsync(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventHttpClient() }));
+
             var url = "http://google.com/?q=test";
             using (var cli = new HttpClient(new AuditHttpClientHandler() { RequestFilter = _ => true, AuditScopeFactory = factory.Object }))
             {

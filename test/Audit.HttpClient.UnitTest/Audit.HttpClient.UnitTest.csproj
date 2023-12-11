@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net462;netcoreapp3.1;net6.0</TargetFrameworks>
@@ -18,12 +18,18 @@
 		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+	</ItemGroup>
+
+
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\Audit.FileSystem\Audit.FileSystem.csproj" />
+	  <ProjectReference Include="..\..\src\Audit.HttpClient\Audit.HttpClient.csproj" />
 	</ItemGroup>
 
 </Project>

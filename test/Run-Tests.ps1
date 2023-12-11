@@ -27,6 +27,7 @@ clear
 
 # Run parallel tests
 StartDotnetUnitTests 'Audit.FileSystem.UnitTest' 'FileSystem';
+StartDotnetUnitTests 'Audit.HttpClient.UnitTest' 'HttpClient';
 StartDotnetUnitTests 'Audit.Mvc.UnitTest' 'MVC';
 StartDotnetUnitTests 'Audit.JsonAdapter.UnitTest' 'JsonAdapter';
 StartDotnetUnitTests 'Audit.WebApi.UnitTest' 'WebApi';
