@@ -2,35 +2,44 @@
 
 **MVC Actions Audit Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** (An extensible framework to audit executing operations in .NET).
 
-Generate Audit Trails for MVC actions. Supporting AspNetCore Mvc.
+Generate Audit Trails for MVC actions. Supporting Asp NET Core Mvc.
 
-Audit.Mvc provides the infrastructure to log interactions with MVC applications. 
+Audit.Mvc / Audit.Mvc.Core provides the infrastructure to log interactions with MVC applications. 
 It can record action methods calls to controllers and razor pages.
 
 ## Install
 
-**NuGet Package** 
-To install the package run the following command on the Package Manager Console:
+**NuGet Packages** 
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.Mvc.svg?style=flat&label=Audit.Mvc)](https://www.nuget.org/packages/Audit.Mvc/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.Mvc.svg)](https://www.nuget.org/packages/Audit.Mvc/)
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.Mvc.Core.svg?style=flat&label=Audit.Mvc.Core)](https://www.nuget.org/packages/Audit.Mvc.Core/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.Mvc.Core.svg)](https://www.nuget.org/packages/Audit.Mvc.Core/)
+
+To install the ASP.NET package run the following command on the Package Manager Console:
 
 ```
 PM> Install-Package Audit.Mvc
 ```
 
-[![NuGet Status](https://img.shields.io/nuget/v/Audit.Mvc.svg?style=flat)](https://www.nuget.org/packages/Audit.Mvc/)
-[![NuGet Count](https://img.shields.io/nuget/dt/Audit.Mvc.svg)](https://www.nuget.org/packages/Audit.Mvc/)
-
-# IMPORTANT NOTE
-
-If your project targets the full .NET framework, but you are using AspNet Core (`Microsoft.AspNetCore.Mvc.*`) 
-you should install and reference the `Audit.Mvc.Core` package instead, otherwise it will assume you are targeting
-the old generation of ASP.NET:
+To install the Asp Net Core package:
 
 ```
 PM> Install-Package Audit.Mvc.Core
 ```
 
-If your project targets the NET Core framework (NetStandard >= 1.6), there is no difference between using `Audit.Mvc` or `Audit.Mvc.Core` 
-since both assumes AspNet Core.
+
+
+
+# IMPORTANT NOTE
+
+Previously, it was possible to employ the `Audit.Mvc` package for ASP.NET Core MVC or vice versa.
+
+However, starting from version 23, the `Audit.Mvc` package is now exclusively designed for ASP.NET Framework MVC, 
+whereas the `Audit.Mvc.Core` package is exclusively tailored for ASP.NET Core MVC.
+
+Please upgrade your references accordingly.
 
 ## Usage
 
