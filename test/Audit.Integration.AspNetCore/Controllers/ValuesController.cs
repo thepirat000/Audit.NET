@@ -29,6 +29,7 @@ namespace Audit.Integration.AspNetCore.Controllers
         [AuditApi(IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
         public async Task<IActionResult> TestFromServiceIgnore([FromServices] IServiceProvider provider, string t, CancellationToken cancellationToken)
         {
+            await Task.Delay(0);
             return Ok(t);
         }
 

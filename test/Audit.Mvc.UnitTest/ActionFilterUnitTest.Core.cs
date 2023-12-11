@@ -1,17 +1,15 @@
-﻿#if NETCOREAPP3_1 || NETCOREAPP1_0 || NETCOREAPP2_0 || NET451 || NET5_0
+﻿#if ASP_CORE
 using Audit.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -90,12 +88,12 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.AreEqual("home", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(action, Is.EqualTo(actionFromController));
+            Assert.That(scope, Is.EqualTo(scopeFromController));
+            Assert.That("http://200.10.10.20:1010/home/index", Is.EqualTo(action.RequestUrl));
+            Assert.That("home", Is.EqualTo(action.ControllerName));
+            Assert.That("value1", Is.EqualTo(action.ActionParameters["test1"]));
+            Assert.That(200, Is.EqualTo(action.ResponseStatusCode));
         }
 
         [Test]
@@ -160,19 +158,19 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
+            Assert.That("TEST_REFERENCE_TYPE", Is.EqualTo((action.ActionParameters["x"] as AuditTarget).Type));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
+            Assert.That(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus, Is.Not.Null);
 
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.AreEqual("home", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(action, Is.EqualTo(actionFromController));
+            Assert.That(scope, Is.EqualTo(scopeFromController));
+            Assert.That("http://200.10.10.20:1010/home/index", Is.EqualTo(action.RequestUrl));
+            Assert.That("home", Is.EqualTo(action.ControllerName));
+            Assert.That("value1", Is.EqualTo(action.ActionParameters["test1"]));
+            Assert.That(200, Is.EqualTo(action.ResponseStatusCode));
         }
 
         [Test]
@@ -231,8 +229,8 @@ namespace Audit.Mvc.UnitTest
             await filter.OnActionExecutionAsync(actionExecutingContext, async () => await Task.FromResult(actionExecutedContext));
             await filter.OnResultExecutionAsync(resultExecuting, () => Task.FromResult<ResultExecutedContext>(resultExecute));
 
-            Assert.IsFalse(itemsDict.ContainsKey("__private_AuditAction__"));
-            Assert.IsFalse(itemsDict.ContainsKey("__private_AuditScope__"));
+            Assert.That(itemsDict.ContainsKey("__private_AuditAction__"), Is.False);
+            Assert.That(itemsDict.ContainsKey("__private_AuditScope__"), Is.False);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
@@ -305,10 +303,9 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.AreEqual(1, action.ActionParameters.Count);
-            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
-            Assert.AreEqual(200, action.ResponseStatusCode);
-
+            Assert.That(action.ActionParameters.Count, Is.EqualTo(1));
+            Assert.That((action.ActionParameters["x"] as AuditTarget).Type, Is.EqualTo("TEST_REFERENCE_TYPE"));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
         }
 
 
@@ -377,14 +374,14 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
+            Assert.That(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus, Is.Not.Null);
 
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.AreEqual("home", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
+            Assert.That(action.RequestUrl, Is.EqualTo("http://200.10.10.20:1010/home/index"));
+            Assert.That(action.ControllerName, Is.EqualTo("home"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
         }
 
         [Test]
@@ -459,19 +456,19 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.NotNull(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus);
+            Assert.That(((AuditAction)scopeFromController.Event.GetMvcAuditAction()).ResponseStatus, Is.Not.Null);
 
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("http://200.10.10.20:1010/home/index", action.RequestUrl);
-            Assert.AreEqual("home", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual(200, action.ResponseStatusCode);
-            Assert.AreEqual(@"json object", action.RequestBody.Type);
-            Assert.AreEqual(@"{ ""test"": 123 }", action.RequestBody.Value);
-            Assert.AreEqual(@"{ ""test"": 123 }".Length, action.RequestBody.Length);
-            Assert.AreEqual("RedirectResult", action.ResponseBody.Type);
-            Assert.AreEqual("url", action.ResponseBody.Value);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
+            Assert.That(action.RequestUrl, Is.EqualTo("http://200.10.10.20:1010/home/index"));
+            Assert.That(action.ControllerName, Is.EqualTo("home"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
+            Assert.That(action.RequestBody.Type, Is.EqualTo(@"json object"));
+            Assert.That(action.RequestBody.Value, Is.EqualTo(@"{ ""test"": 123 }"));
+            Assert.That(action.RequestBody.Length, Is.EqualTo(@"{ ""test"": 123 }".Length));
+            Assert.That(action.ResponseBody.Type, Is.EqualTo("RedirectResult"));
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("url"));
         }
     }
 }

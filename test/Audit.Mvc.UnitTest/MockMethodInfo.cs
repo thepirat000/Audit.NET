@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_1 || NETCOREAPP1_0 || NETCOREAPP2_0 || NET451 || NET5_0
+﻿#if ASP_CORE
 
 namespace Audit.Mvc.UnitTest
 {

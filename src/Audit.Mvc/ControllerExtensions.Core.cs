@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451 || NET5_0
+﻿#if ASP_CORE
 using Audit.Core;
 using Microsoft.AspNetCore.Http;
 
@@ -25,9 +25,7 @@ namespace Audit.Mvc
         {
             return AuditAttribute.GetCurrentScope(httpContext);
         }
-
-
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NET5_0
+        
         /// <summary>
         /// Gets the current Audit Scope.
         /// </summary>
@@ -37,7 +35,6 @@ namespace Audit.Mvc
         {
             return AuditAttribute.GetCurrentScope(page.HttpContext);
         }
-#endif
     }
 }
 #endif

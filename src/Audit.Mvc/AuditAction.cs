@@ -1,13 +1,9 @@
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NET5_0
+#if ASP_CORE
 using Microsoft.AspNetCore.Mvc.Filters;
 #endif
 using System.Collections.Generic;
 using Audit.Core;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
 using System.Text.Json.Serialization;
-#endif
 
 
 namespace Audit.Mvc
@@ -38,7 +34,7 @@ namespace Audit.Mvc
         [JsonExtensionData]
         public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
 
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NET5_0
+#if ASP_CORE
         [JsonIgnore]
         internal PageHandlerExecutingContext PageHandlerExecutingContext { get; set; }
         /// <summary>
