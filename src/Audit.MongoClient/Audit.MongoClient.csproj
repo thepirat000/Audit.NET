@@ -4,7 +4,7 @@
 		<Copyright>Copyright 2023</Copyright>
 		<AssemblyTitle>Audit.MongoClient</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
-		<TargetFrameworks>net472;netstandard2.0;net5.0</TargetFrameworks>
+		<TargetFrameworks>net472;netstandard2.0;net6.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -22,6 +22,10 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
 		<None Include="README.md" Pack="true" PackagePath="\" />
@@ -31,13 +35,9 @@
 		<PackageReference Include="MongoDB.Driver" Version="2.22.0" />
 	</ItemGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
-		<DefineConstants>$(DefineConstants);IS_NK_JSON</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
-	</PropertyGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' ">
+		<PackageReference Include="System.Text.Json" Version="6.0.9" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
