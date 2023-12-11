@@ -1,55 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Description>Generate Audit Logs for ASP.NET SignalR and ASP.NET SignalR Core invokations</Description>
-    <Copyright>Copyright 2016</Copyright>
-    <AssemblyTitle>Audit.SignalR</AssemblyTitle>
-    <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>net45;net7.0</TargetFrameworks>
-    <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
-    <NoWarn>$(NoWarn);1591</NoWarn>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Audit.SignalR</AssemblyName>
-    <AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Audit.SignalR</PackageId>
-    <PackageTags>Audit;SignalR;Trail;Log</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Description>Generate Audit Logs for ASP.NET SignalR and ASP.NET SignalR Core invokations</Description>
+		<Copyright>Copyright 2016</Copyright>
+		<AssemblyTitle>Audit.SignalR</AssemblyTitle>
+		<Authors>Federico Colombo</Authors>
+		<TargetFrameworks>net462;net7.0</TargetFrameworks>
+		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyName>Audit.SignalR</AssemblyName>
+		<AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+		<PackageId>Audit.SignalR</PackageId>
+		<PackageTags>Audit;SignalR;Trail;Log</PackageTags>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
-    <None Include="README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <DefineConstants>$(DefineConstants);ASP_NET_CORE</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
+		<DefineConstants>$(DefineConstants);ASP_NET</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
-    <DefineConstants>$(DefineConstants);ASP_NET</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<DefineConstants>$(DefineConstants);ASP_NET_CORE</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+		<PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.3" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="images\icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="images\icon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
 </Project>
