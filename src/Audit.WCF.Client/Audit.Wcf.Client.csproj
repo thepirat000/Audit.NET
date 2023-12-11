@@ -4,7 +4,7 @@
 		<Copyright>Copyright 2021</Copyright>
 		<AssemblyTitle>Audit.Wcf.Client</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
-		<TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -16,6 +16,7 @@
 		<PackageTags>Audit;Trail;Log;WCF</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
+		<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -34,24 +35,18 @@
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
 		<Reference Include="System.Configuration" />
 		<Reference Include="System.ServiceModel" />
 		<Reference Include="System" />
 		<Reference Include="Microsoft.CSharp" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<Reference Include="System.ServiceModel" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
 		<PackageReference Include="System.Runtime" Version="4.3.1" />
 		<PackageReference Include="System.ServiceModel.Http" Version="4.9.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
 	</ItemGroup>
-	
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<Reference Include="System.ServiceModel" />
 		<PackageReference Include="System.ServiceModel.Federation" Version="4.9.0" />
 	</ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿#if NET6_0_OR_GREATER
+﻿#if NETCOREAPP3_1
 using System;
 using CoreWCF.Configuration;
 using CoreWCF.Description;

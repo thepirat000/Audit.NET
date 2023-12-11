@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading;
-#if NET6_0_OR_GREATER
+#if NETCOREAPP3_1
 using Microsoft.AspNetCore.Hosting;
 using CoreWCF.Configuration;
 #endif
@@ -20,10 +20,10 @@ namespace Audit.Wcf.UnitTest
         [OneTimeSetUp]
         public void Setup()
         {
-#if NET45_OR_GREATER
+#if NET462_OR_GREATER
             ServiceHost host = new ServiceHost(typeof(CatalogService));
             host.Open();
-#else
+#elif NETCOREAPP3_1
             IWebHost host = CreateWebHostBuilder().Build();
             host.RunAsync(_cancellationToken.Token);
 #endif
@@ -35,7 +35,7 @@ namespace Audit.Wcf.UnitTest
             _cancellationToken.Cancel();
         }
 
-#if NET6_0_OR_GREATER
+#if NETCOREAPP3_1
         public static IWebHostBuilder CreateWebHostBuilder() =>
             Microsoft.AspNetCore.WebHost.CreateDefaultBuilder()
                 .UseKestrel(options => {
@@ -195,7 +195,7 @@ namespace Audit.Wcf.UnitTest
 
         public static IContextChannel GetServiceProxy(out ICatalogService svc)
         {
-#if NET45_OR_GREATER
+#if NET462_OR_GREATER
             var channelFactory = new ChannelFactory<ICatalogService>(new BasicHttpBinding(), new EndpointAddress("http://localhost:8733/Design_Time_Addresses/Audit.Wcf.UnitTest/CatalogService/"));
 #else
             var channelFactory = new ChannelFactory<ICatalogService>(new BasicHttpBinding(), new EndpointAddress("http://localhost:8733/CatalogService/basicHttp"));
