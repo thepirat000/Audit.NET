@@ -1,10 +1,5 @@
-﻿#if IS_NK_JSON
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-#else
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using StringEnumConverter = System.Text.Json.Serialization.JsonStringEnumConverter;
-#endif
 
 namespace Audit.FileSystem
 {

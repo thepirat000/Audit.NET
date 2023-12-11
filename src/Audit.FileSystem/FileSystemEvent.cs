@@ -1,10 +1,4 @@
-﻿#if IS_NK_JSON
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-#else
-using System.Text.Json.Serialization;
-using StringEnumConverter = System.Text.Json.Serialization.JsonStringEnumConverter;
-#endif
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 
@@ -12,9 +6,9 @@ namespace Audit.FileSystem
 {
     public class FileSystemEvent
     {
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FileSystemObjectType Object { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FileSystemEventType Event { get; set; }
         public List<string> Errors { get; set; }
         public string Attributes { get; set; }

@@ -1,12 +1,11 @@
-﻿using Audit.FileSystem;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace Audit.UnitTest
+namespace Audit.FileSystem.UnitTest
 {
     public class FileSystemTests
     {
