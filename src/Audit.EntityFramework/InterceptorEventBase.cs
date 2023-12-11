@@ -1,4 +1,4 @@
-﻿#if EF_CORE_3_OR_GREATER
+﻿#if EF_CORE_5_OR_GREATER
 namespace Audit.EntityFramework
 {
     /// <summary>

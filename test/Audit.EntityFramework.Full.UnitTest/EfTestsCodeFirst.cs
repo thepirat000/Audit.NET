@@ -167,9 +167,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 {
                     var validations = ex.EntityValidationErrors.ToList();
                     Assert.AreEqual(1, validations.Count);
-#if !NETCOREAPP3_0
                     Assert.AreEqual(longString, ((dynamic)validations[0].Entry.Entity).Title);
-#endif
                 }
             }
 

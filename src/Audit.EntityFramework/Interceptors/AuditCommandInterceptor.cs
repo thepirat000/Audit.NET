@@ -1,4 +1,4 @@
-﻿#if EF_CORE_3_OR_GREATER
+﻿#if EF_CORE_5_OR_GREATER
 using Audit.Core;
 using Audit.Core.Extensions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -89,11 +89,7 @@ namespace Audit.EntityFramework.Interceptors
             return result;
         }
 
-#if EF_CORE_3
-        public override async Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
-#else
         public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
-#endif
         {
             if (Core.Configuration.AuditDisabled || ExcludeReaderEvents)
             {
@@ -107,11 +103,7 @@ namespace Audit.EntityFramework.Interceptors
             return await base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
         }
 
-#if EF_CORE_3
-        public override async Task<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
-#else
         public override async ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
-#endif
         {
             if (ExcludeReaderEvents)
             {
@@ -153,11 +145,7 @@ namespace Audit.EntityFramework.Interceptors
             EndScope();
             return result;
         }
-#if EF_CORE_3
-        public override async Task<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
-#else
         public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
-#endif
         {
             if (Core.Configuration.AuditDisabled || ExcludeNonQueryEvents)
             {
@@ -170,11 +158,7 @@ namespace Audit.EntityFramework.Interceptors
             _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
             return await base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
         }
-#if EF_CORE_3
-        public override async Task<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
-#else
         public override async ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
-#endif
         {
             if (ExcludeNonQueryEvents)
             {
@@ -212,11 +196,7 @@ namespace Audit.EntityFramework.Interceptors
             EndScope();
             return result;
         }
-#if EF_CORE_3
-        public override async Task<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
-#else
         public override async ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
-#endif
         {
             if (Core.Configuration.AuditDisabled || ExcludeScalarEvents)
             {
@@ -229,11 +209,7 @@ namespace Audit.EntityFramework.Interceptors
             _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
             return await base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
         }
-#if EF_CORE_3
-        public override async Task<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
-#else
         public override async ValueTask<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
-#endif
         {
             if (ExcludeScalarEvents)
             {

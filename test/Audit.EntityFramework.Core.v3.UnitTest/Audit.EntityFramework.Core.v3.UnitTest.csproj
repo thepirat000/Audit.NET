@@ -38,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Audit.EntityFramework.Core.v3\Audit.EntityFramework.Core.v3.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 

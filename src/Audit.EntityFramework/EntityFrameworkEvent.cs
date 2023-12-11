@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore;
 #else
 using System.Data.Entity;
 #endif
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.EntityFramework
 {
@@ -26,7 +22,7 @@ namespace Audit.EntityFramework
         /// that it is easy to identify that multiple events are using the same or different database connection.
         /// </summary>
         public string ConnectionId { get; set; }
-#if EF_CORE_3_OR_GREATER
+#if EF_CORE_5_OR_GREATER
         /// <summary>
         /// A unique identifier for the context instance and pool lease, if any.
         /// This identifier is primarily intended as a correlation ID for logging and debugging such

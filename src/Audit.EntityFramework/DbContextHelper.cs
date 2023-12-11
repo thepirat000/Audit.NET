@@ -317,9 +317,9 @@ namespace Audit.EntityFramework
                 CreationPolicy = EventCreationPolicy.Manual,
                 DataProvider = context.AuditDataProvider,
                 AuditEvent = auditEfEvent,
-#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
                 SkipExtraFrames = 5
-#elif EF_CORE && !NETSTANDARD2_0 && !NET461 && !NET472
+#elif EF_CORE && !NET462 && !NET472
                 SkipExtraFrames = 4
 #else
                 SkipExtraFrames = 3
@@ -414,7 +414,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-#if EF_CORE && (NETSTANDARD1_5 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET472 || NET5_0_OR_GREATER)
+#if EF_CORE
             try
             {
                 var connId = ((dbConnection as dynamic).ClientConnectionId) as Guid?;

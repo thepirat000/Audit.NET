@@ -165,9 +165,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             modelBuilder.Entity<Person>().HasMany<Department>(x => x.Departments).WithMany(x => x.Persons);
         }
     }
-#endif
 
-#if EF_CORE_3_OR_GREATER
     [AuditDbContext(IncludeEntityObjects = true)]
     public class OwnedSingleMultiple_Context : AuditDbContext
     {

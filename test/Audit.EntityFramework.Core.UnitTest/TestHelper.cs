@@ -1,5 +1,5 @@
 ﻿using System;
-#if EF_CORE && !NETCOREAPP1_0 && !NET461
+#if EF_CORE
 using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;

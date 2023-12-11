@@ -21,9 +21,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
-#if !NETCOREAPP1_0
             optionsBuilder.UseLazyLoadingProxies();
-#endif
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -51,9 +49,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
-#if !NETCOREAPP1_0
             optionsBuilder.UseLazyLoadingProxies();
-#endif
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

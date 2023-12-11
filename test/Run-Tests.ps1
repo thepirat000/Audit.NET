@@ -78,17 +78,17 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 [Console]::Title='RUN: 7/9 EF_LocalDb' ; 
-& ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb ;
+& $env:userprofile\.nuget\packages\nunit.consolerunner\3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb ;
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
 [Console]::Title='RUN: 8/9 EF_Sql' ; 
-& ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql ;
+& $env:userprofile\.nuget\packages\nunit.consolerunner\3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql ;
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
 [Console]::Title='RUN: 9/9 EF_Stress' ; 
-& ..\packages\NUnit.ConsoleRunner.3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Stress ;
+& $env:userprofile\.nuget\packages\nunit.consolerunner\3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Stress ;
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }

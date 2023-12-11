@@ -253,7 +253,7 @@ namespace Audit.EntityFramework.Providers
             {
                 if (_disposeDbContext)
                 {
-#if EF_CORE_1 || EF_CORE_2 || EF_FULL
+#if EF_FULL
                     auditDbContext.Dispose();
 #else
                     await auditDbContext.DisposeAsync();
@@ -268,14 +268,8 @@ namespace Audit.EntityFramework.Providers
         {
             var entryType = GetTypeNoProxy(entry.Entry.Entity.GetType());
             Type type;
-#if EF_CORE_6_OR_GREATER
-            IReadOnlyEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
-            type = definingType?.ClrType;
-#elif EF_CORE_3_OR_GREATER
-            IEntityType definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
-            type = definingType?.ClrType;
-#elif EF_CORE_2
-            IEntityType definingType = entry.Entry.Metadata.DefiningEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.ClrType);
+#if EF_CORE_5_OR_GREATER
+            var definingType = entry.Entry.Metadata.FindOwnership()?.DeclaringEntityType ?? localDbContext.Model.FindEntityType(entry.Entry.Metadata.Name);
             type = definingType?.ClrType;
 #elif EF_CORE
             IEntityType definingType = localDbContext.Model.FindEntityType(entryType);
@@ -379,11 +373,7 @@ namespace Audit.EntityFramework.Providers
 
         public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-#if NET45
-            return Task.FromResult(0);
-#else
             return Task.CompletedTask;
-#endif
         }
     }
 }
