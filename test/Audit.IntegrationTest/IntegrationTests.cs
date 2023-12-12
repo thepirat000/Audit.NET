@@ -143,20 +143,6 @@ namespace Audit.IntegrationTest
 
 #if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
-            [Category("Elasticsearch")]
-            public void Test_ElasticSearchDataProvider_FluentApi()
-            {
-                var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
-                    .ConnectionSettings(new Elasticsearch.Providers.AuditConnectionSettings(new Uri("http://server/")))
-                    .Id(ev => "id")
-                    .Index("ix"));
-
-                Assert.AreEqual("http://server/", (x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()));
-                Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
-                Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
-            }
-
-            [Test]
             [Category("PostgreSQL")]
             public void Test_PostgreDataProvider_FluentApi()
             {
@@ -601,25 +587,6 @@ namespace Audit.IntegrationTest
                 TestDelete();
             }
 
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-            [Test]
-            [Category("Elasticsearch")]
-            public void TestElasticsearch()
-            {
-                SetElasticsearchSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            [Test]
-            [Category("Elasticsearch")]
-            public async Task TestElasticsearchAsync()
-            {
-                SetElasticsearchSettings();
-                await TestUpdateAsync();
-            }
-#endif
 #if NET461 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("AmazonQLDB")]
@@ -1027,23 +994,6 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-            public void SetElasticsearchSettings()
-            {
-                var uri = new Uri(AzureSettings.ElasticSearchUrl);
-                var ec = new Nest.ElasticClient(uri);
-                ec.Indices.Delete(Nest.Indices.AllIndices, x => x.Index("auditevent"));
-                var settings = new Elasticsearch.Providers.AuditConnectionSettings(uri);
-                settings.DefaultFieldNameInferrer(s => s);
-                Audit.Core.Configuration.Setup()
-                    .UseElasticsearch(config => config
-                        .ConnectionSettings(settings)
-                        .Index("auditevent")
-                        .Id(ev => Guid.NewGuid()))
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
-#endif
 
 #if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             public void SetAmazonQLDBSettings()

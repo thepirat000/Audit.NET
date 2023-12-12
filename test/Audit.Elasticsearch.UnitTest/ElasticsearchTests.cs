@@ -1,27 +1,38 @@
-﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-using Audit.Elasticsearch.Providers;
+﻿using Audit.Elasticsearch.Providers;
 using Nest;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Audit.Core;
-using Moq;
 using System.Threading;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
-using System.Text;
+using Audit.IntegrationTest;
 
-namespace Audit.IntegrationTest
+namespace Audit.Elasticsearch.UnitTest
 {
     public class ElasticsearchTests
     {
         private ElasticsearchDataProvider GetElasticsearchDataProvider(List<Core.AuditEvent> ins, List<Core.AuditEvent> repl)
         {
-            var client = new ElasticClient(new Uri("http://127.0.0.1:9200"));
+            var client = new ElasticClient(new Uri(AzureSettings.ElasticSearchUrl));
             return new ElasticsearchDataProviderForTest(ins, repl, client);
         }
 
+        [Test]
+        [Category("Elasticsearch")]
+        public void Test_ElasticSearchDataProvider_FluentApi()
+        {
+            var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
+                .ConnectionSettings(new ConnectionSettings(new Uri("http://server/")))
+                .Id(ev => "id")
+                .Index("ix"));
+
+            Assert.AreEqual("http://server/", (x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()));
+            Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
+            Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
+        }
+        
         [Test]
         [Category("Elasticsearch")]
         public void Test_Elasticsearch_HappyPath()
@@ -55,8 +66,8 @@ namespace Audit.IntegrationTest
             ela.Client.Indices.Refresh(indexName);
 
             var evLoad = ela.GetEvent(new ElasticsearchAuditEventId() { Id = guids[0], Index = indexName });
-            var orderOldValue = Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.Old.ToString());
-            var orderNewValue = Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.New.ToString());
+            var orderOldValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.Old.ToString());
+            var orderNewValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.New.ToString());
             var oldDictionary = evLoad.Target.Old as Dictionary<string, object>;
             var newDictionary = evLoad.Target.New as Dictionary<string, object>;
 
@@ -106,8 +117,8 @@ namespace Audit.IntegrationTest
             await ela.Client.Indices.RefreshAsync(indexName);
 
             var evLoad = await ela.GetEventAsync(new ElasticsearchAuditEventId() { Id = guids[0], Index = indexName });
-            var orderOldValue = Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.Old.ToString());
-            var orderNewValue = Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.New.ToString());
+            var orderOldValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.Old.ToString());
+            var orderNewValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.New.ToString());
             var oldDictionary = evLoad.Target.Old as Dictionary<string, object>;
             var newDictionary = evLoad.Target.New as Dictionary<string, object>;
 
@@ -220,7 +231,6 @@ namespace Audit.IntegrationTest
         }
 
     }
-
     public class ElasticsearchDataProviderForTest : ElasticsearchDataProvider
     {
         private List<Core.AuditEvent> _inserted;
@@ -253,5 +263,11 @@ namespace Audit.IntegrationTest
             return base.ReplaceEventAsync(eventId, auditEvent, cancellationToken);
         }
     }
+
+    public class Order
+    {
+        public virtual long Id { get; set; }
+        public virtual string Number { get; set; }
+        public virtual string Status { get; set; }
+    }
 }
-#endif

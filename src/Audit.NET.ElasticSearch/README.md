@@ -27,7 +27,7 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new ElasticsearchDataProvider()
 {
-    ConnectionSettings = new AuditConnectionSettings(new Uri("http://localhost:9200")),
+    ConnectionSettings = new ConnectionSettings(new Uri("http://localhost:9200")),
     IndexBuilder = ev => ev.EventType,
     IdBuilder = ev => Guid.NewGuid()
 };
@@ -48,7 +48,7 @@ Note that you can provide the settings as a function of the [Audit Event](https:
 ### Provider Options
 
 Mandatory:
-- **ConnectionSettings**: The Elasticsearch connection settings. It is recommended to be an instance of `AuditConnectionSettings`.
+- **ConnectionSettings**: The Elasticsearch connection settings. 
 
 Optional:
 - **Index**: The Elasticsearch index name to use. Can be NULL to use the default index. 

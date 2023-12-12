@@ -31,7 +31,6 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
-    <ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj" />
   </ItemGroup>
 

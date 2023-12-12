@@ -15,7 +15,7 @@ namespace Audit.Core
         /// <param name="settings">The Elasticsearch connection settings</param>
         /// <param name="idBuilder">The builder to get the id to use for an audit event. NULL to use a server generated id</param>
         /// <param name="indexBuilder">The builder to get the index to use for an audit event. NULL to use the default index name</param>
-        public static ICreationPolicyConfigurator UseElasticsearch(this IConfigurator configurator, AuditConnectionSettings settings,
+        public static ICreationPolicyConfigurator UseElasticsearch(this IConfigurator configurator, IConnectionSettingsValues settings,
             Func<AuditEvent, Id> idBuilder = null, Func<AuditEvent, IndexName> indexBuilder = null)
         {
             Configuration.DataProvider = new ElasticsearchDataProvider()

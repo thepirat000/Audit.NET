@@ -5,7 +5,7 @@
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.Elasticsearch</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -31,9 +31,7 @@
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="NEST" Version="7.17.0" />
-    <PackageReference Include="NEST.jsonnetserializer" Version="7.17.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NEST" Version="7.17.5" />
   </ItemGroup>
 
   <ItemGroup>

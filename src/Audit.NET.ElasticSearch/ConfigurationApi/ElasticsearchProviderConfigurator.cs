@@ -1,5 +1,4 @@
 ﻿using System;
-using Audit.Elasticsearch.Providers;
 using Elasticsearch.Net;
 using Nest;
 
@@ -11,7 +10,7 @@ namespace Audit.Elasticsearch.Configuration
         internal Func<Core.AuditEvent, IndexName> _indexBuilder;
         internal Func<Core.AuditEvent, Id> _idBuilder;
 
-        public IElasticsearchProviderConfigurator ConnectionSettings(AuditConnectionSettings connectionSettings)
+        public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionSettingsValues connectionSettings)
         {
             _connectionSettings = connectionSettings;
             return this;
@@ -19,19 +18,19 @@ namespace Audit.Elasticsearch.Configuration
 
         public IElasticsearchProviderConfigurator ConnectionSettings(Uri uri)
         {
-            _connectionSettings = new AuditConnectionSettings(uri);
+            _connectionSettings = new ConnectionSettings(uri);
             return this;
         }
 
         public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionPool connectionPool)
         {
-            _connectionSettings = new AuditConnectionSettings(connectionPool);
+            _connectionSettings = new ConnectionSettings(connectionPool);
             return this;
         }
 
         public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionPool connectionPool, IConnection connection)
         {
-            _connectionSettings = new AuditConnectionSettings(connectionPool, connection);
+            _connectionSettings = new ConnectionSettings(connectionPool, connection);
             return this;
         }
 
