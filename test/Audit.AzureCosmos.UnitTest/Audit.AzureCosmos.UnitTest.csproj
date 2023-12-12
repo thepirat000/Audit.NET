@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>3.0.0</VersionPrefix>
 		<TargetFrameworks>net462;netcoreapp3.1;net6.0</TargetFrameworks>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<AssemblyName>Audit.AzureCosmos.UnitTest</AssemblyName>
@@ -12,6 +11,10 @@
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<DebugType>Full</DebugType>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Audit.IntegrationTest\AzureSettings.cs" Link="AzureSettings.cs" />
+	</ItemGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' != 'net462' ">
 		<DefineConstants>$(DefineConstants);IS_COSMOS</DefineConstants>
@@ -28,16 +31,22 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="5.1.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
-		<PackageReference Include="moq" Version="4.8.1" />
-		<PackageReference Include="NUnit" Version="3.7.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="Moq" Version="4.17.2" />
+		<PackageReference Include="NUnit" Version="3.13.1" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+		<PackageReference Include="coverlet.collector" Version="3.0.2" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
 		<PackageReference Include="System.Runtime" Version="4.1.0" />
 		<Reference Include="System" />
 		<Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netcoreapp3.1' ">
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 	</ItemGroup>
 
 </Project>

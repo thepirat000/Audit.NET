@@ -5,7 +5,7 @@
     <Copyright>Copyright 2022</Copyright>
     <AssemblyTitle>Audit.AzureStorageTables</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.8.2" />
   </ItemGroup>
   
   <ItemGroup>

@@ -4,15 +4,13 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Linq;
+using Audit.IntegrationTest;
 
 namespace Audit.AzureCosmos.UnitTest
 {
     [TestFixture]
     public class AzureCosmosTests
     {
-        public static string AzureDocDbUrl => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREDOCDBURL") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREDOCDBURL");
-        public static string AzureDocDbAuthKey => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREDOCDBAUTHKEY") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREDOCDBAUTHKEY");
-        
         [Test]
         [Category("AzureDocDb")]
         public void TestAzureCosmos_CustomId()
@@ -20,10 +18,10 @@ namespace Audit.AzureCosmos.UnitTest
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureDocDbUrl,
+                Endpoint = AzureSettings.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureDocDbAuthKey,
+                AuthKey = AzureSettings.AzureDocDbAuthKey,
                 IdBuilder = _ => id
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
@@ -54,10 +52,10 @@ namespace Audit.AzureCosmos.UnitTest
 
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureDocDbUrl,
+                Endpoint = AzureSettings.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureDocDbAuthKey,
+                AuthKey = AzureSettings.AzureDocDbAuthKey,
                 IdBuilder = _ => id
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
@@ -88,10 +86,10 @@ namespace Audit.AzureCosmos.UnitTest
         {
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureDocDbUrl,
+                Endpoint = AzureSettings.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureDocDbAuthKey
+                AuthKey = AzureSettings.AzureDocDbAuthKey
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(10000, 99999);
 
@@ -132,10 +130,10 @@ namespace Audit.AzureCosmos.UnitTest
         {
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureDocDbUrl,
+                Endpoint = AzureSettings.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureDocDbAuthKey
+                AuthKey = AzureSettings.AzureDocDbAuthKey
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
 

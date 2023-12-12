@@ -10,11 +10,6 @@ namespace Audit.IntegrationTest
 {
     public class AzureStorageBlobsTests
     {
-        public static string AzureBlobCnnString => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBCNNSTRING") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBCNNSTRING");
-        public static string AzureBlobServiceUrl => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBSERVICEURL") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBSERVICEURL");
-        public static string AzureBlobAccountName => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBACCOUNTNAME") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBACCOUNTNAME");
-        public static string AzureBlobAccountKey => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBACCOUNTKEY") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBACCOUNTKEY");
-
         [Test]
         [Category("AzureStorageBlobs")]
         public void Test_AzureStorageBlobs_HappyPath()
@@ -22,7 +17,7 @@ namespace Audit.IntegrationTest
             var id = Guid.NewGuid().ToString();
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureBlobCnnString)
+                .WithConnectionString(AzureSettings.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -56,7 +51,7 @@ namespace Audit.IntegrationTest
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureBlobCnnString)
+                .WithConnectionString(AzureSettings.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -90,7 +85,7 @@ namespace Audit.IntegrationTest
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureBlobCnnString)
+                .WithConnectionString(AzureSettings.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -125,8 +120,8 @@ namespace Audit.IntegrationTest
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
                 .WithCredentials(_ => _
-                    .Url(AzureBlobServiceUrl)
-                    .Credential(new StorageSharedKeyCredential(AzureBlobAccountName, AzureBlobAccountKey)))
+                    .Url(AzureSettings.AzureBlobServiceUrl)
+                    .Credential(new StorageSharedKeyCredential(AzureSettings.AzureBlobAccountName, AzureSettings.AzureBlobAccountKey)))
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)

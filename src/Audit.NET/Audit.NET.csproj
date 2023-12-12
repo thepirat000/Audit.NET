@@ -56,7 +56,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0' ">
-    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' AND '$(TargetFramework)' != 'netstandard2.1' AND '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' ">

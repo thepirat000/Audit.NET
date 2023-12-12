@@ -19,6 +19,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="..\Audit.IntegrationTest\AzureSettings.cs" Link="AzureSettings.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="5.1.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
 		<PackageReference Include="moq" Version="4.8.1" />
