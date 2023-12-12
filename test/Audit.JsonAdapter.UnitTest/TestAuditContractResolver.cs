@@ -1,5 +1,4 @@
-﻿#if TEXT_JSON
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -299,7 +298,4 @@ namespace Audit.JsonNetAdapter.UnitTest
         }
 
     }
-
-
 }
-#endif

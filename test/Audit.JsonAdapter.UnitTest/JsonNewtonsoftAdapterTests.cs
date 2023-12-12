@@ -1,9 +1,7 @@
-﻿#if TEXT_JSON
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Newtonsoft.Json;
 using Audit.Core;
 using System.Collections.Generic;
-using Newtonsoft.Json.Serialization;
 
 namespace Audit.JsonNetAdapter.UnitTest
 {
@@ -12,7 +10,7 @@ namespace Audit.JsonNetAdapter.UnitTest
         [SetUp]
         public void Setup()
         {
-            Audit.Core.Configuration.AuditDisabled = false;
+            Audit.Core.Configuration.Reset();
             Audit.Core.Configuration.ResetCustomActions();
         }
 
@@ -46,4 +44,3 @@ namespace Audit.JsonNetAdapter.UnitTest
         }
     }
 }
-#endif
