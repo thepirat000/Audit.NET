@@ -272,35 +272,6 @@ namespace Audit.IntegrationTest
             }
 
             [Test]
-            [Category("AzureDocDb")]
-            public void Test_AzureCosmos_FluentApi()
-            {
-                var x = new AzureCosmos.Providers.AzureCosmosDataProvider(_ => _
-                    .Endpoint(ev => "Endpoint")
-                    .AuthKey(ev => "AuthKey")
-                    .Container(ev => "Container")
-                    .Database(ev => "Database")
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-                    .ClientOptions(o => o.MaxRequestsPerTcpConnection = 123)
-#else
-                    .ConnectionPolicy(new Microsoft.Azure.Documents.Client.ConnectionPolicy() { ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol.Tcp })
-#endif
-                    .WithId(ev => "Id"));
-                Assert.AreEqual("Endpoint", x.EndpointBuilder?.Invoke(null));
-                Assert.AreEqual("AuthKey", x.AuthKeyBuilder?.Invoke(null));
-                Assert.AreEqual("Database", x.DatabaseBuilder?.Invoke(null));
-                Assert.AreEqual("Container", x.ContainerBuilder?.Invoke(null));
-                Assert.AreEqual("Id", x.IdBuilder?.Invoke(null));
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-                var opt = new Microsoft.Azure.Cosmos.CosmosClientOptions();
-                x.CosmosClientOptionsAction?.Invoke(opt);
-                Assert.AreEqual(123, opt.MaxRequestsPerTcpConnection);
-#else
-                Assert.AreEqual(Microsoft.Azure.Documents.Client.Protocol.Tcp, x.ConnectionPolicyBuilder.Invoke().ConnectionProtocol);
-#endif
-            }
-
-            [Test]
             [Category("MySql")]
             public void Test_MySqlDataProvider_FluentApi()
             {
@@ -416,25 +387,6 @@ namespace Audit.IntegrationTest
                 var tokenBytes = type.Assembly.GetName().GetPublicKeyToken();
                 var publicKeyToken = string.Concat(tokenBytes.Select(i => i.ToString("x2")));
                 Assert.AreEqual(expectedToken, publicKeyToken);
-            }
-
-
-            [Test]
-            [Category("AzureDocDb")]
-            public void TestAzureCosmos()
-            {
-                SetAzureDocDbSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            [Test]
-            [Category("AzureDocDb")]
-            public async Task TestAzureCosmosAsync()
-            {
-                SetAzureDocDbSettings();
-                await TestUpdateAsync();
             }
 
             [Test]
@@ -1071,18 +1023,6 @@ namespace Audit.IntegrationTest
                     .ResetActions();
             }
 #endif
-
-            public void SetAzureDocDbSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseAzureCosmos(config => config
-                        .Endpoint(() => AzureSettings.AzureDocDbUrl)
-                        .AuthKey(() => AzureSettings.AzureDocDbAuthKey)
-                        .Database("Audit")
-                        .Container("AuditTest"))
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
 
             public void SetFileSettings()
             {

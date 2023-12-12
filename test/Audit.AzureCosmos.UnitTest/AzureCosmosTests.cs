@@ -1,15 +1,18 @@
 ﻿using Audit.Core;
 using NUnit.Framework;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Linq;
 
-namespace Audit.IntegrationTest
+namespace Audit.AzureCosmos.UnitTest
 {
     [TestFixture]
     public class AzureCosmosTests
     {
+        public static string AzureDocDbUrl => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREDOCDBURL") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREDOCDBURL");
+        public static string AzureDocDbAuthKey => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREDOCDBAUTHKEY") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREDOCDBAUTHKEY");
+        
         [Test]
         [Category("AzureDocDb")]
         public void TestAzureCosmos_CustomId()
@@ -17,10 +20,10 @@ namespace Audit.IntegrationTest
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureSettings.AzureDocDbUrl,
+                Endpoint = AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey,
+                AuthKey = AzureDocDbAuthKey,
                 IdBuilder = _ => id
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
@@ -51,10 +54,10 @@ namespace Audit.IntegrationTest
 
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureSettings.AzureDocDbUrl,
+                Endpoint = AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey,
+                AuthKey = AzureDocDbAuthKey,
                 IdBuilder = _ => id
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
@@ -78,17 +81,17 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(eventType, auditEvent.EventType);
         }
 
-#if NET452 || NET461 
+#if IS_DOCDB
         [Test]
         [Category("AzureDocDb")]
         public void TestAzureCosmos_Query()
         {
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureSettings.AzureDocDbUrl,
+                Endpoint = AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey
+                AuthKey = AzureDocDbAuthKey
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(10000, 99999);
 
@@ -129,10 +132,10 @@ namespace Audit.IntegrationTest
         {
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureSettings.AzureDocDbUrl,
+                Endpoint = AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey
+                AuthKey = AzureDocDbAuthKey
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
 
