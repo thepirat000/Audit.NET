@@ -872,29 +872,6 @@ namespace Audit.IntegrationTest
                 Assert.AreEqual(orderId, ev.CustomFields["ReferenceId"].ToString());
             }
 
-#if NET452 || NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-            [Test]
-            public void TestEventLog()
-            {
-                SetEventLogSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            public void SetEventLogSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseEventLogProvider(config => config
-                        .LogName("Application")
-                        .SourcePath("TestApplication")
-                        .MachineName(".")
-                        .MessageBuilder(ev => $"{ev.StartDate} - {ev.EndDate} - {ev.EventType} - {ev.Environment.UserName}"))
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
-#endif
-
             public void SetFileSettings()
             {
                 Audit.Core.Configuration.Setup()

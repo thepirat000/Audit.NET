@@ -5,7 +5,7 @@
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.NET.EventLog.Core</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591;CA1416</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -42,12 +42,8 @@
     <Folder Include="Providers\" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-	<PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.6" /> 
+  <ItemGroup>
+	<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.0" /> 
   </ItemGroup>
 
   <ItemGroup>
