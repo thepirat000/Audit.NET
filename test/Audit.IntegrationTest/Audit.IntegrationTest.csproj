@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Audit.NET.AzureCosmos\Audit.NET.AzureCosmos.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.DynamoDB\Audit.NET.DynamoDB.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Kafka\Audit.NET.Kafka.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />

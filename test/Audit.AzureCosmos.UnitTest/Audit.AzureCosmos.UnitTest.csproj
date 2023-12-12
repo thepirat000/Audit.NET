@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net462;netcoreapp3.1;net6.0</TargetFrameworks>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
-		<AssemblyName>Audit.AzureCosmos.UnitTest</AssemblyName>
 		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
