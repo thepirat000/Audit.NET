@@ -7,6 +7,7 @@ using Audit.AzureCosmos.ConfigurationApi;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace Audit.AzureCosmos.Providers
 {
@@ -268,7 +269,7 @@ namespace Audit.AzureCosmos.Providers
         /// <param name="sqlExpression">The Azure Cosmos SQL expression</param>
         /// <param name="queryOptions">The options for processing the query results feed.</param>
         /// <param name="cancellationToken">The Cancellation Token.</param>
-        public async IAsyncEnumerable<T> EnumerateEvents<T>(string sqlExpression, QueryRequestOptions queryOptions = null, CancellationToken cancellationToken = default) where T : AuditEvent
+        public async IAsyncEnumerable<T> EnumerateEvents<T>(string sqlExpression, QueryRequestOptions queryOptions = null, [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : AuditEvent
         {
             var container = GetContainer(null);
             var feed = container.GetItemQueryIterator<T>(sqlExpression, null, queryOptions);
