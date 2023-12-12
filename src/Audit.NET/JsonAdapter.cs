@@ -86,7 +86,7 @@ namespace Audit.Core
 			{
 				return (T)value;
 			}
-#if IS_NK_JSON
+#if IS_NK_JSON 
 			if (value is JContainer container)
 			{
 				return container.ToObject<T>(JsonSerializer.Create(Configuration.JsonSettings));
@@ -96,11 +96,17 @@ namespace Audit.Core
             {
                 return element.Deserialize<T>(Configuration.JsonSettings);
             }
+#elif NETSTANDARD2_0
+            if (value is JsonElement element)
+            {
+                return JsonSerializer.Deserialize<T>(element.GetRawText(), Configuration.JsonSettings);
+            }
 #else
             // Workaround for to convert from JsonElement to Object (https://github.com/dotnet/runtime/issues/31274)
             if (value is JsonElement element)
             {
-			    var bufferWriter = new ArrayBufferWriter<byte>();
+                
+                var bufferWriter = new System.Buffers.ArrayBufferWriter<byte>();
 			    using (var writer = new Utf8JsonWriter(bufferWriter))
 			    {
     				element.WriteTo(writer);

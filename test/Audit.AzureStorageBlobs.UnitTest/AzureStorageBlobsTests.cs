@@ -1,5 +1,4 @@
-﻿#if NET5_0_OR_GREATER
-using Audit.Core;
+﻿using Audit.Core;
 using Azure.Storage;
 using Azure.Storage.Blobs.Models;
 using NUnit.Framework;
@@ -11,15 +10,19 @@ namespace Audit.IntegrationTest
 {
     public class AzureStorageBlobsTests
     {
+        public static string AzureBlobCnnString => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBCNNSTRING") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBCNNSTRING");
+        public static string AzureBlobServiceUrl => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBSERVICEURL") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBSERVICEURL");
+        public static string AzureBlobAccountName => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBACCOUNTNAME") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBACCOUNTNAME");
+        public static string AzureBlobAccountKey => Environment.GetEnvironmentVariable("AUDIT_NET_AZUREBLOBACCOUNTKEY") ?? throw new Exception($"Missing environment variable AUDIT_NET_AZUREBLOBACCOUNTKEY");
+
         [Test]
         [Category("AzureStorageBlobs")]
         public void Test_AzureStorageBlobs_HappyPath()
         {
             var id = Guid.NewGuid().ToString();
-            var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -28,26 +31,21 @@ namespace Audit.IntegrationTest
             Configuration.ResetCustomActions();
             Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
-            var efEvent = new EntityFramework.AuditEventEntityFramework()
+            var efEvent = new AuditEvent()
             {
                 EventType = id,
                 Environment = new AuditEventEnvironment()
                 {
                     MachineName = "Machine",
                     UserName = "User"
-                },
-                EntityFrameworkEvent = new EntityFramework.EntityFrameworkEvent()
-                {
-                    Database = "DB"
                 }
             };
 
             var blobName = dp.InsertEvent(efEvent);
-            var efEventGet = dp.GetEvent<EntityFramework.AuditEventEntityFramework>(containerName, blobName.ToString());
+            var efEventGet = dp.GetEvent<AuditEvent>(containerName, blobName.ToString());
 
             Assert.AreEqual(id, efEventGet.EventType);
             Assert.AreEqual("Machine", efEventGet.Environment.MachineName);
-            Assert.AreEqual("DB", efEventGet.EntityFrameworkEvent.Database);
         }
 
         [Test]
@@ -58,7 +56,7 @@ namespace Audit.IntegrationTest
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -67,26 +65,21 @@ namespace Audit.IntegrationTest
             Configuration.ResetCustomActions();
             Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
-            var efEvent = new EntityFramework.AuditEventEntityFramework()
+            var efEvent = new AuditEvent()
             {
                 EventType = id,
                 Environment = new AuditEventEnvironment()
                 {
                     MachineName = "Machine",
                     UserName = "User"
-                },
-                EntityFrameworkEvent = new EntityFramework.EntityFrameworkEvent()
-                {
-                    Database = "DB"
                 }
             };
 
             var blobName = await dp.InsertEventAsync(efEvent);
-            var efEventGet = await dp.GetEventAsync<EntityFramework.AuditEventEntityFramework>(containerName, blobName.ToString());
+            var efEventGet = await dp.GetEventAsync<AuditEvent>(containerName, blobName.ToString());
 
             Assert.AreEqual(id, efEventGet.EventType);
             Assert.AreEqual("Machine", efEventGet.Environment.MachineName);
-            Assert.AreEqual("DB", efEventGet.EntityFrameworkEvent.Database);
         }
 
         [Test]
@@ -97,7 +90,7 @@ namespace Audit.IntegrationTest
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -132,8 +125,8 @@ namespace Audit.IntegrationTest
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
                 .WithCredentials(_ => _
-                    .Url(AzureSettings.AzureBlobServiceUrl)
-                    .Credential(new StorageSharedKeyCredential(AzureSettings.AzureBlobAccountName, AzureSettings.AzureBlobAccountKey)))
+                    .Url(AzureBlobServiceUrl)
+                    .Credential(new StorageSharedKeyCredential(AzureBlobAccountName, AzureBlobAccountKey)))
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -161,4 +154,3 @@ namespace Audit.IntegrationTest
 
     }
 }
-#endif

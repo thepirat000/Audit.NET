@@ -65,7 +65,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' ">
     <DefineConstants>$(DefineConstants);NK_JSON</DefineConstants>
@@ -94,8 +94,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.8" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-    <ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Azure.Identity" Version="1.10.2" />
   </ItemGroup>
 	
@@ -106,8 +105,7 @@
 	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
-	<ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
 	<PackageReference Include="Azure.Identity" Version="1.10.2" />
   </ItemGroup>
 
@@ -119,7 +117,6 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.0" />
-		<ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
 		<PackageReference Include="Azure.Identity" Version="1.10.2" />
 	</ItemGroup>
 
@@ -131,7 +128,6 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.0" />
-		<ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
 		<PackageReference Include="Azure.Identity" Version="1.10.4" />
 	</ItemGroup>
 
