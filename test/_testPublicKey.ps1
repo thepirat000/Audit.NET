@@ -5,6 +5,7 @@ $pkt = "PublicKeyToken="
 $exclude = @( "Audit.MongoClient", "Audit.NET.MongoDB" )
 
 $hasErrors = $false
+$count = 0
 
 Get-ChildItem -Directory -Path "..\src" -Filter "Audit.*" | ForEach-Object {
     if ($_.Name -notin $exclude) {
@@ -15,6 +16,9 @@ Get-ChildItem -Directory -Path "..\src" -Filter "Audit.*" | ForEach-Object {
                 if ($token -ne $expectedToken) {
                     Write-Host "Token for $($_.FullName) is incorrect: $($token)" -ForegroundColor Red
                     $hasErrors = $true
+                } else {
+                    Write-Host "Token for $($_.FullName) correct: $($token)" -ForegroundColor Green
+                    $count = $count + 1
                 }
             }
         }
@@ -24,6 +28,6 @@ Get-ChildItem -Directory -Path "..\src" -Filter "Audit.*" | ForEach-Object {
 if ($hasErrors) {
     Exit 1
 } else {
-    Write-Host "Successful public key validation" -ForegroundColor Green
+    Write-Host "Successful public key validation of $($count) assemblies" -ForegroundColor Green
     Exit 0
 }
