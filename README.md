@@ -70,6 +70,47 @@ and any custom fields or properties.
 
 The `AuditEvent` is typically serialized into a format suitable for storage or transmission, such as JSON.
 
+# IMPORTANT NOTE - SUPPORT FOR OLDER .NET FRAMEWORKS
+
+Beginning with the version 23.0.0, this library and its extensions has discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
+
+For reference, please consult the following links:
+
+- [.NET Core Support Policy](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core)
+- [Entity Framework Core releases](https://learn.microsoft.com/en-us/ef/core/what-is-new/#stable-releases)
+
+This library and its extensions will maintain support for the following **minimum** .NET framework versions:
+
+- .NET Framework 4.6.2 (net462)
+- .NET Standard 2.0 (netstandard2.0)
+- .NET 6 (net6.0)
+
+The following frameworks were **deprecated and removed** from the list of target frameworks:
+
+- net45, net451, net452, net461
+- netstandard1.3, netstandard1.4, netstandard1.5, netstandard1.6
+- netcoreapp2.1, netcoreapp3.0
+- net5.0
+
+This deprecation resulted in the following changes:
+
+- All library versions will now default to using `System.Text.Json` (Newtonsoft.Json will be deprecated but still usable via the JsonAdapter).
+- `Audit.EntityFramework.Core` libraries has ceased support for EF Core versions 3 and older. The minimum supported version is EF Core 5 (Audit.EntityFramework continue supporting .NET Entity Framework 6).
+- `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` libraries were deprecated.
+- `Audit.NET.JsonSystemAdapter` was deprecated.
+
+This discontinuation led to the following modifications:
+
+- All library versions will now use `System.Text.Json` as the default (Newtonsoft.Json will be deprecated but can still be used through the JsonAdapter).
+- Support for EF Core versions 3 and earlier has been discontinued in the `Audit.EntityFramework.Core` libraries. The minimum supported version is now EF Core 5 (`Audit.EntityFramework` will continue to support .NET Entity Framework 6).
+- The libraries `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` have been deprecated.
+- `Audit.NET.JsonSystemAdapter` has been deprecated.
+
+
+
+
+
+
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its life cycle. 
