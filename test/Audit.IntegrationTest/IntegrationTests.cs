@@ -152,21 +152,6 @@ namespace Audit.IntegrationTest
 #endif
 
             [Test]
-            [Category("MySql")]
-            public void Test_MySqlDataProvider_FluentApi()
-            {
-                var x = new MySql.Providers.MySqlDataProvider(_ => _
-                    .ConnectionString("c")
-                    .IdColumnName("id")
-                    .JsonColumnName("j")
-                    .TableName("t"));
-                Assert.AreEqual("c", x.ConnectionString);
-                Assert.AreEqual("id", x.IdColumnName);
-                Assert.AreEqual("j", x.JsonColumnName);
-                Assert.AreEqual("t", x.TableName);
-            }
-
-            [Test]
             [Category("EF")]
             public void Test_EfDataProvider_FluentApi()
             {
@@ -403,24 +388,7 @@ namespace Audit.IntegrationTest
                 SetSqlSettings();
                 await TestUpdateAsync();
             }
-            
-            [Test]
-            [Category("MySql")]
-            public void TestMySql()
-            {
-                SetMySqlSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            [Test]
-            [Category("MySql")]
-            public async Task TestMySqlAsync()
-            {
-                SetMySqlSettings();
-                await TestUpdateAsync();
-            }
+           
 
             [Test]
             [Category("UDP")]
@@ -781,20 +749,7 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-
-            public void SetMySqlSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseMySql(config => config
-                        .ConnectionString("Server=localhost; Database=test; Uid=admin; Pwd=admin;")
-                        .TableName("event")
-                        .IdColumnName("id")
-                        .JsonColumnName("data")
-                        .CustomColumn("user", ev => ev.Environment.UserName))
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
-
+            
             public void SetUdpSettings()
             {
                 Audit.Core.Configuration.Setup()
