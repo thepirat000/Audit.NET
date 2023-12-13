@@ -4,12 +4,9 @@ using Raven.Client.Documents;
 using Raven.Client.Json.Serialization.NewtonsoftJson;
 using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Threading;
-#if IS_TEXT_JSON
 using Audit.JsonNewtonsoftAdapter;
-#endif
 
 namespace Audit.NET.RavenDB.Providers
 {
@@ -22,7 +19,6 @@ namespace Audit.NET.RavenDB.Providers
         private IDocumentStore _documentStore;
         private readonly Func<AuditEvent, string> _databaseNameFunc;
 
-#if IS_TEXT_JSON
         /// <summary>
         /// Json default settings, used only when the current Audit.NET json adapter is not the Newtonsoft adapter.
         /// </summary>
@@ -31,7 +27,6 @@ namespace Audit.NET.RavenDB.Providers
             NullValueHandling = NullValueHandling.Ignore,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
-#endif
 
         /// <summary>
         /// The Raven Document Store
@@ -73,14 +68,8 @@ namespace Audit.NET.RavenDB.Providers
                     Urls = ravenConfig._storeConfig._urls, 
                     Database = ravenConfig._storeConfig._databaseDefault
                 };
-
-#if IS_TEXT_JSON
-                (_documentStore.Conventions.Serialization as NewtonsoftJsonSerializationConventions)!
+                ((NewtonsoftJsonSerializationConventions)_documentStore.Conventions.Serialization)
                     .JsonContractResolver = new AuditContractResolver();
-#else
-                (_documentStore.Conventions.Serialization as NewtonsoftJsonSerializationConventions)!
-                    .JsonContractResolver = new DefaultContractResolver();
-#endif
             }
             else
             {
@@ -90,7 +79,6 @@ namespace Audit.NET.RavenDB.Providers
             _documentStore.Initialize();
         }
 
-#if IS_TEXT_JSON
         public override object Serialize<T>(T value)
         {
             if (value == null)
@@ -109,7 +97,6 @@ namespace Audit.NET.RavenDB.Providers
             // Default to use Newtonsoft directly
             return JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value, JsonSerializerSettings), value.GetType(), JsonSerializerSettings);
         }
-#endif
 
         public override object InsertEvent(AuditEvent auditEvent)
         {

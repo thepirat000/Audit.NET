@@ -5,9 +5,7 @@ using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using Raven.Client.Documents;
 using Raven.Client.Json.Serialization.NewtonsoftJson;
-#if IS_TEXT_JSON
 using Audit.JsonNewtonsoftAdapter;
-#endif
 
 namespace Audit.RavenDB.UnitTest
 {
@@ -72,11 +70,7 @@ namespace Audit.RavenDB.UnitTest
             Assert.AreEqual("defaultDb", provider.DocumentStore?.Database);
             Assert.AreEqual(dbName, provider.GetDatabaseName(null));
             Assert.AreEqual(null, provider.DocumentStore.Certificate);
-#if IS_TEXT_JSON
             Assert.IsInstanceOf<AuditContractResolver>((provider.DocumentStore.Conventions.Serialization as NewtonsoftJsonSerializationConventions)?.JsonContractResolver);
-#else
-            Assert.IsInstanceOf<DefaultContractResolver>((provider.DocumentStore.Conventions.Serialization as NewtonsoftJsonSerializationConventions)?.JsonContractResolver);
-#endif
         }
     }
 }
