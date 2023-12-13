@@ -1,4 +1,4 @@
-start "KAFKA" /D D:\kafka "D:\kafka\start-server-reset.cmd"
+start wsl -d ubuntu sh -c "~/kafka_2.13-3.0.0/bin/zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties & sleep 15 & ~/kafka_2.13-3.0.0/bin/kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties"
 start wsl -d ubuntu redis-server
 start "ELASTIC" /D D:\Elasticsearch\elasticsearch-7.5.0\bin "D:\Elasticsearch\elasticsearch-7.5.0\bin\elasticsearch.bat"
 start "DYNAMO" /D D:\DynamoDb "D:\DynamoDb\Run.bat"

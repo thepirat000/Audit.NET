@@ -156,7 +156,8 @@ namespace Audit.Kafka.Providers
         {
             var key = KeySelector == null ? default : KeySelector.Invoke(auditEvent);
             var message = new Message<TKey, AuditEvent> { Key = key, Value = auditEvent };
-            var result = _producer.ProduceAsync(GetTopicPartition(auditEvent), message).GetAwaiter().GetResult();
+            var topic = GetTopicPartition(auditEvent);
+            var result = _producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
             ResultHandler?.Invoke(result);
             return result.Key;
         }
@@ -165,7 +166,8 @@ namespace Audit.Kafka.Providers
         {
             var key = KeySelector == null ? default : KeySelector.Invoke(auditEvent);
             var message = new Message<TKey, AuditEvent> { Key = key, Value = auditEvent };
-            var result = await _producer.ProduceAsync(GetTopicPartition(auditEvent), message, cancellationToken);
+            var topic = GetTopicPartition(auditEvent);
+            var result = await _producer.ProduceAsync(topic, message, cancellationToken);
             ResultHandler?.Invoke(result);
             return result.Key;
         }

@@ -45,13 +45,12 @@ StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
 StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
 StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
 StartDotnetUnitTests 'Audit.Elasticsearch.UnitTest' 'Elasticsearch';
+StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
 # StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureStorage' '--filter=TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables';
 # StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';
 StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
 
-# StartDotnetUnitTests 'Audit.IntegrationTest' 'Kafka' '--filter=TestCategory=Kafka';
-# StartDotnetUnitTests 'Audit.IntegrationTest' 'Dynamo' '--filter=TestCategory=Dynamo';
 # StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
 
 # Run sequential tests
