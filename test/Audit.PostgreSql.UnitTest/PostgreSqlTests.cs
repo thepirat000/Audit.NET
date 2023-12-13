@@ -1,12 +1,12 @@
-﻿#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.PostgreSql.Providers;
 
-namespace Audit.IntegrationTest
+namespace Audit.PostgreSql.UnitTest
 {
     [TestFixture]
     [Category("PostgreSQL")]
@@ -15,8 +15,59 @@ namespace Audit.IntegrationTest
         [OneTimeSetUp]
         public void Init()
         {
+            Audit.Core.Configuration.Reset();
             SetupConfiguredPostgreSqlDataProvider();
             AuditScope.Log("test", null);
+        }
+
+        [Test]
+        public void Test_PostgreDataProvider_FluentApi()
+        {
+            var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                .ConnectionString("c")
+                .DataColumn("dc")
+                .IdColumnName("id")
+                .LastUpdatedColumnName("lud")
+                .Schema("sc")
+                .TableName("t")
+                .CustomColumn("c1", ev => 1)
+                .CustomColumn("c2", ev => 2));
+            Assert.AreEqual("c", x.ConnectionStringBuilder(null));
+            Assert.AreEqual("dc", x.DataColumnNameBuilder(null));
+            Assert.AreEqual("id", x.IdColumnNameBuilder(null));
+            Assert.AreEqual("lud", x.LastUpdatedDateColumnNameBuilder(null));
+            Assert.AreEqual("sc", x.SchemaBuilder(null));
+            Assert.AreEqual("t", x.TableNameBuilder(null));
+            Assert.AreEqual(2, x.CustomColumns.Count);
+            Assert.AreEqual("c1", x.CustomColumns[0].Name);
+            Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
+            Assert.AreEqual("c2", x.CustomColumns[1].Name);
+            Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
+        }
+
+        [Test]
+        public void Test_PostgreDataProvider_FluentApiBuilder()
+        {
+            var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                .ConnectionString(ev => "c")
+                .DataColumn(ev => "dc")
+                .IdColumnName(ev => "id")
+                .LastUpdatedColumnName(ev => "lud")
+                .Schema(ev => "sc")
+                .TableName(ev => "t")
+                .CustomColumn("c1", ev => 1)
+                .CustomColumn("c2", ev => 2));
+            Assert.AreEqual("c", x.ConnectionStringBuilder(null));
+            Assert.AreEqual("dc", x.DataColumnNameBuilder(null));
+            Assert.AreEqual("id", x.IdColumnNameBuilder(null));
+            Assert.AreEqual("lud", x.LastUpdatedDateColumnNameBuilder(null));
+            Assert.AreEqual("sc", x.SchemaBuilder(null));
+            Assert.AreEqual("t", x.TableNameBuilder(null));
+            Assert.AreEqual(2, x.CustomColumns.Count);
+            Assert.AreEqual("c1", x.CustomColumns[0].Name);
+            Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
+            Assert.AreEqual("c2", x.CustomColumns[1].Name);
+            Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
         }
         
         [Test]
@@ -139,7 +190,7 @@ namespace Audit.IntegrationTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
                 .ResetActions();
             
-            var dp = Configuration.DataProviderAs<CustomPostgreSqlDataProvider>();
+            var dp = Core.Configuration.DataProviderAs<CustomPostgreSqlDataProvider>();
             return dp;
         }
     }
@@ -186,4 +237,3 @@ namespace Audit.IntegrationTest
         }
     }
 }
-#endif

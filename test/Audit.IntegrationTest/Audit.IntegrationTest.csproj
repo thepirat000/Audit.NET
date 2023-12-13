@@ -27,10 +27,6 @@
     <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />
     <ProjectReference Include="..\..\src\Audit.WebApi\Audit.WebApi.csproj" />
   </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
-    <ProjectReference Include="..\..\src\Audit.NET.PostgreSql\Audit.NET.PostgreSql.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0-preview-20180610-02" />
