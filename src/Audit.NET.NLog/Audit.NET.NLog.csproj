@@ -6,7 +6,7 @@
     <Copyright>Copyright 2019</Copyright>
     <AssemblyTitle>Audit.NLog</AssemblyTitle>
     <Authors>Dominick Marciano</Authors>
-    <TargetFrameworks>netstandard1.3;net45;net5.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -18,7 +18,6 @@
     <PackageTags>Audit;Trail;Log;NLog</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -38,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="NLog" Version="5.2.7" />
   </ItemGroup>
   <ItemGroup>
     <None Include="images\icon.png" Pack="true" PackagePath="\"/>
