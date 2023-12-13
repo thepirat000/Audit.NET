@@ -9,7 +9,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Audit.IntegrationTest
+namespace Audit.Kafka.UnitTest
 {
     [TestFixture]
     [Category("Kafka")]

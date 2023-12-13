@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
-namespace Audit.JsonNetAdapter.UnitTest
+namespace Audit.JsonAdapter.UnitTest
 {
     [TestFixture]
     public class TestAuditContractResolver

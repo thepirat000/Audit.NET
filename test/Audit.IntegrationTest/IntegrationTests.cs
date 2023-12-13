@@ -1,22 +1,16 @@
 ﻿using Audit.Core;
 using Audit.Core.Providers;
 using Audit.Kafka.Providers;
-using Audit.MongoDB.Providers;
-using Audit.SqlServer.Providers;
 using Audit.Udp.Providers;
 using Confluent.Kafka;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using MongoDB.Bson;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Dynamic;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
 #if NETCOREAPP3_0 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -39,80 +33,7 @@ namespace Audit.IntegrationTest
         [TestFixture]
         public class AuditTests
         {
-            [OneTimeSetUp]
-            public void Setup()
-            {
-#if NETCOREAPP2_0_OR_GREATER || NET5_0_OR_GREATER
-                // Allow BSON serialization on any type starting with Audit
-                var objectSerializer = new ObjectSerializer(type =>
-                    ObjectSerializer.DefaultAllowedTypes(type) 
-                    || type.FullName.StartsWith("Audit") 
-                    || type.FullName.StartsWith("MongoDB"));
-                BsonSerializer.RegisterSerializer(objectSerializer);
-#endif
-            }
-
-            [Test]
-            [Category("Mongo")]
-            public void Test_Mongo_ObjectId()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseMongoDB(config => config
-                        .ConnectionString("mongodb://localhost:27017")
-                        .Database("Audit")
-                        .Collection("Event")
-                        .SerializeAsBson())
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-
-                var up = new UserProfiles()
-                {
-                    UserName = "user1"
-                };
-                
-                var scope = AuditScope.Create("test", () => up);
-                object eventId = scope.EventId;
-                up.UserName = "user2";
-                scope.Dispose();
-
-                var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
-
-                Assert.AreEqual("user1", (eventRead.Target.Old as BsonDocument)["UserName"].ToString());
-                Assert.AreEqual("user2", (eventRead.Target.New as BsonDocument)["UserName"].ToString());
-            }
-
-            [Test]
-            [Category("Mongo")]
-            public void Test_Mongo_ClientSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseMongoDB(config => config
-                        .ClientSettings(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) })
-                        .ConnectionString("mongodb://WRONG_HOST:10001")
-                        .Database("Audit")
-                        .Collection("Event")
-                        .SerializeAsBson())
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-
-                var up = new UserProfiles()
-                {
-                    UserName = "user1"
-                };
-
-                object eventId = null;
-                using (var scope = AuditScope.Create("test", () => up))
-                {
-                    eventId = scope.EventId;
-                    up.UserName = "user2";
-                }
-
-                var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
-
-                Assert.AreEqual("user1", (eventRead.Target.Old as BsonDocument)["UserName"].ToString());
-                Assert.AreEqual("user2", (eventRead.Target.New as BsonDocument)["UserName"].ToString());
-            }
-
+           
             [Test]
             [Category("Kafka")]
             public void Test_KafkaDataProvider_FluentApi()
@@ -229,25 +150,6 @@ namespace Audit.IntegrationTest
             }
 
 #endif
-            [Test]
-            [Category("Mongo")]
-            public void Test_MongoDataProvider_FluentApi()
-            {
-                var x = new MongoDB.Providers.MongoDataProvider(_ => _
-                    .ConnectionString("c")
-                    .ClientSettings(new MongoClientSettings() { ReadConcern = ReadConcern.Linearizable })
-                    .Collection("col")
-                    .Database("db")
-                    .SerializeAsBson(true)
-                    .DatabaseSettings(new MongoDatabaseSettings() { ReadConcern = ReadConcern.Majority }));
-                
-                Assert.AreEqual("c", x.ConnectionString);
-                Assert.AreEqual("col", x.Collection);
-                Assert.AreEqual("db", x.Database);
-                Assert.AreEqual(true, x.SerializeAsBson);
-                Assert.AreEqual(ReadConcern.Majority, x.DatabaseSettings.ReadConcern);
-                Assert.AreEqual(ReadConcern.Linearizable, x.ClientSettings.ReadConcern);
-            }
 
             [Test]
             [Category("MySql")]
@@ -501,64 +403,7 @@ namespace Audit.IntegrationTest
                 SetSqlSettings();
                 await TestUpdateAsync();
             }
-
-            [Test]
-            [Category("Mongo")]
-            public void TestMongo()
-            {
-                SetMongoSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            [Test]
-            [Category("Mongo")]
-            public async Task TestMongoAsync()
-            {
-                SetMongoSettings();
-                await TestUpdateAsync();
-            }
-
-            [Test]
-            [Category("Mongo")]
-            public void TestMongoDateSerialization()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseMongoDB(config => config
-                        .ConnectionString("mongodb://localhost:27017")
-                        .Database("Audit")
-                        .Collection("Event"))
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
-                    .ResetActions();
-#if NK_JSON
-                var prevSettings = Audit.Core.Configuration.JsonSettings;
-                Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new List<JsonConverter>() { new JavaScriptDateTimeConverter() } };
-#endif
-                object evId = null;
-                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, s =>
-                {
-                    if (evId != null)
-                    {
-                        Assert.Fail("evId should be null");
-                    }
-                    evId = s.EventId;
-                });
-                var now = DateTime.UtcNow;
-                using (var s = new AuditScopeFactory().Create("test", null, new { someDate = now }, null, null))
-                {
-                }
-                Audit.Core.Configuration.ResetCustomActions();
-                var dp = Audit.Core.Configuration.DataProvider as MongoDataProvider;
-                var evt = dp.GetEvent(evId);
-#if NK_JSON
-                Assert.AreEqual(now.ToString("yyyyMMddHHmmss"), (evt.CustomFields["someDate"] as DateTime?).Value.ToString("yyyyMMddHHmmss"));
-                Audit.Core.Configuration.JsonSettings = prevSettings;
-#else
-                Assert.AreEqual(now.ToString("yyyyMMddHHmmss"), DateTime.Parse(evt.CustomFields["someDate"].ToString()).ToUniversalTime().ToString("yyyyMMddHHmmss"));
-#endif
-            }
-
+            
             [Test]
             [Category("MySql")]
             public void TestMySql()
@@ -933,17 +778,6 @@ namespace Audit.IntegrationTest
                         .SetDatabaseInitializerNull()
 #endif
                         )
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
-
-            public void SetMongoSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseMongoDB(config => config
-                        .ConnectionString("mongodb://localhost:27017")
-                        .Database("Audit")
-                        .Collection("Event"))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }

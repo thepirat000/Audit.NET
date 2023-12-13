@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Audit.Core;
 using System.Collections.Generic;
 
-namespace Audit.JsonNetAdapter.UnitTest
+namespace Audit.JsonAdapter.UnitTest
 {
     public class JsonNewtonsoftAdapterTests
     {
