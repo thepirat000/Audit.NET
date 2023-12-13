@@ -118,9 +118,5 @@
 	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
   </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
-    <ProjectReference Include="..\..\src\Audit.NET.AmazonQLDB\Audit.NET.AmazonQLDB.csproj" />
-  </ItemGroup>
-
+  
 </Project>

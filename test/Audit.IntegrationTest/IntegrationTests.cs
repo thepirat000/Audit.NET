@@ -301,26 +301,6 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
            
-#if NET461 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-            [Test]
-            [Category("AmazonQLDB")]
-            public void TestAmazonQLDB()
-            {
-                SetAmazonQLDBSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
-            [Test]
-            [Category("AmazonQLDB")]
-            public async Task TestAmazonQLDBAsync()
-            {
-                SetAmazonQLDBSettings();
-                await TestUpdateAsync();
-            }
-#endif
-
             public struct TestStruct
             {
                 public int Id { get; set; }
@@ -650,25 +630,6 @@ namespace Audit.IntegrationTest
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
-
-#if NET461 || NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-            public void SetAmazonQLDBSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseAmazonQldb(config =>
-                    {
-                        config
-                            .UseLedger("audit-ledger")
-                            .UseMaxConcurrentTransactions(5)
-                            .And
-                            .Table(ev => ev.EventType.Replace(":", ""))
-                            .SetAttribute("Source", ev => "Production");
-                    })
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-
-            }
-#endif
 
             public static void ExecuteStoredProcedure(IntegrationTests.CustomerOrder order, IntegrationTests.OrderStatus status)
             {

@@ -1,5 +1,4 @@
-﻿#if NET461 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-using Amazon.QLDB.Driver;
+﻿using Amazon.QLDB.Driver;
 using Amazon.QLDBSession;
 using Audit.Core;
 using Audit.NET.AmazonQLDB.Providers;
@@ -11,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace Audit.IntegrationTest
 {
+    [TestFixture]
+    [Category("AmazonQLDB")]
     public class AmazonQLDBTests
     {
         private AmazonQldbDataProvider GetAmazonQLDBDataProvider(List<AuditEvent> ins, List<AuditEvent> repl) =>
@@ -78,4 +79,3 @@ namespace Audit.IntegrationTest
         }
     }
 }
-#endif
