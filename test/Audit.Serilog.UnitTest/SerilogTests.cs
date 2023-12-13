@@ -1,5 +1,4 @@
-﻿#if !NETCOREAPP1_0 && !NET461
-using Audit.Core;
+﻿using Audit.Core;
 using Audit.NET.Serilog;
 using NUnit.Framework;
 using Serilog;
@@ -119,4 +118,3 @@ namespace Audit.UnitTest
         }
     }
 }
-#endif

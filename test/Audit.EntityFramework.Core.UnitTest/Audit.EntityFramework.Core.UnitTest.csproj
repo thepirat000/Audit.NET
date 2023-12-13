@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<VersionPrefix>3.0.0</VersionPrefix>
 		<TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>

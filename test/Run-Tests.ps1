@@ -49,6 +49,7 @@ StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
 StartDotnetUnitTests 'Audit.MongoDB.UnitTest' 'MongoDB';
 StartDotnetUnitTests 'Audit.MySql.UnitTest' 'MySql';
 StartDotnetUnitTests 'Audit.PostgreSql.UnitTest' 'PostgreSql';
+StartDotnetUnitTests 'Audit.Serilog.UnitTest' 'Serilog';
 # StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureStorage' '--filter=TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables';
 # StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';

@@ -31,7 +31,7 @@ namespace Audit.Core
 
             _event.Environment = GetEnvironmentInfo(options);
             
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
             if (options.IncludeActivityTrace)
             {
                 _event.Activity = GetActivityTrace();
@@ -303,7 +303,7 @@ namespace Audit.Core
 
         #region Private Methods
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
         private AuditActivityTrace GetActivityTrace()
         {
             var activity = Activity.Current;
@@ -374,7 +374,6 @@ namespace Audit.Core
                 Culture = System.Globalization.CultureInfo.CurrentCulture.ToString(),
             };
             MethodBase callingMethod = options.CallingMethod;
-#if NET45 || NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET5_0_OR_GREATER
             environment.UserName = Environment.UserName;
             environment.MachineName = Environment.MachineName;
             environment.DomainName = Environment.UserDomainName;
@@ -386,10 +385,6 @@ namespace Audit.Core
             {
                 environment.StackTrace = new StackTrace(options.SkipExtraFrames, true).ToString();
             }
-#else
-            environment.MachineName = Environment.GetEnvironmentVariable("COMPUTERNAME");
-            environment.UserName = Environment.GetEnvironmentVariable("USERNAME");
-#endif
             if (callingMethod != null)
             {
                 environment.CallingMethodName = (callingMethod.DeclaringType != null ? callingMethod.DeclaringType.FullName + "." : "") + callingMethod.Name + "()";

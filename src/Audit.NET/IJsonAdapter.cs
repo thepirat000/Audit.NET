@@ -2,11 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
-using System.Text.Json;
-#endif
 
 namespace Audit.Core
 {

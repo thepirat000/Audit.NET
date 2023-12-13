@@ -4,13 +4,8 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-#if NK_JSON
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-#else
 using System.Text.Json;
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.UnitTest
 {
@@ -44,32 +39,6 @@ namespace Audit.UnitTest
             }
         }
 
-#if NK_JSON
-        [Test]
-        public void Test_FileDataProvider_Loop()
-        {
-            var loop = new Loop() { Id = 1 };
-            loop.Inner = loop;
-            
-            var fdp = new FileDataProvider()
-            {
-                DirectoryPath = _directory,
-                FilenameBuilder = x => x.EventType
-            };
-
-            Configuration.DataProvider = fdp;
-            var guid = "x" + Guid.NewGuid().ToString();
-            new AuditScopeFactory().Log(guid, loop);
-
-            var ev = fdp.GetEvent(Path.Combine(_directory, guid));
-
-            Assert.IsNotNull(ev);
-            Assert.AreEqual(guid, ev.EventType);
-            Assert.AreEqual(2, ev.CustomFields.Count);
-            Assert.AreEqual(1, ev.CustomFields["Id"]);
-            Assert.AreEqual("{\r\n  \"Id\": 1\r\n}", ev.CustomFields["Inner"].ToString());
-        }
-#else
         [Test]
         public void Test_FileDataProvider_Loop()
         {
@@ -85,10 +54,8 @@ namespace Audit.UnitTest
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
 
-#if NET6_0_OR_GREATER                  
             var prevSettings = Configuration.JsonSettings;
             Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
-#endif
 
             try
             {
@@ -102,38 +69,11 @@ namespace Audit.UnitTest
                     Assert.Fail("Should have failed with JsonException object cycle");
                 }
             }
-#if NET6_0_OR_GREATER
             Configuration.JsonSettings = prevSettings;
-#endif
             Assert.IsFalse(File.Exists(Path.Combine(_directory, guid)));
         }
-#endif
-#if NK_JSON
-        [Test]
-        public async Task Test_FileDataProvider_LoopAsync()
-        {
-            var loop = new Loop() { Id = 1 };
-            loop.Inner = loop;
 
-            var fdp = new FileDataProvider()
-            {
-                DirectoryPath = _directory,
-                FilenameBuilder = x => x.EventType
-            };
 
-            Configuration.DataProvider = fdp;
-            var guid = "x" + Guid.NewGuid().ToString();
-            await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(guid, extraFields: loop, isCreateAndSave: true));
-
-            var ev = await fdp.GetEventAsync(Path.Combine(_directory, guid));
-
-            Assert.IsNotNull(ev);
-            Assert.AreEqual(guid, ev.EventType);
-            Assert.AreEqual(2, ev.CustomFields.Count);
-            Assert.AreEqual(1, ev.CustomFields["Id"]);
-            Assert.AreEqual("{\r\n  \"Id\": 1\r\n}", ev.CustomFields["Inner"].ToString());
-        }
-#else
         [Test]
         public async Task Test_FileDataProvider_LoopAsync()
         {
@@ -149,10 +89,8 @@ namespace Audit.UnitTest
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
 
-#if NET6_0_OR_GREATER                  
             var prevSettings = Configuration.JsonSettings;
             Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
-#endif
 
             try
             {
@@ -166,14 +104,12 @@ namespace Audit.UnitTest
                     Assert.Fail("Should have failed with JsonException object cycle");
                 }
             }
-#if NET6_0_OR_GREATER
             Configuration.JsonSettings = prevSettings;
-#endif
             Assert.IsTrue(File.Exists(Path.Combine(_directory, guid)));
             Assert.IsEmpty(File.ReadAllText(Path.Combine(_directory, guid)));
         }
-#endif
-            [Test]
+
+        [Test]
         public void Test_FileDataProvider_Indent()
         {
             var loop = new Loop() { Id = 1 };
@@ -184,22 +120,14 @@ namespace Audit.UnitTest
                 FilenameBuilder = x => x.EventType
             };
 
-#if NK_JSON
-            Configuration.JsonSettings.Formatting = Formatting.Indented;
-#else
             var prevSettings = Configuration.JsonSettings;
             Configuration.JsonSettings = new JsonSerializerOptions() { WriteIndented = true };
-#endif
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
             new AuditScopeFactory().Log(guid, loop);
 
             var fileContents = File.ReadAllText(Path.Combine(_directory, guid));
-#if NK_JSON
-            Configuration.JsonSettings.Formatting = Formatting.None;
-#else
             Configuration.JsonSettings = prevSettings;
-#endif
 
             Assert.IsNotNull(fileContents);
             Assert.IsTrue(fileContents.StartsWith("{\r\n"));
@@ -216,23 +144,15 @@ namespace Audit.UnitTest
                 FilenameBuilder = x => x.EventType
             };
 
-#if NK_JSON
-            Configuration.JsonSettings.Formatting = Formatting.Indented;
-#else
             var prevSettings = Configuration.JsonSettings;
             Configuration.JsonSettings = new JsonSerializerOptions() { WriteIndented = true };
-#endif
 
             Configuration.DataProvider = fdp;
             var guid = "x" + Guid.NewGuid().ToString();
             await new AuditScopeFactory().LogAsync(guid, loop);
 
             var fileContents = File.ReadAllText(Path.Combine(_directory, guid));
-#if NK_JSON
-            Configuration.JsonSettings.Formatting = Formatting.None;
-#else
             Configuration.JsonSettings = prevSettings;
-#endif
 
             Assert.IsNotNull(fileContents);
             Assert.IsTrue(fileContents.StartsWith("{\r\n"));
@@ -249,12 +169,10 @@ namespace Audit.UnitTest
                 DirectoryPath = _directory,
                 FilenameBuilder = x => x.EventType
             };
-#if NK_JSON
-            Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Error;
-#elif NET6_0_OR_GREATER
+
             var prevSettings = Configuration.JsonSettings;
             Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
-#endif
+
             Configuration.Setup().UseFileLogProvider(_ => _
                 .Directory(_directory)
                 .FilenameBuilder(x => x.EventType));
@@ -269,11 +187,8 @@ namespace Audit.UnitTest
             {
                 Assert.IsTrue(ex.Message.ToLower().Contains("loop detected") || ex.Message.ToLower().Contains("cycle"));
             }
-#if NK_JSON
-            Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-#elif NET6_0_OR_GREATER
+
             Configuration.JsonSettings = prevSettings;
-#endif
         }
 
         [Test]
@@ -287,12 +202,9 @@ namespace Audit.UnitTest
                 DirectoryPath = _directory,
                 FilenameBuilder = x => x.EventType
             };
-#if NK_JSON
-            Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Error;
-#elif NET6_0_OR_GREATER
             var prevSettings = Configuration.JsonSettings;
             Configuration.JsonSettings = new JsonSerializerOptions() { MaxDepth = 1, ReferenceHandler = ReferenceHandler.Preserve };
-#endif
+
             Configuration.Setup().UseFileLogProvider(_ => _
                 .Directory(_directory)
                 .FilenameBuilder(x => x.EventType));
@@ -307,11 +219,8 @@ namespace Audit.UnitTest
             {
                 Assert.IsTrue(ex.Message.ToLower().Contains("loop detected") || ex.Message.ToLower().Contains("cycle"));
             }
-#if NK_JSON
-            Configuration.JsonSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-#elif NET6_0_OR_GREATER
+
             Configuration.JsonSettings = prevSettings;
-#endif
         }
     }
 }

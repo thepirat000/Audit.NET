@@ -1,9 +1,4 @@
 using System;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
-using System.Text.Json;
-#endif
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -64,7 +59,7 @@ namespace Audit.Core.ConfigurationApi
         ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "",
             Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null);
 
-#if NET45 || NET461
+#if NET462 || NET472 
         /// <summary>
         /// Store the events in the windows Event Log.
         /// </summary>
