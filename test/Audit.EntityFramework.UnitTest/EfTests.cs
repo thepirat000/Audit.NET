@@ -1,9 +1,10 @@
 ﻿using Audit.Core;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using DataBaseService;
 
 namespace Audit.EntityFramework.UnitTest
@@ -64,8 +65,8 @@ namespace Audit.EntityFramework.UnitTest
             var sub1 = EntityFrameworkEvent.FromJson(evs[0].GetEntityFrameworkEvent().ToJson());
             var sub2 = EventEntry.FromJson(evs[0].GetEntityFrameworkEvent().Entries[0].ToJson());
 
-            var settings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, NullValueHandling = NullValueHandling.Ignore };
-            Assert.AreEqual(JsonConvert.SerializeObject(evs[0].GetEntityFrameworkEvent(), settings), JsonConvert.SerializeObject(sub1, settings));
+            var settings = new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles };
+            Assert.AreEqual(JsonSerializer.Serialize(evs[0].GetEntityFrameworkEvent(), settings), JsonSerializer.Serialize(sub1, settings));
 
             Assert.AreEqual(1, evs.Count);
 
@@ -335,7 +336,7 @@ namespace Audit.EntityFramework.UnitTest
                     .OnInsertAndReplace(ev =>
                     {
                         var p = ev.GetEntityFrameworkEvent().Entries[0].Entity as Post;
-                        p = JsonConvert.DeserializeObject<Post>(JsonConvert.SerializeObject(p, new JsonSerializerSettings() {  ReferenceLoopHandling = ReferenceLoopHandling.Ignore } ));
+                        p = JsonSerializer.Deserialize<Post>(JsonSerializer.Serialize(p, new JsonSerializerOptions() {  ReferenceHandler = ReferenceHandler.IgnoreCycles } ));
                         entities.Add(p);
                         evs.Add(ev);
                     }));
