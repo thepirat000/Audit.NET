@@ -1,11 +1,6 @@
 ﻿using System;
 using Audit.Core;
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
-#endif
-#if NET45
-using System.Data.Common;
-#endif
 
 namespace Audit.SqlServer.Configuration
 {
@@ -15,17 +10,6 @@ namespace Audit.SqlServer.Configuration
     [CLSCompliant(false)]
     public interface ISqlServerProviderConfigurator
     {
-#if NET45
-        /// <summary>
-        /// To set the database initializer to NULL on the internal DbContext 
-        /// </summary>
-        ISqlServerProviderConfigurator SetDatabaseInitializerNull(bool initializeToNull = true);
-        /// <summary>
-        /// Specifies the Sql Server DbConnection to use when creating the DB Context. 
-        /// Use this instead of `ConnectionString()` when you require low level configuration of the connection.
-        /// </summary>
-        ISqlServerProviderConfigurator DbConnection(Func<AuditEvent, DbConnection> connection);
-#else
         /// <summary>
         /// Specifies the DB context options as a function of the audit event.
         /// </summary>
@@ -36,7 +20,6 @@ namespace Audit.SqlServer.Configuration
         /// </summary>
         /// <param name="dbContextOptions">The DB context options as a function of the audit event.</param>
         ISqlServerProviderConfigurator DbContextOptions(DbContextOptions dbContextOptions);
-#endif
         /// <summary>
         /// Specifies the Sql Server connection string.
         /// </summary>

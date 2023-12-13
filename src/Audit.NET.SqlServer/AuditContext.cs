@@ -1,28 +1,5 @@
 ﻿namespace Audit.SqlServer
 {
-#if NET45
-    using System.Data.Entity;
-    using System.Data.Common;
-
-    internal class AuditContext : DbContext
-    {
-        public AuditContext(string connectionString, bool setNullInitializer)
-            : base(connectionString)
-        {
-            if (setNullInitializer)
-            {
-                Database.SetInitializer<AuditContext>(null);
-            }
-        }
-        public AuditContext(DbConnection connection, bool setNullInitializer, bool contextOwnsConnection) : base(connection, contextOwnsConnection)
-        {
-            if (setNullInitializer)
-            {
-                Database.SetInitializer<AuditContext>(null);
-            }
-        }
-    }
-#elif NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
     using System.ComponentModel.DataAnnotations;
     using Microsoft.EntityFrameworkCore;
     
@@ -53,6 +30,5 @@
             }
         }
     }
-#endif
 }
 

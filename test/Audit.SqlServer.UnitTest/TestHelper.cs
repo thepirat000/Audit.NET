@@ -1,9 +1,5 @@
 ﻿using System;
-#if NET45
-using System.Data.SqlClient;
-#else
 using Microsoft.Data.SqlClient;
-#endif
 
 namespace Audit.SqlServer.UnitTest
 {
