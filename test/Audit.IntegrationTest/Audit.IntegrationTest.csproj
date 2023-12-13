@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\src\Audit.NET.AzureCosmos\Audit.NET.AzureCosmos.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.Kafka\Audit.NET.Kafka.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
-    <ProjectReference Include="..\..\src\Audit.NET.Udp\Audit.NET.Udp.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Audit.NET.AzureStorage\Audit.NET.AzureStorage.csproj" />
     <ProjectReference Include="..\..\src\Audit.Mvc\Audit.Mvc.csproj" />

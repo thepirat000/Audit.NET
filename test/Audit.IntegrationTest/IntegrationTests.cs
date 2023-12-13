@@ -1,7 +1,6 @@
 ﻿using Audit.Core;
 using Audit.Core.Providers;
 using Audit.Kafka.Providers;
-using Audit.Udp.Providers;
 using Confluent.Kafka;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -302,17 +301,6 @@ namespace Audit.IntegrationTest
                 await TestUpdateAsync();
             }
            
-
-            [Test]
-            [Category("UDP")]
-            public void TestUdp()
-            {
-                SetUdpSettings();
-                TestUpdate();
-                TestInsert();
-                TestDelete();
-            }
-
 #if NET461 || NETCOREAPP3_0 || NET5_0_OR_GREATER
             [Test]
             [Category("AmazonQLDB")]
@@ -659,17 +647,6 @@ namespace Audit.IntegrationTest
                         .SetDatabaseInitializerNull()
 #endif
                         )
-                    .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
-                    .ResetActions();
-            }
-            
-            public void SetUdpSettings()
-            {
-                Audit.Core.Configuration.Setup()
-                    .UseUdp(config => config
-                        .RemoteAddress("127.0.0.1")
-                        .RemotePort(12349)
-                        .MulticastMode(MulticastMode.Disabled))
                     .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                     .ResetActions();
             }
