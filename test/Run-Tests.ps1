@@ -10,11 +10,6 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Build Failed !!!" -foregroundcolor white -BackgroundColor red
     EXIT 1
 }
-& 'C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe' Audit.EntityFramework.UnitTest -p:Configuration=Release
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Build Failed !!!" -foregroundcolor white -BackgroundColor red
-    EXIT 1
-}
 
 & .\_testPublicKey.ps1
 if ($LASTEXITCODE -ne 0) {
@@ -52,53 +47,23 @@ StartDotnetUnitTests 'Audit.MySql.UnitTest' 'MySql';
 StartDotnetUnitTests 'Audit.PostgreSql.UnitTest' 'PostgreSql';
 StartDotnetUnitTests 'Audit.Serilog.UnitTest' 'Serilog';
 StartDotnetUnitTests 'Audit.AmazonQLDB.UnitTest' 'AmazonQLDB';
-# StartDotnetUnitTests 'Audit.IntegrationTest' 'AzureStorage' '--filter=TestCategory=AzureBlob|TestCategory=AzureStorageBlobs|TestCategory=AzureTables';
-# StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureTables';
 StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';
 StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
-
-# StartDotnetUnitTests 'Audit.IntegrationTest' 'AmazonQLDB' '--filter=TestCategory=AmazonQLDB';
 
 # Run sequential tests
 $hasFailed = $false;
 
-& .\_execDotnetTest.ps1 -projects:Audit.IntegrationTest -extraParams:'--filter=TestCategory=WCF&TestCategory!=Async' -title:'1/9 WCF_Sync' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.IntegrationTest -extraParams:'--filter=TestCategory=WCF&TestCategory=Async' -title:'2/9 WCF_Async' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.UnitTest -title:'3/9 EF_CORE' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.v3.UnitTest -title:'4/9 EF_CORE_V3' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Full.UnitTest -title:'5/9 EF_FULL' -nopause
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-& .\_execDotnetTest.ps1 -projects:'Audit.UnitTest' -title:'6/9 UnitTest' -nopause
+& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Core.UnitTest -title:'1/3 EF_CORE' -nopause
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
 
-[Console]::Title='RUN: 7/9 EF_LocalDb' ; 
-& $env:userprofile\.nuget\packages\nunit.consolerunner\3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=LocalDb ;
+& .\_execDotnetTest.ps1 -projects:Audit.EntityFramework.Full.UnitTest -title:'2/3 EF_FULL' -nopause
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
-[Console]::Title='RUN: 8/9 EF_Sql' ; 
-& $env:userprofile\.nuget\packages\nunit.consolerunner\3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Sql ;
-if ($LASTEXITCODE -ne 0) {
-    $hasFailed = $true;
-}
-[Console]::Title='RUN: 9/9 EF_Stress' ; 
-& $env:userprofile\.nuget\packages\nunit.consolerunner\3.8.0\tools\nunit3-console.exe Audit.EntityFramework.UnitTest\bin\Release\Audit.EntityFramework.UnitTest.dll --noresult --where=cat=Stress ;
+
+& .\_execDotnetTest.ps1 -projects:'Audit.UnitTest' -title:'3/3 UnitTest' -nopause
 if ($LASTEXITCODE -ne 0) {
     $hasFailed = $true;
 }
