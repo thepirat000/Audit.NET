@@ -1,9 +1,5 @@
-﻿#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-using Audit.Core;
-using Audit.Core.Providers;
-using Audit.EntityFramework;
+﻿using Audit.Core;
 using Audit.EntityFramework.Providers;
-using Audit.SqlServer.Providers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -15,18 +11,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-#if NETCOREAPP3_0 || NET5_0_OR_GREATER
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-#endif
-using System.Data.SqlClient;
-// see this why https://github.com/dotnet/efcore/issues/18220 and https://github.com/googleapis/google-cloud-dotnet/issues/6315
 using static System.Linq.Queryable;
 using static System.Linq.Enumerable; // You only need this if you're using LINQ to Objects
 using System.Threading;
 
-namespace Audit.IntegrationTest
+namespace Audit.EntityFramework.Core.UnitTest.Context
 {
-    [TestFixture(Category = "EF")]
+    [TestFixture(Category = "EntityFrameworkTests_Core")]
     public class EntityFrameworkTests_Core
     {
         [OneTimeSetUp]
@@ -48,7 +39,41 @@ namespace Audit.IntegrationTest
                 .ForAnyContext().Reset();
         }
 
-#if NETCOREAPP3_0 || NET5_0_OR_GREATER
+        [Test]
+        public void Test_EF_ProxiedLazyLoading()
+        {
+            var list = new List<AuditEventEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
+                {
+                    list.Add(ev as AuditEventEntityFramework);
+                }))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>(config => config
+                    .ForEntity<Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyBaseContext>(config => config
+                    .ForEntity<Blog>(_ => _.Override("Title", null)));
+
+            var title = Guid.NewGuid().ToString().Substring(0, 25);
+            using (var ctx = new MyTransactionalContext())
+            {
+                var blog = ctx.Blogs.FirstOrDefault();
+                blog.Title = title;
+                ctx.SaveChanges();
+            }
+
+            Assert.AreEqual(1, list.Count);
+            var entries = list[0].EntityFrameworkEvent.Entries;
+            Assert.IsTrue(entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("Update", entries[0].Action);
+            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
+            Assert.AreEqual(title, entries[0].ColumnValues["Title"]);
+        }
+
         [Test]
         public void Test_EFDataProvider_IdentityContext_Error()
         {
@@ -72,7 +97,7 @@ namespace Audit.IntegrationTest
                 });
             }
         }
-#endif
+
         [Test]
         public void Test_EFDataProvider_AuditEntityDisabled_Fluent()
         {
@@ -1291,7 +1316,6 @@ SET IDENTITY_INSERT Posts OFF
         public string Bar { get; set; }
         public string Username { get; set; }
     }
-#if NETCOREAPP3_0 || NET5_0_OR_GREATER
     public class AuditNetTestContext : Audit.EntityFramework.AuditIdentityDbContext
     {
         public static string CnnString = TestHelper.GetConnectionString("FooBar");
@@ -1311,7 +1335,6 @@ SET IDENTITY_INSERT Posts OFF
 
         }
     }
-#endif
 
 }
-#endif
+

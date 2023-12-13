@@ -1,15 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462</TargetFrameworks>
+		<TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
 		<LangVersion>8.0</LangVersion>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-		<AssemblyName>Audit.Wcf.UnitTest</AssemblyName>
+		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+		<AssemblyName>Audit.Wcf.Client.UnitTest</AssemblyName>
 		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
 		<SignAssembly>true</SignAssembly>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-		<PackageId>Audit.Wcf.UnitTest</PackageId>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -19,7 +18,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Audit.Wcf\Audit.Wcf.csproj" />
+		<ProjectReference Include="..\..\src\Audit.Wcf.Client\Audit.Wcf.Client.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 	<ItemGroup>
@@ -31,5 +30,16 @@
 	<ItemGroup>
 		<Reference Include="System.ServiceModel" />
 	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+		<PackageReference Include="Microsoft.AspNetCore" Version="2.1.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="3.1.18" />
+
+		<PackageReference Include="CoreWCF.Http" Version="1.0.0" />
+		<PackageReference Include="CoreWCF.NetTcp" Version="1.0.0" />
+		<PackageReference Include="CoreWCF.Primitives" Version="1.0.0" />
+	</ItemGroup>
+
 
 </Project>

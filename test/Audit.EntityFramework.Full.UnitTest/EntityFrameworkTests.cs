@@ -1,24 +1,16 @@
 ﻿using Audit.Core;
-using Audit.Core.Providers;
-using Audit.EntityFramework;
-using Moq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NUnit.Framework;
 using System.Threading.Tasks;
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
-#else
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
-#endif
+using Audit.EntityFramework.Full.UnitTest;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
-namespace Audit.IntegrationTest
+namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
 {
     [TestFixture(Category ="EF")]
     public class EntityFrameworkTests
@@ -43,10 +35,10 @@ namespace Audit.IntegrationTest
 
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<MyTransactionalContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+                    .ForEntity<Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Format(b => b.Title, t => t + "X")));
+                    .ForEntity<Blog>(_ => _.Format(b => b.Title, t => t + "X")));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
@@ -675,43 +667,6 @@ namespace Audit.IntegrationTest
             }
         }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-        [Test]
-        public void Test_EF_ProxiedLazyLoading()
-        {
-            var list = new List<AuditEventEntityFramework>();
-            Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(x => x.OnInsertAndReplace(ev =>
-                {
-                    list.Add(ev as AuditEventEntityFramework);
-                }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
-
-            Audit.EntityFramework.Configuration.Setup()
-                .ForContext<MyTransactionalContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
-            Audit.EntityFramework.Configuration.Setup()
-                .ForContext<MyBaseContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Override("Title", null)));
-
-            var title = Guid.NewGuid().ToString().Substring(0, 25);
-            using (var ctx = new MyTransactionalContext())
-            {
-                var blog = ctx.Blogs.FirstOrDefault();
-                blog.Title = title;
-                ctx.SaveChanges();
-            }
-
-            Assert.AreEqual(1, list.Count);
-            var entries = list[0].EntityFrameworkEvent.Entries;
-            Assert.IsTrue(entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Update", entries[0].Action);
-            Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual(title, entries[0].ColumnValues["Title"]);
-        }
-#endif
-
         [Test]
         public void Test_EF_IgnoreOverride_CheckCrossContexts()
         {
@@ -725,10 +680,10 @@ namespace Audit.IntegrationTest
 
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<MyTransactionalContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+                    .ForEntity<Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<MyBaseContext>(config => config
-                    .ForEntity<IntegrationTest.Blog>(_ => _.Override("Title", null)));
+                    .ForEntity<Blog>(_ => _.Override("Title", null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
@@ -763,10 +718,10 @@ namespace Audit.IntegrationTest
 
             Audit.EntityFramework.Configuration.Setup()
               .ForContext<MyTransactionalContext>(config => config
-                  .ForEntity<IntegrationTest.Blog>(_ => _.Ignore(blog => blog.BloggerName)));
+                  .ForEntity<Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
               .ForAnyContext(config => config
-                  .ForEntity<IntegrationTest.Blog>(_ => _.Override("Title", null)));
+                  .ForEntity<Blog>(_ => _.Override("Title", null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())
@@ -820,11 +775,11 @@ namespace Audit.IntegrationTest
 
             using (var ctx = new MyTransactionalContext())
             {
-                ctx.Blogs.Add(new IntegrationTest.Blog()
+                ctx.Blogs.Add(new Blog()
                 {
                     BloggerName = "abc",
                     Title = "Test_EF_PrimaryKeyUpdate",
-                    Posts = new List<IntegrationTest.Post>()
+                    Posts = new List<Post>()
                     {
                         new Post()
                         {
@@ -869,11 +824,11 @@ namespace Audit.IntegrationTest
 
             using (var ctx = new MyTransactionalContext())
             {
-                ctx.Blogs.Add(new IntegrationTest.Blog()
+                ctx.Blogs.Add(new Blog()
                 {
                     BloggerName = "fede",
                     Title = "blog1-test",
-                    Posts = new List<IntegrationTest.Post>()
+                    Posts = new List<Post>()
                     {
                         new Post()
                         {
@@ -900,11 +855,11 @@ namespace Audit.IntegrationTest
 
             using (var ctx = new MyTransactionalContext())
             {
-                ctx.Blogs.Add(new IntegrationTest.Blog()
+                ctx.Blogs.Add(new Blog()
                 {
                     BloggerName = "fede",
                     Title = "blog1-test",
-                    Posts = new List<IntegrationTest.Post>()
+                    Posts = new List<Post>()
                     {
                         new Post()
                         {
@@ -942,11 +897,11 @@ namespace Audit.IntegrationTest
 
             using (var ctx = new MyTransactionalContext())
             {
-                ctx.Blogs.Add(new IntegrationTest.Blog()
+                ctx.Blogs.Add(new Blog()
                 {
                     BloggerName = "fede",
                     Title = b1Title,
-                    Posts = new List<IntegrationTest.Post>()
+                    Posts = new List<Post>()
                     {
                         new Post()
                         {
@@ -972,7 +927,7 @@ namespace Audit.IntegrationTest
 
             using (var ctx = new MyTransactionalContext())
             {
-                ctx.Blogs.Add(new IntegrationTest.Blog()
+                ctx.Blogs.Add(new Blog()
                 {
                     BloggerName = "ROLLBACK",
                     Title = "blog1-test"
@@ -989,23 +944,150 @@ namespace Audit.IntegrationTest
             }
 
             Assert.AreEqual(3, logs.Count);
-#if NET452 || NET461
+#if NET462
             Assert.IsTrue(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
 #endif
         }
 
-#if NETCOREAPP2_0 || NETCOREAPP3_0 || NET5_0_OR_GREATER
-        private IDbContextTransaction GetCurrentTran(DbContext context)
-        {
-            var dbtxmgr = context.GetInfrastructure().GetService<IDbContextTransactionManager>();
-            var relcon = dbtxmgr as IRelationalConnection;
-            return relcon.CurrentTransaction;
-        }
-#else
         private DbContextTransaction GetCurrentTran(DbContext context)
         {
             return context.Database.CurrentTransaction;
         }
-#endif
+
+        [AuditDbContext(IncludeEntityObjects = true)]
+        public class AuditPerTableContext : AuditDbContext
+        {
+            public static string CnnString = TestHelper.GetConnectionString("Audit");
+
+            public AuditPerTableContext()
+                : base(CnnString)
+            {
+            }
+
+            protected override void OnModelCreating(DbModelBuilder modelBuilder)
+            {
+                Database.SetInitializer<AuditPerTableContext>(null);
+                modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            }
+
+            public DbSet<Order> Order { get; set; }
+            public DbSet<Orderline> Orderline { get; set; }
+            public DbSet<OrderAudit> OrderAudit { get; set; }
+            public DbSet<OrderlineAudit> OrderlineAudit { get; set; }
+        }
+        public class MyBaseContext : AuditDbContext
+        {
+            public static string CnnString = TestHelper.GetConnectionString("Blogs");
+            public override bool AuditDisabled { get; set; }
+
+            public MyBaseContext()
+                : base(CnnString)
+            {
+            }
+
+            public DbSet<Blog> Blogs { get; set; }
+            public DbSet<Post> Posts { get; set; }
+            public DbSet<AuditPost> AuditPosts { get; set; }
+            public DbSet<AuditBlog> AuditBlogs { get; set; }
+        }
+        public abstract class BaseEntity
+        {
+            public virtual int Id { get; set; }
+
+        }
+
+        [AuditIgnore]
+        public class AuditBlog : BaseEntity
+        {
+            public override int Id { get; set; }
+            public int BlogId { get; set; }
+            public DateTime CreatedDate { get; set; }
+            public string Changes { get; set; }
+        }
+        [AuditIgnore]
+        public class AuditPost : BaseEntity
+        {
+            public override int Id { get; set; }
+            public int PostId { get; set; }
+            public DateTime CreatedDate { get; set; }
+            public string Changes { get; set; }
+        }
+
+        public class Blog : BaseEntity
+        {
+            public override int Id { get; set; }
+            public string Title { get; set; }
+            public string BloggerName { get; set; }
+            public virtual ICollection<Post> Posts { get; set; }
+        }
+        public class Post : BaseEntity
+        {
+            public override int Id { get; set; }
+            public string Title { get; set; }
+            public DateTime DateCreated { get; set; }
+            public string Content { get; set; }
+            public int BlogId { get; set; }
+            public Blog Blog { get; set; }
+        }
+
+        public class Order
+        {
+            public long Id { get; set; }
+            public string Number { get; set; }
+            public string Status { get; set; }
+            public virtual ICollection<Orderline> OrderLines { get; set; }
+        }
+        public class Orderline
+        {
+            public long Id { get; set; }
+            public string Product { get; set; }
+            public int Quantity { get; set; }
+
+            public long OrderId { get; set; }
+            public Order Order { get; set; }
+        }
+        public abstract class AuditBase
+        {
+            [Key, Column(Order = 1)]
+            public DateTime AuditDate { get; set; }
+            public string AuditStatus { get; set; }
+            public string UserName { get; set; }
+        }
+
+        public class OrderAudit : AuditBase
+        {
+            [Key, Column(Order = 0)]
+            public long Id { get; set; }
+            public string Number { get; set; }
+            public string Status { get; set; }
+        }
+        public class OrderlineAudit : AuditBase
+        {
+            [Key, Column(Order = 0)]
+            public long Id { get; set; }
+            public string Product { get; set; }
+            public int Quantity { get; set; }
+            public long OrderId { get; set; }
+        }
+
+        public class MyTransactionalContext : MyBaseContext
+        {
+            public override void OnScopeCreated(IAuditScope auditScope)
+            {
+                Database.BeginTransaction();
+            }
+            public override void OnScopeSaving(IAuditScope auditScope)
+            {
+                if (auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues.ContainsKey("BloggerName")
+                    && auditScope.Event.GetEntityFrameworkEvent().Entries[0].ColumnValues["BloggerName"].Equals("ROLLBACK"))
+                {
+                    Database.CurrentTransaction.Rollback();
+                }
+                else
+                {
+                    Database.CurrentTransaction.Commit();
+                }
+            }
+        }
     }
 }

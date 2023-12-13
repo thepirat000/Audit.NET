@@ -16,6 +16,21 @@ namespace Audit.Kafka.UnitTest
     public class KafkaTests
     {
         [Test]
+        [Category("Kafka")]
+        public void Test_KafkaDataProvider_FluentApi()
+        {
+            var x = new KafkaDataProvider<string>(_ => _
+                .ProducerConfig(new ProducerConfig())
+                .Topic("audit-topic")
+                .Partition(0)
+                .KeySelector(ev => "key"));
+
+            Assert.AreEqual("audit-topic", x.TopicSelector.Invoke(null));
+            Assert.AreEqual(0, x.PartitionSelector.Invoke(null));
+            Assert.AreEqual("key", x.KeySelector.Invoke(null));
+        }
+
+        [Test]
         public async Task Test_KafkaDataProvider_Stress()
         {
             var locker = new object();

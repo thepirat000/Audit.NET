@@ -4,12 +4,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Audit.Core.Providers;
 
 namespace Audit.FileSystem.UnitTest
 {
     public class FileSystemTests
     {
         private static Random random = new Random();
+        
+        [Test]
+        public void Test_FileDataProvider_FluentApi()
+        {
+            var x = new FileDataProvider(_ => _
+                .Directory(@"c:\t")
+                .FilenameBuilder(ev => "fn")
+                .FilenamePrefix("px"));
+
+            Assert.AreEqual(@"c:\t", x.DirectoryPath);
+            Assert.AreEqual("fn", x.FilenameBuilder.Invoke(null));
+            Assert.AreEqual("px", x.FilenamePrefix);
+        }
 
         [Test]
         public void Test_FileSystem_1()

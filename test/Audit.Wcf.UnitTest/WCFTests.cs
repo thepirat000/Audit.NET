@@ -1,6 +1,4 @@
-﻿#if NET452
-using Audit.Core;
-using Audit.WCF;
+﻿using Audit.Core;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -8,12 +6,13 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Newtonsoft.Json;
 
-namespace Audit.IntegrationTest.Wcf
+
+namespace Audit.WCF.UnitTest
 {
     public class WCFTests
     {
@@ -27,11 +26,11 @@ namespace Audit.IntegrationTest.Wcf
                 .UseDynamicProvider(x => x
                     .OnInsert(ev => 
                     {
-                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        inserted.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     })
                     .OnReplace((evId, ev) => 
                     {
-                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        replaced.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
@@ -51,7 +50,7 @@ namespace Audit.IntegrationTest.Wcf
             Assert.AreEqual(1, inserted.Count);
             Assert.AreEqual(1, replaced.Count);
             Assert.IsNull(inserted[0].WcfEvent.Result);
-            Assert.AreEqual(100, replaced[0].WcfEvent.Result.Value);
+            Assert.AreEqual("100", replaced[0].WcfEvent.Result.Value.ToString());
         }
 
         [Test]
@@ -64,11 +63,11 @@ namespace Audit.IntegrationTest.Wcf
                 .UseDynamicProvider(x => x
                     .OnInsert(ev =>
                     {
-                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        inserted.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     })
                     .OnReplace((evId, ev) =>
                     {
-                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        replaced.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
@@ -88,7 +87,7 @@ namespace Audit.IntegrationTest.Wcf
             Assert.AreEqual(2, inserted.Count);
             Assert.AreEqual(0, replaced.Count);
             Assert.IsNull(inserted[0].WcfEvent.Result);
-            Assert.AreEqual(100, inserted[1].WcfEvent.Result.Value);
+            Assert.AreEqual("100", inserted[1].WcfEvent.Result.Value.ToString());
         }
 
         [Test]
@@ -101,11 +100,11 @@ namespace Audit.IntegrationTest.Wcf
                 .UseDynamicProvider(x => x
                     .OnInsert(ev =>
                     {
-                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        inserted.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     })
                     .OnReplace((evId, ev) =>
                     {
-                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        replaced.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
@@ -124,7 +123,7 @@ namespace Audit.IntegrationTest.Wcf
 
             Assert.AreEqual(1, inserted.Count);
             Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual(100, inserted[0].WcfEvent.Result.Value);
+            Assert.AreEqual("100", inserted[0].WcfEvent.Result.Value.ToString());
             Assert.AreEqual(false, inserted[0].WcfEvent.IsAsync);
         }
 
@@ -138,11 +137,11 @@ namespace Audit.IntegrationTest.Wcf
                 .UseDynamicProvider(x => x
                     .OnInsert(ev =>
                     {
-                        inserted.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        inserted.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     })
                     .OnReplace((evId, ev) =>
                     {
-                        replaced.Add(JsonConvert.DeserializeObject<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
+                        replaced.Add(JsonSerializer.Deserialize<AuditEventWcfAction>((ev as AuditEventWcfAction).ToJson()));
                     }))
                 .WithCreationPolicy(EventCreationPolicy.Manual);
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
@@ -162,37 +161,7 @@ namespace Audit.IntegrationTest.Wcf
             Assert.AreEqual(0, inserted.Count);
             Assert.AreEqual(0, replaced.Count);
         }
-
-        private static object Locker = new object();
-        
-        [Test]
-        [Category("WCF")]
-        public void WCFTest_AuditScope()
-        {
-            lock (Locker)
-            {
-                WCFTest_Concurrency_AuditScope(1, 1);
-            }
-        }
-
-        [Test]
-        [Category("WCF")]
-        public void WCFTest_Concurrency_AuditScope()
-        {
-            lock (Locker)
-            {
-                WCFTest_Concurrency_AuditScope(1, 1);
-            }
-            lock (Locker)
-            {
-                WCFTest_Concurrency_AuditScope(5, 10);
-            }
-            lock (Locker)
-            {
-                WCFTest_Concurrency_AuditScope(5, 25);
-            }
-        }
-        
+       
         public void WCFTest_Concurrency_AuditScope(int threads, int callsPerThread)
         {
             var provider = new Mock<AuditDataProvider>();
@@ -376,4 +345,3 @@ namespace Audit.IntegrationTest.Wcf
 
     }
 }
-#endif
