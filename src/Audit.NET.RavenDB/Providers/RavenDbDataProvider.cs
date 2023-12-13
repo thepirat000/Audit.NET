@@ -20,7 +20,7 @@ namespace Audit.NET.RavenDB.Providers
         private readonly Func<AuditEvent, string> _databaseNameFunc;
 
         /// <summary>
-        /// Json default settings, used only when the current Audit.NET json adapter is not the Newtonsoft adapter.
+        /// Json default settings
         /// </summary>
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
         {

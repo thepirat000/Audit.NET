@@ -35,10 +35,6 @@
 		<PackageReference Include="System.Text.Json" Version="6.0.9" />
 	</ItemGroup>
 
-	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>

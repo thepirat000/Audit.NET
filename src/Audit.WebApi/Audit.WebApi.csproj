@@ -26,10 +26,6 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);ASP_NET</DefineConstants>
 	</PropertyGroup>
 

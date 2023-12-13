@@ -21,11 +21,7 @@
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
-
-	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
-	</PropertyGroup>
-
+	
 	<ItemGroup>
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
 		<None Include="README.md" Pack="true" PackagePath="\" />

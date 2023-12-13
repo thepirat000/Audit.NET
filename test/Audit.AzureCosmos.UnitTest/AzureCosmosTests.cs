@@ -112,7 +112,7 @@ namespace Audit.AzureCosmos.UnitTest
                 scope.SetCustomField("value", 200);
             };
 
-            var evs = dp.QueryEvents<AuditEventWithId>(new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = Core.Configuration.JsonSettings })
+            var evs = dp.QueryEvents<AuditEventWithId>(new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = new JsonSerializerSettings() })
                 .Where(x => x.EventType == eventType
                     && x.Duration >= 0)
                 .OrderByDescending(x => x.StartDate)
@@ -156,7 +156,7 @@ namespace Audit.AzureCosmos.UnitTest
                 scope.SetCustomField("value", 200);
             }
 
-            var evs = dp.EnumerateEvents<AuditEventWithId>($"SELECT * FROM c WHERE c.EventType = '{eventType}' ORDER BY c.StartDate DESC", new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = Core.Configuration.JsonSettings })
+            var evs = dp.EnumerateEvents<AuditEventWithId>($"SELECT * FROM c WHERE c.EventType = '{eventType}' ORDER BY c.StartDate DESC", new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = new JsonSerializerSettings() })
                 .ToList();
 
             Assert.AreEqual(3, evs.Count);
