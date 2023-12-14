@@ -21,11 +21,10 @@ if ($LASTEXITCODE -ne 0) {
 clear
 
 # Run parallel tests
+StartDotnetUnitTests 'Audit.Mvc.UnitTest' 'MVC';
 StartDotnetUnitTests 'Audit.FileSystem.UnitTest' 'FileSystem';
 StartDotnetUnitTests 'Audit.HttpClient.UnitTest' 'HttpClient';
-StartDotnetUnitTests 'Audit.Mvc.UnitTest' 'MVC';
 StartDotnetUnitTests 'Audit.JsonAdapter.UnitTest' 'JsonAdapter';
-StartDotnetUnitTests 'Audit.WebApi.UnitTest' 'WebApi';
 StartDotnetUnitTests 'Audit.DynamicProxy.UnitTest' 'DynamicProxy';
 StartDotnetUnitTests 'Audit.Redis.UnitTest' 'Redis';
 StartDotnetUnitTests 'Audit.Wcf.UnitTest' 'Wcf.Server';
@@ -33,17 +32,19 @@ StartDotnetUnitTests 'Audit.Wcf.Client.UnitTest' 'Wcf.Client';
 StartDotnetUnitTests 'Audit.RavenDB.UnitTest' 'RavenDB';
 StartDotnetUnitTests 'Audit.SqlServer.UnitTest' 'SqlServer';
 StartDotnetUnitTests 'Audit.MongoClient.UnitTest' 'MongoClient';
-StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
-StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
-StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
 StartDotnetUnitTests 'Audit.Elasticsearch.UnitTest' 'Elasticsearch';
-StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
 StartDotnetUnitTests 'Audit.MongoDB.UnitTest' 'MongoDB';
 StartDotnetUnitTests 'Audit.MySql.UnitTest' 'MySql';
 StartDotnetUnitTests 'Audit.PostgreSql.UnitTest' 'PostgreSql';
 StartDotnetUnitTests 'Audit.Serilog.UnitTest' 'Serilog';
-StartDotnetUnitTests 'Audit.AmazonQLDB.UnitTest' 'AmazonQLDB';
+StartDotnetUnitTests 'Audit.WebApi.UnitTest' 'WebApi';
 StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
+StartDotnetUnitTests 'Audit.AmazonQLDB.UnitTest' 'AmazonQLDB';
+StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
+StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
+StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
+StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
+
 
 # Run sequential tests
 $hasFailed = $false;
