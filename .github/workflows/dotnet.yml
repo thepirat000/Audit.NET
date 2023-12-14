@@ -22,18 +22,11 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          1.0.4
           2.1.x
           3.1.x
-          5.0.x
           6.0.x
           7.0.x          
-          
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-      with:
-        vs-version: '[17.0,18.0)'      
-      
+                
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.2
       env:
@@ -56,16 +49,9 @@ jobs:
           echo "Execute Demo.sql"
           sqlcmd -i ".\test\Audit.EntityFramework.Core.UnitTest\Demo.sql" -d "master" -I
 
-    - name: Nuget Restore
-      run: nuget restore Audit.NET.sln
-      
     - name: Dotnet Restore 
       run: dotnet restore
       
-    - name: MsBuild Audit.EntityFramework.UnitTest
-      run: |
-        msbuild.exe .\test\Audit.EntityFramework.UnitTest -p:Configuration=Release
-
     - name: Dotnet Build Audit.NET.sln
       run: dotnet build .\Audit.NET.sln --no-restore --configuration release
 
