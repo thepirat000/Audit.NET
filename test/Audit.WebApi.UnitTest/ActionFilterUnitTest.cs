@@ -295,7 +295,7 @@ namespace Audit.WebApi.UnitTest
             actionDescriptor.MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First();
             actionDescriptor.ActionBinding = new HttpActionBinding();
 
-            var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
+            var arg = new AuditEvent() { EventType = "TEST_REFERENCE_TYPE" };
 
             var dataProvider = new Mock<AuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
@@ -330,7 +330,7 @@ namespace Audit.WebApi.UnitTest
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
-            var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
+            var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -374,7 +374,7 @@ namespace Audit.WebApi.UnitTest
             actionDescriptor.MethodInfo = typeof(ActionFilterUnitTest).GetMethods().First();
             actionDescriptor.ActionBinding = new HttpActionBinding();
 
-            var arg = new AuditApiAttribute() { EventTypeName = "TEST_REFERENCE_TYPE" };
+            var arg = new AuditEvent() { EventType = "TEST_REFERENCE_TYPE" };
 
             var dataProvider = new Mock<AuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
@@ -413,7 +413,7 @@ namespace Audit.WebApi.UnitTest
             var scope = itemsDict["__private_AuditApiScope__"] as AuditScope;
 
             //Assert
-            var evtn = (action.ActionParameters["x"] as AuditApiAttribute).EventTypeName;
+            var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);

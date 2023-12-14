@@ -58,7 +58,7 @@ namespace Audit.Mvc.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
+                {"x", new AuditEvent(){ EventType="TEST_REFERENCE_TYPE" } }
             };
             
             var dataProvider = new Mock<AuditDataProvider>();
@@ -79,7 +79,7 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
-            (args["x"] as AuditAttribute).EventTypeName = "CHANGED!";
+            (args["x"] as AuditEvent).EventType = "CHANGED!";
 
             var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
             filter.OnActionExecuted(actionExecutedContext);
@@ -91,7 +91,7 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            var evtn = (action.ActionParameters["x"] as AuditAttribute).EventTypeName;
+            var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
 
@@ -482,7 +482,7 @@ namespace Audit.Mvc.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditAttribute(){ EventTypeName="TEST" } }
+                {"x", new AuditEvent() { EventType = "TEST" } }
             };
 
             var dataProvider = new Mock<AuditDataProvider>();
@@ -512,7 +512,7 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
             Assert.AreEqual(1, action.ActionParameters.Count);
-            Assert.AreEqual("TEST", (action.ActionParameters["x"] as AuditAttribute).EventTypeName);
+            Assert.AreEqual("TEST", (action.ActionParameters["x"] as AuditEvent).EventType);
         }
     }
 }

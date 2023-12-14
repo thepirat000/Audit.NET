@@ -32,11 +32,7 @@ StartDotnetUnitTests 'Audit.Wcf.UnitTest' 'Wcf.Server';
 StartDotnetUnitTests 'Audit.Wcf.Client.UnitTest' 'Wcf.Client';
 StartDotnetUnitTests 'Audit.RavenDB.UnitTest' 'RavenDB';
 StartDotnetUnitTests 'Audit.SqlServer.UnitTest' 'SqlServer';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'Integration' '--filter=TestCategory!=AzureDocDb&TestCategory!=AzureBlob&TestCategory!=AzureStorageBlobs&TestCategory!=WCF&TestCategory!=Elasticsearch&TestCategory!=Dynamo&TestCategory!=PostgreSQL&TestCategory!=Kafka&TestCategory!=AmazonQLDB&TestCategory!=Mongo&TestCategory!=MySql';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'Mongo' '--filter=TestCategory=Mongo';
 StartDotnetUnitTests 'Audit.MongoClient.UnitTest' 'MongoClient';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'MySql' '--filter=TestCategory=MySql';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'PostgreSQL' '--filter=TestCategory=PostgreSQL';
 StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
 StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
 StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
@@ -47,7 +43,6 @@ StartDotnetUnitTests 'Audit.MySql.UnitTest' 'MySql';
 StartDotnetUnitTests 'Audit.PostgreSql.UnitTest' 'PostgreSql';
 StartDotnetUnitTests 'Audit.Serilog.UnitTest' 'Serilog';
 StartDotnetUnitTests 'Audit.AmazonQLDB.UnitTest' 'AmazonQLDB';
-StartDotnetUnitTests 'Audit.IntegrationTest' 'Elasticsearch' '--filter=TestCategory=Elasticsearch';
 StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
 
 # Run sequential tests
