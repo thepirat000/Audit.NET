@@ -84,9 +84,6 @@ jobs:
     #  env:
     #    AUDIT_NET_AZURETABLECNNSTRING: ${{ secrets.AUDIT_NET_AZURETABLECNNSTRING }}
 
-    - name: Test Audit.EntityFramework.Core.v3.UnitTest
-      run: dotnet test .\test\Audit.EntityFramework.Core.v3.UnitTest --no-build --configuration release --verbosity normal
-
     - name: Test Audit.EntityFramework.Full.UnitTest
       run: dotnet test .\test\Audit.EntityFramework.Full.UnitTest --no-build --configuration release --verbosity normal
       
@@ -104,6 +101,9 @@ jobs:
      
     - name: Test Audit.Wcf.UnitTest
       run: dotnet test .\test\Audit.Wcf.UnitTest --no-build --configuration release --verbosity normal
+      
+    - name: Test Audit.Wcf.Client.UnitTest
+      run: dotnet test .\test\Audit.Wcf.Client.UnitTest --no-build --configuration release --verbosity normal
       
     - name: Test Audit.UnitTest
       run: dotnet test .\test\Audit.UnitTest --no-build --configuration release --verbosity normal
