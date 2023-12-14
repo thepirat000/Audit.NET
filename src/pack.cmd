@@ -3,7 +3,6 @@ cls
 
 del "audit.net\bin\release\*.nupkg"
 del "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.nupkg"
-del "Audit.NET.JsonSystemAdapter\bin\release\*.nupkg"
 del "audit.mvc\bin\release\*.nupkg"
 del "audit.mvc.core\bin\release\*.nupkg"
 del "audit.webapi\bin\release\*.nupkg"
@@ -14,10 +13,8 @@ del "audit.net.sqlserver\bin\release\*.nupkg"
 del "audit.net.mysql\bin\release\*.nupkg"
 del "audit.entityframework\bin\release\*.nupkg"
 del "audit.entityframework.core\bin\release\*.nupkg"
-del "audit.entityframework.core.v3\bin\release\*.nupkg"
 del "audit.entityframework.Identity\bin\release\*.nupkg"
 del "audit.entityframework.Identity.core\bin\release\*.nupkg"
-del "audit.entityframework.Identity.core.v3\bin\release\*.nupkg"
 del "audit.WCF\bin\release\*.nupkg"
 del "audit.WCF.Client\bin\release\*.nupkg"
 del "audit.net.azurestorage\bin\release\*.nupkg"
@@ -49,7 +46,6 @@ IF NOT ERRORLEVEL 0 GOTO error
 
 dotnet pack "Audit.NET/" -c Release
 dotnet pack "Audit.NET.JsonNewtonsoftAdapter/" -c Release
-dotnet pack "Audit.NET.JsonSystemAdapter/" -c Release
 dotnet pack "Audit.Mvc/" -c Release
 dotnet pack "Audit.Mvc.Core/" -c Release
 dotnet pack "Audit.WebApi/" -c Release
@@ -60,10 +56,8 @@ dotnet pack "Audit.NET.SqlServer/" -c Release
 dotnet pack "Audit.NET.MySql/" -c Release
 dotnet pack "Audit.EntityFramework/" -c Release
 dotnet pack "Audit.EntityFramework.Core/" -c Release
-dotnet pack "Audit.EntityFramework.Core.v3/" -c Release
 dotnet pack "Audit.EntityFramework.Identity/" -c Release
 dotnet pack "Audit.EntityFramework.Identity.Core/" -c Release
-dotnet pack "Audit.EntityFramework.Identity.Core.v3/" -c Release
 dotnet pack "Audit.Wcf/" -c Release
 dotnet pack "Audit.Wcf.Client/" -c Release
 dotnet pack "Audit.NET.AzureStorage/" -c Release

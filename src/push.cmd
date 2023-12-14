@@ -3,7 +3,6 @@ cls
 
 del "audit.net\bin\release\*.symbols.nupkg"
 del "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.symbols.nupkg"
-del "Audit.NET.JsonSystemAdapter\bin\release\*.symbols.nupkg"
 del "audit.mvc\bin\release\*.symbols.nupkg"
 del "audit.mvc.core\bin\release\*.symbols.nupkg"
 del "audit.webapi\bin\release\*.symbols.nupkg"
@@ -14,10 +13,8 @@ del "audit.net.sqlserver\bin\release\*.symbols.nupkg"
 del "audit.net.mysql\bin\release\*.symbols.nupkg"
 del "audit.entityframework\bin\release\*.symbols.nupkg"
 del "audit.entityframework.core\bin\release\*.symbols.nupkg"
-del "audit.entityframework.core.v3\bin\release\*.symbols.nupkg"
 del "audit.entityframework.identity\bin\release\*.symbols.nupkg"
 del "audit.entityframework.identity.core\bin\release\*.symbols.nupkg"
-del "audit.entityframework.identity.core.v3\bin\release\*.symbols.nupkg"
 del "audit.Wcf\bin\release\*.symbols.nupkg"
 del "audit.Wcf.Client\bin\release\*.symbols.nupkg"
 del "audit.net.azurestorage\bin\release\*.symbols.nupkg"
@@ -43,7 +40,6 @@ del "Audit.MongoClient\bin\release\*.symbols.nupkg"
 
 nuget push "audit.net\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.nupkg" -NoSymbols -source %1
-nuget push "Audit.NET.JsonSystemAdapter\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.mvc\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.Mvc.Core\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.webapi\bin\release\*.nupkg" -NoSymbols -source %1
@@ -54,10 +50,8 @@ nuget push "audit.net.sqlserver\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.net.mysql\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework.Core\bin\release\*.nupkg" -NoSymbols -source %1
-nuget push "audit.EntityFramework.Core.v3\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework.Identity\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.EntityFramework.Identity.Core\bin\release\*.nupkg" -NoSymbols -source %1
-nuget push "audit.EntityFramework.Identity.Core.v3\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "audit.Wcf\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.Wcf.Client\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureStorage\bin\release\*.nupkg" -NoSymbols -source %1
