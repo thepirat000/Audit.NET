@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+		<DebugType>Full</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Audit.NET.AzureStorageBlobs\Audit.NET.AzureStorageBlobs.csproj" />
+		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Audit.IntegrationTest\AzureSettings.cs" Link="AzureSettings.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Castle.Core" Version="5.1.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
+		<PackageReference Include="moq" Version="4.8.1" />
+		<PackageReference Include="NUnit" Version="3.7.1" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+		<PackageReference Include="System.Runtime" Version="4.1.0" />
+		<Reference Include="System" />
+		<Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+	</ItemGroup>
+
+</Project>

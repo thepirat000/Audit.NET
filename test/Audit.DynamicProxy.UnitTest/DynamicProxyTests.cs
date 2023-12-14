@@ -2,11 +2,10 @@
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Newtonsoft.Json;
 
 namespace Audit.DynamicProxy.UnitTest
 {
@@ -52,7 +51,7 @@ namespace Audit.DynamicProxy.UnitTest
 
         private static string ToJson(object obj)
         {
-            return obj == null ? null : JsonConvert.SerializeObject(obj);
+            return obj == null ? null : JsonSerializer.Serialize(obj);
         }
         
         [Test]

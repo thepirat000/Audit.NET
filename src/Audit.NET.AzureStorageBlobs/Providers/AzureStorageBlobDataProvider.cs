@@ -1,10 +1,6 @@
 ﻿using Audit.Core;
 using System;
 using System.Threading.Tasks;
-#if NETSTANDARD2_0
-using System.Text.Json;
-using System.Text.Json.Serialization;
-#endif
 using Azure.Storage.Blobs;
 using Audit.AzureStorageBlobs.ConfigurationApi;
 using Azure.Storage;
@@ -86,27 +82,6 @@ namespace Audit.AzureStorageBlobs.Providers
             }
         }
 
-#if NETSTANDARD2_0
-        public JsonSerializerOptions JsonSettings { get; set; } = new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = null
-        };
-
-        public override object Serialize<T>(T value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            if (value is string)
-            {
-                return value;
-            }
-            return JsonSerializer.Deserialize(JsonSerializer.Serialize(value, JsonSettings), value.GetType(), JsonSettings);
-        }
-#endif
-
         private BlobContainerClient EnsureContainerClient(string containerName)
         {
             var cacheKey = $"{ConnectionString ?? ServiceUrl}|{containerName}";
@@ -181,11 +156,8 @@ namespace Audit.AzureStorageBlobs.Providers
                 Metadata = MetadataBuilder?.Invoke(auditEvent),
                 AccessTier = AccessTierBuilder?.Invoke(auditEvent)
             };
-#if NETSTANDARD2_0
-            blob.Upload(new BinaryData(auditEvent, JsonSettings), options);
-#else
-            blob.Upload(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options);
-#endif
+            blob.Upload(new BinaryData(auditEvent, Configuration.JsonSettings), options);
+            
             return blobName;
         }
 
@@ -198,11 +170,8 @@ namespace Audit.AzureStorageBlobs.Providers
                 Metadata = MetadataBuilder?.Invoke(auditEvent),
                 AccessTier = AccessTierBuilder?.Invoke(auditEvent)
             };
-#if NETSTANDARD2_0
-            await blob.UploadAsync(new BinaryData(auditEvent, JsonSettings), options, cancellationToken);
-#else
             await blob.UploadAsync(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options, cancellationToken);
-#endif
+
             return blobName;
         }
 
@@ -256,11 +225,8 @@ namespace Audit.AzureStorageBlobs.Providers
             if (blobClient.Exists())
             {
                 var result = blobClient.DownloadContent();
-#if NETSTANDARD2_0
-                return result.Value.Content.ToObjectFromJson<T>(JsonSettings);
-#else
+                
                 return result.Value.Content.ToObjectFromJson<T>(Core.Configuration.JsonSettings);
-#endif
             }
             return default;
         }
@@ -272,11 +238,8 @@ namespace Audit.AzureStorageBlobs.Providers
             if (await blobClient.ExistsAsync(cancellationToken))
             {
                 var result = await blobClient.DownloadContentAsync(cancellationToken);
-#if NETSTANDARD2_0
-                return result.Value.Content.ToObjectFromJson<T>(JsonSettings);
-#else
+
                 return result.Value.Content.ToObjectFromJson<T>(Core.Configuration.JsonSettings);
-#endif
             }
             return default;
         }

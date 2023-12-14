@@ -76,7 +76,7 @@ namespace Audit.Redis.Providers
             var channel = ChannelBuilder.Invoke(auditEvent);
             var sub = Context.Value.GetSubscriber();
             var value = GetValue(auditEvent);
-            sub.Publish(channel, value);
+            sub.Publish(new RedisChannel(channel, RedisChannel.PatternMode.Auto), value);
         }
 
         private async Task PublishAsync(Guid eventId, AuditEvent auditEvent)
@@ -89,7 +89,7 @@ namespace Audit.Redis.Providers
             var channel = ChannelBuilder.Invoke(auditEvent);
             var sub = Context.Value.GetSubscriber();
             var value = GetValue(auditEvent);
-            await sub.PublishAsync(channel, value);
+            await sub.PublishAsync(new RedisChannel(channel, RedisChannel.PatternMode.Auto), value);
         }
     }
 }

@@ -1,11 +1,7 @@
 using Audit.Core;
 using System;
 using System.Collections.Generic;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.EntityFramework
 {

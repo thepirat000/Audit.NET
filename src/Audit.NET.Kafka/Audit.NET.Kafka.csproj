@@ -4,7 +4,7 @@
     <Copyright>Copyright 2020</Copyright>
     <AssemblyTitle>Audit.Kafka</AssemblyTitle>
     <Authors>Federico Colombo</Authors>
-    <TargetFrameworks>netstandard2.0;netstandard1.3;net45;net5.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;net6.0</TargetFrameworks>
     <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -39,6 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="1.5.1" />
+    <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
   </ItemGroup>
 </Project>

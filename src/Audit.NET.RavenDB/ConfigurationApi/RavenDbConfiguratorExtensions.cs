@@ -1,11 +1,7 @@
 ﻿using Audit.Core;
 using Audit.Core.ConfigurationApi;
 using Audit.NET.RavenDB.Providers;
-using Newtonsoft.Json;
-using Raven.Client.Documents;
-using Raven.Client.Json.Serialization.NewtonsoftJson;
 using System;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Audit.NET.RavenDB.ConfigurationApi
 {

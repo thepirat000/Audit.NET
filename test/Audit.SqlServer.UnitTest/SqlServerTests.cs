@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
 using Audit.SqlServer.Providers;
-#if !NET45
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-#endif
 using NUnit.Framework;
 
 namespace Audit.SqlServer.UnitTest
@@ -104,9 +102,6 @@ namespace Audit.SqlServer.UnitTest
                     .Schema(ev => "schema")
                     .TableName("table")
                     .CustomColumn("EventType", ev => ev.EventType)
-#if NET45
-                    .SetDatabaseInitializerNull()
-#endif
             );
             Assert.AreEqual("cnnString", x.ConnectionStringBuilder.Invoke(null));
             Assert.AreEqual("evType", x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }));
@@ -115,12 +110,8 @@ namespace Audit.SqlServer.UnitTest
             Assert.AreEqual("last", x.LastUpdatedDateColumnNameBuilder.Invoke(null));
             Assert.AreEqual("schema", x.SchemaBuilder.Invoke(null));
             Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
-#if NET45
-            Assert.AreEqual(true, x.SetDatabaseInitializerNull);
-#endif
         }
 
-#if NETCOREAPP3_0 || NET5_0_OR_GREATER
         [Test]
         public void Test_Sql_DbContextOptions()
         {
@@ -148,7 +139,12 @@ namespace Audit.SqlServer.UnitTest
             public TestInterceptor() : base()
             {
             }
+
+#if NET462
+            public override async Task<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
+#else
             public override async ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
+#endif
             {
                 await Task.Delay(0);
                 Count++;
@@ -160,41 +156,5 @@ namespace Audit.SqlServer.UnitTest
                 return result;
             }
         }
-#endif
-
-#if NET45
-        [Test]
-        public void Test_SqlServer_DbConnection()
-        {
-            var sqlDp = new SqlDataProvider(_ => _
-                .DbConnection(ev => new SqlConnection(SqlTestHelper.GetConnectionString()))
-                .TableName(ev => SqlTestHelper.TableName)
-                .IdColumnName(ev => "EventId")
-                .JsonColumnName(ev => "Data")
-                .LastUpdatedColumnName("LastUpdatedDate")
-                .CustomColumn("EventType", ev => ev.EventType));
-
-            var ids = new List<object>();
-            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
-            {
-                ids.Add(scope.EventId);
-            });
-
-            Audit.Core.Configuration.Setup()
-                .UseCustomProvider(sqlDp);
-
-            AuditScope.Log("test1", new { Name = "John" });
-            AuditScope.Log("test2", new { Name = "Mary" });
-
-            Assert.AreEqual(2, ids.Count);
-
-            var ev1 = sqlDp.GetEvent(ids[0]);
-            var ev2 = sqlDp.GetEvent(ids[1]);
-
-            Assert.AreEqual("John", ev1.CustomFields["Name"].ToString());
-            Assert.AreEqual("Mary", ev2.CustomFields["Name"].ToString());
-        }
-#endif
-
     }
 }

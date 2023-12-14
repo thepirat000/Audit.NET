@@ -1,4 +1,4 @@
-﻿#if NET45 || NET461
+﻿#if ASP_NET
 using System.Collections.Generic;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;

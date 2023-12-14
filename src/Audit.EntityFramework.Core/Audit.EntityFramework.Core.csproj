@@ -5,7 +5,7 @@
 		<Copyright>Copyright 2016</Copyright>
 		<AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
-		<TargetFrameworks>netstandard1.5;netstandard2.0;net461;netstandard2.1;net472;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -17,7 +17,6 @@
 		<PackageTags>Audit;Trail;Log;EntityFramework;Core</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-		<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">2.0.3</NetStandardImplicitPackageVersion>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -26,26 +25,17 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_1</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_2;EF_CORE_2_OR_GREATER</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net472' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_3;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_5;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER</DefineConstants>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+		<DefineConstants>$(DefineConstants);EF_CORE_5;EF_CORE_5_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_6;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_6;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_7;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_7;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -58,80 +48,28 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="ConfigurationApi\**" />
-		<EmbeddedResource Remove="ConfigurationApi\**" />
-		<None Remove="ConfigurationApi\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.1" />
+		<PackageReference Include="System.Text.Json" Version="6.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.17" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.2" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.4" />
-		<Reference Include="System" />
-		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="System.Transactions" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
-		<Reference Include="System" />
-		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-		<Reference Include="Microsoft.CSharp" />
-		<Reference Include="System.Transactions" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' ">
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-		<PackageReference Include="System.Text.Json" Version="5.0.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.8" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.25" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.14" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
 	</ItemGroup>
-
-	<PropertyGroup Condition=" '$(TargetFramework)' != 'net5.0' AND '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' AND '$(TargetFramework)' != 'net8.0' ">
-		<DefineConstants>$(DefineConstants);IS_NK_JSON</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0' OR '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' OR '$(TargetFramework)' == 'net8.0' ">
-		<DefineConstants>$(DefineConstants);IS_TEXT_JSON</DefineConstants>
-	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="images\icon.png" Pack="true" PackagePath="\" />

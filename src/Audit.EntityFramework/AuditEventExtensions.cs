@@ -29,7 +29,7 @@ namespace Audit.EntityFramework
                 : null;
         }
 
-#if EF_CORE_3_OR_GREATER
+#if EF_CORE_5_OR_GREATER
         /// <summary>
         /// Gets the Low-Level EF Command Event portion of the Audit Event on the given scope.
         /// </summary>
@@ -53,8 +53,7 @@ namespace Audit.EntityFramework
                 ? Core.Configuration.JsonAdapter.ToObject<CommandEvent>(field)
                 : null;
         }
-#endif
-#if EF_CORE_5_OR_GREATER
+
         /// <summary>
         /// Gets the Low-Level EF Transaction Event portion of the Audit Event on the given scope.
         /// </summary>

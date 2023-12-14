@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
-#endif
-#if NET45
-using System.Data.Common;
-#endif
 
 namespace Audit.SqlServer.Configuration
 {
@@ -22,25 +17,7 @@ namespace Audit.SqlServer.Configuration
         internal Func<AuditEvent, string> _jsonColumnNameBuilder;
         internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
         internal Func<AuditEvent, DbContextOptions> _dbContextOptionsBuilder = null;
-#endif
-#if NET45
-        internal bool _setDatabaseInitializerNull = false;
-        public ISqlServerProviderConfigurator SetDatabaseInitializerNull(bool initializeToNull = true)
-        {
-            _setDatabaseInitializerNull = initializeToNull;
-            return this;
-        }
-
-        internal Func<AuditEvent, DbConnection> _dbConnectionBuilder { get; set; }
-        public ISqlServerProviderConfigurator DbConnection(Func<AuditEvent, DbConnection> connection)
-        {
-            _dbConnectionBuilder = connection;
-            return this;
-        }
-
-#endif
 
         public ISqlServerProviderConfigurator ConnectionString(string connectionString)
         {
@@ -126,7 +103,6 @@ namespace Audit.SqlServer.Configuration
             return this;
         }
 
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
         public ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder)
         {
             _dbContextOptionsBuilder = dbContextOptionsBuilder;
@@ -137,6 +113,5 @@ namespace Audit.SqlServer.Configuration
             _dbContextOptionsBuilder = ev => dbContextOptions;
             return this;
         }
-#endif
     }
 }

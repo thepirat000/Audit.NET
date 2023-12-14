@@ -28,9 +28,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             optionsBuilder.UseLoggerFactory(_loggerFactory);
             optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
-#if !NETCOREAPP1_0
             optionsBuilder.UseLazyLoadingProxies();
-#endif
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

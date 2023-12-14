@@ -1,5 +1,4 @@
-﻿#if TEXT_JSON
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
-namespace Audit.JsonNetAdapter.UnitTest
+namespace Audit.JsonAdapter.UnitTest
 {
     [TestFixture]
     public class TestAuditContractResolver
@@ -299,7 +298,4 @@ namespace Audit.JsonNetAdapter.UnitTest
         }
 
     }
-
-
 }
-#endif

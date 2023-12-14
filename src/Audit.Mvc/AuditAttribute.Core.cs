@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NETSTANDARD1_6 || NET451 || NET5_0
+﻿#if ASP_CORE
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -211,11 +211,7 @@ namespace Audit.Mvc
         {
             var actionArguments = (context.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo.GetParameters()
                 .Where(pi => context.ActionArguments.ContainsKey(pi.Name)
-#if NETSTANDARD1_6
-                && !pi.CustomAttributes.Any(ca => ca.AttributeType == typeof(AuditIgnoreAttribute)))
-#else
-                && !pi.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any())
-#endif
+                    && !pi.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any())
                 .ToDictionary(k => k.Name, v => context.ActionArguments[v.Name]);
             if (SerializeActionParameters)
             {
@@ -336,7 +332,7 @@ namespace Audit.Mvc
             {
                 return vr.ViewName;
             }
-#if NETCOREAPP3_0 || NETSTANDARD2_1 || NETSTANDARD2_0 || NET5_0
+#if ASP_CORE
             if (result is RedirectToPageResult rtp)
             {
                 return rtp.PageName;
@@ -358,21 +354,15 @@ namespace Audit.Mvc
             }
 
             var controllerIgnored = (actionDescriptor as ControllerActionDescriptor).ControllerTypeInfo
-#if NETSTANDARD1_6
-                .CustomAttributes.Any(ca => ca.AttributeType == typeof(AuditIgnoreAttribute));
-#else
                 .GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
-#endif
+
             if (controllerIgnored)
             {
                 return true;
             }
             var methodIgnored = (actionDescriptor as ControllerActionDescriptor).MethodInfo
-#if NETSTANDARD1_6
-                .CustomAttributes.Any(ca => ca.AttributeType == typeof(AuditIgnoreAttribute));
-#else
                 .GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
-#endif
+
             return methodIgnored;
         }
 

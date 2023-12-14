@@ -911,7 +911,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var list = new List<AuditEvent>();
             var subs = mx.GetSubscriber();
-            subs.Subscribe("mychannel:audit", (ch, x) =>
+            subs.Subscribe(new RedisChannel("mychannel:audit", RedisChannel.PatternMode.Literal), (ch, x) =>
             {
                 list.Add(Configuration.JsonAdapter.Deserialize<AuditEvent>(x));
             });
@@ -943,7 +943,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var list = new List<AuditEvent>();
             var subs = mx.GetSubscriber();
-            await subs.SubscribeAsync("mychannel:audit", (ch, x) =>
+            await subs.SubscribeAsync(new RedisChannel("mychannel:audit", RedisChannel.PatternMode.Literal), (ch, x) =>
             {
                 list.Add(Configuration.JsonAdapter.Deserialize<AuditEvent>(x));
             });
@@ -977,7 +977,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var list = new List<RedisValue>();
             var subs = mx.GetSubscriber();
-            subs.Subscribe("Redis_PubSub_CustomSerializer:channel", (ch, x) =>
+            subs.Subscribe(new RedisChannel("Redis_PubSub_CustomSerializer:channel", RedisChannel.PatternMode.Literal), (ch, x) =>
             {
                 list.Add(x);
             });

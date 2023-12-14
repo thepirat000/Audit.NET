@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if ASP_NET
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -69,15 +69,9 @@ namespace Audit.Mvc
             {
                 UserName = (request.IsAuthenticated) ? filterContext.HttpContext.User?.Identity.Name : "Anonymous",
                 IpAddress = request.ServerVariables?["HTTP_X_FORWARDED_FOR"] ?? request.UserHostAddress,
-#if NET45 
-                RequestUrl = request.Unvalidated.RawUrl,
-                FormVariables = ToDictionary(request.Unvalidated.Form),
-                Headers = IncludeHeaders ? ToDictionary(request.Unvalidated.Headers) : null,
-#else
                 RequestUrl = request.RawUrl,
                 FormVariables = ToDictionary(request.Form),
                 Headers = IncludeHeaders ? ToDictionary(request.Headers) : null,
-#endif
                 RequestBody = IncludeRequestBody ? GetRequestBody(filterContext.HttpContext) : null,
                 HttpMethod = request.HttpMethod,
                 ActionName = filterContext.ActionDescriptor?.ActionName,

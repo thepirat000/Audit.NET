@@ -218,6 +218,7 @@ namespace Audit.DynamoDB.Providers
         /// <param name="eventId">The event ID to retrieve. 
         /// Must be a Primitive, a DynamoDBEntry or an array of any of these two types. The first (or only) element must be the Hash key, and the second element is the range key.
         /// </param>
+        /// <param name="cancellationToken">The cancellation token</param>
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             if (eventId == null)

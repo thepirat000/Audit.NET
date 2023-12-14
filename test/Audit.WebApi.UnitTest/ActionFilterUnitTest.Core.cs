@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_1 || NETCOREAPP2_0 || NETCOREAPP1_0 || NET451 || NET5_0
+﻿#if ASP_CORE
 using System.Collections.Generic;
 using Moq;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -68,8 +68,8 @@ namespace Audit.WebApi.UnitTest
 
                 var okIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.OK);
                 var badIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.BadRequest);
-                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {Configuration.JsonAdapter.Serialize(testCase)}");
-                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {Configuration.JsonAdapter.Serialize(testCase)}");
+                Assert.That(testCase.ExpectInclude_200, Is.EqualTo(okIncluded), $"Expect OK (200) included = {testCase.ExpectInclude_200}: {Configuration.JsonAdapter.Serialize(testCase)}");
+                Assert.That(testCase.ExpectInclude_400, Is.EqualTo(badIncluded), $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {Configuration.JsonAdapter.Serialize(testCase)}");
             }
         }
 
@@ -167,19 +167,19 @@ namespace Audit.WebApi.UnitTest
             {
                 svcProvider.Verify(p => p.GetService(It.IsAny<Type>()), Times.AtLeastOnce);
             }
-            Assert.IsNotNull(action.ActionExecutingContext);
-            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName, (action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ActionName);
-            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName, (action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ControllerName);
-            Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
-            Assert.AreEqual("application/json", action.Headers["content-type"]);
-            Assert.AreEqual("values", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual("this is the result", action.ResponseBody.Value);
-            Assert.AreEqual(2, action.ResponseHeaders.Count);
-            Assert.AreEqual("1", action.ResponseHeaders["header-one"]);
-            Assert.AreEqual("2", action.ResponseHeaders["header-two"]);
-            Assert.AreEqual(123, action.RequestBody.Length);
-            Assert.AreEqual("application/json", action.RequestBody.Type);
+            Assert.That(action.ActionExecutingContext, Is.Not.Null);
+            Assert.That((action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ActionName, Is.EqualTo((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName));
+            Assert.That((action.ActionExecutingContext.ActionDescriptor as ControllerActionDescriptor).ControllerName, Is.EqualTo((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName));
+            Assert.That(action.RequestUrl, Is.EqualTo("http://200.10.10.20:1010/api/values"));
+            Assert.That(action.Headers["content-type"], Is.EqualTo("application/json"));
+            Assert.That(action.ControllerName, Is.EqualTo("values"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("this is the result"));
+            Assert.That(action.ResponseHeaders.Count, Is.EqualTo(2));
+            Assert.That(action.ResponseHeaders["header-one"], Is.EqualTo("1"));
+            Assert.That(action.ResponseHeaders["header-two"], Is.EqualTo("2"));
+            Assert.That(action.RequestBody.Length, Is.EqualTo(123));
+            Assert.That(action.RequestBody.Type, Is.EqualTo("application/json"));
         }
 
         [Test]
@@ -234,10 +234,9 @@ namespace Audit.WebApi.UnitTest
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
 
             //Assert
-            Assert.AreEqual("this is the result", action.ResponseBody.Value);
-
-            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName, (action.GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName);
-            Assert.AreEqual((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName, (action.GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ControllerName);
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("this is the result"));
+            Assert.That((action.GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName, Is.EqualTo((actionContext.ActionDescriptor as ControllerActionDescriptor).ActionName));
+            Assert.That((action.GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ControllerName, Is.EqualTo((actionContext.ActionDescriptor as ControllerActionDescriptor).ControllerName));
         }
 
         [Test]
@@ -307,11 +306,11 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
-            Assert.AreEqual("application/json", action.Headers["content-type"]);
-            Assert.AreEqual("values", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual("this is the result", action.ResponseBody.Value);
+            Assert.That(action.RequestUrl, Is.EqualTo("http://200.10.10.20:1010/api/values"));
+            Assert.That(action.Headers["content-type"], Is.EqualTo("application/json"));
+            Assert.That(action.ControllerName, Is.EqualTo("values"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("this is the result"));
         }
 
         [Test]
@@ -375,16 +374,16 @@ namespace Audit.WebApi.UnitTest
             var action = itemsDict["__private_AuditApiAction__"] as AuditApiAction;
 
             //Assert
-            Assert.AreEqual("TEST_REFERENCE_TYPE", (action.ActionParameters["x"] as AuditTarget).Type);
+            Assert.That((action.ActionParameters["x"] as AuditTarget).Type, Is.EqualTo("TEST_REFERENCE_TYPE"));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.AreEqual("http://200.10.10.20:1010/api/values", action.RequestUrl);
-            Assert.AreEqual("application/json", action.Headers["content-type"]);
-            Assert.AreEqual("values", action.ControllerName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual("this is the result", action.ResponseBody.Value);
+            Assert.That(action.RequestUrl, Is.EqualTo("http://200.10.10.20:1010/api/values"));
+            Assert.That(action.Headers["content-type"], Is.EqualTo("application/json"));
+            Assert.That(action.ControllerName, Is.EqualTo("values"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("this is the result"));
         }
     }
 }

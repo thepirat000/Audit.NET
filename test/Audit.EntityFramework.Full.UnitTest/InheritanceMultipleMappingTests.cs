@@ -1,4 +1,4 @@
-﻿#if NET472
+﻿#if NET462 || NET472
 using NUnit.Framework;
 using System;
 using System.Collections;

@@ -70,7 +70,7 @@ namespace Audit.JsonNewtonsoftAdapter
 
             contract.ExtensionDataSetter = (o, key, value) =>
             {
-                if (key.StartsWith('@'))
+                if (key.StartsWith("@"))
                 {
                     return;
                 }

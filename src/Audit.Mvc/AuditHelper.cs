@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if ASP_NET
 using System.Web.Mvc;
 using System;
 using System.Collections.Generic;

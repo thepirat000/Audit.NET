@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using Audit.Core;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver.Core.Events;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.MongoClient
 {
@@ -51,21 +47,13 @@ namespace Audit.MongoClient
         /// <summary>
         /// The database reply.
         /// </summary>
-#if IS_NK_JSON
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public object Reply { get; set; }
 
         /// <summary>
         /// The database error message if an error occurred, otherwise NULL.
         /// </summary>
-#if IS_NK_JSON
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string Error { get; set; }
 
         /// <summary>

@@ -1,15 +1,9 @@
-﻿#if EF_CORE_3_OR_GREATER
+﻿#if EF_CORE_5_OR_GREATER
 using Microsoft.EntityFrameworkCore;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
 using System.Text.Json.Serialization;
-#endif
-
 
 namespace Audit.EntityFramework
 {
-
     /// <summary>
     /// Event information for transaction interception
     /// </summary>

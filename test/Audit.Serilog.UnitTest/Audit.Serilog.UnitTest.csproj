@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net462;netcoreapp3.1;net6.0</TargetFrameworks>
+		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Audit.NET.Serilog\Audit.NET.Serilog.csproj" />
+		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+		<PackageReference Include="Moq" Version="4.7.99" />
+		<PackageReference Include="NUnit" Version="3.7.1" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
+		<PackageReference Include="System.Runtime" Version="4.3.0" />
+		<PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
+		<PackageReference Include="Serilog" Version="3.1.1" />
+		<PackageReference Include="Serilog.Sinks.InMemory.Assertions" Version="0.11.0" />
+		<PackageReference Include="FluentAssertions" Version="6.7.0" />
+	</ItemGroup>
+
+</Project>

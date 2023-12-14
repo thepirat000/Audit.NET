@@ -1,5 +1,4 @@
-﻿using Audit.Core;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 
 namespace Audit.Wcf.Client

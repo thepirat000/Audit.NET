@@ -26,12 +26,7 @@ namespace Audit.Core
                 LastUpdatedDateColumnNameBuilder = sqlDbConfig._lastUpdatedColumnNameBuilder,
                 SchemaBuilder = sqlDbConfig._schemaBuilder,
                 CustomColumns = sqlDbConfig._customColumns,
-#if NET45
-                SetDatabaseInitializerNull = sqlDbConfig._setDatabaseInitializerNull,
-                DbConnectionBuilder = sqlDbConfig._dbConnectionBuilder
-#else
                 DbContextOptionsBuilder = sqlDbConfig._dbContextOptionsBuilder
-#endif
             };
             return new CreationPolicyConfigurator();
         }

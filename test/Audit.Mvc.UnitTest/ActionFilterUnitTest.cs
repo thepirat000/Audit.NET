@@ -1,4 +1,4 @@
-﻿#if NET45 || NET461
+﻿#if ASP_NET
 using Audit.Core;
 using Moq;
 using NUnit.Framework;
@@ -6,9 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -25,7 +23,7 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
-            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Headers).Returns(() => nvc);
             var httpResponse = new Mock<HttpResponseBase>();
 
             httpResponse.Setup(c => c.StatusCode).Returns(200);
@@ -38,7 +36,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
 
             var ctrlDescriptor = new Mock<ControllerDescriptor>();
             ctrlDescriptor.Setup(c => c.ControllerType).Returns(this.GetType()); // controller type (to check controller-level ignore)
@@ -60,7 +58,7 @@ namespace Audit.Mvc.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
+                {"x", new AuditEvent(){ EventType="TEST_REFERENCE_TYPE" } }
             };
             
             var dataProvider = new Mock<AuditDataProvider>();
@@ -81,7 +79,7 @@ namespace Audit.Mvc.UnitTest
             var scopeFromController = AuditAttribute.GetCurrentScope(httpContext.Object);
             var actionFromController = scopeFromController.Event.GetMvcAuditAction();
 
-            (args["x"] as AuditAttribute).EventTypeName = "CHANGED!";
+            (args["x"] as AuditEvent).EventType = "CHANGED!";
 
             var actionExecutedContext = new ActionExecutedContext(controllerContext, actionDescriptor.Object, false, null);
             filter.OnActionExecuted(actionExecutedContext);
@@ -93,7 +91,7 @@ namespace Audit.Mvc.UnitTest
             var scope = itemsDict["__private_AuditScope__"] as AuditScope;
 
             //Assert
-            var evtn = (action.ActionParameters["x"] as AuditAttribute).EventTypeName;
+            var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
             Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
 
@@ -114,7 +112,7 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
-            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Headers).Returns(() => nvc);
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -128,7 +126,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
 
             var ctrlDescriptor = new Mock<ControllerDescriptor>();
             ctrlDescriptor.Setup(c => c.ControllerType).Returns(this.GetType()); // controller type (to check controller-level ignore)
@@ -198,7 +196,7 @@ namespace Audit.Mvc.UnitTest
             var nvc = new NameValueCollection();
             //var request = new HttpRequest(null, "http://200.10.10.20:1010/api/values", null);
             request.Setup(c => c.ContentType).Returns("application/json");
-            request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Headers).Returns(() => nvc);
 
             var httpResponse = new Mock<HttpResponseBase>();
 
@@ -212,7 +210,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
 
             var ctrlDescriptor = new Mock<ControllerDescriptor>();
             ctrlDescriptor.Setup(c => c.ControllerType).Returns(this.GetType()); // controller type (to check controller-level ignore)
@@ -283,6 +281,7 @@ namespace Audit.Mvc.UnitTest
             
             request.Setup(c => c.ContentType).Returns("application/json");
             request.Setup(c => c.Unvalidated.Headers).Returns(() => nvc);
+            request.Setup(c => c.Headers).Returns(() => nvc);
 
             request.SetupGet(r => r.InputStream).Returns(new MemoryStream(Encoding.UTF8.GetBytes(@"{ ""test"": 123 }")));
             request.SetupGet(r => r.ContentLength).Returns(@"{ ""test"": 123 }".Length);
@@ -301,7 +300,7 @@ namespace Audit.Mvc.UnitTest
             {
                 HttpContext = httpContext.Object
             };
-            controllerContext.HttpContext.Request.Unvalidated.Headers.Add("test-header", "header-value");
+            controllerContext.HttpContext.Request.Headers.Add("test-header", "header-value");
 
             var ctrlDescriptor = new Mock<ControllerDescriptor>();
             ctrlDescriptor.Setup(c => c.ControllerType).Returns(this.GetType()); // controller type (to check controller-level ignore)
@@ -483,7 +482,7 @@ namespace Audit.Mvc.UnitTest
             var args = new Dictionary<string, object>()
             {
                 {"test1", "value1" },
-                {"x", new AuditAttribute(){ EventTypeName="TEST" } }
+                {"x", new AuditEvent() { EventType = "TEST" } }
             };
 
             var dataProvider = new Mock<AuditDataProvider>();
@@ -513,7 +512,7 @@ namespace Audit.Mvc.UnitTest
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
             Assert.AreEqual(1, action.ActionParameters.Count);
-            Assert.AreEqual("TEST", (action.ActionParameters["x"] as AuditAttribute).EventTypeName);
+            Assert.AreEqual("TEST", (action.ActionParameters["x"] as AuditEvent).EventType);
         }
     }
 }

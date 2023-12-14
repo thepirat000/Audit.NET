@@ -83,28 +83,61 @@ PM> Install-Package Audit.NET
 ## Changelog
 Check the [CHANGELOG.md](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md) file.
 
-## Default Serialization Mechanism 
+# Introduction
 
-Audit.NET will default to different serialization mechanism depending on the target framework of the client application, 
-as shown on the following table:
+The **Audit Scope** and **Audit Event** are the central objects of this framework. 
 
-| Target | Serialization |
-| ------------ | ---------------- |
-| **≥ .NET 5.0** | `System.Text.Json` |
-| **≤ .NETSTANDARD2.1 / .NETCOREAPP3.1** | `Newtonsoft.Json` |
-| **≤ .NET 4.8** | `Newtonsoft.Json` |
+### Audit Scope
+The `AuditScope` serves as the central object in this framework, representing the scope of an audited operation or event. 
+It acts as a context for auditing, capturing pertinent details like the start time, involved entities, and any additional 
+custom information. Essentially, the `AuditScope` encapsulates an `AuditEvent`, controlling its life cycle.
 
-- `System.Text.Json` is the new default for applications and libraries targeting .NET 5.0 or higher
-- `Newtonsoft.Json` will still be the default for applications and libraries targeting lower framework versions.
+The `AuditScope` is a disposable object, commonly utilized within a using statement to ensure proper finalization and recording of audit information upon exiting the scope.
 
-If you want to change the default behavior, refer to [Custom serialization mechanism](#custom-serialization-mechanism).
+See the [audit scope statechart](#auditscope-statechart).
+
+### Audit Event
+The `AuditEvent` functions as an extensible information container that captures the details of the audited operation, 
+is the representation of the audited information within an Audit Scope.
+It includes details about the audited operation, such as the event type, timestamp, execution duration, 
+and any custom fields or properties. 
+
+The `AuditEvent` is typically serialized into a format suitable for storage or transmission, such as JSON.
+
+# IMPORTANT NOTE - SUPPORT FOR OLDER .NET FRAMEWORKS
+
+Beginning with the version 23.0.0, this library and its extensions has discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
+
+For reference, please consult the following links:
+
+- [.NET Core Support Policy](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core)
+- [Entity Framework Core releases](https://learn.microsoft.com/en-us/ef/core/what-is-new/#stable-releases)
+
+This library and its extensions will maintain support for the following **minimum** .NET framework versions:
+
+- .NET Framework 4.6.2 (net462)
+- .NET Standard 2.0 (netstandard2.0)
+- .NET 6 (net6.0)
+
+The following frameworks were **deprecated and removed** from the list of target frameworks:
+
+- net45, net451, net452, net461
+- netstandard1.3, netstandard1.4, netstandard1.5, netstandard1.6
+- netcoreapp2.1, netcoreapp3.0
+- net5.0
+
+This discontinuation led to the following modifications:
+
+- All library versions will now use `System.Text.Json` as the default (Newtonsoft.Json will be deprecated but can still be used through the JsonAdapter).
+- Support for EF Core versions 3 and earlier has been discontinued in the `Audit.EntityFramework.Core` libraries. The minimum supported version is now EF Core 5 (`Audit.EntityFramework` will continue to support .NET Entity Framework 6).
+- The libraries `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` have been deprecated.
+- `Audit.NET.JsonSystemAdapter` has been deprecated.
+
 
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its life cycle. 
 The **Audit Event** is an extensible information container of an audited operation. 
-See the [audit scope statechart](#auditscope-statechart).
-
 
 
 There are several ways to create an Audit Scope:
@@ -249,10 +282,6 @@ public async Task SaveOrderAsync(Order order)
     }
 }
 ```
-
-> **Note**
-> 
-> On older .NET framework versions [the `Dispose` method was always synchronous](https://github.com/dotnet/roslyn/issues/114), so if your audit code is on async methods and you created the scope within a `using` statement, you should explicitly call the `DisposeAsync()` method. For projects targeting .NET Standard starting on version 2.0 and C# 8, you can simply use the `await using` statement, since the `AuditScope` implements the [`IAsyncDisposable` interface](https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable).
 
 ## Output
 
@@ -773,27 +802,12 @@ if (environment.IsDevelopment())
 ```
 
 ### Global serialization settings
-Most of the data providers serializes audit events in JSON format. 
 
-The default mechanism for serialization depends on the target framework of your application:
+Most of the data providers serializes audit events in JSON format. Audit.NET uses `System.Text.Json` by default for serialization and deserialization of audit events. 
 
-- Targeting **.NET 5.0** or higher: The JSON serialization is done with Microsoft's `System.Text.Json` library.
-- Targeting lower framework versions: The JSON serialization is done with James Newton-King's `Newtonsoft.Json` library.
+If you want to change the behavior, you can change the settings via the static property `Configuration.JsonSettings`.
 
-You can change the settings for the default serialization mechanism via the static property `Configuration.JsonSettings`.
-
-For example, when using _Newtonsoft.Json_:
-
-```c#
-Audit.Core.Configuration.JsonSettings = new JsonSerializerSettings()
-{
-    NullValueHandling = NullValueHandling.Ignore,
-    TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
-    Converters = new List<JsonConverter>() { new MyStreamConverter() }
-};
-```
-
-Or, if you target net5.0 or higher, using System.Text.Json:
+For example:
 
 ```c#
 Audit.Core.Configuration.JsonSettings = new JsonSerializerOptions
@@ -823,19 +837,17 @@ Audit.Core.Configuration.Setup()
 > **Note**
 > 
 > Take into account that some of the `AuditEvent` properties relies on attribute decoration for serialization and deserialization.
-(On .NET 5.0 and higher, these decorations are from `System.Text.Json`, but when targeting an older .NET framework the decorators are from `Newtonsoft.Json`).
-The recommendation is to use the default adapter amd, when needed, use the alternative adapters provided (see next section).
+> The recommendation is to use the default adapter and, when needed, use the Newtonsoft Json adapter provided (see next section).
 
 #### Alternative serialization mechanism
 
-Two libraries are provided to configure an alternative JSON serialization mechanism:
+This library offers the option to configure an alternative JSON serialization mechanism through the following adapter:
 
-- [`Audit.NET.JsonNewtonsoftAdapter`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonNewtonsoftAdapter): 
+- [`Audit.NET.JsonNewtonsoftAdapter`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonNewtonsoftAdapter)
 
-    To use when you target .NET 5.0 or higher, but you want to use `Newtonsoft.Json` as the serialization mechanism.
+    Use this when you prefer employing Newtonsoft.Json as the serialization mechanism.
 
-    Add a reference to the library `Audit.NET.JsonNewtonsoftAdapter` and set an instance of `JsonNewtonsoftAdapter`
-    to the static configuration property `Configuration.JsonAdapter`, for example:
+    Assign an instance of `JsonNewtonsoftAdapter` to the static configuration property `Configuration.JsonAdapter`. For example:
 
     ```c#
     var settings = new JsonSerializerSettings()
@@ -845,7 +857,8 @@ Two libraries are provided to configure an alternative JSON serialization mechan
     Audit.Core.Configuration.JsonAdapter = new JsonNewtonsoftAdapter(settings);
     ```
 
-    Or by calling the `JsonNewtonsoftAdapter()` fluent configuration API:
+    Alternatively, you can use the fluent configuration API with the `JsonNewtonsoftAdapter()` method, like this:
+
 
     ```c#
     Audit.Core.Configuration.Setup()
@@ -855,29 +868,6 @@ Two libraries are provided to configure an alternative JSON serialization mechan
 
     > NOTE: This `JsonNewtonsoftAdapter` takes into account `JsonExtensionDataAttribute` and `JsonIgnoreAttribute` decorators from both `System.Text.Json` and `Newtonsoft.Json`, so the Audit Events 
     > will be properly serialized.
-
-- [`Audit.NET.JsonSystemSerializer`](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.JsonSystemAdapter): 
-
-    When you target an older .NET Framework, but want to use `System.Text.Json`
- 
-    Add a reference to the library `Audit.NET.JsonSystemSerializer` and set an instance of `JsonSystemAdapter`
-    to the static configuration property `Configuration.JsonAdapter`, for example:
-
-    ```c#
-    var options = new JsonSerializerOptions()
-    {
-        WriteIndented = true
-    };
-    Audit.Core.Configuration.JsonAdapter = new JsonSystemAdapter(options);
-    ```
-
-    Or by calling the `JsonSystemAdapter()` fluent configuration API:
-
-    ```c#
-    Audit.Core.Configuration.Setup()
-        .JsonSystemAdapter(options)
-        ...
-    ```
 
 ## Configuration Fluent API
 Alternatively to the properties/methods mentioned before, you can configure the library using a convenient [Fluent API](http://martinfowler.com/bliki/FluentInterface.html) provided by the method `Audit.Core.Configuration.Setup()`, this is the most straightforward way to configure the library.

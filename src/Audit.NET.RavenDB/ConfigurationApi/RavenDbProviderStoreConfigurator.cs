@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography.X509Certificates;
 using Audit.Core;
-using Raven.Client.Json.Serialization;
 
 namespace Audit.NET.RavenDB.ConfigurationApi
 {

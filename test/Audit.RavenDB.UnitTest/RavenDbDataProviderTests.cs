@@ -17,11 +17,7 @@ namespace Audit.RavenDB.UnitTest
     public class RavenDbDataProviderTests
     {
         private const string ravenServerUrl = "http://localhost:8080";
-#if IS_TEXT_JSON
         private const string eventType = "SysTxtJson";
-#else
-        private const string eventType = "Newtonsoft";
-#endif
 
         public class DailyTemperature
         {
@@ -55,11 +51,7 @@ namespace Audit.RavenDB.UnitTest
 
             // Assert
             Assert.IsNotNull(ev);
-#if IS_TEXT_JSON
             Assert.AreEqual("SysTxtJson", ev.EventType);
-#else
-            Assert.AreEqual("Newtonsoft", ev.EventType);
-#endif
         }
 
 
@@ -97,13 +89,8 @@ namespace Audit.RavenDB.UnitTest
             // Assert
             Assert.IsNotNull(ev);
             Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
-#if IS_TEXT_JSON
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?["prop"]?.ToString());
-#else
-            Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?.subField?.ToString());
-            Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?.prop.ToString());
-#endif
             Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
             Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
@@ -145,16 +132,11 @@ namespace Audit.RavenDB.UnitTest
             Assert.IsNotNull(ev);
 
             // CustomFields will not be property deserialized when using newtonsoft.json with the default RavenContractResolver (.NET < 5.0) 
-#if IS_TEXT_JSON
             Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?.subField?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?.prop.ToString());
-#endif
-            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
-            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
 
-#if IS_TEXT_JSON
         [Test]
         public void Test_RavenDbDataProvider_TextJson_WithNewtonAdapter()
         {
@@ -195,7 +177,6 @@ namespace Audit.RavenDB.UnitTest
             Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
             Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
-#endif
 
         [Test]
         public void Test_RavenDbDataProvider_InsertOnStartReplaceOnEnd()
@@ -210,9 +191,7 @@ namespace Audit.RavenDB.UnitTest
             TryCreateDatabase(rdb.DocumentStore, databaseName);
 
             Audit.Core.Configuration.Setup()
-#if IS_TEXT_JSON
                 .JsonNewtonsoftAdapter()
-#endif
                 .UseCustomProvider(rdb)
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -237,13 +216,8 @@ namespace Audit.RavenDB.UnitTest
             // Assert
             Assert.IsNotNull(ev);
             Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
-#if IS_TEXT_JSON
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?["prop"]?.ToString());
-#else
-            Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?.subField?.ToString());
-            Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?.prop.ToString());
-#endif
             Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
             Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
         }
@@ -261,9 +235,7 @@ namespace Audit.RavenDB.UnitTest
             TryCreateDatabase(rdb.DocumentStore, databaseName);
 
             Audit.Core.Configuration.Setup()
-#if IS_TEXT_JSON
                 .JsonNewtonsoftAdapter()
-#endif
                 .UseCustomProvider(rdb)
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
 
@@ -294,15 +266,9 @@ namespace Audit.RavenDB.UnitTest
             Assert.AreEqual("field value", ev2.CustomFields["field"].ToString());
             Assert.IsFalse(ev1.Environment.CustomFields.ContainsKey("extra"));
             Assert.IsTrue(ev2.Environment.CustomFields.ContainsKey("extra"));
-#if IS_TEXT_JSON
             Assert.AreEqual("sub-field value", ((dynamic)ev1.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("sub-field value", ((dynamic)ev2.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("test", ((dynamic)ev2.Environment.CustomFields["extra"])?["prop"]?.ToString());
-#else
-            Assert.AreEqual("sub-field value", ((dynamic)ev1.CustomFields["doc"])?.subField?.ToString());
-            Assert.AreEqual("sub-field value", ((dynamic)ev2.CustomFields["doc"])?.subField?.ToString());
-            Assert.AreEqual("test", ((dynamic)ev2.Environment.CustomFields["extra"])?.prop.ToString());
-#endif
             Assert.AreEqual(20, (ev1.Target.Old as DailyTemperature)?.LowTemp);
             Assert.IsNull(ev1.Target.New);
             Assert.AreEqual(20, (ev2.Target.Old as DailyTemperature)?.LowTemp);

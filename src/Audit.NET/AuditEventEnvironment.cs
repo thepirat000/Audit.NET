@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
-using System.Text.Json;
 using System.Text.Json.Serialization;
-#endif
+
 namespace Audit.Core
 {
     public class AuditEventEnvironment : IAuditOutput
@@ -17,71 +13,43 @@ namespace Audit.Core
         /// <summary>
         /// Gets or sets the name of the machine.
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string MachineName { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the domain.
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string DomainName { get; set; }
 
         /// <summary>
         /// The name of the method that has the audited code
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string CallingMethodName { get; set; }
 
         /// <summary>
         /// The full stack trace
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string StackTrace { get; set; }
 
         /// <summary>
         /// The name of the assembly from where the audit scope was invoked
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string AssemblyName { get; set; }
 
         /// <summary>
         /// The exception information (if any)
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string Exception { get; set; }
 
         /// <summary>
         /// The locale name
         /// </summary>
-#if IS_NK_JSON
-	    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public string Culture { get; set; }
 
         [JsonExtensionData]

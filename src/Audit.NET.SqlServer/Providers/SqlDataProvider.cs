@@ -4,17 +4,8 @@ using Audit.Core;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
-#if NET45
-using System.Data.Common;
-#endif
-#if NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
 using Microsoft.Data.SqlClient;
-#else
-using System.Data.SqlClient;
-#endif
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
 using Microsoft.EntityFrameworkCore;
-#endif
 
 namespace Audit.SqlServer.Providers
 {
@@ -34,16 +25,6 @@ namespace Audit.SqlServer.Providers
     /// </remarks>
     public class SqlDataProvider : AuditDataProvider
     {
-#if NET45
-        /// <summary>
-        /// True to set the database initializer to NULL on the internal DbContext 
-        /// </summary>
-        public bool SetDatabaseInitializerNull { get; set; }
-        /// <summary>
-        /// The DbConnection builder to use, alternative to ConnectionString when you need more control or configuration over the DB connection. 
-        /// </summary>
-        public Func<AuditEvent, DbConnection> DbConnectionBuilder { get; set; }
-#endif
         /// <summary>
         /// The SQL connection string builder
         /// </summary>
@@ -96,13 +77,12 @@ namespace Audit.SqlServer.Providers
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
         public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
         /// <summary>
         /// The DbContext options builder, to provide custom database options for the DbContext
         /// </summary>
         [CLSCompliant(false)]
         public Func<AuditEvent, DbContextOptions> DbContextOptionsBuilder { get; set; } = null;
-#endif
+
         public SqlDataProvider()
         {
         }
@@ -121,12 +101,7 @@ namespace Audit.SqlServer.Providers
                 SchemaBuilder = sqlConfig._schemaBuilder;
                 TableNameBuilder = sqlConfig._tableNameBuilder;
                 CustomColumns = sqlConfig._customColumns;
-#if NET45
-                SetDatabaseInitializerNull = sqlConfig._setDatabaseInitializerNull;
-                DbConnectionBuilder = sqlConfig._dbConnectionBuilder;
-#else
                 DbContextOptionsBuilder = sqlConfig._dbContextOptionsBuilder;
-#endif
             }
         }
 
@@ -136,16 +111,8 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetInsertCommandText(auditEvent);
-#if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
-                return result.ToList().FirstOrDefault();
-#elif NETSTANDARD1_3
-                var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
-                return result.ToList().FirstOrDefault()?.Id;
-#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
                 return result.ToList().FirstOrDefault()?.Id;
-#endif
             }
         }
 
@@ -155,16 +122,8 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetInsertCommandText(auditEvent);
-#if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, parameters);
-                return (await result.ToListAsync(cancellationToken)).FirstOrDefault();
-#elif NETSTANDARD1_3
-                var result = ctx.FakeIdSet.FromSql(cmdText, parameters);
-                return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
-#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
                 return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
-#endif
             }
         }
 
@@ -174,11 +133,7 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
-#if NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
                 ctx.Database.ExecuteSqlRaw(cmdText, parameters);
-#else
-                ctx.Database.ExecuteSqlCommand(cmdText, parameters);
-#endif
             }
         }
 
@@ -188,13 +143,7 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(auditEvent))
             {
                 var cmdText = GetReplaceCommandText(auditEvent);
-#if NETSTANDARD1_3
-                await ctx.Database.ExecuteSqlCommandAsync(cmdText, cancellationToken, parameters);
-#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
                 await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters, cancellationToken);
-#else
-                await ctx.Database.ExecuteSqlCommandAsync(cmdText, cancellationToken, parameters);
-#endif
             }
         }
 
@@ -207,16 +156,9 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(null))
             {
                 var cmdText = GetSelectCommandText(null);
-#if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("@eventId", eventId));
-                var json = result.FirstOrDefault();
-#elif NETSTANDARD1_3
-                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
-                var json = result.FirstOrDefault()?.Id;
-#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
                 var json = result.FirstOrDefault()?.Id;
-#endif
+
                 if (json != null)
                 {
                     return AuditEvent.FromJson<T>(json);
@@ -234,16 +176,9 @@ namespace Audit.SqlServer.Providers
             using (var ctx = CreateContext(null))
             {
                 var cmdText = GetSelectCommandText(null);
-#if NET45
-                var result = ctx.Database.SqlQuery<string>(cmdText, new SqlParameter("@eventId", eventId));
-                var json = await result.FirstOrDefaultAsync(cancellationToken);
-#elif NETSTANDARD1_3
-                var result = ctx.FakeIdSet.FromSql(cmdText, new SqlParameter("@eventId", eventId));
-                var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
-#elif NETSTANDARD2_0 || NET462 || NETSTANDARD2_1 || NET5_0_OR_GREATER
                 var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
                 var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
-#endif
+
                 if (json != null)
                 {
                     return AuditEvent.FromJson<T>(json);
@@ -404,17 +339,6 @@ namespace Audit.SqlServer.Providers
 
         private AuditContext CreateContext(AuditEvent auditEvent)
         {
-#if NET45
-            if (DbConnectionBuilder != null)
-            {
-                return new AuditContext(DbConnectionBuilder.Invoke(auditEvent), SetDatabaseInitializerNull, true);
-            }
-            else
-            {
-                return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), SetDatabaseInitializerNull);
-            }
-
-#else
             if (DbContextOptionsBuilder != null)
             {
                 return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), DbContextOptionsBuilder.Invoke(auditEvent));
@@ -423,7 +347,6 @@ namespace Audit.SqlServer.Providers
             {
                 return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent));
             }
-#endif
         }
 
     }

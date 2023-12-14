@@ -1,6 +1,5 @@
 ﻿using System;
 using Audit.Core;
-using Audit.Elasticsearch.Providers;
 using Elastic = Elasticsearch.Net;
 using Nest;
 
@@ -15,7 +14,7 @@ namespace Audit.Elasticsearch.Configuration
         /// Specifies the Elasticsearch connection settings.
         /// </summary>
         /// <param name="connectionSettings">The elasticsearch connection settings.</param>
-        IElasticsearchProviderConfigurator ConnectionSettings(AuditConnectionSettings connectionSettings);
+        IElasticsearchProviderConfigurator ConnectionSettings(IConnectionSettingsValues connectionSettings);
 
         /// <summary>
         /// Specifies the Elasticsearch connection settings by providing the single node URL.

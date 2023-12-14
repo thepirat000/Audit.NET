@@ -36,26 +36,16 @@ PM> Install-Package Audit.EntityFramework.Identity
 
 The following table shows the entity framework package version used for each .NET framework and audit library:
 
-| <sub>Target</sub> \ <sup>Library</sup> | `Audit.EntityFramework` / `Audit.EntityFramework.Identity` | `Audit.EntityFramework.Core` / `Audit.EntityFramework.Identity.Core` | `Audit.EntityFramework.Core.v3` / `Audit.EntityFramework.Identity.Core.v3` | 
+| <sub>Target</sub> \ <sup>Library</sup> | `Audit.EntityFramework` / `Audit.EntityFramework.Identity` | `Audit.EntityFramework.Core` / `Audit.EntityFramework.Identity.Core` |  
 | ------------ | ---------------- |  -------------- | -------------- |
-| **.NET 4.5** | EntityFramework 6.1.3 | N/C | N/C |
-| **.NET 4.6.1** | EntityFramework 6.1.3 | Microsoft.EntityFrameworkCore 2.2.4 | N/C |
-| **.NET 4.7.2** | EntityFramework 6.3.0 | Microsoft.EntityFrameworkCore 3.1.0 | N/C |
-| **.NET Standard 1.5** | Microsoft.EntityFrameworkCore 1.1.2 | Microsoft.EntityFrameworkCore 1.1.2 | N/C |
-| **.NET Standard 2.0** | Microsoft.EntityFrameworkCore 2.2.4 | Microsoft.EntityFrameworkCore 3.1.0 | Microsoft.EntityFrameworkCore 3.1.0 |
-| **.NET Standard 2.1** | EntityFramework 6.3.0 | Microsoft.EntityFrameworkCore 5.0.1 | Microsoft.EntityFrameworkCore 3.1.0 |
-| **.NET 5.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 5.0.8 | Microsoft.EntityFrameworkCore 3.1.0 |
-| **.NET 6.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 6.0.0 | N/C |
-| **.NET 7.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 7.0.0 | N/C |
-| **.NET 8.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 8.0.0 | N/C |
+| **.NET 4.6.2** | EntityFramework 6.4.4 | N/C | 
+| **.NET 4.7.2** | EntityFramework 6.4.4 | N/C | 
+| **.NET Standard 2.1** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 5.0.17 | 
+| **.NET 6.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 6.0.25 | 
+| **.NET 7.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 7.0.14 | 
+| **.NET 8.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 8.0.0 | 
 
 > N/C: Not Compatible
-
-Examples:
-
-- Your app targets the full .NET framework but want to use EntityFramework Core, you must install the `Audit.EntityFramework.Core` package.
-- Your app targets .NET standard 2.1 and want to use EntityFramework 6, you must install `Audit.EntityFramework` package.
-- Your app targets .NET 5.0 and want to use EntityFramework Core 3, you must install `Audit.EntityFramework.Core.v3` package.
 
 ## Usage
 

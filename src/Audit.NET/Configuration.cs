@@ -5,13 +5,8 @@ using Audit.Core.ConfigurationApi;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-#else
 using System.Text.Json;
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.Core
 {
@@ -78,11 +73,7 @@ namespace Audit.Core
         /// <summary>
         /// Global json serializer settings for serializing the audit event on the data providers or by calling the ToJson() method on the AuditEvent.
         /// </summary>
-#if IS_NK_JSON
-        public static JsonSerializerSettings JsonSettings { get; set; }
-#else
         public static JsonSerializerOptions JsonSettings { get; set; }
-#endif
 
         // Custom actions
         internal static Dictionary<ActionType, List<Func<AuditScope, CancellationToken, Task>>> AuditScopeActions { get; private set; }
@@ -109,22 +100,12 @@ namespace Audit.Core
             AuditDisabled = false;
             DataProvider = new FileDataProvider();
             CreationPolicy = EventCreationPolicy.InsertOnEnd;
-#if IS_NK_JSON
-            JsonSettings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
-#else
             JsonSettings = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 PropertyNamingPolicy = null,
-#if NET6_0_OR_GREATER
                 ReferenceHandler = ReferenceHandler.IgnoreCycles
-#endif
             };
-#endif
             SystemClock = new DefaultSystemClock();
             _auditScopeFactory = new AuditScopeFactory();
             IncludeTypeNamespaces = false;
@@ -153,11 +134,7 @@ namespace Audit.Core
                 AuditScopeActions[when].Add((scope, ct) =>
                 {
                     action.Invoke(scope);
-#if NET45
-                    return Task.Delay(0, ct);
-#else
                     return Task.CompletedTask;
-#endif
                 });
             }
         }
@@ -205,11 +182,7 @@ namespace Audit.Core
                 AuditScopeActions[ActionType.OnEventSaving].Add((scope, ct) =>
                 {
                     action.Invoke(scope);
-#if NET45
-                    return Task.Delay(0, ct);
-#else
                     return Task.CompletedTask;
-#endif
                 });
             }
         }
@@ -255,11 +228,7 @@ namespace Audit.Core
                 AuditScopeActions[ActionType.OnScopeCreated].Add((scope, ct) => 
                 {
                     action.Invoke(scope);
-#if NET45
-                    return Task.Delay(0, ct);
-#else
                     return Task.CompletedTask;
-#endif
 
                 });
             }

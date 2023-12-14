@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
-using System.Text.Json;
 using System.Text.Json.Serialization;
-#endif
 
 namespace Audit.Core
 {
@@ -21,16 +15,12 @@ namespace Audit.Core
         public string EventType { get; set; }
 
         /// <summary>
-        /// The enviroment information
+        /// The environment information
         /// </summary>
-#if IS_NK_JSON
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public AuditEventEnvironment Environment { get; set; }
         
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
         /// <summary>
         /// The current distributed tracing activity information 
         /// </summary>
@@ -47,21 +37,13 @@ namespace Audit.Core
         /// <summary>
         /// The tracked target.
         /// </summary>
-#if IS_NK_JSON
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public AuditTarget Target { get; set; }
 
         /// <summary>
         /// Comments.
         /// </summary>
-#if IS_NK_JSON
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-#else
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-#endif
         public List<string> Comments { get; set; }
 
         /// <summary>

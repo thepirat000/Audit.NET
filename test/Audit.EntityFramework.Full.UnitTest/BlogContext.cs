@@ -8,7 +8,7 @@ namespace Audit.EntityFramework.Full.UnitTest
 {
     public class BlogContext : AuditDbContext
     {
-        public static string CnnString = TestHelper.GetConnectionString("Blogs2");
+        public static string CnnString = TestHelper.GetConnectionString("BlogsCtx2");
 
         public BlogContext() : base(CnnString)
         {

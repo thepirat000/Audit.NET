@@ -1,4 +1,4 @@
-﻿#if NET5_0_OR_GREATER
+﻿#if NETCOREAPP3_1 || NET6_0
 using System;
 using System.Linq;
 using System.Net;
@@ -75,9 +75,9 @@ namespace Audit.WebApi.UnitTest
 
             var response = await client.GetAsync($"/TestIsolation/Action_AuditApiAttribute?q={guid}");
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(1, dataProvider.GetAllEvents().Count);
-            Assert.AreEqual(guid.ToString(), dataProvider.GetAllEventsOfType<AuditEventWebApi>().First().Action.ActionParameters["q"].ToString());
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(dataProvider.GetAllEvents().Count, Is.EqualTo(1));
+            Assert.That(dataProvider.GetAllEventsOfType<AuditEventWebApi>().First().Action.ActionParameters["q"].ToString(), Is.EqualTo(guid.ToString()));
         }
 
         [TestCase(10)]
@@ -96,9 +96,9 @@ namespace Audit.WebApi.UnitTest
 
             var response = await client.GetAsync($"/TestIsolation/Action_Middleware?q={guid}");
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual(1, dataProvider.GetAllEvents().Count);
-            Assert.IsTrue(dataProvider.GetAllEventsOfType<AuditEventWebApi>().First().Action.RequestUrl.Contains(guid.ToString()));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(dataProvider.GetAllEvents().Count, Is.EqualTo(1));
+            Assert.That(dataProvider.GetAllEventsOfType<AuditEventWebApi>().First().Action.RequestUrl.Contains(guid.ToString()), Is.True);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         [SetUp]
         public void Setup()
         {
+            Audit.Core.Configuration.Reset();
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
             new BlogsContext().Database.EnsureCreated();
@@ -246,9 +247,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
 
         }
-#endif
 
-#if EF_CORE_3_OR_GREATER
         [Test]
         public void Test_EF_Core_OwnedSingleMultiple()
         {
@@ -288,7 +287,6 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 #endif
 
-#if !NETCOREAPP1_0
         [Test]
         public void Test_EF_StackTrace()
         {
@@ -314,7 +312,6 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsTrue(evs[0].Environment.StackTrace.Contains(nameof(Test_EF_StackTrace)), $"Expected contains {nameof(Test_EF_StackTrace)} but was {evs[0].Environment.StackTrace}");
             
         }
-#endif
         
         [Test]
         public void Test_EF_TransactionId()
@@ -405,7 +402,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForContext<BlogsContext>().Reset();
         }
 
-#if !NETCOREAPP1_0
         [Test]
         public void Test_ProxiedLazyLoading()
         {
@@ -454,7 +450,6 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.IsNotNull(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"]);
             Assert.IsNotNull(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"]);
         }
-#endif
 
         [Test]
         public void Test_EF_CustomFields()
@@ -800,7 +795,6 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
-#if !NETCOREAPP1_0
         [Test]
         public void Test_EF_MapProxyTypes()
         {
@@ -849,11 +843,10 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
         }
 
+        [AuditInclude]
         public class ProxyPost : Post 
         {
            public override string Title { get => base.Title; set => base.Title = $"F:{value}"; }
         }
-#endif
-
     }
 }

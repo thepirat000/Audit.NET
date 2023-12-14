@@ -1,4 +1,4 @@
-﻿#if NET45_OR_GREATER
+﻿#if NET462_OR_GREATER
 using System;
 using System.Configuration;
 using System.ServiceModel.Configuration;

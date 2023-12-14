@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <TargetFrameworks>netcoreapp3.0;net461;net5.0</TargetFrameworks>
+    <TargetFrameworks>net462;netcoreapp3.1;net6.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
-    <AssemblyName>Audit.Redis.UnitTest</AssemblyName>
-    <PackageId>Audit.Redis.UnitTest</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -23,13 +20,7 @@
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.2.88" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>

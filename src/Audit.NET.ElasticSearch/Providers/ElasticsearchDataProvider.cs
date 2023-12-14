@@ -3,7 +3,6 @@ using System.Threading;
 using Audit.Core;
 using System.Threading.Tasks;
 using Nest;
-using Newtonsoft.Json;
 
 namespace Audit.Elasticsearch.Providers
 {
@@ -27,7 +26,6 @@ namespace Audit.Elasticsearch.Providers
 
         /// <summary>
         /// The Elasticsearch connection settings to use. 
-        /// The recommendation is to return an instance of AuditConnectionSettings in order to use the proper Audit Event serializer.
         /// </summary>
         public IConnectionSettingsValues ConnectionSettings { get; set; }
 

@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<VersionPrefix>3.0.0</VersionPrefix>
-		<TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net472;net5.0;net461;netcoreapp1.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<AssemblyName>Audit.EntityFramework.Core.UnitTest</AssemblyName>
@@ -17,94 +15,39 @@
 		<DebugType>Full</DebugType>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE</DefineConstants>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+		<DefineConstants>$(DefineConstants);EF_CORE_5;EF_CORE_5_OR_GREATER</DefineConstants>
 	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_2;EF_CORE_2_OR_GREATER</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'netcoreapp2.1' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_3;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'net5.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_5;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER</DefineConstants>
-	</PropertyGroup>
-
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_6;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_6;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER</DefineConstants>
 	</PropertyGroup>
-
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_7;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_7;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER</DefineConstants>
 	</PropertyGroup>
-
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_2_OR_GREATER;EF_CORE_3_OR_GREATER;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER</DefineConstants>
+		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-		<PackageReference Include="microsoft.entityframeworkcore" Version="5.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.17" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.17" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-		<PackageReference Include="microsoft.entityframeworkcore" Version="1.1.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.2" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-		<PackageReference Include="microsoft.entityframeworkcore" Version="2.2.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-		<PackageReference Include="microsoft.entityframeworkcore" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-		<PackageReference Include="microsoft.entityframeworkcore" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.14" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.14" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.14" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
@@ -114,7 +57,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp1.0' ">
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
@@ -124,20 +67,9 @@
 		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
 		<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.10" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-		<PackageReference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" Version="11.0.50727.1" />
-		<PackageReference Include="moq" Version="4.9.0" />
-		<PackageReference Include="nunit" Version="3.10.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Audit.EntityFramework.Core\Audit.EntityFramework.Core.csproj" />
+		<ProjectReference Include="..\..\src\Audit.EntityFramework.Identity.Core\Audit.EntityFramework.Identity.Core.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
-
-
 </Project>

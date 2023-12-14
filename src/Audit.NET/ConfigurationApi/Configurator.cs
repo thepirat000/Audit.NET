@@ -1,10 +1,5 @@
 using System;
 using Audit.Core.Providers;
-#if IS_NK_JSON
-using Newtonsoft.Json;
-#else
-using System.Text.Json;
-#endif
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -90,7 +85,8 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();
         }
-#if NET45 || NET461
+
+#if NET462 || NET472 
         public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".", Func<AuditEvent, string> messageBuilder = null)
         {
             Configuration.DataProvider = new EventLogDataProvider()

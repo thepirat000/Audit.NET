@@ -1,4 +1,5 @@
 ﻿#if ASP_NET_CORE
+#nullable enable
 using Audit.Core;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -29,7 +30,9 @@ namespace Audit.SignalR
         /// <summary>
         /// Creates a new AuditHubFilter
         /// </summary>
+#pragma warning disable CS8618
         public AuditHubFilter() { }
+#pragma warning restore CS8618
 
         /// <summary>
         /// Creates a new AuditHubFilter using the fluent configuration API.
@@ -52,7 +55,7 @@ namespace Audit.SignalR
             IncomingEventsFilter = filters._incomingEventsFilter;
         }
 
-        public async ValueTask<object> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object>> next)
+        public async ValueTask<object?> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object?>> next)
         {
             if (AuditDisabled)
             {
@@ -149,17 +152,13 @@ namespace Audit.SignalR
 
         private bool AuditEventEnabled(SignalrEventBase ev)
         {
-            switch (ev.GetType().Name)
+            return ev switch
             {
-                case nameof(SignalrEventIncoming):
-                    return IncomingEventsFilter?.Invoke(ev as SignalrEventIncoming) ?? true;
-                case nameof(SignalrEventConnect):
-                    return ConnectEventsFilter?.Invoke(ev as SignalrEventConnect) ?? true;
-                case nameof(SignalrEventDisconnect):
-                    return DisconnectEventsFilter?.Invoke(ev as SignalrEventDisconnect) ?? true;
-                default:
-                    return true;
-            }
+                SignalrEventIncoming incoming => IncomingEventsFilter?.Invoke(incoming) ?? true,
+                SignalrEventConnect connect => ConnectEventsFilter?.Invoke(connect) ?? true,
+                SignalrEventDisconnect disconnect => DisconnectEventsFilter?.Invoke(disconnect) ?? true,
+                _ => true
+            };
         }
 
         private async Task<IAuditScope> CreateAuditScopeAsync(SignalrEventBase signalrEvent, CancellationToken cancellationToken)
