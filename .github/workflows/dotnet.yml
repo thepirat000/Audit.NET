@@ -70,13 +70,17 @@ jobs:
         dotnet tool install dotnet-reportgenerator-globaltool
         dotnet tool install dotnet-coverage
 
-    - name: Run unit tests
+    - name: Run unit tests (no integration)
       run: |
-        dotnet coverage collect dotnet test -m:1 --output ${{ github.workspace }}/Tests/Coverage.cobertura.xml --output-format cobertura
+        dotnet coverage collect dotnet test -m:1 --filter=TestCategory!=Integration --output ${{ github.workspace }}/Tests/Coverage.UnitTest.cobertura.xml --output-format cobertura
+
+    - name: Run integration tests (SqlServer)
+      run: |
+        dotnet coverage collect dotnet test -m:1 --filter=TestCategory=SqlServer --output ${{ github.workspace }}/Tests/Coverage.SqlServer.cobertura.xml --output-format cobertura
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:-*UnitTest;-*Integration;+Audit.*"
+        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:-*UnitTest;-*Integration;+Audit.*"
 
     - name: Upload Code Coverage Report
       uses: actions/upload-artifact@v2
