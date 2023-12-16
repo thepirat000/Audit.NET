@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 namespace Audit.IntegrationTest
 {
     [TestFixture]
-    [Category("Integration-AmazonQLDB")]
+    [Category("Integration")]
+    [Category("AmazonQLDB")]
     public class AmazonQLDBTests
     {
         private AmazonQldbDataProvider GetAmazonQLDBDataProvider(List<AuditEvent> ins, List<AuditEvent> repl) =>
@@ -27,7 +28,8 @@ namespace Audit.IntegrationTest
             };
 
         [Test]
-        [Category("Integration-AmazonQLDB")]
+        [Category("Integration")]
+        [Category("AmazonQLDB")]
         public void Test_AmazonQLDB_HappyPath()
         {
             var ins = new List<AuditEvent>();

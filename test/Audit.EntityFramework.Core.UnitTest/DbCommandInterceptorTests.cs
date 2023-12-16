@@ -17,7 +17,8 @@ using Audit.Core.Providers;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration-SqlServer")]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class DbCommandInterceptorTests
     {
         private static Random _rnd = new Random();

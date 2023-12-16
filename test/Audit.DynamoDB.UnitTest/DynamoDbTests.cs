@@ -14,7 +14,8 @@ namespace Audit.DynamoDB.UnitTest
     public class DynamoDbTests
     {
         [Test]
-        [Category("Integration-Dynamo")]
+        [Category("Integration")]
+        [Category("Dynamo")]
         public void TestStressDynamo()
         {
             int N = 32;

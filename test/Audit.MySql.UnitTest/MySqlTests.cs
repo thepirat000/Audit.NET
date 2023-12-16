@@ -29,7 +29,8 @@ namespace Audit.MySql.UnitTest
         }
 
         [Test]
-        [Category("Integration-MySql")]
+        [Category("Integration")]
+        [Category("MySql")]
         public void Test_MySqlDataProvider_Insert()
         {
             Audit.Core.Configuration.Setup()

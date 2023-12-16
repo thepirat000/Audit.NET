@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -52,6 +53,7 @@ namespace Audit.WebApi.UnitTest
                         e.MapControllers();
                     });
                 })
+                .ConfigureLogging(log => log.SetMinimumLevel(LogLevel.Warning))
             );
         }
     }

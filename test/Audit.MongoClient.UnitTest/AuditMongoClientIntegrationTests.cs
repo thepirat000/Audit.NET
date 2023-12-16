@@ -7,7 +7,8 @@ using System;
 namespace Audit.MongoClient.UnitTest
 {
     [TestFixture]
-    [Category("Integration-Mongo")]
+    [Category("Integration")]
+    [Category("Mongo")]
     public class AuditMongoClientIntegrationTests
     {
         [SetUp]

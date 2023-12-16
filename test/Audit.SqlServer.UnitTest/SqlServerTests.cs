@@ -14,7 +14,8 @@ using NUnit.Framework;
 namespace Audit.SqlServer.UnitTest
 {
     [TestFixture]
-    [Category("Integration-SqlServer")]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class SqlServerTests
     {
         [OneTimeSetUp]

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration-SqlServer")]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class InheritanceTests
     {
         [SetUp]

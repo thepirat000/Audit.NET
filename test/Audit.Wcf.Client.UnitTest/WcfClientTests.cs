@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 #if NETCOREAPP3_1
 using Microsoft.AspNetCore.Hosting;
 using CoreWCF.Configuration;
@@ -41,6 +42,7 @@ namespace Audit.Wcf.UnitTest
                 .UseKestrel(options => {
                     options.ListenAnyIP(Startup.HTTP_PORT);
                 })
+                .ConfigureLogging(x => x.SetMinimumLevel(LogLevel.Warning))
                 .UseNetTcp(Startup.NETTCP_PORT)
                 .UseStartup<Startup>();
 #endif

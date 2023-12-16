@@ -11,7 +11,8 @@ using Audit.Core.Providers;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration-SqlServer")]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class EfCoreInMemoryTests
     {
         private static readonly Random Rnd = new Random();

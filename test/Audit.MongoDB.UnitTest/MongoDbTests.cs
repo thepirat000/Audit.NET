@@ -11,7 +11,8 @@ using NUnit.Framework;
 namespace Audit.MongoDb.UnitTest
 {
     [TestFixture]
-    [Category("Integration-Mongo")]
+    [Category("Integration")]
+    [Category("Mongo")]
     public class MongoDbTests
     {
         [OneTimeSetUp]

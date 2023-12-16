@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("Integration-SqlServer")]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class SaveChangesTests
     {
         [SetUp]

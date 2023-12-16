@@ -11,7 +11,8 @@ using NUnit.Framework;
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("Integration-SqlServer")]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class EfChangeTrackerTests
     {
         [SetUp]
