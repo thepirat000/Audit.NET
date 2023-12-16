@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading;
-using Microsoft.Extensions.Logging;
 #if NETCOREAPP3_1
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using CoreWCF.Configuration;
 #endif
