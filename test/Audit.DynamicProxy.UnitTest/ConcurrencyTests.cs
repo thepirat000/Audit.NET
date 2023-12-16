@@ -3,7 +3,6 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Audit.DynamicProxy.UnitTest
@@ -44,23 +43,23 @@ namespace Audit.DynamicProxy.UnitTest
             });
             th.Start();
             th.Join();
-            Assert.AreEqual("M1", scope.Event.GetAuditInterceptEvent().MethodName);
-            Assert.AreEqual(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
+            Assert.That(scope.Event.GetAuditInterceptEvent().MethodName, Is.EqualTo("M1"));
+            Assert.That(scope.Event.GetAuditInterceptEvent().Arguments[0].Value, Is.EqualTo(i));
         }
 
         public virtual void M2(Guid i)
         {
             var rnd = new Random();
             var scope = AuditProxy.CurrentScope;
-            Assert.AreEqual("M2", scope.Event.GetAuditInterceptEvent().MethodName);
-            Assert.AreEqual(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
+            Assert.That(scope.Event.GetAuditInterceptEvent().MethodName, Is.EqualTo("M2"));
+            Assert.That(scope.Event.GetAuditInterceptEvent().Arguments[0].Value, Is.EqualTo(i));
         }
         public virtual void M3(Guid i)
         {
             var rnd = new Random();
             var scope = AuditProxy.CurrentScope;
-            Assert.AreEqual("M3", scope.Event.GetAuditInterceptEvent().MethodName);
-            Assert.AreEqual(i, scope.Event.GetAuditInterceptEvent().Arguments[0].Value);
+            Assert.That(scope.Event.GetAuditInterceptEvent().MethodName, Is.EqualTo("M3"));
+            Assert.That(scope.Event.GetAuditInterceptEvent().Arguments[0].Value, Is.EqualTo(i));
         }
     }
 }
