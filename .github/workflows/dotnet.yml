@@ -72,11 +72,11 @@ jobs:
 
     - name: Run unit tests (no integration)
       run: |
-        dotnet coverage collect dotnet test -m:1 --filter=TestCategory!~Integration --output ${{ github.workspace }}/Tests/Coverage.UnitTest.cobertura.xml --output-format cobertura
+        dotnet coverage collect dotnet test -m:1 --filter=TestCategory!=Integration --output ${{ github.workspace }}/Tests/Coverage.UnitTest.cobertura.xml --output-format cobertura
 
     - name: Run integration tests (SqlServer)
       run: |
-        dotnet coverage collect dotnet test -m:1 --filter=TestCategory=Integration-SqlServer --output ${{ github.workspace }}/Tests/Coverage.SqlServer.cobertura.xml --output-format cobertura
+        dotnet coverage collect dotnet test -m:1 --filter=TestCategory=SqlServer --output ${{ github.workspace }}/Tests/Coverage.SqlServer.cobertura.xml --output-format cobertura
 
     - name: Generate Code Coverage Report
       run: |
