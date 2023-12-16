@@ -76,7 +76,7 @@ jobs:
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:-*UnitTest"
+        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:-*UnitTest;-*Integration;+Audit.*"
 
     - name: Upload Code Coverage Report
       uses: actions/upload-artifact@v2
