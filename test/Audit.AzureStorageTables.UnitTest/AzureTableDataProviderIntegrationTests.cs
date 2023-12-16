@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 namespace Audit.AzureStorageTables.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("AzureTables")]
+    [Category("Integration-Azure")]
     public class AzureTableDataProviderIntegrationTests
     {
         #region Sync

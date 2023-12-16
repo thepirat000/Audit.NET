@@ -2,18 +2,24 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net462;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
+		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<IsTestProject>true</IsTestProject>
+		<DebugType>Full</DebugType>
+		<IsPackable>false</IsPackable>
+		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 	</PropertyGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' != 'net462' ">
-		<PackageReference Include="NUnit" Version="3.13.3" />
-		<PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
-		<PackageReference Include="NUnit" Version="3.13.3" />
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+		<PackageReference Include="NUnit" Version="3.10.1" />
 		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
 	</ItemGroup>
 
 	<ItemGroup>

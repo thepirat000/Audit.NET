@@ -9,6 +9,7 @@ using NUnit.Framework;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
+    [Category("Integration-SqlServer")]
     public class EfEarlySavingTests
     {
         class Message

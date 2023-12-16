@@ -10,8 +10,6 @@ using Audit.JsonNewtonsoftAdapter;
 namespace Audit.RavenDB.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("RavenDB")]
     public class RavenDbDataProviderConfigurationTests
     {
         private const string ravenServerUrl = "http://localhost:8080";

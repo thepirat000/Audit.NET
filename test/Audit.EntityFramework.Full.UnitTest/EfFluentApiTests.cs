@@ -11,7 +11,6 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
     public class EfFluentApiTests
     {
         [Test]
-        [Category("EF")]
         public void Test_EfDataProvider_FluentApi()
         {
             var ctx = new OtherContextFromDbContext();
@@ -31,7 +30,6 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
         }
 
         [Test]
-        [Category("EF")]
         public void Test_EfDataProvider_FluentApi2()
         {
             var ctx = new OtherContextFromDbContext();
@@ -53,7 +51,6 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
         }
 
         [Test]
-        [Category("EF")]
         public void Test_EfDataProvider_FluentApi3()
         {
             var ctx = new OtherContextFromDbContext();
@@ -75,7 +72,6 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
         }
 
         [Test]
-        [Category("EF")]
         public void Test_EfDataProvider_FluentApi4()
         {
             var ctx = new OtherContextFromDbContext();

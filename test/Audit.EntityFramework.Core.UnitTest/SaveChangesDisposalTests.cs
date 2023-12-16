@@ -9,7 +9,8 @@ using System.Threading;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
-    [TestFixture(Category = "EF")]
+    [TestFixture]
+    [Category("Integration-SqlServer")]
     public class SaveChangesDisposalTests
     {
         [SetUp]

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 namespace Audit.AzureStorageTables.UnitTest
 {
     [TestFixture]
-    [Category("AzureTables")]
     public class AzureTableDataProviderConfigurationTests
     {
         [Test]

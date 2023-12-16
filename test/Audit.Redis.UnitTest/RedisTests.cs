@@ -10,6 +10,8 @@ using StackExchange.Redis;
 
 namespace Audit.IntegrationTest
 {
+    [TestFixture]
+    [Category("Integration-Redis")]
     public class RedisTests
     {
         private const string RedisCnnString = "localhost:6379,allowAdmin=true";

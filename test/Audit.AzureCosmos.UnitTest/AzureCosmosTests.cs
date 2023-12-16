@@ -12,7 +12,7 @@ namespace Audit.AzureCosmos.UnitTest
     public class AzureCosmosTests
     {
         [Test]
-        [Category("AzureDocDb")]
+        [Category("Integration-Azure")]
         public void TestAzureCosmos_CustomId()
         {
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
@@ -45,7 +45,7 @@ namespace Audit.AzureCosmos.UnitTest
         }
         
         [Test]
-        [Category("AzureDocDb")]
+        [Category("Integration-Azure")]
         public async Task TestAzureCosmos_CustomIdAsync()
         {
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
@@ -81,7 +81,7 @@ namespace Audit.AzureCosmos.UnitTest
 
 #if IS_DOCDB
         [Test]
-        [Category("AzureDocDb")]
+        [Category("Integration-Azure")]
         public void TestAzureCosmos_Query()
         {
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
@@ -125,7 +125,7 @@ namespace Audit.AzureCosmos.UnitTest
         }
 
         [Test]
-        [Category("AzureDocDb")]
+        [Category("Integration-Azure")]
         public void TestAzureCosmos_Enumerate()
         {
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()

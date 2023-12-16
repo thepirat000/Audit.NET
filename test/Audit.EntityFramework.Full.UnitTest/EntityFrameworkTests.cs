@@ -12,7 +12,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
 {
-    [TestFixture(Category ="EF")]
+    [TestFixture]
     public class EntityFrameworkTests
     {
         [SetUp]

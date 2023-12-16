@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
-    [TestFixture(Category = "EF")]
+    [TestFixture]
+    [Category("Integration-SqlServer")]
     public class SaveChangesInterceptorTests
     {
         [SetUp]

@@ -14,7 +14,7 @@ using System.Text;
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("LocalDb")]
+    [Category("Integration-SqlServer")]
     public class InheritanceMultipleMappingTests
     {
         [SetUp]

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("LocalDb")]
+    [Category("Integration-SqlServer")]
     public class InheritanceTests
     {
         [SetUp]

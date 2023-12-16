@@ -6,7 +6,6 @@ namespace Audit.AzureCosmos.UnitTest
     public class AzureCosmosConfigurationTests
     {
         [Test]
-        [Category("AzureDocDb")]
         public void Test_AzureCosmos_FluentApi()
         {
             var x = new AzureCosmos.Providers.AzureCosmosDataProvider(_ => _

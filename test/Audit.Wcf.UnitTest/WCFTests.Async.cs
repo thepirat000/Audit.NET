@@ -15,8 +15,6 @@ namespace Audit.WCF.UnitTest
     public class WCFTests_Async
     {
         [Test]
-        [Category("WCF")]
-        [Category("Async")]
         public async Task WCFTest_CreationPolicy_InsertOnStartReplaceOnEnd_Async()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -59,8 +57,6 @@ namespace Audit.WCF.UnitTest
         }
 
         [Test]
-        [Category("WCF")]
-        [Category("Async")]
         public async Task WCFTest_CreationPolicy_InsertOnStartInsertOnEnd_Async()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -102,8 +98,6 @@ namespace Audit.WCF.UnitTest
         }
         
         [Test]
-        [Category("WCF")]
-        [Category("Async")]
         public async Task WCFTest_CreationPolicy_InsertOnEnd_Async()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -143,8 +137,6 @@ namespace Audit.WCF.UnitTest
         }
 
         [Test]
-        [Category("WCF")]
-        [Category("Async")]
         public async Task WCFTest_CreationPolicy_Manual_Async()
         {
             var inserted = new List<AuditEventWcfAction>();

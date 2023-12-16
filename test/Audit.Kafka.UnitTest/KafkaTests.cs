@@ -12,11 +12,9 @@ using System.Threading.Tasks;
 namespace Audit.Kafka.UnitTest
 {
     [TestFixture]
-    [Category("Kafka")]
     public class KafkaTests
     {
         [Test]
-        [Category("Kafka")]
         public void Test_KafkaDataProvider_FluentApi()
         {
             var x = new KafkaDataProvider<string>(_ => _
@@ -30,7 +28,9 @@ namespace Audit.Kafka.UnitTest
             Assert.AreEqual("key", x.KeySelector.Invoke(null));
         }
 
+        
         [Test]
+        [Category("Integration-Kafka")]
         public async Task Test_KafkaDataProvider_Stress()
         {
             var locker = new object();
@@ -80,6 +80,7 @@ namespace Audit.Kafka.UnitTest
 
 
         [Test]
+        [Category("Integration-Kafka")]
         public async Task Test_KafkaDataProvider_HappyPath_Async()
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
@@ -130,6 +131,7 @@ namespace Audit.Kafka.UnitTest
         }
 
         [Test]
+        [Category("Integration-Kafka")]
         public void Test_KafkaDataProvider_HappyPath()
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
@@ -183,6 +185,7 @@ namespace Audit.Kafka.UnitTest
         }
 
         [Test]
+        [Category("Integration-Kafka")]
         public void Test_KafkaDataProvider_KeyedHappyPath()
         {
             var reports = new List<DeliveryResult<string, AuditEvent>>();

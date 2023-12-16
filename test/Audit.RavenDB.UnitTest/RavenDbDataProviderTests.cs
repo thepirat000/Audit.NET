@@ -12,8 +12,7 @@ using Raven.Client.ServerWide.Operations;
 namespace Audit.RavenDB.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("RavenDB")]
+    [Category("Integration-RavenDB")]
     public class RavenDbDataProviderTests
     {
         private const string ravenServerUrl = "http://localhost:8080";

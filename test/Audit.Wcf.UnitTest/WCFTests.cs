@@ -17,7 +17,6 @@ namespace Audit.WCF.UnitTest
     public class WCFTests
     {
         [Test]
-        [Category("WCF")]
         public void WCFTest_CreationPolicy_InsertOnStartReplaceOnEnd()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -54,7 +53,6 @@ namespace Audit.WCF.UnitTest
         }
 
         [Test]
-        [Category("WCF")]
         public void WCFTest_CreationPolicy_InsertOnStartInsertOnEnd()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -91,7 +89,6 @@ namespace Audit.WCF.UnitTest
         }
 
         [Test]
-        [Category("WCF")]
         public void WCFTest_CreationPolicy_InsertOnEnd()
         {
             var inserted = new List<AuditEventWcfAction>();
@@ -128,7 +125,6 @@ namespace Audit.WCF.UnitTest
         }
 
         [Test]
-        [Category("WCF")]
         public void WCFTest_CreationPolicy_Manual()
         {
             var inserted = new List<AuditEventWcfAction>();

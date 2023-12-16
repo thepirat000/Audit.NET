@@ -6,7 +6,6 @@ using NUnit.Framework;
 namespace Audit.MySql.UnitTest
 {
     [TestFixture]
-    [Category("MySql")]
     public class MySqlTests
     {
         [SetUp]
@@ -30,6 +29,7 @@ namespace Audit.MySql.UnitTest
         }
 
         [Test]
+        [Category("Integration-MySql")]
         public void Test_MySqlDataProvider_Insert()
         {
             Audit.Core.Configuration.Setup()

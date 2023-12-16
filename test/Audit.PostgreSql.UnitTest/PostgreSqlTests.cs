@@ -9,7 +9,6 @@ using Audit.PostgreSql.Providers;
 namespace Audit.PostgreSql.UnitTest
 {
     [TestFixture]
-    [Category("PostgreSQL")]
     public class PostgreSqlTests
     {
         [OneTimeSetUp]
@@ -71,6 +70,7 @@ namespace Audit.PostgreSql.UnitTest
         }
         
         [Test]
+        [Category("Integration-PostgreSQL")]
         public void Test_PostgreDataProvider_CustomDataColumn()
         {
             var overrideEventType = Guid.NewGuid().ToString();
@@ -87,6 +87,7 @@ namespace Audit.PostgreSql.UnitTest
         }
 
         [Test]
+        [Category("Integration-PostgreSQL")]
         public void Test_PostgreDataProvider_Paging_No_Where()
         {
             const int pageNumberOne = 1;
@@ -100,6 +101,7 @@ namespace Audit.PostgreSql.UnitTest
         }
         
         [Test]
+        [Category("Integration-PostgreSQL")]
         public void Test_PostgreDataProvider_Paging_OutOfRange_Inputs()
         {
             /* define negative values.  the code should "safety-ize" them to page-number=1 and page-size=1 */
@@ -114,6 +116,7 @@ namespace Audit.PostgreSql.UnitTest
         }        
         
         [Test]
+        [Category("Integration-PostgreSQL")]
         public void Test_PostgreDataProvider_Paging_With_Where()
         {
             const int pageNumber = 3;
@@ -128,6 +131,7 @@ namespace Audit.PostgreSql.UnitTest
         }
         
         [Test]
+        [Category("Integration-PostgreSQL")]
         public void Test_EnumerateEvents_WhereExpression()
         {
             var overrideEventType = Guid.NewGuid().ToString();
@@ -144,6 +148,7 @@ namespace Audit.PostgreSql.UnitTest
         }
 
         [Test]
+        [Category("Integration-PostgreSQL")]
         public void Test_EnumerateEvents_WhereSortByExpression()
         {
             var overrideEventType = Guid.NewGuid().ToString();

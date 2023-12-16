@@ -17,7 +17,8 @@ using System.Threading;
 
 namespace Audit.EntityFramework.Core.UnitTest.Context
 {
-    [TestFixture(Category = "EntityFrameworkTests_Core")]
+    [TestFixture]
+    [Category("Integration-SqlServer")]
     public class EntityFrameworkTests_Core
     {
         [OneTimeSetUp]

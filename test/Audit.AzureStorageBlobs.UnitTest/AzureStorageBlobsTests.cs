@@ -11,7 +11,7 @@ namespace Audit.IntegrationTest
     public class AzureStorageBlobsTests
     {
         [Test]
-        [Category("AzureStorageBlobs")]
+        [Category("Integration-Azure")]
         public void Test_AzureStorageBlobs_HappyPath()
         {
             var id = Guid.NewGuid().ToString();
@@ -44,7 +44,7 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
-        [Category("AzureStorageBlobs")]
+        [Category("Integration-Azure")]
         public async Task Test_AzureStorageBlobs_HappyPathAsync()
         {
             var id = Guid.NewGuid().ToString();
@@ -78,7 +78,7 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
-        [Category("AzureStorageBlobs")]
+        [Category("Integration-Azure")]
         public void Test_AzureStorageBlobs_ConnectionString()
         {
             var id = Guid.NewGuid().ToString();
@@ -112,7 +112,7 @@ namespace Audit.IntegrationTest
         }
 
         [Test]
-        [Category("AzureStorageBlobs")]
+        [Category("Integration-Azure")]
         public void Test_AzureStorageBlobs_Credential()
         {
             var id = Guid.NewGuid().ToString();
