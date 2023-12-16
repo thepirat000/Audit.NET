@@ -35,40 +35,6 @@ With Audit.NET you can generate tracking information about operations being exec
 [MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md) 
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
-# IMPORTANT NOTE - SUPPORT FOR OLDER .NET FRAMEWORKS
-
-Beginning with the next major version 23.*, this library and its extensions will discontinue support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
-
-For reference, please consult the following links:
-
-- .NET Core Support Policy: https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core
-- Entity Framework Core releases: https://learn.microsoft.com/en-us/ef/core/what-is-new/#stable-releases
-
-This library and its extensions will maintain support for the following **minimum** .NET framework versions:
-
-- .NET Framework 4.6.2 (net462)
-- .NET Standard 2.0 (netstandard2.0)
-- .NET 6 (net6.0)
-
-The following frameworks are slated for **deprecation and removal** from the list of target frameworks:
-
-- net45, net451, net452, net461
-- netstandard1.3, netstandard1.4, netstandard1.5, netstandard1.6
-- netcoreapp2.1, netcoreapp3.0
-- net5.0
-
-This deprecation will result in the following changes:
-
-- All library versions will now default to using System.Text.Json (Newtonsoft.Json will be deprecated but still usable via the JsonAdapter).
-- Audit.EntityFramework.Core libraries will cease support for EF Core versions 3 and older, with the minimum supported version being EF Core 5 (Audit.EntityFramework will continue supporting .NET Entity Framework 6).
-- Audit.EntityFramework.Core.v3 and Audit.EntityFramework.Identity.Core.v3 libraries will be deprecated.
-- Audit.NET.JsonSystemAdapter will also be deprecated.
-
-
-
-
-
-
 ## [NuGet](https://www.nuget.org/packages/Audit.NET/)
 
 [![NuGet Status](https://img.shields.io/nuget/v/Audit.NET.svg?style=flat)](https://www.nuget.org/packages/Audit.NET/)
