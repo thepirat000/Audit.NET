@@ -41,12 +41,12 @@ namespace Audit.AzureStorageTables.UnitTest
 
             var entity = provider.GetTableClient(auditEvent).GetEntity<TableEntity>(entityId[0], entityId[1]).Value;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual("Part", entity.PartitionKey);
-            Assert.AreEqual(id, entity.RowKey);
-            Assert.AreEqual(123, entity.GetInt32("test"));
-            Assert.AreEqual(id, entity.GetString("EventType"));
-            Assert.AreEqual("test updated user name", entity.GetString("UserName"));
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
+            Assert.That(entity.RowKey, Is.EqualTo(id));
+            Assert.That(entity.GetInt32("test"), Is.EqualTo(123));
+            Assert.That(entity.GetString("EventType"), Is.EqualTo(id));
+            Assert.That(entity.GetString("UserName"), Is.EqualTo("test updated user name"));
         }
 
         [Test]
@@ -78,12 +78,12 @@ namespace Audit.AzureStorageTables.UnitTest
 
             var entity = provider.GetTableClient(auditEvent).GetEntity<TableEntity>(entityId[0], entityId[1]).Value;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual("Part", entity.PartitionKey);
-            Assert.AreEqual(id, entity.RowKey);
-            Assert.AreEqual(123, entity.GetInt32("test"));
-            Assert.AreEqual(id, entity.GetString("EventType"));
-            Assert.AreEqual("test updated user name", entity.GetString("UserName"));
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
+            Assert.That(entity.RowKey, Is.EqualTo(id));
+            Assert.That(entity.GetInt32("test"), Is.EqualTo(123));
+            Assert.That(entity.GetString("EventType"), Is.EqualTo(id));
+            Assert.That(entity.GetString("UserName"), Is.EqualTo("test updated user name"));
         }
 
         [Test]
@@ -109,12 +109,12 @@ namespace Audit.AzureStorageTables.UnitTest
 
             var entity = provider.GetTableClient(auditEvent).GetEntity<AuditEventTableEntity>(entityId[0], entityId[1]).Value;
             var auditEventLoaded = Configuration.JsonAdapter.Deserialize(entity.AuditEvent, typeof(AuditEvent)) as AuditEvent;
-            
-            Assert.IsNotNull(entity);
-            Assert.AreEqual(nameof(AuditEvent), entity.PartitionKey);
-            Assert.IsNotNull(entity.RowKey);
-            Assert.AreEqual(id, auditEventLoaded.EventType);
-            Assert.AreEqual("test updated user name", auditEventLoaded.Environment.UserName);
+
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo(nameof(AuditEvent)));
+            Assert.That(entity.RowKey, Is.Not.Null);
+            Assert.That(auditEventLoaded.EventType, Is.EqualTo(id));
+            Assert.That(auditEventLoaded.Environment.UserName, Is.EqualTo("test updated user name"));
         }
 
         [Test]
@@ -150,12 +150,12 @@ namespace Audit.AzureStorageTables.UnitTest
             var provider = Configuration.DataProvider as AzureTableDataProvider;
             var entity = provider.GetTableClient(auditEvent).GetEntity<TableEntity>("Part", id).Value;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual("Part", entity.PartitionKey);
-            Assert.AreEqual(id, entity.RowKey);
-            Assert.AreEqual(123, entity.GetInt32("test"));
-            Assert.AreEqual(id, entity.GetString("EventType"));
-            Assert.AreEqual("test updated user name", entity.GetString("UserName"));
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
+            Assert.That(entity.RowKey, Is.EqualTo(id));
+            Assert.That(entity.GetInt32("test"), Is.EqualTo(123));
+            Assert.That(entity.GetString("EventType"), Is.EqualTo(id));
+            Assert.That(entity.GetString("UserName"), Is.EqualTo("test updated user name"));
         }
         #endregion
 
@@ -187,12 +187,12 @@ namespace Audit.AzureStorageTables.UnitTest
 
             var entity = (await (await provider.GetTableClientAsync(auditEvent)).GetEntityAsync<TableEntity>(entityId[0], entityId[1])).Value;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual("Part", entity.PartitionKey);
-            Assert.AreEqual(id, entity.RowKey);
-            Assert.AreEqual(123, entity.GetInt32("test"));
-            Assert.AreEqual(id, entity.GetString("EventType"));
-            Assert.AreEqual("test updated user name", entity.GetString("UserName"));
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
+            Assert.That(entity.RowKey, Is.EqualTo(id));
+            Assert.That(entity.GetInt32("test"), Is.EqualTo(123));
+            Assert.That(entity.GetString("EventType"), Is.EqualTo(id));
+            Assert.That(entity.GetString("UserName"), Is.EqualTo("test updated user name"));
         }
 
         [Test]
@@ -224,12 +224,12 @@ namespace Audit.AzureStorageTables.UnitTest
 
             var entity = (await (await provider.GetTableClientAsync(auditEvent)).GetEntityAsync<TableEntity>(entityId[0], entityId[1])).Value;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual("Part", entity.PartitionKey);
-            Assert.AreEqual(id, entity.RowKey);
-            Assert.AreEqual(123, entity.GetInt32("test"));
-            Assert.AreEqual(id, entity.GetString("EventType"));
-            Assert.AreEqual("test updated user name", entity.GetString("UserName"));
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
+            Assert.That(entity.RowKey, Is.EqualTo(id));
+            Assert.That(entity.GetInt32("test"), Is.EqualTo(123));
+            Assert.That(entity.GetString("EventType"), Is.EqualTo(id));
+            Assert.That(entity.GetString("UserName"), Is.EqualTo("test updated user name"));
         }
 
         [Test]
@@ -256,11 +256,11 @@ namespace Audit.AzureStorageTables.UnitTest
             var entity = (await (await provider.GetTableClientAsync(auditEvent)).GetEntityAsync<AuditEventTableEntity>(entityId[0], entityId[1])).Value;
             var auditEventLoaded = Configuration.JsonAdapter.Deserialize(entity.AuditEvent, typeof(AuditEvent)) as AuditEvent;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual(nameof(AuditEvent), entity.PartitionKey);
-            Assert.IsNotNull(entity.RowKey);
-            Assert.AreEqual(id, auditEventLoaded.EventType);
-            Assert.AreEqual("test updated user name", auditEventLoaded.Environment.UserName);
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo(nameof(AuditEvent)));
+            Assert.That(entity.RowKey, Is.Not.Null);
+            Assert.That(auditEventLoaded.EventType, Is.EqualTo(id));
+            Assert.That(auditEventLoaded.Environment.UserName, Is.EqualTo("test updated user name"));
         }
 
         [Test]
@@ -296,12 +296,12 @@ namespace Audit.AzureStorageTables.UnitTest
             var provider = Configuration.DataProvider as AzureTableDataProvider;
             var entity = (await (await provider.GetTableClientAsync(auditEvent)).GetEntityAsync<TableEntity>("Part", id)).Value;
 
-            Assert.IsNotNull(entity);
-            Assert.AreEqual("Part", entity.PartitionKey);
-            Assert.AreEqual(id, entity.RowKey);
-            Assert.AreEqual(123, entity.GetInt32("test"));
-            Assert.AreEqual(id, entity.GetString("EventType"));
-            Assert.AreEqual("test updated user name", entity.GetString("UserName"));
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
+            Assert.That(entity.RowKey, Is.EqualTo(id));
+            Assert.That(entity.GetInt32("test"), Is.EqualTo(123));
+            Assert.That(entity.GetString("EventType"), Is.EqualTo(id));
+            Assert.That(entity.GetString("UserName"), Is.EqualTo("test updated user name"));
         }
         #endregion
     }

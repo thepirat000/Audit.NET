@@ -39,31 +39,31 @@ namespace Audit.UnitTest
             var allEvents = dp.GetAllEvents();
             var allCustomEvents = dp.GetAllEventsOfType<CustomAuditEvent>();
 
-            Assert.IsNotNull(event0);
-            Assert.IsNotNull(allEvents);
-            Assert.IsNotNull(allCustomEvents);
-            Assert.AreEqual(1, allEvents.Count);
-            Assert.AreEqual(1, allCustomEvents.Count);
+            Assert.That(event0, Is.Not.Null);
+            Assert.That(allEvents, Is.Not.Null);
+            Assert.That(allCustomEvents, Is.Not.Null);
+            Assert.That(allEvents.Count, Is.EqualTo(1));
+            Assert.That(allCustomEvents.Count, Is.EqualTo(1));
 
             var old = event0.Target.Old as List<string>;
             var @new = event0.Target.New as List<string>;
-            
-            Assert.IsNotNull(old);
-            Assert.IsNotNull(@new);
-            Assert.AreEqual(1, old.Count);
-            Assert.AreEqual(2, @new.Count);
-            Assert.AreEqual("initial", old[0]);
-            Assert.AreEqual("initial", @new[0]);
-            Assert.AreEqual("final", @new[1]);
-            Assert.AreEqual("test", event0.EventType);
-            Assert.AreEqual("test", allEvents[0].EventType);
-            Assert.AreEqual("test", allCustomEvents[0].EventType);
-            Assert.AreEqual(123, allCustomEvents[0].AuditEventId);
+
+            Assert.That(old, Is.Not.Null);
+            Assert.That(@new, Is.Not.Null);
+            Assert.That(old.Count, Is.EqualTo(1));
+            Assert.That(@new.Count, Is.EqualTo(2));
+            Assert.That(old[0], Is.EqualTo("initial"));
+            Assert.That(@new[0], Is.EqualTo("initial"));
+            Assert.That(@new[1], Is.EqualTo("final"));
+            Assert.That(event0.EventType, Is.EqualTo("test"));
+            Assert.That(allEvents[0].EventType, Is.EqualTo("test"));
+            Assert.That(allCustomEvents[0].EventType, Is.EqualTo("test"));
+            Assert.That(allCustomEvents[0].AuditEventId, Is.EqualTo(123));
 
             dp.ClearEvents();
 
             var allEventsAfterClear = dp.GetAllEvents();
-            Assert.AreEqual(0, allEventsAfterClear.Count);
+            Assert.That(allEventsAfterClear.Count, Is.EqualTo(0));
         }
 
         [TestCase(EventCreationPolicy.InsertOnEnd)]
@@ -86,31 +86,31 @@ namespace Audit.UnitTest
             var allEvents = dp.GetAllEvents();
             var allCustomEvents = dp.GetAllEventsOfType<CustomAuditEvent>();
 
-            Assert.IsNotNull(event0);
-            Assert.IsNotNull(allEvents);
-            Assert.IsNotNull(allCustomEvents);
-            Assert.AreEqual(1, allEvents.Count);
-            Assert.AreEqual(1, allCustomEvents.Count);
+            Assert.That(event0, Is.Not.Null);
+            Assert.That(allEvents, Is.Not.Null);
+            Assert.That(allCustomEvents, Is.Not.Null);
+            Assert.That(allEvents.Count, Is.EqualTo(1));
+            Assert.That(allCustomEvents.Count, Is.EqualTo(1));
 
             var old = event0.Target.Old as List<string>;
             var @new = event0.Target.New as List<string>;
 
-            Assert.IsNotNull(old);
-            Assert.IsNotNull(@new);
-            Assert.AreEqual(1, old.Count);
-            Assert.AreEqual(2, @new.Count);
-            Assert.AreEqual("initial", old[0]);
-            Assert.AreEqual("initial", @new[0]);
-            Assert.AreEqual("final", @new[1]);
-            Assert.AreEqual("test", event0.EventType);
-            Assert.AreEqual("test", allEvents[0].EventType);
-            Assert.AreEqual("test", allCustomEvents[0].EventType);
-            Assert.AreEqual(123, allCustomEvents[0].AuditEventId);
+            Assert.That(old, Is.Not.Null);
+            Assert.That(@new, Is.Not.Null);
+            Assert.That(old.Count, Is.EqualTo(1));
+            Assert.That(@new.Count, Is.EqualTo(2));
+            Assert.That(old[0], Is.EqualTo("initial"));
+            Assert.That(@new[0], Is.EqualTo("initial"));
+            Assert.That(@new[1], Is.EqualTo("final"));
+            Assert.That(event0.EventType, Is.EqualTo("test"));
+            Assert.That(allEvents[0].EventType, Is.EqualTo("test"));
+            Assert.That(allCustomEvents[0].EventType, Is.EqualTo("test"));
+            Assert.That(allCustomEvents[0].AuditEventId, Is.EqualTo(123));
 
             dp.ClearEvents();
 
             var allEventsAfterClear = dp.GetAllEvents();
-            Assert.AreEqual(0, allEventsAfterClear.Count);
+            Assert.That(allEventsAfterClear.Count, Is.EqualTo(0));
         }
     }
 }

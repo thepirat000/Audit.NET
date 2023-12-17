@@ -38,13 +38,13 @@ namespace Audit.UnitTest
             
             Configuration.Reset();
 
-            Assert.AreEqual(false, Configuration.IncludeTypeNamespaces);
-            Assert.AreEqual(false, Configuration.IncludeStackTrace);
-            Assert.AreEqual(false, Configuration.IncludeActivityTrace);
+            Assert.That(Configuration.IncludeTypeNamespaces, Is.EqualTo(false));
+            Assert.That(Configuration.IncludeStackTrace, Is.EqualTo(false));
+            Assert.That(Configuration.IncludeActivityTrace, Is.EqualTo(false));
             Assert.IsInstanceOf<FileDataProvider>(Configuration.DataProvider);
-            Assert.AreEqual(false, Configuration.AuditDisabled);
-            Assert.AreEqual(0, Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count);
-            Assert.AreEqual(EventCreationPolicy.InsertOnEnd, Configuration.CreationPolicy);
+            Assert.That(Configuration.AuditDisabled, Is.EqualTo(false));
+            Assert.That(Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count, Is.EqualTo(0));
+            Assert.That(Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.InsertOnEnd));
         }
 
         [Test]
@@ -83,10 +83,10 @@ namespace Audit.UnitTest
                 scope.Save();
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(evs[0].Comments.Contains("OnScopeCreated"));
-            Assert.IsTrue(evs[0].Comments.Contains("OnEventSaving"));
-            Assert.IsTrue(saved);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Comments.Contains("OnScopeCreated"), Is.True);
+            Assert.That(evs[0].Comments.Contains("OnEventSaving"), Is.True);
+            Assert.That(saved, Is.True);
         }
 
         [Test]
@@ -120,10 +120,10 @@ namespace Audit.UnitTest
             {
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(evs[0].Comments.Contains("OnScopeCreated"));
-            Assert.IsTrue(evs[0].Comments.Contains("OnEventSaving"));
-            Assert.IsTrue(saved);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Comments.Contains("OnScopeCreated"), Is.True);
+            Assert.That(evs[0].Comments.Contains("OnEventSaving"), Is.True);
+            Assert.That(saved, Is.True);
         }
 
         [Test]
@@ -162,21 +162,21 @@ namespace Audit.UnitTest
                 scope.SetCustomField("FromScope", 3);
             }
 
-            Assert.AreEqual(1, evs_onScopeCreated.Count);
-            Assert.AreEqual(2, evs_onScopeCreated[0].CustomFields.Count);
-            Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromCustomField"));
-            Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromAnon"));
-            Assert.AreEqual("1", evs_onScopeCreated[0].CustomFields["FromCustomField"].ToString());
-            Assert.AreEqual("2", evs_onScopeCreated[0].CustomFields["FromAnon"].ToString());
+            Assert.That(evs_onScopeCreated.Count, Is.EqualTo(1));
+            Assert.That(evs_onScopeCreated[0].CustomFields.Count, Is.EqualTo(2));
+            Assert.That(evs_onScopeCreated[0].CustomFields.ContainsKey("FromCustomField"), Is.True);
+            Assert.That(evs_onScopeCreated[0].CustomFields.ContainsKey("FromAnon"), Is.True);
+            Assert.That(evs_onScopeCreated[0].CustomFields["FromCustomField"].ToString(), Is.EqualTo("1"));
+            Assert.That(evs_onScopeCreated[0].CustomFields["FromAnon"].ToString(), Is.EqualTo("2"));
 
-            Assert.AreEqual(1, evs_Provider.Count);
-            Assert.AreEqual(3, evs_Provider[0].CustomFields.Count);
-            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromCustomField"));
-            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromAnon"));
-            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromScope"));
-            Assert.AreEqual("1", evs_Provider[0].CustomFields["FromCustomField"].ToString());
-            Assert.AreEqual("2", evs_Provider[0].CustomFields["FromAnon"].ToString());
-            Assert.AreEqual("3", evs_Provider[0].CustomFields["FromScope"].ToString());
+            Assert.That(evs_Provider.Count, Is.EqualTo(1));
+            Assert.That(evs_Provider[0].CustomFields.Count, Is.EqualTo(3));
+            Assert.That(evs_Provider[0].CustomFields.ContainsKey("FromCustomField"), Is.True);
+            Assert.That(evs_Provider[0].CustomFields.ContainsKey("FromAnon"), Is.True);
+            Assert.That(evs_Provider[0].CustomFields.ContainsKey("FromScope"), Is.True);
+            Assert.That(evs_Provider[0].CustomFields["FromCustomField"].ToString(), Is.EqualTo("1"));
+            Assert.That(evs_Provider[0].CustomFields["FromAnon"].ToString(), Is.EqualTo("2"));
+            Assert.That(evs_Provider[0].CustomFields["FromScope"].ToString(), Is.EqualTo("3"));
         }
 
         [Test]
@@ -210,9 +210,9 @@ namespace Audit.UnitTest
             using (var scope = AuditScope.Create(options))
             {
             }
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual("test", evs[0].EventType);
-            Assert.AreEqual("override", evs[1].EventType);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].EventType, Is.EqualTo("test"));
+            Assert.That(evs[1].EventType, Is.EqualTo("override"));
         }
 
         [Test]
@@ -230,8 +230,8 @@ namespace Audit.UnitTest
             {
             }
 
-            Assert.AreEqual(1, ins);
-            Assert.AreEqual(1, upd);
+            Assert.That(ins, Is.EqualTo(1));
+            Assert.That(upd, Is.EqualTo(1));
         }
 
         [Test]
@@ -250,15 +250,15 @@ namespace Audit.UnitTest
                  .Target(() => 1)
                  .CallingMethod(mb));
 
-            Assert.AreEqual("event type", scope.EventType);
-            Assert.AreEqual("event type", scope.Event.EventType);
-            Assert.IsTrue(scope.Event.CustomFields.ContainsKey("f"));
-            Assert.AreEqual(EventCreationPolicy.Manual, scope.EventCreationPolicy);
-            Assert.AreEqual(typeof(AuditEvent), scope.Event.GetType());
-            Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
-            Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
-            Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(mb.Name));
+            Assert.That(scope.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.CustomFields.ContainsKey("f"), Is.True);
+            Assert.That(scope.EventCreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
+            Assert.That(scope.Event.GetType(), Is.EqualTo(typeof(AuditEvent)));
+            Assert.That(scope.DataProvider.GetType(), Is.EqualTo(typeof(DynamicDataProvider)));
+            Assert.That(scope.SaveMode, Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(scope.Event.Target.Old.ToString(), Is.EqualTo("1"));
+            Assert.That(scope.Event.Environment.CallingMethodName.Contains(mb.Name), Is.True);
         }
 
         [Test]
@@ -277,15 +277,15 @@ namespace Audit.UnitTest
                 .Target(() => 1)
                 .CallingMethod(mb));
 
-            Assert.AreEqual("event type", scope.EventType);
-            Assert.AreEqual("event type", scope.Event.EventType);
-            Assert.IsTrue(scope.Event.CustomFields.ContainsKey("f"));
-            Assert.AreEqual(EventCreationPolicy.Manual, scope.EventCreationPolicy);
-            Assert.AreEqual(typeof(AuditEvent), scope.Event.GetType());
-            Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
-            Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
-            Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(mb.Name));
+            Assert.That(scope.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.CustomFields.ContainsKey("f"), Is.True);
+            Assert.That(scope.EventCreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
+            Assert.That(scope.Event.GetType(), Is.EqualTo(typeof(AuditEvent)));
+            Assert.That(scope.DataProvider.GetType(), Is.EqualTo(typeof(DynamicDataProvider)));
+            Assert.That(scope.SaveMode, Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(scope.Event.Target.Old.ToString(), Is.EqualTo("1"));
+            Assert.That(scope.Event.Environment.CallingMethodName.Contains(mb.Name), Is.True);
         }
 
         [Test]
@@ -298,10 +298,10 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
             AuditScope.Log("test", new { field1 = "one" });
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("test", evs[0].EventType);
-            Assert.AreEqual("one", evs[0].CustomFields["field1"].ToString());
-            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_Log"));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EventType, Is.EqualTo("test"));
+            Assert.That(evs[0].CustomFields["field1"].ToString(), Is.EqualTo("one"));
+            Assert.That(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_Log"), Is.True);
         }
 
         [Test]
@@ -319,9 +319,9 @@ namespace Audit.UnitTest
             {
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.IsTrue(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"));
-            Assert.IsTrue(evs[1].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"));
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"), Is.True);
+            Assert.That(evs[1].Environment.CallingMethodName.Contains("Test_AuditScope_CallingMethod"), Is.True);
         }
 
         [Test]
@@ -343,10 +343,10 @@ namespace Audit.UnitTest
             }
             Audit.Core.Configuration.SystemClock = new DefaultSystemClock();
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(10000, evs[0].Duration);
-            Assert.AreEqual(new DateTime(2020, 1, 1, 0, 0, 0), evs[0].StartDate);
-            Assert.AreEqual(new DateTime(2020, 1, 1, 0, 0, 10), evs[0].EndDate);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Duration, Is.EqualTo(10000));
+            Assert.That(evs[0].StartDate, Is.EqualTo(new DateTime(2020, 1, 1, 0, 0, 0)));
+            Assert.That(evs[0].EndDate, Is.EqualTo(new DateTime(2020, 1, 1, 0, 0, 10)));
         }
 
         [Test]
@@ -372,13 +372,13 @@ namespace Audit.UnitTest
             obj.Id = 3;
             obj.Name = "X";
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("SomeClass", evs[0].Target.Type);
-            
-            Assert.AreEqual(1, JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.Old)).Id);
-            Assert.AreEqual("Test", JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.Old)).Name);
-            Assert.AreEqual(2, JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.New)).Id);
-            Assert.AreEqual("NewTest", JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.New)).Name);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Target.Type, Is.EqualTo("SomeClass"));
+
+            Assert.That(JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.Old)).Id, Is.EqualTo(1));
+            Assert.That(JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.Old)).Name, Is.EqualTo("Test"));
+            Assert.That(JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.New)).Id, Is.EqualTo(2));
+            Assert.That(JsonAdapter.Deserialize<SomeClass>(JsonAdapter.Serialize(evs[0].Target.New)).Name, Is.EqualTo("NewTest"));
         }
 
         [Test]
@@ -399,10 +399,10 @@ namespace Audit.UnitTest
                 scope.SetTargetGetter(() => null);
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("Object", evs[0].Target.Type);
-            Assert.IsNull(evs[0].Target.Old);
-            Assert.IsNull(evs[0].Target.New);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Target.Type, Is.EqualTo("Object"));
+            Assert.That(evs[0].Target.Old, Is.Null);
+            Assert.That(evs[0].Target.New, Is.Null);
         }
 
         [Test]
@@ -423,8 +423,8 @@ namespace Audit.UnitTest
                 scope.SetTargetGetter(null);
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsNull(evs[0].Target);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Target, Is.Null);
         }
 
         [Test]
@@ -447,18 +447,18 @@ namespace Audit.UnitTest
             using (var scope = new AuditScopeFactory().Create("TEST", null, null, null, null))
             {
             }
-            
-            Assert.AreEqual(1, listEv.Count);
+
+            Assert.That(listEv.Count, Is.EqualTo(1));
 
             var manualJson = listEv[0].ToJson();
 
-            Assert.AreEqual(1, listJson.Count);
+            Assert.That(listJson.Count, Is.EqualTo(1));
 
             var jsonExpected = JsonSerializer.Serialize(listEv[0], Core.Configuration.JsonSettings);
-            Assert.IsTrue(jsonExpected.Count(c => c == '\n') > 5);
-            Assert.AreEqual(jsonExpected, listJson[0]);
-            Assert.AreEqual(jsonExpected, manualJson);
-            Assert.AreEqual(JsonAdapter.Serialize(listEv[0]), listEv[0].ToJson());
+            Assert.That(jsonExpected.Count(c => c == '\n') > 5, Is.True);
+            Assert.That(listJson[0], Is.EqualTo(jsonExpected));
+            Assert.That(manualJson, Is.EqualTo(jsonExpected));
+            Assert.That(listEv[0].ToJson(), Is.EqualTo(JsonAdapter.Serialize(listEv[0])));
             Core.Configuration.JsonSettings = prevSettings;
         }
 
@@ -481,7 +481,7 @@ namespace Audit.UnitTest
                 scope.SaveAsync().Wait();
             }
             Audit.Core.Configuration.AuditDisabled = false;
-            Assert.AreEqual(0, list.Count);
+            Assert.That(list.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -506,7 +506,7 @@ namespace Audit.UnitTest
                 scope.SaveAsync().Wait();
             }
             Audit.Core.Configuration.AuditDisabled = false;
-            Assert.AreEqual(0, list.Count);
+            Assert.That(list.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -535,12 +535,12 @@ namespace Audit.UnitTest
             var fileCount = Directory.EnumerateFiles(dir).Count();
             Directory.Delete(dir, true);
 
-            Assert.AreEqual(1, fileCount);
-            Assert.AreEqual(JsonAdapter.Serialize(ev), JsonAdapter.Serialize(fileFromProvider));
-            Assert.AreEqual("evt", ev.EventType);
-            Assert.AreEqual("start", ev.Target.Old.ToString());
-            Assert.AreEqual("end", ev.Target.New.ToString());
-            Assert.AreEqual("1", ev.CustomFields["X"].ToString());
+            Assert.That(fileCount, Is.EqualTo(1));
+            Assert.That(JsonAdapter.Serialize(fileFromProvider), Is.EqualTo(JsonAdapter.Serialize(ev)));
+            Assert.That(ev.EventType, Is.EqualTo("evt"));
+            Assert.That(ev.Target.Old.ToString(), Is.EqualTo("start"));
+            Assert.That(ev.Target.New.ToString(), Is.EqualTo("end"));
+            Assert.That(ev.CustomFields["X"].ToString(), Is.EqualTo("1"));
         }
 
         [Test]
@@ -563,8 +563,8 @@ namespace Audit.UnitTest
                 scope.Save();
             }
 
-            Assert.AreEqual(1, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
+            Assert.That(modes.Count, Is.EqualTo(1));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnStart));
         }
 
         [Test]
@@ -587,10 +587,10 @@ namespace Audit.UnitTest
                 scope.Save();
             }
 
-            Assert.AreEqual(3, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
-            Assert.AreEqual(SaveMode.ReplaceOnEnd, modes[1]);
-            Assert.AreEqual(SaveMode.ReplaceOnEnd, modes[2]);
+            Assert.That(modes.Count, Is.EqualTo(3));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(modes[1], Is.EqualTo(SaveMode.ReplaceOnEnd));
+            Assert.That(modes[2], Is.EqualTo(SaveMode.ReplaceOnEnd));
         }
 
         [Test]
@@ -613,10 +613,10 @@ namespace Audit.UnitTest
                 scope.Save();
             }
 
-            Assert.AreEqual(3, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[1]);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[2]);
+            Assert.That(modes.Count, Is.EqualTo(3));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(modes[1], Is.EqualTo(SaveMode.InsertOnEnd));
+            Assert.That(modes[2], Is.EqualTo(SaveMode.InsertOnEnd));
         }
 
         [Test]
@@ -639,9 +639,9 @@ namespace Audit.UnitTest
                 scope.Save();
             }
 
-            Assert.AreEqual(2, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[0]);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[1]);
+            Assert.That(modes.Count, Is.EqualTo(2));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnEnd));
+            Assert.That(modes[1], Is.EqualTo(SaveMode.InsertOnEnd));
         }
 
         [Test]
@@ -664,8 +664,8 @@ namespace Audit.UnitTest
                 scope.Save();
             }
 
-            Assert.AreEqual(1, modes.Count);
-            Assert.AreEqual(SaveMode.Manual, modes[0]);
+            Assert.That(modes.Count, Is.EqualTo(1));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.Manual));
         }
 
         [Test]
@@ -706,9 +706,9 @@ namespace Audit.UnitTest
                 }));
             }
             Task.WaitAll(tasks.ToArray());
-            Assert.AreEqual(MAX * 2, counter);
-            Assert.AreEqual(MAX * 2, counter2);
-            Assert.AreEqual(MAX * 2, counter3);
+            Assert.That(counter, Is.EqualTo(MAX * 2));
+            Assert.That(counter2, Is.EqualTo(MAX * 2));
+            Assert.That(counter3, Is.EqualTo(MAX * 2));
         }
 
 
@@ -726,13 +726,13 @@ namespace Audit.UnitTest
             var scope = new AuditScopeFactory().Create("et1", null, EventCreationPolicy.Manual, null);
             scope.Save();
             scope.SetCustomField("field", "value");
-            Assert.AreEqual(1, onInsertCount);
-            Assert.AreEqual(0, onReplaceCount);
-            Assert.AreEqual(1, onInsertOrReplaceCount);
+            Assert.That(onInsertCount, Is.EqualTo(1));
+            Assert.That(onReplaceCount, Is.EqualTo(0));
+            Assert.That(onInsertOrReplaceCount, Is.EqualTo(1));
             scope.Save();
-            Assert.AreEqual(1, onInsertCount);
-            Assert.AreEqual(1, onReplaceCount);
-            Assert.AreEqual(2, onInsertOrReplaceCount);
+            Assert.That(onInsertCount, Is.EqualTo(1));
+            Assert.That(onReplaceCount, Is.EqualTo(1));
+            Assert.That(onInsertOrReplaceCount, Is.EqualTo(2));
         }
 
         [Test]
@@ -741,22 +741,22 @@ namespace Audit.UnitTest
             Core.Configuration.IncludeTypeNamespaces = false;
             var s = new List<Dictionary<HashSet<string>, KeyValuePair<int, decimal>>>();
             var fullname = s.GetType().GetFullTypeName();
-            Assert.AreEqual("List<Dictionary<HashSet<String>,KeyValuePair<Int32,Decimal>>>", fullname);
+            Assert.That(fullname, Is.EqualTo("List<Dictionary<HashSet<String>,KeyValuePair<Int32,Decimal>>>"));
             Core.Configuration.IncludeTypeNamespaces = true;
             fullname = s.GetType().GetFullTypeName();
-            Assert.AreEqual("System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.Collections.Generic.HashSet<System.String>,System.Collections.Generic.KeyValuePair<System.Int32,System.Decimal>>>", fullname);
+            Assert.That(fullname, Is.EqualTo("System.Collections.Generic.List<System.Collections.Generic.Dictionary<System.Collections.Generic.HashSet<System.String>,System.Collections.Generic.KeyValuePair<System.Int32,System.Decimal>>>"));
             Core.Configuration.IncludeTypeNamespaces = false;
             fullname = typeof(AuditEvent).GetFullTypeName();
-            Assert.AreEqual("AuditEvent", fullname);
+            Assert.That(fullname, Is.EqualTo("AuditEvent"));
             Core.Configuration.IncludeTypeNamespaces = true;
             fullname = typeof(AuditEvent).GetFullTypeName();
-            Assert.AreEqual("Audit.Core.AuditEvent", fullname);
+            Assert.That(fullname, Is.EqualTo("Audit.Core.AuditEvent"));
             Core.Configuration.IncludeTypeNamespaces = false;
             var anon1 = (new { anon = true, str = "", inti = 1, otro = new { boo = true, str = "sdhdh" } }).GetType().GetFullTypeName();
             Core.Configuration.IncludeTypeNamespaces = true;
             var anon2 = (new { anon = true, str = "", inti = 1, otro = new { boo = true, str = "sdhdh" } }).GetType().GetFullTypeName();
-            Assert.AreEqual("AnonymousType<Boolean,String,Int32,AnonymousType<Boolean,String>>", anon1);
-            Assert.AreEqual("AnonymousType<System.Boolean,System.String,System.Int32,AnonymousType<System.Boolean,System.String>>", anon2);
+            Assert.That(anon1, Is.EqualTo("AnonymousType<Boolean,String,Int32,AnonymousType<Boolean,String>>"));
+            Assert.That(anon2, Is.EqualTo("AnonymousType<System.Boolean,System.String,System.Int32,AnonymousType<System.Boolean,System.String>>"));
         }
 
         [Test]
@@ -769,12 +769,12 @@ namespace Audit.UnitTest
                 .WithAction(action => action.OnScopeCreated(s => x++));
             var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
-            Assert.AreEqual(typeof(FileDataProvider), Core.Configuration.DataProvider.GetType());
-            Assert.AreEqual("prefix", (Core.Configuration.DataProvider as FileDataProvider).FilenamePrefix);
-            Assert.AreEqual(@"C:\", (Core.Configuration.DataProvider as FileDataProvider).DirectoryPath);
-            Assert.AreEqual(EventCreationPolicy.Manual, Core.Configuration.CreationPolicy);
+            Assert.That(Core.Configuration.DataProvider.GetType(), Is.EqualTo(typeof(FileDataProvider)));
+            Assert.That((Core.Configuration.DataProvider as FileDataProvider).FilenamePrefix, Is.EqualTo("prefix"));
+            Assert.That((Core.Configuration.DataProvider as FileDataProvider).DirectoryPath, Is.EqualTo(@"C:\"));
+            Assert.That(Core.Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
             Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
-            Assert.AreEqual(1, x);
+            Assert.That(x, Is.EqualTo(1));
         }
 
 #if NET462 || NET472
@@ -786,11 +786,11 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.Manual);
             var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
-            Assert.AreEqual(typeof(EventLogDataProvider), Core.Configuration.DataProvider.GetType());
-            Assert.AreEqual("LogName", (Core.Configuration.DataProvider as EventLogDataProvider).LogName);
-            Assert.AreEqual("SourcePath", (Core.Configuration.DataProvider as EventLogDataProvider).SourcePath);
-            Assert.AreEqual("MachineName", (Core.Configuration.DataProvider as EventLogDataProvider).MachineName);
-            Assert.AreEqual(EventCreationPolicy.Manual, Core.Configuration.CreationPolicy);
+            Assert.That(Core.Configuration.DataProvider.GetType(), Is.EqualTo(typeof(EventLogDataProvider)));
+            Assert.That((Core.Configuration.DataProvider as EventLogDataProvider).LogName, Is.EqualTo("LogName"));
+            Assert.That((Core.Configuration.DataProvider as EventLogDataProvider).SourcePath, Is.EqualTo("SourcePath"));
+            Assert.That((Core.Configuration.DataProvider as EventLogDataProvider).MachineName, Is.EqualTo("MachineName"));
+            Assert.That(Core.Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
         }
 #endif
         [Test]
@@ -880,7 +880,7 @@ namespace Audit.UnitTest
             }
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual("eventType as id", id);
+            Assert.That(id, Is.EqualTo("eventType as id"));
         }
 
         [Test]
@@ -952,7 +952,7 @@ namespace Audit.UnitTest
                 scope.Save(); // this should do nothing because of the creation policy (this no more true since v4.6.2)
                 provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             }
-            Assert.AreEqual(eventType, ev.EventType);
+            Assert.That(ev.EventType, Is.EqualTo(eventType));
             Assert.True(ev.Comments.Contains("test"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
@@ -986,7 +986,7 @@ namespace Audit.UnitTest
                 target = "final";
                 scope.Discard();
             }
-            Assert.AreEqual(eventType, ev.EventType);
+            Assert.That(ev.EventType, Is.EqualTo(eventType));
             Assert.True(ev.Comments.Contains("test"));
             Assert.Null(ev.Target.New);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
@@ -1065,8 +1065,8 @@ namespace Audit.UnitTest
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
-            Assert.AreEqual("123", ev.CustomFields["DATA"].ToString());
-            Assert.AreEqual("class value", ev.CustomFields["class"].ToString());
+            Assert.That(ev.CustomFields["DATA"].ToString(), Is.EqualTo("123"));
+            Assert.That(ev.CustomFields["class"].ToString(), Is.EqualTo("class value"));
         }
 
         [Test]
@@ -1081,7 +1081,7 @@ namespace Audit.UnitTest
             scope2.Save();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);
-            Assert.AreNotEqual(scope1.EventId, scope2.EventId);
+            Assert.That(scope2.EventId, Is.Not.EqualTo(scope1.EventId));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 

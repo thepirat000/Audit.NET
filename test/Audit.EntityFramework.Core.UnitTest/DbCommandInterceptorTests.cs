@@ -70,36 +70,36 @@ namespace Audit.EntityFramework.Core.UnitTest
                 //NonQueryExecuting
                 var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES ({0}, 'test', {1})", id, "comments");
 
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
 
-            Assert.IsTrue(inserted[0].CommandEvent.CommandText.Contains("SELECT"));
-            Assert.AreEqual(CommandType.Text, inserted[0].CommandEvent.CommandType);
-            Assert.IsNotNull(inserted[0].CommandEvent.ConnectionId);
-            Assert.IsNull(inserted[0].CommandEvent.ErrorMessage);
+            Assert.That(inserted[0].CommandEvent.CommandText.Contains("SELECT"), Is.True);
+            Assert.That(inserted[0].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(inserted[0].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].CommandEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[0].CommandEvent.IsAsync);
-            Assert.IsNull(inserted[0].CommandEvent.Parameters);
-            Assert.IsNull(inserted[0].CommandEvent.Result);
-            Assert.IsTrue(inserted[0].CommandEvent.Success);
-            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader", inserted[0].EventType);
+            Assert.That(inserted[0].CommandEvent.Parameters, Is.Null);
+            Assert.That(inserted[0].CommandEvent.Result, Is.Null);
+            Assert.That(inserted[0].CommandEvent.Success, Is.True);
+            Assert.That(inserted[0].EventType, Is.EqualTo("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader"));
 
-            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteNonQuery", inserted[1].EventType);
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery, inserted[1].CommandEvent.Method);
-            Assert.IsTrue(inserted[1].CommandEvent.CommandText.Contains("INSERT INTO DEPARTMENTS"));
-            Assert.AreEqual(CommandType.Text, inserted[1].CommandEvent.CommandType);
-            Assert.IsNotNull(inserted[1].CommandEvent.ConnectionId);
-            Assert.IsNull(inserted[1].CommandEvent.ErrorMessage);
+            Assert.That(inserted[1].EventType, Is.EqualTo("DbCommandInterceptContext:DbCommandIntercept:ExecuteNonQuery"));
+            Assert.That(inserted[1].CommandEvent.Method, Is.EqualTo(DbCommandMethod.ExecuteNonQuery));
+            Assert.That(inserted[1].CommandEvent.CommandText.Contains("INSERT INTO DEPARTMENTS"), Is.True);
+            Assert.That(inserted[1].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(inserted[1].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[1].CommandEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[1].CommandEvent.IsAsync);
-            Assert.AreEqual(2, inserted[1].CommandEvent.Parameters.Count);
-            Assert.IsTrue(inserted[1].CommandEvent.Parameters.Any(p => p.Value.ToString() == "comments"));
-            Assert.IsTrue(inserted[1].CommandEvent.Parameters.Any(p => p.Value.ToString() == id.ToString()));
-            Assert.AreEqual("1", inserted[1].CommandEvent.Result.ToString()); 
-            Assert.IsTrue(inserted[1].CommandEvent.Success);
+            Assert.That(inserted[1].CommandEvent.Parameters.Count, Is.EqualTo(2));
+            Assert.That(inserted[1].CommandEvent.Parameters.Any(p => p.Value.ToString() == "comments"), Is.True);
+            Assert.That(inserted[1].CommandEvent.Parameters.Any(p => p.Value.ToString() == id.ToString()), Is.True);
+            Assert.That(inserted[1].CommandEvent.Result.ToString(), Is.EqualTo("1"));
+            Assert.That(inserted[1].CommandEvent.Success, Is.True);
 
-            Assert.AreEqual(inserted[0].CommandEvent.ConnectionId, inserted[1].CommandEvent.ConnectionId);
+            Assert.That(inserted[1].CommandEvent.ConnectionId, Is.EqualTo(inserted[0].CommandEvent.ConnectionId));
         }
 
         [Test]
@@ -126,36 +126,36 @@ namespace Audit.EntityFramework.Core.UnitTest
                 //NonQueryExecuting
                 var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
 
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
 
-            Assert.AreEqual(DbCommandMethod.ExecuteReader, inserted[0].CommandEvent.Method);
-            Assert.IsTrue(inserted[0].CommandEvent.CommandText.Contains("SELECT"));
-            Assert.AreEqual(CommandType.Text, inserted[0].CommandEvent.CommandType);
-            Assert.IsNotNull(inserted[0].CommandEvent.ConnectionId);
-            Assert.IsNull(inserted[0].CommandEvent.ErrorMessage);
-            Assert.IsTrue(inserted[0].CommandEvent.IsAsync);
-            Assert.IsNull(inserted[0].CommandEvent.Parameters);
-            Assert.IsNull(inserted[0].CommandEvent.Result);
-            Assert.IsTrue(inserted[0].CommandEvent.Success);
-            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader", inserted[0].EventType);
+            Assert.That(inserted[0].CommandEvent.Method, Is.EqualTo(DbCommandMethod.ExecuteReader));
+            Assert.That(inserted[0].CommandEvent.CommandText.Contains("SELECT"), Is.True);
+            Assert.That(inserted[0].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(inserted[0].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].CommandEvent.ErrorMessage, Is.Null);
+            Assert.That(inserted[0].CommandEvent.IsAsync, Is.True);
+            Assert.That(inserted[0].CommandEvent.Parameters, Is.Null);
+            Assert.That(inserted[0].CommandEvent.Result, Is.Null);
+            Assert.That(inserted[0].CommandEvent.Success, Is.True);
+            Assert.That(inserted[0].EventType, Is.EqualTo("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader"));
 
-            Assert.AreEqual("DbCommandInterceptContext:DbCommandIntercept:ExecuteNonQuery", inserted[1].EventType);
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery, inserted[1].CommandEvent.Method);
-            Assert.IsTrue(inserted[1].CommandEvent.CommandText.Contains("INSERT INTO DEPARTMENTS"));
-            Assert.AreEqual(CommandType.Text, inserted[1].CommandEvent.CommandType);
-            Assert.IsNotNull(inserted[1].CommandEvent.ConnectionId);
-            Assert.IsNull(inserted[1].CommandEvent.ErrorMessage);
-            Assert.IsTrue(inserted[1].CommandEvent.IsAsync);
-            Assert.AreEqual(1, inserted[1].CommandEvent.Parameters.Count);
-            Assert.AreEqual("comments", inserted[1].CommandEvent.Parameters.First().Value.ToString());
-            Assert.AreEqual("1", inserted[1].CommandEvent.Result.ToString());
-            Assert.IsTrue(inserted[1].CommandEvent.Success);
+            Assert.That(inserted[1].EventType, Is.EqualTo("DbCommandInterceptContext:DbCommandIntercept:ExecuteNonQuery"));
+            Assert.That(inserted[1].CommandEvent.Method, Is.EqualTo(DbCommandMethod.ExecuteNonQuery));
+            Assert.That(inserted[1].CommandEvent.CommandText.Contains("INSERT INTO DEPARTMENTS"), Is.True);
+            Assert.That(inserted[1].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(inserted[1].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[1].CommandEvent.ErrorMessage, Is.Null);
+            Assert.That(inserted[1].CommandEvent.IsAsync, Is.True);
+            Assert.That(inserted[1].CommandEvent.Parameters.Count, Is.EqualTo(1));
+            Assert.That(inserted[1].CommandEvent.Parameters.First().Value.ToString(), Is.EqualTo("comments"));
+            Assert.That(inserted[1].CommandEvent.Result.ToString(), Is.EqualTo("1"));
+            Assert.That(inserted[1].CommandEvent.Success, Is.True);
 
-            Assert.AreEqual(inserted[0].CommandEvent.ConnectionId, inserted[1].CommandEvent.ConnectionId);
+            Assert.That(inserted[1].CommandEvent.ConnectionId, Is.EqualTo(inserted[0].CommandEvent.ConnectionId));
         }
 
         [Test]
@@ -184,18 +184,20 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
 
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery.ToString(), inserted[0].EventType);
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery, inserted[0].CommandEvent.Method);
-            Assert.IsTrue(inserted[0].CommandEvent.CommandText.Contains("SELECT 1/0"));
-            Assert.AreEqual(CommandType.Text, inserted[0].CommandEvent.CommandType);
-            Assert.IsNotNull(inserted[0].CommandEvent.ConnectionId);
-            Assert.IsNotNull(inserted[0].CommandEvent.ErrorMessage);
-            Assert.IsTrue(inserted[0].CommandEvent.ErrorMessage.Contains("Divide by zero"));
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+
+
+            Assert.That(inserted[0].EventType, Is.EqualTo(DbCommandMethod.ExecuteNonQuery.ToString()));
+            Assert.That(inserted[0].CommandEvent.Method, Is.EqualTo(DbCommandMethod.ExecuteNonQuery));
+            Assert.That(inserted[0].CommandEvent.CommandText.Contains("SELECT 1/0"), Is.True);
+            Assert.That(inserted[0].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(inserted[0].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].CommandEvent.ErrorMessage, Is.Not.Null);
+            Assert.That(inserted[0].CommandEvent.ErrorMessage.Contains("Divide by zero"), Is.True);
             Assert.IsFalse(inserted[0].CommandEvent.IsAsync);
-            Assert.IsNull(inserted[0].CommandEvent.Result);
+            Assert.That(inserted[0].CommandEvent.Result, Is.Null);
             Assert.IsFalse(inserted[0].CommandEvent.Success);
         }
 
@@ -227,20 +229,19 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery.ToString(), inserted[0].EventType);
-            Assert.AreEqual(DbCommandMethod.ExecuteNonQuery, inserted[0].CommandEvent.Method);
-            Assert.IsTrue(inserted[0].CommandEvent.CommandText.Contains("SELECT 1/0"));
-            Assert.AreEqual(CommandType.Text, inserted[0].CommandEvent.CommandType);
-            Assert.IsNotNull(inserted[0].CommandEvent.ConnectionId);
-            Assert.IsNotNull(inserted[0].CommandEvent.ErrorMessage);
-            Assert.IsTrue(inserted[0].CommandEvent.ErrorMessage.Contains("Divide by zero"));
-            Assert.IsTrue(inserted[0].CommandEvent.IsAsync);
-            Assert.IsNull(inserted[0].CommandEvent.Result);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo(DbCommandMethod.ExecuteNonQuery.ToString()));
+            Assert.That(inserted[0].CommandEvent.Method, Is.EqualTo(DbCommandMethod.ExecuteNonQuery));
+            Assert.That(inserted[0].CommandEvent.CommandText.Contains("SELECT 1/0"), Is.True);
+            Assert.That(inserted[0].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(inserted[0].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].CommandEvent.ErrorMessage, Is.Not.Null);
+            Assert.That(inserted[0].CommandEvent.ErrorMessage.Contains("Divide by zero"), Is.True);
+            Assert.That(inserted[0].CommandEvent.IsAsync, Is.True);
+            Assert.That(inserted[0].CommandEvent.Result, Is.Null);
             Assert.IsFalse(inserted[0].CommandEvent.Success);
-            Assert.AreEqual("DbCommandIntercept", inserted[0].CommandEvent.Database);
+            Assert.That(inserted[0].CommandEvent.Database, Is.EqualTo("DbCommandIntercept"));
         }
 
         [Test]
@@ -267,16 +268,16 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var dept = ctx.Departments.FirstOrDefault(d => d.Id == newId);
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.IsNotNull(inserted[0].Parameters);
-            Assert.IsTrue(inserted[0].Parameters.Any());
-            Assert.AreEqual(newId, inserted[0].Parameters.First().Value);
-            Assert.IsNotNull(inserted[0].Result);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].Parameters, Is.Not.Null);
+            Assert.That(inserted[0].Parameters.Any(), Is.True);
+            Assert.That(inserted[0].Parameters.First().Value, Is.EqualTo(newId));
+            Assert.That(inserted[0].Result, Is.Not.Null);
             var resultList = inserted[0].Result as Dictionary<string, List<Dictionary<string, object>>>;
-            Assert.AreEqual(1, resultList.Count);
-            Assert.AreEqual(newId, (int)resultList.Values.First()[0]["Id"]);
-            Assert.AreEqual("Comment", resultList.Values.First()[0]["Comments"]);
-            Assert.AreEqual("Test", resultList.Values.First()[0]["Name"]);
+            Assert.That(resultList.Count, Is.EqualTo(1));
+            Assert.That((int)resultList.Values.First()[0]["Id"], Is.EqualTo(newId));
+            Assert.That(resultList.Values.First()[0]["Comments"], Is.EqualTo("Comment"));
+            Assert.That(resultList.Values.First()[0]["Name"], Is.EqualTo("Test"));
         }
 
         [Test]
@@ -303,16 +304,16 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var dept = ctx.Departments.FirstOrDefault(d => d.Id == newId);
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.IsNotNull(inserted[0].Parameters);
-            Assert.IsTrue(inserted[0].Parameters.Any());
-            Assert.AreEqual(newId, inserted[0].Parameters.First().Value);
-            Assert.IsNotNull(inserted[0].Result);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].Parameters, Is.Not.Null);
+            Assert.That(inserted[0].Parameters.Any(), Is.True);
+            Assert.That(inserted[0].Parameters.First().Value, Is.EqualTo(newId));
+            Assert.That(inserted[0].Result, Is.Not.Null);
             var resultList = inserted[0].Result as Dictionary<string, List<Dictionary<string, object>>>;
-            Assert.AreEqual(1, resultList.Count);
-            Assert.AreEqual(newId, (int)resultList.Values.First()[0]["Id"]);
-            Assert.AreEqual("Comment", resultList.Values.First()[0]["Comments"]);
-            Assert.AreEqual("Test", resultList.Values.First()[0]["Name"]);
+            Assert.That(resultList.Count, Is.EqualTo(1));
+            Assert.That((int)resultList.Values.First()[0]["Id"], Is.EqualTo(newId));
+            Assert.That(resultList.Values.First()[0]["Comments"], Is.EqualTo("Comment"));
+            Assert.That(resultList.Values.First()[0]["Name"], Is.EqualTo("Test"));
         }
 
 #if EF_CORE_7_OR_GREATER
@@ -345,10 +346,10 @@ namespace Audit.EntityFramework.Core.UnitTest
                 dept.Address.Text = "AddrUpdated";
                 await ctx.SaveChangesAsync();
             }
-            
-            Assert.AreEqual(1, inserted.Count);
-            
-            Assert.AreEqual(2, (inserted[0].Result as ICollection)?.Count); // Two result sets
+
+            Assert.That(inserted.Count, Is.EqualTo(1));
+
+            Assert.That((inserted[0].Result as ICollection)?.Count, Is.EqualTo(2)); // Two result sets
         }
 #endif
 
@@ -389,24 +390,23 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, insertedCommands.Count);
-            Assert.AreEqual(1, insertedSavechanges.Count);
-
-            Assert.AreEqual(DbCommandMethod.ExecuteReader.ToString(), insertedCommands[0].EventType);
-            Assert.AreEqual(DbCommandMethod.ExecuteReader, insertedCommands[0].CommandEvent.Method);
-            Assert.IsTrue(insertedCommands[0].CommandEvent.CommandText.Contains("INSERT INTO"));
-            Assert.AreEqual(CommandType.Text, insertedCommands[0].CommandEvent.CommandType);
-            Assert.IsNotNull(insertedCommands[0].CommandEvent.ConnectionId);
-            Assert.IsNotNull(insertedCommands[0].CommandEvent.ContextId);
-            Assert.IsNull(insertedCommands[0].CommandEvent.ErrorMessage);
+            Assert.That(insertedCommands.Count, Is.EqualTo(1));
+            Assert.That(insertedSavechanges.Count, Is.EqualTo(1));
+            Assert.That(insertedCommands[0].EventType, Is.EqualTo(DbCommandMethod.ExecuteReader.ToString()));
+            Assert.That(insertedCommands[0].CommandEvent.Method, Is.EqualTo(DbCommandMethod.ExecuteReader));
+            Assert.That(insertedCommands[0].CommandEvent.CommandText.Contains("INSERT INTO"), Is.True);
+            Assert.That(insertedCommands[0].CommandEvent.CommandType, Is.EqualTo(CommandType.Text));
+            Assert.That(insertedCommands[0].CommandEvent.ConnectionId, Is.Not.Null);
+            Assert.That(insertedCommands[0].CommandEvent.ContextId, Is.Not.Null);
+            Assert.That(insertedCommands[0].CommandEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(insertedCommands[0].CommandEvent.IsAsync);
-            Assert.IsNotNull(insertedCommands[0].CommandEvent.Parameters);
-            Assert.IsNull(insertedCommands[0].CommandEvent.Result);
-            Assert.IsTrue(insertedCommands[0].CommandEvent.Success);
-            Assert.AreEqual(insertedCommands[0].CommandEvent.ConnectionId, insertedSavechanges[0].EntityFrameworkEvent.ConnectionId);
-            Assert.AreEqual("DbCommandIntercept", insertedCommands[0].CommandEvent.Database);
-            Assert.AreEqual(insertedCommands[0].CommandEvent.Database, insertedSavechanges[0].EntityFrameworkEvent.Database);
-            Assert.AreEqual(insertedCommands[0].CommandEvent.ContextId, insertedSavechanges[0].EntityFrameworkEvent.ContextId);
+            Assert.That(insertedCommands[0].CommandEvent.Parameters, Is.Not.Null);
+            Assert.That(insertedCommands[0].CommandEvent.Result, Is.Null);
+            Assert.That(insertedCommands[0].CommandEvent.Success, Is.True);
+            Assert.That(insertedSavechanges[0].EntityFrameworkEvent.ConnectionId, Is.EqualTo(insertedCommands[0].CommandEvent.ConnectionId));
+            Assert.That(insertedCommands[0].CommandEvent.Database, Is.EqualTo("DbCommandIntercept"));
+            Assert.That(insertedSavechanges[0].EntityFrameworkEvent.Database, Is.EqualTo(insertedCommands[0].CommandEvent.Database));
+            Assert.That(insertedSavechanges[0].EntityFrameworkEvent.ContextId, Is.EqualTo(insertedCommands[0].CommandEvent.ContextId));
         }
 #endif
 
@@ -430,8 +430,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var result = ctx.Database.ExecuteSqlRaw("SELECT {0}", "test");
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.IsNull(inserted[0].CommandEvent.Parameters);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].CommandEvent.Parameters, Is.Null);
         }
 
         [Test]
@@ -456,11 +456,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(1, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -491,12 +491,12 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("DbCommandInterceptContext_InheritingFromAuditDbContext | DbCommandIntercept | ExecuteNonQuery", inserted[0].EventType);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo("DbCommandInterceptContext_InheritingFromAuditDbContext | DbCommandIntercept | ExecuteNonQuery"));
         }
 
         [Test]
@@ -527,12 +527,12 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("DbCommandInterceptContext_InheritingFromAuditDbContext | DbCommandIntercept | ExecuteNonQuery", inserted[0].EventType);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo("DbCommandInterceptContext_InheritingFromAuditDbContext | DbCommandIntercept | ExecuteNonQuery"));
         }
 
         [Test]
@@ -561,11 +561,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(0, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -594,11 +594,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(0, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -627,13 +627,13 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[0].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
         }
 
         [Test]
@@ -662,13 +662,13 @@ namespace Audit.EntityFramework.Core.UnitTest
             {
                 //NonQueryExecuting
                 var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-                Assert.AreEqual(1, result);
+                Assert.That(result, Is.EqualTo(1));
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[0].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
         }
 
         [Test]
@@ -698,16 +698,16 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             //NonQueryExecuting
             var result = dbContext.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-            Assert.AreEqual(1, result);
-            
+            Assert.That(result, Is.EqualTo(1));
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
-            Assert.AreEqual(1, dbContext.ScopeCreatedCommands.Count);
-            Assert.AreEqual(1, dbContext.ScopeSavingCommands.Count);
-            Assert.AreEqual(1, dbContext.ScopeSavedCommands.Count);
+
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[0].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(dbContext.ScopeCreatedCommands.Count, Is.EqualTo(1));
+            Assert.That(dbContext.ScopeSavingCommands.Count, Is.EqualTo(1));
+            Assert.That(dbContext.ScopeSavedCommands.Count, Is.EqualTo(1));
             dbContext.Dispose();
         }
 
@@ -738,16 +738,16 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             //NonQueryExecuting
             var result = await dbContext.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
-            Assert.AreEqual(1, result);
+            Assert.That(result, Is.EqualTo(1));
 
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
-            Assert.AreEqual(1, dbContext.ScopeCreatedCommands.Count);
-            Assert.AreEqual(1, dbContext.ScopeSavingCommands.Count);
-            Assert.AreEqual(1, dbContext.ScopeSavedCommands.Count);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[0].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(dbContext.ScopeCreatedCommands.Count, Is.EqualTo(1));
+            Assert.That(dbContext.ScopeSavingCommands.Count, Is.EqualTo(1));
+            Assert.That(dbContext.ScopeSavedCommands.Count, Is.EqualTo(1));
             await dbContext.DisposeAsync();
         }
     }

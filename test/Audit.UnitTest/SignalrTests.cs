@@ -36,7 +36,7 @@ namespace Audit.UnitTest
             };
 
             SimulateConnectReconnectDisconnect(module);
-            Assert.AreEqual(0, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -59,19 +59,19 @@ namespace Audit.UnitTest
 
             SimulateConnectReconnectDisconnect(module);
 
-            Assert.AreEqual(3, evs.Count);
-            Assert.AreEqual("Connect", evs[0].EventType);
-            Assert.AreEqual(SignalrEventType.Connect, evs[0].GetSignalrEvent<SignalrEventConnect>().EventType);
-            Assert.AreEqual("x", evs[0].GetSignalrEvent<SignalrEventConnect>().ConnectionId);
+            Assert.That(evs.Count, Is.EqualTo(3));
+            Assert.That(evs[0].EventType, Is.EqualTo("Connect"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventConnect>().EventType, Is.EqualTo(SignalrEventType.Connect));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventConnect>().ConnectionId, Is.EqualTo("x"));
 
-            Assert.AreEqual("Reconnect", evs[1].EventType);
-            Assert.AreEqual(SignalrEventType.Reconnect, evs[1].GetSignalrEvent<SignalrEventReconnect>().EventType);
-            Assert.AreEqual("x", evs[1].GetSignalrEvent<SignalrEventReconnect>().ConnectionId);
+            Assert.That(evs[1].EventType, Is.EqualTo("Reconnect"));
+            Assert.That(evs[1].GetSignalrEvent<SignalrEventReconnect>().EventType, Is.EqualTo(SignalrEventType.Reconnect));
+            Assert.That(evs[1].GetSignalrEvent<SignalrEventReconnect>().ConnectionId, Is.EqualTo("x"));
 
-            Assert.AreEqual("Disconnect", evs[2].EventType);
-            Assert.AreEqual(SignalrEventType.Disconnect, evs[2].GetSignalrEvent<SignalrEventDisconnect>().EventType);
-            Assert.AreEqual("x", evs[2].GetSignalrEvent<SignalrEventDisconnect>().ConnectionId);
-            Assert.AreEqual(true, evs[2].GetSignalrEvent<SignalrEventDisconnect>().StopCalled);
+            Assert.That(evs[2].EventType, Is.EqualTo("Disconnect"));
+            Assert.That(evs[2].GetSignalrEvent<SignalrEventDisconnect>().EventType, Is.EqualTo(SignalrEventType.Disconnect));
+            Assert.That(evs[2].GetSignalrEvent<SignalrEventDisconnect>().ConnectionId, Is.EqualTo("x"));
+            Assert.That(evs[2].GetSignalrEvent<SignalrEventDisconnect>().StopCalled, Is.EqualTo(true));
         }
 
 
@@ -93,13 +93,13 @@ namespace Audit.UnitTest
             SimulateIncoming(module, "cnn-incoming", "send", new object[]{1, "two"});
             Task.Delay(50).Wait();
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("Incoming", evs[0].EventType);
-            Assert.AreEqual(SignalrEventType.Incoming, evs[0].GetSignalrEvent<SignalrEventIncoming>().EventType);
-            Assert.AreEqual("cnn-incoming", evs[0].GetSignalrEvent<SignalrEventIncoming>().ConnectionId);
-            Assert.AreEqual("send", evs[0].GetSignalrEvent<SignalrEventIncoming>().MethodName);
-            Assert.AreEqual(1, evs[0].GetSignalrEvent<SignalrEventIncoming>().Args[0]);
-            Assert.AreEqual("two", evs[0].GetSignalrEvent<SignalrEventIncoming>().Args[1]);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EventType, Is.EqualTo("Incoming"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventIncoming>().EventType, Is.EqualTo(SignalrEventType.Incoming));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventIncoming>().ConnectionId, Is.EqualTo("cnn-incoming"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventIncoming>().MethodName, Is.EqualTo("send"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventIncoming>().Args[0], Is.EqualTo(1));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventIncoming>().Args[1], Is.EqualTo("two"));
         }
 
         [Test]
@@ -121,13 +121,13 @@ namespace Audit.UnitTest
             SimulateOutgoing(module, "cnn-Outgoing", "myhub", "signal", new object[] { "one", 2 });
             Task.Delay(50).Wait();
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("Outgoing", evs[0].EventType);
-            Assert.AreEqual(SignalrEventType.Outgoing, evs[0].GetSignalrEvent<SignalrEventOutgoing>().EventType);
-            Assert.AreEqual("signal", evs[0].GetSignalrEvent<SignalrEventOutgoing>().Signal);
-            Assert.AreEqual("receive", evs[0].GetSignalrEvent<SignalrEventOutgoing>().MethodName);
-            Assert.AreEqual("one", evs[0].GetSignalrEvent<SignalrEventOutgoing>().Args[0]);
-            Assert.AreEqual(2, evs[0].GetSignalrEvent<SignalrEventOutgoing>().Args[1]);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EventType, Is.EqualTo("Outgoing"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventOutgoing>().EventType, Is.EqualTo(SignalrEventType.Outgoing));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventOutgoing>().Signal, Is.EqualTo("signal"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventOutgoing>().MethodName, Is.EqualTo("receive"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventOutgoing>().Args[0], Is.EqualTo("one"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventOutgoing>().Args[1], Is.EqualTo(2));
         }
 
         [Test]
@@ -149,13 +149,13 @@ namespace Audit.UnitTest
             SimulateIncomingError(module, new ArgumentNullException("SomeParameter", "message"), "cnn-Error", "err", new object[] { 0 });
             Task.Delay(50).Wait();
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("Error", evs[0].EventType);
-            Assert.AreEqual(SignalrEventType.Error, evs[0].GetSignalrEvent<SignalrEventError>().EventType);
-            Assert.AreEqual("cnn-Error", evs[0].GetSignalrEvent<SignalrEventError>().ConnectionId);
-            Assert.AreEqual("err", evs[0].GetSignalrEvent<SignalrEventError>().MethodName);
-            Assert.AreEqual(0, evs[0].GetSignalrEvent<SignalrEventError>().Args[0]);
-            Assert.IsTrue(evs[0].GetSignalrEvent<SignalrEventError>().Exception.Contains("SomeParameter"));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EventType, Is.EqualTo("Error"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventError>().EventType, Is.EqualTo(SignalrEventType.Error));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventError>().ConnectionId, Is.EqualTo("cnn-Error"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventError>().MethodName, Is.EqualTo("err"));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventError>().Args[0], Is.EqualTo(0));
+            Assert.That(evs[0].GetSignalrEvent<SignalrEventError>().Exception.Contains("SomeParameter"), Is.True);
         }
 
         [Test]
@@ -179,7 +179,7 @@ namespace Audit.UnitTest
             SimulateIncomingError(module, new ArgumentNullException("SomeParameter", "message"), "cnn-Error", "err", new object[] { 0 });
             Task.Delay(50).Wait();
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -213,17 +213,17 @@ namespace Audit.UnitTest
 
             Task.Delay(1000).Wait();
 
-            Assert.AreEqual(6 * threads, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(6 * threads));
             for (int i = 0; i < threads; i++)
             {
                 var id = ids[i];
-                Assert.AreEqual(id, tasks[i].Result);
-                Assert.AreEqual(1, evs.Count(x => x.GetSignalrEvent<SignalrEventConnect>()?.ConnectionId == id));
-                Assert.AreEqual(1, evs.Count(x => x.GetSignalrEvent<SignalrEventDisconnect>()?.ConnectionId == id));
-                Assert.AreEqual(1, evs.Count(x => x.GetSignalrEvent<SignalrEventReconnect>()?.ConnectionId == id));
-                Assert.AreEqual(1, evs.Count(x => x.GetSignalrEvent<SignalrEventIncoming>()?.ConnectionId == id));
-                Assert.AreEqual(1, evs.Count(x => x.GetSignalrEvent<SignalrEventOutgoing>()?.Signal == "mysignal-" + id));
-                Assert.AreEqual(1, evs.Count(x => x.GetSignalrEvent<SignalrEventError>()?.ConnectionId == id));
+                Assert.That(tasks[i].Result, Is.EqualTo(id));
+                Assert.That(evs.Count(x => x.GetSignalrEvent<SignalrEventConnect>()?.ConnectionId == id), Is.EqualTo(1));
+                Assert.That(evs.Count(x => x.GetSignalrEvent<SignalrEventDisconnect>()?.ConnectionId == id), Is.EqualTo(1));
+                Assert.That(evs.Count(x => x.GetSignalrEvent<SignalrEventReconnect>()?.ConnectionId == id), Is.EqualTo(1));
+                Assert.That(evs.Count(x => x.GetSignalrEvent<SignalrEventIncoming>()?.ConnectionId == id), Is.EqualTo(1));
+                Assert.That(evs.Count(x => x.GetSignalrEvent<SignalrEventOutgoing>()?.Signal == "mysignal-" + id), Is.EqualTo(1));
+                Assert.That(evs.Count(x => x.GetSignalrEvent<SignalrEventError>()?.ConnectionId == id), Is.EqualTo(1));
             }
 
 

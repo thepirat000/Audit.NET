@@ -5,6 +5,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Sinks.InMemory;
 using Serilog.Sinks.InMemory.Assertions;
+using System.Net.Http;
 
 namespace Audit.UnitTest
 {
@@ -20,6 +21,12 @@ namespace Audit.UnitTest
             _logger = new LoggerConfiguration()
                 .WriteTo.InMemory()
                 .CreateLogger();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _logger.Dispose();
         }
 
         [Test]

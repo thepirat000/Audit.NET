@@ -20,9 +20,9 @@ namespace Audit.FileSystem.UnitTest
                 .FilenameBuilder(ev => "fn")
                 .FilenamePrefix("px"));
 
-            Assert.AreEqual(@"c:\t", x.DirectoryPath);
-            Assert.AreEqual("fn", x.FilenameBuilder.Invoke(null));
-            Assert.AreEqual("px", x.FilenamePrefix);
+            Assert.That(x.DirectoryPath, Is.EqualTo(@"c:\t"));
+            Assert.That(x.FilenameBuilder.Invoke(null), Is.EqualTo("fn"));
+            Assert.That(x.FilenamePrefix, Is.EqualTo("px"));
         }
 
         [Test]
@@ -60,22 +60,22 @@ namespace Audit.FileSystem.UnitTest
             File.Delete(t2path);
             Thread.Sleep(1500);
 
-            Assert.IsTrue(evs.Count >= 3, "Events: {0}", evs.Count);
+            Assert.That(evs.Count >= 3, Is.True, $"Events: {evs.Count}");
             var create = evs.Single(x => x.Event == FileSystemEventType.Create);
-            Assert.AreEqual(FileSystemEventType.Create, create.Event);
-            Assert.AreEqual(filename1, create.Name);
-            Assert.AreEqual(14, create.Length);
-            Assert.AreEqual(ContentType.Text, create.FileContent.Type);
-            Assert.AreEqual("this is a test", (create.FileContent as FileTextualContent).Value);
-            Assert.IsNotNull(create.MD5);
+            Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create));
+            Assert.That(create.Name, Is.EqualTo(filename1));
+            Assert.That(create.Length, Is.EqualTo(14));
+            Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Text));
+            Assert.That((create.FileContent as FileTextualContent).Value, Is.EqualTo("this is a test"));
+            Assert.That(create.MD5, Is.Not.Null);
 
             var rename = evs.Single(x => x.Event == FileSystemEventType.Rename);
-            Assert.AreEqual(filename1, rename.OldName);
-            Assert.AreEqual(filename2, rename.Name);
-            Assert.IsNotNull(rename.MD5);
+            Assert.That(rename.OldName, Is.EqualTo(filename1));
+            Assert.That(rename.Name, Is.EqualTo(filename2));
+            Assert.That(rename.MD5, Is.Not.Null);
 
             var delete = evs.Single(x => x.Event == FileSystemEventType.Delete);
-            Assert.AreEqual(filename2, delete.Name);
+            Assert.That(delete.Name, Is.EqualTo(filename2));
 
             System.IO.Directory.Delete(folder, true);
         }

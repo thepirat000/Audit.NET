@@ -34,6 +34,7 @@ namespace Audit.Wcf.UnitTest
         public void TearDown()
         {
             _cancellationToken.Cancel();
+            _cancellationToken.Dispose();
         }
 
 #if NETCOREAPP3_1
@@ -76,46 +77,46 @@ namespace Audit.Wcf.UnitTest
                 }
                 catch (FaultException ex)
                 {
-                    Assert.IsTrue(ex.Message.Contains("internal error"));
+                    Assert.That(ex.Message.Contains("internal error"), Is.True);
                 }
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(1, replaced.Count);
-            Assert.AreEqual(1, idsReplaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(1));
+            Assert.That(idsReplaced.Count, Is.EqualTo(1));
             var actionInserted = inserted[0].GetWcfClientAction();
             var actionReplaced = replaced[0].GetWcfClientAction();
-            Assert.IsNotNull(actionInserted);
-            Assert.IsNotNull(actionReplaced);
-            Assert.IsTrue(actionInserted.Action.Contains("InsertProduct"));
-            Assert.IsTrue(actionReplaced.Action.Contains("InsertProduct"));
+            Assert.That(actionInserted, Is.Not.Null);
+            Assert.That(actionReplaced, Is.Not.Null);
+            Assert.That(actionInserted.Action.Contains("InsertProduct"), Is.True);
+            Assert.That(actionReplaced.Action.Contains("InsertProduct"), Is.True);
 
-            Assert.IsTrue(inserted[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"));
-            Assert.IsTrue(replaced[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"));
+            Assert.That(inserted[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"), Is.True);
+            Assert.That(replaced[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"), Is.True);
 
-            Assert.IsNull(inserted[0].EndDate);
-            Assert.IsNotNull(replaced[0].EndDate);
+            Assert.That(inserted[0].EndDate, Is.Null);
+            Assert.That(replaced[0].EndDate, Is.Not.Null);
 
-            Assert.IsTrue(actionInserted.RequestBody.Contains("test name") && actionInserted.RequestBody.Contains("001"));
-            Assert.IsTrue(actionReplaced.RequestBody.Contains("test name") && actionReplaced.RequestBody.Contains("001"));
+            Assert.That(actionInserted.RequestBody.Contains("test name") && actionInserted.RequestBody.Contains("001"), Is.True);
+            Assert.That(actionReplaced.RequestBody.Contains("test name") && actionReplaced.RequestBody.Contains("001"), Is.True);
 
-            Assert.IsNull(actionInserted.ResponseBody);
-            Assert.IsTrue(actionReplaced.ResponseBody.Contains("InsertProductResponse"));
+            Assert.That(actionInserted.ResponseBody, Is.Null);
+            Assert.That(actionReplaced.ResponseBody.Contains("InsertProductResponse"), Is.True);
 
-            Assert.IsNull(actionInserted.ResponseHeaders);
-            Assert.IsTrue(actionReplaced.ResponseHeaders.Count > 0);
+            Assert.That(actionInserted.ResponseHeaders, Is.Null);
+            Assert.That(actionReplaced.ResponseHeaders.Count > 0, Is.True);
 
-            Assert.IsNull(actionInserted.ResponseStatuscode);
-            Assert.AreEqual(200, (int)actionReplaced.ResponseStatuscode);
+            Assert.That(actionInserted.ResponseStatuscode, Is.Null);
+            Assert.That((int)actionReplaced.ResponseStatuscode, Is.EqualTo(200));
 
-            Assert.IsTrue(actionInserted.RequestHeaders.ContainsKey("CustomHeader"));
-            Assert.IsTrue(actionReplaced.RequestHeaders.ContainsKey("CustomHeader"));
+            Assert.That(actionInserted.RequestHeaders.ContainsKey("CustomHeader"), Is.True);
+            Assert.That(actionReplaced.RequestHeaders.ContainsKey("CustomHeader"), Is.True);
 
-            Assert.AreEqual(Environment.UserName, actionInserted.RequestHeaders["CustomHeader"]);
-            Assert.AreEqual(Environment.UserName, actionReplaced.RequestHeaders["CustomHeader"]);
+            Assert.That(actionInserted.RequestHeaders["CustomHeader"], Is.EqualTo(Environment.UserName));
+            Assert.That(actionReplaced.RequestHeaders["CustomHeader"], Is.EqualTo(Environment.UserName));
 
-            Assert.AreEqual("POST", actionInserted.HttpMethod);
-            Assert.AreEqual("POST", actionReplaced.HttpMethod);
+            Assert.That(actionInserted.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(actionReplaced.HttpMethod, Is.EqualTo("POST"));
 
             Assert.IsFalse(actionInserted.IsFault);
             Assert.IsFalse(actionReplaced.IsFault);
@@ -150,49 +151,49 @@ namespace Audit.Wcf.UnitTest
                 }
                 catch (FaultException ex)
                 {
-                    Assert.IsTrue(ex.Message.Contains("internal error"));
+                    Assert.That(ex.Message.Contains("internal error"), Is.True);
                 }
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(1, replaced.Count);
-            Assert.AreEqual(1, idsReplaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(1));
+            Assert.That(idsReplaced.Count, Is.EqualTo(1));
             var actionInserted = inserted[0].GetWcfClientAction();
             var actionReplaced = replaced[0].GetWcfClientAction();
-            Assert.IsNotNull(actionInserted);
-            Assert.IsNotNull(actionReplaced);
-            Assert.IsTrue(actionInserted.Action.Contains("InsertProduct"));
-            Assert.IsTrue(actionReplaced.Action.Contains("InsertProduct"));
+            Assert.That(actionInserted, Is.Not.Null);
+            Assert.That(actionReplaced, Is.Not.Null);
+            Assert.That(actionInserted.Action.Contains("InsertProduct"), Is.True);
+            Assert.That(actionReplaced.Action.Contains("InsertProduct"), Is.True);
 
-            Assert.IsTrue(inserted[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"));
-            Assert.IsTrue(replaced[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"));
+            Assert.That(inserted[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"), Is.True);
+            Assert.That(replaced[0].EventType.Contains("Catalog:") && inserted[0].EventType.Contains("InsertProduct"), Is.True);
 
-            Assert.IsNull(inserted[0].EndDate);
-            Assert.IsNotNull(replaced[0].EndDate);
+            Assert.That(inserted[0].EndDate, Is.Null);
+            Assert.That(replaced[0].EndDate, Is.Not.Null);
 
-            Assert.IsTrue(actionInserted.RequestBody.Contains("should fail") && actionInserted.RequestBody.Contains("002"));
-            Assert.IsTrue(actionReplaced.RequestBody.Contains("should fail") && actionReplaced.RequestBody.Contains("002"));
+            Assert.That(actionInserted.RequestBody.Contains("should fail") && actionInserted.RequestBody.Contains("002"), Is.True);
+            Assert.That(actionReplaced.RequestBody.Contains("should fail") && actionReplaced.RequestBody.Contains("002"), Is.True);
 
-            Assert.IsNull(actionInserted.ResponseBody);
-            Assert.IsTrue(actionReplaced.ResponseBody.Contains("faultcode"));
+            Assert.That(actionInserted.ResponseBody, Is.Null);
+            Assert.That(actionReplaced.ResponseBody.Contains("faultcode"), Is.True);
 
-            Assert.IsNull(actionInserted.ResponseHeaders);
-            Assert.IsTrue(actionReplaced.ResponseHeaders.Count > 0);
+            Assert.That(actionInserted.ResponseHeaders, Is.Null);
+            Assert.That(actionReplaced.ResponseHeaders.Count > 0, Is.True);
 
-            Assert.IsNull(actionInserted.ResponseStatuscode);
-            Assert.AreEqual(500, (int)actionReplaced.ResponseStatuscode);
+            Assert.That(actionInserted.ResponseStatuscode, Is.Null);
+            Assert.That((int)actionReplaced.ResponseStatuscode, Is.EqualTo(500));
 
-            Assert.IsTrue(actionInserted.RequestHeaders.ContainsKey("CustomHeader"));
-            Assert.IsTrue(actionReplaced.RequestHeaders.ContainsKey("CustomHeader"));
+            Assert.That(actionInserted.RequestHeaders.ContainsKey("CustomHeader"), Is.True);
+            Assert.That(actionReplaced.RequestHeaders.ContainsKey("CustomHeader"), Is.True);
 
-            Assert.AreEqual(Environment.UserName, actionInserted.RequestHeaders["CustomHeader"]);
-            Assert.AreEqual(Environment.UserName, actionReplaced.RequestHeaders["CustomHeader"]);
+            Assert.That(actionInserted.RequestHeaders["CustomHeader"], Is.EqualTo(Environment.UserName));
+            Assert.That(actionReplaced.RequestHeaders["CustomHeader"], Is.EqualTo(Environment.UserName));
 
-            Assert.AreEqual("POST", actionInserted.HttpMethod);
-            Assert.AreEqual("POST", actionReplaced.HttpMethod);
+            Assert.That(actionInserted.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(actionReplaced.HttpMethod, Is.EqualTo("POST"));
 
             Assert.IsFalse(actionInserted.IsFault);
-            Assert.IsTrue(actionReplaced.IsFault);
+            Assert.That(actionReplaced.IsFault, Is.True);
         }
 
         public static IContextChannel GetServiceProxy(out ICatalogService svc)

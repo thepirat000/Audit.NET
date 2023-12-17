@@ -67,13 +67,13 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, list.Count);
+            Assert.That(list.Count, Is.EqualTo(1));
             var entries = list[0].EntityFrameworkEvent.Entries;
-            Assert.IsTrue(entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Update", entries[0].Action);
+            Assert.That(entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."), Is.True);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Action, Is.EqualTo("Update"));
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual(title, entries[0].ColumnValues["Title"]);
+            Assert.That(entries[0].ColumnValues["Title"], Is.EqualTo(title));
         }
 
         [Test]
@@ -133,7 +133,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = ctx.Order.Single(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
-                Assert.AreEqual(0, orderlineAudits.Count);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(0));
             }
         }
 
@@ -170,7 +170,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
-                Assert.AreEqual(0, orderlineAudits.Count);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(0));
             }
         }
 
@@ -216,7 +216,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = ctx.Order.Single(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
-                Assert.AreEqual(0, orderlineAudits.Count);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(0));
             }
         }
 
@@ -261,7 +261,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = ctx.Order.Single(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
-                Assert.AreEqual(0, orderlineAudits.Count);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(0));
             }
         }
 
@@ -307,7 +307,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).ToList();
-                Assert.AreEqual(0, orderlineAudits.Count);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(0));
             }
         }
 
@@ -356,13 +356,13 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditPerTableContext())
             {
                 var orderAudits = ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToList();
-                Assert.AreEqual(1, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.AreEqual(id, orderAudits[0].Number);
+                Assert.That(orderAudits.Count, Is.EqualTo(1));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Number, Is.EqualTo(id));
             }
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
-            Assert.IsTrue(evs[0].GetEntityFrameworkEvent().Entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."), Is.True);
         }
 
         [Test]
@@ -409,13 +409,13 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditPerTableContext())
             {
                 var orderAudits = await ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToListAsync();
-                Assert.AreEqual(1, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.AreEqual(id, orderAudits[0].Number);
+                Assert.That(orderAudits.Count, Is.EqualTo(1));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Number, Is.EqualTo(id));
             }
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
-            Assert.IsTrue(evs[0].GetEntityFrameworkEvent().Entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].GetEntry().Entity.GetType().FullName.StartsWith("Castle.Proxies."), Is.True);
         }
 
 
@@ -466,14 +466,14 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 var orderAudit = ctx.OrderAudit.AsNoTracking().SingleOrDefault(a => a.Number.Equals(id));
                 Assert.NotNull(orderAudit);
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(orderAudit.Id)).ToList();
-                Assert.AreEqual(2, orderlineAudits.Count);
-                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
-                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
-                Assert.AreEqual("Insert", orderAudit.AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(2));
+                Assert.That(orderlineAudits[0].Product, Is.EqualTo("p1: " + id));
+                Assert.That(orderlineAudits[1].Product, Is.EqualTo("p2: " + id));
+                Assert.That(orderAudit.AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].UserName, Is.EqualTo(orderlineAudits[0].UserName));
+                Assert.That(orderAudit.UserName, Is.EqualTo(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
             }
@@ -488,11 +488,11 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditPerTableContext())
             {
                 var orderAudits = ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToList();
-                Assert.AreEqual(2, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.AreEqual("Cancelled", orderAudits[0].Status);
-                Assert.AreEqual("Pending", orderAudits[1].Status);
-                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+                Assert.That(orderAudits.Count, Is.EqualTo(2));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Status, Is.EqualTo("Cancelled"));
+                Assert.That(orderAudits[1].Status, Is.EqualTo("Pending"));
+                Assert.That(orderAudits[1].AuditStatus, Is.EqualTo("Insert"));
             }
 
             using (var ctx = new AuditPerTableContext())
@@ -507,9 +507,9 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = ctx.Order.Single(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).OrderByDescending(a => a.AuditDate).ToList();
-                Assert.AreEqual(3, orderlineAudits.Count);
-                Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
-                Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
+                Assert.That(orderlineAudits.Count, Is.EqualTo(3));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Delete"));
+                Assert.That(orderlineAudits[0].Product.StartsWith("p1"), Is.True);
             }
             
         }
@@ -566,14 +566,14 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 var orderAudit = ctx.OrderAudit.AsNoTracking().SingleOrDefault(a => a.Number.Equals(id));
                 Assert.NotNull(orderAudit);
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(orderAudit.Id)).ToList();
-                Assert.AreEqual(2, orderlineAudits.Count);
-                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
-                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
-                Assert.AreEqual("Insert", orderAudit.AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(2));
+                Assert.That(orderlineAudits[0].Product, Is.EqualTo("p1: " + id));
+                Assert.That(orderlineAudits[1].Product, Is.EqualTo("p2: " + id));
+                Assert.That(orderAudit.AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].UserName, Is.EqualTo(orderlineAudits[0].UserName));
+                Assert.That(orderAudit.UserName, Is.EqualTo(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
             }
@@ -588,11 +588,11 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditInDifferentContext())
             {
                 var orderAudits = ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToList();
-                Assert.AreEqual(2, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.AreEqual("Cancelled", orderAudits[0].Status);
-                Assert.AreEqual("Pending", orderAudits[1].Status);
-                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+                Assert.That(orderAudits.Count, Is.EqualTo(2));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Status, Is.EqualTo("Cancelled"));
+                Assert.That(orderAudits[1].Status, Is.EqualTo("Pending"));
+                Assert.That(orderAudits[1].AuditStatus, Is.EqualTo("Insert"));
             }
 
             using (var ctx = new AuditPerTableContext())
@@ -607,9 +607,9 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = ctx.Order.Single(a => a.Number.Equals(id));
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).OrderByDescending(a => a.AuditDate).ToList();
-                Assert.AreEqual(3, orderlineAudits.Count);
-                Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
-                Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
+                Assert.That(orderlineAudits.Count, Is.EqualTo(3));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Delete"));
+                Assert.That(orderlineAudits[0].Product.StartsWith("p1"), Is.True);
             }
 
         }
@@ -675,15 +675,15 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 var orderAudit = ctx.OrderAudit.AsNoTracking().SingleOrDefault(a => a.Number.Equals(id));
                 Assert.NotNull(orderAudit);
                 var orderlineAudits = ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(orderAudit.Id)).ToList();
-                Assert.AreEqual(2, orderlineAudits.Count);
-                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
-                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
-                Assert.AreEqual("Insert", orderAudit.AuditStatus);
-                Assert.IsNull(orderAudit.Status);
-                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(2));
+                Assert.That(orderlineAudits[0].Product, Is.EqualTo("p1: " + id));
+                Assert.That(orderlineAudits[1].Product, Is.EqualTo("p2: " + id));
+                Assert.That(orderAudit.AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderAudit.Status, Is.Null);
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].UserName, Is.EqualTo(orderlineAudits[0].UserName));
+                Assert.That(orderAudit.UserName, Is.EqualTo(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
             }
@@ -698,11 +698,11 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditInDifferentContext())
             {
                 var orderAudits = ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToList();
-                Assert.AreEqual(2, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.IsNull(orderAudits[0].Status);
-                Assert.IsNull(orderAudits[1].Status);
-                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+                Assert.That(orderAudits.Count, Is.EqualTo(2));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Status, Is.Null);
+                Assert.That(orderAudits[1].Status, Is.Null);
+                Assert.That(orderAudits[1].AuditStatus, Is.EqualTo("Insert"));
             }
         }
 
@@ -754,14 +754,14 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 var orderAudit = await ctx.OrderAudit.AsNoTracking().SingleOrDefaultAsync(a => a.Number.Equals(id));
                 Assert.NotNull(orderAudit);
                 var orderlineAudits = await ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(orderAudit.Id)).ToListAsync();
-                Assert.AreEqual(2, orderlineAudits.Count);
-                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
-                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
-                Assert.AreEqual("Insert", orderAudit.AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(2));
+                Assert.That(orderlineAudits[0].Product, Is.EqualTo("p1: " + id));
+                Assert.That(orderlineAudits[1].Product, Is.EqualTo("p2: " + id));
+                Assert.That(orderAudit.AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].UserName, Is.EqualTo(orderlineAudits[0].UserName));
+                Assert.That(orderAudit.UserName, Is.EqualTo(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
             }
@@ -776,11 +776,11 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditInDifferentContext())
             {
                 var orderAudits = await ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToListAsync();
-                Assert.AreEqual(2, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.AreEqual("Cancelled", orderAudits[0].Status);
-                Assert.AreEqual("Pending", orderAudits[1].Status);
-                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+                Assert.That(orderAudits.Count, Is.EqualTo(2));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Status, Is.EqualTo("Cancelled"));
+                Assert.That(orderAudits[1].Status, Is.EqualTo("Pending"));
+                Assert.That(orderAudits[1].AuditStatus, Is.EqualTo("Insert"));
             }
 
             using (var ctx = new AuditPerTableContext())
@@ -795,9 +795,9 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
                 var orderlineAudits = await ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).OrderByDescending(a => a.AuditDate).ToListAsync();
-                Assert.AreEqual(3, orderlineAudits.Count);
-                Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
-                Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
+                Assert.That(orderlineAudits.Count, Is.EqualTo(3));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Delete"));
+                Assert.That(orderlineAudits[0].Product.StartsWith("p1"), Is.True);
             }
 
         }
@@ -854,14 +854,14 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 var orderAudit = await ctx.OrderAudit.AsNoTracking().SingleOrDefaultAsync(a => a.Number.Equals(id));
                 Assert.NotNull(orderAudit);
                 var orderlineAudits = await ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(orderAudit.Id)).ToListAsync();
-                Assert.AreEqual(2, orderlineAudits.Count);
-                Assert.AreEqual("p1: " + id, orderlineAudits[0].Product);
-                Assert.AreEqual("p2: " + id, orderlineAudits[1].Product);
-                Assert.AreEqual("Insert", orderAudit.AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[0].AuditStatus);
-                Assert.AreEqual("Insert", orderlineAudits[1].AuditStatus);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderlineAudits[1].UserName);
-                Assert.AreEqual(orderlineAudits[0].UserName, orderAudit.UserName);
+                Assert.That(orderlineAudits.Count, Is.EqualTo(2));
+                Assert.That(orderlineAudits[0].Product, Is.EqualTo("p1: " + id));
+                Assert.That(orderlineAudits[1].Product, Is.EqualTo("p2: " + id));
+                Assert.That(orderAudit.AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].AuditStatus, Is.EqualTo("Insert"));
+                Assert.That(orderlineAudits[1].UserName, Is.EqualTo(orderlineAudits[0].UserName));
+                Assert.That(orderAudit.UserName, Is.EqualTo(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[0].UserName));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(orderlineAudits[1].UserName));
             }
@@ -876,11 +876,11 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditPerTableContext())
             {
                 var orderAudits = await ctx.OrderAudit.AsNoTracking().Where(a => a.Number.Equals(id)).OrderByDescending(a => a.AuditDate).ToListAsync();
-                Assert.AreEqual(2, orderAudits.Count);
-                Assert.AreEqual("Update", orderAudits[0].AuditStatus);
-                Assert.AreEqual("Cancelled", orderAudits[0].Status);
-                Assert.AreEqual("Pending", orderAudits[1].Status);
-                Assert.AreEqual("Insert", orderAudits[1].AuditStatus);
+                Assert.That(orderAudits.Count, Is.EqualTo(2));
+                Assert.That(orderAudits[0].AuditStatus, Is.EqualTo("Update"));
+                Assert.That(orderAudits[0].Status, Is.EqualTo("Cancelled"));
+                Assert.That(orderAudits[1].Status, Is.EqualTo("Pending"));
+                Assert.That(orderAudits[1].AuditStatus, Is.EqualTo("Insert"));
             }
 
             using (var ctx = new AuditPerTableContext())
@@ -895,9 +895,9 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             {
                 var order = await ctx.Order.SingleAsync(a => a.Number.Equals(id));
                 var orderlineAudits = await ctx.OrderlineAudit.AsNoTracking().Where(a => a.OrderId.Equals(order.Id)).OrderByDescending(a => a.AuditDate).ToListAsync();
-                Assert.AreEqual(3, orderlineAudits.Count);
-                Assert.AreEqual("Delete", orderlineAudits[0].AuditStatus);
-                Assert.IsTrue(orderlineAudits[0].Product.StartsWith("p1"));
+                Assert.That(orderlineAudits.Count, Is.EqualTo(3));
+                Assert.That(orderlineAudits[0].AuditStatus, Is.EqualTo("Delete"));
+                Assert.That(orderlineAudits[0].Product.StartsWith("p1"), Is.True);
             }
         }
 
@@ -919,7 +919,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 .WithAction(x => x.OnScopeCreated(sc =>
                 {
                     var wcfEvent = sc.GetEntityFrameworkEvent();
-                    Assert.AreEqual("Blogs", wcfEvent.Database);
+                    Assert.That(wcfEvent.Database, Is.EqualTo("Blogs"));
                 }));
             int blogId;
             using (var ctx = new MyAuditedVerboseContext())
@@ -949,7 +949,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             Assert.NotNull(ev1.TransactionId);
             Assert.NotNull(ev2.TransactionId);
             Assert.Null(ev3.TransactionId);
-            Assert.AreEqual(ev1.TransactionId, ev2.TransactionId);
+            Assert.That(ev2.TransactionId, Is.EqualTo(ev1.TransactionId));
 
             Audit.Core.Configuration.ResetCustomActions();
         }
@@ -1007,8 +1007,8 @@ SET IDENTITY_INSERT Posts OFF
                 Assert.IsFalse(auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent"));
                 var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
 
-                Assert.AreEqual(4, result);
-                Assert.AreEqual("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
+                Assert.That(result, Is.EqualTo(4));
+                Assert.That(auditEvent.EventType, Is.EqualTo("Blogs" + "_" + ctx.GetType().Name));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
@@ -1072,8 +1072,8 @@ SET IDENTITY_INSERT Posts OFF
                 Assert.IsFalse(auditEvent.CustomFields.ContainsKey("EntityFrameworkEvent"));
                 var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
 
-                Assert.AreEqual(4, result);
-                Assert.AreEqual("Blogs" + "_" + ctx.GetType().Name, auditEvent.EventType);
+                Assert.That(result, Is.EqualTo(4));
+                Assert.That(auditEvent.EventType, Is.EqualTo("Blogs" + "_" + ctx.GetType().Name));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));

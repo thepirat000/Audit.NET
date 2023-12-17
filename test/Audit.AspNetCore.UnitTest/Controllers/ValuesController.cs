@@ -4,14 +4,13 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Audit.Integration.AspNetCore.Pages.Test;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Audit.Integration.AspNetCore.Controllers
+namespace Audit.AspNetCore.UnitTest.Controllers
 {
 
     [Route("api/[controller]")]

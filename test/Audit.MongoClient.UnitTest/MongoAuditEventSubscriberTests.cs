@@ -54,7 +54,6 @@ namespace Audit.MongoClient.UnitTest
             Assert.That(evs[0].Command.CommandName, Is.EqualTo(cmdStart.CommandName));
             Assert.That(evs[0].Command.Success, Is.True);
             Assert.That(evs[0].Command.CommandName, Is.EqualTo(cmdStart.CommandName));
-            Assert.That(evs[0].Command.GetCommandStartedEvent(), Is.Not.Null);
             Assert.That(evs[0].Command.GetCommandStartedEvent().CommandName, Is.EqualTo(cmdStart.CommandName));
             Assert.That(evs[0].Command.Duration, Is.EqualTo(1000));
             Assert.That(evs[0].Command.Error, Is.Null);
@@ -101,7 +100,6 @@ namespace Audit.MongoClient.UnitTest
             Assert.That(evs[0].Command.CommandName, Is.EqualTo(cmdStart.CommandName));
             Assert.That(evs[0].Command.Success, Is.False);
             Assert.That(evs[0].Command.CommandName, Is.EqualTo(cmdStart.CommandName));
-            Assert.That(evs[0].Command.GetCommandStartedEvent(), Is.Not.Null);
             Assert.That(evs[0].Command.GetCommandStartedEvent().CommandName, Is.EqualTo(cmdStart.CommandName));
             Assert.That(evs[0].Command.Duration, Is.EqualTo(1000));
             Assert.That(evs[0].Command.Error, Is.Not.Null);

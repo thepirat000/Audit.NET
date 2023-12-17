@@ -39,10 +39,10 @@ namespace Audit.AzureCosmos.UnitTest
             };
 
             var ev = dp.GetEvent(id, eventType);
-            
-            Assert.AreEqual(id, auditEvent.CustomFields["id"].ToString());
-            Assert.AreEqual(auditEvent.CustomFields["value"].ToString(), ev.CustomFields["value"].ToString());
-            Assert.AreEqual(eventType, auditEvent.EventType);
+
+            Assert.That(auditEvent.CustomFields["id"].ToString(), Is.EqualTo(id));
+            Assert.That(ev.CustomFields["value"].ToString(), Is.EqualTo(auditEvent.CustomFields["value"].ToString()));
+            Assert.That(auditEvent.EventType, Is.EqualTo(eventType));
         }
         
         [Test]
@@ -76,9 +76,9 @@ namespace Audit.AzureCosmos.UnitTest
 
             var ev = await dp.GetEventAsync(id, eventType);
 
-            Assert.AreEqual(id, auditEvent.CustomFields["id"].ToString());
-            Assert.AreEqual(auditEvent.CustomFields["value"].ToString(), ev.CustomFields["value"].ToString());
-            Assert.AreEqual(eventType, auditEvent.EventType);
+            Assert.That(auditEvent.CustomFields["id"].ToString(), Is.EqualTo(id));
+            Assert.That(ev.CustomFields["value"].ToString(), Is.EqualTo(auditEvent.CustomFields["value"].ToString()));
+            Assert.That(auditEvent.EventType, Is.EqualTo(eventType));
         }
 
 #if IS_DOCDB
@@ -121,10 +121,10 @@ namespace Audit.AzureCosmos.UnitTest
                 .OrderByDescending(x => x.StartDate)
                 .ToList();
 
-            Assert.AreEqual(3, evs.Count);
-            Assert.AreEqual(200, evs[0].CustomFields["value"]);
+            Assert.That(evs.Count, Is.EqualTo(3));
+            Assert.That(evs[0].CustomFields["value"], Is.EqualTo(200));
             Assert.IsFalse(evs[1].CustomFields.ContainsKey("value"));
-            Assert.AreEqual(100, evs[2].CustomFields["value"]);
+            Assert.That(evs[2].CustomFields["value"], Is.EqualTo(100));
         }
 
         [Test]
@@ -163,10 +163,10 @@ namespace Audit.AzureCosmos.UnitTest
             var evs = dp.EnumerateEvents<AuditEventWithId>($"SELECT * FROM c WHERE c.EventType = '{eventType}' ORDER BY c.StartDate DESC", new Microsoft.Azure.Documents.Client.FeedOptions() { EnableCrossPartitionQuery = true, JsonSerializerSettings = new JsonSerializerSettings() })
                 .ToList();
 
-            Assert.AreEqual(3, evs.Count);
-            Assert.AreEqual(200, evs[0].CustomFields["value"]);
+            Assert.That(evs.Count, Is.EqualTo(3));
+            Assert.That(evs[0].CustomFields["value"], Is.EqualTo(200));
             Assert.IsFalse(evs[1].CustomFields.ContainsKey("value"));
-            Assert.AreEqual(100, evs[2].CustomFields["value"]);
+            Assert.That(evs[2].CustomFields["value"], Is.EqualTo(100));
         }
 #endif
 

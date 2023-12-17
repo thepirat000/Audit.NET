@@ -69,19 +69,19 @@ namespace Audit.EntityFramework.Core.UnitTest
                 context2.SaveChanges(true);
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(1, evs[0].EntityFrameworkEvent.Entries.Count);
-            Assert.AreEqual(1, evs[1].EntityFrameworkEvent.Entries.Count);
-            Assert.AreEqual("Insert", evs[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual("Insert", evs[1].EntityFrameworkEvent.Entries[0].Action);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
 
-            Assert.AreEqual("DepartmentContext1:Type1", evs[0].EventType);
-            Assert.AreEqual("DepartmentContext2:Type2", evs[1].EventType);
+            Assert.That(evs[0].EventType, Is.EqualTo("DepartmentContext1:Type1"));
+            Assert.That(evs[1].EventType, Is.EqualTo("DepartmentContext2:Type2"));
 
-            Assert.AreEqual("Override test 1", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
-            Assert.AreEqual("Override 2", evs[1].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
-            Assert.IsNotNull(evs[0].EntityFrameworkEvent.Entries[0].Entity);
-            Assert.IsNull(evs[1].EntityFrameworkEvent.Entries[0].Entity);
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string, Is.EqualTo("Override test 1"));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string, Is.EqualTo("Override 2"));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Entity, Is.Not.Null);
+            Assert.That(evs[1].EntityFrameworkEvent.Entries[0].Entity, Is.Null);
         }
     }
 }

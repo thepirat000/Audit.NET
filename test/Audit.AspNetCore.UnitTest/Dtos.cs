@@ -1,4 +1,4 @@
-﻿namespace Audit.Integration.AspNetCore
+﻿namespace Audit.AspNetCore.UnitTest
 { 
     public class Customer
     {

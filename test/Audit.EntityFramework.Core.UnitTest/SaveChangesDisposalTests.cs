@@ -46,8 +46,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.IsNotNull(inserted[0]);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(inserted[0], Is.Not.Null);
         }
 
         [Test]
@@ -73,8 +73,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.IsNotNull(inserted[0]);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(inserted[0], Is.Not.Null);
         }
 
     }

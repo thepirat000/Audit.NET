@@ -105,7 +105,7 @@ namespace Audit.UnitTest
                 }
             }
             Configuration.JsonSettings = prevSettings;
-            Assert.IsTrue(File.Exists(Path.Combine(_directory, guid)));
+            Assert.That(File.Exists(Path.Combine(_directory, guid)), Is.True);
             Assert.IsEmpty(File.ReadAllText(Path.Combine(_directory, guid)));
         }
 
@@ -129,8 +129,8 @@ namespace Audit.UnitTest
             var fileContents = File.ReadAllText(Path.Combine(_directory, guid));
             Configuration.JsonSettings = prevSettings;
 
-            Assert.IsNotNull(fileContents);
-            Assert.IsTrue(fileContents.StartsWith("{\r\n"));
+            Assert.That(fileContents, Is.Not.Null);
+            Assert.That(fileContents.StartsWith("{\r\n"), Is.True);
         }
 
         [Test]
@@ -154,8 +154,8 @@ namespace Audit.UnitTest
             var fileContents = File.ReadAllText(Path.Combine(_directory, guid));
             Configuration.JsonSettings = prevSettings;
 
-            Assert.IsNotNull(fileContents);
-            Assert.IsTrue(fileContents.StartsWith("{\r\n"));
+            Assert.That(fileContents, Is.Not.Null);
+            Assert.That(fileContents.StartsWith("{\r\n"), Is.True);
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace Audit.UnitTest
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex.Message.ToLower().Contains("loop detected") || ex.Message.ToLower().Contains("cycle"));
+                Assert.That(ex.Message.ToLower().Contains("loop detected") || ex.Message.ToLower().Contains("cycle"), Is.True);
             }
 
             Configuration.JsonSettings = prevSettings;
@@ -217,7 +217,7 @@ namespace Audit.UnitTest
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex.Message.ToLower().Contains("loop detected") || ex.Message.ToLower().Contains("cycle"));
+                Assert.That(ex.Message.ToLower().Contains("loop detected") || ex.Message.ToLower().Contains("cycle"), Is.True);
             }
 
             Configuration.JsonSettings = prevSettings;

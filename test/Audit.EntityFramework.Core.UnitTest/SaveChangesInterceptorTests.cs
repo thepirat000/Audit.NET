@@ -53,17 +53,17 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("InterceptContext**", inserted[0].EventType);
-            
-            Assert.AreEqual(true, inserted[0].EntityFrameworkEvent.Success);
-            Assert.AreEqual(1, inserted[0].EntityFrameworkEvent.Entries.Count);
-            Assert.IsTrue(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid));
-            Assert.AreEqual("Insert", inserted[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual(3, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count);
-            Assert.AreEqual(guid, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString());
-            Assert.AreEqual("override", inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Comments"].ToString());
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo("InterceptContext**"));
+
+            Assert.That(inserted[0].EntityFrameworkEvent.Success, Is.EqualTo(true));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid), Is.True);
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count, Is.EqualTo(3));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString(), Is.EqualTo(guid));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Comments"].ToString(), Is.EqualTo("override"));
         }
 
         [Test]
@@ -92,17 +92,17 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("InterceptContext**", inserted[0].EventType);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo("InterceptContext**"));
 
-            Assert.AreEqual(true, inserted[0].EntityFrameworkEvent.Success);
-            Assert.AreEqual(1, inserted[0].EntityFrameworkEvent.Entries.Count);
-            Assert.IsTrue(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid));
-            Assert.AreEqual("Insert", inserted[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual(3, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count);
-            Assert.AreEqual(guid, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString());
-            Assert.AreEqual("override", inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Comments"].ToString());
+            Assert.That(inserted[0].EntityFrameworkEvent.Success, Is.EqualTo(true));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid), Is.True);
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count, Is.EqualTo(3));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString(), Is.EqualTo(guid));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Comments"].ToString(), Is.EqualTo("override"));
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.Departments.Add(dept);
                 ctx.SaveChanges();
             }
-            Assert.AreEqual(0, inserted.Count);
+            Assert.That(inserted.Count, Is.EqualTo(0));
             var guid = Guid.NewGuid().ToString();
             dept.Name = guid;
             using (var ctx = new InterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditSaveChangesInterceptor()).Options))
@@ -141,20 +141,20 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
                 catch (ArgumentException ex)
                 {
-                    Assert.IsTrue(ex.Message.Contains("item with the same key"));
+                    Assert.That(ex.Message.Contains("item with the same key"), Is.True);
                 }
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("InterceptContext**", inserted[0].EventType);
-            Assert.AreEqual(false, inserted[0].EntityFrameworkEvent.Success);
-            Assert.IsTrue(inserted[0].EntityFrameworkEvent.ErrorMessage.Contains("item with the same key"));
-            Assert.AreEqual(1, inserted[0].EntityFrameworkEvent.Entries.Count);
-            Assert.IsTrue(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid));
-            Assert.AreEqual("Insert", inserted[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual(3, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count);
-            Assert.AreEqual(guid, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString());
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo("InterceptContext**"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Success, Is.EqualTo(false));
+            Assert.That(inserted[0].EntityFrameworkEvent.ErrorMessage.Contains("item with the same key"), Is.True);
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid), Is.True);
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count, Is.EqualTo(3));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString(), Is.EqualTo(guid));
         }
 
         [Test]
@@ -181,7 +181,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.Departments.AddAsync(dept);
                 await ctx.SaveChangesAsync();
             }
-            Assert.AreEqual(0, inserted.Count);
+            Assert.That(inserted.Count, Is.EqualTo(0));
             var guid = Guid.NewGuid().ToString();
             dept.Name = guid;
             using (var ctx = new InterceptContext(new DbContextOptionsBuilder().AddInterceptors(new AuditSaveChangesInterceptor()).Options))
@@ -193,20 +193,20 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
                 catch (ArgumentException ex)
                 {
-                    Assert.IsTrue(ex.Message.Contains("item with the same key"));
+                    Assert.That(ex.Message.Contains("item with the same key"), Is.True);
                 }
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("InterceptContext**", inserted[0].EventType);
-            Assert.AreEqual(false, inserted[0].EntityFrameworkEvent.Success);
-            Assert.IsTrue(inserted[0].EntityFrameworkEvent.ErrorMessage.Contains("item with the same key"));
-            Assert.AreEqual(1, inserted[0].EntityFrameworkEvent.Entries.Count);
-            Assert.IsTrue(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid));
-            Assert.AreEqual("Insert", inserted[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual(3, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count);
-            Assert.AreEqual(guid, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString());
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo("InterceptContext**"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Success, Is.EqualTo(false));
+            Assert.That(inserted[0].EntityFrameworkEvent.ErrorMessage.Contains("item with the same key"), Is.True);
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Entity.ToString().Contains(guid), Is.True);
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count, Is.EqualTo(3));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"].ToString(), Is.EqualTo(guid));
         }
 
         [Test]
@@ -256,15 +256,15 @@ namespace Audit.EntityFramework.Core.UnitTest
             
             Task.WaitAll(tasks.ToArray());
 
-            Assert.AreEqual(threads, inserted.Count);
-            Assert.AreEqual("InterceptContext**", inserted[0].EventType);
+            Assert.That(inserted.Count, Is.EqualTo(threads));
+            Assert.That(inserted[0].EventType, Is.EqualTo("InterceptContext**"));
 
-            Assert.AreEqual(true, inserted[0].EntityFrameworkEvent.Success);
-            Assert.AreEqual(1, inserted[0].EntityFrameworkEvent.Entries.Count);
-            Assert.AreEqual("Insert", inserted[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual(3, inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count);
-            Assert.AreEqual("test", inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Comments"].ToString());
-            Assert.IsTrue(Enumerable.Range(0, threads).All(i => inserted.Any(ev => ev.EntityFrameworkEvent.Entries[0].PrimaryKey["Id"].ToString() == i.ToString())));
+            Assert.That(inserted[0].EntityFrameworkEvent.Success, Is.EqualTo(true));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count, Is.EqualTo(3));
+            Assert.That(inserted[0].EntityFrameworkEvent.Entries[0].ColumnValues["Comments"].ToString(), Is.EqualTo("test"));
+            Assert.That(Enumerable.Range(0, threads).All(i => inserted.Any(ev => ev.EntityFrameworkEvent.Entries[0].PrimaryKey["Id"].ToString() == i.ToString())), Is.True);
         }
     }
 

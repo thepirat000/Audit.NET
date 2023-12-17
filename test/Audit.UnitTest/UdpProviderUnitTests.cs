@@ -38,11 +38,11 @@ namespace Audit.UnitTest
             stop = true;
             cts.Cancel();
             Task.Delay(2000).Wait();
-            Assert.AreEqual(2, events.Count);
-            Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[0].EventType);
-            Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[1].EventType);
+            Assert.That(events.Count, Is.EqualTo(2));
+            Assert.That(events[0].EventType, Is.EqualTo("Test_UdpDataProvider_BasicTest"));
+            Assert.That(events[1].EventType, Is.EqualTo("Test_UdpDataProvider_BasicTest"));
             Assert.NotNull(events[0].CustomFields["UdpEventId"]);
-            Assert.AreEqual(events[0].CustomFields["UdpEventId"].ToString(), events[1].CustomFields["UdpEventId"].ToString());
+            Assert.That(events[1].CustomFields["UdpEventId"].ToString(), Is.EqualTo(events[0].CustomFields["UdpEventId"].ToString()));
         }
 
         [Test]
@@ -74,11 +74,11 @@ namespace Audit.UnitTest
             stop = true;
             cts.Cancel();
             await Task.Delay(2000);
-            Assert.AreEqual(2, events.Count);
-            Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[0].EventType);
-            Assert.AreEqual("Test_UdpDataProvider_BasicTest", events[1].EventType);
+            Assert.That(events.Count, Is.EqualTo(2));
+            Assert.That(events[0].EventType, Is.EqualTo("Test_UdpDataProvider_BasicTest"));
+            Assert.That(events[1].EventType, Is.EqualTo("Test_UdpDataProvider_BasicTest"));
             Assert.NotNull(events[0].CustomFields["UdpEventId"]);
-            Assert.AreEqual(events[0].CustomFields["UdpEventId"].ToString(), events[1].CustomFields["UdpEventId"].ToString());
+            Assert.That(events[1].CustomFields["UdpEventId"].ToString(), Is.EqualTo(events[0].CustomFields["UdpEventId"].ToString()));
         }
 
         private static bool stop = false;
@@ -142,8 +142,8 @@ namespace Audit.UnitTest
             cts.Cancel();
             Task.Delay(1000).Wait();
 
-            Assert.AreEqual(N, events.Count);
-            Assert.IsTrue(events[0].EventType.StartsWith("Test_UdpDataProvider_MultiThread_"));
+            Assert.That(events.Count, Is.EqualTo(N));
+            Assert.That(events[0].EventType.StartsWith("Test_UdpDataProvider_MultiThread_"), Is.True);
             Assert.NotNull(events[0].CustomFields["UdpEventId"].ToString());
         }
 
@@ -169,7 +169,7 @@ namespace Audit.UnitTest
             }
 
             Task.Delay(1000).Wait();
-            Assert.AreEqual(1, events.Count);
+            Assert.That(events.Count, Is.EqualTo(1));
         }
 
         [Test]

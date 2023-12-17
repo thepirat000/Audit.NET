@@ -41,16 +41,16 @@ namespace Audit.EntityFramework.Full.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(1, evs[0].Entries.Count);
-            Assert.AreEqual(1, evs[1].Entries.Count);
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("Update", evs[1].Entries[0].Action);
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues["Address"] is Address);
-            Assert.AreEqual("City 1", (evs[0].Entries[0].ColumnValues["Address"] as Address).City);
-            Assert.AreEqual("City 2", (evs[1].Entries[0].ColumnValues["Address"] as Address).City);
-            Assert.IsTrue((evs[1].Entries[0].Changes.Any(ch => ch.ColumnName == "Address" && (ch.OriginalValue as Address)?.City == "City 1")));
-            Assert.IsTrue((evs[1].Entries[0].Changes.Any(ch => ch.ColumnName == "Address" && (ch.NewValue as Address)?.City == "City 2")));
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address"] is Address, Is.True);
+            Assert.That((evs[0].Entries[0].ColumnValues["Address"] as Address).City, Is.EqualTo("City 1"));
+            Assert.That((evs[1].Entries[0].ColumnValues["Address"] as Address).City, Is.EqualTo("City 2"));
+            Assert.That((evs[1].Entries[0].Changes.Any(ch => ch.ColumnName == "Address" && (ch.OriginalValue as Address)?.City == "City 1")), Is.True);
+            Assert.That((evs[1].Entries[0].Changes.Any(ch => ch.ColumnName == "Address" && (ch.NewValue as Address)?.City == "City 2")), Is.True);
 
         }
     }

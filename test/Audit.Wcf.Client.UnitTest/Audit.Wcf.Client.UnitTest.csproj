@@ -21,12 +21,7 @@
 		<ProjectReference Include="..\..\src\Audit.Wcf.Client\Audit.Wcf.Client.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-		<PackageReference Include="NUnit" Version="3.10.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-		<PackageReference Include="Moq" Version="4.7.99" />
-	</ItemGroup>
+
 	<ItemGroup>
 		<Reference Include="System.ServiceModel" />
 	</ItemGroup>
@@ -35,7 +30,6 @@
 		<PackageReference Include="Microsoft.AspNetCore" Version="2.1.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="3.1.18" />
-
 		<PackageReference Include="CoreWCF.Http" Version="1.0.0" />
 		<PackageReference Include="CoreWCF.NetTcp" Version="1.0.0" />
 		<PackageReference Include="CoreWCF.Primitives" Version="1.0.0" />

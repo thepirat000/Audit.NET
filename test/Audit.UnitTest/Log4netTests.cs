@@ -44,11 +44,11 @@ namespace Audit.UnitTest
             }
 
             var events = _adapter.PopAllEvents();
-            Assert.AreEqual(2, events.Length);
-            Assert.AreEqual("Test_log4net_InsertOnStartReplaceOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).EventType);
-            Assert.AreEqual("Test_log4net_InsertOnStartReplaceOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).EventType);
+            Assert.That(events.Length, Is.EqualTo(2));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).EventType, Is.EqualTo("Test_log4net_InsertOnStartReplaceOnEnd"));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).EventType, Is.EqualTo("Test_log4net_InsertOnStartReplaceOnEnd"));
             var jsonAdapter = new JsonAdapter();
-            Assert.AreEqual(jsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"].ToString(), jsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"].ToString());
+            Assert.That(jsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"].ToString(), Is.EqualTo(jsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"].ToString()));
         }
 
         [Test]
@@ -76,12 +76,12 @@ namespace Audit.UnitTest
             }
 
             var events = _adapter.PopAllEvents();
-            Assert.AreEqual(2, events.Length);
-            Assert.AreEqual(Level.Debug, events[0].Level);
-            Assert.AreEqual(Level.Error, events[1].Level);
-            Assert.AreEqual("Test_log4net_InsertOnStartInsertOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).EventType);
-            Assert.AreEqual("Test_log4net_InsertOnStartInsertOnEnd", JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).EventType);
-            Assert.AreNotEqual(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"].ToString(), JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"].ToString());
+            Assert.That(events.Length, Is.EqualTo(2));
+            Assert.That(events[0].Level, Is.EqualTo(Level.Debug));
+            Assert.That(events[1].Level, Is.EqualTo(Level.Error));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).EventType, Is.EqualTo("Test_log4net_InsertOnStartInsertOnEnd"));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).EventType, Is.EqualTo("Test_log4net_InsertOnStartInsertOnEnd"));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject.ToString()).CustomFields["EventId"].ToString(), Is.Not.EqualTo(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject.ToString()).CustomFields["EventId"].ToString()));
         }
     }
 }

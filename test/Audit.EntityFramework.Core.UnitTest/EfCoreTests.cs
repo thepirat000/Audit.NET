@@ -70,24 +70,24 @@ namespace Audit.EntityFramework.Core.UnitTest
             person.Address = person.Address with { City = "NewCity", Country = person.Address.Country with { Alias = "newalias" } };
             context.SaveChanges();
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(1, evs[0].Entries.Count);
-            Assert.AreEqual(1, evs[1].Entries.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].Entries.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("Update", evs[1].Entries[0].Action);
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
 
-            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
-            Assert.AreEqual("New Name", evs[1].Entries[0].ColumnValues["Name"]);
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("Development"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Name"], Is.EqualTo("New Name"));
 
-            Assert.AreEqual("*Vienna*", evs[0].Entries[0].ColumnValues["Address_City"]);
-            Assert.AreEqual("*NewCity*", evs[1].Entries[0].ColumnValues["Address_City"]);
+            Assert.That(evs[0].Entries[0].ColumnValues["Address_City"], Is.EqualTo("*Vienna*"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address_City"], Is.EqualTo("*NewCity*"));
 
-            Assert.AreEqual("AU", evs[0].Entries[0].ColumnValues["Address_Country_Alias"]);
-            Assert.AreEqual("NEWALIAS", evs[1].Entries[0].ColumnValues["Address_Country_Alias"]);
+            Assert.That(evs[0].Entries[0].ColumnValues["Address_Country_Alias"], Is.EqualTo("AU"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address_Country_Alias"], Is.EqualTo("NEWALIAS"));
 
-            Assert.AreEqual("AU", evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.OriginalValue);
-            Assert.AreEqual("NEWALIAS", evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.NewValue);
+            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.OriginalValue, Is.EqualTo("AU"));
+            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.NewValue, Is.EqualTo("NEWALIAS"));
         }
 #endif
 
@@ -117,15 +117,15 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             ctx.SaveChanges();
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(1, evs[0].Entries.Count);
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("ReservationRequests", evs[0].Entries[0].Table);
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Id"));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "LocationId" && (string)cv.Value == guid));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Uid" && (string)cv.Value == "u"));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationComments" && (string)cv.Value == "test"));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationTo"));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[0].Table, Is.EqualTo("ReservationRequests"));
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Id"), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "LocationId" && (string)cv.Value == guid), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Uid" && (string)cv.Value == "u"), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationComments" && (string)cv.Value == "test"), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationTo"), Is.True);
 
             evs.Clear();
 
@@ -136,18 +136,18 @@ namespace Audit.EntityFramework.Core.UnitTest
             r.UserId = "u2";
             ctx.SaveChanges();
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(1, evs[0].Entries.Count);
-            Assert.AreEqual("Update", evs[0].Entries[0].Action);
-            Assert.AreEqual("ReservationRequests", evs[0].Entries[0].Table);
-            Assert.AreEqual(2, evs[0].Entries[0].Changes.Count);
-            Assert.IsTrue(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Uid" && (string)ch.OriginalValue == "u" && (string)ch.NewValue == "u2"));
-            Assert.IsTrue(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LocationId" && (string)ch.OriginalValue == guid && (string)ch.NewValue == newGuid));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Id"));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "LocationId" && (string)cv.Value == newGuid));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Uid" && (string)cv.Value == "u2"));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationComments" && (string)cv.Value == "test"));
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationTo"));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[0].Entries[0].Table, Is.EqualTo("ReservationRequests"));
+            Assert.That(evs[0].Entries[0].Changes.Count, Is.EqualTo(2));
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Uid" && (string)ch.OriginalValue == "u" && (string)ch.NewValue == "u2"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LocationId" && (string)ch.OriginalValue == guid && (string)ch.NewValue == newGuid), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Id"), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "LocationId" && (string)cv.Value == newGuid), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "Uid" && (string)cv.Value == "u2"), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationComments" && (string)cv.Value == "test"), Is.True);
+            Assert.That(evs[0].Entries[0].ColumnValues.Any(cv => cv.Key == "ReservationTo"), Is.True);
         }
 
         [Test]
@@ -175,13 +175,13 @@ namespace Audit.EntityFramework.Core.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(5, evs[0].Entries.Count);
-            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "Tags" && e.Action == "Insert" && e.ColumnValues["Text"]?.ToString() == "tag 1"));
-            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "Tags" && e.Action == "Insert" && e.ColumnValues["Text"]?.ToString() == "tag 2"));
-            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "Posts" && e.Action == "Insert" && e.ColumnValues["Name"]?.ToString() == "test"));
-            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "PostTag" && e.Action == "Insert" && e.ColumnValues["PostsId"]?.ToString() == "10" && e.ColumnValues["TagsId"]?.ToString() == "101"));
-            Assert.IsTrue(evs[0].Entries.Any(e => e.Table == "PostTag" && e.Action == "Insert" && e.ColumnValues["PostsId"]?.ToString() == "10" && e.ColumnValues["TagsId"]?.ToString() == "102"));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(5));
+            Assert.That(evs[0].Entries.Any(e => e.Table == "Tags" && e.Action == "Insert" && e.ColumnValues["Text"]?.ToString() == "tag 1"), Is.True);
+            Assert.That(evs[0].Entries.Any(e => e.Table == "Tags" && e.Action == "Insert" && e.ColumnValues["Text"]?.ToString() == "tag 2"), Is.True);
+            Assert.That(evs[0].Entries.Any(e => e.Table == "Posts" && e.Action == "Insert" && e.ColumnValues["Name"]?.ToString() == "test"), Is.True);
+            Assert.That(evs[0].Entries.Any(e => e.Table == "PostTag" && e.Action == "Insert" && e.ColumnValues["PostsId"]?.ToString() == "10" && e.ColumnValues["TagsId"]?.ToString() == "101"), Is.True);
+            Assert.That(evs[0].Entries.Any(e => e.Table == "PostTag" && e.Action == "Insert" && e.ColumnValues["PostsId"]?.ToString() == "10" && e.ColumnValues["TagsId"]?.ToString() == "102"), Is.True);
         }
 
         [Test]
@@ -280,12 +280,12 @@ namespace Audit.EntityFramework.Core.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(4, evs[0].Entries.Count); 
-            Assert.AreEqual("deparment test", evs[0].Entries.First(e => e.Table == "Department" && e.ColumnValues.ContainsKey("Name")).ColumnValues["Name"]);
-            Assert.AreEqual("person test", evs[0].Entries.First(e => e.Table == "Person" && e.ColumnValues.ContainsKey("Name")).ColumnValues["Name"]);
-            Assert.AreEqual("Vienna1", evs[0].Entries.First(e => e.Table == "Department" && e.ColumnValues.ContainsKey("Address_City")).ColumnValues["Address_City"]);
-            Assert.AreEqual("Vienna2", evs[0].Entries.First(e => e.Table == "Person_Addresses" && e.ColumnValues.ContainsKey("City")).ColumnValues["City"]);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(4));
+            Assert.That(evs[0].Entries.First(e => e.Table == "Department" && e.ColumnValues.ContainsKey("Name")).ColumnValues["Name"], Is.EqualTo("deparment test"));
+            Assert.That(evs[0].Entries.First(e => e.Table == "Person" && e.ColumnValues.ContainsKey("Name")).ColumnValues["Name"], Is.EqualTo("person test"));
+            Assert.That(evs[0].Entries.First(e => e.Table == "Department" && e.ColumnValues.ContainsKey("Address_City")).ColumnValues["Address_City"], Is.EqualTo("Vienna1"));
+            Assert.That(evs[0].Entries.First(e => e.Table == "Person_Addresses" && e.ColumnValues.ContainsKey("City")).ColumnValues["City"], Is.EqualTo("Vienna2"));
         }
 #endif
 
@@ -308,10 +308,10 @@ namespace Audit.EntityFramework.Core.UnitTest
                 context.SaveChanges();
             }
             Audit.Core.Configuration.IncludeStackTrace = false;
-            
-            Assert.AreEqual(1, evs.Count);
-           
-            Assert.IsTrue(evs[0].Environment.StackTrace.Contains(nameof(Test_EF_StackTrace)), $"Expected contains {nameof(Test_EF_StackTrace)} but was {evs[0].Environment.StackTrace}");
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+
+            Assert.That(evs[0].Environment.StackTrace.Contains(nameof(Test_EF_StackTrace)), Is.True, $"Expected contains {nameof(Test_EF_StackTrace)} but was {evs[0].Environment.StackTrace}");
             
         }
         
@@ -338,8 +338,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(evs[0].GetEntityFrameworkEvent().TransactionId));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(!string.IsNullOrWhiteSpace(evs[0].GetEntityFrameworkEvent().TransactionId), Is.True);
         }
 
         [Test]
@@ -365,9 +365,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsNull(evs[0].GetEntityFrameworkEvent().TransactionId);
-            Assert.IsNull(evs[0].GetEntityFrameworkEvent().AmbientTransactionId);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().TransactionId, Is.Null);
+            Assert.That(evs[0].GetEntityFrameworkEvent().AmbientTransactionId, Is.Null);
         }
 
         [Test]
@@ -396,9 +396,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsNull(evs[0].GetEntityFrameworkEvent().TransactionId);
-            Assert.IsNull(evs[0].GetEntityFrameworkEvent().AmbientTransactionId);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().TransactionId, Is.Null);
+            Assert.That(evs[0].GetEntityFrameworkEvent().AmbientTransactionId, Is.Null);
 
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<BlogsContext>().Reset();
@@ -439,18 +439,18 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ev2 = AuditEvent.FromJson<AuditEventEntityFramework>(evs[0].ToJson());
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(evs[0].GetEntityFrameworkEvent().Entries[0].Entity.GetType().FullName.StartsWith("Castle.Proxies."));
-            Assert.AreEqual(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"], evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual(guid, evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Title"]);
-            Assert.AreEqual("Blogs", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
-            Assert.AreEqual("dbo", evs[0].GetEntityFrameworkEvent().Entries[0].Schema.ToLower());
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].Entity.GetType().FullName.StartsWith("Castle.Proxies."), Is.True);
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"], Is.EqualTo(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Title"], Is.EqualTo(guid));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Blogs"));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].Schema.ToLower(), Is.EqualTo("dbo"));
             Assert.AreEqual(1, (evs[0].GetEntityFrameworkEvent().CustomFields["Additional Field On event"] as dynamic).x);
             Assert.AreEqual("two", (evs[0].GetEntityFrameworkEvent().Entries[0].CustomFields["Additional Field On entry"] as dynamic).y);
             Assert.AreEqual("one", (evs[0].GetEntityFrameworkEvent().CustomFields["Additional Field On event"] as dynamic).y);
             Assert.AreEqual(2, (evs[0].GetEntityFrameworkEvent().Entries[0].CustomFields["Additional Field On entry"] as dynamic).x);
-            Assert.IsNotNull(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"]);
-            Assert.IsNotNull(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"]);
+            Assert.That(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"], Is.Not.Null);
+            Assert.That(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"], Is.Not.Null);
         }
 
         [Test]
@@ -489,18 +489,18 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             var ev2 = AuditEvent.FromJson<AuditEventEntityFramework>(evs[0].ToJson());
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
 
-            Assert.AreEqual(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"], evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual(guid, evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Title"]);
-            Assert.AreEqual("Blogs", evs[0].GetEntityFrameworkEvent().Entries[0].Table);
-            Assert.AreEqual("dbo", evs[0].GetEntityFrameworkEvent().Entries[0].Schema.ToLower());
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"], Is.EqualTo(evs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Title"], Is.EqualTo(guid));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Blogs"));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries[0].Schema.ToLower(), Is.EqualTo("dbo"));
             Assert.AreEqual(1, (evs[0].GetEntityFrameworkEvent().CustomFields["Additional Field On event"] as dynamic).x);
             Assert.AreEqual("two", (evs[0].GetEntityFrameworkEvent().Entries[0].CustomFields["Additional Field On entry"] as dynamic).y);
             Assert.AreEqual("one", (evs[0].GetEntityFrameworkEvent().CustomFields["Additional Field On event"] as dynamic).y);
             Assert.AreEqual(2, (evs[0].GetEntityFrameworkEvent().Entries[0].CustomFields["Additional Field On entry"] as dynamic).x);
-            Assert.IsNotNull(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"]);
-            Assert.IsNotNull(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"]);
+            Assert.That(ev2.EntityFrameworkEvent.CustomFields["Additional Field On event"], Is.Not.Null);
+            Assert.That(ev2.EntityFrameworkEvent.Entries[0].CustomFields["Additional Field On entry"], Is.Not.Null);
         }
 
         [Test]
@@ -541,39 +541,39 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(4, events.Count);
-            Assert.AreEqual(1, events[0].Entries.Count);
-            Assert.AreEqual(id, events[0].Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual("tenant", events[0].Entries[0].ColumnValues["Name"]);
-            Assert.AreEqual(id, events[0].Entries[0].PrimaryKey["Id"]);
+            Assert.That(events.Count, Is.EqualTo(4));
+            Assert.That(events[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(events[0].Entries[0].ColumnValues["Id"], Is.EqualTo(id));
+            Assert.That(events[0].Entries[0].ColumnValues["Name"], Is.EqualTo("tenant"));
+            Assert.That(events[0].Entries[0].PrimaryKey["Id"], Is.EqualTo(id));
 
-            Assert.AreEqual(2, events[1].Entries.Count);
-            Assert.AreEqual(id+1, events[1].Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual("test1", events[1].Entries[0].ColumnValues["Name"]);
-            Assert.AreEqual(id, events[1].Entries[0].ColumnValues["TenantId"]);
-            Assert.AreEqual(2, events[1].Entries[0].PrimaryKey.Count);
-            Assert.AreEqual(id+1, events[1].Entries[0].PrimaryKey["Id"]);
-            Assert.AreEqual(id, events[1].Entries[0].PrimaryKey["TenantId"]);
+            Assert.That(events[1].Entries.Count, Is.EqualTo(2));
+            Assert.That(events[1].Entries[0].ColumnValues["Id"], Is.EqualTo(id + 1));
+            Assert.That(events[1].Entries[0].ColumnValues["Name"], Is.EqualTo("test1"));
+            Assert.That(events[1].Entries[0].ColumnValues["TenantId"], Is.EqualTo(id));
+            Assert.That(events[1].Entries[0].PrimaryKey.Count, Is.EqualTo(2));
+            Assert.That(events[1].Entries[0].PrimaryKey["Id"], Is.EqualTo(id + 1));
+            Assert.That(events[1].Entries[0].PrimaryKey["TenantId"], Is.EqualTo(id));
 
-            Assert.AreEqual(id + 2, events[1].Entries[1].ColumnValues["Id"]);
-            Assert.AreEqual("test2", events[1].Entries[1].ColumnValues["Name"]);
-            Assert.AreEqual(id, events[1].Entries[1].ColumnValues["TenantId"]);
-            Assert.AreEqual(2, events[1].Entries[1].PrimaryKey.Count);
-            Assert.AreEqual(id + 2, events[1].Entries[1].PrimaryKey["Id"]);
-            Assert.AreEqual(id, events[1].Entries[1].PrimaryKey["TenantId"]);
+            Assert.That(events[1].Entries[1].ColumnValues["Id"], Is.EqualTo(id + 2));
+            Assert.That(events[1].Entries[1].ColumnValues["Name"], Is.EqualTo("test2"));
+            Assert.That(events[1].Entries[1].ColumnValues["TenantId"], Is.EqualTo(id));
+            Assert.That(events[1].Entries[1].PrimaryKey.Count, Is.EqualTo(2));
+            Assert.That(events[1].Entries[1].PrimaryKey["Id"], Is.EqualTo(id + 2));
+            Assert.That(events[1].Entries[1].PrimaryKey["TenantId"], Is.EqualTo(id));
 
-            Assert.AreEqual(1, events[2].Entries.Count);
-            Assert.AreEqual(id + 3, events[2].Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual(id + 1, events[2].Entries[0].ColumnValues["EmployeeId"]);
-            Assert.AreEqual(id, events[2].Entries[0].ColumnValues["TenantId"]);
-            Assert.AreEqual(id + 2, events[2].Entries[0].ColumnValues["TrusteeId"]);
-            Assert.AreEqual(id + 3, events[2].Entries[0].PrimaryKey["Id"]);
+            Assert.That(events[2].Entries.Count, Is.EqualTo(1));
+            Assert.That(events[2].Entries[0].ColumnValues["Id"], Is.EqualTo(id + 3));
+            Assert.That(events[2].Entries[0].ColumnValues["EmployeeId"], Is.EqualTo(id + 1));
+            Assert.That(events[2].Entries[0].ColumnValues["TenantId"], Is.EqualTo(id));
+            Assert.That(events[2].Entries[0].ColumnValues["TrusteeId"], Is.EqualTo(id + 2));
+            Assert.That(events[2].Entries[0].PrimaryKey["Id"], Is.EqualTo(id + 3));
 
-            Assert.AreEqual(1, events[3].Entries.Count);
-            Assert.AreEqual(1, events[3].Entries[0].Changes.Count);
-            Assert.AreEqual("Name", events[3].Entries[0].Changes[0].ColumnName);
-            Assert.AreEqual("test1", events[3].Entries[0].Changes[0].OriginalValue);
-            Assert.AreEqual("test1-updated", events[3].Entries[0].Changes[0].NewValue);
+            Assert.That(events[3].Entries.Count, Is.EqualTo(1));
+            Assert.That(events[3].Entries[0].Changes.Count, Is.EqualTo(1));
+            Assert.That(events[3].Entries[0].Changes[0].ColumnName, Is.EqualTo("Name"));
+            Assert.That(events[3].Entries[0].Changes[0].OriginalValue, Is.EqualTo("test1"));
+            Assert.That(events[3].Entries[0].Changes[0].NewValue, Is.EqualTo("test1-updated"));
 
         }
 
@@ -622,17 +622,17 @@ namespace Audit.EntityFramework.Core.UnitTest
 
                 var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
 
-                Assert.AreEqual(2, audits.Count);
-                Assert.AreEqual("Blog", audits[0].EntityType);
-                Assert.AreEqual(blog.Id, audits[0].EntityId);
-                Assert.AreEqual(blog.Title, audits[0].Title);
+                Assert.That(audits.Count, Is.EqualTo(2));
+                Assert.That(audits[0].EntityType, Is.EqualTo("Blog"));
+                Assert.That(audits[0].EntityId, Is.EqualTo(blog.Id));
+                Assert.That(audits[0].Title, Is.EqualTo(blog.Title));
 
-                Assert.AreEqual("Post", audits[1].EntityType);
-                Assert.AreEqual(post.Id, audits[1].EntityId);
-                Assert.AreEqual(post.Title, audits[1].Title);
+                Assert.That(audits[1].EntityType, Is.EqualTo("Post"));
+                Assert.That(audits[1].EntityId, Is.EqualTo(post.Id));
+                Assert.That(audits[1].Title, Is.EqualTo(post.Title));
 
-                Assert.AreEqual("test user", audits[0].AuditUser);
-                Assert.AreEqual("test user", audits[1].AuditUser);
+                Assert.That(audits[0].AuditUser, Is.EqualTo("test user"));
+                Assert.That(audits[1].AuditUser, Is.EqualTo("test user"));
             }
         }
 
@@ -670,17 +670,17 @@ namespace Audit.EntityFramework.Core.UnitTest
 
                 var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
 
-                Assert.AreEqual(2, audits.Count);
-                Assert.AreEqual("Blog", audits[0].EntityType);
-                Assert.AreEqual(blog.Id, audits[0].EntityId);
-                Assert.AreEqual(blog.Title, audits[0].Title);
+                Assert.That(audits.Count, Is.EqualTo(2));
+                Assert.That(audits[0].EntityType, Is.EqualTo("Blog"));
+                Assert.That(audits[0].EntityId, Is.EqualTo(blog.Id));
+                Assert.That(audits[0].Title, Is.EqualTo(blog.Title));
 
-                Assert.AreEqual("Post", audits[1].EntityType);
-                Assert.AreEqual(post.Id, audits[1].EntityId);
-                Assert.AreEqual(post.Title, audits[1].Title);
+                Assert.That(audits[1].EntityType, Is.EqualTo("Post"));
+                Assert.That(audits[1].EntityId, Is.EqualTo(post.Id));
+                Assert.That(audits[1].Title, Is.EqualTo(post.Title));
 
-                Assert.AreEqual("test user", audits[0].AuditUser);
-                Assert.AreEqual("test user", audits[1].AuditUser);
+                Assert.That(audits[0].AuditUser, Is.EqualTo("test user"));
+                Assert.That(audits[1].AuditUser, Is.EqualTo("test user"));
             }
         }
 
@@ -698,13 +698,13 @@ namespace Audit.EntityFramework.Core.UnitTest
                         {
                             if (entry.Action == "Update")
                             {
-                                Assert.AreEqual(typeof(BlogAudit), entity.GetType());
+                                Assert.That(entity.GetType(), Is.EqualTo(typeof(BlogAudit)));
                                 var ba = entity as BlogAudit;
                                 ba.BlogId = (int)entry.PrimaryKey.First().Value;
                             }
                             else
                             {
-                                Assert.AreEqual(typeof(CommonAudit), entity.GetType());
+                                Assert.That(entity.GetType(), Is.EqualTo(typeof(CommonAudit)));
                                 var ca = entity as CommonAudit;
                                 ca.Group = guid;
                                 ca.EntityType = entry.EntityType.Name;
@@ -736,14 +736,14 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
                 var blogaudits = context.BlogsAudits.Where(x => x.Title == newTitle).ToList();
 
-                Assert.IsNotNull(blogaudits);
-                Assert.AreEqual(1, blogaudits.Count);
-                Assert.AreEqual(blog.Id, blogaudits[0].BlogId);
-                Assert.AreEqual(1, audits.Count);
-                Assert.AreEqual("Blog", audits[0].EntityType);
-                Assert.AreEqual(blog.Id, audits[0].EntityId);
-                Assert.AreEqual("TestBlog", audits[0].Title);
-                Assert.AreEqual("test user", audits[0].AuditUser);
+                Assert.That(blogaudits, Is.Not.Null);
+                Assert.That(blogaudits.Count, Is.EqualTo(1));
+                Assert.That(blogaudits[0].BlogId, Is.EqualTo(blog.Id));
+                Assert.That(audits.Count, Is.EqualTo(1));
+                Assert.That(audits[0].EntityType, Is.EqualTo("Blog"));
+                Assert.That(audits[0].EntityId, Is.EqualTo(blog.Id));
+                Assert.That(audits[0].Title, Is.EqualTo("TestBlog"));
+                Assert.That(audits[0].AuditUser, Is.EqualTo("test user"));
             }
         }
 
@@ -790,10 +790,10 @@ namespace Audit.EntityFramework.Core.UnitTest
 
                 var audits = context.BlogsAudits.Where(a => a.BloggerName == guid).OrderBy(a => a.AuditDate).ToList();
 
-                Assert.AreEqual(2, audits.Count);
-                Assert.AreEqual("Test_EFFailureLogging", audits[0].Title);
-                Assert.AreEqual(longText, audits[1].Title);
-                Assert.IsTrue(audits[1].Exception.Length > 5);
+                Assert.That(audits.Count, Is.EqualTo(2));
+                Assert.That(audits[0].Title, Is.EqualTo("Test_EFFailureLogging"));
+                Assert.That(audits[1].Title, Is.EqualTo(longText));
+                Assert.That(audits[1].Exception.Length > 5, Is.True);
             }
         }
 
@@ -831,17 +831,17 @@ namespace Audit.EntityFramework.Core.UnitTest
 
                 var audits = context.CommonAudits.Where(a => a.Group == guid).OrderBy(a => a.AuditDate).ToList();
 
-                Assert.AreEqual(2, audits.Count);
-                Assert.AreEqual("Blog", audits[0].EntityType);
-                Assert.AreEqual(blog.Id, audits[0].EntityId);
-                Assert.AreEqual(blog.Title, audits[0].Title);
+                Assert.That(audits.Count, Is.EqualTo(2));
+                Assert.That(audits[0].EntityType, Is.EqualTo("Blog"));
+                Assert.That(audits[0].EntityId, Is.EqualTo(blog.Id));
+                Assert.That(audits[0].Title, Is.EqualTo(blog.Title));
 
-                Assert.AreEqual("Post", audits[1].EntityType);
-                Assert.AreEqual(post.Id, audits[1].EntityId);
-                Assert.AreEqual($"F:TestPost", audits[1].Title);
+                Assert.That(audits[1].EntityType, Is.EqualTo("Post"));
+                Assert.That(audits[1].EntityId, Is.EqualTo(post.Id));
+                Assert.That(audits[1].Title, Is.EqualTo($"F:TestPost"));
 
-                Assert.AreEqual("test user", audits[0].AuditUser);
-                Assert.AreEqual("test user", audits[1].AuditUser);
+                Assert.That(audits[0].AuditUser, Is.EqualTo("test user"));
+                Assert.That(audits[1].AuditUser, Is.EqualTo("test user"));
             }
         }
 

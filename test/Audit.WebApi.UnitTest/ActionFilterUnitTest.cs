@@ -65,8 +65,8 @@ namespace Audit.WebApi.UnitTest
 
                 var okIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.OK);
                 var badIncluded = attr.ShouldIncludeResponseBody(HttpStatusCode.BadRequest);
-                Assert.AreEqual(testCase.ExpectInclude_200, okIncluded, $"Expect OK (200) included = {testCase.ExpectInclude_200}: {Core.Configuration.JsonAdapter.Serialize(testCase)}");
-                Assert.AreEqual(testCase.ExpectInclude_400, badIncluded, $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {Core.Configuration.JsonAdapter.Serialize(testCase)}");
+                Assert.That(okIncluded, Is.EqualTo(testCase.ExpectInclude_200), $"Expect OK (200) included = {testCase.ExpectInclude_200}: {Core.Configuration.JsonAdapter.Serialize(testCase)}");
+                Assert.That(badIncluded, Is.EqualTo(testCase.ExpectInclude_400), $"Expect BadRequest (400) included = {testCase.ExpectInclude_400}: {Core.Configuration.JsonAdapter.Serialize(testCase)}");
             }
         }
 
@@ -171,18 +171,18 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual(typeof(ActionFilterUnitTest).GetMethods().First().Name, action.ActionName);
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo(typeof(ActionFilterUnitTest).GetMethods().First().Name));
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
             Assert.AreEqual(123, ((dynamic)action.RequestBody).Length);
             Assert.AreEqual("application/json", ((dynamic)action.RequestBody).Type);
-            Assert.AreEqual(2, action.ResponseHeaders.Count);
-            Assert.AreEqual("1", action.ResponseHeaders["header-one"]);
-            Assert.AreEqual("2", action.ResponseHeaders["header-two"]);
+            Assert.That(action.ResponseHeaders.Count, Is.EqualTo(2));
+            Assert.That(action.ResponseHeaders["header-one"], Is.EqualTo("1"));
+            Assert.That(action.ResponseHeaders["header-two"], Is.EqualTo("2"));
 
-            Assert.AreEqual(actionContext.ActionDescriptor.ActionName, action.GetHttpActionContext().ActionDescriptor.ActionName);
+            Assert.That(action.GetHttpActionContext().ActionDescriptor.ActionName, Is.EqualTo(actionContext.ActionDescriptor.ActionName));
         }
 
 
@@ -257,12 +257,12 @@ namespace Audit.WebApi.UnitTest
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual(actionDescriptor.MethodInfo.Name, action.ActionName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
-            Assert.AreEqual(actionContext.ActionDescriptor.ActionName, action.HttpActionContext.ActionDescriptor.ActionName);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo(actionDescriptor.MethodInfo.Name));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
+            Assert.That(action.HttpActionContext.ActionDescriptor.ActionName, Is.EqualTo(actionContext.ActionDescriptor.ActionName));
         }
 
         [Test]
@@ -331,16 +331,16 @@ namespace Audit.WebApi.UnitTest
 
             //Assert
             var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
-            Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
+            Assert.That(evtn, Is.EqualTo("TEST_REFERENCE_TYPE"));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual(actionDescriptor.MethodInfo.Name, action.ActionName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo(actionDescriptor.MethodInfo.Name));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
         }
 
 
@@ -414,16 +414,16 @@ namespace Audit.WebApi.UnitTest
 
             //Assert
             var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
-            Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
+            Assert.That(evtn, Is.EqualTo("TEST_REFERENCE_TYPE"));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             dataProvider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
             Assert.IsFalse(string.IsNullOrWhiteSpace(action.ActionName));
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
         }
     }
 

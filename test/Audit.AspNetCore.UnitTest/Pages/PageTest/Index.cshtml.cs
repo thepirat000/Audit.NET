@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Audit.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Audit.Integration.AspNetCore.Pages.Test
+namespace Audit.AspNetCore.UnitTest.Pages.Test
 {
     [IgnoreAntiforgeryToken]
     public class IndexModel : PageModel

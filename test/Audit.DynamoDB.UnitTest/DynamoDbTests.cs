@@ -41,8 +41,8 @@ namespace Audit.DynamoDB.UnitTest
                 }
             });
 
-            Assert.AreEqual(N, hashes.Count);
-            Assert.AreEqual(N * 2, count);
+            Assert.That(hashes.Count, Is.EqualTo(N));
+            Assert.That(count, Is.EqualTo(N * 2));
 
             // Assert events
             int maxCheck = N / 4;
@@ -57,9 +57,9 @@ namespace Audit.DynamoDB.UnitTest
                 var ev = ddp.GetEvent<AuditEvent>((Primitive)hash, (Primitive)DateTime.Now.Year);
 
                 Assert.NotNull(ev);
-                Assert.AreEqual("AuditEvents", ev.EventType);
-                Assert.AreEqual(DateTime.Now.Year.ToString(), ev.CustomFields["SortKey"].ToString());
-                Assert.AreEqual(hash, ev.CustomFields["HashKey"].ToString());
+                Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
+                Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo(DateTime.Now.Year.ToString()));
+                Assert.That(ev.CustomFields["HashKey"].ToString(), Is.EqualTo(hash));
             }
         }
 

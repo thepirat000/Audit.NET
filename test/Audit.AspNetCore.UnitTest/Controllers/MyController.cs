@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Audit.Integration.AspNetCore.Controllers
+namespace Audit.AspNetCore.UnitTest.Controllers
 {
     [AuditApi]
     [Route("api/[controller]")]

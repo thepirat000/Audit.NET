@@ -70,33 +70,31 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
 
                 var deptLoaded = ctx.Departments.FirstOrDefault();
-                Assert.IsNotNull(deptLoaded);
+                Assert.That(deptLoaded, Is.Not.Null);
             }
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
 
-            Assert.IsNotNull(inserted[0].TransactionEvent.TransactionId);
-            Assert.AreEqual("Start", inserted[0].TransactionEvent.Action);
-            Assert.IsNotNull(inserted[0].TransactionEvent.ConnectionId);
-            Assert.IsNotNull(inserted[0].TransactionEvent.DbConnectionId);
-            Assert.IsNull(inserted[0].TransactionEvent.ErrorMessage);
+            Assert.That(inserted[0].TransactionEvent.TransactionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.Action, Is.EqualTo("Start"));
+            Assert.That(inserted[0].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.DbConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[0].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[0].TransactionEvent.Success);
-            Assert.AreEqual($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}",
-                inserted[0].EventType);
+            Assert.That(inserted[0].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[0].EventType, Is.EqualTo($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}"));
 
-            Assert.AreEqual("Commit", inserted[1].TransactionEvent.Action);
-            Assert.AreEqual($"DbTransactionIntercept:{inserted[1].TransactionEvent.TransactionId}",
-                inserted[1].EventType);
-            Assert.IsNotNull(inserted[1].TransactionEvent.ConnectionId);
-            Assert.IsNull(inserted[1].TransactionEvent.ErrorMessage);
+            Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Commit"));
+            Assert.That(inserted[1].EventType, Is.EqualTo($"DbTransactionIntercept:{inserted[1].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[1].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[1].TransactionEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[1].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[1].TransactionEvent.Success);
+            Assert.That(inserted[1].TransactionEvent.Success, Is.True);
 
-            Assert.AreEqual(inserted[0].TransactionEvent.ConnectionId, inserted[1].TransactionEvent.ConnectionId);
-            Assert.AreEqual(inserted[0].TransactionEvent.DbConnectionId, inserted[1].TransactionEvent.DbConnectionId);
-            Assert.AreEqual(inserted[0].TransactionEvent.TransactionId, inserted[1].TransactionEvent.TransactionId);
+            Assert.That(inserted[1].TransactionEvent.ConnectionId, Is.EqualTo(inserted[0].TransactionEvent.ConnectionId));
+            Assert.That(inserted[1].TransactionEvent.DbConnectionId, Is.EqualTo(inserted[0].TransactionEvent.DbConnectionId));
+            Assert.That(inserted[1].TransactionEvent.TransactionId, Is.EqualTo(inserted[0].TransactionEvent.TransactionId));
         }
 
         [Test]
@@ -139,33 +137,31 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.SaveChangesAsync();
 
                 var deptLoaded = await ctx.Departments.FirstOrDefaultAsync();
-                Assert.IsNotNull(deptLoaded);
+                Assert.That(deptLoaded, Is.Not.Null);
             }
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
 
-            Assert.IsNotNull(inserted[0].TransactionEvent.TransactionId);
-            Assert.AreEqual("Start", inserted[0].TransactionEvent.Action);
-            Assert.IsNotNull(inserted[0].TransactionEvent.ConnectionId);
-            Assert.IsNotNull(inserted[0].TransactionEvent.DbConnectionId);
-            Assert.IsNull(inserted[0].TransactionEvent.ErrorMessage);
-            Assert.IsTrue(inserted[0].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[0].TransactionEvent.Success);
-            Assert.AreEqual($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}",
-                inserted[0].EventType);
+            Assert.That(inserted[0].TransactionEvent.TransactionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.Action, Is.EqualTo("Start"));
+            Assert.That(inserted[0].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.DbConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.ErrorMessage, Is.Null);
+            Assert.That(inserted[0].TransactionEvent.IsAsync, Is.True);
+            Assert.That(inserted[0].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[0].EventType, Is.EqualTo($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}"));
 
-            Assert.AreEqual("Commit", inserted[1].TransactionEvent.Action);
-            Assert.AreEqual($"DbTransactionIntercept:{inserted[1].TransactionEvent.TransactionId}",
-                inserted[1].EventType);
-            Assert.IsNotNull(inserted[1].TransactionEvent.ConnectionId);
-            Assert.IsNull(inserted[1].TransactionEvent.ErrorMessage);
-            Assert.IsTrue(inserted[1].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[1].TransactionEvent.Success);
+            Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Commit"));
+            Assert.That(inserted[1].EventType, Is.EqualTo($"DbTransactionIntercept:{inserted[1].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[1].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[1].TransactionEvent.ErrorMessage, Is.Null);
+            Assert.That(inserted[1].TransactionEvent.IsAsync, Is.True);
+            Assert.That(inserted[1].TransactionEvent.Success, Is.True);
 
-            Assert.AreEqual(inserted[0].TransactionEvent.ConnectionId, inserted[1].TransactionEvent.ConnectionId);
-            Assert.AreEqual(inserted[0].TransactionEvent.DbConnectionId, inserted[1].TransactionEvent.DbConnectionId);
-            Assert.AreEqual(inserted[0].TransactionEvent.TransactionId, inserted[1].TransactionEvent.TransactionId);
+            Assert.That(inserted[1].TransactionEvent.ConnectionId, Is.EqualTo(inserted[0].TransactionEvent.ConnectionId));
+            Assert.That(inserted[1].TransactionEvent.DbConnectionId, Is.EqualTo(inserted[0].TransactionEvent.DbConnectionId));
+            Assert.That(inserted[1].TransactionEvent.TransactionId, Is.EqualTo(inserted[0].TransactionEvent.TransactionId));
         }
 
         [Test]
@@ -206,21 +202,21 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
 
-            Assert.AreEqual($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}", inserted[0].EventType);
-            Assert.IsNotNull(inserted[0].TransactionEvent.ConnectionId);
-            Assert.IsNull(inserted[0].TransactionEvent.ErrorMessage);
+            Assert.That(inserted[0].EventType, Is.EqualTo($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[0].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[0].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[0].TransactionEvent.Success);
-            Assert.AreEqual("Start", inserted[0].TransactionEvent.Action);
+            Assert.That(inserted[0].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[0].TransactionEvent.Action, Is.EqualTo("Start"));
 
-            Assert.IsNotNull(inserted[1].TransactionEvent.ConnectionId);
-            Assert.IsNull(inserted[1].TransactionEvent.ErrorMessage);
+            Assert.That(inserted[1].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[1].TransactionEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[1].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[1].TransactionEvent.Success);
-            Assert.AreEqual("Rollback", inserted[1].TransactionEvent.Action);
+            Assert.That(inserted[1].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Rollback"));
         }
 
         [Test]
@@ -261,21 +257,21 @@ namespace Audit.EntityFramework.Core.UnitTest
                 }
             }
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
 
-            Assert.AreEqual($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}", inserted[0].EventType);
-            Assert.IsNotNull(inserted[0].TransactionEvent.ConnectionId);
-            Assert.IsNull(inserted[0].TransactionEvent.ErrorMessage);
-            Assert.IsTrue(inserted[0].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[0].TransactionEvent.Success);
-            Assert.AreEqual("Start", inserted[0].TransactionEvent.Action);
+            Assert.That(inserted[0].EventType, Is.EqualTo($"DbTransactionIntercept:{inserted[0].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[0].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[0].TransactionEvent.ErrorMessage, Is.Null);
+            Assert.That(inserted[0].TransactionEvent.IsAsync, Is.True);
+            Assert.That(inserted[0].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[0].TransactionEvent.Action, Is.EqualTo("Start"));
 
-            Assert.IsNotNull(inserted[1].TransactionEvent.ConnectionId);
-            Assert.IsNull(inserted[1].TransactionEvent.ErrorMessage);
-            Assert.IsTrue(inserted[1].TransactionEvent.IsAsync);
-            Assert.IsTrue(inserted[1].TransactionEvent.Success);
-            Assert.AreEqual("Rollback", inserted[1].TransactionEvent.Action);
+            Assert.That(inserted[1].TransactionEvent.ConnectionId, Is.Not.Null);
+            Assert.That(inserted[1].TransactionEvent.ErrorMessage, Is.Null);
+            Assert.That(inserted[1].TransactionEvent.IsAsync, Is.True);
+            Assert.That(inserted[1].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Rollback"));
         }
 
         [Test]
@@ -321,18 +317,18 @@ namespace Audit.EntityFramework.Core.UnitTest
                 User = new DbTransactionInterceptContext_InheritingFromAuditDbContext.User() { Id = uid, UserName = "test" }
             });
             ((IAuditBypass)dbContext).SaveChangesBypassAudit();
-            
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[0].TransactionEvent.TransactionId}", inserted[0].EventType);
-            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[1].TransactionEvent.TransactionId}", inserted[1].EventType);
-            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
-            Assert.IsTrue(inserted[1].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[1].CustomFields["customField"].ToString());
-            Assert.AreEqual(2, dbContext.ScopeCreatedTransactions.Count);
-            Assert.AreEqual(2, dbContext.ScopeSavingTransactions.Count);
-            Assert.AreEqual(2, dbContext.ScopeSavedTransactions.Count);
+
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[0].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[1].EventType, Is.EqualTo($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[1].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[0].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[0].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(inserted[1].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[1].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(dbContext.ScopeCreatedTransactions.Count, Is.EqualTo(2));
+            Assert.That(dbContext.ScopeSavingTransactions.Count, Is.EqualTo(2));
+            Assert.That(dbContext.ScopeSavedTransactions.Count, Is.EqualTo(2));
             dbContext.Dispose();
         }
 
@@ -380,17 +376,17 @@ namespace Audit.EntityFramework.Core.UnitTest
             });
             await ((IAuditBypass)dbContext).SaveChangesBypassAuditAsync();
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[0].TransactionEvent.TransactionId}", inserted[0].EventType);
-            Assert.AreEqual($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[1].TransactionEvent.TransactionId}", inserted[1].EventType);
-            Assert.IsTrue(inserted[0].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[0].CustomFields["customField"].ToString());
-            Assert.IsTrue(inserted[1].CustomFields.ContainsKey("customField"));
-            Assert.AreEqual(id.ToString(), inserted[1].CustomFields["customField"].ToString());
-            Assert.AreEqual(2, dbContext.ScopeCreatedTransactions.Count);
-            Assert.AreEqual(2, dbContext.ScopeSavingTransactions.Count);
-            Assert.AreEqual(2, dbContext.ScopeSavedTransactions.Count);
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].EventType, Is.EqualTo($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[0].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[1].EventType, Is.EqualTo($"DbTransactionInterceptContext_InheritingFromAuditDbContext | DbTransactionIntercept | {inserted[1].TransactionEvent.TransactionId}"));
+            Assert.That(inserted[0].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[0].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(inserted[1].CustomFields.ContainsKey("customField"), Is.True);
+            Assert.That(inserted[1].CustomFields["customField"].ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(dbContext.ScopeCreatedTransactions.Count, Is.EqualTo(2));
+            Assert.That(dbContext.ScopeSavingTransactions.Count, Is.EqualTo(2));
+            Assert.That(dbContext.ScopeSavedTransactions.Count, Is.EqualTo(2));
             await dbContext.DisposeAsync();
         }
 

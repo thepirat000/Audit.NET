@@ -50,8 +50,8 @@ namespace Audit.RavenDB.UnitTest
             var ev = rdb.GetEvent<AuditEvent>(id);
 
             // Assert
-            Assert.IsNotNull(ev);
-            Assert.AreEqual("SysTxtJson", ev.EventType);
+            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev.EventType, Is.EqualTo("SysTxtJson"));
         }
 
 
@@ -87,12 +87,12 @@ namespace Audit.RavenDB.UnitTest
             var ev = rdb.GetEvent<AuditEvent>(id);
 
             // Assert
-            Assert.IsNotNull(ev);
-            Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
+            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev.CustomFields["field"].ToString(), Is.EqualTo("field value"));
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?["prop"]?.ToString());
-            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
-            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
+            Assert.That((ev.Target.Old as DailyTemperature)?.LowTemp, Is.EqualTo(20));
+            Assert.That((ev.Target.New as DailyTemperature)?.LowTemp, Is.EqualTo(21));
         }
 
         [Test]
@@ -129,10 +129,10 @@ namespace Audit.RavenDB.UnitTest
             var ev = rdb.GetEvent<AuditEvent>(id);
 
             // Assert
-            Assert.IsNotNull(ev);
+            Assert.That(ev, Is.Not.Null);
 
             // CustomFields will not be property deserialized when using newtonsoft.json with the default RavenContractResolver (.NET < 5.0) 
-            Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
+            Assert.That(ev.CustomFields["field"].ToString(), Is.EqualTo("field value"));
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?.subField?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?.prop.ToString());
         }
@@ -171,11 +171,11 @@ namespace Audit.RavenDB.UnitTest
             var ev = rdb.GetEvent<AuditEvent>(id);
 
             // Assert
-            Assert.IsNotNull(ev);
-            Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
-            Assert.AreEqual("sub-field value", (ev.CustomFields["doc"] as JToken)?["subField"]?.ToString());
-            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
-            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
+            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev.CustomFields["field"].ToString(), Is.EqualTo("field value"));
+            Assert.That((ev.CustomFields["doc"] as JToken)?["subField"]?.ToString(), Is.EqualTo("sub-field value"));
+            Assert.That((ev.Target.Old as DailyTemperature)?.LowTemp, Is.EqualTo(20));
+            Assert.That((ev.Target.New as DailyTemperature)?.LowTemp, Is.EqualTo(21));
         }
 
         [Test]
@@ -214,12 +214,12 @@ namespace Audit.RavenDB.UnitTest
             var ev = rdb.GetEvent<AuditEvent>(id);
 
             // Assert
-            Assert.IsNotNull(ev);
-            Assert.AreEqual("field value", ev.CustomFields["field"].ToString());
+            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev.CustomFields["field"].ToString(), Is.EqualTo("field value"));
             Assert.AreEqual("sub-field value", ((dynamic)ev.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("test", ((dynamic)ev.Environment.CustomFields["extra"])?["prop"]?.ToString());
-            Assert.AreEqual(20, (ev.Target.Old as DailyTemperature)?.LowTemp);
-            Assert.AreEqual(21, (ev.Target.New as DailyTemperature)?.LowTemp);
+            Assert.That((ev.Target.Old as DailyTemperature)?.LowTemp, Is.EqualTo(20));
+            Assert.That((ev.Target.New as DailyTemperature)?.LowTemp, Is.EqualTo(21));
         }
 
         [Test]
@@ -260,19 +260,19 @@ namespace Audit.RavenDB.UnitTest
             var ev2 = rdb.GetEvent<AuditEvent>(id2);
 
             // Assert
-            Assert.IsNotNull(ev1);
-            Assert.IsNotNull(ev2);
-            Assert.AreEqual("field value", ev1.CustomFields["field"].ToString());
-            Assert.AreEqual("field value", ev2.CustomFields["field"].ToString());
+            Assert.That(ev1, Is.Not.Null);
+            Assert.That(ev2, Is.Not.Null);
+            Assert.That(ev1.CustomFields["field"].ToString(), Is.EqualTo("field value"));
+            Assert.That(ev2.CustomFields["field"].ToString(), Is.EqualTo("field value"));
             Assert.IsFalse(ev1.Environment.CustomFields.ContainsKey("extra"));
-            Assert.IsTrue(ev2.Environment.CustomFields.ContainsKey("extra"));
+            Assert.That(ev2.Environment.CustomFields.ContainsKey("extra"), Is.True);
             Assert.AreEqual("sub-field value", ((dynamic)ev1.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("sub-field value", ((dynamic)ev2.CustomFields["doc"])?["subField"]?.ToString());
             Assert.AreEqual("test", ((dynamic)ev2.Environment.CustomFields["extra"])?["prop"]?.ToString());
-            Assert.AreEqual(20, (ev1.Target.Old as DailyTemperature)?.LowTemp);
-            Assert.IsNull(ev1.Target.New);
-            Assert.AreEqual(20, (ev2.Target.Old as DailyTemperature)?.LowTemp);
-            Assert.AreEqual(21, (ev2.Target.New as DailyTemperature)?.LowTemp);
+            Assert.That((ev1.Target.Old as DailyTemperature)?.LowTemp, Is.EqualTo(20));
+            Assert.That(ev1.Target.New, Is.Null);
+            Assert.That((ev2.Target.Old as DailyTemperature)?.LowTemp, Is.EqualTo(20));
+            Assert.That((ev2.Target.New as DailyTemperature)?.LowTemp, Is.EqualTo(21));
         }
 
 

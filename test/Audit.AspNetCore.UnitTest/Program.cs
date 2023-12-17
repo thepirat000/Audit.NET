@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Audit.Integration.AspNetCore
+namespace Audit.AspNetCore.UnitTest
 {
     public class Program
     {

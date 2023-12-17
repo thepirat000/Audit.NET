@@ -23,9 +23,9 @@ namespace Audit.Kafka.UnitTest
                 .Partition(0)
                 .KeySelector(ev => "key"));
 
-            Assert.AreEqual("audit-topic", x.TopicSelector.Invoke(null));
-            Assert.AreEqual(0, x.PartitionSelector.Invoke(null));
-            Assert.AreEqual("key", x.KeySelector.Invoke(null));
+            Assert.That(x.TopicSelector.Invoke(null), Is.EqualTo("audit-topic"));
+            Assert.That(x.PartitionSelector.Invoke(null), Is.EqualTo(0));
+            Assert.That(x.KeySelector.Invoke(null), Is.EqualTo("key"));
         }
 
         
@@ -75,8 +75,8 @@ namespace Audit.Kafka.UnitTest
             var waiterCount = new Task(() => { while (true) { lock(locker) if (reports.Count >= count) break; }; });
             await Task.WhenAny(new Task[] { waiterTime, waiterCount });
 
-            Assert.AreEqual(count, reports.Count);
-            Assert.IsTrue(reports.All(r => r.Status == PersistenceStatus.Persisted));
+            Assert.That(reports.Count, Is.EqualTo(count));
+            Assert.That(reports.All(r => r.Status == PersistenceStatus.Persisted), Is.True);
         }
 
 
@@ -108,9 +108,9 @@ namespace Audit.Kafka.UnitTest
             scope.Event.CustomFields["custom_field"] = "UPDATED:" + guid;
             await scope.DisposeAsync();
 
-            Assert.AreEqual(2, reports.Count);
-            Assert.AreEqual(PersistenceStatus.Persisted, reports[0].Status);
-            Assert.AreEqual(PersistenceStatus.Persisted, reports[1].Status);
+            Assert.That(reports.Count, Is.EqualTo(2));
+            Assert.That(reports[0].Status, Is.EqualTo(PersistenceStatus.Persisted));
+            Assert.That(reports[1].Status, Is.EqualTo(PersistenceStatus.Persisted));
 
             var cv = new ConsumerBuilder<Null, AuditEvent>(new ConsumerConfig()
             {
@@ -126,10 +126,10 @@ namespace Audit.Kafka.UnitTest
             cv.Seek(new TopicPartitionOffset(topic, reports[1].Partition, reports[1].Offset));
             var r2 = cv.Consume(1000);
 
-            Assert.IsNotNull(r1);
-            Assert.IsNotNull(r2);
-            Assert.AreEqual(guid.ToString(), r1.Message.Value.CustomFields["custom_field"].ToString());
-            Assert.AreEqual("UPDATED:" + guid, r2.Message.Value.CustomFields["custom_field"].ToString());
+            Assert.That(r1, Is.Not.Null);
+            Assert.That(r2, Is.Not.Null);
+            Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo(guid.ToString()));
+            Assert.That(r2.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
         }
 
         [Test]
@@ -162,9 +162,9 @@ namespace Audit.Kafka.UnitTest
             scope.Event.CustomFields["custom_field"] = "UPDATED:" + guid;
             scope.Dispose();
 
-            Assert.AreEqual(2, reports.Count);
-            Assert.AreEqual(PersistenceStatus.Persisted, reports[0].Status);
-            Assert.AreEqual(PersistenceStatus.Persisted, reports[1].Status);
+            Assert.That(reports.Count, Is.EqualTo(2));
+            Assert.That(reports[0].Status, Is.EqualTo(PersistenceStatus.Persisted));
+            Assert.That(reports[1].Status, Is.EqualTo(PersistenceStatus.Persisted));
 
             var cv = new ConsumerBuilder<Null, AuditEvent>(new ConsumerConfig()
             {
@@ -180,11 +180,11 @@ namespace Audit.Kafka.UnitTest
             var r1 = cv.Consume(1000);
             cv.Seek(new TopicPartitionOffset(topic, reports[0].Partition, reports[1].Offset));
             var r2 = cv.Consume(1000);
-            
-            Assert.IsNotNull(r1);
-            Assert.IsNotNull(r2);
-            Assert.AreEqual(guid.ToString(), r1.Message.Value.CustomFields["custom_field"].ToString());
-            Assert.AreEqual("UPDATED:" + guid, r2.Message.Value.CustomFields["custom_field"].ToString());
+
+            Assert.That(r1, Is.Not.Null);
+            Assert.That(r2, Is.Not.Null);
+            Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo(guid.ToString()));
+            Assert.That(r2.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
         }
 
         [Test]
@@ -216,8 +216,8 @@ namespace Audit.Kafka.UnitTest
             scope.Event.CustomFields["custom_field"] = "UPDATED:" + guid;
             scope.Dispose();
 
-            Assert.AreEqual(1, reports.Count);
-            Assert.AreEqual(PersistenceStatus.Persisted, reports[0].Status);
+            Assert.That(reports.Count, Is.EqualTo(1));
+            Assert.That(reports[0].Status, Is.EqualTo(PersistenceStatus.Persisted));
 
             var cv = new ConsumerBuilder<string, AuditEvent>(new ConsumerConfig()
             {
@@ -231,9 +231,9 @@ namespace Audit.Kafka.UnitTest
             cv.Seek(new TopicPartitionOffset(topic, reports[0].Partition, reports[0].Offset));
             var r1 = cv.Consume(1000);
 
-            Assert.IsNotNull(r1);
-            Assert.AreEqual("UPDATED:" + guid, r1.Message.Value.CustomFields["custom_field"].ToString());
-            Assert.AreEqual("key1", r1.Message.Key);
+            Assert.That(r1, Is.Not.Null);
+            Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
+            Assert.That(r1.Message.Key, Is.EqualTo("key1"));
         }
 
         private async Task DeleteTopic(string host, string topic)

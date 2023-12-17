@@ -59,21 +59,21 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(2, list.Count);
+            Assert.That(list.Count, Is.EqualTo(2));
             var entries = list[0].EntityFrameworkEvent.Entries;
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Insert", entries[0].Action);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Action, Is.EqualTo("Insert"));
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual(title + "X", entries[0].ColumnValues["Title"]);
+            Assert.That(entries[0].ColumnValues["Title"], Is.EqualTo(title + "X"));
             entries = list[1].EntityFrameworkEvent.Entries;
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Update", entries[0].Action);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Action, Is.EqualTo("Update"));
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual("NewTitleX", entries[0].ColumnValues["Title"]);
-            Assert.AreEqual(1, entries[0].Changes.Count);
-            Assert.AreEqual("Title", entries[0].Changes[0].ColumnName);
-            Assert.AreEqual("NewTitleX", entries[0].Changes[0].NewValue);
-            Assert.AreEqual(title + "X", entries[0].Changes[0].OriginalValue);
+            Assert.That(entries[0].ColumnValues["Title"], Is.EqualTo("NewTitleX"));
+            Assert.That(entries[0].Changes.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Changes[0].ColumnName, Is.EqualTo("Title"));
+            Assert.That(entries[0].Changes[0].NewValue, Is.EqualTo("NewTitleX"));
+            Assert.That(entries[0].Changes[0].OriginalValue, Is.EqualTo(title + "X"));
         }
 
         [Test]
@@ -109,8 +109,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -148,8 +148,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -186,8 +186,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -224,8 +224,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -261,8 +261,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -298,8 +298,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -334,8 +334,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -371,8 +371,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -409,8 +409,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -446,8 +446,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -482,8 +482,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -518,8 +518,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -554,8 +554,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -591,8 +591,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -626,8 +626,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -662,8 +662,8 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             using (var ctx = new AuditPerTableContext())
             {
                 var order = await ctx.OrderAudit.AsQueryable().FirstOrDefaultAsync(o => o.Number == id);
-                Assert.IsNotNull(order);
-                Assert.AreEqual("FromAction", order.Status);
+                Assert.That(order, Is.Not.Null);
+                Assert.That(order.Status, Is.EqualTo("FromAction"));
             }
         }
 
@@ -697,12 +697,12 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 ctx.SaveChanges();
             }
 
-             Assert.AreEqual(1, list.Count);
+            Assert.That(list.Count, Is.EqualTo(1));
             var entries = list[0].EntityFrameworkEvent.Entries;
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Insert", entries[0].Action);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Action, Is.EqualTo("Insert"));
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual(title, entries[0].ColumnValues["Title"]);
+            Assert.That(entries[0].ColumnValues["Title"], Is.EqualTo(title));
         }
 
         [Test]
@@ -743,21 +743,21 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(2, list.Count);
+            Assert.That(list.Count, Is.EqualTo(2));
             var entries = list[0].EntityFrameworkEvent.Entries;
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Insert", entries[0].Action);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Action, Is.EqualTo("Insert"));
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual(null, entries[0].ColumnValues["Title"]);
+            Assert.That(entries[0].ColumnValues["Title"], Is.EqualTo(null));
             entries = list[1].EntityFrameworkEvent.Entries;
-            Assert.AreEqual(1, entries.Count);
-            Assert.AreEqual("Update", entries[0].Action);
+            Assert.That(entries.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Action, Is.EqualTo("Update"));
             Assert.IsFalse(entries[0].ColumnValues.ContainsKey("BloggerName"));
-            Assert.AreEqual(null, entries[0].ColumnValues["Title"]);
-            Assert.AreEqual(1, entries[0].Changes.Count);
-            Assert.AreEqual("Title", entries[0].Changes[0].ColumnName);
-            Assert.AreEqual(null, entries[0].Changes[0].NewValue);
-            Assert.AreEqual(null, entries[0].Changes[0].OriginalValue);
+            Assert.That(entries[0].ColumnValues["Title"], Is.EqualTo(null));
+            Assert.That(entries[0].Changes.Count, Is.EqualTo(1));
+            Assert.That(entries[0].Changes[0].ColumnName, Is.EqualTo("Title"));
+            Assert.That(entries[0].Changes[0].NewValue, Is.EqualTo(null));
+            Assert.That(entries[0].Changes[0].OriginalValue, Is.EqualTo(null));
         }
 
 
@@ -792,16 +792,16 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, logs.Count);
-            Assert.AreEqual("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
-            Assert.AreEqual("Posts", logs[0].GetEntityFrameworkEvent().Entries[1].Table);
-            Assert.AreEqual((int)logs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"], (int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]);
-            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"] > 0);
-            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"] > 0);
-            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["Id"] > 0);
-            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[1].PrimaryKey["Id"] > 0);
-            Assert.IsTrue((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["BlogId"] > 0);
-            Assert.AreEqual((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["BlogId"], (int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"]);
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Blogs"));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[1].Table, Is.EqualTo("Posts"));
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"], Is.EqualTo((int)logs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"]));
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[0].ColumnValues["Id"] > 0, Is.True);
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"] > 0, Is.True);
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["Id"] > 0, Is.True);
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[1].PrimaryKey["Id"] > 0, Is.True);
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["BlogId"] > 0, Is.True);
+            Assert.That((int)logs[0].GetEntityFrameworkEvent().Entries[0].PrimaryKey["Id"], Is.EqualTo((int)logs[0].GetEntityFrameworkEvent().Entries[1].ColumnValues["BlogId"]));
 
         }
 
@@ -841,9 +841,9 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, logs.Count);
-            Assert.AreEqual(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
-            Assert.AreEqual("Posts", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Posts"));
 
             logs.Clear();
 
@@ -872,11 +872,11 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, logs.Count);
-            Assert.AreEqual(1, logs[0].GetEntityFrameworkEvent().Entries.Count);
-            Assert.AreEqual("Blogs", logs[0].GetEntityFrameworkEvent().Entries[0].Table);
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Blogs"));
 
-            Assert.IsTrue(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+            Assert.That(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name), Is.True);
         }
 
 
@@ -943,9 +943,9 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 Assert.Null(b);
             }
 
-            Assert.AreEqual(3, logs.Count);
+            Assert.That(logs.Count, Is.EqualTo(3));
 #if NET462
-            Assert.IsTrue(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name));
+            Assert.That(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name), Is.True);
 #endif
         }
 

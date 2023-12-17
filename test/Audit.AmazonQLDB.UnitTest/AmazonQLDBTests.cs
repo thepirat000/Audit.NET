@@ -48,12 +48,12 @@ namespace Audit.AmazonQLDB.UnitTest
                 sb += "-end";
             }
 
-            Assert.AreEqual(1, ins.Count);
-            Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("init", ins[0].Target.Old.ToString());
-            Assert.AreEqual(null, ins[0].Target.New);
-            Assert.AreEqual("init", repl[0].Target.Old.ToString());
-            Assert.AreEqual("init-end", repl[0].Target.New.ToString());
+            Assert.That(ins.Count, Is.EqualTo(1));
+            Assert.That(repl.Count, Is.EqualTo(1));
+            Assert.That(ins[0].Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(ins[0].Target.New, Is.EqualTo(null));
+            Assert.That(repl[0].Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(repl[0].Target.New.ToString(), Is.EqualTo("init-end"));
         }
     }
 

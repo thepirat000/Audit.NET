@@ -33,6 +33,12 @@ namespace Audit.HttpClientUnitTest
             Audit.Core.Configuration.Reset();
         }
 
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _httpClient.Dispose();
+        }
+
         private Action<IAuditClientHandlerConfigurator> config = _ => _
             .IncludeRequestBody()
             .IncludeRequestHeaders()
@@ -46,14 +52,14 @@ namespace Audit.HttpClientUnitTest
         public void Test_Handler_Constructor_Parameterless()
         {
             var handler = new AuditHttpClientHandler();
-            Assert.IsNotNull(handler.InnerHandler);
+            Assert.That(handler.InnerHandler, Is.Not.Null);
         }
 
         [Test]
         public void Test_Handler_Constructor_Config()
         {
             var handler = new AuditHttpClientHandler(_ => _.IncludeResponseBody());
-            Assert.IsNotNull(handler.InnerHandler);
+            Assert.That(handler.InnerHandler, Is.Not.Null);
         }
 
         [Test]
@@ -63,9 +69,9 @@ namespace Audit.HttpClientUnitTest
             inner.Properties["x"] = 123;
             var handler = new AuditHttpClientHandler(_ => _.IncludeResponseBody(), inner);
             var handlerNullInner = new AuditHttpClientHandler(_ => _.IncludeResponseBody(), null);
-            Assert.IsNotNull(handler.InnerHandler);
-            Assert.IsNull(handlerNullInner.InnerHandler);
-            Assert.AreEqual(123, (handler.InnerHandler as HttpClientHandler).Properties["x"]);
+            Assert.That(handler.InnerHandler, Is.Not.Null);
+            Assert.That(handlerNullInner.InnerHandler, Is.Null);
+            Assert.That((handler.InnerHandler as HttpClientHandler).Properties["x"], Is.EqualTo(123));
         }
 
         [Test]
@@ -91,33 +97,33 @@ namespace Audit.HttpClientUnitTest
                 await cli.SendAsync(requestMessage);
             }
 
-            Assert.AreEqual(2, actions.Count);
-            Assert.AreEqual(2, evs.Count);
+            Assert.That(actions.Count, Is.EqualTo(2));
+            Assert.That(evs.Count, Is.EqualTo(2));
 
-            Assert.AreEqual("test", evs[0].EventType);
-            Assert.AreEqual("POST", actions[0].Method);
-            Assert.IsNotNull(actions[0].Request);
-            Assert.IsNotNull(actions[0].Request.Content);
-            Assert.AreEqual("string content", actions[0].Request.Content.Body.ToString());
-            Assert.AreEqual("text/plain; charset=utf-8", actions[0].Request.Content.Headers["Content-Type"]);
-            Assert.AreEqual("http", actions[1].Request.Scheme);
-            Assert.AreEqual("test1, test2", actions[0].Request.Headers["pepe"]);
-            Assert.AreEqual("?some=querystring", actions[0].Request.QueryString);
-            Assert.AreEqual("/some/path", actions[0].Request.Path);
-            Assert.IsNull(actions[0].Response);
-            Assert.AreEqual(url, actions[0].Url);
+            Assert.That(evs[0].EventType, Is.EqualTo("test"));
+            Assert.That(actions[0].Method, Is.EqualTo("POST"));
+            Assert.That(actions[0].Request, Is.Not.Null);
+            Assert.That(actions[0].Request.Content, Is.Not.Null);
+            Assert.That(actions[0].Request.Content.Body.ToString(), Is.EqualTo("string content"));
+            Assert.That(actions[0].Request.Content.Headers["Content-Type"], Is.EqualTo("text/plain; charset=utf-8"));
+            Assert.That(actions[1].Request.Scheme, Is.EqualTo("http"));
+            Assert.That(actions[0].Request.Headers["pepe"], Is.EqualTo("test1, test2"));
+            Assert.That(actions[0].Request.QueryString, Is.EqualTo("?some=querystring"));
+            Assert.That(actions[0].Request.Path, Is.EqualTo("/some/path"));
+            Assert.That(actions[0].Response, Is.Null);
+            Assert.That(actions[0].Url, Is.EqualTo(url));
 
-            Assert.AreEqual("POST", actions[1].Method);
-            Assert.IsNotNull(actions[1].Request);
-            Assert.IsNotNull(actions[1].Response);
-            Assert.AreEqual(url, actions[1].Url);
-            Assert.IsTrue(actions[1].Response.Headers.Count > 0);
-            Assert.AreEqual(false, actions[1].Response.IsSuccess);
-            Assert.AreEqual(404, actions[1].Response.StatusCode);
-            Assert.AreEqual("Not Found", actions[1].Response.Reason);
-            Assert.AreEqual("NotFound", actions[1].Response.Status);
-            Assert.IsTrue(actions[1].Response.Content.Body.ToString().Length > 0);
-            Assert.IsTrue(actions[1].Response.Content.Headers.Count > 0);
+            Assert.That(actions[1].Method, Is.EqualTo("POST"));
+            Assert.That(actions[1].Request, Is.Not.Null);
+            Assert.That(actions[1].Response, Is.Not.Null);
+            Assert.That(actions[1].Url, Is.EqualTo(url));
+            Assert.That(actions[1].Response.Headers.Count > 0, Is.True);
+            Assert.That(actions[1].Response.IsSuccess, Is.EqualTo(false));
+            Assert.That(actions[1].Response.StatusCode, Is.EqualTo(404));
+            Assert.That(actions[1].Response.Reason, Is.EqualTo("Not Found"));
+            Assert.That(actions[1].Response.Status, Is.EqualTo("NotFound"));
+            Assert.That(actions[1].Response.Content.Body.ToString().Length > 0, Is.True);
+            Assert.That(actions[1].Response.Content.Headers.Count > 0, Is.True);
         }
 
         [Test]
@@ -141,26 +147,26 @@ namespace Audit.HttpClientUnitTest
                 await cli.SendAsync(requestMessage);
             }
 
-            Assert.AreEqual(1, actions.Count);
+            Assert.That(actions.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("POST", actions[0].Method);
-            Assert.IsNotNull(actions[0].Request);
-            Assert.IsNotNull(actions[0].Request.Content);
-            Assert.AreEqual("string content", actions[0].Request.Content.Body.ToString());
-            Assert.AreEqual("text/plain; charset=utf-8", actions[0].Request.Content.Headers["Content-Type"]);
-            Assert.AreEqual("http", actions[0].Request.Scheme);
-            Assert.AreEqual("test1, test2", actions[0].Request.Headers["pepe"]);
-            Assert.AreEqual("?some=querystring", actions[0].Request.QueryString);
-            Assert.AreEqual("/some/path", actions[0].Request.Path);
-            Assert.IsNotNull(actions[0].Response);
-            Assert.AreEqual(url, actions[0].Url);
-            Assert.IsTrue(actions[0].Response.Headers.Count > 0);
-            Assert.AreEqual(false, actions[0].Response.IsSuccess);
-            Assert.AreEqual(404, actions[0].Response.StatusCode);
-            Assert.AreEqual("Not Found", actions[0].Response.Reason);
-            Assert.AreEqual("NotFound", actions[0].Response.Status);
-            Assert.IsTrue(actions[0].Response.Content.Body.ToString().Length > 0);
-            Assert.IsTrue(actions[0].Response.Content.Headers.Count > 0);
+            Assert.That(actions[0].Method, Is.EqualTo("POST"));
+            Assert.That(actions[0].Request, Is.Not.Null);
+            Assert.That(actions[0].Request.Content, Is.Not.Null);
+            Assert.That(actions[0].Request.Content.Body.ToString(), Is.EqualTo("string content"));
+            Assert.That(actions[0].Request.Content.Headers["Content-Type"], Is.EqualTo("text/plain; charset=utf-8"));
+            Assert.That(actions[0].Request.Scheme, Is.EqualTo("http"));
+            Assert.That(actions[0].Request.Headers["pepe"], Is.EqualTo("test1, test2"));
+            Assert.That(actions[0].Request.QueryString, Is.EqualTo("?some=querystring"));
+            Assert.That(actions[0].Request.Path, Is.EqualTo("/some/path"));
+            Assert.That(actions[0].Response, Is.Not.Null);
+            Assert.That(actions[0].Url, Is.EqualTo(url));
+            Assert.That(actions[0].Response.Headers.Count > 0, Is.True);
+            Assert.That(actions[0].Response.IsSuccess, Is.EqualTo(false));
+            Assert.That(actions[0].Response.StatusCode, Is.EqualTo(404));
+            Assert.That(actions[0].Response.Reason, Is.EqualTo("Not Found"));
+            Assert.That(actions[0].Response.Status, Is.EqualTo("NotFound"));
+            Assert.That(actions[0].Response.Content.Body.ToString().Length > 0, Is.True);
+            Assert.That(actions[0].Response.Content.Headers.Count > 0, Is.True);
         }
 
         [Test]
@@ -184,26 +190,26 @@ namespace Audit.HttpClientUnitTest
                 await cli.SendAsync(requestMessage);
             }
 
-            Assert.AreEqual(1, actions.Count);
+            Assert.That(actions.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("POST", actions[0].Method);
-            Assert.IsNotNull(actions[0].Request);
-            Assert.IsNotNull(actions[0].Request.Content);
-            Assert.AreEqual("string content", actions[0].Request.Content.Body.ToString());
-            Assert.AreEqual("text/plain; charset=utf-8", actions[0].Request.Content.Headers["Content-Type"]);
-            Assert.AreEqual("http", actions[0].Request.Scheme);
-            Assert.AreEqual("test1, test2", actions[0].Request.Headers["pepe"]);
-            Assert.AreEqual("?some=querystring", actions[0].Request.QueryString);
-            Assert.AreEqual("/some/path", actions[0].Request.Path);
-            Assert.IsNotNull(actions[0].Response);
-            Assert.AreEqual(url, actions[0].Url);
-            Assert.IsTrue(actions[0].Response.Headers.Count > 0);
-            Assert.AreEqual(false, actions[0].Response.IsSuccess);
-            Assert.AreEqual(404, actions[0].Response.StatusCode);
-            Assert.AreEqual("Not Found", actions[0].Response.Reason);
-            Assert.AreEqual("NotFound", actions[0].Response.Status);
-            Assert.IsTrue(actions[0].Response.Content.Body.ToString().Length > 0);
-            Assert.IsTrue(actions[0].Response.Content.Headers.Count > 0);
+            Assert.That(actions[0].Method, Is.EqualTo("POST"));
+            Assert.That(actions[0].Request, Is.Not.Null);
+            Assert.That(actions[0].Request.Content, Is.Not.Null);
+            Assert.That(actions[0].Request.Content.Body.ToString(), Is.EqualTo("string content"));
+            Assert.That(actions[0].Request.Content.Headers["Content-Type"], Is.EqualTo("text/plain; charset=utf-8"));
+            Assert.That(actions[0].Request.Scheme, Is.EqualTo("http"));
+            Assert.That(actions[0].Request.Headers["pepe"], Is.EqualTo("test1, test2"));
+            Assert.That(actions[0].Request.QueryString, Is.EqualTo("?some=querystring"));
+            Assert.That(actions[0].Request.Path, Is.EqualTo("/some/path"));
+            Assert.That(actions[0].Response, Is.Not.Null);
+            Assert.That(actions[0].Url, Is.EqualTo(url));
+            Assert.That(actions[0].Response.Headers.Count > 0, Is.True);
+            Assert.That(actions[0].Response.IsSuccess, Is.EqualTo(false));
+            Assert.That(actions[0].Response.StatusCode, Is.EqualTo(404));
+            Assert.That(actions[0].Response.Reason, Is.EqualTo("Not Found"));
+            Assert.That(actions[0].Response.Status, Is.EqualTo("NotFound"));
+            Assert.That(actions[0].Response.Content.Body.ToString().Length > 0, Is.True);
+            Assert.That(actions[0].Response.Content.Headers.Count > 0, Is.True);
         }
 
 
@@ -222,25 +228,25 @@ namespace Audit.HttpClientUnitTest
             var url = "http://google.com/some/path?some=querystring";
             await cli.PutAsync(url, new StringContent("string content", Encoding.UTF8));
 
-            Assert.AreEqual(1, actions.Count);
+            Assert.That(actions.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("PUT", actions[0].Method);
-            Assert.IsNotNull(actions[0].Request);
-            Assert.IsNotNull(actions[0].Request.Content);
-            Assert.AreEqual("string content", actions[0].Request.Content.Body.ToString());
-            Assert.AreEqual("text/plain; charset=utf-8", actions[0].Request.Content.Headers["Content-Type"]);
-            Assert.AreEqual("http", actions[0].Request.Scheme);
-            Assert.AreEqual("?some=querystring", actions[0].Request.QueryString);
-            Assert.AreEqual("/some/path", actions[0].Request.Path);
-            Assert.IsNotNull(actions[0].Response);
-            Assert.AreEqual(url, actions[0].Url);
-            Assert.IsTrue(actions[0].Response.Headers.Count > 0);
-            Assert.AreEqual(false, actions[0].Response.IsSuccess);
-            Assert.AreEqual(404, actions[0].Response.StatusCode);
-            Assert.AreEqual("Not Found", actions[0].Response.Reason);
-            Assert.AreEqual("NotFound", actions[0].Response.Status);
-            Assert.IsTrue(actions[0].Response.Content.Body.ToString().Length > 0);
-            Assert.IsTrue(actions[0].Response.Content.Headers.Count > 0);
+            Assert.That(actions[0].Method, Is.EqualTo("PUT"));
+            Assert.That(actions[0].Request, Is.Not.Null);
+            Assert.That(actions[0].Request.Content, Is.Not.Null);
+            Assert.That(actions[0].Request.Content.Body.ToString(), Is.EqualTo("string content"));
+            Assert.That(actions[0].Request.Content.Headers["Content-Type"], Is.EqualTo("text/plain; charset=utf-8"));
+            Assert.That(actions[0].Request.Scheme, Is.EqualTo("http"));
+            Assert.That(actions[0].Request.QueryString, Is.EqualTo("?some=querystring"));
+            Assert.That(actions[0].Request.Path, Is.EqualTo("/some/path"));
+            Assert.That(actions[0].Response, Is.Not.Null);
+            Assert.That(actions[0].Url, Is.EqualTo(url));
+            Assert.That(actions[0].Response.Headers.Count > 0, Is.True);
+            Assert.That(actions[0].Response.IsSuccess, Is.EqualTo(false));
+            Assert.That(actions[0].Response.StatusCode, Is.EqualTo(404));
+            Assert.That(actions[0].Response.Reason, Is.EqualTo("Not Found"));
+            Assert.That(actions[0].Response.Status, Is.EqualTo("NotFound"));
+            Assert.That(actions[0].Response.Content.Body.ToString().Length > 0, Is.True);
+            Assert.That(actions[0].Response.Content.Headers.Count > 0, Is.True);
         }
 
         [Test]
@@ -270,26 +276,26 @@ namespace Audit.HttpClientUnitTest
                 await cli.GetAsync(url);
             }
 
-            Assert.AreEqual(1, actions.Count, "a");
-            Assert.AreEqual(1, evs.Count, "b");
+            Assert.That(actions.Count, Is.EqualTo(1), "a");
+            Assert.That(evs.Count, Is.EqualTo(1), "b");
 
-            Assert.AreEqual("GET", actions[0].Method);
-            Assert.AreEqual($"GET.{url}", evs[0].EventType);
-            Assert.IsNotNull(actions[0].Request);
-            Assert.IsNull(actions[0].Request.Content?.Body);
-            Assert.IsNull(actions[0].Request.Content?.Headers);
-            Assert.AreEqual("http", actions[0].Request.Scheme);
-            Assert.AreEqual("?q=testGet", actions[0].Request.QueryString);
-            Assert.AreEqual("/", actions[0].Request.Path);
-            Assert.IsNotNull(actions[0].Response);
-            Assert.AreEqual(url, actions[0].Url);
-            Assert.IsTrue(actions[0].Response.Headers.Count > 0);
-            Assert.AreEqual(true, actions[0].Response.IsSuccess);
-            Assert.AreEqual(200, actions[0].Response.StatusCode);
-            Assert.AreEqual("OK", actions[0].Response.Reason);
-            Assert.AreEqual("OK", actions[0].Response.Status);
-            Assert.IsTrue(actions[0].Response.Content.Body.ToString().Length > 10);
-            Assert.IsTrue(actions[0].Response.Content.Headers.Count > 0);
+            Assert.That(actions[0].Method, Is.EqualTo("GET"));
+            Assert.That(evs[0].EventType, Is.EqualTo($"GET.{url}"));
+            Assert.That(actions[0].Request, Is.Not.Null);
+            Assert.That(actions[0].Request.Content?.Body, Is.Null);
+            Assert.That(actions[0].Request.Content?.Headers, Is.Null);
+            Assert.That(actions[0].Request.Scheme, Is.EqualTo("http"));
+            Assert.That(actions[0].Request.QueryString, Is.EqualTo("?q=testGet"));
+            Assert.That(actions[0].Request.Path, Is.EqualTo("/"));
+            Assert.That(actions[0].Response, Is.Not.Null);
+            Assert.That(actions[0].Url, Is.EqualTo(url));
+            Assert.That(actions[0].Response.Headers.Count > 0, Is.True);
+            Assert.That(actions[0].Response.IsSuccess, Is.EqualTo(true));
+            Assert.That(actions[0].Response.StatusCode, Is.EqualTo(200));
+            Assert.That(actions[0].Response.Reason, Is.EqualTo("OK"));
+            Assert.That(actions[0].Response.Status, Is.EqualTo("OK"));
+            Assert.That(actions[0].Response.Content.Body.ToString().Length > 10, Is.True);
+            Assert.That(actions[0].Response.Content.Headers.Count > 0, Is.True);
         }
 
         [Test]
@@ -312,25 +318,23 @@ namespace Audit.HttpClientUnitTest
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is HttpRequestException);
+                Assert.That(ex is HttpRequestException, Is.True);
             }
 
-            Assert.AreEqual(1, actions.Count);
+            Assert.That(actions.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("POST", actions[0].Method);
-            Assert.IsTrue(actions[0].Exception.Contains("HttpRequestException"));
-#if !NETCOREAPP1_0
-            Assert.IsTrue(evs[0].Environment.Exception.Length > 0);
-#endif
-            Assert.IsNotNull(actions[0].Request);
-            Assert.IsNotNull(actions[0].Request.Content);
-            Assert.AreEqual("string content", actions[0].Request.Content.Body.ToString());
-            Assert.AreEqual("text/plain; charset=utf-8", actions[0].Request.Content.Headers["Content-Type"]);
-            Assert.AreEqual("http", actions[0].Request.Scheme);
-            Assert.AreEqual("?some=querystring", actions[0].Request.QueryString);
-            Assert.AreEqual("/some/path", actions[0].Request.Path);
-            Assert.AreEqual(url, actions[0].Url);
-            Assert.IsNull(actions[0].Response);
+            Assert.That(actions[0].Method, Is.EqualTo("POST"));
+            Assert.That(actions[0].Exception.Contains("HttpRequestException"), Is.True);
+            Assert.That(evs[0].Environment.Exception.Length > 0, Is.True);
+            Assert.That(actions[0].Request, Is.Not.Null);
+            Assert.That(actions[0].Request.Content, Is.Not.Null);
+            Assert.That(actions[0].Request.Content.Body.ToString(), Is.EqualTo("string content"));
+            Assert.That(actions[0].Request.Content.Headers["Content-Type"], Is.EqualTo("text/plain; charset=utf-8"));
+            Assert.That(actions[0].Request.Scheme, Is.EqualTo("http"));
+            Assert.That(actions[0].Request.QueryString, Is.EqualTo("?some=querystring"));
+            Assert.That(actions[0].Request.Path, Is.EqualTo("/some/path"));
+            Assert.That(actions[0].Url, Is.EqualTo(url));
+            Assert.That(actions[0].Response, Is.Null);
         }
 
         [Test]
@@ -357,12 +361,12 @@ namespace Audit.HttpClientUnitTest
             await cli.PostAsync(url, new StringContent("string content", Encoding.UTF8));
             await cli.GetAsync(url);
 
-            Assert.AreEqual(1, actions.Count);
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(actions.Count, Is.EqualTo(1));
+            Assert.That(evs.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("GET", actions[0].Method);
-            Assert.AreEqual(url, evs[0].EventType);
-            Assert.IsNotNull(actions[0].Response);
+            Assert.That(actions[0].Method, Is.EqualTo("GET"));
+            Assert.That(evs[0].EventType, Is.EqualTo(url));
+            Assert.That(actions[0].Response, Is.Not.Null);
         }
 
         [Test]
@@ -389,12 +393,12 @@ namespace Audit.HttpClientUnitTest
             await cli.PostAsync(url, new StringContent("string content", Encoding.UTF8));
             await cli.GetAsync(url);
 
-            Assert.AreEqual(1, actions.Count);
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(actions.Count, Is.EqualTo(1));
+            Assert.That(evs.Count, Is.EqualTo(1));
 
-            Assert.AreEqual("GET", actions[0].Method);
-            Assert.AreEqual("OK", actions[0].Response.Status);
-            Assert.IsNotNull(actions[0].Response);
+            Assert.That(actions[0].Method, Is.EqualTo("GET"));
+            Assert.That(actions[0].Response.Status, Is.EqualTo("OK"));
+            Assert.That(actions[0].Response, Is.Not.Null);
         }
 
         [Test]
@@ -416,7 +420,7 @@ namespace Audit.HttpClientUnitTest
                 await cli.GetAsync(url);
             }
 
-            Assert.AreEqual(0, actions.Count);
+            Assert.That(actions.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -441,9 +445,9 @@ namespace Audit.HttpClientUnitTest
                 await cli.GetAsync(url);
             }
 
-            Assert.AreEqual(1, actions.Count);
-            Assert.AreEqual(url, actions[0].Url);
-            Assert.AreEqual("GET", actions[0].Method);
+            Assert.That(actions.Count, Is.EqualTo(1));
+            Assert.That(actions[0].Url, Is.EqualTo(url));
+            Assert.That(actions[0].Method, Is.EqualTo("GET"));
         }
     }
 }

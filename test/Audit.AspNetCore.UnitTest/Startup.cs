@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 
-namespace Audit.Integration.AspNetCore
+namespace Audit.AspNetCore.UnitTest
 {
     public class Startup
     {

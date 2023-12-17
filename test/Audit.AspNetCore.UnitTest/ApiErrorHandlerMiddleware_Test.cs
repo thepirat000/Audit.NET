@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace Audit.Integration.AspNetCore
+namespace Audit.AspNetCore.UnitTest
 {
     public class ApiErrorHandlerMiddleware_Test
     {

@@ -22,13 +22,13 @@ namespace Audit.EntityFramework.Core.UnitTest
             var ctx = new MyContext();
             var ctx2 = new AnotherContext();
 
-            Assert.AreEqual("FromAttr", ctx.AuditEventType);
-            Assert.AreEqual(true, ctx.IncludeEntityObjects);
-            Assert.AreEqual(true, ctx.ExcludeValidationResults);
-            Assert.AreEqual(AuditOptionMode.OptIn, ctx.Mode);
+            Assert.That(ctx.AuditEventType, Is.EqualTo("FromAttr"));
+            Assert.That(ctx.IncludeEntityObjects, Is.EqualTo(true));
+            Assert.That(ctx.ExcludeValidationResults, Is.EqualTo(true));
+            Assert.That(ctx.Mode, Is.EqualTo(AuditOptionMode.OptIn));
 
-            Assert.AreEqual("ForAnyContext", ctx2.AuditEventType);
-            Assert.AreEqual(AuditOptionMode.OptOut, ctx2.Mode);
+            Assert.That(ctx2.AuditEventType, Is.EqualTo("ForAnyContext"));
+            Assert.That(ctx2.Mode, Is.EqualTo(AuditOptionMode.OptOut));
         }
 
 
@@ -66,25 +66,25 @@ namespace Audit.EntityFramework.Core.UnitTest
             var mustbenull1 = helper.MergeEntitySettings(null, null, null);
             var mustbenull2 = helper.MergeEntitySettings(null, new Dictionary<Type, EfEntitySettings>(), null);
             var mustbenull3 = helper.MergeEntitySettings(new Dictionary<Type, EfEntitySettings>(), new Dictionary<Type, EfEntitySettings>(), new Dictionary<Type, EfEntitySettings>());
-            Assert.AreEqual(2, merged.Count);
-            Assert.IsNull(mustbenull1);
-            Assert.IsNull(mustbenull2);
-            Assert.IsNull(mustbenull3);
+            Assert.That(merged.Count, Is.EqualTo(2));
+            Assert.That(mustbenull1, Is.Null);
+            Assert.That(mustbenull2, Is.Null);
+            Assert.That(mustbenull3, Is.Null);
             var merge = merged[typeof(string)];
-            Assert.AreEqual(3, merge.IgnoredProperties.Count);
-            Assert.IsTrue(merge.IgnoredProperties.Contains("I1"));
-            Assert.IsTrue(merge.IgnoredProperties.Contains("I2"));
-            Assert.IsTrue(merge.IgnoredProperties.Contains("I3"));
-            Assert.AreEqual(4, merge.OverrideProperties.Count);
-            Assert.AreEqual(1, merge.OverrideProperties["C1"].Invoke(null));
-            Assert.AreEqual("ATTR", merge.OverrideProperties["C2"].Invoke(null));
-            Assert.AreEqual(now, merge.OverrideProperties["C3"].Invoke(null));
-            Assert.AreEqual(null, merge.OverrideProperties["C4"].Invoke(null));
+            Assert.That(merge.IgnoredProperties.Count, Is.EqualTo(3));
+            Assert.That(merge.IgnoredProperties.Contains("I1"), Is.True);
+            Assert.That(merge.IgnoredProperties.Contains("I2"), Is.True);
+            Assert.That(merge.IgnoredProperties.Contains("I3"), Is.True);
+            Assert.That(merge.OverrideProperties.Count, Is.EqualTo(4));
+            Assert.That(merge.OverrideProperties["C1"].Invoke(null), Is.EqualTo(1));
+            Assert.That(merge.OverrideProperties["C2"].Invoke(null), Is.EqualTo("ATTR"));
+            Assert.That(merge.OverrideProperties["C3"].Invoke(null), Is.EqualTo(now));
+            Assert.That(merge.OverrideProperties["C4"].Invoke(null), Is.EqualTo(null));
             merge = merged[typeof(int)];
-            Assert.AreEqual(1, merge.IgnoredProperties.Count);
-            Assert.IsTrue(merge.IgnoredProperties.Contains("I3"));
-            Assert.AreEqual("INT", merge.OverrideProperties["C2"].Invoke(null));
-            Assert.AreEqual(null, merge.OverrideProperties["C4"].Invoke(null));
+            Assert.That(merge.IgnoredProperties.Count, Is.EqualTo(1));
+            Assert.That(merge.IgnoredProperties.Contains("I3"), Is.True);
+            Assert.That(merge.OverrideProperties["C2"].Invoke(null), Is.EqualTo("INT"));
+            Assert.That(merge.OverrideProperties["C4"].Invoke(null), Is.EqualTo(null));
         }
     }
 

@@ -64,21 +64,21 @@ namespace Audit.EntityFramework.Full.UnitTest
                 context.SaveChanges();
             }
 
-            Assert.AreEqual(3, evs.Count);
-            Assert.AreEqual(1, evs[0].Entries.Count);
-            Assert.AreEqual(1, evs[1].Entries.Count);
-            Assert.AreEqual(1, evs[2].Entries.Count);
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("Update", evs[1].Entries[0].Action);
-            Assert.AreEqual("Delete", evs[2].Entries[0].Action);
-            Assert.AreEqual("Attention", evs[0].Entries[0].ColumnValues["Attention"]);
-            Assert.AreEqual("AttentionUpdate", evs[1].Entries[0].ColumnValues["Attention"]);
-            Assert.AreEqual("LeafFour", evs[0].Entries[0].Table);
-            Assert.AreEqual("LeafFour", evs[1].Entries[0].Table);
-            Assert.AreEqual("LeafFour", evs[2].Entries[0].Table);
-            Assert.IsTrue(evs[0].Entries[0].ColumnValues.ContainsKey("LeafProp"));
-            Assert.IsTrue(evs[1].Entries[0].ColumnValues.ContainsKey("LeafProp"));
-            Assert.IsTrue(evs[2].Entries[0].ColumnValues.ContainsKey("LeafProp"));
+            Assert.That(evs.Count, Is.EqualTo(3));
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[2].Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[2].Entries[0].Action, Is.EqualTo("Delete"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Attention"], Is.EqualTo("Attention"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Attention"], Is.EqualTo("AttentionUpdate"));
+            Assert.That(evs[0].Entries[0].Table, Is.EqualTo("LeafFour"));
+            Assert.That(evs[1].Entries[0].Table, Is.EqualTo("LeafFour"));
+            Assert.That(evs[2].Entries[0].Table, Is.EqualTo("LeafFour"));
+            Assert.That(evs[0].Entries[0].ColumnValues.ContainsKey("LeafProp"), Is.True);
+            Assert.That(evs[1].Entries[0].ColumnValues.ContainsKey("LeafProp"), Is.True);
+            Assert.That(evs[2].Entries[0].ColumnValues.ContainsKey("LeafProp"), Is.True);
         }
     }
 

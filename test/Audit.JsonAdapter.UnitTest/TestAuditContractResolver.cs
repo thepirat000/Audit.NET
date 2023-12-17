@@ -122,17 +122,17 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClassGeneric<T>>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(serialized);
-            Assert.IsTrue(serialized.Contains(@"""Id"": 123"));
-            Assert.IsTrue(serialized.Contains(@$"""Name"": ""{obj.Name}"""));
-            Assert.IsTrue(serialized.Contains(@"""InnerProp"": {"));
-            Assert.IsTrue(serialized.Contains(@"""sub"": ""Value2"""));
+            Assert.That(serialized, Is.Not.Null);
+            Assert.That(serialized.Contains(@"""Id"": 123"), Is.True);
+            Assert.That(serialized.Contains(@$"""Name"": ""{obj.Name}"""), Is.True);
+            Assert.That(serialized.Contains(@"""InnerProp"": {"), Is.True);
+            Assert.That(serialized.Contains(@"""sub"": ""Value2"""), Is.True);
             Assert.IsFalse(serialized.Contains("IgnoredProperty"));
             Assert.IsFalse(serialized.Contains("MoreData"));
 
-            Assert.IsNotNull(deserialized);
-            Assert.AreEqual(obj.Id, deserialized.Id);
-            Assert.AreEqual(obj.Name, deserialized.Name);
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.Id, Is.EqualTo(obj.Id));
+            Assert.That(deserialized.Name, Is.EqualTo(obj.Name));
             Assert.AreEqual(1, ((dynamic)deserialized.MoreData).Count);
             var inner = ((dynamic) deserialized.MoreData)["InnerProp"];
             Assert.AreEqual("Value2", inner switch
@@ -156,16 +156,16 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClassGeneric<Dictionary<string, string>>>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(serialized);
-            Assert.IsTrue(serialized.Contains(@"""Id"": 123"));
-            Assert.IsTrue(serialized.Contains(@$"""Name"": ""{obj.Name}"""));
+            Assert.That(serialized, Is.Not.Null);
+            Assert.That(serialized.Contains(@"""Id"": 123"), Is.True);
+            Assert.That(serialized.Contains(@$"""Name"": ""{obj.Name}"""), Is.True);
             Assert.IsFalse(serialized.Contains("IgnoredProperty"));
             Assert.IsFalse(serialized.Contains("MoreData"));
 
-            Assert.IsNotNull(deserialized);
-            Assert.AreEqual(obj.Id, deserialized.Id);
-            Assert.AreEqual(obj.Name, deserialized.Name);
-            Assert.IsNull(deserialized.MoreData);
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.Id, Is.EqualTo(obj.Id));
+            Assert.That(deserialized.Name, Is.EqualTo(obj.Name));
+            Assert.That(deserialized.MoreData, Is.Null);
         }
 
         [Test]
@@ -182,16 +182,16 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClassGeneric<OnlyNewton>>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(serialized);
-            Assert.IsTrue(serialized.Contains(@"""Id"": 123"));
-            Assert.IsTrue(serialized.Contains(@$"""Name"": ""{obj.Name}"""));
+            Assert.That(serialized, Is.Not.Null);
+            Assert.That(serialized.Contains(@"""Id"": 123"), Is.True);
+            Assert.That(serialized.Contains(@$"""Name"": ""{obj.Name}"""), Is.True);
             Assert.IsFalse(serialized.Contains("IgnoredProperty"));
             Assert.IsFalse(serialized.Contains("MoreData"));
 
-            Assert.IsNotNull(deserialized);
-            Assert.AreEqual(obj.Id, deserialized.Id);
-            Assert.AreEqual(obj.Name, deserialized.Name);
-            Assert.IsNull(deserialized.MoreData);
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.Id, Is.EqualTo(obj.Id));
+            Assert.That(deserialized.Name, Is.EqualTo(obj.Name));
+            Assert.That(deserialized.MoreData, Is.Null);
         }
 
         [Test]
@@ -208,16 +208,16 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClassGeneric<Dictionary<string, object>>>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(serialized);
-            Assert.IsTrue(serialized.Contains(@"""Id"": 123"));
-            Assert.IsTrue(serialized.Contains(@$"""Name"": ""{obj.Name}"""));
+            Assert.That(serialized, Is.Not.Null);
+            Assert.That(serialized.Contains(@"""Id"": 123"), Is.True);
+            Assert.That(serialized.Contains(@$"""Name"": ""{obj.Name}"""), Is.True);
             Assert.IsFalse(serialized.Contains("IgnoredProperty"));
             Assert.IsFalse(serialized.Contains("MoreData"));
 
-            Assert.IsNotNull(deserialized);
-            Assert.AreEqual(obj.Id, deserialized.Id);
-            Assert.AreEqual(obj.Name, deserialized.Name);
-            Assert.IsNull(deserialized.MoreData);
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.Id, Is.EqualTo(obj.Id));
+            Assert.That(deserialized.Name, Is.EqualTo(obj.Name));
+            Assert.That(deserialized.MoreData, Is.Null);
         }
 
         [Test]
@@ -237,11 +237,11 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<TestClassGeneric<Dictionary<string, object>>>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(serialized);
-            Assert.IsTrue(serialized.Contains(@"""empty"": null"));
+            Assert.That(serialized, Is.Not.Null);
+            Assert.That(serialized.Contains(@"""empty"": null"), Is.True);
 
-            Assert.IsNotNull(deserialized);
-            Assert.IsNull(deserialized.MoreData["empty"]);
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.MoreData["empty"], Is.Null);
         }
 
         [Test]
@@ -257,19 +257,19 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<OnlyNewton>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(serialized);
-            Assert.IsTrue(serialized.Contains(@"""Id"": 123"));
-            Assert.IsTrue(serialized.Contains(@$"""a"": 1"));
-            Assert.IsTrue(serialized.Contains(@$"""b"": 2"));
-            Assert.IsTrue(serialized.Contains(@"""FullName"": """));
+            Assert.That(serialized, Is.Not.Null);
+            Assert.That(serialized.Contains(@"""Id"": 123"), Is.True);
+            Assert.That(serialized.Contains(@$"""a"": 1"), Is.True);
+            Assert.That(serialized.Contains(@$"""b"": 2"), Is.True);
+            Assert.That(serialized.Contains(@"""FullName"": """), Is.True);
             Assert.IsFalse(serialized.Contains("ExtraData"));
-            Assert.IsTrue(serialized.IndexOf(@"""FullName""") < serialized.IndexOf(@"""Id"""));
+            Assert.That(serialized.IndexOf(@"""FullName""") < serialized.IndexOf(@"""Id"""), Is.True);
 
-            Assert.IsNotNull(deserialized);
-            Assert.AreEqual(obj.Id, deserialized.Id);
-            Assert.AreEqual(obj.Name, deserialized.Name);
-            Assert.AreEqual("1", (deserialized.ExtraData as JToken)["a"].ToString());
-            Assert.AreEqual("2", (deserialized.ExtraData as JToken)["b"].ToString());
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.Id, Is.EqualTo(obj.Id));
+            Assert.That(deserialized.Name, Is.EqualTo(obj.Name));
+            Assert.That((deserialized.ExtraData as JToken)["a"].ToString(), Is.EqualTo("1"));
+            Assert.That((deserialized.ExtraData as JToken)["b"].ToString(), Is.EqualTo("2"));
         }
 
         [Test]
@@ -289,12 +289,12 @@ namespace Audit.JsonAdapter.UnitTest
             var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(ev, _jsonSerializerSettings);
             var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<AuditEvent>(serialized, _jsonSerializerSettings);
 
-            Assert.IsNotNull(deserialized);
-            Assert.AreEqual(ev.Environment.UserName, deserialized.Environment.UserName);
-            Assert.AreEqual("DEV", deserialized.Environment.CustomFields["env"].ToString());
-            Assert.AreEqual("test", deserialized.EventType);
-            Assert.AreEqual("1", (deserialized.Target.Old as JToken)["a"].ToString());
-            Assert.AreEqual("3", (deserialized.Target.New as JToken)["a"].ToString());
+            Assert.That(deserialized, Is.Not.Null);
+            Assert.That(deserialized.Environment.UserName, Is.EqualTo(ev.Environment.UserName));
+            Assert.That(deserialized.Environment.CustomFields["env"].ToString(), Is.EqualTo("DEV"));
+            Assert.That(deserialized.EventType, Is.EqualTo("test"));
+            Assert.That((deserialized.Target.Old as JToken)["a"].ToString(), Is.EqualTo("1"));
+            Assert.That((deserialized.Target.New as JToken)["a"].ToString(), Is.EqualTo("3"));
         }
 
     }

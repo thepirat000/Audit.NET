@@ -92,16 +92,16 @@ namespace Audit.Mvc.UnitTest
 
             //Assert
             var evtn = (action.ActionParameters["x"] as AuditEvent).EventType;
-            Assert.AreEqual("TEST_REFERENCE_TYPE", evtn);
+            Assert.That(evtn, Is.EqualTo("TEST_REFERENCE_TYPE"));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
 
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo("get"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
         }
 
         [Test]
@@ -180,12 +180,12 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo("get"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
         }
 
         [Test]
@@ -264,12 +264,12 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once());
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo("get"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
         }
 
         [Test]
@@ -356,18 +356,18 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once());
-            Assert.AreEqual(action, actionFromController);
-            Assert.AreEqual(scope, scopeFromController);
+            Assert.That(actionFromController, Is.EqualTo(action));
+            Assert.That(scopeFromController, Is.EqualTo(scope));
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
-            Assert.AreEqual("header-value", action.Headers["test-header"]);
-            Assert.AreEqual("get", action.ActionName);
-            Assert.AreEqual("value1", action.ActionParameters["test1"]);
+            Assert.That(action.Headers["test-header"], Is.EqualTo("header-value"));
+            Assert.That(action.ActionName, Is.EqualTo("get"));
+            Assert.That(action.ActionParameters["test1"], Is.EqualTo("value1"));
 
-            Assert.AreEqual(@"json object", action.RequestBody.Type);
-            Assert.AreEqual(@"{ ""test"": 123 }", action.RequestBody.Value);
-            Assert.AreEqual(@"{ ""test"": 123 }".Length, action.RequestBody.Length);
-            Assert.AreEqual("RedirectResult", action.ResponseBody.Type);
-            Assert.AreEqual("url", action.ResponseBody.Value);
+            Assert.That(action.RequestBody.Type, Is.EqualTo(@"json object"));
+            Assert.That(action.RequestBody.Value, Is.EqualTo(@"{ ""test"": 123 }"));
+            Assert.That(action.RequestBody.Length, Is.EqualTo(@"{ ""test"": 123 }".Length));
+            Assert.That(action.ResponseBody.Type, Is.EqualTo("RedirectResult"));
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("url"));
 
         }
 
@@ -511,8 +511,8 @@ namespace Audit.Mvc.UnitTest
             //Assert
             dataProvider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once());
             dataProvider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never());
-            Assert.AreEqual(1, action.ActionParameters.Count);
-            Assert.AreEqual("TEST", (action.ActionParameters["x"] as AuditEvent).EventType);
+            Assert.That(action.ActionParameters.Count, Is.EqualTo(1));
+            Assert.That((action.ActionParameters["x"] as AuditEvent).EventType, Is.EqualTo("TEST"));
         }
     }
 }

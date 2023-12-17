@@ -33,17 +33,17 @@ namespace Audit.PostgreSql.UnitTest
                 .TableName("t")
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
-            Assert.AreEqual("c", x.ConnectionStringBuilder(null));
-            Assert.AreEqual("dc", x.DataColumnNameBuilder(null));
-            Assert.AreEqual("id", x.IdColumnNameBuilder(null));
-            Assert.AreEqual("lud", x.LastUpdatedDateColumnNameBuilder(null));
-            Assert.AreEqual("sc", x.SchemaBuilder(null));
-            Assert.AreEqual("t", x.TableNameBuilder(null));
-            Assert.AreEqual(2, x.CustomColumns.Count);
-            Assert.AreEqual("c1", x.CustomColumns[0].Name);
-            Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
-            Assert.AreEqual("c2", x.CustomColumns[1].Name);
-            Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
+            Assert.That(x.ConnectionStringBuilder(null), Is.EqualTo("c"));
+            Assert.That(x.DataColumnNameBuilder(null), Is.EqualTo("dc"));
+            Assert.That(x.IdColumnNameBuilder(null), Is.EqualTo("id"));
+            Assert.That(x.LastUpdatedDateColumnNameBuilder(null), Is.EqualTo("lud"));
+            Assert.That(x.SchemaBuilder(null), Is.EqualTo("sc"));
+            Assert.That(x.TableNameBuilder(null), Is.EqualTo("t"));
+            Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
+            Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
+            Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));
+            Assert.That(x.CustomColumns[1].Name, Is.EqualTo("c2"));
+            Assert.That(x.CustomColumns[1].Value.Invoke(null), Is.EqualTo(2));
         }
 
         [Test]
@@ -58,17 +58,17 @@ namespace Audit.PostgreSql.UnitTest
                 .TableName(ev => "t")
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
-            Assert.AreEqual("c", x.ConnectionStringBuilder(null));
-            Assert.AreEqual("dc", x.DataColumnNameBuilder(null));
-            Assert.AreEqual("id", x.IdColumnNameBuilder(null));
-            Assert.AreEqual("lud", x.LastUpdatedDateColumnNameBuilder(null));
-            Assert.AreEqual("sc", x.SchemaBuilder(null));
-            Assert.AreEqual("t", x.TableNameBuilder(null));
-            Assert.AreEqual(2, x.CustomColumns.Count);
-            Assert.AreEqual("c1", x.CustomColumns[0].Name);
-            Assert.AreEqual(1, x.CustomColumns[0].Value.Invoke(null));
-            Assert.AreEqual("c2", x.CustomColumns[1].Name);
-            Assert.AreEqual(2, x.CustomColumns[1].Value.Invoke(null));
+            Assert.That(x.ConnectionStringBuilder(null), Is.EqualTo("c"));
+            Assert.That(x.DataColumnNameBuilder(null), Is.EqualTo("dc"));
+            Assert.That(x.IdColumnNameBuilder(null), Is.EqualTo("id"));
+            Assert.That(x.LastUpdatedDateColumnNameBuilder(null), Is.EqualTo("lud"));
+            Assert.That(x.SchemaBuilder(null), Is.EqualTo("sc"));
+            Assert.That(x.TableNameBuilder(null), Is.EqualTo("t"));
+            Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
+            Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
+            Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));
+            Assert.That(x.CustomColumns[1].Name, Is.EqualTo("c2"));
+            Assert.That(x.CustomColumns[1].Value.Invoke(null), Is.EqualTo(2));
         }
         
         [Test]
@@ -84,7 +84,7 @@ namespace Audit.PostgreSql.UnitTest
 
             var getEvent = dp?.GetEvent<AuditEvent>(id);
 
-            Assert.AreEqual(overrideEventType, getEvent?.EventType);
+            Assert.That(getEvent?.EventType, Is.EqualTo(overrideEventType));
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace Audit.PostgreSql.UnitTest
             
             IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
             ICollection<AuditEvent> realizedEvents = events.ToList();
-            Assert.IsNotNull(realizedEvents);
+            Assert.That(realizedEvents, Is.Not.Null);
         }
         
         [Test]
@@ -111,7 +111,7 @@ namespace Audit.PostgreSql.UnitTest
 
             IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
             ICollection<AuditEvent> realizedEvents = events.ToList();
-            Assert.IsNotNull(realizedEvents);
+            Assert.That(realizedEvents, Is.Not.Null);
         }        
         
         [Test]
@@ -125,7 +125,7 @@ namespace Audit.PostgreSql.UnitTest
 
             IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumber, pageSize, whereExpression);
             ICollection<AuditEvent> realizedEvents = events.ToList();
-            Assert.IsNotNull(realizedEvents);
+            Assert.That(realizedEvents, Is.Not.Null);
         }
         
         [Test]
@@ -141,7 +141,7 @@ namespace Audit.PostgreSql.UnitTest
             var events = dp?.EnumerateEvents(whereExpression);
             var ev = events?.FirstOrDefault();
 
-            Assert.IsNotNull(ev);
+            Assert.That(ev, Is.Not.Null);
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace Audit.PostgreSql.UnitTest
             var events = dp?.EnumerateEvents<AuditEvent>(whereExpression, GetLastUpdatedColumnNameColumnName(), "1");
             var ev = events?.FirstOrDefault();
 
-            Assert.IsNotNull(ev);
+            Assert.That(ev, Is.Not.Null);
         }
         
         private static string GetLastUpdatedColumnNameColumnName()

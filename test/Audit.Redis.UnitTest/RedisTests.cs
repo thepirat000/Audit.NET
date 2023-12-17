@@ -52,13 +52,13 @@ namespace Audit.Redis.UnitTest
             Core.Configuration.ResetCustomActions();
             db.KeyDelete(key);
 
-            Assert.AreEqual(2, ids.Count);
-            Assert.AreEqual(ids[0], ids[1]);
-            Assert.AreEqual(evFromApi.EventType, aev.EventType);
-            Assert.AreEqual(evFromApi.StartDate, aev.StartDate);
-            Assert.AreEqual(evFromApi.EndDate, aev.EndDate);
-            Assert.AreEqual("Redis_String_Basic", aev.EventType);
-            Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids[1], Is.EqualTo(ids[0]));
+            Assert.That(aev.EventType, Is.EqualTo(evFromApi.EventType));
+            Assert.That(aev.StartDate, Is.EqualTo(evFromApi.StartDate));
+            Assert.That(aev.EndDate, Is.EqualTo(evFromApi.EndDate));
+            Assert.That(aev.EventType, Is.EqualTo("Redis_String_Basic"));
+            Assert.That(Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]), Is.EqualTo(new List<int>() { 1, 2, 3, 4, 5 }));
         }
 
         [Test]
@@ -88,9 +88,9 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             db.KeyDelete(key2);
 
-            Assert.IsTrue(value1.HasValue);
-            Assert.IsTrue(value2.HasValue);
-            Assert.AreEqual("test", value2.ToString());
+            Assert.That(value1.HasValue, Is.True);
+            Assert.That(value2.HasValue, Is.True);
+            Assert.That(value2.ToString(), Is.EqualTo("test"));
         }
 
         [Test, Order(10)]
@@ -126,13 +126,13 @@ namespace Audit.Redis.UnitTest
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(2, ids.Count);
-            Assert.AreEqual(ids[0], ids[1]);
-            Assert.AreEqual(evFromApi.EventType, aev.EventType);
-            Assert.AreEqual(evFromApi.StartDate, aev.StartDate);
-            Assert.AreEqual(evFromApi.EndDate, aev.EndDate);
-            Assert.AreEqual("Redis_String_Basic_Async", aev.EventType);
-            Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids[1], Is.EqualTo(ids[0]));
+            Assert.That(aev.EventType, Is.EqualTo(evFromApi.EventType));
+            Assert.That(aev.StartDate, Is.EqualTo(evFromApi.StartDate));
+            Assert.That(aev.EndDate, Is.EqualTo(evFromApi.EndDate));
+            Assert.That(aev.EventType, Is.EqualTo("Redis_String_Basic_Async"));
+            Assert.That(Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]), Is.EqualTo(new List<int>() { 1, 2, 3, 4, 5 }));
         }
 
         [Test, Order(10)]
@@ -168,8 +168,8 @@ namespace Audit.Redis.UnitTest
             Assert.IsFalse(exists);
             Assert.IsFalse(value2.HasValue);
 
-            Assert.AreEqual("Redis_String_Ttl", aev.EventType);
-            Assert.AreEqual(new List<int>() { 2, 3, 4, 5 }, Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+            Assert.That(aev.EventType, Is.EqualTo("Redis_String_Ttl"));
+            Assert.That(Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]), Is.EqualTo(new List<int>() { 2, 3, 4, 5 }));
         }
 
         [Test, Order(10)]
@@ -201,9 +201,9 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(2, ids.Count);
-            Assert.AreEqual("deserializer test", evFromApi.EventType);
-            Assert.AreEqual(new byte[] { 1, 2, 4, 8 }, value);
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(evFromApi.EventType, Is.EqualTo("deserializer test"));
+            Assert.That(value, Is.EqualTo(new byte[] { 1, 2, 4, 8 }));
         }
 
         [Test, Order(10)]
@@ -243,12 +243,12 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(4, ids.Count);
-            Assert.AreEqual(4, values.Length);
-            Assert.AreEqual(evFromApi.EventType, aev2.EventType);
-            Assert.AreEqual(evFromApi.StartDate, aev2.StartDate);
-            Assert.AreEqual("Redis_List_Basic_2", aev1.EventType);
-            Assert.AreEqual("Redis_List_Basic_1", aev2.EventType);
+            Assert.That(ids.Count, Is.EqualTo(4));
+            Assert.That(values.Length, Is.EqualTo(4));
+            Assert.That(aev2.EventType, Is.EqualTo(evFromApi.EventType));
+            Assert.That(aev2.StartDate, Is.EqualTo(evFromApi.StartDate));
+            Assert.That(aev1.EventType, Is.EqualTo("Redis_List_Basic_2"));
+            Assert.That(aev2.EventType, Is.EqualTo("Redis_List_Basic_1"));
         }
 
         [Test]
@@ -275,9 +275,9 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             db.KeyDelete(key2);
 
-            Assert.IsTrue(value1.HasValue);
-            Assert.IsTrue(value2.HasValue);
-            Assert.AreEqual("test", value2.ToString());
+            Assert.That(value1.HasValue, Is.True);
+            Assert.That(value2.HasValue, Is.True);
+            Assert.That(value2.ToString(), Is.EqualTo("test"));
         }
 
         [Test, Order(10)]
@@ -315,12 +315,12 @@ namespace Audit.Redis.UnitTest
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(4, ids.Count);
-            Assert.AreEqual(4, values.Length);
-            Assert.AreEqual(evFromApi.EventType, aev2.EventType);
-            Assert.AreEqual(evFromApi.StartDate, aev2.StartDate);
-            Assert.AreEqual("Redis_List_Basic_2", aev1.EventType);
-            Assert.AreEqual("Redis_List_Basic_1", aev2.EventType);
+            Assert.That(ids.Count, Is.EqualTo(4));
+            Assert.That(values.Length, Is.EqualTo(4));
+            Assert.That(aev2.EventType, Is.EqualTo(evFromApi.EventType));
+            Assert.That(aev2.StartDate, Is.EqualTo(evFromApi.StartDate));
+            Assert.That(aev1.EventType, Is.EqualTo("Redis_List_Basic_2"));
+            Assert.That(aev2.EventType, Is.EqualTo("Redis_List_Basic_1"));
         }
 
         [Test, Order(10)]
@@ -353,7 +353,7 @@ namespace Audit.Redis.UnitTest
 
             Assert.IsFalse(exists);
 
-            Assert.AreEqual("Redis_List_Ttl", aev.EventType);
+            Assert.That(aev.EventType, Is.EqualTo("Redis_List_Ttl"));
         }
 
         [Test, Order(10)]
@@ -381,9 +381,9 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(2, values.Length);
-            Assert.AreEqual(new byte[] { 1, 2, 4, 8 }, (byte[])values[0]);
-            Assert.AreEqual(new byte[] { 1, 2, 4, 8 }, (byte[])values[1]);
+            Assert.That(values.Length, Is.EqualTo(2));
+            Assert.That((byte[])values[0], Is.EqualTo(new byte[] { 1, 2, 4, 8 }));
+            Assert.That((byte[])values[1], Is.EqualTo(new byte[] { 1, 2, 4, 8 }));
         }
 
         [Test, Order(10)]
@@ -409,10 +409,10 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(3, values.Length);
-            Assert.AreEqual("4", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]).EventType);
-            Assert.AreEqual("3", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]).EventType);
-            Assert.AreEqual("2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2]).EventType);
+            Assert.That(values.Length, Is.EqualTo(3));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]).EventType, Is.EqualTo("4"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]).EventType, Is.EqualTo("3"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2]).EventType, Is.EqualTo("2"));
         }
 
         [Test, Order(10)]
@@ -458,12 +458,12 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(6, ids.Count);
-            Assert.AreEqual(2, values.Length);
-            Assert.AreEqual("Redis_Hash_Basic_1", evFromApi.EventType);
-            Assert.IsTrue(v1.HasValue);
-            Assert.IsTrue(v2.HasValue);
-            Assert.AreEqual("updated", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
+            Assert.That(ids.Count, Is.EqualTo(6));
+            Assert.That(values.Length, Is.EqualTo(2));
+            Assert.That(evFromApi.EventType, Is.EqualTo("Redis_Hash_Basic_1"));
+            Assert.That(v1.HasValue, Is.True);
+            Assert.That(v2.HasValue, Is.True);
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString(), Is.EqualTo("updated"));
         }
 
         [Test]
@@ -491,9 +491,9 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             db.KeyDelete(key2);
 
-            Assert.IsTrue(value1.HasValue);
-            Assert.IsTrue(value2.HasValue);
-            Assert.AreEqual("test", value2.ToString());
+            Assert.That(value1.HasValue, Is.True);
+            Assert.That(value2.HasValue, Is.True);
+            Assert.That(value2.ToString(), Is.EqualTo("test"));
         }
 
         [Test, Order(10)]
@@ -538,12 +538,12 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(6, ids.Count);
-            Assert.AreEqual(2, values.Length);
-            Assert.AreEqual("Redis_Hash_Basic_1", evFromApi.EventType);
-            Assert.IsTrue(v1.HasValue);
-            Assert.IsTrue(v2.HasValue);
-            Assert.AreEqual("updated", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
+            Assert.That(ids.Count, Is.EqualTo(6));
+            Assert.That(values.Length, Is.EqualTo(2));
+            Assert.That(evFromApi.EventType, Is.EqualTo("Redis_Hash_Basic_1"));
+            Assert.That(v1.HasValue, Is.True);
+            Assert.That(v2.HasValue, Is.True);
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString(), Is.EqualTo("updated"));
         }
 
         [Test, Order(10)]
@@ -577,9 +577,9 @@ namespace Audit.Redis.UnitTest
 
             var exists2 = db.KeyExists(key);
 
-            Assert.IsTrue(exists1);
+            Assert.That(exists1, Is.True);
             Assert.IsFalse(exists2);
-            Assert.AreEqual("Redis_Hash_Ttl", aev.EventType);
+            Assert.That(aev.EventType, Is.EqualTo("Redis_Hash_Ttl"));
         }
 
         [Test, Order(10)]
@@ -606,7 +606,7 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(random, (byte[])value);
+            Assert.That((byte[])value, Is.EqualTo(random));
         }
 
         [Test, Order(10)]
@@ -646,13 +646,13 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(4, ids.Count);
-            Assert.AreEqual(4, values.Length);
-            Assert.AreEqual(-56.78, values[0].Score);
-            Assert.AreEqual("Redis_SortedSet_Basic_1", evFromApi.EventType);
-            Assert.AreEqual("Redis_SortedSet_Basic_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual(12.34, values[3].Score);
-            Assert.AreEqual("Redis_SortedSet_Basic_1", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
+            Assert.That(ids.Count, Is.EqualTo(4));
+            Assert.That(values.Length, Is.EqualTo(4));
+            Assert.That(values[0].Score, Is.EqualTo(-56.78));
+            Assert.That(evFromApi.EventType, Is.EqualTo("Redis_SortedSet_Basic_1"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType, Is.EqualTo("Redis_SortedSet_Basic_2"));
+            Assert.That(values[3].Score, Is.EqualTo(12.34));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType, Is.EqualTo("Redis_SortedSet_Basic_1"));
         }
 
         [Test]
@@ -680,9 +680,9 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             db.KeyDelete(key2);
 
-            Assert.IsTrue(value1.HasValue);
-            Assert.IsTrue(value2.HasValue);
-            Assert.AreEqual("test", value2.ToString());
+            Assert.That(value1.HasValue, Is.True);
+            Assert.That(value2.HasValue, Is.True);
+            Assert.That(value2.ToString(), Is.EqualTo("test"));
         }
 
         [Test, Order(10)]
@@ -720,13 +720,13 @@ namespace Audit.Redis.UnitTest
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(4, ids.Count);
-            Assert.AreEqual(4, values.Length);
-            Assert.AreEqual(-56.78, values[0].Score);
-            Assert.AreEqual("Redis_SortedSet_Basic_1", evFromApi.EventType);
-            Assert.AreEqual("Redis_SortedSet_Basic_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual(12.34, values[3].Score);
-            Assert.AreEqual("Redis_SortedSet_Basic_1", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
+            Assert.That(ids.Count, Is.EqualTo(4));
+            Assert.That(values.Length, Is.EqualTo(4));
+            Assert.That(values[0].Score, Is.EqualTo(-56.78));
+            Assert.That(evFromApi.EventType, Is.EqualTo("Redis_SortedSet_Basic_1"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType, Is.EqualTo("Redis_SortedSet_Basic_2"));
+            Assert.That(values[3].Score, Is.EqualTo(12.34));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType, Is.EqualTo("Redis_SortedSet_Basic_1"));
         }
 
         [Test, Order(10)]
@@ -759,7 +759,7 @@ namespace Audit.Redis.UnitTest
             var exists = db.KeyExists(key);
 
             Assert.IsFalse(exists);
-            Assert.AreEqual("Redis_SortedSet_Ttl", aev.EventType);
+            Assert.That(aev.EventType, Is.EqualTo("Redis_SortedSet_Ttl"));
         }
 
         [Test, Order(10)]
@@ -791,7 +791,7 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.AreEqual(random, (byte[])values[0]);
+            Assert.That((byte[])values[0], Is.EqualTo(random));
         }
 
         [Test, Order(10)]
@@ -824,11 +824,11 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(2, values.Length);
-            Assert.AreEqual(-100, values[0].Score);
-            Assert.AreEqual(-56.78, values[1].Score);
-            Assert.AreEqual("Redis_SortedSet_CappedByScore_3", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByScore_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
+            Assert.That(values.Length, Is.EqualTo(2));
+            Assert.That(values[0].Score, Is.EqualTo(-100));
+            Assert.That(values[1].Score, Is.EqualTo(-56.78));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByScore_3"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByScore_2"));
         }
 
         [Test, Order(10)]
@@ -856,13 +856,13 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(3, values.Length);
-            Assert.AreEqual(-50.55, values[0].Score);
-            Assert.AreEqual(12.34, values[1].Score);
-            Assert.AreEqual(142857.77, values[2].Score);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_4", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_1", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_5", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType);
+            Assert.That(values.Length, Is.EqualTo(3));
+            Assert.That(values[0].Score, Is.EqualTo(-50.55));
+            Assert.That(values[1].Score, Is.EqualTo(12.34));
+            Assert.That(values[2].Score, Is.EqualTo(142857.77));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByRank_4"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByRank_1"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByRank_5"));
         }
 
         [Test, Order(10)]
@@ -890,13 +890,13 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(3, values.Length);
-            Assert.AreEqual(-987.65, values[0].Score);
-            Assert.AreEqual(-100.00, values[1].Score);
-            Assert.AreEqual(-50.55, values[2].Score);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_3", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_4", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType);
+            Assert.That(values.Length, Is.EqualTo(3));
+            Assert.That(values[0].Score, Is.EqualTo(-987.65));
+            Assert.That(values[1].Score, Is.EqualTo(-100.00));
+            Assert.That(values[2].Score, Is.EqualTo(-50.55));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByRank_2"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByRank_3"));
+            Assert.That(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType, Is.EqualTo("Redis_SortedSet_CappedByRank_4"));
         }
 
         [Test, Order(10)]
@@ -926,9 +926,9 @@ namespace Audit.Redis.UnitTest
 
             Task.Delay(1000).Wait();
 
-            Assert.AreEqual(2, list.Count);
-            Assert.AreEqual("Redis_PubSub_Basic_1", list[0].EventType);
-            Assert.AreEqual("Redis_PubSub_Basic_2", list[1].EventType);
+            Assert.That(list.Count, Is.EqualTo(2));
+            Assert.That(list[0].EventType, Is.EqualTo("Redis_PubSub_Basic_1"));
+            Assert.That(list[1].EventType, Is.EqualTo("Redis_PubSub_Basic_2"));
         }
 
         [Test, Order(10)]
@@ -958,9 +958,9 @@ namespace Audit.Redis.UnitTest
 
             await Task.Delay(1000);
 
-            Assert.AreEqual(2, list.Count);
-            Assert.AreEqual("Redis_PubSub_Basic_1", list[0].EventType);
-            Assert.AreEqual("Redis_PubSub_Basic_2", list[1].EventType);
+            Assert.That(list.Count, Is.EqualTo(2));
+            Assert.That(list[0].EventType, Is.EqualTo("Redis_PubSub_Basic_1"));
+            Assert.That(list[1].EventType, Is.EqualTo("Redis_PubSub_Basic_2"));
         }
 
         [Test, Order(10)]
@@ -990,7 +990,7 @@ namespace Audit.Redis.UnitTest
 
             var db = mx.GetDatabase();
             db.KeyDelete(key);
-            Assert.AreEqual(random, (byte[])list[0]);
+            Assert.That((byte[])list[0], Is.EqualTo(random));
         }
 
         [Test, Order(int.MaxValue)]
@@ -1027,10 +1027,10 @@ namespace Audit.Redis.UnitTest
 
             db.KeyDelete(key);
 
-            Assert.AreEqual(N, values.Count);
+            Assert.That(values.Count, Is.EqualTo(N));
             for (int a = 0; a < N; a++)
             {
-                Assert.IsTrue(values.Any(x => x.EventType == $"Redis_Multithread_{a}"));
+                Assert.That(values.Any(x => x.EventType == $"Redis_Multithread_{a}"), Is.True);
             }
         }
 
@@ -1069,10 +1069,10 @@ namespace Audit.Redis.UnitTest
 
             await db.KeyDeleteAsync(key);
 
-            Assert.AreEqual(N, values.Count);
+            Assert.That(values.Count, Is.EqualTo(N));
             for (int a = 0; a < N; a++)
             {
-                Assert.IsTrue(values.Any(x => x.EventType == $"Redis_Multithread_{a}"));
+                Assert.That(values.Any(x => x.EventType == $"Redis_Multithread_{a}"), Is.True);
             }
         }
 
@@ -1092,7 +1092,7 @@ namespace Audit.Redis.UnitTest
             }
             catch (ArgumentException ae)
             {
-                Assert.IsTrue(ae.Message.ToLower().Contains("redis key"));
+                Assert.That(ae.Message.ToLower().Contains("redis key"), Is.True);
             }
 
             //hash
@@ -1108,7 +1108,7 @@ namespace Audit.Redis.UnitTest
             }
             catch (ArgumentException ae)
             {
-                Assert.IsTrue(ae.Message.ToLower().Contains("hash field"));
+                Assert.That(ae.Message.ToLower().Contains("hash field"), Is.True);
             }
 
             //ss
@@ -1124,7 +1124,7 @@ namespace Audit.Redis.UnitTest
             }
             catch (ArgumentException ae)
             {
-                Assert.IsTrue(ae.Message.ToLower().Contains("score builder"));
+                Assert.That(ae.Message.ToLower().Contains("score builder"), Is.True);
             }
 
             //pubsub
@@ -1140,7 +1140,7 @@ namespace Audit.Redis.UnitTest
             }
             catch (ArgumentException ae)
             {
-                Assert.IsTrue(ae.Message.ToLower().Contains("channel"));
+                Assert.That(ae.Message.ToLower().Contains("channel"), Is.True);
             }
 
         }
@@ -1179,8 +1179,8 @@ namespace Audit.Redis.UnitTest
             var db = mx.GetDatabase(dbIndex);
             var values = db.StreamRange(key);
 
-            Assert.AreEqual(2, ids.Count);
-            Assert.AreEqual(2, values.Length);
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(values.Length, Is.EqualTo(2));
 
             var evType1 = values[0]["EventType"].ToString();
             var evType2 = values[1]["EventType"].ToString();
@@ -1195,15 +1195,15 @@ namespace Audit.Redis.UnitTest
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.IsNull(evFromApiNotExists);
-            Assert.AreEqual(evType1, aev1.EventType);
-            Assert.AreEqual(evType2, aev2.EventType);
-            Assert.AreEqual(evFromApi1.EventType, aev1.EventType);
-            Assert.AreEqual(evFromApi1.StartDate, aev1.StartDate);
-            Assert.AreEqual(evFromApi2.EventType, aev2.EventType);
-            Assert.AreEqual(evFromApi2.StartDate, aev2.StartDate);
-            Assert.AreEqual("Redis_Stream_Basic_1", aev1.EventType);
-            Assert.AreEqual("Redis_Stream_Basic_2", aev2.EventType);
+            Assert.That(evFromApiNotExists, Is.Null);
+            Assert.That(aev1.EventType, Is.EqualTo(evType1));
+            Assert.That(aev2.EventType, Is.EqualTo(evType2));
+            Assert.That(aev1.EventType, Is.EqualTo(evFromApi1.EventType));
+            Assert.That(aev1.StartDate, Is.EqualTo(evFromApi1.StartDate));
+            Assert.That(aev2.EventType, Is.EqualTo(evFromApi2.EventType));
+            Assert.That(aev2.StartDate, Is.EqualTo(evFromApi2.StartDate));
+            Assert.That(aev1.EventType, Is.EqualTo("Redis_Stream_Basic_1"));
+            Assert.That(aev2.EventType, Is.EqualTo("Redis_Stream_Basic_2"));
         }
 
         [Test, Order(10)]
@@ -1240,8 +1240,8 @@ namespace Audit.Redis.UnitTest
             var db = mx.GetDatabase(dbIndex);
             var values = await db.StreamRangeAsync(key);
 
-            Assert.AreEqual(2, ids.Count);
-            Assert.AreEqual(2, values.Length);
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(values.Length, Is.EqualTo(2));
 
             var evType1 = values[0]["EventType"].ToString();
             var evType2 = values[1]["EventType"].ToString();
@@ -1256,15 +1256,15 @@ namespace Audit.Redis.UnitTest
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
 
-            Assert.IsNull(evFromApiNotExists);
-            Assert.AreEqual(evType1, aev1.EventType);
-            Assert.AreEqual(evType2, aev2.EventType);
-            Assert.AreEqual(evFromApi1.EventType, aev1.EventType);
-            Assert.AreEqual(evFromApi1.StartDate, aev1.StartDate);
-            Assert.AreEqual(evFromApi2.EventType, aev2.EventType);
-            Assert.AreEqual(evFromApi2.StartDate, aev2.StartDate);
-            Assert.AreEqual("Redis_Stream_Basic_1", aev1.EventType);
-            Assert.AreEqual("Redis_Stream_Basic_2", aev2.EventType);
+            Assert.That(evFromApiNotExists, Is.Null);
+            Assert.That(aev1.EventType, Is.EqualTo(evType1));
+            Assert.That(aev2.EventType, Is.EqualTo(evType2));
+            Assert.That(aev1.EventType, Is.EqualTo(evFromApi1.EventType));
+            Assert.That(aev1.StartDate, Is.EqualTo(evFromApi1.StartDate));
+            Assert.That(aev2.EventType, Is.EqualTo(evFromApi2.EventType));
+            Assert.That(aev2.StartDate, Is.EqualTo(evFromApi2.StartDate));
+            Assert.That(aev1.EventType, Is.EqualTo("Redis_Stream_Basic_1"));
+            Assert.That(aev2.EventType, Is.EqualTo("Redis_Stream_Basic_2"));
         }
 
         [Test, Order(10)]
@@ -1295,8 +1295,8 @@ namespace Audit.Redis.UnitTest
             var db = mx.GetDatabase();
             var values = db.StreamRange(key);
 
-            Assert.AreEqual(10, ids.Count);
-            Assert.AreEqual(5, values.Length);
+            Assert.That(ids.Count, Is.EqualTo(10));
+            Assert.That(values.Length, Is.EqualTo(5));
 
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();

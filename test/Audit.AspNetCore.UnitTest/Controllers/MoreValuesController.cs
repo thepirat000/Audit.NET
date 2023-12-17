@@ -2,7 +2,7 @@
 using Audit.WebApi;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Audit.Integration.AspNetCore.Controllers
+namespace Audit.AspNetCore.UnitTest.Controllers
 {
     [AuditApi(EventTypeName = "FromControllerAttribute", IncludeHeaders = true, IncludeResponseBody = true, IncludeRequestBody = true, IncludeModelState = true)]
     [Route("api/[controller]")]

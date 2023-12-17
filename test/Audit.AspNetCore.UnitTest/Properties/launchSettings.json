@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Audit.Integration.AspNetCore": {
+    "Audit.AspNetCore.UnitTest": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",

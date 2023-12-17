@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<PublicSign>true</PublicSign>
+		<StartupObject>Audit.AspNetCore.UnitTest.Program</StartupObject>
+		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="wwwroot\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Audit.Mvc.Core\Audit.Mvc.Core.csproj" />
+		<ProjectReference Include="..\..\src\Audit.SignalR\Audit.SignalR.csproj" />
+		<ProjectReference Include="..\..\src\Audit.WebApi.Core\Audit.WebApi.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Views\Mvc\Index.cshtml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

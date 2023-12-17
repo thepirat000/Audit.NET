@@ -1,0 +1,41 @@
+<Project>
+
+	<PropertyGroup Label="Default Versions">
+
+	</PropertyGroup>
+
+	<Choose>
+		<When Condition="$(MSBuildProjectName.Contains('UnitTest'))">
+			<PropertyGroup>
+				<IsTestProject>True</IsTestProject>
+			</PropertyGroup>
+			
+			<ItemGroup>
+				<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+				<PackageReference Include="Moq" Version="4.20.70" />
+				<PackageReference Include="NUnit" Version="3.14.0" />
+				<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+
+				<PackageReference Include="coverlet.collector" Version="6.0.0">
+					<PrivateAssets>all</PrivateAssets>
+					<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+				</PackageReference>
+
+				<PackageReference Include="NUnit.Analyzers" Version="3.10.0">
+					<PrivateAssets>all</PrivateAssets>
+					<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+				</PackageReference>
+			</ItemGroup>
+		</When>
+		<When Condition="$(MSBuildProjectDirectory.Contains('\src\'))">
+			<PropertyGroup>
+
+			</PropertyGroup>
+
+			<ItemGroup>
+
+			</ItemGroup>
+		</When>
+	</Choose>
+
+</Project>

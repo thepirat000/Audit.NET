@@ -27,9 +27,9 @@ namespace Audit.Elasticsearch.UnitTest
                 .Id(ev => "id")
                 .Index("ix"));
 
-            Assert.AreEqual("http://server/", (x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()));
-            Assert.IsTrue(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")));
-            Assert.AreEqual("ix", x.IndexBuilder.Invoke(null).Name);
+            Assert.That((x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()), Is.EqualTo("http://server/"));
+            Assert.That(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")), Is.True);
+            Assert.That(x.IndexBuilder.Invoke(null).Name, Is.EqualTo("ix"));
         }
         
         [Test]
@@ -71,18 +71,18 @@ namespace Audit.Elasticsearch.UnitTest
             var oldDictionary = evLoad.Target.Old as Dictionary<string, object>;
             var newDictionary = evLoad.Target.New as Dictionary<string, object>;
 
-            Assert.IsNotNull(evLoad);
-            Assert.IsNotNull(oldDictionary);
-            Assert.IsNotNull(newDictionary);
-            Assert.AreEqual(1, guids.Count);
-            Assert.AreEqual(1, ins.Count);
-            Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("Created", orderOldValue.Status);
-            Assert.AreEqual("Created", oldDictionary["status"].ToString());
-            Assert.AreEqual("Updated", orderNewValue.Status);
-            Assert.AreEqual("Updated", newDictionary["status"].ToString());
-            Assert.AreEqual("value", evLoad.CustomFields["MyCustomField"]);
-            Assert.AreEqual(null, ins[0].Target.New);
+            Assert.That(evLoad, Is.Not.Null);
+            Assert.That(oldDictionary, Is.Not.Null);
+            Assert.That(newDictionary, Is.Not.Null);
+            Assert.That(guids.Count, Is.EqualTo(1));
+            Assert.That(ins.Count, Is.EqualTo(1));
+            Assert.That(repl.Count, Is.EqualTo(1));
+            Assert.That(orderOldValue.Status, Is.EqualTo("Created"));
+            Assert.That(oldDictionary["status"].ToString(), Is.EqualTo("Created"));
+            Assert.That(orderNewValue.Status, Is.EqualTo("Updated"));
+            Assert.That(newDictionary["status"].ToString(), Is.EqualTo("Updated"));
+            Assert.That(evLoad.CustomFields["MyCustomField"], Is.EqualTo("value"));
+            Assert.That(ins[0].Target.New, Is.EqualTo(null));
         }
 
         [Test]
@@ -123,18 +123,18 @@ namespace Audit.Elasticsearch.UnitTest
             var oldDictionary = evLoad.Target.Old as Dictionary<string, object>;
             var newDictionary = evLoad.Target.New as Dictionary<string, object>;
 
-            Assert.IsNotNull(evLoad);
-            Assert.IsNotNull(oldDictionary);
-            Assert.IsNotNull(newDictionary);
-            Assert.AreEqual(1, guids.Count);
-            Assert.AreEqual(1, ins.Count);
-            Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("Created", orderOldValue.Status);
-            Assert.AreEqual("Created", oldDictionary["status"].ToString());
-            Assert.AreEqual("Updated", orderNewValue.Status);
-            Assert.AreEqual("Updated", newDictionary["status"].ToString());
-            Assert.AreEqual("value", evLoad.CustomFields["MyCustomField"]);
-            Assert.AreEqual(null, ins[0].Target.New);
+            Assert.That(evLoad, Is.Not.Null);
+            Assert.That(oldDictionary, Is.Not.Null);
+            Assert.That(newDictionary, Is.Not.Null);
+            Assert.That(guids.Count, Is.EqualTo(1));
+            Assert.That(ins.Count, Is.EqualTo(1));
+            Assert.That(repl.Count, Is.EqualTo(1));
+            Assert.That(orderOldValue.Status, Is.EqualTo("Created"));
+            Assert.That(oldDictionary["status"].ToString(), Is.EqualTo("Created"));
+            Assert.That(orderNewValue.Status, Is.EqualTo("Updated"));
+            Assert.That(newDictionary["status"].ToString(), Is.EqualTo("Updated"));
+            Assert.That(evLoad.CustomFields["MyCustomField"], Is.EqualTo("value"));
+            Assert.That(ins[0].Target.New, Is.EqualTo(null));
         }
 
         [Test]
@@ -172,17 +172,17 @@ namespace Audit.Elasticsearch.UnitTest
                 ela.Client.Delete(new DeleteRequest(results.Hits.First().Index, results.Hits.First().Id));
             }
 
-            Assert.IsNotNull(evResult);
-            Assert.AreEqual(1, results.Documents.Count);
-            Assert.AreEqual(1, ins.Count);
-            Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("init", evResult.Target.Old.ToString());
-            Assert.AreEqual("init", ins[0].Target.Old.ToString());
-            Assert.AreEqual(null, ins[0].Target.New);
-            Assert.AreEqual("init", repl[0].Target.Old.ToString());
-            Assert.AreEqual("init-end", repl[0].Target.New.ToString());
-            Assert.AreEqual("init-end", evResult.Target.New.ToString());
-            Assert.AreEqual("value", evResult.CustomFields["MyCustomField"]?.ToString());
+            Assert.That(evResult, Is.Not.Null);
+            Assert.That(results.Documents.Count, Is.EqualTo(1));
+            Assert.That(ins.Count, Is.EqualTo(1));
+            Assert.That(repl.Count, Is.EqualTo(1));
+            Assert.That(evResult.Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(ins[0].Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(ins[0].Target.New, Is.EqualTo(null));
+            Assert.That(repl[0].Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(repl[0].Target.New.ToString(), Is.EqualTo("init-end"));
+            Assert.That(evResult.Target.New.ToString(), Is.EqualTo("init-end"));
+            Assert.That(evResult.CustomFields["MyCustomField"]?.ToString(), Is.EqualTo("value"));
         }
 
         [Test]
@@ -220,17 +220,17 @@ namespace Audit.Elasticsearch.UnitTest
                 await ela.Client.DeleteAsync(new DeleteRequest(results.Hits.First().Index, results.Hits.First().Id));
             }
 
-            Assert.IsNotNull(evResult);
-            Assert.AreEqual(1, results.Documents.Count);
-            Assert.AreEqual(1, ins.Count);
-            Assert.AreEqual(1, repl.Count);
-            Assert.AreEqual("init", evResult.Target.Old.ToString());
-            Assert.AreEqual("init", ins[0].Target.Old.ToString());
-            Assert.AreEqual(null, ins[0].Target.New);
-            Assert.AreEqual("init", repl[0].Target.Old.ToString());
-            Assert.AreEqual("init-end", repl[0].Target.New.ToString());
-            Assert.AreEqual("init-end", evResult.Target.New.ToString());
-            Assert.AreEqual("value", evResult.CustomFields["MyCustomField"]?.ToString());
+            Assert.That(evResult, Is.Not.Null);
+            Assert.That(results.Documents.Count, Is.EqualTo(1));
+            Assert.That(ins.Count, Is.EqualTo(1));
+            Assert.That(repl.Count, Is.EqualTo(1));
+            Assert.That(evResult.Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(ins[0].Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(ins[0].Target.New, Is.EqualTo(null));
+            Assert.That(repl[0].Target.Old.ToString(), Is.EqualTo("init"));
+            Assert.That(repl[0].Target.New.ToString(), Is.EqualTo("init-end"));
+            Assert.That(evResult.Target.New.ToString(), Is.EqualTo("init-end"));
+            Assert.That(evResult.CustomFields["MyCustomField"]?.ToString(), Is.EqualTo("value"));
         }
 
     }

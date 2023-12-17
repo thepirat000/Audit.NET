@@ -16,37 +16,37 @@ namespace Audit.UnitTest
         {
             GetProviderCount = 0;
             var options = new AuditScopeOptions(_ => _.DataProvider(GetProvider).CreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd));
-            Assert.AreEqual(0, GetProviderCount);
+            Assert.That(GetProviderCount, Is.EqualTo(0));
             using (var scope = AuditScope.Create(options))
             {
-                Assert.AreEqual(1, GetProviderCount);
+                Assert.That(GetProviderCount, Is.EqualTo(1));
                 scope.SetCustomField("custom", "value");
                 scope.Save();
             }
-            Assert.AreEqual(1, GetProviderCount);
+            Assert.That(GetProviderCount, Is.EqualTo(1));
             options = new AuditScopeOptions(_ => _.DataProvider(GetProvider).CreationPolicy(EventCreationPolicy.Manual));
             using (var scope = new AuditScope(options))
             {
-                Assert.AreEqual(2, GetProviderCount);
+                Assert.That(GetProviderCount, Is.EqualTo(2));
                 scope.Save();
                 scope.Save();
             }
-            Assert.AreEqual(2, GetProviderCount);
+            Assert.That(GetProviderCount, Is.EqualTo(2));
             Audit.Core.Configuration.DataProviderFactory = GetProvider;
             using (var scope = AuditScope.Create("Test", null, new { custom = "value" }))
-            { 
-                Assert.AreEqual(3, GetProviderCount);
+            {
+                Assert.That(GetProviderCount, Is.EqualTo(3));
                 scope.Discard();
             }
-            Assert.AreEqual(3, GetProviderCount);
+            Assert.That(GetProviderCount, Is.EqualTo(3));
 
             Audit.Core.Configuration.Setup().UseFactory(GetProvider);
             using (var scope = AuditScope.Create("Test", null, new { custom = "value" }))
             {
-                Assert.AreEqual(4, GetProviderCount);
+                Assert.That(GetProviderCount, Is.EqualTo(4));
                 scope.Save();
             }
-            Assert.AreEqual(4, GetProviderCount);
+            Assert.That(GetProviderCount, Is.EqualTo(4));
         }
 
         [TestCase(true)]
@@ -90,12 +90,12 @@ namespace Audit.UnitTest
             scope.SetCustomField("f", 2);
             await scope.SaveAsync(cs.Token);
 
-            Assert.AreEqual(cancel, tokenCancelled_inserted);
-            Assert.AreEqual(cancel, tokenCancelled_replaced);
-            Assert.AreEqual(1, events_inserted.Count);
-            Assert.AreEqual(1, events_replaced.Count);
-            Assert.AreEqual("1", events_inserted[0].CustomFields["f"].ToString());
-            Assert.AreEqual("2", events_replaced[0].CustomFields["f"].ToString());
+            Assert.That(tokenCancelled_inserted, Is.EqualTo(cancel));
+            Assert.That(tokenCancelled_replaced, Is.EqualTo(cancel));
+            Assert.That(events_inserted.Count, Is.EqualTo(1));
+            Assert.That(events_replaced.Count, Is.EqualTo(1));
+            Assert.That(events_inserted[0].CustomFields["f"].ToString(), Is.EqualTo("1"));
+            Assert.That(events_replaced[0].CustomFields["f"].ToString(), Is.EqualTo("2"));
         }
 
         private static int GetProviderCount = 0;

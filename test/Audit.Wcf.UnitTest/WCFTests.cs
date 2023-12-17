@@ -46,10 +46,10 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(1, replaced.Count);
-            Assert.IsNull(inserted[0].WcfEvent.Result);
-            Assert.AreEqual("100", replaced[0].WcfEvent.Result.Value.ToString());
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].WcfEvent.Result, Is.Null);
+            Assert.That(replaced[0].WcfEvent.Result.Value.ToString(), Is.EqualTo("100"));
         }
 
         [Test]
@@ -82,10 +82,10 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.IsNull(inserted[0].WcfEvent.Result);
-            Assert.AreEqual("100", inserted[1].WcfEvent.Result.Value.ToString());
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].WcfEvent.Result, Is.Null);
+            Assert.That(inserted[1].WcfEvent.Result.Value.ToString(), Is.EqualTo("100"));
         }
 
         [Test]
@@ -118,10 +118,10 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("100", inserted[0].WcfEvent.Result.Value.ToString());
-            Assert.AreEqual(false, inserted[0].WcfEvent.IsAsync);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].WcfEvent.Result.Value.ToString(), Is.EqualTo("100"));
+            Assert.That(inserted[0].WcfEvent.IsAsync, Is.EqualTo(false));
         }
 
         [Test]
@@ -154,8 +154,8 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual(0, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
         }
        
         public void WCFTest_Concurrency_AuditScope(int threads, int callsPerThread)
@@ -169,12 +169,12 @@ namespace Audit.WCF.UnitTest
                 var request = wcfEvent.InputParameters[0].Value as GetOrderRequest;
                 var result = wcfEvent.Result.Value as GetOrderResponse;
                 Assert.NotNull(request.OrderId);
-                Assert.AreEqual(request.OrderId, ev.CustomFields["Test-Field-1"]);
+                Assert.That(ev.CustomFields["Test-Field-1"], Is.EqualTo(request.OrderId));
                 Assert.False(bag.Contains(request.OrderId));
                 bag.Add(request.OrderId);
-                Assert.AreEqual(ev.CustomFields["Test-Field-1"], ev.CustomFields["Test-Field-2"]);
-                Assert.AreEqual(request.OrderId, result.Order.OrderId);
-                Assert.IsTrue(ev.Environment.CallingMethodName.Contains("GetOrder()"));
+                Assert.That(ev.CustomFields["Test-Field-2"], Is.EqualTo(ev.CustomFields["Test-Field-1"]));
+                Assert.That(result.Order.OrderId, Is.EqualTo(request.OrderId));
+                Assert.That(ev.Environment.CallingMethodName.Contains("GetOrder()"), Is.True);
                 return Guid.NewGuid();
             });
 
@@ -189,8 +189,8 @@ namespace Audit.WCF.UnitTest
                 host.Close();
             }
             Console.WriteLine("Times: {0}.", threads * callsPerThread);
-            Assert.AreEqual(bag.Distinct().Count(), bag.Count);
-            Assert.AreEqual(threads * callsPerThread, bag.Count);
+            Assert.That(bag.Count, Is.EqualTo(bag.Distinct().Count()));
+            Assert.That(bag.Count, Is.EqualTo(threads * callsPerThread));
 
         }
 

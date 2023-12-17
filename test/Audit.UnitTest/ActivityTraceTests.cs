@@ -33,20 +33,20 @@ namespace Audit.UnitTest
             var scope = AuditScope.Create(new AuditScopeOptions() { IncludeActivityTrace = true });
             scope.Dispose();
 
-            Assert.IsNotNull(scope.Event.Activity);
-            Assert.IsNotEmpty(scope.Event.Activity.SpanId);
-            Assert.IsNotEmpty(scope.Event.Activity.ParentId);
-            Assert.IsNotEmpty(scope.Event.Activity.TraceId);
-            Assert.IsTrue(scope.Event.Activity.StartTimeUtc <= DateTime.UtcNow);
-            Assert.IsNotNull(scope.Event.Activity.Tags);
-            Assert.AreEqual(1, scope.Event.Activity.Tags.Count);
-            Assert.AreEqual("TAG1", scope.Event.Activity.Tags[0].Key);
-            Assert.AreEqual("VALUE1", scope.Event.Activity.Tags[0].Value);
-            Assert.AreEqual("Test1", scope.Event.Activity.Operation);
-            Assert.IsNotNull(scope.Event.Activity.Events);
-            Assert.AreEqual(1, scope.Event.Activity.Events.Count);
-            Assert.AreEqual("Event1", scope.Event.Activity.Events[0].Name);
-            Assert.IsTrue(scope.Event.Activity.Events[0].Timestamp <= DateTime.UtcNow);
+            Assert.That(scope.Event.Activity, Is.Not.Null);
+            Assert.That(scope.Event.Activity.SpanId, Is.Not.Empty);
+            Assert.That(scope.Event.Activity.ParentId, Is.Not.Empty);
+            Assert.That(scope.Event.Activity.TraceId, Is.Not.Empty);
+            Assert.That(scope.Event.Activity.StartTimeUtc <= DateTime.UtcNow, Is.True);
+            Assert.That(scope.Event.Activity.Tags, Is.Not.Null);
+            Assert.That(scope.Event.Activity.Tags.Count, Is.EqualTo(1));
+            Assert.That(scope.Event.Activity.Tags[0].Key, Is.EqualTo("TAG1"));
+            Assert.That(scope.Event.Activity.Tags[0].Value, Is.EqualTo("VALUE1"));
+            Assert.That(scope.Event.Activity.Operation, Is.EqualTo("Test1"));
+            Assert.That(scope.Event.Activity.Events, Is.Not.Null);
+            Assert.That(scope.Event.Activity.Events.Count, Is.EqualTo(1));
+            Assert.That(scope.Event.Activity.Events[0].Name, Is.EqualTo("Event1"));
+            Assert.That(scope.Event.Activity.Events[0].Timestamp <= DateTime.UtcNow, Is.True);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace Audit.UnitTest
             Activity.Current = null;
             var scope = AuditScope.Create(new AuditScopeOptions() { IncludeActivityTrace = true });
 
-            Assert.IsNull(scope.Event.Activity);
+            Assert.That(scope.Event.Activity, Is.Null);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Audit.UnitTest
 
             var scope = AuditScope.Create(new AuditScopeOptions() { IncludeActivityTrace = false });
 
-            Assert.IsNull(scope.Event.Activity);
+            Assert.That(scope.Event.Activity, Is.Null);
         }
     }
 }

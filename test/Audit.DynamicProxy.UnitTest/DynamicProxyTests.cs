@@ -40,13 +40,13 @@ namespace Audit.DynamicProxy.UnitTest
             var audited = AuditProxy.Create<InterceptMeBase>(real);
             var res = await audited.AsyncFunctionAsync("2000");
 
-            Assert.AreEqual("ok", res);
-            Assert.AreEqual(1, inserts.Count);
-            Assert.AreEqual(1, replaces.Count);
+            Assert.That(res, Is.EqualTo("ok"));
+            Assert.That(inserts.Count, Is.EqualTo(1));
+            Assert.That(replaces.Count, Is.EqualTo(1));
 
-            Assert.IsNull(inserts[0].GetAuditInterceptEvent().Result);
-            Assert.AreEqual("Task<String>", replaces[0].GetAuditInterceptEvent().Result.Type);
-            Assert.AreEqual("ok", replaces[0].GetAuditInterceptEvent().Result.Value.ToString());
+            Assert.That(inserts[0].GetAuditInterceptEvent().Result, Is.Null);
+            Assert.That(replaces[0].GetAuditInterceptEvent().Result.Type, Is.EqualTo("Task<String>"));
+            Assert.That(replaces[0].GetAuditInterceptEvent().Result.Value.ToString(), Is.EqualTo("ok"));
         }
 
         private static string ToJson(object obj)
@@ -74,7 +74,7 @@ namespace Audit.DynamicProxy.UnitTest
             var res = await audited.AsyncFunctionAsync("2000");
 
             var t1 = audited.MethodThatReturnsATask("1000");
-            Assert.AreEqual("InterceptMe.MethodThatReturnsATask", logs[2].EventType);
+            Assert.That(logs[2].EventType, Is.EqualTo("InterceptMe.MethodThatReturnsATask"));
             t1.Start();
             var s = t1.Result;
 
@@ -89,12 +89,12 @@ namespace Audit.DynamicProxy.UnitTest
 
             var source = new CancellationTokenSource();
             source.CancelAfter(TimeSpan.FromSeconds(1));
-            Assert.ThrowsAsync<TaskCanceledException>(async () =>
+            Assert.ThrowsAsync<OperationCanceledException>(async () =>
             {
                 await audited.AsyncMethodAsyncWithCancellation(source.Token);
             });
-            
-            Assert.AreEqual(6, logs.Count);
+
+            Assert.That(logs.Count, Is.EqualTo(6));
             
             Audit.Core.Configuration.AddOnSavingAction(scope =>
             {
@@ -112,33 +112,33 @@ namespace Audit.DynamicProxy.UnitTest
 
 
             // Aync returning void cannot be continued
-            Assert.AreEqual("InterceptMe.AsyncReturningVoidAsync", logs[0].EventType);
+            Assert.That(logs[0].EventType, Is.EqualTo("InterceptMe.AsyncReturningVoidAsync"));
             Assert.True(logs[0].Duration < 1000);
             Assert.True(logs[0].GetAuditInterceptEvent().IsAsync);
             Assert.Null(logs[0].GetAuditInterceptEvent().AsyncStatus);
 
-            Assert.AreEqual("ok", res);
-            Assert.AreEqual("InterceptMe.AsyncFunctionAsync", logs[1].EventType);
-            Assert.AreEqual("ok", logs[1].GetAuditInterceptEvent().Result.Value);
+            Assert.That(res, Is.EqualTo("ok"));
+            Assert.That(logs[1].EventType, Is.EqualTo("InterceptMe.AsyncFunctionAsync"));
+            Assert.That(logs[1].GetAuditInterceptEvent().Result.Value, Is.EqualTo("ok"));
             Assert.True(logs[1].Duration >= 2000);
-            Assert.AreEqual(TaskStatus.RanToCompletion.ToString(), logs[1].GetAuditInterceptEvent().AsyncStatus);
+            Assert.That(logs[1].GetAuditInterceptEvent().AsyncStatus, Is.EqualTo(TaskStatus.RanToCompletion.ToString()));
 
             // Methods that returns a task (but are not async) are not continued
-            Assert.AreEqual("InterceptMe.MethodThatReturnsATask", logs[2].EventType);
+            Assert.That(logs[2].EventType, Is.EqualTo("InterceptMe.MethodThatReturnsATask"));
             Assert.True(logs[2].Duration < 1000);
             Assert.False(logs[2].GetAuditInterceptEvent().IsAsync);
 
-            Assert.AreEqual("InterceptMe.AsyncMethodAsync", logs[3].EventType);
+            Assert.That(logs[3].EventType, Is.EqualTo("InterceptMe.AsyncMethodAsync"));
             Assert.True(logs[3].Duration >= 500);
-            Assert.AreEqual(TaskStatus.RanToCompletion.ToString(), logs[3].GetAuditInterceptEvent().AsyncStatus);
+            Assert.That(logs[3].GetAuditInterceptEvent().AsyncStatus, Is.EqualTo(TaskStatus.RanToCompletion.ToString()));
 
-            Assert.AreEqual("InterceptMe.AsyncFunctionAsync", logs[4].EventType);
+            Assert.That(logs[4].EventType, Is.EqualTo("InterceptMe.AsyncFunctionAsync"));
             Assert.NotNull(logs[4].GetAuditInterceptEvent().Exception);
-            Assert.AreEqual(TaskStatus.Faulted.ToString(), logs[4].GetAuditInterceptEvent().AsyncStatus);
+            Assert.That(logs[4].GetAuditInterceptEvent().AsyncStatus, Is.EqualTo(TaskStatus.Faulted.ToString()));
 
-            Assert.AreEqual("InterceptMe.AsyncMethodAsyncWithCancellation", logs[5].EventType);
+            Assert.That(logs[5].EventType, Is.EqualTo("InterceptMe.AsyncMethodAsyncWithCancellation"));
             Assert.True(logs[5].Duration >= 1000);
-            Assert.AreEqual(TaskStatus.Canceled.ToString(), logs[5].GetAuditInterceptEvent().AsyncStatus);
+            Assert.That(logs[5].GetAuditInterceptEvent().AsyncStatus, Is.EqualTo(TaskStatus.Canceled.ToString()));
         }
 
         [Test]
@@ -158,15 +158,15 @@ namespace Audit.DynamicProxy.UnitTest
             audited.RefParam("A", ref i1, () => 1);
             audited.OutParam("B", out i2, () => 2);
 
-            Assert.AreEqual(2, logs[0].GetAuditInterceptEvent().Arguments.Count);
-            Assert.AreEqual(1, logs[1].GetAuditInterceptEvent().Arguments.Count);
+            Assert.That(logs[0].GetAuditInterceptEvent().Arguments.Count, Is.EqualTo(2));
+            Assert.That(logs[1].GetAuditInterceptEvent().Arguments.Count, Is.EqualTo(1));
             Assert.Null(logs[0].GetAuditInterceptEvent().Result);
 
-            Assert.AreEqual(100, logs[0].GetAuditInterceptEvent().Arguments[1].Value);
-            Assert.AreEqual(101, logs[0].GetAuditInterceptEvent().Arguments[1].OutputValue);
+            Assert.That(logs[0].GetAuditInterceptEvent().Arguments[1].Value, Is.EqualTo(100));
+            Assert.That(logs[0].GetAuditInterceptEvent().Arguments[1].OutputValue, Is.EqualTo(101));
 
-            Assert.AreEqual(2, logs[1].GetAuditInterceptEvent().Arguments[0].Value);
-            Assert.AreEqual(22, logs[1].GetAuditInterceptEvent().Arguments[0].OutputValue);
+            Assert.That(logs[1].GetAuditInterceptEvent().Arguments[0].Value, Is.EqualTo(2));
+            Assert.That(logs[1].GetAuditInterceptEvent().Arguments[0].OutputValue, Is.EqualTo(22));
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace Audit.DynamicProxy.UnitTest
             var t = audited.SomeProperty;
             var str = audited.ReturnString("test");
 
-            Assert.AreEqual(3, logs.Count);
+            Assert.That(logs.Count, Is.EqualTo(3));
             Assert.Contains("InterceptMe.get_SomeProperty", logs);
             Assert.Contains("InterceptMe.set_SomeProperty", logs);
             Assert.Contains("InterceptMe.ReturnString", logs);
@@ -202,8 +202,8 @@ namespace Audit.DynamicProxy.UnitTest
                 .UseCustomProvider(provider.Object);
             var x = AuditProxy.Create<IInterceptMe>(real, null);
             var str = x.ReturnString(guid);
-            Assert.AreEqual(guid.ToUpper(), str);
-            Assert.AreEqual("test", x.GetSomePropValue());
+            Assert.That(str, Is.EqualTo(guid.ToUpper()));
+            Assert.That(x.GetSomePropValue(), Is.EqualTo("test"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             provider.Verify(p => p.InsertEvent(It.Is<AuditEvent>(ev => (string)ev.GetAuditInterceptEvent().Arguments[0].Value == guid)), Times.Once);
         }
@@ -221,7 +221,7 @@ namespace Audit.DynamicProxy.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             x = AuditProxy.Create<IInterceptMe>(real, new InterceptionSettings() { IgnoreEvents = false });
             x.SomeEvent += (s, e) => { };
-            Assert.AreEqual("test", x.GetSomePropValue());
+            Assert.That(x.GetSomePropValue(), Is.EqualTo("test"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
         }
 
@@ -238,7 +238,7 @@ namespace Audit.DynamicProxy.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
             x = AuditProxy.Create<IInterceptMe>(real, new InterceptionSettings() { IgnoreEvents = false });
             x.SomeEvent += (s, e) => { };
-            Assert.AreEqual("test", x.GetSomePropValue());
+            Assert.That(x.GetSomePropValue(), Is.EqualTo("test"));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
         }
 

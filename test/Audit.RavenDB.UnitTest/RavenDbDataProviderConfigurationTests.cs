@@ -26,9 +26,9 @@ namespace Audit.RavenDB.UnitTest
             var provider2 = new RavenDbDataProvider(_ => _
                 .UseDocumentStore(ds.Object));
 
-            Assert.IsNotNull(provider1.DocumentStore);
-            Assert.IsNotNull(provider2.DocumentStore);
-            Assert.AreEqual(testUrl, provider1.DocumentStore?.Urls[0]);
+            Assert.That(provider1.DocumentStore, Is.Not.Null);
+            Assert.That(provider2.DocumentStore, Is.Not.Null);
+            Assert.That(provider1.DocumentStore?.Urls[0], Is.EqualTo(testUrl));
         }
 
         [Test]
@@ -43,12 +43,12 @@ namespace Audit.RavenDB.UnitTest
                     .Urls(ravenServerUrl)
                     .Database(_ => dbName)));
 
-            Assert.IsNotNull(provider.DocumentStore);
+            Assert.That(provider.DocumentStore, Is.Not.Null);
 
-            Assert.AreEqual(ravenServerUrl, provider.DocumentStore?.Urls[0]);
-            Assert.AreEqual("defaultDb", provider.DocumentStore?.Database);
-            Assert.AreEqual(dbName, provider.GetDatabaseName(null));
-            Assert.AreEqual(null, provider.DocumentStore.Certificate);
+            Assert.That(provider.DocumentStore?.Urls[0], Is.EqualTo(ravenServerUrl));
+            Assert.That(provider.DocumentStore?.Database, Is.EqualTo("defaultDb"));
+            Assert.That(provider.GetDatabaseName(null), Is.EqualTo(dbName));
+            Assert.That(provider.DocumentStore.Certificate, Is.EqualTo(null));
         }
 
         [Test]
@@ -62,12 +62,12 @@ namespace Audit.RavenDB.UnitTest
                     .Urls(ravenServerUrl)
                     .Database(_ => dbName)));
 
-            Assert.IsNotNull(provider.DocumentStore);
+            Assert.That(provider.DocumentStore, Is.Not.Null);
 
-            Assert.AreEqual(ravenServerUrl, provider.DocumentStore?.Urls[0]);
-            Assert.AreEqual("defaultDb", provider.DocumentStore?.Database);
-            Assert.AreEqual(dbName, provider.GetDatabaseName(null));
-            Assert.AreEqual(null, provider.DocumentStore.Certificate);
+            Assert.That(provider.DocumentStore?.Urls[0], Is.EqualTo(ravenServerUrl));
+            Assert.That(provider.DocumentStore?.Database, Is.EqualTo("defaultDb"));
+            Assert.That(provider.GetDatabaseName(null), Is.EqualTo(dbName));
+            Assert.That(provider.DocumentStore.Certificate, Is.EqualTo(null));
             Assert.IsInstanceOf<AuditContractResolver>((provider.DocumentStore.Conventions.Serialization as NewtonsoftJsonSerializationConventions)?.JsonContractResolver);
         }
     }

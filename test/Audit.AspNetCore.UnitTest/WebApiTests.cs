@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace Audit.Integration.AspNetCore
+namespace Audit.AspNetCore.UnitTest
 {
     [TestFixture]
     public class WebApiTests
@@ -53,7 +53,7 @@ namespace Audit.Integration.AspNetCore
         public async Task TestInitialize()
         {
             var s = await _httpClient.GetStringAsync("api/values");
-            Assert.AreEqual("[\"value1\",\"value2\"]", s);
+            Assert.That(s, Is.EqualTo("[\"value1\",\"value2\"]"));
         }
 
         [Test]
@@ -76,16 +76,16 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(2, insertEvs.Count);
-            Assert.AreEqual(0, updatedEvs.Count);
-            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
-            Assert.IsNull(insertEvs[0].Action.ResponseStatus);
-            Assert.AreEqual("OK", insertEvs[1].Action.ResponseStatus);
-            Assert.IsNotNull(insertEvs[0].Activity);
-            Assert.IsNotNull(insertEvs[1].Activity);
-            Assert.IsNotEmpty(insertEvs[0].Activity.TraceId);
-            Assert.IsNotEmpty(insertEvs[1].Activity.TraceId);
-            Assert.AreEqual(insertEvs[0].Activity.TraceId, insertEvs[1].Activity.TraceId);
+            Assert.That(insertEvs.Count, Is.EqualTo(2));
+            Assert.That(updatedEvs.Count, Is.EqualTo(0));
+            Assert.That(await res.Content.ReadAsStringAsync(), Is.Not.Null);
+            Assert.That(insertEvs[0].Action.ResponseStatus, Is.Null);
+            Assert.That(insertEvs[1].Action.ResponseStatus, Is.EqualTo("OK"));
+            Assert.That(insertEvs[0].Activity, Is.Not.Null);
+            Assert.That(insertEvs[1].Activity, Is.Not.Null);
+            Assert.That(insertEvs[0].Activity.TraceId, Is.Not.Empty);
+            Assert.That(insertEvs[1].Activity.TraceId, Is.Not.Empty);
+            Assert.That(insertEvs[1].Activity.TraceId, Is.EqualTo(insertEvs[0].Activity.TraceId));
         }
 
         [Test]
@@ -107,10 +107,10 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(0, updatedEvs.Count);
-            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
-            Assert.AreEqual("OK", insertEvs[0].Action.ResponseStatus);
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(updatedEvs.Count, Is.EqualTo(0));
+            Assert.That(await res.Content.ReadAsStringAsync(), Is.Not.Null);
+            Assert.That(insertEvs[0].Action.ResponseStatus, Is.EqualTo("OK"));
         }
 
         [Test]
@@ -132,11 +132,11 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(1, updatedEvs.Count);
-            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
-            Assert.IsNull(insertEvs[0].Action.ResponseStatus);
-            Assert.AreEqual("OK", updatedEvs[0].Action.ResponseStatus);
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(updatedEvs.Count, Is.EqualTo(1));
+            Assert.That(await res.Content.ReadAsStringAsync(), Is.Not.Null);
+            Assert.That(insertEvs[0].Action.ResponseStatus, Is.Null);
+            Assert.That(updatedEvs[0].Action.ResponseStatus, Is.EqualTo("OK"));
         }
 
         [Test]
@@ -158,8 +158,8 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(0, insertEvs.Count);
-            Assert.AreEqual(0, updatedEvs.Count);
+            Assert.That(insertEvs.Count, Is.EqualTo(0));
+            Assert.That(updatedEvs.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -177,9 +177,9 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
-            Assert.AreEqual(true, insertEvs[0].CustomFields["ScopeExists"]);
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(await res.Content.ReadAsStringAsync(), Is.Not.Null);
+            Assert.That(insertEvs[0].CustomFields["ScopeExists"], Is.EqualTo(true));
         }
 
         [Test]
@@ -197,11 +197,11 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.PostAsync(url, new StringContent("{\"value\": \"def\"}", Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.IsNotNull(await res.Content.ReadAsStringAsync());
-            Assert.AreEqual(true, insertEvs[0].CustomFields["ScopeExists"]);
-            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext());
-            Assert.AreEqual("GlobalAudit", (insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName);
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(await res.Content.ReadAsStringAsync(), Is.Not.Null);
+            Assert.That(insertEvs[0].CustomFields["ScopeExists"], Is.EqualTo(true));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext(), Is.Not.Null);
+            Assert.That((insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName, Is.EqualTo("GlobalAudit"));
         }
 
         [Test]
@@ -219,12 +219,12 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual(1, action.ActionParameters.Count);
-            Assert.AreEqual("test", action.ActionParameters["t"]);
-            Assert.AreEqual("TestFromServiceIgnore", action.ActionName);
+            Assert.That(action.ActionParameters.Count, Is.EqualTo(1));
+            Assert.That(action.ActionParameters["t"], Is.EqualTo("test"));
+            Assert.That(action.ActionName, Is.EqualTo("TestFromServiceIgnore"));
         }
 
         [Test]
@@ -244,17 +244,17 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
             Assert.IsFalse(action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.IsTrue(action.Headers == null || action.Headers.Count == 0);
-            Assert.IsTrue(action.ResponseHeaders.Count > 0);
-            Assert.AreEqual("test", action.ResponseHeaders["some-header-attr"]);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext());
-            Assert.AreEqual("TestResponseHeadersAttribute", (insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName);
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.Headers == null || action.Headers.Count == 0, Is.True);
+            Assert.That(action.ResponseHeaders.Count > 0, Is.True);
+            Assert.That(action.ResponseHeaders["some-header-attr"], Is.EqualTo("test"));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext(), Is.Not.Null);
+            Assert.That((insertEvs[0].GetWebApiAuditAction().GetActionExecutingContext().ActionDescriptor as ControllerActionDescriptor).ActionName, Is.EqualTo("TestResponseHeadersAttribute"));
         }
 
         [Test]
@@ -274,15 +274,15 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
             Assert.IsFalse(action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.IsTrue(action.Headers.Count > 0);
-            Assert.IsTrue(action.ResponseHeaders.Count > 0);
-            Assert.AreEqual("test", action.ResponseHeaders["some-header-global"]);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.Headers.Count > 0, Is.True);
+            Assert.That(action.ResponseHeaders.Count > 0, Is.True);
+            Assert.That(action.ResponseHeaders["some-header-global"], Is.EqualTo("test"));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
         }
         
         [Test]
@@ -302,17 +302,17 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.IsTrue(action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.IsNull(action.ActionName);
-            Assert.IsNull(action.ControllerName);
-            Assert.IsTrue(action.Headers.Count > 0);
-            Assert.IsTrue(action.ResponseHeaders.Count > 0);
-            Assert.AreEqual("test", action.ResponseHeaders["some-header"]);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
+            Assert.That(action.IsMiddleware, Is.True);
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.ActionName, Is.Null);
+            Assert.That(action.ControllerName, Is.Null);
+            Assert.That(action.Headers.Count > 0, Is.True);
+            Assert.That(action.ResponseHeaders.Count > 0, Is.True);
+            Assert.That(action.ResponseHeaders["some-header"], Is.EqualTo("test"));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
         }
 
         [Test]
@@ -334,20 +334,20 @@ namespace Audit.Integration.AspNetCore
 
             var responseBody = await res.Content.ReadAsStringAsync();
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual("mix", responseBody);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(responseBody, Is.EqualTo("mix"));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual("PostMix", action.ActionName);
-            Assert.AreEqual("Values", action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.AreEqual(2, action.ActionParameters.Count);
-            Assert.AreEqual(null, action.Exception);
-            Assert.AreEqual(rqBody, action.RequestBody.Value);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.AreEqual("mix", action.ResponseBody.Value);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo("PostMix"));
+            Assert.That(action.ControllerName, Is.EqualTo("Values"));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.ActionParameters.Count, Is.EqualTo(2));
+            Assert.That(action.Exception, Is.EqualTo(null));
+            Assert.That(action.RequestBody.Value, Is.EqualTo(rqBody));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseBody.Value, Is.EqualTo("mix"));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
         }
 
         [Test]
@@ -368,20 +368,20 @@ namespace Audit.Integration.AspNetCore
             var res = await _httpClient.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "application/json"));
 
 
-            Assert.AreEqual(HttpStatusCode.InternalServerError, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual(null, action.ActionName);
-            Assert.AreEqual(null, action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.AreEqual(null, action.ActionParameters);
-            Assert.IsNotNull(action.Exception);
-            Assert.IsTrue(action.Exception.ToUpper().Contains("THIS IS A TEST EXCEPTION 666"));
-            Assert.AreEqual(rqBody, action.RequestBody.Value);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.AreEqual(null, action.ResponseBody);
-            Assert.AreEqual(500, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo(null));
+            Assert.That(action.ControllerName, Is.EqualTo(null));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.ActionParameters, Is.EqualTo(null));
+            Assert.That(action.Exception, Is.Not.Null);
+            Assert.That(action.Exception.ToUpper().Contains("THIS IS A TEST EXCEPTION 666"), Is.True);
+            Assert.That(action.RequestBody.Value, Is.EqualTo(rqBody));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseBody, Is.EqualTo(null));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(500));
         }
 
         [Test]
@@ -400,18 +400,18 @@ namespace Audit.Integration.AspNetCore
             var rqBody = "{\"value\": \"x\"}";
             var res = await _httpClient.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.NotFound, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual(null, action.ActionName);
-            Assert.AreEqual(null, action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.AreEqual(null, action.ActionParameters);
-            Assert.IsNull(action.Exception);
-            Assert.AreEqual(rqBody, action.RequestBody.Value);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.AreEqual(404, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo(null));
+            Assert.That(action.ControllerName, Is.EqualTo(null));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.ActionParameters, Is.EqualTo(null));
+            Assert.That(action.Exception, Is.Null);
+            Assert.That(action.RequestBody.Value, Is.EqualTo(rqBody));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(404));
         }
         
         [Test]
@@ -430,18 +430,18 @@ namespace Audit.Integration.AspNetCore
             var rqBody = "{\"value\": \"123\"}";
             var res = await _httpClient.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "unknown/unknown"));
 
-            Assert.AreEqual(HttpStatusCode.UnsupportedMediaType, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.UnsupportedMediaType));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual(null, action.ActionName);
-            Assert.AreEqual(null, action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.AreEqual(null, action.ActionParameters);
-            Assert.IsNull(action.Exception);
-            Assert.AreEqual(rqBody, action.RequestBody.Value);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.AreEqual(415, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo(null));
+            Assert.That(action.ControllerName, Is.EqualTo(null));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.ActionParameters, Is.EqualTo(null));
+            Assert.That(action.Exception, Is.Null);
+            Assert.That(action.RequestBody.Value, Is.EqualTo(rqBody));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(415));
         }
 
         [Test]
@@ -460,18 +460,18 @@ namespace Audit.Integration.AspNetCore
             var rqBody = "{\"value\": \"def\"}";
             var res = await _httpClient.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual(null, action.ActionName);
-            Assert.AreEqual(null, action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.AreEqual(null, action.Exception);
-            Assert.AreEqual(rqBody, action.RequestBody.Value);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.AreEqual(null, action.ResponseBody);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo(null));
+            Assert.That(action.ControllerName, Is.EqualTo(null));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.Exception, Is.EqualTo(null));
+            Assert.That(action.RequestBody.Value, Is.EqualTo(rqBody));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseBody, Is.EqualTo(null));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
         }
 
         [Test]
@@ -490,19 +490,19 @@ namespace Audit.Integration.AspNetCore
             var rqBody = "{\"value\": \"def\"}";
             var res = await _httpClient.PostAsync(url, new StringContent(rqBody, Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual("TestIgnoreResponse", action.ActionName);
-            Assert.AreEqual("Values", action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.AreEqual(null, action.Exception);
-            Assert.AreEqual(rqBody, action.RequestBody.Value);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.AreEqual("OkObjectResult", action.ResponseBody.Type);
-            Assert.AreEqual(null, action.ResponseBody.Value);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo("TestIgnoreResponse"));
+            Assert.That(action.ControllerName, Is.EqualTo("Values"));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.Exception, Is.EqualTo(null));
+            Assert.That(action.RequestBody.Value, Is.EqualTo(rqBody));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseBody.Type, Is.EqualTo("OkObjectResult"));
+            Assert.That(action.ResponseBody.Value, Is.EqualTo(null));
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
         }
 
         [Test]
@@ -520,17 +520,17 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.AreEqual("Get", action.ActionName);
-            Assert.AreEqual("MoreValues", action.ControllerName);
-            Assert.AreEqual(true, action.IsMiddleware);
-            Assert.AreEqual("GET", action.HttpMethod);
-            Assert.AreEqual(null, action.Exception);
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
-            Assert.IsNotNull(action.ResponseBody);
-            Assert.AreEqual(200, action.ResponseStatusCode);
+            Assert.That(action.ActionName, Is.EqualTo("Get"));
+            Assert.That(action.ControllerName, Is.EqualTo("MoreValues"));
+            Assert.That(action.IsMiddleware, Is.EqualTo(true));
+            Assert.That(action.HttpMethod, Is.EqualTo("GET"));
+            Assert.That(action.Exception, Is.EqualTo(null));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
+            Assert.That(action.ResponseBody, Is.Not.Null);
+            Assert.That(action.ResponseStatusCode, Is.EqualTo(200));
         }
 
         [Test]
@@ -550,17 +550,17 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.PostAsync(url, new StringContent("{\"value\": \"def\"}", Encoding.UTF8, "application/json"));
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
             var action = insertEvs[0].GetWebApiAuditAction();
-            Assert.IsTrue(action.IsMiddleware);
-            Assert.AreEqual("POST", action.HttpMethod);
-            Assert.IsNull(action.ActionName);
-            Assert.IsNull(action.ControllerName);
-            Assert.IsTrue(action.Headers.Count > 0);
-            Assert.AreEqual("{\"value\": \"def\"}", action.RequestBody.Value.ToString());
-            Assert.AreEqual("hi", action.ResponseBody.Value.ToString());
-            Assert.IsTrue(action.RequestUrl.EndsWith(url));
+            Assert.That(action.IsMiddleware, Is.True);
+            Assert.That(action.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(action.ActionName, Is.Null);
+            Assert.That(action.ControllerName, Is.Null);
+            Assert.That(action.Headers.Count > 0, Is.True);
+            Assert.That(action.RequestBody.Value.ToString(), Is.EqualTo("{\"value\": \"def\"}"));
+            Assert.That(action.ResponseBody.Value.ToString(), Is.EqualTo("hi"));
+            Assert.That(action.RequestUrl.EndsWith(url), Is.True);
         }
 
         [Test]
@@ -582,8 +582,8 @@ namespace Audit.Integration.AspNetCore
             var res = await _httpClient.SendAsync(req);
 
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(0, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(0));
         }
         
         [Test]
@@ -605,8 +605,8 @@ namespace Audit.Integration.AspNetCore
             var req = new HttpRequestMessage(HttpMethod.Post, url);
             var res = await _httpClient.SendAsync(req);
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(0, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -627,8 +627,8 @@ namespace Audit.Integration.AspNetCore
             
             var res = await _httpClient.GetAsync(url);
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(0, insertEvs.Count);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(0));
         }
         
         [Test]
@@ -649,13 +649,13 @@ namespace Audit.Integration.AspNetCore
             var req = new HttpRequestMessage(HttpMethod.Post, url);
             var res = await _httpClient.SendAsync(req);
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(1, insertEvs[0].GetWebApiAuditAction().ActionParameters.Count);
-            Assert.IsTrue(insertEvs[0].GetWebApiAuditAction().ActionParameters.ContainsKey("user"));
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ActionParameters.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ActionParameters.ContainsKey("user"), Is.True);
             Assert.IsFalse(insertEvs[0].GetWebApiAuditAction().ActionParameters.ContainsKey("password"));
             Assert.IsFalse(insertEvs[0].GetWebApiAuditAction().IsMiddleware);
-            Assert.IsTrue(insertEvs[0].GetWebApiAuditAction().RequestUrl.EndsWith(url));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().RequestUrl.EndsWith(url), Is.True);
         }
 
         [Test]
@@ -680,22 +680,22 @@ namespace Audit.Integration.AspNetCore
             
             var req = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(nvc) };
             var res = await _httpClient.SendAsync(req);
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(200, insertEvs[0].GetWebApiAuditAction().ResponseStatusCode);
-            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().FormVariables);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ResponseStatusCode, Is.EqualTo(200));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().FormVariables, Is.Not.Null);
 
             nvc.Add(new KeyValuePair<string, string>("c", "3"));
             req = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(nvc) };
             res = await _httpClient.SendAsync(req);
 
-            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
-            Assert.AreEqual(2, insertEvs.Count);
-            Assert.IsNotNull(insertEvs[0].GetWebApiAuditAction().TraceId);
-            Assert.IsNotNull(insertEvs[1].GetWebApiAuditAction().TraceId);
-            Assert.AreNotEqual(insertEvs[0].GetWebApiAuditAction().TraceId, insertEvs[1].GetWebApiAuditAction().TraceId);
+            Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(2));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().TraceId, Is.Not.Null);
+            Assert.That(insertEvs[1].GetWebApiAuditAction().TraceId, Is.Not.Null);
+            Assert.That(insertEvs[1].GetWebApiAuditAction().TraceId, Is.Not.EqualTo(insertEvs[0].GetWebApiAuditAction().TraceId));
             // Form should be null since the api is limited to 2
-            Assert.IsNull(insertEvs[1].GetWebApiAuditAction().FormVariables);
+            Assert.That(insertEvs[1].GetWebApiAuditAction().FormVariables, Is.Null);
         }
 
         [Test]
@@ -715,13 +715,13 @@ namespace Audit.Integration.AspNetCore
             var s = await _httpClient.PostAsync($"api/values/GlobalAudit", new StringContent("{\"value\": \"def\"}", Encoding.UTF8, "application/json"));
 
 
-            Assert.AreEqual(HttpStatusCode.OK, s.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual("{\"value\": \"def\"}", insertEvs[0].GetWebApiAuditAction().RequestBody.Value);
-            Assert.AreEqual(0, insertEvs[0].GetWebApiAuditAction().ActionParameters.Count, "request should not be logged on action params because it's ignored");
-            Assert.AreEqual("def", insertEvs[0].GetWebApiAuditAction().ResponseBody.Value);
-            Assert.AreEqual(200, insertEvs[0].GetWebApiAuditAction().ResponseStatusCode);
-            Assert.AreEqual("POST.Values.GlobalAudit", insertEvs[0].EventType);
+            Assert.That(s.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().RequestBody.Value, Is.EqualTo("{\"value\": \"def\"}"));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ActionParameters.Count, Is.EqualTo(0), "request should not be logged on action params because it's ignored");
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ResponseBody.Value, Is.EqualTo("def"));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ResponseStatusCode, Is.EqualTo(200));
+            Assert.That(insertEvs[0].EventType, Is.EqualTo("POST.Values.GlobalAudit"));
             Assert.IsFalse(insertEvs[0].GetWebApiAuditAction().IsMiddleware);
         }
 
@@ -742,13 +742,13 @@ namespace Audit.Integration.AspNetCore
             var s = await _httpClient.PostAsync($"api/values/TestIgnoreResponseFilter", new StringContent("{\"value\": \"def\"}", Encoding.UTF8, "application/json"));
 
 
-            Assert.AreEqual(HttpStatusCode.OK, s.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual("{\"value\": \"def\"}", insertEvs[0].GetWebApiAuditAction().RequestBody.Value);
-            Assert.AreEqual(1, insertEvs[0].GetWebApiAuditAction().ActionParameters.Count);
-            Assert.IsNull(insertEvs[0].GetWebApiAuditAction().ResponseBody.Value);
-            Assert.AreEqual(200, insertEvs[0].GetWebApiAuditAction().ResponseStatusCode);
-            Assert.AreEqual("POST Values/TestIgnoreResponseFilter", insertEvs[0].EventType);
+            Assert.That(s.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().RequestBody.Value, Is.EqualTo("{\"value\": \"def\"}"));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ActionParameters.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ResponseBody.Value, Is.Null);
+            Assert.That(insertEvs[0].GetWebApiAuditAction().ResponseStatusCode, Is.EqualTo(200));
+            Assert.That(insertEvs[0].EventType, Is.EqualTo("POST Values/TestIgnoreResponseFilter"));
             Assert.IsFalse(insertEvs[0].GetWebApiAuditAction().IsMiddleware);
         }
 
@@ -773,11 +773,11 @@ namespace Audit.Integration.AspNetCore
 
             
             var s = await _httpClient.GetStringAsync($"api/values/10");
-            Assert.AreEqual("10", s);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(1, replaceEvs.Count);
-            Assert.AreEqual(null, insertEvs[0].ResponseBody);
-            Assert.AreEqual("10", replaceEvs[0].ResponseBody.Value);
+            Assert.That(s, Is.EqualTo("10"));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(replaceEvs.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].ResponseBody, Is.EqualTo(null));
+            Assert.That(replaceEvs[0].ResponseBody.Value, Is.EqualTo("10"));
             Assert.IsFalse(insertEvs[0].IsMiddleware);
         }
 
@@ -802,14 +802,14 @@ namespace Audit.Integration.AspNetCore
 
             
             var s = await _httpClient.PostAsync($"api/values", new StringContent("{\"value\": \"abc\"}", Encoding.UTF8, "application/json"));
-            Assert.AreEqual(HttpStatusCode.OK, s.StatusCode);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(1, replaceEvs.Count);
-            Assert.AreEqual("{\"value\": \"abc\"}", insertEvs[0].RequestBody.Value);
-            Assert.AreEqual(null, insertEvs[0].ResponseBody);
-            Assert.AreEqual("abc", replaceEvs[0].ResponseBody.Value);
-            Assert.IsNull(insertEvs[0].ResponseHeaders);
-            Assert.IsNull(replaceEvs[0].ResponseHeaders);
+            Assert.That(s.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(replaceEvs.Count, Is.EqualTo(1));
+            Assert.That(insertEvs[0].RequestBody.Value, Is.EqualTo("{\"value\": \"abc\"}"));
+            Assert.That(insertEvs[0].ResponseBody, Is.EqualTo(null));
+            Assert.That(replaceEvs[0].ResponseBody.Value, Is.EqualTo("abc"));
+            Assert.That(insertEvs[0].ResponseHeaders, Is.Null);
+            Assert.That(replaceEvs[0].ResponseHeaders, Is.Null);
         }
 
         [Test]
@@ -843,11 +843,11 @@ namespace Audit.Integration.AspNetCore
             finally
             {
             }
-            Assert.AreEqual(null, s);
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(1, replaceEvs.Count);
-            Assert.IsTrue(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), "returned exception: " + replaceEvs[0].Exception);
-            Assert.IsTrue(replaceEvs[0].Exception.Contains("at Audit.Integration.AspNetCore.Controllers.ValuesController"), "stacktrace not found");
+            Assert.That(s, Is.EqualTo(null));
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(replaceEvs.Count, Is.EqualTo(1));
+            Assert.That(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), Is.True, "returned exception: " + replaceEvs[0].Exception);
+            Assert.That(replaceEvs[0].Exception.Contains("at Audit.AspNetCore.UnitTest.Controllers.ValuesController"), Is.True, "stacktrace not found");
         }
         
         [Test]
@@ -877,9 +877,9 @@ namespace Audit.Integration.AspNetCore
             // should not log the response body
             await _httpClient.GetStringAsync($"api/values/hi/111");
 
-            Assert.AreEqual(2, insertEvs.Count);
-            Assert.AreEqual("this is a bad request test", insertEvs[0].ResponseBody.Value);
-            Assert.IsNull(insertEvs[1].ResponseBody);
+            Assert.That(insertEvs.Count, Is.EqualTo(2));
+            Assert.That(insertEvs[0].ResponseBody.Value, Is.EqualTo("this is a bad request test"));
+            Assert.That(insertEvs[1].ResponseBody, Is.Null);
         }
 
         [Test]
@@ -914,9 +914,9 @@ namespace Audit.Integration.AspNetCore
             finally
             {
             }
-            Assert.AreEqual("ApiErrorHandlerMiddleware", s);
-            Assert.IsTrue(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), "returned exception: " + replaceEvs[0].Exception);
-            Assert.IsTrue(replaceEvs[0].Exception.Contains("at Audit.Integration.AspNetCore.Controllers.ValuesController"), "stacktrace not found");
+            Assert.That(s, Is.EqualTo("ApiErrorHandlerMiddleware"));
+            Assert.That(replaceEvs[0].Exception.Contains("THIS IS A TEST EXCEPTION"), Is.True, "returned exception: " + replaceEvs[0].Exception);
+            Assert.That(replaceEvs[0].Exception.Contains("at Audit.AspNetCore.UnitTest.Controllers.ValuesController"), Is.True, "stacktrace not found");
         }
 
         [Test]
@@ -932,10 +932,10 @@ namespace Audit.Integration.AspNetCore
             var s = await _httpClient.PostAsync($"api/values/TestSerializeParams", new StringContent(Configuration.JsonAdapter.Serialize(customer), Encoding.UTF8, "application/json"));
 
             var events = (Core.Configuration.DataProvider as InMemoryDataProvider).GetAllEventsOfType<AuditEventWebApi>();
-            
-            Assert.AreEqual(1, events.Count);
-            Assert.AreEqual(1, events[0].Action.ActionParameters.Count);
-            Assert.AreEqual(123, (events[0].Action.ActionParameters["customer"] as Customer)?.Id);
+
+            Assert.That(events.Count, Is.EqualTo(1));
+            Assert.That(events[0].Action.ActionParameters.Count, Is.EqualTo(1));
+            Assert.That((events[0].Action.ActionParameters["customer"] as Customer)?.Id, Is.EqualTo(123));
         }
 
         [Test]
@@ -952,9 +952,9 @@ namespace Audit.Integration.AspNetCore
 
             var events = (Core.Configuration.DataProvider as InMemoryDataProvider).GetAllEventsOfType<AuditEventWebApi>();
 
-            Assert.AreEqual(1, events.Count);
-            Assert.AreEqual(1, events[0].Action.ActionParameters.Count);
-            Assert.AreEqual(-1, (events[0].Action.ActionParameters["customer"] as Customer)?.Id);
+            Assert.That(events.Count, Is.EqualTo(1));
+            Assert.That(events[0].Action.ActionParameters.Count, Is.EqualTo(1));
+            Assert.That((events[0].Action.ActionParameters["customer"] as Customer)?.Id, Is.EqualTo(-1));
         }
 
         [Test]
@@ -974,13 +974,13 @@ namespace Audit.Integration.AspNetCore
             var events = (Configuration.DataProvider as InMemoryDataProvider)?.GetAllEventsOfType<AuditEventWebApi>();
             var eventJson = events?.FirstOrDefault()?.ToJson();
             var op = (events?[0].Action.ActionParameters.First().Value as JsonPatchDocument<Customer>)?.Operations[0];
-            
-            Assert.IsNotNull(events);
-            Assert.IsNotNull(eventJson);
-            Assert.IsNotNull(op);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            Assert.AreEqual(1, events.Count);
-            Assert.AreEqual("NewValue", op.value);
+
+            Assert.That(events, Is.Not.Null);
+            Assert.That(eventJson, Is.Not.Null);
+            Assert.That(op, Is.Not.Null);
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(events.Count, Is.EqualTo(1));
+            Assert.That(op.value, Is.EqualTo("NewValue"));
         }
     }
 }

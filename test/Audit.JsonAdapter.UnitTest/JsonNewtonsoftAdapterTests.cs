@@ -36,11 +36,11 @@ namespace Audit.JsonAdapter.UnitTest
 
             var deserialized = AuditEvent.FromJson(evs[0]);
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(evs[0].Contains(@"""$type"":"));
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Contains(@"""$type"":"), Is.True);
             Assert.IsFalse(evs[0].Contains(@"""CustomFields"""));
-            Assert.IsTrue(evs[0].Contains(@"""ExtraField"""));
-            Assert.AreEqual("123", deserialized.CustomFields["ExtraField"].ToString());
+            Assert.That(evs[0].Contains(@"""ExtraField"""), Is.True);
+            Assert.That(deserialized.CustomFields["ExtraField"].ToString(), Is.EqualTo("123"));
         }
     }
 }

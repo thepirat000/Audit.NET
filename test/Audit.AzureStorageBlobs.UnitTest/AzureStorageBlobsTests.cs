@@ -41,8 +41,8 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var blobName = dp.InsertEvent(efEvent);
             var efEventGet = dp.GetEvent<AuditEvent>(containerName, blobName.ToString());
 
-            Assert.AreEqual(id, efEventGet.EventType);
-            Assert.AreEqual("Machine", efEventGet.Environment.MachineName);
+            Assert.That(efEventGet.EventType, Is.EqualTo(id));
+            Assert.That(efEventGet.Environment.MachineName, Is.EqualTo("Machine"));
         }
 
         [Test]
@@ -76,8 +76,8 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var blobName = await dp.InsertEventAsync(efEvent);
             var efEventGet = await dp.GetEventAsync<AuditEvent>(containerName, blobName.ToString());
 
-            Assert.AreEqual(id, efEventGet.EventType);
-            Assert.AreEqual("Machine", efEventGet.Environment.MachineName);
+            Assert.That(efEventGet.EventType, Is.EqualTo(id));
+            Assert.That(efEventGet.Environment.MachineName, Is.EqualTo("Machine"));
         }
 
         [Test]
@@ -107,12 +107,12 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var result = dp.GetEvent<AuditEvent>(containerName, "Test" + "_" + originalId + ".json");
             var result2 = dp.GetEvent<AuditEvent>(containerName, "NotExists.json");
 
-            Assert.IsNotNull(result);
-            Assert.IsNull(result2);
-            Assert.AreEqual("123", result.CustomFields["custom"].ToString());
-            Assert.AreEqual("changed!", result.Target.New.ToString());
-            Assert.AreEqual(originalId, result.Target.Old.ToString());
-            Assert.AreEqual("Test", result.EventType);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result2, Is.Null);
+            Assert.That(result.CustomFields["custom"].ToString(), Is.EqualTo("123"));
+            Assert.That(result.Target.New.ToString(), Is.EqualTo("changed!"));
+            Assert.That(result.Target.Old.ToString(), Is.EqualTo(originalId));
+            Assert.That(result.EventType, Is.EqualTo("Test"));
         }
 
         [Test]
@@ -144,12 +144,12 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var result = dp.GetEvent<AuditEvent>(containerName, "Test" + "_" + originalId + ".json");
             var result2 = dp.GetEvent<AuditEvent>(containerName, "NotExists.json");
 
-            Assert.IsNotNull(result);
-            Assert.IsNull(result2);
-            Assert.AreEqual("123", result.CustomFields["custom"].ToString());
-            Assert.AreEqual("changed!", result.Target.New.ToString());
-            Assert.AreEqual(originalId, result.Target.Old.ToString());
-            Assert.AreEqual("Test", result.EventType);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result2, Is.Null);
+            Assert.That(result.CustomFields["custom"].ToString(), Is.EqualTo("123"));
+            Assert.That(result.Target.New.ToString(), Is.EqualTo("changed!"));
+            Assert.That(result.Target.Old.ToString(), Is.EqualTo(originalId));
+            Assert.That(result.EventType, Is.EqualTo("Test"));
         }
 
     }

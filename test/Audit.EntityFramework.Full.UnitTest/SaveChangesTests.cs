@@ -47,7 +47,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 await ctx.SaveChangesAsync(default(CancellationToken));
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;net472;netcoreapp2.0;netcoreapp3.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>net462;net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<AssemblyName>Audit.Mvc.UnitTest</AssemblyName>
@@ -10,11 +10,9 @@
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<PackageId>Audit.Mvc.UnitTest</PackageId>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.3</RuntimeFrameworkVersion>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-		<SuppressTfmSupportBuildWarnings Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">true</SuppressTfmSupportBuildWarnings>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net462' " >
@@ -27,23 +25,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Moq" Version="4.7.99" />
-		<PackageReference Include="coverlet.collector" Version="6.0.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-		<PackageReference Include="NUnit" Version="4.0.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' ">
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-		<PackageReference Include="NUnit" Version="3.10.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

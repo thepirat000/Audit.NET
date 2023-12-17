@@ -21,12 +21,12 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
                     .Map<Post_1, AuditPost_1>())
                 .IgnoreMatchedProperties(t => t == typeof(string)));
 
-            Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(typeof(string)));
-            Assert.AreEqual(false, x.IgnoreMatchedPropertiesFunc(typeof(int)));
-            Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
-            Assert.AreEqual(typeof(AuditBlog_1), x.AuditTypeMapper.Invoke(typeof(Blog_1), null));
-            Assert.AreEqual(typeof(AuditPost_1), x.AuditTypeMapper.Invoke(typeof(Post_1), null));
-            Assert.AreEqual(null, x.AuditTypeMapper.Invoke(typeof(AuditBlog_1), null));
+            Assert.That(x.IgnoreMatchedPropertiesFunc(typeof(string)), Is.EqualTo(true));
+            Assert.That(x.IgnoreMatchedPropertiesFunc(typeof(int)), Is.EqualTo(false));
+            Assert.That(x.DbContextBuilder.Invoke(null), Is.EqualTo(ctx));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Blog_1), null), Is.EqualTo(typeof(AuditBlog_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Post_1), null), Is.EqualTo(typeof(AuditPost_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(AuditBlog_1), null), Is.EqualTo(null));
         }
 
         [Test]
@@ -43,11 +43,11 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
                 .IgnoreMatchedProperties(true));
 
 
-            Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(null));
-            Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
-            Assert.AreEqual(typeof(AuditBlog_1), x.AuditTypeMapper.Invoke(typeof(Blog_1), null));
-            Assert.AreEqual(typeof(AuditBlog_1), x.AuditTypeMapper.Invoke(typeof(Post_1), null));
-            Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EventEntry(), new { Id = 1 }).Result);
+            Assert.That(x.IgnoreMatchedPropertiesFunc(null), Is.EqualTo(true));
+            Assert.That(x.DbContextBuilder.Invoke(null), Is.EqualTo(ctx));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Blog_1), null), Is.EqualTo(typeof(AuditBlog_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Post_1), null), Is.EqualTo(typeof(AuditBlog_1)));
+            Assert.That(x.AuditEntityAction.Invoke(new AuditEvent(), new EventEntry(), new { Id = 1 }).Result, Is.EqualTo(true));
         }
 
         [Test]
@@ -64,11 +64,11 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
                 .IgnoreMatchedProperties(true));
 
 
-            Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(null));
-            Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
-            Assert.AreEqual(typeof(AuditBlog_1), x.AuditTypeMapper.Invoke(typeof(Blog_1), null));
-            Assert.AreEqual(typeof(AuditPost_1), x.AuditTypeMapper.Invoke(typeof(Post_1), null));
-            Assert.AreEqual(true, x.AuditEntityAction.Invoke(new AuditEvent(), new EventEntry(), new { Id = 1 }).Result);
+            Assert.That(x.IgnoreMatchedPropertiesFunc(null), Is.EqualTo(true));
+            Assert.That(x.DbContextBuilder.Invoke(null), Is.EqualTo(ctx));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Blog_1), null), Is.EqualTo(typeof(AuditBlog_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Post_1), null), Is.EqualTo(typeof(AuditPost_1)));
+            Assert.That(x.AuditEntityAction.Invoke(new AuditEvent(), new EventEntry(), new { Id = 1 }).Result, Is.EqualTo(true));
         }
 
         [Test]
@@ -82,12 +82,12 @@ namespace Different.Audit.EntityFramework.Full.UnitTest.Context
                     .Map<Post_1, AuditPost_1>())
                 .IgnoreMatchedProperties(true));
 
-            Assert.AreEqual(true, x.IgnoreMatchedPropertiesFunc(null));
-            Assert.AreEqual(ctx, x.DbContextBuilder.Invoke(null));
-            Assert.AreEqual(typeof(AuditPost_1), x.AuditTypeMapper.Invoke(typeof(Blog_1), new EventEntry() { Action = "Update" }));
-            Assert.AreEqual(typeof(AuditBlog_1), x.AuditTypeMapper.Invoke(typeof(Blog_1), new EventEntry() { Action = "Insert" }));
-            Assert.AreEqual(typeof(AuditPost_1), x.AuditTypeMapper.Invoke(typeof(Post_1), null));
-            Assert.AreEqual(null, x.AuditTypeMapper.Invoke(typeof(AuditBlog_1), null));
+            Assert.That(x.IgnoreMatchedPropertiesFunc(null), Is.EqualTo(true));
+            Assert.That(x.DbContextBuilder.Invoke(null), Is.EqualTo(ctx));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Blog_1), new EventEntry() { Action = "Update" }), Is.EqualTo(typeof(AuditPost_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Blog_1), new EventEntry() { Action = "Insert" }), Is.EqualTo(typeof(AuditBlog_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(Post_1), null), Is.EqualTo(typeof(AuditPost_1)));
+            Assert.That(x.AuditTypeMapper.Invoke(typeof(AuditBlog_1), null), Is.EqualTo(null));
         }
     }
 

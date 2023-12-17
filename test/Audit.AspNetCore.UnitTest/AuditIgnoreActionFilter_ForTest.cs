@@ -1,7 +1,7 @@
 ﻿using Audit.WebApi;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Audit.Integration.AspNetCore
+namespace Audit.AspNetCore.UnitTest
 {
     public class AuditIgnoreActionFilter_ForTest : AuditIgnoreActionFilter
     {

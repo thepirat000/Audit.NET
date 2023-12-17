@@ -47,13 +47,13 @@ namespace Audit.SqlServer.UnitTest
 
             var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
 
-            Assert.AreEqual(1, ids.Count);
+            Assert.That(ids.Count, Is.EqualTo(1));
 
             var auditEvent = sqlDp.GetEvent(ids[0]);
 
-            Assert.IsNotNull(auditEvent);
-            Assert.AreEqual(nameof(Test_SqlServer_Provider), auditEvent.EventType);
-            Assert.AreEqual(guid.ToString(), auditEvent.CustomFields["guid"]?.ToString());
+            Assert.That(auditEvent, Is.Not.Null);
+            Assert.That(auditEvent.EventType, Is.EqualTo(nameof(Test_SqlServer_Provider)));
+            Assert.That(auditEvent.CustomFields["guid"]?.ToString(), Is.EqualTo(guid.ToString()));
         }
 
         [Test]
@@ -84,13 +84,13 @@ namespace Audit.SqlServer.UnitTest
 
             var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
 
-            Assert.AreEqual(2, ids.Count);
-            Assert.AreEqual(ids[0], ids[1]);
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids[1], Is.EqualTo(ids[0]));
             var auditEvent = sqlDp.GetEvent(ids[0]);
 
-            Assert.IsNotNull(auditEvent);
-            Assert.AreEqual(nameof(Test_SqlServer_Provider), auditEvent.EventType);
-            Assert.AreEqual("final", auditEvent.CustomFields["field"]?.ToString());
+            Assert.That(auditEvent, Is.Not.Null);
+            Assert.That(auditEvent.EventType, Is.EqualTo(nameof(Test_SqlServer_Provider)));
+            Assert.That(auditEvent.CustomFields["field"]?.ToString(), Is.EqualTo("final"));
         }
 
         [Test]
@@ -105,13 +105,13 @@ namespace Audit.SqlServer.UnitTest
                     .TableName("table")
                     .CustomColumn("EventType", ev => ev.EventType)
             );
-            Assert.AreEqual("cnnString", x.ConnectionStringBuilder.Invoke(null));
-            Assert.AreEqual("evType", x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }));
-            Assert.AreEqual("json", x.JsonColumnNameBuilder.Invoke(null));
-            Assert.IsTrue(x.CustomColumns.Any(cc => cc.Name == "EventType" && (string)cc.Value.Invoke(new AuditEvent() { EventType = "pepe" }) == "pepe"));
-            Assert.AreEqual("last", x.LastUpdatedDateColumnNameBuilder.Invoke(null));
-            Assert.AreEqual("schema", x.SchemaBuilder.Invoke(null));
-            Assert.AreEqual("table", x.TableNameBuilder.Invoke(null));
+            Assert.That(x.ConnectionStringBuilder.Invoke(null), Is.EqualTo("cnnString"));
+            Assert.That(x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }), Is.EqualTo("evType"));
+            Assert.That(x.JsonColumnNameBuilder.Invoke(null), Is.EqualTo("json"));
+            Assert.That(x.CustomColumns.Any(cc => cc.Name == "EventType" && (string)cc.Value.Invoke(new AuditEvent() { EventType = "pepe" }) == "pepe"), Is.True);
+            Assert.That(x.LastUpdatedDateColumnNameBuilder.Invoke(null), Is.EqualTo("last"));
+            Assert.That(x.SchemaBuilder.Invoke(null), Is.EqualTo("schema"));
+            Assert.That(x.TableNameBuilder.Invoke(null), Is.EqualTo("table"));
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace Audit.SqlServer.UnitTest
             {
             }
 
-            Assert.AreEqual(1, TestInterceptor.Count);
+            Assert.That(TestInterceptor.Count, Is.EqualTo(1));
         }
 
         public class TestInterceptor : DbConnectionInterceptor

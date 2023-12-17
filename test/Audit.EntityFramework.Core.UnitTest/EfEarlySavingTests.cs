@@ -83,12 +83,12 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(1, updated.Count);
-            Assert.AreEqual(0, inserted[0].Result);
-            Assert.AreEqual(1, updated[0].Result);
-            Assert.AreEqual(1, inserted[0].Entries.Count);
-            Assert.AreEqual(1, updated[0].Entries.Count);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(updated.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].Result, Is.EqualTo(0));
+            Assert.That(updated[0].Result, Is.EqualTo(1));
+            Assert.That(inserted[0].Entries.Count, Is.EqualTo(1));
+            Assert.That(updated[0].Entries.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -116,9 +116,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, updated.Count);
-            Assert.AreEqual(1, inserted[0].Result);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(updated.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].Result, Is.EqualTo(1));
         }
 
         [Test]
@@ -164,8 +164,8 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             using (var context = new TestContext())
             {
-                Assert.AreEqual(1, await context.Messages.CountAsync(e => e.MessageId == messageId));
-                Assert.AreEqual(1, await context.MessageAudits.CountAsync(e => e.MessageId == messageId));
+                Assert.That(await context.Messages.CountAsync(e => e.MessageId == messageId), Is.EqualTo(1));
+                Assert.That(await context.MessageAudits.CountAsync(e => e.MessageId == messageId), Is.EqualTo(1));
             }
         }
 
@@ -201,13 +201,13 @@ namespace Audit.EntityFramework.Core.UnitTest
                 };
                 await context.AddAsync(message);
                 Exception exception = Assert.CatchAsync<Exception>(async () => await context.SaveChangesAsync());
-                Assert.AreEqual(exceptionMessage, exception.Message);
+                Assert.That(exception.Message, Is.EqualTo(exceptionMessage));
             }
 
             using (var context = new TestContext())
             {
-                Assert.AreEqual(0, await context.Messages.CountAsync(e => e.MessageId == messageId));
-                Assert.AreEqual(0, await context.MessageAudits.CountAsync(e => e.MessageId == messageId));
+                Assert.That(await context.Messages.CountAsync(e => e.MessageId == messageId), Is.EqualTo(0));
+                Assert.That(await context.MessageAudits.CountAsync(e => e.MessageId == messageId), Is.EqualTo(0));
             }
         }
     }

@@ -6,7 +6,7 @@ using Audit.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Audit.Integration.AspNetCore.Controllers
+namespace Audit.AspNetCore.UnitTest.Controllers
 {
     public class TestModelClass
     {

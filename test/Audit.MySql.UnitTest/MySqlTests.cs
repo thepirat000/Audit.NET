@@ -22,10 +22,10 @@ namespace Audit.MySql.UnitTest
                 .IdColumnName("id")
                 .JsonColumnName("j")
                 .TableName("t"));
-            Assert.AreEqual("c", x.ConnectionString);
-            Assert.AreEqual("id", x.IdColumnName);
-            Assert.AreEqual("j", x.JsonColumnName);
-            Assert.AreEqual("t", x.TableName);
+            Assert.That(x.ConnectionString, Is.EqualTo("c"));
+            Assert.That(x.IdColumnName, Is.EqualTo("id"));
+            Assert.That(x.JsonColumnName, Is.EqualTo("j"));
+            Assert.That(x.TableName, Is.EqualTo("t"));
         }
 
         [Test]

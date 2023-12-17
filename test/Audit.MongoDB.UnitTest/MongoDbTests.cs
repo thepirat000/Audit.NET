@@ -52,8 +52,8 @@ namespace Audit.MongoDb.UnitTest
 
             var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
 
-            Assert.AreEqual("user1", (eventRead.Target.Old as BsonDocument)["UserName"].ToString());
-            Assert.AreEqual("user2", (eventRead.Target.New as BsonDocument)["UserName"].ToString());
+            Assert.That((eventRead.Target.Old as BsonDocument)["UserName"].ToString(), Is.EqualTo("user1"));
+            Assert.That((eventRead.Target.New as BsonDocument)["UserName"].ToString(), Is.EqualTo("user2"));
         }
 
         [Test]
@@ -83,8 +83,8 @@ namespace Audit.MongoDb.UnitTest
 
             var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
 
-            Assert.AreEqual("user1", (eventRead.Target.Old as BsonDocument)["UserName"].ToString());
-            Assert.AreEqual("user2", (eventRead.Target.New as BsonDocument)["UserName"].ToString());
+            Assert.That((eventRead.Target.Old as BsonDocument)["UserName"].ToString(), Is.EqualTo("user1"));
+            Assert.That((eventRead.Target.New as BsonDocument)["UserName"].ToString(), Is.EqualTo("user2"));
         }
 
 
@@ -99,12 +99,12 @@ namespace Audit.MongoDb.UnitTest
                 .SerializeAsBson(true)
                 .DatabaseSettings(new MongoDatabaseSettings() { ReadConcern = ReadConcern.Majority }));
 
-            Assert.AreEqual("c", x.ConnectionString);
-            Assert.AreEqual("col", x.Collection);
-            Assert.AreEqual("db", x.Database);
-            Assert.AreEqual(true, x.SerializeAsBson);
-            Assert.AreEqual(ReadConcern.Majority, x.DatabaseSettings.ReadConcern);
-            Assert.AreEqual(ReadConcern.Linearizable, x.ClientSettings.ReadConcern);
+            Assert.That(x.ConnectionString, Is.EqualTo("c"));
+            Assert.That(x.Collection, Is.EqualTo("col"));
+            Assert.That(x.Database, Is.EqualTo("db"));
+            Assert.That(x.SerializeAsBson, Is.EqualTo(true));
+            Assert.That(x.DatabaseSettings.ReadConcern, Is.EqualTo(ReadConcern.Majority));
+            Assert.That(x.ClientSettings.ReadConcern, Is.EqualTo(ReadConcern.Linearizable));
         }
 
         [Test]
@@ -135,8 +135,7 @@ namespace Audit.MongoDb.UnitTest
             Audit.Core.Configuration.ResetCustomActions();
             var dp = Audit.Core.Configuration.DataProvider as MongoDataProvider;
             var evt = dp.GetEvent(evId);
-            Assert.AreEqual(now.ToString("yyyyMMddHHmmss"),
-                DateTime.Parse(evt.CustomFields["someDate"].ToString()).ToUniversalTime().ToString("yyyyMMddHHmmss"));
+            Assert.That(DateTime.Parse(evt.CustomFields["someDate"].ToString()).ToUniversalTime().ToString("yyyyMMddHHmmss"), Is.EqualTo(now.ToString("yyyyMMddHHmmss")));
         }
 
         public class UserProfiles

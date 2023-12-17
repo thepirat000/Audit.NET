@@ -51,18 +51,18 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             context.SaveChanges();
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
 
-            Assert.AreEqual(2, evs[0].Entries.Count);
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(2));
 
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("Insert", evs[0].Entries[1].Action);
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[1].Action, Is.EqualTo("Insert"));
 
-            Assert.AreEqual(1, evs[0].Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+            Assert.That(evs[0].Entries[0].ColumnValues["Id"], Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("Development"));
 
-            Assert.AreEqual("Vienna", evs[0].Entries[1].ColumnValues["City"]);
-            Assert.AreEqual("Street", evs[0].Entries[1].ColumnValues["Street"]);
+            Assert.That(evs[0].Entries[1].ColumnValues["City"], Is.EqualTo("Vienna"));
+            Assert.That(evs[0].Entries[1].ColumnValues["Street"], Is.EqualTo("Street"));
 
             Assert.AreEqual(1, ((dynamic)evs[0].Entries[0].Entity).Id);
             Assert.AreEqual("Vienna", ((dynamic)evs[0].Entries[0].Entity).Address.City);
@@ -91,18 +91,18 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             await context.SaveChangesAsync();
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
 
-            Assert.AreEqual(2, evs[0].Entries.Count);
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(2));
 
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("Insert", evs[0].Entries[1].Action);
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[1].Action, Is.EqualTo("Insert"));
 
-            Assert.AreEqual(1, evs[0].Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+            Assert.That(evs[0].Entries[0].ColumnValues["Id"], Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("Development"));
 
-            Assert.AreEqual("Vienna", evs[0].Entries[1].ColumnValues["City"]);
-            Assert.AreEqual("Street", evs[0].Entries[1].ColumnValues["Street"]);
+            Assert.That(evs[0].Entries[1].ColumnValues["City"], Is.EqualTo("Vienna"));
+            Assert.That(evs[0].Entries[1].ColumnValues["Street"], Is.EqualTo("Street"));
 
             Assert.AreEqual(1, ((dynamic)evs[0].Entries[0].Entity).Id);
             Assert.AreEqual("Vienna", ((dynamic)evs[0].Entries[0].Entity).Address.City);
@@ -143,19 +143,19 @@ namespace Audit.EntityFramework.Core.UnitTest
                 efEventRemove = ctx.SaveChangesGetAudit();
             }
 
-            Assert.IsNotNull(efEventInsert);
-            Assert.IsNotNull(efEventRemove);
-            Assert.AreEqual(1, efEventInsert.Result);
-            Assert.AreEqual(1, efEventInsert.Entries.Count);
-            Assert.AreEqual("Insert", efEventInsert.Entries[0].Action);
-            Assert.AreEqual("User", efEventInsert.Entries[0].Table);
-            Assert.AreEqual(id.ToString(), efEventInsert.Entries[0].PrimaryKey.First().Value.ToString());
+            Assert.That(efEventInsert, Is.Not.Null);
+            Assert.That(efEventRemove, Is.Not.Null);
+            Assert.That(efEventInsert.Result, Is.EqualTo(1));
+            Assert.That(efEventInsert.Entries.Count, Is.EqualTo(1));
+            Assert.That(efEventInsert.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(efEventInsert.Entries[0].Table, Is.EqualTo("User"));
+            Assert.That(efEventInsert.Entries[0].PrimaryKey.First().Value.ToString(), Is.EqualTo(id.ToString()));
 
-            Assert.AreEqual(1, efEventRemove.Result);
-            Assert.AreEqual(1, efEventRemove.Entries.Count);
-            Assert.AreEqual("Delete", efEventRemove.Entries[0].Action);
-            Assert.AreEqual("User", efEventRemove.Entries[0].Table);
-            Assert.AreEqual(id.ToString(), efEventRemove.Entries[0].PrimaryKey.First().Value.ToString());
+            Assert.That(efEventRemove.Result, Is.EqualTo(1));
+            Assert.That(efEventRemove.Entries.Count, Is.EqualTo(1));
+            Assert.That(efEventRemove.Entries[0].Action, Is.EqualTo("Delete"));
+            Assert.That(efEventRemove.Entries[0].Table, Is.EqualTo("User"));
+            Assert.That(efEventRemove.Entries[0].PrimaryKey.First().Value.ToString(), Is.EqualTo(id.ToString()));
         }
 
         [Test]
@@ -192,19 +192,18 @@ namespace Audit.EntityFramework.Core.UnitTest
                 efEventRemove = await ctx.SaveChangesGetAuditAsync();
             }
 
-            Assert.IsNotNull(efEventInsert);
-            Assert.IsNotNull(efEventRemove);
-            Assert.AreEqual(1, efEventInsert.Result);
-            Assert.AreEqual(1, efEventInsert.Entries.Count);
-            Assert.AreEqual("Insert", efEventInsert.Entries[0].Action);
-            Assert.AreEqual("User", efEventInsert.Entries[0].Table);
-            Assert.AreEqual(id.ToString(), efEventInsert.Entries[0].PrimaryKey.First().Value.ToString());
-
-            Assert.AreEqual(1, efEventRemove.Result);
-            Assert.AreEqual(1, efEventRemove.Entries.Count);
-            Assert.AreEqual("Delete", efEventRemove.Entries[0].Action);
-            Assert.AreEqual("User", efEventRemove.Entries[0].Table);
-            Assert.AreEqual(id.ToString(), efEventRemove.Entries[0].PrimaryKey.First().Value.ToString());
+            Assert.That(efEventInsert, Is.Not.Null);
+            Assert.That(efEventRemove, Is.Not.Null);
+            Assert.That(efEventInsert.Result, Is.EqualTo(1));
+            Assert.That(efEventInsert.Entries.Count, Is.EqualTo(1));
+            Assert.That(efEventInsert.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(efEventInsert.Entries[0].Table, Is.EqualTo("User"));
+            Assert.That(efEventInsert.Entries[0].PrimaryKey.First().Value.ToString(), Is.EqualTo(id.ToString()));
+            Assert.That(efEventRemove.Result, Is.EqualTo(1));
+            Assert.That(efEventRemove.Entries.Count, Is.EqualTo(1));
+            Assert.That(efEventRemove.Entries[0].Action, Is.EqualTo("Delete"));
+            Assert.That(efEventRemove.Entries[0].Table, Is.EqualTo("User"));
+            Assert.That(efEventRemove.Entries[0].PrimaryKey.First().Value.ToString(), Is.EqualTo(id.ToString()));
         }
 
         [TestCase(true)]
@@ -246,9 +245,9 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            Assert.IsNotNull(audit);
-            Assert.AreEqual(blog.BloggerName, audit.Title);
-            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+            Assert.That(audit, Is.Not.Null);
+            Assert.That(audit.Title, Is.EqualTo(blog.BloggerName));
+            Assert.That((bool?)disposedField?.GetValue(ctx1), Is.EqualTo(dispose));
         }
 
         [TestCase(true)]
@@ -289,10 +288,10 @@ namespace Audit.EntityFramework.Core.UnitTest
             }
 
             var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
-            
-            Assert.IsNotNull(audit);
-            Assert.AreEqual(blog.BloggerName, audit.Title);
-            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+
+            Assert.That(audit, Is.Not.Null);
+            Assert.That(audit.Title, Is.EqualTo(blog.BloggerName));
+            Assert.That((bool?)disposedField?.GetValue(ctx1), Is.EqualTo(dispose));
         }
 
         [TestCase(true)]
@@ -332,11 +331,11 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx2.Blogs.AddAsync(blog);
 
                 var exception = Assert.Throws<AggregateException>(() => ctx2.SaveChanges());
-                Assert.AreEqual("test exception", exception.GetBaseException().Message);
+                Assert.That(exception.GetBaseException().Message, Is.EqualTo("test exception"));
             }
 
             var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
-            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+            Assert.That((bool?)disposedField?.GetValue(ctx1), Is.EqualTo(dispose));
         }
 
 
@@ -377,11 +376,11 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx2.Blogs.AddAsync(blog);
 
                 var exception = Assert.ThrowsAsync<ArgumentException>(async () => await ctx2.SaveChangesAsync());
-                Assert.AreEqual("test exception", exception.GetBaseException().Message);
+                Assert.That(exception.GetBaseException().Message, Is.EqualTo("test exception"));
             }
 
             var disposedField = typeof(DbContext).GetField("_disposed", BindingFlags.NonPublic | BindingFlags.Instance);
-            Assert.AreEqual(dispose, (bool?)disposedField?.GetValue(ctx1));
+            Assert.That((bool?)disposedField?.GetValue(ctx1), Is.EqualTo(dispose));
         }
 
         [Test]
@@ -425,10 +424,10 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.IsTrue(evs[0].CustomFields.ContainsKey("TestCustomField"));
-            Assert.AreEqual("1", evs[0].CustomFields["TestCustomField"].ToString());
-            Assert.AreEqual("2", evs[1].CustomFields["TestCustomField"].ToString());
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].CustomFields.ContainsKey("TestCustomField"), Is.True);
+            Assert.That(evs[0].CustomFields["TestCustomField"].ToString(), Is.EqualTo("1"));
+            Assert.That(evs[1].CustomFields["TestCustomField"].ToString(), Is.EqualTo("2"));
         }
 
         [Test]
@@ -484,11 +483,11 @@ namespace Audit.EntityFramework.Core.UnitTest
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var audit = ctx.UserAudits.Single(u => u.UserId == id);
-                Assert.AreEqual(1, audit.AuditId);
-                Assert.AreEqual("Insert", audit.Action);
-                Assert.AreEqual("user", audit.AuditUser);
-                Assert.AreEqual("test", audit.Name);
-                Assert.AreEqual(id, audit.UserId);
+                Assert.That(audit.AuditId, Is.EqualTo(1));
+                Assert.That(audit.Action, Is.EqualTo("Insert"));
+                Assert.That(audit.AuditUser, Is.EqualTo("user"));
+                Assert.That(audit.Name, Is.EqualTo("test"));
+                Assert.That(audit.UserId, Is.EqualTo(id));
             }
         }
 
@@ -554,10 +553,10 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var auditLogs = ctx.AuditLogs.Where(l => l.TablePk == (id + 1).ToString()).ToList();
                 var orderAudits = ctx.OrderAudits.Where(l => l.Id == id).ToList();
 
-                Assert.AreEqual(1, auditLogs.Count);
-                Assert.AreEqual(1, orderAudits.Count);
-                Assert.AreEqual("test user", orderAudits[0].UserName);
-                Assert.AreEqual("test user", auditLogs[0].AuditUser);
+                Assert.That(auditLogs.Count, Is.EqualTo(1));
+                Assert.That(orderAudits.Count, Is.EqualTo(1));
+                Assert.That(orderAudits[0].UserName, Is.EqualTo("test user"));
+                Assert.That(auditLogs[0].AuditUser, Is.EqualTo("test user"));
             }
 
         }
@@ -615,11 +614,12 @@ namespace Audit.EntityFramework.Core.UnitTest
             using (var ctx = new BlogsMemoryContext(options))
             {
                 var audit = ctx.UserAudits.Single(u => u.UserId == id);
-                Assert.AreEqual(1, audit.AuditId);
-                Assert.AreEqual("Insert", audit.Action);
-                Assert.AreEqual("user", audit.AuditUser);
-                Assert.AreEqual("test", audit.Name);
-                Assert.AreEqual(id, audit.UserId);
+
+                Assert.That(audit.AuditId, Is.EqualTo(1));
+                Assert.That(audit.Action, Is.EqualTo("Insert"));
+                Assert.That(audit.AuditUser, Is.EqualTo("user"));
+                Assert.That(audit.Name, Is.EqualTo("test"));
+                Assert.That(audit.UserId, Is.EqualTo(id));
             }
         }
 
@@ -649,10 +649,10 @@ namespace Audit.EntityFramework.Core.UnitTest
             context.SaveChanges();
 
             var log = context.AuditLogs.FirstOrDefault(a => a.CustomerName == guid);
-            Assert.IsNotNull(log);
-            Assert.AreEqual(guid, log.CustomerName);
-            Assert.AreEqual("Insert", log.Action);
-            Assert.AreEqual("Customer", log.Table);
+            Assert.That(log, Is.Not.Null);
+            Assert.That(log.CustomerName, Is.EqualTo(guid));
+            Assert.That(log.Action, Is.EqualTo("Insert"));
+            Assert.That(log.Table, Is.EqualTo("Customer"));
         }
 
         [Test]
@@ -679,10 +679,10 @@ namespace Audit.EntityFramework.Core.UnitTest
             await context.SaveChangesAsync();
 
             var log = await context.AuditLogs.FirstOrDefaultAsync(a => a.CustomerName == guid);
-            Assert.IsNotNull(log);
-            Assert.AreEqual(guid, log.CustomerName);
-            Assert.AreEqual("Insert", log.Action);
-            Assert.AreEqual("Customer", log.Table);
+            Assert.That(log, Is.Not.Null);
+            Assert.That(log.CustomerName, Is.EqualTo(guid));
+            Assert.That(log.Action, Is.EqualTo("Insert"));
+            Assert.That(log.Table, Is.EqualTo("Customer"));
         }
 
         [Test]
@@ -708,18 +708,18 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             context.SaveChanges();
 
-            Assert.AreEqual(1, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(1));
 
-            Assert.AreEqual(2, evs[0].Entries.Count);
-            
-            Assert.AreEqual("Insert", evs[0].Entries[0].Action);
-            Assert.AreEqual("Insert", evs[0].Entries[1].Action);
+            Assert.That(evs[0].Entries.Count, Is.EqualTo(2));
 
-            Assert.AreEqual(1, evs[0].Entries[0].ColumnValues["Id"]);
-            Assert.AreEqual("Development", evs[0].Entries[0].ColumnValues["Name"]);
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[1].Action, Is.EqualTo("Insert"));
 
-            Assert.AreEqual("Vienna", evs[0].Entries[1].ColumnValues["Address_City"]);
-            Assert.AreEqual("Street", evs[0].Entries[1].ColumnValues["Address_Street"]);
+            Assert.That(evs[0].Entries[0].ColumnValues["Id"], Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("Development"));
+
+            Assert.That(evs[0].Entries[1].ColumnValues["Address_City"], Is.EqualTo("Vienna"));
+            Assert.That(evs[0].Entries[1].ColumnValues["Address_Street"], Is.EqualTo("Street"));
             
             Assert.AreEqual(1, ((dynamic)evs[0].Entries[0].Entity).Id);
             Assert.AreEqual("Vienna", ((dynamic)evs[0].Entries[0].Entity).Address.City);
@@ -751,14 +751,14 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             context.SaveChanges();
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(6, evs[1].Entries.Count); // 2 inserts to Person + 4 inserts to PersonDepartment
-            Assert.IsTrue(evs[1].Entries.All(e => e.Action == "Insert"));
-            Assert.AreEqual(2, evs[1].Entries.Count(e => e.Table == "Persons"));
-            Assert.AreEqual(4, evs[1].Entries.Count(e => e.Table == "DepartmentPerson"));
-            Assert.IsTrue(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.ColumnValues.ContainsKey("DepartmentsId")));
-            Assert.IsTrue(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.ColumnValues.ContainsKey("PersonsId")));
-            Assert.IsTrue(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.PrimaryKey.Count == 2));
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[1].Entries.Count, Is.EqualTo(6)); // 2 inserts to Person + 4 inserts to PersonDepartment
+            Assert.That(evs[1].Entries.All(e => e.Action == "Insert"), Is.True);
+            Assert.That(evs[1].Entries.Count(e => e.Table == "Persons"), Is.EqualTo(2));
+            Assert.That(evs[1].Entries.Count(e => e.Table == "DepartmentPerson"), Is.EqualTo(4));
+            Assert.That(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.ColumnValues.ContainsKey("DepartmentsId")), Is.True);
+            Assert.That(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.ColumnValues.ContainsKey("PersonsId")), Is.True);
+            Assert.That(evs[1].Entries.Where(e => e.Table == "DepartmentPerson").All(dpe => dpe.PrimaryKey.Count == 2), Is.True);
         }
 #endif
 
@@ -798,7 +798,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(2, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -837,7 +837,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.SaveChangesAsync();
             }
 
-            Assert.AreEqual(2, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -876,7 +876,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(2, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -915,7 +915,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(2, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -962,15 +962,15 @@ namespace Audit.EntityFramework.Core.UnitTest
                 ctx.SaveChanges();
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent().Entries.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
             var entry = evs[0].GetEntityFrameworkEvent().Entries[0];
-            Assert.AreEqual(1, entry.Changes.Count);
+            Assert.That(entry.Changes.Count, Is.EqualTo(1));
             var changeToken = entry.Changes.First(_ => _.ColumnName == "Token");
-            Assert.AreEqual("***", changeToken.OriginalValue);
-            Assert.AreEqual("***", changeToken.NewValue);
+            Assert.That(changeToken.OriginalValue, Is.EqualTo("***"));
+            Assert.That(changeToken.NewValue, Is.EqualTo("***"));
             Assert.IsFalse(entry.ColumnValues.ContainsKey("Password"));
-            Assert.AreEqual("***", entry.ColumnValues["Token"]);
+            Assert.That(entry.ColumnValues["Token"], Is.EqualTo("***"));
         }
 
         [Test]
@@ -1018,8 +1018,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 userAudit = ctx.UserAudits.FirstOrDefault(x => x.UserId == id);
             }
 
-            Assert.IsNotNull(userAudit);
-            Assert.AreEqual(overrideValue, userAudit.Name);
+            Assert.That(userAudit, Is.Not.Null);
+            Assert.That(userAudit.Name, Is.EqualTo(overrideValue));
         }
 
         [Test]
@@ -1068,8 +1068,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 userAudit = ctx.UserAudits.FirstOrDefault(x => x.UserId == id);
             }
 
-            Assert.IsNotNull(userAudit);
-            Assert.AreEqual(overrideValue, userAudit.Name2);
+            Assert.That(userAudit, Is.Not.Null);
+            Assert.That(userAudit.Name2, Is.EqualTo(overrideValue));
         }
 
         [Test]
@@ -1118,8 +1118,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 userAudit = ctx.UserAudits.FirstOrDefault(x => x.UserId == id);
             }
 
-            Assert.IsNotNull(userAudit);
-            Assert.AreEqual(overrideValue, userAudit.Name2);
+            Assert.That(userAudit, Is.Not.Null);
+            Assert.That(userAudit.Name2, Is.EqualTo(overrideValue));
         }
 
         [Test]
@@ -1160,10 +1160,10 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             }
 
-            Assert.IsNotNull(entityType1);
-            Assert.AreEqual(typeof(User), entityType1);
-            Assert.IsNotNull(entityType2);
-            Assert.AreEqual(typeof(User), entityType2);
+            Assert.That(entityType1, Is.Not.Null);
+            Assert.That(entityType1, Is.EqualTo(typeof(User)));
+            Assert.That(entityType2, Is.Not.Null);
+            Assert.That(entityType2, Is.EqualTo(typeof(User)));
         }
 
         [Test]
@@ -1203,10 +1203,10 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await ctx.SaveChangesAsync();
             }
 
-            Assert.IsNotNull(entityType1);
-            Assert.AreEqual(typeof(User), entityType1);
-            Assert.IsNotNull(entityType2);
-            Assert.AreEqual(typeof(User), entityType2);
+            Assert.That(entityType1, Is.Not.Null);
+            Assert.That(entityType1, Is.EqualTo(typeof(User)));
+            Assert.That(entityType2, Is.Not.Null);
+            Assert.That(entityType2, Is.EqualTo(typeof(User)));
         }
     }
 }

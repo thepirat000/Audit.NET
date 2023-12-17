@@ -71,19 +71,19 @@ namespace Audit.EntityFramework.Full.UnitTest
                 context2.SaveChanges();
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(1, evs[0].EntityFrameworkEvent.Entries.Count);
-            Assert.AreEqual(1, evs[1].EntityFrameworkEvent.Entries.Count);
-            Assert.AreEqual("Insert", evs[0].EntityFrameworkEvent.Entries[0].Action);
-            Assert.AreEqual("Insert", evs[1].EntityFrameworkEvent.Entries[0].Action);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries[0].Action, Is.EqualTo("Insert"));
 
-            Assert.AreEqual("Type1", evs[0].EventType);
-            Assert.AreEqual("Type2", evs[1].EventType);
+            Assert.That(evs[0].EventType, Is.EqualTo("Type1"));
+            Assert.That(evs[1].EventType, Is.EqualTo("Type2"));
 
-            Assert.AreEqual("Override test 1", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
-            Assert.AreEqual("Override 2", evs[1].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string);
-            Assert.IsNotNull(evs[0].EntityFrameworkEvent.Entries[0].Entity);
-            Assert.IsNull(evs[1].EntityFrameworkEvent.Entries[0].Entity);
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string, Is.EqualTo("Override test 1"));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries[0].ColumnValues["Name"] as string, Is.EqualTo("Override 2"));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Entity, Is.Not.Null);
+            Assert.That(evs[1].EntityFrameworkEvent.Entries[0].Entity, Is.Null);
         }
 
         [Test]
@@ -125,15 +125,15 @@ namespace Audit.EntityFramework.Full.UnitTest
                 ctx.Database.Delete();
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(1, evs[0].EntityFrameworkEvent.Entries.Count);
-            Assert.AreEqual("Mapping", evs[0].EntityFrameworkEvent.Entries[0].Table);
-            Assert.AreEqual(3, evs[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count);
-            Assert.IsNotNull(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Id"]);
-            Assert.IsNotNull(evs[0].EntityFrameworkEvent.Entries[0].Entity);
-            Assert.AreEqual(typeof(ClientMapping), evs[0].EntityFrameworkEvent.Entries[0].Entity.GetType());
-            Assert.AreEqual("one", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyOne"]);
-            Assert.AreEqual("two", evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyTwo"]);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Table, Is.EqualTo("Mapping"));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues.Count, Is.EqualTo(3));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["Id"], Is.Not.Null);
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Entity, Is.Not.Null);
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].Entity.GetType(), Is.EqualTo(typeof(ClientMapping)));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyOne"], Is.EqualTo("one"));
+            Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyTwo"], Is.EqualTo("two"));
 
         }
 

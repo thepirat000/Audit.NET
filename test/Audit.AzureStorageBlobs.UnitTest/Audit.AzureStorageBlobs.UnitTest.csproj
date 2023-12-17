@@ -23,10 +23,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Castle.Core" Version="5.1.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
-		<PackageReference Include="moq" Version="4.8.1" />
-		<PackageReference Include="NUnit" Version="3.7.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

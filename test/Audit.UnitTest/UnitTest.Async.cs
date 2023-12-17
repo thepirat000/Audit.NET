@@ -54,10 +54,10 @@ namespace Audit.UnitTest
                 await scope.SaveAsync();
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(evs[0].Comments.Contains("OnScopeCreated"));
-            Assert.IsTrue(evs[0].Comments.Contains("OnEventSaving"));
-            Assert.IsTrue(saved);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Comments.Contains("OnScopeCreated"), Is.True);
+            Assert.That(evs[0].Comments.Contains("OnEventSaving"), Is.True);
+            Assert.That(saved, Is.True);
         }
 
         [Test]
@@ -92,10 +92,10 @@ namespace Audit.UnitTest
             {
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.IsTrue(evs[0].Comments.Contains("OnScopeCreated"));
-            Assert.IsTrue(evs[0].Comments.Contains("OnEventSaving"));
-            Assert.IsTrue(saved);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Comments.Contains("OnScopeCreated"), Is.True);
+            Assert.That(evs[0].Comments.Contains("OnEventSaving"), Is.True);
+            Assert.That(saved, Is.True);
         }
 
         [Test]
@@ -134,21 +134,21 @@ namespace Audit.UnitTest
                 scope.SetCustomField("FromScope", 3);
             }
 
-            Assert.AreEqual(1, evs_onScopeCreated.Count);
-            Assert.AreEqual(2, evs_onScopeCreated[0].CustomFields.Count);
-            Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromCustomField"));
-            Assert.IsTrue(evs_onScopeCreated[0].CustomFields.ContainsKey("FromAnon"));
-            Assert.AreEqual("1", evs_onScopeCreated[0].CustomFields["FromCustomField"].ToString());
-            Assert.AreEqual("2", evs_onScopeCreated[0].CustomFields["FromAnon"].ToString());
+            Assert.That(evs_onScopeCreated.Count, Is.EqualTo(1));
+            Assert.That(evs_onScopeCreated[0].CustomFields.Count, Is.EqualTo(2));
+            Assert.That(evs_onScopeCreated[0].CustomFields.ContainsKey("FromCustomField"), Is.True);
+            Assert.That(evs_onScopeCreated[0].CustomFields.ContainsKey("FromAnon"), Is.True);
+            Assert.That(evs_onScopeCreated[0].CustomFields["FromCustomField"].ToString(), Is.EqualTo("1"));
+            Assert.That(evs_onScopeCreated[0].CustomFields["FromAnon"].ToString(), Is.EqualTo("2"));
 
-            Assert.AreEqual(1, evs_Provider.Count);
-            Assert.AreEqual(3, evs_Provider[0].CustomFields.Count);
-            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromCustomField"));
-            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromAnon"));
-            Assert.IsTrue(evs_Provider[0].CustomFields.ContainsKey("FromScope"));
-            Assert.AreEqual("1", evs_Provider[0].CustomFields["FromCustomField"].ToString());
-            Assert.AreEqual("2", evs_Provider[0].CustomFields["FromAnon"].ToString());
-            Assert.AreEqual("3", evs_Provider[0].CustomFields["FromScope"].ToString());
+            Assert.That(evs_Provider.Count, Is.EqualTo(1));
+            Assert.That(evs_Provider[0].CustomFields.Count, Is.EqualTo(3));
+            Assert.That(evs_Provider[0].CustomFields.ContainsKey("FromCustomField"), Is.True);
+            Assert.That(evs_Provider[0].CustomFields.ContainsKey("FromAnon"), Is.True);
+            Assert.That(evs_Provider[0].CustomFields.ContainsKey("FromScope"), Is.True);
+            Assert.That(evs_Provider[0].CustomFields["FromCustomField"].ToString(), Is.EqualTo("1"));
+            Assert.That(evs_Provider[0].CustomFields["FromAnon"].ToString(), Is.EqualTo("2"));
+            Assert.That(evs_Provider[0].CustomFields["FromScope"].ToString(), Is.EqualTo("3"));
         }
 
         [Test]
@@ -182,9 +182,9 @@ namespace Audit.UnitTest
             using (var scope = await AuditScope.CreateAsync(options))
             {
             }
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual("test", evs[0].EventType);
-            Assert.AreEqual("override", evs[1].EventType);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[0].EventType, Is.EqualTo("test"));
+            Assert.That(evs[1].EventType, Is.EqualTo("override"));
         }
 
         [Test]
@@ -202,8 +202,8 @@ namespace Audit.UnitTest
             {
             }
 
-            Assert.AreEqual(1, ins);
-            Assert.AreEqual(1, upd);
+            Assert.That(ins, Is.EqualTo(1));
+            Assert.That(upd, Is.EqualTo(1));
         }
 
         [Test]
@@ -221,15 +221,15 @@ namespace Audit.UnitTest
                  .Target(() => 1)
                  .CallingMethod(someMethod));
 
-            Assert.AreEqual("event type", scope.EventType);
-            Assert.AreEqual("event type", scope.Event.EventType);
-            Assert.IsTrue(scope.Event.CustomFields.ContainsKey("f"));
-            Assert.AreEqual(EventCreationPolicy.Manual, scope.EventCreationPolicy);
-            Assert.AreEqual(typeof(AuditEvent), scope.Event.GetType());
-            Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
-            Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
-            Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(someMethod.Name));
+            Assert.That(scope.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.CustomFields.ContainsKey("f"), Is.True);
+            Assert.That(scope.EventCreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
+            Assert.That(scope.Event.GetType(), Is.EqualTo(typeof(AuditEvent)));
+            Assert.That(scope.DataProvider.GetType(), Is.EqualTo(typeof(DynamicDataProvider)));
+            Assert.That(scope.SaveMode, Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(scope.Event.Target.Old.ToString(), Is.EqualTo("1"));
+            Assert.That(scope.Event.Environment.CallingMethodName.Contains(someMethod.Name), Is.True);
         }
 
         [Test]
@@ -247,15 +247,15 @@ namespace Audit.UnitTest
                  .Target(() => 1)
                  .CallingMethod(someMethod));
 
-            Assert.AreEqual("event type", scope.EventType);
-            Assert.AreEqual("event type", scope.Event.EventType);
-            Assert.IsTrue(scope.Event.CustomFields.ContainsKey("f"));
-            Assert.AreEqual(EventCreationPolicy.Manual, scope.EventCreationPolicy);
-            Assert.AreEqual(typeof(AuditEvent), scope.Event.GetType());
-            Assert.AreEqual(typeof(DynamicDataProvider), scope.DataProvider.GetType());
-            Assert.AreEqual(SaveMode.InsertOnStart, scope.SaveMode);
-            Assert.AreEqual("1", scope.Event.Target.Old.ToString());
-            Assert.IsTrue(scope.Event.Environment.CallingMethodName.Contains(someMethod.Name));
+            Assert.That(scope.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.EventType, Is.EqualTo("event type"));
+            Assert.That(scope.Event.CustomFields.ContainsKey("f"), Is.True);
+            Assert.That(scope.EventCreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
+            Assert.That(scope.Event.GetType(), Is.EqualTo(typeof(AuditEvent)));
+            Assert.That(scope.DataProvider.GetType(), Is.EqualTo(typeof(DynamicDataProvider)));
+            Assert.That(scope.SaveMode, Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(scope.Event.Target.Old.ToString(), Is.EqualTo("1"));
+            Assert.That(scope.Event.Environment.CallingMethodName.Contains(someMethod.Name), Is.True);
         }
 
         [Test]
@@ -268,9 +268,9 @@ namespace Audit.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
             await AuditScope.LogAsync("test", new { field1 = "one" });
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual("test", evs[0].EventType);
-            Assert.AreEqual("one", evs[0].CustomFields["field1"].ToString());
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].EventType, Is.EqualTo("test"));
+            Assert.That(evs[0].CustomFields["field1"].ToString(), Is.EqualTo("one"));
         }
 
         [Test]
@@ -288,7 +288,7 @@ namespace Audit.UnitTest
             {
             }
 
-            Assert.AreEqual(2, evs.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -319,11 +319,11 @@ namespace Audit.UnitTest
                 target = "x3";
             }
 
-            Assert.AreEqual(1, insertEvs.Count);
-            Assert.AreEqual(2, replaceEvs.Count);
-            Assert.AreEqual("x1", insertEvs[0].Target.Old.ToString());
-            Assert.AreEqual("x2", replaceEvs[0].Target.New.ToString());
-            Assert.AreEqual("x3", replaceEvs[1].Target.New.ToString());
+            Assert.That(insertEvs.Count, Is.EqualTo(1));
+            Assert.That(replaceEvs.Count, Is.EqualTo(2));
+            Assert.That(insertEvs[0].Target.Old.ToString(), Is.EqualTo("x1"));
+            Assert.That(replaceEvs[0].Target.New.ToString(), Is.EqualTo("x2"));
+            Assert.That(replaceEvs[1].Target.New.ToString(), Is.EqualTo("x3"));
         }
 
 
@@ -355,12 +355,12 @@ namespace Audit.UnitTest
             var fileCount = Directory.EnumerateFiles(dir).Count();
             Directory.Delete(dir, true);
 
-            Assert.AreEqual(1, fileCount);
-            Assert.AreEqual(JsonAdapter.Serialize(ev), JsonAdapter.Serialize(fileFromProvider));
-            Assert.AreEqual("evt", ev.EventType);
-            Assert.AreEqual("start", ev.Target.Old.ToString());
-            Assert.AreEqual("end", ev.Target.New.ToString());
-            Assert.AreEqual("1", ev.CustomFields["X"].ToString());
+            Assert.That(fileCount, Is.EqualTo(1));
+            Assert.That(JsonAdapter.Serialize(fileFromProvider), Is.EqualTo(JsonAdapter.Serialize(ev)));
+            Assert.That(ev.EventType, Is.EqualTo("evt"));
+            Assert.That(ev.Target.Old.ToString(), Is.EqualTo("start"));
+            Assert.That(ev.Target.New.ToString(), Is.EqualTo("end"));
+            Assert.That(ev.CustomFields["X"].ToString(), Is.EqualTo("1"));
         }
 
         [Test]
@@ -383,8 +383,8 @@ namespace Audit.UnitTest
                 await scope.SaveAsync();
             }
 
-            Assert.AreEqual(1, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
+            Assert.That(modes.Count, Is.EqualTo(1));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnStart));
         }
 
         [Test]
@@ -407,10 +407,10 @@ namespace Audit.UnitTest
                 await scope.SaveAsync();
             }
 
-            Assert.AreEqual(3, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
-            Assert.AreEqual(SaveMode.ReplaceOnEnd, modes[1]);
-            Assert.AreEqual(SaveMode.ReplaceOnEnd, modes[2]);
+            Assert.That(modes.Count, Is.EqualTo(3));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(modes[1], Is.EqualTo(SaveMode.ReplaceOnEnd));
+            Assert.That(modes[2], Is.EqualTo(SaveMode.ReplaceOnEnd));
         }
 
         [Test]
@@ -433,10 +433,10 @@ namespace Audit.UnitTest
                 await scope.SaveAsync();
             }
 
-            Assert.AreEqual(3, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnStart, modes[0]);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[1]);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[2]);
+            Assert.That(modes.Count, Is.EqualTo(3));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnStart));
+            Assert.That(modes[1], Is.EqualTo(SaveMode.InsertOnEnd));
+            Assert.That(modes[2], Is.EqualTo(SaveMode.InsertOnEnd));
         }
 
         [Test]
@@ -459,9 +459,9 @@ namespace Audit.UnitTest
                 await scope.SaveAsync();
             }
 
-            Assert.AreEqual(2, modes.Count);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[0]);
-            Assert.AreEqual(SaveMode.InsertOnEnd, modes[1]);
+            Assert.That(modes.Count, Is.EqualTo(2));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.InsertOnEnd));
+            Assert.That(modes[1], Is.EqualTo(SaveMode.InsertOnEnd));
         }
 
         [Test]
@@ -484,8 +484,8 @@ namespace Audit.UnitTest
                 await scope.SaveAsync();
             }
 
-            Assert.AreEqual(1, modes.Count);
-            Assert.AreEqual(SaveMode.Manual, modes[0]);
+            Assert.That(modes.Count, Is.EqualTo(1));
+            Assert.That(modes[0], Is.EqualTo(SaveMode.Manual));
         }
 
         [Test]
@@ -527,9 +527,9 @@ namespace Audit.UnitTest
             }
             await Task.WhenAll(tasks.ToArray());
             await Task.Delay(1000);
-            Assert.AreEqual(MAX * 2, counter);
-            Assert.AreEqual(MAX * 2, counter2);
-            Assert.AreEqual(MAX * 2, counter3);
+            Assert.That(counter, Is.EqualTo(MAX * 2));
+            Assert.That(counter2, Is.EqualTo(MAX * 2));
+            Assert.That(counter3, Is.EqualTo(MAX * 2));
         }
 
 
@@ -547,13 +547,13 @@ namespace Audit.UnitTest
             var scope = await new AuditScopeFactory().CreateAsync("et1", null, EventCreationPolicy.Manual, null);
             await scope.SaveAsync();
             scope.SetCustomField("field", "value");
-            Assert.AreEqual(1, onInsertCount);
-            Assert.AreEqual(0, onReplaceCount);
-            Assert.AreEqual(1, onInsertOrReplaceCount);
+            Assert.That(onInsertCount, Is.EqualTo(1));
+            Assert.That(onReplaceCount, Is.EqualTo(0));
+            Assert.That(onInsertOrReplaceCount, Is.EqualTo(1));
             await scope.SaveAsync();
-            Assert.AreEqual(1, onInsertCount);
-            Assert.AreEqual(1, onReplaceCount);
-            Assert.AreEqual(2, onInsertOrReplaceCount);
+            Assert.That(onInsertCount, Is.EqualTo(1));
+            Assert.That(onReplaceCount, Is.EqualTo(1));
+            Assert.That(onInsertOrReplaceCount, Is.EqualTo(2));
         }
 
 
@@ -702,7 +702,7 @@ namespace Audit.UnitTest
                 await scope.SaveAsync(); // this should do nothing because of the creation policy (this no more true since v4.6.2)
                 provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             }
-            Assert.AreEqual(eventType, ev.EventType);
+            Assert.That(ev.EventType, Is.EqualTo(eventType));
             Assert.True(ev.Comments.Contains("test"));
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(1));
@@ -737,7 +737,7 @@ namespace Audit.UnitTest
                 target = "final";
                 scope.Discard();
             }
-            Assert.AreEqual(eventType, ev.EventType);
+            Assert.That(ev.EventType, Is.EqualTo(eventType));
             Assert.True(ev.Comments.Contains("test"));
             Assert.Null(ev.Target.New);
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Never);
@@ -824,8 +824,8 @@ namespace Audit.UnitTest
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
-            Assert.AreEqual("123", ev.CustomFields["DATA"].ToString());
-            Assert.AreEqual("class value", ev.CustomFields["class"].ToString());
+            Assert.That(ev.CustomFields["DATA"].ToString(), Is.EqualTo("123"));
+            Assert.That(ev.CustomFields["class"].ToString(), Is.EqualTo("class value"));
         }
 
         [Test]
@@ -841,7 +841,7 @@ namespace Audit.UnitTest
             await scope2.SaveAsync();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);
-            Assert.AreNotEqual(scope1.EventId, scope2.EventId);
+            Assert.That(scope2.EventId, Is.Not.EqualTo(scope1.EventId));
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
     }

@@ -48,12 +48,12 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual("1000", response);
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(1, replaced.Count);
-            Assert.IsNull(inserted[0].WcfEvent.Result);
-            Assert.AreEqual("1000", replaced[0].WcfEvent.Result.Value.ToString());
-            Assert.IsTrue(replaced[0].Duration >= 1000 && replaced[0].Duration < 2000);
+            Assert.That(response, Is.EqualTo("1000"));
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(1));
+            Assert.That(inserted[0].WcfEvent.Result, Is.Null);
+            Assert.That(replaced[0].WcfEvent.Result.Value.ToString(), Is.EqualTo("1000"));
+            Assert.That(replaced[0].Duration >= 1000 && replaced[0].Duration < 2000, Is.True);
         }
 
         [Test]
@@ -90,11 +90,11 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual("10", response);
-            Assert.AreEqual(2, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.IsNull(inserted[0].WcfEvent.Result);
-            Assert.AreEqual("10", inserted[1].WcfEvent.Result.Value.ToString());
+            Assert.That(response, Is.EqualTo("10"));
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].WcfEvent.Result, Is.Null);
+            Assert.That(inserted[1].WcfEvent.Result.Value.ToString(), Is.EqualTo("10"));
         }
         
         [Test]
@@ -130,10 +130,10 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual(1, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
-            Assert.AreEqual("5", inserted[0].WcfEvent.Result.Value.ToString());
-            Assert.AreEqual(true, inserted[0].WcfEvent.IsAsync);
+            Assert.That(inserted.Count, Is.EqualTo(1));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+            Assert.That(inserted[0].WcfEvent.Result.Value.ToString(), Is.EqualTo("5"));
+            Assert.That(inserted[0].WcfEvent.IsAsync, Is.EqualTo(true));
         }
 
         [Test]
@@ -169,8 +169,8 @@ namespace Audit.WCF.UnitTest
             }
             Thread.Sleep(100);
 
-            Assert.AreEqual(0, inserted.Count);
-            Assert.AreEqual(0, replaced.Count);
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
         private static BasicHttpBinding CreateBinding()

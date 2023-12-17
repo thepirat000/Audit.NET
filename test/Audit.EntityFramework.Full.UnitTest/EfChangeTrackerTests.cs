@@ -55,17 +55,17 @@ namespace Audit.EntityFramework.Full.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(2, evs[1].EntityFrameworkEvent.Entries.Count);
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries.Count, Is.EqualTo(2));
 
-            Assert.IsTrue(evs[1].EntityFrameworkEvent.Entries.Any(e => e.Entity is SimpleContext.Brand));
+            Assert.That(evs[1].EntityFrameworkEvent.Entries.Any(e => e.Entity is SimpleContext.Brand), Is.True);
             var evEntityCar = evs[1].EntityFrameworkEvent.Entries.FirstOrDefault(e => e.Entity is SimpleContext.Car);
-            Assert.IsNotNull(evEntityCar);
-            Assert.IsTrue(evEntityCar.Changes.Any(ch => ch.ColumnName == "BrandId"));
-            Assert.IsNull(evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").OriginalValue);
-            Assert.IsNotNull(evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").NewValue);
-            Assert.IsTrue(car.BrandId > 0);
-            Assert.AreEqual(car.BrandId, evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").NewValue);
+            Assert.That(evEntityCar, Is.Not.Null);
+            Assert.That(evEntityCar.Changes.Any(ch => ch.ColumnName == "BrandId"), Is.True);
+            Assert.That(evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").OriginalValue, Is.Null);
+            Assert.That(evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").NewValue, Is.Not.Null);
+            Assert.That(car.BrandId > 0, Is.True);
+            Assert.That(evEntityCar.Changes.First(ch => ch.ColumnName == "BrandId").NewValue, Is.EqualTo(car.BrandId));
         }
 
         [Test]
@@ -94,10 +94,10 @@ namespace Audit.EntityFramework.Full.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.AreEqual(1, evs.Count);
-            Assert.AreEqual(1, evs[0].GetEntityFrameworkEvent()?.Entries.Count);
-            Assert.AreEqual("Insert", evs[0].GetEntityFrameworkEvent()?.Entries[0].Action);
-            Assert.AreEqual("OriginalName", evs[0].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]);
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent()?.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"], Is.EqualTo("OriginalName"));
 
             using (var context = new SimpleContext())
             {
@@ -105,11 +105,11 @@ namespace Audit.EntityFramework.Full.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.AreEqual(2, evs.Count);
-            Assert.AreEqual(1, evs[1].GetEntityFrameworkEvent()?.Entries.Count);
-            Assert.AreEqual("Update", evs[1].GetEntityFrameworkEvent()?.Entries[0].Action);
-            Assert.AreEqual("OriginalName", evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Name")?.OriginalValue?.ToString());
-            Assert.AreEqual("UpdatedName", evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Name")?.NewValue?.ToString());
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Name")?.OriginalValue?.ToString(), Is.EqualTo("OriginalName"));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Name")?.NewValue?.ToString(), Is.EqualTo("UpdatedName"));
 
             using (var context = new SimpleContext())
             {
@@ -119,10 +119,10 @@ namespace Audit.EntityFramework.Full.UnitTest
 
             }
 
-            Assert.AreEqual(3, evs.Count);
-            Assert.AreEqual(1, evs[2].GetEntityFrameworkEvent()?.Entries.Count);
-            Assert.AreEqual("Delete", evs[2].GetEntityFrameworkEvent()?.Entries[0].Action);
-            Assert.AreEqual("UpdatedName", evs[2].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]?.ToString());
+            Assert.That(evs.Count, Is.EqualTo(3));
+            Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Delete"));
+            Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]?.ToString(), Is.EqualTo("UpdatedName"));
         }
     }
 }

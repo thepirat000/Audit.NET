@@ -20,6 +20,12 @@ namespace Audit.UnitTest
             LogManager.Setup().LoadConfiguration(c => c.ForLogger(global::NLog.LogLevel.Debug).WriteTo(_adapter));
         }
 
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _adapter.Dispose();
+        }
+
         [Test]
         public void Test_NLog_InsertOnEnd()
         {
@@ -44,9 +50,9 @@ namespace Audit.UnitTest
             }
 
             var events = _adapter.Logs.Select(l => new NLogObject(l)).ToArray();
-            Assert.AreEqual(1, events.Length);
-            Assert.AreEqual(LogLevel.Error, events[0].Level);
-            Assert.AreEqual(nameof(Test_NLog_InsertOnEnd), JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).EventType);
+            Assert.That(events.Length, Is.EqualTo(1));
+            Assert.That(events[0].Level, Is.EqualTo(LogLevel.Error));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).EventType, Is.EqualTo(nameof(Test_NLog_InsertOnEnd)));
         }
         [Test]
         public void Test_NLog_InsertOnStartReplaceOnEnd()
@@ -67,10 +73,10 @@ namespace Audit.UnitTest
             }
 
             var events = _adapter.Logs.Select(l => new NLogObject(l)).ToArray();
-            Assert.AreEqual(2, events.Length);
-            Assert.AreEqual(nameof(Test_NLog_InsertOnStartReplaceOnEnd), JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).EventType);
-            Assert.AreEqual(nameof(Test_NLog_InsertOnStartReplaceOnEnd), JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).EventType);
-            Assert.AreEqual(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).CustomFields["EventId"].ToString(), JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).CustomFields["EventId"].ToString());
+            Assert.That(events.Length, Is.EqualTo(2));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).EventType, Is.EqualTo(nameof(Test_NLog_InsertOnStartReplaceOnEnd)));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).EventType, Is.EqualTo(nameof(Test_NLog_InsertOnStartReplaceOnEnd)));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).CustomFields["EventId"].ToString(), Is.EqualTo(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).CustomFields["EventId"].ToString()));
         }
 
         [Test]
@@ -97,12 +103,12 @@ namespace Audit.UnitTest
             }
 
             var events = _adapter.Logs.Select(l => new NLogObject(l)).ToArray();
-            Assert.AreEqual(2, events.Length);
-            Assert.AreEqual(LogLevel.Debug, events[0].Level);
-            Assert.AreEqual(LogLevel.Error, events[1].Level);
-            Assert.AreEqual(nameof(Test_NLog_InsertOnStartInsertOnEnd), JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).EventType);
-            Assert.AreEqual(nameof(Test_NLog_InsertOnStartInsertOnEnd), JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).EventType);
-            Assert.AreNotEqual(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).CustomFields["EventId"], JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).CustomFields["EventId"]);
+            Assert.That(events.Length, Is.EqualTo(2));
+            Assert.That(events[0].Level, Is.EqualTo(LogLevel.Debug));
+            Assert.That(events[1].Level, Is.EqualTo(LogLevel.Error));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).EventType, Is.EqualTo(nameof(Test_NLog_InsertOnStartInsertOnEnd)));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).EventType, Is.EqualTo(nameof(Test_NLog_InsertOnStartInsertOnEnd)));
+            Assert.That(JsonAdapter.Deserialize<AuditEvent>(events[1].MessageObject).CustomFields["EventId"], Is.Not.EqualTo(JsonAdapter.Deserialize<AuditEvent>(events[0].MessageObject).CustomFields["EventId"]));
         }
     }
 
