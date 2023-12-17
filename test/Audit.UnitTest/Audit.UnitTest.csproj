@@ -29,6 +29,10 @@
 		<PackageReference Include="System.Text.Json" Version="6.0.9" />
 	</ItemGroup>
 
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net462' and '$(TargetFramework)' != 'net472' ">
+		<ProjectReference Include="..\..\src\Audit.NET.EventLog.Core\Audit.NET.EventLog.Core.csproj" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 	</ItemGroup>

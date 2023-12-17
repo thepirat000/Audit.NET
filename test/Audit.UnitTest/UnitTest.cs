@@ -1086,6 +1086,37 @@ namespace Audit.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
+#if NET6_0_OR_GREATER
+        [Test]
+        public void AuditActivityTrace_Serialization()
+        {
+            // Arrange
+            var trace = new AuditActivityTrace() { SpanId = "span" };
+            var json = trace.ToJson();
+
+            // Act
+            var traceRead = AuditActivityTrace.FromJson(json);
+
+            // Assert
+            Assert.That(traceRead.SpanId, Is.EqualTo(trace.SpanId).And.EqualTo("span"));
+        }
+#endif
+
+        [Test]
+        public void AuditEventEnvironment_Serialization()
+        {
+            // Arrange
+            var env = new AuditEventEnvironment() { MachineName = "machine"};
+            var json = env.ToJson();
+
+            // Act
+            var envRead = AuditEventEnvironment.FromJson(json);
+
+            // Assert
+            Assert.That(envRead.MachineName, Is.EqualTo(env.MachineName).And.EqualTo("machine"));
+        }
+
+
         public class SomeClass
         {
             public int Id { get; set; }
