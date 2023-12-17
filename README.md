@@ -70,7 +70,7 @@ and any custom fields or properties.
 
 The `AuditEvent` is typically serialized into a format suitable for storage or transmission, such as JSON.
 
-# IMPORTANT NOTE - SUPPORT FOR OLDER .NET FRAMEWORKS
+# SUPPORT FOR OLDER .NET FRAMEWORKS
 
 Beginning with the version 23.0.0, this library and its extensions has discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
 
