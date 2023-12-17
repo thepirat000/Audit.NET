@@ -13,6 +13,8 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
 {
     [TestFixture]
+    [Category("Integration")]
+    [Category("SqlServer")]
     public class EntityFrameworkTests
     {
         [SetUp]
