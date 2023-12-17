@@ -27,15 +27,6 @@
 				</PackageReference>
 			</ItemGroup>
 		</When>
-		<When Condition="$(MSBuildProjectDirectory.Contains('\src\'))">
-			<PropertyGroup>
-
-			</PropertyGroup>
-
-			<ItemGroup>
-
-			</ItemGroup>
-		</When>
 	</Choose>
 
 </Project>
