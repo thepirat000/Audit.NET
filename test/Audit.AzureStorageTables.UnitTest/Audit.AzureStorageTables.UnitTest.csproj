@@ -17,7 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Include="..\Audit.IntegrationTest\AzureSettings.cs" Link="AzureSettings.cs" />
+	  <Compile Include="..\AzureSettings.cs" Link="AzureSettings.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

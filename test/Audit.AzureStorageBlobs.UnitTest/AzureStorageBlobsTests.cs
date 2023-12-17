@@ -1,12 +1,13 @@
-﻿using Audit.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Audit.Core;
+using Audit.IntegrationTest;
 using Azure.Storage;
 using Azure.Storage.Blobs.Models;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Audit.IntegrationTest
+namespace Audit.AzureStorageBlobs.UnitTest
 {
     public class AzureStorageBlobsTests
     {

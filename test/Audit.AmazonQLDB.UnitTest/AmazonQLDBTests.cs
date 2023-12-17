@@ -1,14 +1,14 @@
-﻿using Amazon.QLDB.Driver;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Amazon.QLDB.Driver;
 using Amazon.QLDBSession;
 using Audit.Core;
 using Audit.NET.AmazonQLDB.Providers;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Audit.IntegrationTest
+namespace Audit.AmazonQLDB.UnitTest
 {
     [TestFixture]
     [Category("Integration")]

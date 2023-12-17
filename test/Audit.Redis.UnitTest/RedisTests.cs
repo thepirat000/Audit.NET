@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Redis.Providers;
 using NUnit.Framework;
 using StackExchange.Redis;
 
-namespace Audit.IntegrationTest
+namespace Audit.Redis.UnitTest
 {
     [TestFixture]
     [Category("Integration")]
@@ -49,8 +48,8 @@ namespace Audit.IntegrationTest
             var value = db.StringGet(key);
             var evFromApi = (Audit.Core.Configuration.DataProvider as RedisDataProvider).GetEvent(key);
             
-            var aev = Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
-            Configuration.ResetCustomActions();
+            var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
+            Core.Configuration.ResetCustomActions();
             db.KeyDelete(key);
 
             Assert.AreEqual(2, ids.Count);
@@ -59,7 +58,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(evFromApi.StartDate, aev.StartDate);
             Assert.AreEqual(evFromApi.EndDate, aev.EndDate);
             Assert.AreEqual("Redis_String_Basic", aev.EventType);
-            Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+            Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
         }
 
         [Test]
@@ -121,11 +120,11 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var value = await db.StringGetAsync(key);
-            var evFromApi = await Configuration.DataProvider.GetEventAsync(key);
+            var evFromApi = await Core.Configuration.DataProvider.GetEventAsync(key);
 
-            var aev = Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
+            var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
             await db.KeyDeleteAsync(key);
-            Configuration.ResetCustomActions();
+            Core.Configuration.ResetCustomActions();
 
             Assert.AreEqual(2, ids.Count);
             Assert.AreEqual(ids[0], ids[1]);
@@ -133,7 +132,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(evFromApi.StartDate, aev.StartDate);
             Assert.AreEqual(evFromApi.EndDate, aev.EndDate);
             Assert.AreEqual("Redis_String_Basic_Async", aev.EventType);
-            Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+            Assert.AreEqual(new List<int>() { 1, 2, 3, 4, 5 }, Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
         }
 
         [Test, Order(10)]
@@ -159,7 +158,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var value = db.StringGet(key);
-            var aev = Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
+            var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
 
             Task.Delay(5500).Wait();
 
@@ -170,7 +169,7 @@ namespace Audit.IntegrationTest
             Assert.IsFalse(value2.HasValue);
 
             Assert.AreEqual("Redis_String_Ttl", aev.EventType);
-            Assert.AreEqual(new List<int>() { 2, 3, 4, 5 }, Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
+            Assert.AreEqual(new List<int>() { 2, 3, 4, 5 }, Core.Configuration.JsonAdapter.ToObject<List<int>>(aev.CustomFields["custom"]));
         }
 
         [Test, Order(10)]
@@ -198,9 +197,9 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var value = (byte[])db.StringGet(key);
-            var evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
+            var evFromApi = Core.Configuration.DataProvider.GetEvent(ids[0]);
             db.KeyDelete(key);
-            Configuration.ResetCustomActions();
+            Core.Configuration.ResetCustomActions();
 
             Assert.AreEqual(2, ids.Count);
             Assert.AreEqual("deserializer test", evFromApi.EventType);
@@ -238,9 +237,9 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase(dbIndex);
             var values = db.ListRange(key);
-            var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
-            var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3]);
-            var evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
+            var aev1 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
+            var aev2 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3]);
+            var evFromApi = Core.Configuration.DataProvider.GetEvent(ids[0]);
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
 
@@ -310,9 +309,9 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var values = await db.ListRangeAsync(key);
-            var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
-            var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3]);
-            var evFromApi = await Configuration.DataProvider.GetEventAsync(ids[0]);
+            var aev1 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
+            var aev2 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3]);
+            var evFromApi = await Core.Configuration.DataProvider.GetEventAsync(ids[0]);
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
 
@@ -346,7 +345,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var values = db.ListRange(key);
-            var aev = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
+            var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
 
             Task.Delay(5500).Wait();
 
@@ -411,9 +410,9 @@ namespace Audit.IntegrationTest
             db.KeyDelete(key);
 
             Assert.AreEqual(3, values.Length);
-            Assert.AreEqual("4", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]).EventType);
-            Assert.AreEqual("3", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]).EventType);
-            Assert.AreEqual("2", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2]).EventType);
+            Assert.AreEqual("4", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]).EventType);
+            Assert.AreEqual("3", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]).EventType);
+            Assert.AreEqual("2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2]).EventType);
         }
 
         [Test, Order(10)]
@@ -454,7 +453,7 @@ namespace Audit.IntegrationTest
             var values = db.HashGetAll(key);
             var v1 = db.HashGet(key, "Redis_Hash_Basic_1");
             var v2 = db.HashGet(key, "Redis_Hash_Basic_2");
-            var evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
+            var evFromApi = Core.Configuration.DataProvider.GetEvent(ids[0]);
 
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
@@ -464,7 +463,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual("Redis_Hash_Basic_1", evFromApi.EventType);
             Assert.IsTrue(v1.HasValue);
             Assert.IsTrue(v2.HasValue);
-            Assert.AreEqual("updated", Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
+            Assert.AreEqual("updated", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
         }
 
         [Test]
@@ -534,7 +533,7 @@ namespace Audit.IntegrationTest
             var values = db.HashGetAll(key);
             var v1 = db.HashGet(key, "Redis_Hash_Basic_1");
             var v2 = db.HashGet(key, "Redis_Hash_Basic_2");
-            var evFromApi = await Configuration.DataProvider.GetEventAsync(ids[0]);
+            var evFromApi = await Core.Configuration.DataProvider.GetEventAsync(ids[0]);
 
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
@@ -544,7 +543,7 @@ namespace Audit.IntegrationTest
             Assert.AreEqual("Redis_Hash_Basic_1", evFromApi.EventType);
             Assert.IsTrue(v1.HasValue);
             Assert.IsTrue(v2.HasValue);
-            Assert.AreEqual("updated", Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
+            Assert.AreEqual("updated", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(v1).CustomFields["test"].ToString());
         }
 
         [Test, Order(10)]
@@ -572,7 +571,7 @@ namespace Audit.IntegrationTest
 
             var exists1 = db.KeyExists(key);
             var value = db.HashGet(key, "Redis_Hash_Ttl");
-            var aev = Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
+            var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
 
             Task.Delay(5500).Wait();
 
@@ -642,7 +641,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase(dbIndex);
             var values = db.SortedSetRangeByRankWithScores(key);
-            var evFromApi = Configuration.DataProvider.GetEvent(ids[0]);
+            var evFromApi = Core.Configuration.DataProvider.GetEvent(ids[0]);
 
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
@@ -651,9 +650,9 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(4, values.Length);
             Assert.AreEqual(-56.78, values[0].Score);
             Assert.AreEqual("Redis_SortedSet_Basic_1", evFromApi.EventType);
-            Assert.AreEqual("Redis_SortedSet_Basic_2", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_Basic_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
             Assert.AreEqual(12.34, values[3].Score);
-            Assert.AreEqual("Redis_SortedSet_Basic_1", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_Basic_1", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
         }
 
         [Test]
@@ -716,7 +715,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var values = await db.SortedSetRangeByRankWithScoresAsync(key);
-            var evFromApi = await Configuration.DataProvider.GetEventAsync(ids[0]);
+            var evFromApi = await Core.Configuration.DataProvider.GetEventAsync(ids[0]);
 
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
@@ -725,9 +724,9 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(4, values.Length);
             Assert.AreEqual(-56.78, values[0].Score);
             Assert.AreEqual("Redis_SortedSet_Basic_1", evFromApi.EventType);
-            Assert.AreEqual("Redis_SortedSet_Basic_2", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_Basic_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
             Assert.AreEqual(12.34, values[3].Score);
-            Assert.AreEqual("Redis_SortedSet_Basic_1", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_Basic_1", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[3].Element).EventType);
         }
 
         [Test, Order(10)]
@@ -753,7 +752,7 @@ namespace Audit.IntegrationTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
             var values = db.SortedSetRangeByRank(key);
-            var aev = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
+            var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]);
 
             Task.Delay(5500).Wait();
 
@@ -770,14 +769,14 @@ namespace Audit.IntegrationTest
             object id;
             var random = new byte[] { 15, 4, 9, 22, 10, 14 };
             var deserialize = new AuditEvent() { EventType = "test 123" };
-            Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+            Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
 
             var dp = new RedisDataProviderHelper(RedisCnnString, ev => random, b => deserialize)
                 .AsSortedSet(s => s
                     .Key(ev => key)
                     .Score(ev => 1));
 
-            Configuration.Setup().Use(dp);
+            Core.Configuration.Setup().Use(dp);
 
             using (var scope = AuditScope.Create(new AuditScopeOptions() { DataProvider = dp }))
             {
@@ -790,7 +789,7 @@ namespace Audit.IntegrationTest
             var values = db.SortedSetRangeByScore(key, 1, 1);
 
             db.KeyDelete(key);
-            Configuration.ResetCustomActions();
+            Core.Configuration.ResetCustomActions();
 
             Assert.AreEqual(random, (byte[])values[0]);
         }
@@ -828,8 +827,8 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(2, values.Length);
             Assert.AreEqual(-100, values[0].Score);
             Assert.AreEqual(-56.78, values[1].Score);
-            Assert.AreEqual("Redis_SortedSet_CappedByScore_3", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByScore_2", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByScore_3", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByScore_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
         }
 
         [Test, Order(10)]
@@ -861,9 +860,9 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(-50.55, values[0].Score);
             Assert.AreEqual(12.34, values[1].Score);
             Assert.AreEqual(142857.77, values[2].Score);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_4", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_1", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_5", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByRank_4", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByRank_1", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByRank_5", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType);
         }
 
         [Test, Order(10)]
@@ -895,9 +894,9 @@ namespace Audit.IntegrationTest
             Assert.AreEqual(-987.65, values[0].Score);
             Assert.AreEqual(-100.00, values[1].Score);
             Assert.AreEqual(-50.55, values[2].Score);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_2", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_3", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
-            Assert.AreEqual("Redis_SortedSet_CappedByRank_4", Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByRank_2", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByRank_3", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1].Element).EventType);
+            Assert.AreEqual("Redis_SortedSet_CappedByRank_4", Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[2].Element).EventType);
         }
 
         [Test, Order(10)]
@@ -916,7 +915,7 @@ namespace Audit.IntegrationTest
             var subs = mx.GetSubscriber();
             subs.Subscribe(new RedisChannel("mychannel:audit", RedisChannel.PatternMode.Literal), (ch, x) =>
             {
-                list.Add(Configuration.JsonAdapter.Deserialize<AuditEvent>(x));
+                list.Add(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(x));
             });
 
             using (var scope = AuditScope.Create(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_1" })) {}
@@ -948,7 +947,7 @@ namespace Audit.IntegrationTest
             var subs = mx.GetSubscriber();
             await subs.SubscribeAsync(new RedisChannel("mychannel:audit", RedisChannel.PatternMode.Literal), (ch, x) =>
             {
-                list.Add(Configuration.JsonAdapter.Deserialize<AuditEvent>(x));
+                list.Add(Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(x));
             });
 
             using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { EventType = "Redis_PubSub_Basic_1" })) { await scope.DisposeAsync(); }
@@ -1024,7 +1023,7 @@ namespace Audit.IntegrationTest
 
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
-            var values = db.ListRange(key).Select(x => Configuration.JsonAdapter.Deserialize<AuditEvent>(x)).ToList();
+            var values = db.ListRange(key).Select(x => Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(x)).ToList();
 
             db.KeyDelete(key);
 
@@ -1066,7 +1065,7 @@ namespace Audit.IntegrationTest
 
             var mx = GetMultiplexer();
             var db = mx.GetDatabase();
-            var values = (await db.ListRangeAsync(key)).Select(x => Configuration.JsonAdapter.Deserialize<AuditEvent>(x)).ToList();
+            var values = (await db.ListRangeAsync(key)).Select(x => Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(x)).ToList();
 
             await db.KeyDeleteAsync(key);
 
@@ -1186,12 +1185,12 @@ namespace Audit.IntegrationTest
             var evType1 = values[0]["EventType"].ToString();
             var evType2 = values[1]["EventType"].ToString();
 
-            var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]["MyAuditEvent"]);
-            var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]["MyAuditEvent"]);
+            var aev1 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]["MyAuditEvent"]);
+            var aev2 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]["MyAuditEvent"]);
 
-            var evFromApi1 = Configuration.DataProvider.GetEvent(ids[0]);
-            var evFromApi2 = Configuration.DataProvider.GetEvent(ids[1]);
-            var evFromApiNotExists = Configuration.DataProvider.GetEvent("0-0");
+            var evFromApi1 = Core.Configuration.DataProvider.GetEvent(ids[0]);
+            var evFromApi2 = Core.Configuration.DataProvider.GetEvent(ids[1]);
+            var evFromApiNotExists = Core.Configuration.DataProvider.GetEvent("0-0");
 
             db.KeyDelete(key);
             Core.Configuration.ResetCustomActions();
@@ -1247,12 +1246,12 @@ namespace Audit.IntegrationTest
             var evType1 = values[0]["EventType"].ToString();
             var evType2 = values[1]["EventType"].ToString();
 
-            var aev1 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]["MyAuditEvent"]);
-            var aev2 = Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]["MyAuditEvent"]);
+            var aev1 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[0]["MyAuditEvent"]);
+            var aev2 = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(values[1]["MyAuditEvent"]);
 
-            var evFromApi1 = await Configuration.DataProvider.GetEventAsync(ids[0]);
-            var evFromApi2 = await Configuration.DataProvider.GetEventAsync(ids[1]);
-            var evFromApiNotExists = await Configuration.DataProvider.GetEventAsync("0-0");
+            var evFromApi1 = await Core.Configuration.DataProvider.GetEventAsync(ids[0]);
+            var evFromApi2 = await Core.Configuration.DataProvider.GetEventAsync(ids[1]);
+            var evFromApiNotExists = await Core.Configuration.DataProvider.GetEventAsync("0-0");
 
             await db.KeyDeleteAsync(key);
             Core.Configuration.ResetCustomActions();
