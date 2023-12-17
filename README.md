@@ -70,6 +70,8 @@ and any custom fields or properties.
 
 The `AuditEvent` is typically serialized into a format suitable for storage or transmission, such as JSON.
 
+The audit events are stored using a **Data Provider**. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET?tab=readme-ov-file#storage-providers) or [implement your own](https://github.com/thepirat000/Audit.NET?tab=readme-ov-file#data-providers).
+
 # SUPPORT FOR OLDER .NET FRAMEWORKS
 
 Beginning with the version 23.0.0, this library and its extensions has discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
