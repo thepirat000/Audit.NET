@@ -529,7 +529,7 @@ namespace Audit.UnitTest
             {
                 target = "end";
             }
-            var fileFromProvider = (Audit.Core.Configuration.DataProvider as FileDataProvider).GetEvent($@"{dir}\evt-1.json");
+            var fileFromProvider = Core.Configuration.DataProviderAs<FileDataProvider>().GetEvent($@"{dir}\evt-1.json");
 
             var ev = JsonAdapter.Deserialize<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
             var fileCount = Directory.EnumerateFiles(dir).Count();
@@ -770,8 +770,8 @@ namespace Audit.UnitTest
             var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
             Assert.That(Core.Configuration.DataProvider.GetType(), Is.EqualTo(typeof(FileDataProvider)));
-            Assert.That((Core.Configuration.DataProvider as FileDataProvider).FilenamePrefix, Is.EqualTo("prefix"));
-            Assert.That((Core.Configuration.DataProvider as FileDataProvider).DirectoryPath, Is.EqualTo(@"C:\"));
+            Assert.That(Core.Configuration.DataProviderAs<FileDataProvider>().FilenamePrefix, Is.EqualTo("prefix"));
+            Assert.That(Core.Configuration.DataProviderAs<FileDataProvider>().DirectoryPath, Is.EqualTo(@"C:\"));
             Assert.That(Core.Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
             Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
             Assert.That(x, Is.EqualTo(1));
@@ -787,12 +787,13 @@ namespace Audit.UnitTest
             var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
             Assert.That(Core.Configuration.DataProvider.GetType(), Is.EqualTo(typeof(EventLogDataProvider)));
-            Assert.That((Core.Configuration.DataProvider as EventLogDataProvider).LogName, Is.EqualTo("LogName"));
-            Assert.That((Core.Configuration.DataProvider as EventLogDataProvider).SourcePath, Is.EqualTo("SourcePath"));
-            Assert.That((Core.Configuration.DataProvider as EventLogDataProvider).MachineName, Is.EqualTo("MachineName"));
+            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().LogName, Is.EqualTo("LogName"));
+            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().SourcePath, Is.EqualTo("SourcePath"));
+            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().MachineName, Is.EqualTo("MachineName"));
             Assert.That(Core.Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
         }
 #endif
+
         [Test]
         public void Test_StartAndSave()
         {

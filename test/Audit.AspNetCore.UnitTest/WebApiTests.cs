@@ -931,7 +931,7 @@ namespace Audit.AspNetCore.UnitTest
             var customer = new Customer() {Id = 123, Name = "Test"};
             var s = await _httpClient.PostAsync($"api/values/TestSerializeParams", new StringContent(Configuration.JsonAdapter.Serialize(customer), Encoding.UTF8, "application/json"));
 
-            var events = (Core.Configuration.DataProvider as InMemoryDataProvider).GetAllEventsOfType<AuditEventWebApi>();
+            var events = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventWebApi>();
 
             Assert.That(events.Count, Is.EqualTo(1));
             Assert.That(events[0].Action.ActionParameters.Count, Is.EqualTo(1));
@@ -950,7 +950,7 @@ namespace Audit.AspNetCore.UnitTest
             var customer = new Customer() { Id = 123, Name = "Test" };
             var s = await _httpClient.PostAsync($"api/values/TestDoNotSerializeParams", new StringContent(Configuration.JsonAdapter.Serialize(customer), Encoding.UTF8, "application/json"));
 
-            var events = (Core.Configuration.DataProvider as InMemoryDataProvider).GetAllEventsOfType<AuditEventWebApi>();
+            var events = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventWebApi>();
 
             Assert.That(events.Count, Is.EqualTo(1));
             Assert.That(events[0].Action.ActionParameters.Count, Is.EqualTo(1));
@@ -971,7 +971,7 @@ namespace Audit.AspNetCore.UnitTest
             
             var result = await _httpClient.PatchAsync($"api/My/JsonPatch", new StringContent(bodyJson, Encoding.UTF8, "application/json-patch+json"));
 
-            var events = (Configuration.DataProvider as InMemoryDataProvider)?.GetAllEventsOfType<AuditEventWebApi>();
+            var events = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventWebApi>();
             var eventJson = events?.FirstOrDefault()?.ToJson();
             var op = (events?[0].Action.ActionParameters.First().Value as JsonPatchDocument<Customer>)?.Operations[0];
 

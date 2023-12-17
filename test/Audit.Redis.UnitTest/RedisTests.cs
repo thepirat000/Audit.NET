@@ -46,7 +46,7 @@ namespace Audit.Redis.UnitTest
             var mx = GetMultiplexer();
             var db = mx.GetDatabase(dbIndex);
             var value = db.StringGet(key);
-            var evFromApi = (Audit.Core.Configuration.DataProvider as RedisDataProvider).GetEvent(key);
+            var evFromApi = Core.Configuration.DataProviderAs<RedisDataProvider>().GetEvent(key);
             
             var aev = Core.Configuration.JsonAdapter.Deserialize<AuditEvent>(value);
             Core.Configuration.ResetCustomActions();

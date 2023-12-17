@@ -50,7 +50,7 @@ namespace Audit.MongoDb.UnitTest
             up.UserName = "user2";
             scope.Dispose();
 
-            var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
+            var eventRead = Core.Configuration.DataProviderAs<MongoDataProvider>().GetEvent(eventId);
 
             Assert.That((eventRead.Target.Old as BsonDocument)["UserName"].ToString(), Is.EqualTo("user1"));
             Assert.That((eventRead.Target.New as BsonDocument)["UserName"].ToString(), Is.EqualTo("user2"));
@@ -81,7 +81,7 @@ namespace Audit.MongoDb.UnitTest
                 up.UserName = "user2";
             }
 
-            var eventRead = (Audit.Core.Configuration.DataProvider as MongoDataProvider).GetEvent(eventId);
+            var eventRead = Core.Configuration.DataProviderAs<MongoDataProvider>().GetEvent(eventId);
 
             Assert.That((eventRead.Target.Old as BsonDocument)["UserName"].ToString(), Is.EqualTo("user1"));
             Assert.That((eventRead.Target.New as BsonDocument)["UserName"].ToString(), Is.EqualTo("user2"));
@@ -133,7 +133,7 @@ namespace Audit.MongoDb.UnitTest
             scope.Dispose();
 
             Audit.Core.Configuration.ResetCustomActions();
-            var dp = Audit.Core.Configuration.DataProvider as MongoDataProvider;
+            var dp = Configuration.DataProviderAs<MongoDataProvider>();
             var evt = dp.GetEvent(evId);
             Assert.That(DateTime.Parse(evt.CustomFields["someDate"].ToString()).ToUniversalTime().ToString("yyyyMMddHHmmss"), Is.EqualTo(now.ToString("yyyyMMddHHmmss")));
         }

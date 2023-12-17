@@ -147,7 +147,7 @@ namespace Audit.AzureStorageTables.UnitTest
                 scope.Event.Environment.UserName = "test updated user name";
             }
 
-            var provider = Configuration.DataProvider as AzureTableDataProvider;
+            var provider = Configuration.DataProviderAs<AzureTableDataProvider>();
             var entity = provider.GetTableClient(auditEvent).GetEntity<TableEntity>("Part", id).Value;
 
             Assert.That(entity, Is.Not.Null);
@@ -293,7 +293,7 @@ namespace Audit.AzureStorageTables.UnitTest
                 scope.Event.Environment.UserName = "test updated user name";
             }
 
-            var provider = Configuration.DataProvider as AzureTableDataProvider;
+            var provider = Configuration.DataProviderAs<AzureTableDataProvider>();
             var entity = (await (await provider.GetTableClientAsync(auditEvent)).GetEntityAsync<TableEntity>("Part", id)).Value;
 
             Assert.That(entity, Is.Not.Null);

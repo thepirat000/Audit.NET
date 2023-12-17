@@ -53,7 +53,7 @@ namespace Audit.DynamoDB.UnitTest
                 {
                     break;
                 }
-                var ddp = (Audit.Core.Configuration.DataProvider as DynamoDataProvider);
+                var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
                 var ev = ddp.GetEvent<AuditEvent>((Primitive)hash, (Primitive)DateTime.Now.Year);
 
                 Assert.NotNull(ev);
