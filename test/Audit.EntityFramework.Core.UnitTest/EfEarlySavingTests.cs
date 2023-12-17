@@ -39,13 +39,13 @@ namespace Audit.EntityFramework.Core.UnitTest
 
         class TestContext : AuditDbContext
         {
-            public static string CnnString = TestHelper.GetConnectionString("TransactionTestEfCore");
+            private static string CnnString = TestHelper.GetConnectionString("TransactionTestEfCore");
 
             public DbSet<Message> Messages { get; set; }
             public DbSet<MessageAudit> MessageAudits { get; set; }
 
-            protected override void OnConfiguring(DbContextOptionsBuilder options)
-                => options.UseSqlServer(CnnString);
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+                => optionsBuilder.UseSqlServer(CnnString);
         }
 
         [OneTimeSetUp]
@@ -186,7 +186,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                         .AuditEntityAction<MessageAudit>((auditEvent, eventEntry, entity) =>
                         {
                             throw new Exception(exceptionMessage);
+#pragma warning disable CS0162
                             return Task.FromResult(true);
+#pragma warning restore CS0162
                         })
                     )
                 );

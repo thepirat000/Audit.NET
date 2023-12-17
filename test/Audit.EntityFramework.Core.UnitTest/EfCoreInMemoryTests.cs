@@ -316,7 +316,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                     {
                         au.AuditAction = "";
                         throw new ArgumentException("test exception");
+#pragma warning disable CS0162
                         return null;
+#pragma warning restore CS0162
                     }));
 
             var blog = new Blog()
@@ -359,7 +361,9 @@ namespace Audit.EntityFramework.Core.UnitTest
                     {
                         au.AuditAction = "";
                         throw new ArgumentException("test exception");
+#pragma warning disable CS0162
                         return null;
+#pragma warning restore CS0162
                     }));
 
             var blog = new Blog()

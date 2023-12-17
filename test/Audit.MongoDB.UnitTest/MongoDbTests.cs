@@ -129,9 +129,8 @@ namespace Audit.MongoDb.UnitTest
                 evId = s.EventId;
             });
             var now = DateTime.UtcNow;
-            using (var s = new AuditScopeFactory().Create("test", null, new { someDate = now }, null, null))
-            {
-            }
+            var scope = new AuditScopeFactory().Create("test", null, new { someDate = now }, null, null);
+            scope.Dispose();
 
             Audit.Core.Configuration.ResetCustomActions();
             var dp = Audit.Core.Configuration.DataProvider as MongoDataProvider;

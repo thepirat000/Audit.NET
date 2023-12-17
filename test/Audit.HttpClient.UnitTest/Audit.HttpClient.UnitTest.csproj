@@ -7,6 +7,7 @@
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 		<DebugType>Full</DebugType>
 	</PropertyGroup>
 
@@ -16,8 +17,6 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
 		<PackageReference Include="NUnit" Version="3.10.1" />
 		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-		<PackageReference Include="System.Net.Http" Version="4.3.4" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

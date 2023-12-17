@@ -92,8 +92,10 @@ namespace Audit.DynamoDB.UnitTest
                 await client.DeleteTableAsync(tableName);
             }
             catch
+#pragma warning disable S108
             {
             }
+#pragma warning restore S108
 
             await client.CreateTableAsync(new CreateTableRequest()
             {

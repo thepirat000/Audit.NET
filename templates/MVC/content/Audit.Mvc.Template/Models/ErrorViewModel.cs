@@ -1,5 +1,3 @@
-using System;
-
 namespace Audit.Mvc.Template.Models
 {
     public class ErrorViewModel

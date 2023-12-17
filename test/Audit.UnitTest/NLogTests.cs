@@ -17,7 +17,7 @@ namespace Audit.UnitTest
         public void Setup()
         {
             _adapter = new MemoryTarget();
-            global::NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(_adapter, global::NLog.LogLevel.Debug);
+            LogManager.Setup().LoadConfiguration(c => c.ForLogger(global::NLog.LogLevel.Debug).WriteTo(_adapter));
         }
 
         [Test]
