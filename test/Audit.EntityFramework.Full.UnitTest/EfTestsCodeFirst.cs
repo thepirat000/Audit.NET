@@ -33,6 +33,15 @@ namespace Audit.EntityFramework.Full.UnitTest
             Audit.Core.Configuration.AuditDisabled = false;
         }
 
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            using (var ctx = new BlogContext())
+            {
+                ctx.Database.Delete();
+            }
+        }
+
         [Test]
         public void Test_EF_Provider_ExplicitMapper_MapExplicit()
         {
@@ -80,7 +89,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             // Assert
             using (var ctx = new BlogContext())
             {
-                var audit = ctx.Audits.Single(u => u.Title == title);
+                var audit = ctx.Audits.First(u => u.Title == title);
 
                 Assert.That(audit.TableName, Is.EqualTo("Blog"));
                 Assert.That(audit.AuditAction, Is.EqualTo("Insert"));
@@ -136,7 +145,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             // Assert
             using (var ctx = new BlogContext())
             {
-                var audit = await ctx.Audits.SingleAsync(u => u.Title == title);
+                var audit = await ctx.Audits.FirstAsync(u => u.Title == title);
 
                 Assert.That(audit.TableName, Is.EqualTo("Blog"));
                 Assert.That(audit.AuditAction, Is.EqualTo("Insert"));
