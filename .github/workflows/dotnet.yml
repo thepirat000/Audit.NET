@@ -73,15 +73,15 @@ jobs:
 
     - name: Run unit tests (no integration)
       run: |
-        dotnet coverage collect dotnet test -m:1 --filter=TestCategory!=Integration --output ${{ github.workspace }}/Tests/Coverage.UnitTest.cobertura.xml --output-format cobertura
+        dotnet coverage collect dotnet test --no-build --configuration release -m:1 --filter=TestCategory!=Integration --output ${{ github.workspace }}/Tests/Coverage.UnitTest.cobertura.xml --output-format cobertura
 
     - name: Run integration tests (SqlServer)
       run: |
-        dotnet coverage collect dotnet test -m:1 --filter=TestCategory=SqlServer --output ${{ github.workspace }}/Tests/Coverage.SqlServer.cobertura.xml --output-format cobertura
+        dotnet coverage collect dotnet test --no-build --configuration release -m:1 --filter=TestCategory=SqlServer --output ${{ github.workspace }}/Tests/Coverage.SqlServer.cobertura.xml --output-format cobertura
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:-*UnitTest;-*Integration;+Audit.*"
+        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v2
@@ -90,7 +90,7 @@ jobs:
         path: ${{ github.workspace }}/Tests/coveragereport
     
     - name: Rename summary coverage file
-      run: mv "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
+      run: mv -force "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
 
     - name: Commit CODE_COVERAGE.md
       uses: stefanzweifel/git-auto-commit-action@v5
