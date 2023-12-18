@@ -90,7 +90,7 @@ jobs:
         path: ${{ github.workspace }}/Tests/coveragereport
     
     - name: Rename summary coverage file
-      run: mv "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
+      run: mv -f "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
 
     - name: Commit CODE_COVERAGE.md
       uses: stefanzweifel/git-auto-commit-action@v5
