@@ -8,7 +8,8 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+  workflow_dispatch:
+  
 env:
   AUDIT_NET_AZUREDOCDBAUTHKEY: ${{ secrets.AUDIT_NET_AZUREDOCDBAUTHKEY }}
   AUDIT_NET_AZUREDOCDBURL: ${{ secrets.AUDIT_NET_AZUREDOCDBURL }}
