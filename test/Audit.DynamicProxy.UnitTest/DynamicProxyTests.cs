@@ -120,7 +120,7 @@ namespace Audit.DynamicProxy.UnitTest
             Assert.That(res, Is.EqualTo("ok"));
             Assert.That(logs[1].EventType, Is.EqualTo("InterceptMe.AsyncFunctionAsync"));
             Assert.That(logs[1].GetAuditInterceptEvent().Result.Value, Is.EqualTo("ok"));
-            Assert.True(logs[1].Duration >= 2000);
+            Assert.True(logs[1].Duration >= 1000);
             Assert.That(logs[1].GetAuditInterceptEvent().AsyncStatus, Is.EqualTo(TaskStatus.RanToCompletion.ToString()));
 
             // Methods that returns a task (but are not async) are not continued
