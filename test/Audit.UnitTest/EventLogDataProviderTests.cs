@@ -6,6 +6,8 @@ using NUnit.Framework;
 namespace Audit.UnitTest
 {
     [TestFixture]
+    [Category("Integration")]
+    [Category("EventLog")]
     public class EventLogDataProviderTests
     {
         [SetUp]
