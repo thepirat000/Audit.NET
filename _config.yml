@@ -1,4 +1,6 @@
 theme: jekyll-theme-hacker
+logo: "src/Audit.NET/images/icon.png"
+search: true,
 plugins:
   - jekyll-relative-links
   - jekyll-sitemap
