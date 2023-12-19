@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 12/18/2023 - 7:08:35 AM |
+| Generated on: | 12/19/2023 - 12:32:25 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 21 |
 | Classes: | 242 |
 | Files: | 181 |
-| **Line coverage:** | 76.1% (7379 of 9688) |
-| Covered lines: | 7379 |
-| Uncovered lines: | 2309 |
-| Coverable lines: | 9688 |
-| Total lines: | 17065 |
-| **Branch coverage:** | 70.6% (2890 of 4092) |
-| Covered branches: | 2890 |
-| Total branches: | 4092 |
+| **Line coverage:** | 76.2% (7396 of 9702) |
+| Covered lines: | 7396 |
+| Uncovered lines: | 2306 |
+| Coverable lines: | 9702 |
+| Total lines: | 17100 |
+| **Branch coverage:** | 70.6% (2892 of 4094) |
+| Covered branches: | 2892 |
+| Total branches: | 4094 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -27,7 +27,7 @@
 |Audit.DynamicProxy.AuditProxy|11|0|11|59|100%|4|4|100%|
 |Audit.DynamicProxy.InterceptEvent|12|0|12|59|100%|0|0||
 |Audit.DynamicProxy.InterceptionSettings|7|0|7|48|100%|0|0||
-|**Audit.EntityFramework**|**1750**|**576**|**2326**|**5179**|**75.2%**|**636**|**844**|**75.3%**|
+|**Audit.EntityFramework**|**1764**|**576**|**2340**|**5214**|**75.3%**|**638**|**846**|**75.4%**|
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AssociationEntry|0|3|3|18|0%|0|0||
 |Audit.EntityFramework.AssociationEntryRecord|0|5|5|19|0%|0|0||
@@ -58,11 +58,11 @@
 |Audit.EntityFramework.DbContextHelper|305|115|420|933|72.6%|292|382|76.4%|
 |Audit.EntityFramework.DefaultAuditContext|20|2|22|45|90.9%|0|0||
 |Audit.EntityFramework.EntityFrameworkEvent|11|3|14|81|78.5%|0|0||
+|Audit.EntityFramework.EntityKeyHelper|114|0|114|295|100%|80|84|95.2%|
 |Audit.EntityFramework.EntityName|2|0|2|11|100%|0|0||
 |Audit.EntityFramework.EventEntry|12|4|16|68|75%|0|0||
 |Audit.EntityFramework.EventEntryChange|3|0|3|9|100%|0|0||
 |Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|379|87.1%|81|102|79.4%|
-|EntityKeyHelper|100|0|100|260|100%|78|82|95.1%|
 |**Audit.EntityFramework.Core**|**1834**|**820**|**2654**|**6047**|**69.1%**|**796**|**1036**|**76.8%**|
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AuditDbContext|33|0|33|249|100%|0|0||
@@ -219,12 +219,12 @@
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|4|4|100%|
 |Audit.Udp.Providers.UdpDataProvider|60|2|62|196|96.7%|14|16|87.5%|
-|**Audit.SignalR**|**338**|**103**|**441**|**1106**|**76.6%**|**143**|**294**|**48.6%**|
+|**Audit.SignalR**|**341**|**100**|**441**|**1106**|**77.3%**|**143**|**294**|**48.6%**|
 |Audit.SignalR.AuditEventSignalr|1|0|1|15|100%|0|0||
 |Audit.SignalR.AuditHubFilter|99|9|108|196|91.6%|70|100|70%|
 |Audit.SignalR.AuditPipelineModule|159|48|207|348|76.8%|68|174|39%|
 |Audit.SignalR.Configuration.AuditHubConfigurator|11|4|15|58|73.3%|0|0||
-|Audit.SignalR.Configuration.AuditHubFilterConfigurator|3|21|24|90|12.5%|0|0||
+|Audit.SignalR.Configuration.AuditHubFilterConfigurator|6|18|24|90|25%|0|0||
 |Audit.SignalR.SignalrEventBase|1|2|3|33|33.3%|0|0||
 |Audit.SignalR.SignalrEventConnect|7|0|7|41|100%|0|0||
 |Audit.SignalR.SignalrEventDisconnect|9|0|9|43|100%|0|0||
