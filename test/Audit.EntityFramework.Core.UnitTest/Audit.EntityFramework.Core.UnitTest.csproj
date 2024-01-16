@@ -33,7 +33,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.17" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.17" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
