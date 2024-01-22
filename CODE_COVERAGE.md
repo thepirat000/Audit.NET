@@ -1,14 +1,14 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 12/19/2023 - 12:32:25 AM |
+| Generated on: | 1/22/2024 - 2:15:40 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 21 |
 | Classes: | 242 |
 | Files: | 181 |
-| **Line coverage:** | 76.2% (7396 of 9702) |
-| Covered lines: | 7396 |
-| Uncovered lines: | 2306 |
+| **Line coverage:** | 76.2% (7393 of 9702) |
+| Covered lines: | 7393 |
+| Uncovered lines: | 2309 |
 | Coverable lines: | 9702 |
 | Total lines: | 17100 |
 | **Branch coverage:** | 70.6% (2892 of 4094) |
@@ -219,12 +219,12 @@
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|4|4|100%|
 |Audit.Udp.Providers.UdpDataProvider|60|2|62|196|96.7%|14|16|87.5%|
-|**Audit.SignalR**|**341**|**100**|**441**|**1106**|**77.3%**|**143**|**294**|**48.6%**|
+|**Audit.SignalR**|**338**|**103**|**441**|**1106**|**76.6%**|**143**|**294**|**48.6%**|
 |Audit.SignalR.AuditEventSignalr|1|0|1|15|100%|0|0||
 |Audit.SignalR.AuditHubFilter|99|9|108|196|91.6%|70|100|70%|
 |Audit.SignalR.AuditPipelineModule|159|48|207|348|76.8%|68|174|39%|
 |Audit.SignalR.Configuration.AuditHubConfigurator|11|4|15|58|73.3%|0|0||
-|Audit.SignalR.Configuration.AuditHubFilterConfigurator|6|18|24|90|25%|0|0||
+|Audit.SignalR.Configuration.AuditHubFilterConfigurator|3|21|24|90|12.5%|0|0||
 |Audit.SignalR.SignalrEventBase|1|2|3|33|33.3%|0|0||
 |Audit.SignalR.SignalrEventConnect|7|0|7|41|100%|0|0||
 |Audit.SignalR.SignalrEventDisconnect|9|0|9|43|100%|0|0||
