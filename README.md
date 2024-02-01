@@ -274,10 +274,10 @@ An example of the output in JSON:
     },
     "Activity": {
         "StartTimeUtc": "2023-12-01T17:36:52.2256288Z",
-		"SpanId": "23a93b9e8cbc457f",
-		"TraceId": "2d3e5e90f790c7d2274d9bb047531f66",
-		"ParentId": "0000000000000000",
-		"Operation": "Update"
+	"SpanId": "23a93b9e8cbc457f",
+	"TraceId": "2d3e5e90f790c7d2274d9bb047531f66",
+	"ParentId": "0000000000000000",
+	"Operation": "Update"
     },
     "StartDate": "2016-08-23T11:33:14.653191Z",
     "EndDate": "2016-08-23T11:33:23.1820786Z",
