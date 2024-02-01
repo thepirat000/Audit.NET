@@ -10,7 +10,7 @@ issues | build status | chat / support | donations
 
 Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
 
-With Audit.NET you can generate tracking information about operations being executed. It gathers environmental information such as the caller user id, machine name, method name, exceptions, including execution time and exposing an extensible mechanism to enrich the logs and handle the audit output.
+With Audit.NET you can generate tracking information about operations being executed. It gathers environmental information such as the caller user ID, machine name, method name, and exceptions, including execution time and exposing an extensible mechanism to enrich the logs and handle the audit output.
 
 [**Output extensions**](#storage-providers) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
 [Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
@@ -74,7 +74,7 @@ The audit events are stored using a **Data Provider**. You can use one of the [a
 
 # SUPPORT FOR OLDER .NET FRAMEWORKS
 
-Beginning with the version 23.0.0, this library and its extensions has discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
+Beginning with version 23.0.0, this library and its extensions have discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
 
 For reference, please consult the following links:
 
@@ -98,7 +98,7 @@ This discontinuation led to the following modifications:
 
 - All library versions will now use `System.Text.Json` as the default (Newtonsoft.Json will be deprecated but can still be used through the JsonAdapter).
 - Support for EF Core versions 3 and earlier has been discontinued in the `Audit.EntityFramework.Core` libraries. The minimum supported version is now EF Core 5 (`Audit.EntityFramework` will continue to support .NET Entity Framework 6).
-- The libraries `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` have been deprecated.
+- The libraries `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` has been deprecated.
 - `Audit.NET.JsonSystemAdapter` has been deprecated.
 
 
@@ -123,7 +123,7 @@ There are several ways to create an Audit Scope:
     var scope = AuditScope.Create("Order:Update", () => order, new { MyProperty = "value" });
     ```
 
-    The first parameter of the `AuditScope.Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library to inspect the value at the beginning and at the disposal of the scope. It is not mandatory to supply a target object.
+    The first parameter of the `AuditScope.Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library to inspect the value at the beginning and the disposal of the scope. It is not mandatory to supply a target object.
     
     You can use the overload that accepts an `AuditScopeOptions` instance to configure any of the available options for the scope:
 
@@ -190,7 +190,7 @@ using (AuditScope.Create("Order:Update", () => order))
 
 ### Simple logging
 
-If you are not tracking an object, nor the duration of an event, you can use the `Log` shortcut method that logs an event immediately. 
+If you are not tracking an object or the duration of an event, you can use the `Log` shortcut method that logs an event immediately. 
 For example:
 ```c#
 AuditScope.Log("Event Type", new { ExtraField = "extra value" });
@@ -232,7 +232,7 @@ For more information about the `EventCreationPolicy` please see [Event Creation 
 
 ## Asynchronous operations
 
-Asynchronous versions of the operations that saves audit logs are also provided. For example:
+Asynchronous versions of the operations that save audit logs are also provided. For example:
 
 ```c#
 public async Task SaveOrderAsync(Order order)
@@ -303,7 +303,7 @@ An example of the output in JSON:
 
 ## Output details
 
-The following tables describes the output fields:
+The following tables describe the output fields:
 
 - ### [AuditEvent object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEvent.cs)
 Field Name | Type | Description 
@@ -433,7 +433,7 @@ The output of the previous examples would be:
 
 The `AuditScope` object has a `Discard()` method to allow the user to discard an event. Discarding an event means it won't be saved.
 
-For example, if you want to avoid saving the audit event under certain condition:
+For example, if you want to avoid saving the audit event under certain conditions:
 
 ```c#
 using (var scope = AuditScope.Create(new AuditScopeOptions("SomeEvent", () => someTarget)))
@@ -458,15 +458,15 @@ A _data provider_ (or _storage sink_) contains the logic to handle the audit eve
 You can use one of the [data providers included](#data-providers-included) or inject your own mechanism 
 by creating a class that inherits from `AuditDataProvider` and overrides its methods:
 
-- `InsertEvent`: should store the event and return a unique ID for it. 
-- `ReplaceEvent`: should update an event given its ID. This method is only called for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
+- `InsertEvent`: should store the event and return a unique ID. 
+- `ReplaceEvent`: should update an event given its ID. This method is only used for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
 
 If your data provider will support asynchronous operations, you must also implement the following methods:
 
 - `InsertEventAsync`: Asynchronous implementation of the InsertEvent method. 
 - `ReplaceEventAsync`: Asynchronous implementation of the ReplaceEvent method.
 
-Also, if your data provider will support event retrieval, you should implement the methods:
+Also, if your data provider will support event retrieval, you should implement the following methods:
 
 - `GetEvent`: Retrieves an event by id. 
 - `GetEventAsync`: Asynchronous implementation of the GetEvent method. 
@@ -529,7 +529,7 @@ Audit.Core.Configuration.Setup()
 	.UseCustomProvider(new MyCustomDataProvider());
 ```
 
-You can also set the global data provider with a factory method that is called when an Audit Scope is created. For example:
+You can also set the global data provider with a factory method called when an Audit Scope is created. For example:
 
 ```c#
 Audit.Core.Configuration.DataProviderFactory = () => new LazyDataProvider();
@@ -577,7 +577,7 @@ Audit.Core.Configuration.Setup()
 		.OnInsert(ev => Console.Write(ev.ToJson())));
 ```
 
-For async operations you should use the `DynamicAsyncDataProvider`, for example:
+For async operations, you should use the `DynamicAsyncDataProvider`, for example:
 
 ```c#
 var dataProvider = new DynamicAsyncDataProvider();
@@ -629,7 +629,7 @@ The audit scope can be configured to call its data provider in different ways:
 The audit event is inserted when the scope is disposed. 
 
 - **Insert on Start, Replace on End:**
-The event (on its initial state) is inserted when the scope is created, and then the complete event information is replaced when the scope is disposed. 
+The event (in its initial state) is inserted when the scope is created, and then the complete event information is replaced when the scope is disposed. 
 
 - **Insert on Start, Insert on End:**
 Two versions of the event are inserted, the initial when the scope is created, and the final when the scope is disposed.
@@ -637,7 +637,7 @@ Two versions of the event are inserted, the initial when the scope is created, a
 - **Manual:**
 The event saving (insert/replace) should be explicitly invoked by calling the `Save()` method on the `AuditScope`.
 
-You can set the Creation Policy per-scope, for example to explicitly set the Creation Policy to Manual:
+You can set the Creation Policy per scope, for example, to explicitly set the Creation Policy to Manual:
 ```c#
 using (var scope = AuditScope.Create(new AuditScopeOptions { CreationPolicy = EventCreationPolicy.Manual }))
 {
@@ -659,7 +659,7 @@ The following is the internal state machine representation of the `AuditScope` o
 # Configuration
 
 ### Data provider
-To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
+To change the default data provider, set the static property `DataProvider` on `Audit.Core.Configuration` class. This should be done before the `AuditScope` creation, i.e. during application startup.
 
 For example, to set your own provider as the default data provider:
 ```c#
@@ -671,7 +671,7 @@ Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 > If you don't specify a Data Provider, a default `FileDataProvider` will be used to write the events as .json files into the current working directory.
 
 ### Creation Policy
-To change the default creation policy, set the static property `CreationPolicy` on `Audit.Core.Configuration` class. This should be done prior to the `AuditScope` creation, i.e. during application startup.
+To change the default creation policy, set the static property `CreationPolicy` on `Audit.Core.Configuration` class. This should be done before the `AuditScope` creation, i.e. during application startup.
  
 For example, to set the default creation policy to Manual:
 ```c#
@@ -698,7 +698,7 @@ Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 });
 ```
 
-Or to add custom fields / comments globally to all scopes:
+Or to add custom fields/comments globally to all scopes:
 ```c#
 Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
 {
@@ -741,10 +741,10 @@ Audit.Core.Configuration.Setup()
 
 ### Activity Trace
 
-To include the activy trace details from [System.Diagnostics.Activity](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activity?view=net-8.0) 
-API into the event, ensure that the `IncludeActivityTrace` configuration is set to `true`. Default is `false`.
+To include the activity trace details from [System.Diagnostics.Activity](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activity?view=net-8.0) 
+API into the event, ensure that the `IncludeActivityTrace` configuration is set to `true`. The default is `false`.
 
-It will include the current `Activity` operation name, ID, StartTime, along with associated Tags and Events.
+It will include the current `Activity` operation name, ID, and StartTime, along with associated Tags and Events.
 
 ```c#
 Audit.Core.Configuration.IncludeActivityTrace = true;
@@ -760,7 +760,7 @@ Audit.Core.Configuration.Setup()
 ### Global switch off
 
 You can disable audit logging by setting the static property `Configuration.AuditDisabled` to `true`. 
-The audit events are globally ignored while this flag is set. For example to disable the audits on certain environment:
+The audit events are globally ignored while this flag is set. For example to disable the audits on certain environments:
 
 ```c#
 if (environment.IsDevelopment())
@@ -771,7 +771,7 @@ if (environment.IsDevelopment())
 
 ### Global serialization settings
 
-Most of the data providers serializes audit events in JSON format. Audit.NET uses `System.Text.Json` by default for serialization and deserialization of audit events. 
+Most of the data providers serialize audit events in JSON format. Audit.NET uses `System.Text.Json` by default for the serialization and deserialization of audit events. 
 
 If you want to change the behavior, you can change the settings via the static property `Configuration.JsonSettings`.
 
@@ -804,7 +804,7 @@ Audit.Core.Configuration.Setup()
 
 > **Note**
 > 
-> Take into account that some of the `AuditEvent` properties relies on attribute decoration for serialization and deserialization.
+> Take into account that some of the `AuditEvent` properties rely on attribute decoration for serialization and deserialization.
 > The recommendation is to use the default adapter and, when needed, use the Newtonsoft Json adapter provided (see next section).
 
 #### Alternative serialization mechanism
@@ -890,7 +890,7 @@ Audit.Core.Configuration.Setup()
 
 # Extensions
 
-The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF and Entity Framework: 
+The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF, and Entity Framework: 
 
 <a></a> | Package | Description 
 ------------ | ------------------- | ------------------
@@ -932,12 +932,13 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 
 # Change Log
 
-For detailed information on changes in new release refer to the [change log](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md).
+For detailed information on changes in the new release refer to the [change log](https://github.com/thepirat000/Audit.NET/blob/master/CHANGELOG.md).
 
 # Contribute
 
 If you like this project please contribute in any of the following ways:
 
+- [Sponsoring this project](https://github.com/sponsors/thepirat000).
 - [Star](https://github.com/thepirat000/Audit.NET/stargazers) this project on GitHub.
 - Request a new feature or expose any bug you found by creating a [new issue](https://github.com/thepirat000/Audit.NET/issues/new).
 - Ask any questions about the library on [StackOverflow](http://stackoverflow.com/questions/ask?tags=Audit.NET).
@@ -953,5 +954,5 @@ If you like this project please contribute in any of the following ways:
       <img width="24" height="24" alt="Tweet this package" src="https://nuget.org/Content/gallery/img/twitter.svg" />
     </a>
   </p>
-- Make a donation via PayPal:
+- Donate via PayPal:
 [![paypal](https://img.shields.io/badge/donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=thepirat000%40hotmail.com&currency_code=USD&source=url)
