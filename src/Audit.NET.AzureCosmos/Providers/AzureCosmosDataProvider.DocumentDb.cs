@@ -105,7 +105,7 @@ namespace Audit.AzureCosmos.Providers
             IdBuilder = cosmosDbConfig._idBuilder;
         }
 
-        public override object Serialize<T>(T value)
+        public override object CloneValue<T>(T value, AuditEvent auditEvent)
         {
             if (value == null)
             {

@@ -516,35 +516,46 @@ public class MyCustomDataProvider : AuditDataProvider
 
 The data provider can be set globally for the entire application or per audit scope.
 
-To set the global data provider assign the `DataProvider` property on the static `Audit.Core.Configuration` object. For example:
+> **Note**
+> 
+> If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
+
+To set the global data provider assign the `DataProvider` property on the static `Audit.Core.Configuration` object, or call the fluent API `Use()`. For example:
 
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
 ```
 
-Or using the fluent API `UseCustomProvider` method:
+Or using the fluent API `Use()` method:
 
 ```c#
 Audit.Core.Configuration.Setup()
-	.UseCustomProvider(new MyCustomDataProvider());
+	.Use(new MyCustomDataProvider());
 ```
 
-You can also set the global data provider with a factory method called when an Audit Scope is created. For example:
+#### Lazy Factory data provider
 
-```c#
-Audit.Core.Configuration.DataProviderFactory = () => new LazyDataProvider();
-```
-
-Or using the fluent API `UseFactory`: 
+You can set the global data provider as a **lazy factory method** invoked until it is first used.
+For example, when you require resolving dependencies from the DI container to instantiate the data provider:
 
 ```c#
 Audit.Core.Configuration.Setup()
-	.UseFactory(() => new LazyDataProvider());
+    .UseLazyFactory(() => app.ApplicationServices.GetService<CustomDataProvider>());
 ```
 
-> **Note**
-> 
-> If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
+#### Deferred Factory data provider
+
+You can defer creating the data provider for each Audit Event until it is ready to be saved by using
+a **deferred factory method**. For example:
+
+```c#
+var sqlDataProvider = new SqlDataProvider(config => config...);
+var fileDataProvider = new FileDataProvider(config => config...);
+
+Audit.Core.Configuration.Setup()
+    .UseDeferredFactory(auditEvent => auditEvent is AuditEventWebApi ? sqlDataProvider : fileDataProvider);
+
+```
 
 See [Configuration section](#configuration) for more information.
 
@@ -556,7 +567,6 @@ var scope = AuditScope.Create(new AuditScopeOptions
   DataProvider = new MyCustomDataProvider(), ... }
 );
 ```
-
 
 ### Dynamic data providers 
 
@@ -593,34 +603,68 @@ Audit.Core.Configuration.Setup()
         .OnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson())));
 ```
 
+### Wrapper data providers 
+
+A special type of Data Providers that allows wrapping other Data Providers with different purposes:
+
+- LazyDataProvider
+
+  Allows to lazily instantiate the data provider to use. The data provider factory method will be called only once; the first time it's needed.
+
+  ```c#
+  Configuration.DataProvider = new LazyDataProvider(() => app.ApplicationServices.GetService<MyCustomDataProvider>());
+  ```
+
+- DeferredDataProvider
+
+  Allows to defer the data provider instantiation until the audit event is about to be saved. The data provider factory method will be called for each audit event being saved.
+
+  ```c#
+  Configuration.DataProvider = new DeferredDataProvider(auditEvent => auditEvent is AuditEventWebApi ? new FileDataProvider() : EventLogDataProvider());
+  ```
+
+- ConditionalDataProvider
+
+  Enables the configuration of different data providers based on conditions related to the audit event.
+
+  ```c#
+  Configuration.DataProvider = new ConditionalDataProvider(config => config
+    .When(auditEvent => auditEvent.EventType.Equals("A"), new MyCustomDataProvider())
+    .When(auditEvent => auditEvent.EventType.Equals("B"), new SqlDataProvider())
+    .Otherwise(new FileDataProvider()));
+  ```
+
 #### Data providers included
 
 The Data Providers included are summarized in the following table:
 
-Data Provider | Package | Description | [Configuration API](#configuration-fluent-api) |
------------- | ---------------- |  ----------------------------------------------------------------- | ------------------ |
-[AmazonQldbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/Providers/AmazonQldbDataProvider.cs) | [Audit.NET.AmazonQLDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/README.md) | Store the audit events using [Amazon QLDB](https://aws.amazon.com/es/qldb/). | `.UseAmazonQldb()`
-[AzureCosmosDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/Providers/AzureCosmosDataProvider.cs) | [Audit.NET.AzureCosmos](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureCosmos#auditnetazurecosmos) | Store the events in an **Azure Cosmos DB** container, in JSON format. | `.UseAzureCosmos()`
-[AzureStorageBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/Providers/AzureStorageBlobDataProvider.cs) | [Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageBlobs) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureStorageBlobs()`
-[AzureStorageTableDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageTables/Providers/AzureTableDataProvider.cs) | [Audit.NET.AzureStorageTables](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageTables) | Store the events in an **Azure Table Storage**. | `.UseAzureTableStorage()`
-[DynamoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/Providers/DynamoDataProvider.cs) | [Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md) | Store audit events in [Amazon DynamoDB™](https://aws.amazon.com/dynamodb/) tables. | `.UseDynamoDB()`
-[DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) / [DynamicAsyncDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicAsyncDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Dynamically change the behavior at run-time. Define _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()` / `.UseDynamicAsyncProvider()`
-[ElasticsearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/Providers/ElasticsearchDataProvider.cs) | [Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md) | Store audit events in Elasticsearch indices. | `.UseElasticsearch()`
-[EntityFrameworkDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/Providers/EntityFrameworkDataProvider.cs) | [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md#entity-framework-data-provider) | Store EntityFramework audit events in the same EF context. (This data provider can only be used for Entity Framework audits) | `.UseEntityFramework()`
-[EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) [Audit.NET.EventLog.Core](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.EventLog.Core) | Write the audit logs to the Windows EventLog. | `.UseEventLogProvider()`
-[FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configure the directory and path. | `.UseFileLogProvider()`
-[InMemoryDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/InMemoryDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs in memory in a thread-safe list. Useful for testing purposes. | `.UseInMemoryProvider()`
-[KafkaDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/Providers/KafkaDataProvider.cs) | [Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md) | Stream the audit events to [Apache Kafka](https://kafka.apache.org/) topics. | `.UseKafka()` / `.UseKafka<TKey>()`
-[Log4netDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/Providers/Log4netDataProvider.cs) | [Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md) | Store the audit events using [Apache log4net™](https://logging.apache.org/log4net/). | `.UseLog4net()`
-[MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()`
-[MySqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/Providers/MySqlDataProvider.cs) | [Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MySql#auditnetmysql) | Store the events as rows in a **MySQL** database table, in JSON format. | `.UseMySql()` 
-[NLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/Providers/NLogDataProvider.cs) | [Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md) | Store the audit events using [NLog](https://nlog-project.org/). | `.UseNLog()`
-[PostgreSqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/Providers/PostgreSqlDataProvider.cs) | [Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.PostgreSql#auditnetpostgresql) | Store the events as rows in a **PostgreSQL** database table, in JSON format. | `.UsePostgreSql()`
-[SerilogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Serilog/Providers/SerilogDataProvider.cs) | [Audit.NET.Serilog](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Serilog/README.md) | Store the audit events using [Serilog™](https://serilog.net/) | `.UseSerilog()`
-[SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()`
-[RavenDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/Providers/RavenDbSqlDataProvider.cs) | [Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.RavenDB#auditnetravendb) | Store the events as documents in a **Raven DB** database table, in JSON format. | `.UseRavenDB()`
-[RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes, Streams or publish to a PubSub channel. | `.UseRedis()`
-[UdpDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/Providers/UdpDataProvider.cs) | [Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md) | Send Audit Logs as UDP datagrams to a network. | `.UseUdp()`
+| Type | Data Provider | Package | Description | [Configuration API](#configuration-fluent-api) |
+| ------------ | ---------------- | ---------------- | ----------------------------------------------------------------- | ------------------ |
+| SQL | [AmazonQldbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/Providers/AmazonQldbDataProvider.cs) | [Audit.NET.AmazonQLDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AmazonQLDB/README.md) | Store the audit events using [Amazon QLDB](https://aws.amazon.com/es/qldb/). | `.UseAmazonQldb()`
+| SQL | [EntityFrameworkDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/Providers/EntityFrameworkDataProvider.cs) | [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md#entity-framework-data-provider) | Store EntityFramework audit events in the same EF context. (This data provider can only be used for Entity Framework audits) | `.UseEntityFramework()`
+| SQL | [MySqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/Providers/MySqlDataProvider.cs) | [Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MySql#auditnetmysql) | Store the events as rows in a **MySQL** database table, in JSON format. | `.UseMySql()` 
+| SQL | [PostgreSqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/Providers/PostgreSqlDataProvider.cs) | [Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.PostgreSql#auditnetpostgresql) | Store the
+| SQL | [SqlDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/Providers/SqlDataProvider.cs) | [Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.SqlServer#auditnetsqlserver) | Store the events as rows in a **MS SQL** Table, in JSON format. | `.UseSqlServer()`
+| NoSQL | [AzureCosmosDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/Providers/AzureCosmosDataProvider.cs) | [Audit.NET.AzureCosmos](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureCosmos#auditnetazurecosmos) | Store the events in an **Azure Cosmos DB** container, in JSON format. | `.UseAzureCosmos()`
+| NoSQL | [AzureStorageBlobDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/Providers/AzureStorageBlobDataProvider.cs) | [Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageBlobs) | Store the events in an **Azure Blob Storage** container, in JSON format. | `.UseAzureStorageBlobs()`
+| NoSQL | [AzureStorageTableDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageTables/Providers/AzureTableDataProvider.cs) | [Audit.NET.AzureStorageTables](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageTables) | Store the events in an **Azure Table Storage**. | `.UseAzureTableStorage()`
+| NoSQL | [DynamoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/Providers/DynamoDataProvider.cs) | [Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md) | Store audit events in [Amazon DynamoDB™](https://aws.amazon.com/dynamodb/) tables. | `.UseDynamoDB()`
+| NoSQL | [ElasticsearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/Providers/ElasticsearchDataProvider.cs) | [Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md) | Store audit events in Elasticsearch indices. | `.UseElasticsearch()`
+| NoSQL | [KafkaDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/Providers/KafkaDataProvider.cs) | [Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md) | Stream the audit events to [Apache Kafka](https://kafka.apache.org/) topics. | `.UseKafka()` / `.UseKafka<TKey>()`
+| NoSQL | [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs) | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) | Store the events in a **Mongo DB** collection, in BSON format. | `.UseMongoDB()`
+| NoSQL | [RavenDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/Providers/RavenDbSqlDataProvider.cs) | [Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.RavenDB#auditnetravendb) | Store the events as documents in a **Raven DB** database table, in JSON format. | `.UseRavenDB()`
+| NoSQL | [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs) | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes, Streams or publish to a PubSub channel. | `.UseRedis()`
+| Local | [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) [Audit.NET.EventLog.Core](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.EventLog.Core) | Write the audit logs to the Windows EventLog. | `.UseEventLogProvider()`
+| Local | [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs as files. Dynamically configure the directory and path. | `.UseFileLogProvider()`
+| Local | [InMemoryDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/InMemoryDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Store the audit logs in memory in a thread-safe list. Useful for testing purposes. | `.UseInMemoryProvider()`
+| Logging | [Log4netDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/Providers/Log4netDataProvider.cs) | [Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md) | Store the audit events using [Apache log4net™](https://logging.apache.org/log4net/). | `.UseLog4net()`
+| Logging | [NLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/Providers/NLogDataProvider.cs) | [Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md) | Store the audit events using [NLog](https://nlog-project.org/). | `.UseNLog()`
+| Logging | [SerilogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Serilog/Providers/SerilogDataProvider.cs) |  [Audit.NET.Serilog](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Serilog/README.md) | Store the audit events using [Serilog™](https://serilog.net/) | `.UseSerilog()`
+| Network | [UdpDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/Providers/UdpDataProvider.cs) | [Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md) | Send Audit Logs as UDP datagrams to a network. | `.UseUdp()`
+| Wrapper | [ConditionalDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/Wrappers/ConditionalDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Allows the configuration of different data providers based on conditions related to the audit event. | `.UseConditional()`
+| Wrapper | [DeferredDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/Wrappers/DeferredDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Facilitates delayed data provider instantiation via a factory method that is invoked for each Audit Event. | `.UseDeferredFactory()`
+| Wrapper | [DynamicDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicDataProvider.cs) / [DynamicAsyncDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/DynamicAsyncDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Dynamically change the behavior at run-time. Define _Insert_ and a _Replace_ actions with lambda expressions. | `.UseDynamicProvider()` / `.UseDynamicAsyncProvider()`
+| Wrapper | [LazyDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/Wrappers/LazyDataProvider.cs) | [Audit.NET](https://github.com/thepirat000/Audit.NET) | Facilitates delayed data provider instantiation via a factory method that is invoked just once, upon the initial need. | `.UseLazyFactory()`
 
 ## Event Creation Policy
 
@@ -884,6 +928,18 @@ Audit.Core.Configuration.Setup()
 Audit.Core.Configuration.Setup()
     .UseDynamicProvider(config => config
         .OnInsert(ev => Console.WriteLine("{0}: {1}->{2}", ev.StartDate, ev.Environment.UserName, ev.EventType)));
+```
+
+##### Multiple providers with conditional logic:
+
+```c#
+var sqlDataProvider = new SqlDataProvider(sql => sql.ConnectionString(CnnString).TableName("Logs"));
+var fileDataProvider = new FileDataProvider(file => file.Directory(@"C:\logs"));
+
+Audit.Core.Configuration.Setup()
+    .UseConditional(c => c
+        .When(ev => ev.EventType == "API", sqlDataProvider)
+        .Otherwise(fileDataProvider));
 ```
 
 -----------

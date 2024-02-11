@@ -82,7 +82,7 @@ namespace Audit.NET.AmazonQLDB.Providers
             }
         }
 
-        public override object Serialize<T>(T value)
+        public override object CloneValue<T>(T value, AuditEvent auditEvent)
         {
             if (value == null)
             {

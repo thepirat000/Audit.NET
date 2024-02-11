@@ -173,11 +173,11 @@ namespace Audit.MongoDB.Providers
         {
             foreach(var k in auditEvent.CustomFields.Keys.ToList())
             {
-                auditEvent.CustomFields[k] = Serialize(auditEvent.CustomFields[k]);
+                auditEvent.CustomFields[k] = CloneValue(auditEvent.CustomFields[k], auditEvent);
             }
         }
         
-        public override object Serialize<T>(T value)
+        public override object CloneValue<T>(T value, AuditEvent auditEvent)
         {
             if (value == null || value is string)
             {
@@ -199,7 +199,7 @@ namespace Audit.MongoDB.Providers
                 return value.ToBsonDocument(typeof(object));
             }
 
-            return base.Serialize(value);
+            return base.CloneValue(value, auditEvent);
         }
 
         protected virtual BsonDocument ParseBson(AuditEvent auditEvent)

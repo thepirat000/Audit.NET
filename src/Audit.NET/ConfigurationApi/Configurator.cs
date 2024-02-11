@@ -1,5 +1,6 @@
 using System;
 using Audit.Core.Providers;
+using Audit.Core.Providers.Wrappers;
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -45,15 +46,23 @@ namespace Audit.Core.ConfigurationApi
         {
             return UseDynamicProvider(config);
         }
-        public ICreationPolicyConfigurator UseFactory(Func<AuditDataProvider> dataProviderFactory)
+        public ICreationPolicyConfigurator UseDeferredFactory(Func<AuditEvent, AuditDataProvider> dataProviderFactory)
         {
-            Configuration.DataProviderFactory = dataProviderFactory;
+            Configuration.DataProvider = new DeferredDataProvider(dataProviderFactory);
             return new CreationPolicyConfigurator();
         }
-        public ICreationPolicyConfigurator Use(Func<AuditDataProvider> dataProviderFactory)
+        public ICreationPolicyConfigurator UseLazyFactory(Func<AuditDataProvider> dataProviderInitializer)
         {
-            return UseFactory(dataProviderFactory);
+            Configuration.DataProvider = new LazyDataProvider(dataProviderInitializer);
+            return new CreationPolicyConfigurator();
         }
+
+        public ICreationPolicyConfigurator UseConditional(Action<IConditionalDataProviderConfigurator> config)
+        {
+            Configuration.DataProvider = new ConditionalDataProvider(config);
+            return new CreationPolicyConfigurator();
+        }
+
         public ICreationPolicyConfigurator Use(AuditDataProvider provider)
         {
             return UseCustomProvider(provider);

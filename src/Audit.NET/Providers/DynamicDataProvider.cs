@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Audit.Core.Providers
 {
     /// <summary>
-    /// A dynamic provider that lets you create a an audit data provider on the fly by specifying the actions to take as lambda expressions.
+    /// A dynamic provider that lets you create an audit data provider on the fly by specifying the Insert and Replace actions as lambda expressions.
     /// </summary>
     public class DynamicDataProvider : AuditDataProvider
     {

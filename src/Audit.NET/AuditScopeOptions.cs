@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Audit.Core.Providers.Wrappers;
 
 namespace Audit.Core
 {
@@ -24,14 +25,17 @@ namespace Audit.Core
         public object ExtraFields { get; set; }
 
         /// <summary>
-        /// Gets or Sets the data provider builder.
+        /// Sets the data provider as a factory method that will be invoked the first time it's needed and only once. This is a shortcut to set a LazyDataProvider.
         /// </summary>
-        public Func<AuditDataProvider> DataProviderFactory { get; set; }
-
+        public Func<AuditDataProvider> DataProviderFactory 
+        {
+            set => DataProvider = new LazyDataProvider(value);
+        }
+        
         /// <summary>
         /// Gets or sets the data provider to use.
         /// </summary>
-        public AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
+        public AuditDataProvider DataProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the event creation policy to use.
@@ -97,7 +101,7 @@ namespace Audit.Core
             TargetGetter = targetGetter;
             ExtraFields = extraFields;
             CreationPolicy = creationPolicy ?? Configuration.CreationPolicy;
-            DataProviderFactory = dataProvider != null ? () => dataProvider : Configuration.DataProviderFactory;
+            DataProvider = dataProvider ?? Configuration.DataProvider;
             IsCreateAndSave = isCreateAndSave;
             AuditEvent = auditEvent;
             SkipExtraFrames = skipExtraFrames;
@@ -126,7 +130,7 @@ namespace Audit.Core
                 TargetGetter = scopeConfig._options.TargetGetter;
                 ExtraFields = scopeConfig._options.ExtraFields;
                 CreationPolicy = scopeConfig._options.CreationPolicy;
-                DataProviderFactory = scopeConfig._options.DataProviderFactory;
+                DataProvider = scopeConfig._options.DataProvider;
                 IsCreateAndSave = scopeConfig._options.IsCreateAndSave;
                 AuditEvent = scopeConfig._options.AuditEvent;
                 SkipExtraFrames = scopeConfig._options.SkipExtraFrames;

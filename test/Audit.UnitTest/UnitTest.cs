@@ -12,6 +12,7 @@ using System.Reflection;
 using Configuration = Audit.Core.Configuration;
 using InMemoryDataProvider = Audit.Core.Providers.InMemoryDataProvider;
 using System.Text.Json;
+using Audit.Core.Providers;
 
 namespace Audit.UnitTest
 {
@@ -798,7 +799,7 @@ namespace Audit.UnitTest
         public void Test_StartAndSave()
         {
             var provider = new Mock<InMemoryDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
 
             var eventType = "event type";
 
@@ -811,7 +812,7 @@ namespace Audit.UnitTest
         public void Test_CustomAction_OnCreating()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             
             var eventType = "event type 1";
             var target = "test";
@@ -843,7 +844,7 @@ namespace Audit.UnitTest
         public void Test_CustomAction_OnSaving()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             //provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent e) => e.Comments);
             var eventType = "event type 1";
             var target = "test";
@@ -888,7 +889,7 @@ namespace Audit.UnitTest
         public void Test_CustomAction_OnSaving_Discard()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
@@ -909,7 +910,7 @@ namespace Audit.UnitTest
         public void Test_CustomAction_OnCreating_Double()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
             var key1 = "key1";
@@ -939,7 +940,7 @@ namespace Audit.UnitTest
         public void TestSave()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
             var eventType = "SomeEvent";
@@ -974,7 +975,7 @@ namespace Audit.UnitTest
         public void TestDiscard()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
             var eventType = "SomeEvent";
@@ -1111,7 +1112,7 @@ namespace Audit.UnitTest
 
             // Act
             var envRead = AuditEventEnvironment.FromJson(json);
-
+            
             // Assert
             Assert.That(envRead.MachineName, Is.EqualTo(env.MachineName).And.EqualTo("machine"));
         }

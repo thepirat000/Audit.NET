@@ -45,16 +45,18 @@ namespace Audit.Core
             {
                 _event.CustomFields = new Dictionary<string, object>();
             }
+
+            ProcessExtraFields(options.ExtraFields);
+            
             if (options.TargetGetter != null)
             {
                 var targetValue = options.TargetGetter.Invoke();
                 _event.Target = new AuditTarget
                 {
-                    Old = _dataProvider.Serialize(targetValue),
+                    Old = _dataProvider.CloneValue(targetValue, _event),
                     Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
                 };
             }
-            ProcessExtraFields(options.ExtraFields);
         }
 #endregion
 
@@ -140,7 +142,7 @@ namespace Audit.Core
                 var targetValue = targetGetter.Invoke();
                 _event.Target = new AuditTarget
                 {
-                    Old = _dataProvider.Serialize(targetValue),
+                    Old = _dataProvider.CloneValue(targetValue, _event),
                     Type = targetValue?.GetType().GetFullTypeName() ?? "Object"
                 };
             }
@@ -175,10 +177,10 @@ namespace Audit.Core
         /// <typeparam name="TC">The type of the value.</typeparam>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="value">The value object.</param>
-        /// <param name="serialize">if set to <c>true</c> the field is serialized immediately.</param>
+        /// <param name="serialize">if set to <c>true</c> the value will be serialized immediately.</param>
         public void SetCustomField<TC>(string fieldName, TC value, bool serialize = false)
         {
-            _event.CustomFields[fieldName] = serialize ? _dataProvider.Serialize(value) : value;
+            _event.CustomFields[fieldName] = serialize ? _dataProvider.CloneValue(value, _event) : value;
         }
 
         /// <summary>
@@ -477,7 +479,7 @@ namespace Audit.Core
             _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
             if (_targetGetter != null)
             {
-                _event.Target.New = _dataProvider.Serialize(_targetGetter.Invoke());
+                _event.Target.New = _dataProvider.CloneValue(_targetGetter.Invoke(), _event);
             }
         }
 

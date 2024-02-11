@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using InMemoryDataProvider = Audit.Core.Providers.InMemoryDataProvider;
+using Audit.Core.Providers;
 
 namespace Audit.UnitTest
 {
@@ -562,7 +563,7 @@ namespace Audit.UnitTest
         public async Task Test_StartAndSave_Async()
         {
             var provider = new Mock<InMemoryDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
 
             var eventType = "event type";
 
@@ -576,7 +577,7 @@ namespace Audit.UnitTest
         public async Task Test_CustomAction_OnCreating_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
 
             var eventType = "event type 1";
             var target = "test";
@@ -610,7 +611,7 @@ namespace Audit.UnitTest
         public async Task Test_CustomAction_OnSaving_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             //provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent e) => e.Comments);
             var eventType = "event type 1";
             var target = "test";
@@ -634,7 +635,7 @@ namespace Audit.UnitTest
         public async Task Test_CustomAction_OnSaving_Discard_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
@@ -656,7 +657,7 @@ namespace Audit.UnitTest
         public async Task Test_CustomAction_OnCreating_Double_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
             var key1 = "key1";
@@ -688,7 +689,7 @@ namespace Audit.UnitTest
         public async Task TestSave_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
             var eventType = "SomeEvent";
@@ -724,7 +725,7 @@ namespace Audit.UnitTest
         public async Task TestDiscard_Async()
         {
             var provider = new Mock<AuditDataProvider>();
-            provider.Setup(p => p.Serialize(It.IsAny<string>())).CallBase();
+            provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
             var eventType = "SomeEvent";

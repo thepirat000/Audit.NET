@@ -38,7 +38,7 @@ StartDotnetUnitTests 'Audit.MySql.UnitTest' 'MySql';
 StartDotnetUnitTests 'Audit.PostgreSql.UnitTest' 'PostgreSql';
 StartDotnetUnitTests 'Audit.Serilog.UnitTest' 'Serilog';
 StartDotnetUnitTests 'Audit.WebApi.UnitTest' 'WebApi';
-StartDotnetUnitTests 'Audit.Integration.AspNetCore' 'AspNetCore';
+StartDotnetUnitTests 'Audit.AspNetCore.UnitTest' 'AspNetCore';
 StartDotnetUnitTests 'Audit.AmazonQLDB.UnitTest' 'AmazonQLDB';
 StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
 StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';

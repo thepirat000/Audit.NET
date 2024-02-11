@@ -911,7 +911,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 auditEvents.Add(ev);
                 return Guid.NewGuid();
             });
-            provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
+            provider.Setup(p => p.CloneValue(It.IsAny<object>(), It.IsAny<AuditEvent>())).Returns((object obj, AuditEvent _) => obj);
 
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object)
@@ -964,7 +964,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 auditEvent = ev;
                 return Guid.NewGuid();
             });
-            provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
+            provider.Setup(p => p.CloneValue(It.IsAny<object>(), It.IsAny<AuditEvent>())).Returns((object obj, AuditEvent _) => obj);
 
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
@@ -1029,7 +1029,7 @@ SET IDENTITY_INSERT Posts OFF
                 auditEvent = ev;
                 return Guid.NewGuid();
             });
-            provider.Setup(p => p.Serialize(It.IsAny<object>())).Returns((object obj) => obj);
+            provider.Setup(p => p.CloneValue(It.IsAny<object>(), It.IsAny<AuditEvent>())).Returns((object obj, AuditEvent _) => obj);
 
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);

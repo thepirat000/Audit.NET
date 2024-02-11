@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [24.0.0] - 2024-:
+- Audit.NET: Adding wrapper providers to allow lazy instantiation of the data provider. LazyDataProvider, DeferredDataProvider and ConditionalDataProvider.
+
 ## [23.0.0] - 2023-12-13:
 - Beginning with version 23.0.0, this library and its extensions has discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
 New minimum supported .NET framework versions are net462, netstandard2.0 & net6.0. (#637)

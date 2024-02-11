@@ -10,15 +10,18 @@ namespace Audit.Core
     public abstract class AuditDataProvider
     {
         /// <summary>
-        /// Override this method to provide a different serialization method for the values that need to be serialized before saving.
+        /// Override this method to provide a different cloning method for the values that need to be pre-serialized before saving.
         /// (old target value and custom fields)
         /// </summary>
-        public virtual object Serialize<T>(T value)
+        /// <param name="value">The value to clone</param>
+        /// <param name="auditEvent">The audit event associated to the value being serialized</param>
+        public virtual object CloneValue<T>(T value, AuditEvent auditEvent)
         {
             if (value == null)
             {
                 return null;
             }
+            
             if (value is string)
             {
                 return value;

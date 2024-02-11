@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Audit.Core.Providers.Wrappers;
 
 namespace Audit.Core
 {
@@ -26,20 +27,23 @@ namespace Audit.Core
         public static EventCreationPolicy CreationPolicy { get; set; }
 
         /// <summary>
-        /// Gets or Sets the Default data provider factory.
+        /// Sets the Default data provider as a factory method that will be invoked the first time it's needed and only once. This is a shortcut to set a LazyDataProvider.
         /// </summary>
-        public static Func<AuditDataProvider> DataProviderFactory { get; set; }
+        public static Func<AuditDataProvider> DataProviderFactory 
+        {
+            set => DataProvider = new LazyDataProvider(value);
+        }
 
         /// <summary>
         /// Gets or Sets the Default data provider instance.
         /// </summary>
-        public static AuditDataProvider DataProvider { get { return DataProviderFactory?.Invoke(); } set { DataProviderFactory = () => value; } }
+        public static AuditDataProvider DataProvider { get; set; }
 
         /// <summary>
         /// Gets the Default data provider instance as the specified type. Returns null if the data provider is not of the given type.
         /// </summary>
         /// <typeparam name="T">The AuditDataProvider type</typeparam>
-        public static T DataProviderAs<T>() where T : AuditDataProvider { return DataProviderFactory?.Invoke() as T; } 
+        public static T DataProviderAs<T>() where T : AuditDataProvider { return DataProvider as T; } 
 
         /// <summary>
         /// Gets or Sets a value that indicates if the logged Type Names should include the namespace. Default is false.

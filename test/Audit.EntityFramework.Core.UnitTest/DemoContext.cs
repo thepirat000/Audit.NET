@@ -11,7 +11,7 @@ namespace Audit.EntityFramework.Core.UnitTest
 {
     public class DemoContext : AuditDbContext
     {
-        public static string CnnString = TestHelper.GetConnectionString("Demo");
+        public static string CnnString = TestHelper.GetConnectionString("Demo2");
 
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -65,12 +65,13 @@ namespace Audit.EntityFramework.Core.UnitTest
     }
     public class PettyCashTransaction
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-        public int EmployeeId { get; set; }
-        public int TrusteeId { get; set; }
-        public int TenantId { get; set; }
+        public int? EmployeeId { get; set; }
+        public int? TrusteeId { get; set; }
+        public int? TenantId { get; set; }
 
-        public Employee Employee { get; set; }
-        public Employee Trustee { get; set; }
+        public Employee? Employee { get; set; }
+        public Employee? Trustee { get; set; }
     }
 }

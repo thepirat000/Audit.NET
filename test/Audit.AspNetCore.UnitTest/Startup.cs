@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Audit.Core.Providers;
+using Audit.Core.Providers.Wrappers;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

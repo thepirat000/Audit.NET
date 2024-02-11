@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Audit.Core.Providers.Wrappers;
 
 namespace Audit.Core
 {
@@ -31,9 +32,15 @@ namespace Audit.Core
             return this;
         }
 
-        public IAuditScopeOptionsConfigurator DataProvider(Func<AuditDataProvider> dataProviderFactory)
+        public IAuditScopeOptionsConfigurator DataProviderLazyFactory(Func<AuditDataProvider> dataProviderFactory)
         {
             _options.DataProviderFactory = dataProviderFactory;
+            return this;
+        }
+
+        public IAuditScopeOptionsConfigurator DataProviderDeferredFactory(Func<AuditEvent, AuditDataProvider> dataProviderFactory)
+        {
+            _options.DataProvider = new DeferredDataProvider(dataProviderFactory);
             return this;
         }
 
