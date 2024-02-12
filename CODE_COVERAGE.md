@@ -1,16 +1,16 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 2/12/2024 - 4:32:11 AM |
+| Generated on: | 2/12/2024 - 5:39:26 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 22 |
-| Classes: | 253 |
-| Files: | 191 |
-| **Line coverage:** | 76.2% (7572 of 9927) |
-| Covered lines: | 7572 |
+| Classes: | 254 |
+| Files: | 192 |
+| **Line coverage:** | 76.2% (7573 of 9928) |
+| Covered lines: | 7573 |
 | Uncovered lines: | 2355 |
-| Coverable lines: | 9927 |
-| Total lines: | 17842 |
+| Coverable lines: | 9928 |
+| Total lines: | 17858 |
 | **Branch coverage:** | 70.3% (2925 of 4160) |
 | Covered branches: | 2925 |
 | Total branches: | 4160 |
@@ -208,13 +208,14 @@
 |Audit.Core.NLogConfiguratorExtensions|9|2|11|37|81.8%|0|0||
 |Audit.NLog.Configuration.NLogConfigurator|6|6|12|47|50%|0|0||
 |Audit.NLog.Providers.NLogDataProvider|25|15|40|125|62.5%|11|20|55%|
-|**Audit.NET.Polly**|**62**|**24**|**86**|**301**|**72%**|**4**|**6**|**66.6%**|
+|**Audit.NET.Polly**|**63**|**24**|**87**|**317**|**72.4%**|**4**|**6**|**66.6%**|
 |Audit.Core.PollyConfiguratorExtensions|2|0|2|19|100%|0|0||
 |Audit.Polly.Configuration.PollyProviderConfigurator|5|0|5|19|100%|0|0||
 |Audit.Polly.Configuration.PollyResilienceConfigurator|4|0|4|19|100%|0|0||
 |Audit.Polly.FallbackActionArgumentsExtensions|14|2|16|59|87.5%|1|2|50%|
 |Audit.Polly.HedgingActionGeneratorArgumentsExtensions|7|10|17|65|41.1%|1|2|50%|
 |Audit.Polly.Providers.PollyDataProvider|30|12|42|120|71.4%|2|2|100%|
+|Audit.Polly.ResilienceContextExtensions|1|0|1|16|100%|0|0||
 |**Audit.NET.Serilog**|**37**|**30**|**67**|**238**|**55.2%**|**8**|**20**|**40%**|
 |Audit.Core.SerilogConfiguratorExtensions|9|2|11|43|81.8%|0|0||
 |Audit.Serilog.Configuration.SerilogConfigurator|6|6|12|53|50%|0|0||
