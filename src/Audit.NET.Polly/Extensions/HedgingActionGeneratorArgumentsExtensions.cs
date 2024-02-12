@@ -20,7 +20,7 @@ namespace Audit.Polly
         
         internal static async ValueTask<Outcome<object>> FallbackToDataProviderInternal(this HedgingActionGeneratorArguments<object> args, AuditDataProvider hedgingDataProvider)
         {
-            var auditEvent = args.PrimaryContext.Properties.GetValue(new ResiliencePropertyKey<AuditEvent?>("AuditEvent"), null);
+            var auditEvent = args.PrimaryContext.GetAuditEvent();
 
             if (auditEvent == null)
             {

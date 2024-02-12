@@ -8,6 +8,7 @@ using Audit.Polly.Providers;
 using Moq;
 using NUnit.Framework;
 using Polly;
+using System.Collections.Generic;
 
 namespace Audit.UnitTest
 {
@@ -25,9 +26,9 @@ namespace Audit.UnitTest
         {
             // Arrange
             var fallbackDataProvider = new Mock<AuditDataProvider>();
-            
+
             var predicateBuilder = new PredicateBuilder().Handle<Exception>();
-            
+
             var primaryDataProvider = new FailingDataProvider(3);
 
             // Act
@@ -66,9 +67,12 @@ namespace Audit.UnitTest
             Assert.That(primaryDataProvider.SuccessCountReplacedAsync, Is.Zero);
 
             fallbackDataProvider.Verify(x => x.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
-            fallbackDataProvider.Verify(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+            fallbackDataProvider.Verify(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()),
+                Times.Once);
             fallbackDataProvider.Verify(x => x.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Once);
-            fallbackDataProvider.Verify(x => x.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+            fallbackDataProvider.Verify(
+                x => x.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
         [Test]
@@ -95,7 +99,7 @@ namespace Audit.UnitTest
                 var scope = AuditScope.Create($"Test_{i}", null, new { index = i });
                 scope.Dispose();
             }
-            
+
             var e1 = primaryDataProvider.GetAllEvents();
             var e2 = anotherDataProvider.GetAllEvents();
 
@@ -134,26 +138,60 @@ namespace Audit.UnitTest
             Assert.That(primaryDataProvider.FailCountInsert, Is.EqualTo(2));
             Assert.That(primaryDataProvider.SuccessCountInserted, Is.EqualTo(10));
         }
-    }
 
-    public class DelayedDataProvider : InMemoryDataProvider
-    {
-        public int _delayMs;
-        public DelayedDataProvider(int delayMs)
+        [Test]
+        public void Test_Fallback_OnFallback_GetAuditEvent()
         {
-            _delayMs = delayMs;
+            var events = new List<AuditEvent>();
+            var primaryDataProvider = new FailingDataProvider(10);
+
+            Audit.Core.Configuration.Setup()
+                .UsePolly(p => p
+                    .DataProvider(primaryDataProvider)
+                    .WithResilience(r => r
+                        .AddFallback(new()
+                        {
+                            ShouldHandle = new PredicateBuilder().Handle<ArithmeticException>(),
+                            FallbackAction = args => default,
+                            OnFallback = args =>
+                            {
+                                events.Add(args.Context.GetAuditEvent());
+
+                                return default;
+                            }
+                        })))
+                .WithInsertOnEndCreationPolicy();
+            
+            AuditScope.Log("Test", new { Test = 1 });
+            
+            Assert.That(events.Count, Is.EqualTo(1));
+            Assert.That(events[0].EventType, Is.EqualTo("Test"));
+
+            Assert.That(primaryDataProvider.FailCountInsert, Is.EqualTo(1));
+            Assert.That(primaryDataProvider.SuccessCountInserted, Is.Zero);
         }
 
-        public override object InsertEvent(AuditEvent auditEvent)
+        public class DelayedDataProvider : InMemoryDataProvider
         {
-            Thread.Sleep(_delayMs);
-            return base.InsertEvent(auditEvent);
-        }
+            public int _delayMs;
 
-        public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
-        {
-            await Task.Delay(_delayMs);
-            return await base.InsertEventAsync(auditEvent, cancellationToken);
+            public DelayedDataProvider(int delayMs)
+            {
+                _delayMs = delayMs;
+            }
+
+            public override object InsertEvent(AuditEvent auditEvent)
+            {
+                Thread.Sleep(_delayMs);
+                return base.InsertEvent(auditEvent);
+            }
+
+            public override async Task<object> InsertEventAsync(AuditEvent auditEvent,
+                CancellationToken cancellationToken = default)
+            {
+                await Task.Delay(_delayMs);
+                return await base.InsertEventAsync(auditEvent, cancellationToken);
+            }
         }
     }
 
@@ -228,4 +266,5 @@ namespace Audit.UnitTest
             return base.ReplaceEventAsync(eventId, auditEvent, cancellationToken);
         }
     }
+    
 }

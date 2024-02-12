@@ -14,7 +14,7 @@ namespace Audit.Polly
         /// <param name="fallbackDataProvider">The Audit Data Provider instance to use for fallback</param>
         public static async ValueTask<Outcome<object>> FallbackToDataProvider(this FallbackActionArguments<object> args, AuditDataProvider fallbackDataProvider)
         {
-            var auditEvent = args.Context.Properties.GetValue(new ResiliencePropertyKey<AuditEvent?>("AuditEvent"), null);
+            var auditEvent = args.Context.GetAuditEvent();
 
             if (auditEvent == null)
             {
