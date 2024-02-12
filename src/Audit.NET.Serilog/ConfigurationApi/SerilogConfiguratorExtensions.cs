@@ -3,7 +3,7 @@ namespace Audit.Core
     using System;
     using Audit.Core.ConfigurationApi;
     using Audit.Serilog.Configuration;
-    using Audit.NET.Serilog.Providers;
+    using Audit.Serilog.Providers;
 
     /// <summary>
     ///     Extensions for serilog.

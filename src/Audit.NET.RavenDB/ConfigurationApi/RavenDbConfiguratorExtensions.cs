@@ -1,9 +1,9 @@
 ﻿using Audit.Core;
 using Audit.Core.ConfigurationApi;
-using Audit.NET.RavenDB.Providers;
+using Audit.RavenDB.Providers;
 using System;
 
-namespace Audit.NET.RavenDB.ConfigurationApi
+namespace Audit.RavenDB.ConfigurationApi
 {
     public static class RavenDbConfiguratorExtensions
     {

@@ -37,6 +37,7 @@ del "Audit.NET.Kafka\bin\release\*.nupkg"
 del "Audit.NET.AzureStorageTables\bin\release\*.nupkg"
 del "Audit.NET.Serilog\bin\release\*.nupkg"
 del "Audit.MongoClient\bin\release\*.nupkg"
+del "Audit.NET.Polly\bin\release\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -80,7 +81,7 @@ dotnet pack "Audit.NET.Kafka/" -c Release
 dotnet pack "Audit.NET.AzureStorageTables/" -c Release
 dotnet pack "Audit.NET.Serilog/" -c Release
 dotnet pack "Audit.MongoClient/" -c Release
-
+dotnet pack "Audit.NET.Polly/" -c Release
 
 ECHO.
 ECHO ADD TAG NOW !

@@ -1,5 +1,5 @@
 ﻿using Audit.Core;
-using Audit.NET.RavenDB.ConfigurationApi;
+using Audit.RavenDB.ConfigurationApi;
 using Raven.Client.Documents;
 using Raven.Client.Json.Serialization.NewtonsoftJson;
 using System;
@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System.Threading;
 using Audit.JsonNewtonsoftAdapter;
 
-namespace Audit.NET.RavenDB.Providers
+namespace Audit.RavenDB.Providers
 {
     /// <summary>
     /// Data provider for persisting Audit Events as documents into a Raven DB 

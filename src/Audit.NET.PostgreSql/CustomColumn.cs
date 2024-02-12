@@ -1,7 +1,7 @@
-﻿using Audit.Core;
-using System;
+﻿using System;
+using Audit.Core;
 
-namespace Audit.NET.PostgreSql
+namespace Audit.PostgreSql
 {
     /// <summary>
     /// Represents a custom column on the audit table

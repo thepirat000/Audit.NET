@@ -7,5 +7,29 @@ namespace Audit.Core.ConfigurationApi
             Configuration.CreationPolicy = creationPolicy;
             return new ActionConfigurator();
         }
+
+        public IActionConfigurator WithManualCreationPolicy()
+        {
+            Configuration.CreationPolicy = EventCreationPolicy.Manual;
+            return new ActionConfigurator();
+        }
+
+        public IActionConfigurator WithInsertOnEndCreationPolicy()
+        {
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+            return new ActionConfigurator();
+        }
+
+        public IActionConfigurator WithInsertOnStartReplaceOnEndCreationPolicy()
+        {
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            return new ActionConfigurator();
+        }
+
+        public IActionConfigurator WithInsertOnStartInsertOnEndCreationPolicy()
+        {
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd;
+            return new ActionConfigurator();
+        }
     }
 }

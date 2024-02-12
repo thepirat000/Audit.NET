@@ -44,6 +44,7 @@ StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
 StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
 StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
 StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
+StartDotnetUnitTests 'Audit.Polly.UnitTest' 'Polly';
 
 
 # Run sequential tests

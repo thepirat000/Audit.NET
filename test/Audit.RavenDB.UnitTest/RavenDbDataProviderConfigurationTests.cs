@@ -1,5 +1,5 @@
 using Audit.Core;
-using Audit.NET.RavenDB.Providers;
+using Audit.RavenDB.Providers;
 using Moq;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;

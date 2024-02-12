@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Amazon.QLDB.Driver;
 using Amazon.QLDBSession;
 using Audit.Core;
-using Audit.NET.AmazonQLDB.Providers;
+using Audit.AmazonQLDB.Providers;
 using NUnit.Framework;
 
 namespace Audit.AmazonQLDB.UnitTest

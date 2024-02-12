@@ -1,8 +1,8 @@
 using System;
 using Amazon.QLDB.Driver;
 using Audit.Core.ConfigurationApi;
-using Audit.NET.AmazonQLDB.ConfigurationApi;
-using Audit.NET.AmazonQLDB.Providers;
+using Audit.AmazonQLDB.ConfigurationApi;
+using Audit.AmazonQLDB.Providers;
 
 namespace Audit.Core
 {

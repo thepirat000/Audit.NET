@@ -1,4 +1,4 @@
-namespace Audit.NET.Serilog.Providers
+namespace Audit.Serilog.Providers
 {
     using System;
     using Audit.Core;

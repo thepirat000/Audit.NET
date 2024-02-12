@@ -189,5 +189,30 @@ namespace Audit.UnitTest
             Assert.That(dp2.GetAllEvents().Count, Is.EqualTo(1));
             Assert.That(dp2.GetAllEvents()[0].EventType, Is.EqualTo("B"));
         }
+
+        [Test]
+        public void Test_DeferredFactory_CustomFields()
+        {
+            var dp_1 = new InMemoryDataProvider();
+            var dp_2 = new InMemoryDataProvider();
+
+            Configuration.Setup()
+                .UseDeferredFactory(ev =>
+                {
+                    if ((int)ev.CustomFields["MyField"] == 1)
+                    {
+                        return dp_1;
+                    }
+
+                    return dp_2;
+                })
+                .WithInsertOnEndCreationPolicy();
+
+            var scope = AuditScope.Create("Test", null, new { MyField = 1 });
+            scope.Dispose();
+            
+            Assert.That(dp_1.GetAllEvents().Count, Is.EqualTo(1));
+            Assert.That(dp_2.GetAllEvents().Count, Is.Zero);
+        }
     }
 }

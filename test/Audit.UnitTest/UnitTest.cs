@@ -58,7 +58,7 @@ namespace Audit.UnitTest
                 {
                     evs.Add(AuditEvent.FromJson(ev.ToJson()));
                 }))
-                .WithCreationPolicy(EventCreationPolicy.Manual)
+                .WithManualCreationPolicy()
                 .ResetActions()
                 .WithAction(action => action
                     .OnEventSaved(async scope =>
@@ -191,7 +191,7 @@ namespace Audit.UnitTest
                     {
                         evs.Add(AuditEvent.FromJson(ev.ToJson()));
                     }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+                .WithInsertOnEndCreationPolicy();
 
             var auditEvent = new AuditEvent()
             {
@@ -296,7 +296,7 @@ namespace Audit.UnitTest
             var evs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
                 .Use(x => x.OnInsertAndReplace(ev => { evs.Add(ev); }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+                .WithInsertOnEndCreationPolicy();
             AuditScope.Log("test", new { field1 = "one" });
 
             Assert.That(evs.Count, Is.EqualTo(1));
@@ -474,7 +474,7 @@ namespace Audit.UnitTest
                     {
                         list.Add(ev);
                     }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+                .WithInsertOnStartReplaceOnEndCreationPolicy();
 
             using (var scope = new AuditScopeFactory().Create("", null, null, null, null))
             {
@@ -495,7 +495,7 @@ namespace Audit.UnitTest
                     {
                         list.Add(ev);
                     }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                .WithInsertOnStartReplaceOnEndCreationPolicy()
                 .WithAction(_ => _.OnEventSaving(scope =>
                 {
                     Audit.Core.Configuration.AuditDisabled = true;
@@ -602,7 +602,7 @@ namespace Audit.UnitTest
                 .UseDynamicProvider(x => x
                     .OnInsert(ev => { })
                     .OnReplace((id, ev) => { }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd)
+                .WithInsertOnStartInsertOnEndCreationPolicy()
                 .WithAction(a => a
                     .OnEventSaving(scope =>
                     {

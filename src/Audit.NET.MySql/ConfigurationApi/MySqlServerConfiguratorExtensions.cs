@@ -2,7 +2,7 @@ using System;
 using Audit.Core.ConfigurationApi;
 using Audit.MySql.Providers;
 using Audit.MySql.Configuration;
-using Audit.NET.MySql;
+using Audit.MySql;
 using System.Collections.Generic;
 
 namespace Audit.Core

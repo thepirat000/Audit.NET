@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Audit.Core;
 
-namespace Audit.NET.AmazonQLDB.ConfigurationApi
+namespace Audit.AmazonQLDB.ConfigurationApi
 {
     public class AmazonQldbProviderAttributeConfigurator : IAmazonQldbProviderAttributeConfigurator
     {

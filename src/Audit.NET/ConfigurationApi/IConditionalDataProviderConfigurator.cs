@@ -2,6 +2,9 @@
 
 namespace Audit.Core.ConfigurationApi
 {
+    /// <summary>
+    /// Provides a fluent API to configure the Conditional data provider.
+    /// </summary>
     public interface IConditionalDataProviderConfigurator
     {
         /// <summary>

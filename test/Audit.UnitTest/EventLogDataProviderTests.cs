@@ -45,5 +45,20 @@ namespace Audit.UnitTest
             // Assert
             Assert.That(eventId1, Is.Null);
         }
+
+        [Test]
+        public void Test_EventLogDataProvider_FluentApi()
+        {
+            var x = new EventLogDataProvider(_ => _
+                .LogName("LogName")
+                .MachineName("MachineName")
+                .MessageBuilder(ev => "MessageBuilder")
+                .SourcePath("SourcePath")
+            );
+            Assert.That(x.LogName, Is.EqualTo("LogName"));
+            Assert.That(x.MachineName, Is.EqualTo("MachineName"));
+            Assert.That(x.MessageBuilder.Invoke(new AuditEvent()), Is.EqualTo("MessageBuilder"));
+            Assert.That(x.SourcePath, Is.EqualTo("SourcePath"));
+        }
     }
 }

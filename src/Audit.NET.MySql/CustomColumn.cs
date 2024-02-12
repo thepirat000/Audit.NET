@@ -1,9 +1,7 @@
-﻿using Audit.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using Audit.Core;
 
-namespace Audit.NET.MySql
+namespace Audit.MySql
 {
     /// <summary>
     /// Represents a custom column on the audit table

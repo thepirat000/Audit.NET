@@ -1,5 +1,5 @@
 ﻿using Audit.Core;
-using Audit.NET.Serilog;
+using Audit.Serilog;
 using NUnit.Framework;
 using Serilog;
 using Serilog.Core;

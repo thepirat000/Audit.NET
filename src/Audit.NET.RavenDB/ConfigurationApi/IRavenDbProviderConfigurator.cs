@@ -3,7 +3,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using Audit.Core;
 
-namespace Audit.NET.RavenDB.ConfigurationApi
+namespace Audit.RavenDB.ConfigurationApi
 {
     /// <summary>
     /// Provides a configuration for the RavenDB data provider

@@ -1,6 +1,7 @@
 ﻿#if EVENTLOG_CORE || NET462 || NET472 
 using System;
 using System.Diagnostics;
+using Audit.Core.ConfigurationApi;
 
 namespace Audit.Core.Providers
 {
@@ -34,6 +35,23 @@ namespace Audit.Core.Providers
         /// The Machine name (use "." to set local machine)
         /// </summary>
         public string MachineName { get; set; } = ".";
+
+        public EventLogDataProvider()
+        {
+        }
+
+        public EventLogDataProvider(Action<IEventLogProviderConfigurator> config)
+        {
+            var eventLogConfig = new EventLogProviderConfigurator();
+            if (config != null)
+            {
+                config.Invoke(eventLogConfig);
+                LogName = eventLogConfig._logName;
+                SourcePath = eventLogConfig._sourcePath;
+                MachineName = eventLogConfig._machineName;
+                MessageBuilder = eventLogConfig._messageBuilder;
+            }
+        }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {

@@ -1,4 +1,4 @@
-namespace Audit.NET.Serilog
+namespace Audit.Serilog
 {
     public enum LogLevel
     {

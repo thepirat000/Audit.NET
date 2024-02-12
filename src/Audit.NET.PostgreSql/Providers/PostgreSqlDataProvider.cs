@@ -1,5 +1,4 @@
 ﻿using Audit.Core;
-using Audit.NET.PostgreSql;
 using Npgsql;
 using System;
 using System.Collections.Generic;

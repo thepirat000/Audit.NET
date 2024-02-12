@@ -3,7 +3,7 @@ using Raven.Client.Documents;
 using System;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Audit.NET.RavenDB.ConfigurationApi
+namespace Audit.RavenDB.ConfigurationApi
 {
     public class RavenDbProviderConfigurator : IRavenDbProviderConfigurator
     {

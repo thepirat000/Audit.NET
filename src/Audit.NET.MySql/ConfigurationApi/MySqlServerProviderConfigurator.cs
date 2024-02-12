@@ -1,9 +1,6 @@
 ﻿using Audit.Core;
-using Audit.NET.MySql;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Audit.MySql.Configuration
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Audit.Core;
 
-namespace Audit.NET.AmazonQLDB.ConfigurationApi
+namespace Audit.AmazonQLDB.ConfigurationApi
 {
     /// <summary>
     /// Provides a Table level configuration for AmazonQLDB provider

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Audit.Core;
-using Audit.NET.MySql;
 using MySqlConnector;
 
 namespace Audit.MySql.Providers

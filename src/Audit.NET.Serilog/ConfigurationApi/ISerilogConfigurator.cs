@@ -1,6 +1,5 @@
 namespace Audit.Serilog.Configuration
 {
-    using Audit.NET.Serilog;
     using System;
     using Audit.Core;
     using global::Serilog;

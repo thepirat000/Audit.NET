@@ -39,11 +39,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Providers\" />
+	<Folder Include="Providers\" />
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.0" /> 
+	<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.1" /> 
   </ItemGroup>
 
   <ItemGroup>

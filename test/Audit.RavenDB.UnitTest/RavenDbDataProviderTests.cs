@@ -1,6 +1,6 @@
 using Audit.Core;
-using Audit.NET.RavenDB.ConfigurationApi;
-using Audit.NET.RavenDB.Providers;
+using Audit.RavenDB.ConfigurationApi;
+using Audit.RavenDB.Providers;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Raven.Client.Documents;

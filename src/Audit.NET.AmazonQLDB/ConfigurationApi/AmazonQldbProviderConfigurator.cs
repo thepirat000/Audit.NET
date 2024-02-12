@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using Newtonsoft.Json;
 
-namespace Audit.NET.AmazonQLDB.ConfigurationApi
+namespace Audit.AmazonQLDB.ConfigurationApi
 {
     public class AmazonQldbProviderConfigurator : IAmazonQldbProviderConfigurator
     {

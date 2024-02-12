@@ -3,16 +3,16 @@ using Amazon.IonDotnet.Tree;
 using Amazon.IonDotnet.Tree.Impl;
 using Amazon.QLDB.Driver;
 using Amazon.QLDBSession.Model;
-using Audit.Core;
-using Audit.NET.AmazonQLDB.ConfigurationApi;
+using Audit.AmazonQLDB.ConfigurationApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Audit.Core;
 using Newtonsoft.Json;
 
-namespace Audit.NET.AmazonQLDB.Providers
+namespace Audit.AmazonQLDB.Providers
 {
     /// <summary>
     /// Amazon QLDB data provider for Audit.NET. Store the audit events into Amazon QLDB tables.

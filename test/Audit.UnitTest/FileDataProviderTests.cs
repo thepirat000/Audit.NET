@@ -222,5 +222,28 @@ namespace Audit.UnitTest
 
             Configuration.JsonSettings = prevSettings;
         }
+
+        [Test]
+        public void Test_FileDataProvider_FluentApi()
+        {
+            var x = new FileDataProvider(_ => _
+                .Directory(@"Directory")
+                .FilenamePrefix("FilenamePrefix")
+            );
+            Assert.That(x.DirectoryPath, Is.EqualTo("Directory"));
+            Assert.That(x.FilenamePrefix, Is.EqualTo("FilenamePrefix"));
+        }
+
+        [Test]
+        public void Test_FileDataProvider_FluentApi_Func()
+        {
+            var x = new FileDataProvider(_ => _
+                .DirectoryBuilder(ev => @"Directory")
+                .FilenameBuilder(ev => "Filename")
+            );
+            Assert.That(x.DirectoryPathBuilder.Invoke(new AuditEvent()), Is.EqualTo("Directory"));
+            Assert.That(x.FilenameBuilder.Invoke(new AuditEvent()), Is.EqualTo("Filename"));
+        }
+
     }
 }

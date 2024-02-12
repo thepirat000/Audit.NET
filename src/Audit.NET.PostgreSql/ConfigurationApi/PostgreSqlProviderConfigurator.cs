@@ -1,10 +1,6 @@
 ﻿using Audit.Core;
-using Audit.NET.PostgreSql;
-using Audit.PostgreSql.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Audit.PostgreSql.Configuration
 {

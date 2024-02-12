@@ -3,8 +3,6 @@ namespace Audit.Serilog.Configuration
     using System;
     using global::Serilog;
     using Audit.Core;
-    using Audit.NET.Serilog;
-
 
     public class SerilogConfigurator : ISerilogConfigurator
     {
