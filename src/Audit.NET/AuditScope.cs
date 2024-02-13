@@ -27,6 +27,9 @@ namespace Audit.Core
             _targetGetter = options.TargetGetter;
 
             _event = options.AuditEvent ?? new AuditEvent();
+            
+            _event.SetScope(this);
+            
             _event.StartDate = Configuration.SystemClock.UtcNow;
 
             _event.Environment = GetEnvironmentInfo(options);
@@ -41,6 +44,7 @@ namespace Audit.Core
             {
                 _event.EventType = options.EventType;
             }
+            
             if (_event.CustomFields == null)
             {
                 _event.CustomFields = new Dictionary<string, object>();

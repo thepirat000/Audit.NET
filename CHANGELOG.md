@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [24.0.2] - 2024-02-:
+- Audit.NET: Adding a Weak Reference to the AuditScope in the AuditEvent class, to allow accessing the current AuditScope from the AuditEvent.
+
 ## [24.0.1] - 2024-02-12:
 - Audit.NET.Polly: Adding GetAuditEvent extension method to ResilienceContext.
 

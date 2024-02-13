@@ -62,6 +62,25 @@ namespace Audit.Core
         public int Duration { get; set; }
 
         /// <summary>
+        /// A weak reference to the audit scope associated with this event.
+        /// </summary>
+        private readonly WeakReference _auditScope = new WeakReference(null);
+
+        internal void SetScope(IAuditScope auditScope)
+        {
+            _auditScope.Target = auditScope;
+        }
+
+        /// <summary>
+        /// Gets the Audit Scope associated with this Audit Event.
+        /// Returns NULL if the Audit Event is not associated with an Audit Scope, or after the Audit Scope has been disposed of and garbage collected.
+        /// </summary>
+        public IAuditScope GetScope()
+        {
+            return _auditScope.Target as IAuditScope;
+        }
+
+        /// <summary>
         /// Converts the event to its JSON representation using JSON.NET.
         /// </summary>
         public string ToJson()
