@@ -54,7 +54,7 @@ Audit.Core.Configuration.Setup()
 
 ## Extension for Fallback
 
-To facilitate the [fallback strategy](https://www.pollydocs.org/strategies/fallback.html) to a different Data Provider you can use the `FallbackToDataProvider()` extension method in the FallbackAction.
+To facilitate the [fallback](https://www.pollydocs.org/strategies/fallback.html) to a different Data Provider you can use the `FallbackToDataProvider()` extension method in the FallbackAction.
 
 For instance, to establish a fallback policy for a [RavenDB data provider](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.RavenDB#readme),
 ensuring that in the event of a RavenException, the Audit Events will be written to a file using a [File data provider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) as a fallback:
@@ -62,12 +62,12 @@ ensuring that in the event of a RavenException, the Audit Events will be written
 ```c#
 var ravenDbProvider = new RavenDbDataProvider(...);
 
-var fallbakDbProvider = new FileDataProvider(f => f.Directory(@"c:\logs"));
+var fallbakDbProvider = new FileDataProvider(...);
 
 Audit.Core.Configuration.Setup()
     .UsePolly(p => p
         .DataProvider(ravenDbProvider)
-        .WithResilience(r => r
+        .WithResilience(resilience => resilience
             .AddFallback(new()
             {
                 ShouldHandle = new PredicateBuilder().Handle<RavenException>(),
