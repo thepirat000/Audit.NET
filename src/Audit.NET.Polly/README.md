@@ -60,8 +60,9 @@ For instance, to establish a fallback policy for a [RavenDB data provider](https
 ensuring that in the event of a RavenException, the Audit Events will be written to a file using a [File data provider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs) as a fallback:
 
 ```c#
-var ravenDbProvider = new RavenDbDataProvider(...);
+using Audit.Polly;
 
+var ravenDbProvider = new RavenDbDataProvider(...);
 var fallbakDbProvider = new FileDataProvider(...);
 
 Audit.Core.Configuration.Setup()
@@ -82,8 +83,10 @@ To facilitate the [hedging strategy](https://www.pollydocs.org/strategies/hedgin
 For instance, to establish a hedging policy for a data provider so in case of exceptions, the Audit Events will be written to a different data provider using a hedging strategy:
 
 ```c#
-var primaryDataProvider = new SqlDataProvider(sqlConfig => sqlConfig...);
-var secondaryDataProvider = new FileDataProvider(fileConfig => fileConfig...);
+Audit.Polly
+
+var primaryDataProvider = new SqlDataProvider(...);
+var secondaryDataProvider = new FileDataProvider(...);
 
 Audit.Core.Configuration.Setup()
     .UsePolly(p => p
