@@ -83,7 +83,7 @@ To facilitate the [hedging strategy](https://www.pollydocs.org/strategies/hedgin
 For instance, to establish a hedging policy for a data provider so in case of exceptions, the Audit Events will be written to a different data provider using a hedging strategy:
 
 ```c#
-Audit.Polly
+using Audit.Polly;
 
 var primaryDataProvider = new SqlDataProvider(...);
 var secondaryDataProvider = new FileDataProvider(...);
