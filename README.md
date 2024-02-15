@@ -533,6 +533,15 @@ Audit.Core.Configuration.Setup()
 	.Use(new MyCustomDataProvider());
 ```
 
+To set the data provider per-scope, use the `AuditScopeOptions` when creating an `AuditScope`. For example:
+
+```c#
+var scope = AuditScope.Create(new AuditScopeOptions 
+{ 
+  DataProvider = new MyCustomDataProvider(), ... }
+);
+```
+
 #### Lazy Factory data provider
 
 You can set the global data provider using a deferred instantiation technique, with a **lazy factory method** that will be called upon its initial utilization. 
@@ -624,17 +633,6 @@ A special type of Data Providers that allows wrapping other Data Providers with 
     .When(auditEvent => auditEvent.EventType.Equals("B"), new SqlDataProvider())
     .Otherwise(new FileDataProvider()));
   ```
-
-#### Data provider per scope
-
-To set the data provider per-scope, use the `AuditScopeOptions` when creating an `AuditScope`. For example:
-
-```c#
-var scope = AuditScope.Create(new AuditScopeOptions 
-{ 
-  DataProvider = new MyCustomDataProvider(), ... }
-);
-```
 
 #### Data providers included
 
