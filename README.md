@@ -535,8 +535,8 @@ Audit.Core.Configuration.Setup()
 
 #### Lazy Factory data provider
 
-You can set the global data provider as a **lazy factory method** invoked until it is first used.
-For example, when you require resolving dependencies from the DI container to instantiate the data provider:
+You can set the global data provider using a deferred instantiation technique, with a **lazy factory method** that will be called upon its initial utilization. 
+For instance, in situations where dependency resolution is necessitated but not immediately accessible during initialization:
 
 ```c#
 Audit.Core.Configuration.Setup()
@@ -545,8 +545,8 @@ Audit.Core.Configuration.Setup()
 
 #### Deferred Factory data provider
 
-You can defer creating the data provider for each Audit Event until it is ready to be saved by using
-a **deferred factory method**. For example:
+You can defer creating the data provider for each Audit Event until it is ready to be saved by using a **deferred factory method**. 
+This factory method will be called for each Audit Event. For example:
 
 ```c#
 var sqlDataProvider = new SqlDataProvider(config => config...);
@@ -557,16 +557,7 @@ Audit.Core.Configuration.Setup()
 
 ```
 
-See [Configuration section](#configuration) for more information.
-
-To set the data provider per-scope, use the `AuditScopeOptions` when creating an `AuditScope`. For example:
-
-```c#
-var scope = AuditScope.Create(new AuditScopeOptions 
-{ 
-  DataProvider = new MyCustomDataProvider(), ... }
-);
-```
+See [Wrapper data providers](#wrapper-data-providers) for more information.
 
 ### Dynamic data providers 
 
@@ -633,6 +624,17 @@ A special type of Data Providers that allows wrapping other Data Providers with 
     .When(auditEvent => auditEvent.EventType.Equals("B"), new SqlDataProvider())
     .Otherwise(new FileDataProvider()));
   ```
+
+#### Data provider per scope
+
+To set the data provider per-scope, use the `AuditScopeOptions` when creating an `AuditScope`. For example:
+
+```c#
+var scope = AuditScope.Create(new AuditScopeOptions 
+{ 
+  DataProvider = new MyCustomDataProvider(), ... }
+);
+```
 
 #### Data providers included
 
