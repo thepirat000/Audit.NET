@@ -520,7 +520,7 @@ The data provider can be set globally for the entire application or per audit sc
 > 
 > If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
 
-To set the global data provider assign the `DataProvider` property on the static `Audit.Core.Configuration` object, or call the fluent API `Use()`. For example:
+To set the global data provider, assign the `DataProvider` property on the static `Audit.Core.Configuration` object or call the fluent API `Use()`. For example:
 
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
