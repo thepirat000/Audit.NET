@@ -36,8 +36,8 @@ and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.
 [DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), 
 [UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md) and more. 
 
-- [**Output wrappers**](#data-providers-wrappers) are included 
-to facilitate the encapsulation of other Data Provider for diverse purposes, like resilience or lazy instantiation, such as
+- [**Output wrappers**](#data-provider-wrappers) are included 
+to facilitate the encapsulation of other Data Providers for diverse purposes, like resilience or lazy instantiation, such as
 [Polly](#polly-data-provider), 
 [Lazy](#lazy-data-provider),
 [Deferred](#deferred-data-provider) and
