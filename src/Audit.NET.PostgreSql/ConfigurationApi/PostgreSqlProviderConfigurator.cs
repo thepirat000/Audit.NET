@@ -6,56 +6,56 @@ namespace Audit.PostgreSql.Configuration
 {
     public class PostgreSqlProviderConfigurator : IPostgreSqlProviderConfigurator
     {
-        internal Func<AuditEvent, string> _connectionStringBuilder = _ => "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
-        internal Func<AuditEvent, string> _schemaBuilder = _ => null;
-        internal Func<AuditEvent, string> _tableNameBuilder = _ => "event";
-        internal Func<AuditEvent, string> _idColumnNameBuilder = _ => "id";
-        internal Func<AuditEvent, string> _dataColumnNameBuilder = _ => "data";
-        internal Func<AuditEvent, string> _dataJsonStringBuilder = null;
-        internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = _ => null;
+        internal Setting<string> _connectionString = "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        internal Setting<string> _schema;
+        internal Setting<string> _tableName = "event";
+        internal Setting<string> _idColumnName = "id";
+        internal Setting<string> _dataColumnName = "data";
+        internal Func<AuditEvent, string> _dataJsonStringBuilder;
+        internal Setting<string> _lastUpdatedColumnName;
 
         internal DataType _dataColumnType = DataType.JSON;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
 
         public IPostgreSqlProviderConfigurator ConnectionString(string connectionString)
         {
-            _connectionStringBuilder = _ => connectionString;
+            _connectionString = connectionString;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder)
         {
-            _connectionStringBuilder = connectionStringBuilder;
+            _connectionString = connectionStringBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator TableName(string tableName)
         {
-            _tableNameBuilder = _ => tableName;
+            _tableName = tableName;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator TableName(Func<AuditEvent, string> tableNameBuilder)
         {
-            _tableNameBuilder = tableNameBuilder;
+            _tableName = tableNameBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator IdColumnName(string idColumnName)
         {
-            _idColumnNameBuilder = _ => idColumnName;
+            _idColumnName = idColumnName;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator IdColumnName(Func<AuditEvent, string> idColumnNameBuilder)
         {
-            _idColumnNameBuilder = idColumnNameBuilder;
+            _idColumnName = idColumnNameBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
         {
-            _dataColumnNameBuilder = _ => dataColumnName;
+            _dataColumnName = dataColumnName;
             _dataColumnType = dataColumnType;
             _dataJsonStringBuilder = jsonStringBuilder;
             return this;
@@ -63,7 +63,7 @@ namespace Audit.PostgreSql.Configuration
 
         public IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
         {
-            _dataColumnNameBuilder = dataColumnNameBuilder;
+            _dataColumnName = dataColumnNameBuilder;
             _dataColumnType = dataColumnType;
             _dataJsonStringBuilder = jsonStringBuilder;
             return this;
@@ -71,25 +71,25 @@ namespace Audit.PostgreSql.Configuration
 
         public IPostgreSqlProviderConfigurator LastUpdatedColumnName(string lastUpdatedColumnName)
         {
-            _lastUpdatedColumnNameBuilder = _ => lastUpdatedColumnName;
+            _lastUpdatedColumnName = lastUpdatedColumnName;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator LastUpdatedColumnName(Func<AuditEvent, string> lastUpdatedColumnNameBuilder)
         {
-            _lastUpdatedColumnNameBuilder = lastUpdatedColumnNameBuilder;
+            _lastUpdatedColumnName = lastUpdatedColumnNameBuilder;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator Schema(string schema)
         {
-            _schemaBuilder = _ => schema;
+            _schema = schema;
             return this;
         }
 
         public IPostgreSqlProviderConfigurator Schema(Func<AuditEvent, string> schemaBuilder)
         {
-            _schemaBuilder = schemaBuilder;
+            _schema = schemaBuilder;
             return this;
         }
 

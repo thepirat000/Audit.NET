@@ -26,37 +26,21 @@ namespace Audit.AzureCosmos.Providers
     public class AzureCosmosDataProvider : AuditDataProvider
     {
         /// <summary>
-        /// A func that returns the endpoint URL to use.
+        /// The endpoint URL to use
         /// </summary>
-        public Func<AuditEvent, string> EndpointBuilder { get; set; }
+        public Setting<string> Endpoint { get; set; }
         /// <summary>
-        /// Sets the endpoint URL.
+        /// The AuthKey to use
         /// </summary>
-        public string Endpoint { set { EndpointBuilder = _ => value; } }
+        public Setting<string> AuthKey { get; set; }
         /// <summary>
-        /// A func that returns the AuthKey to use
+        /// The Database name to use
         /// </summary>
-        public Func<AuditEvent, string> AuthKeyBuilder { get; set; }
+        public Setting<string> Database { get; set; }
         /// <summary>
-        /// Sets the AuthKey to use.
+        /// The Container name to use 
         /// </summary>
-        public string AuthKey { set { AuthKeyBuilder = _ => value; } }
-        /// <summary>
-        /// A func that returns the Database name to use for a given audit event.
-        /// </summary>
-        public Func<AuditEvent, string> DatabaseBuilder { get; set; }
-        /// <summary>
-        /// Sets the Database name to use.
-        /// </summary>
-        public string Database { set { DatabaseBuilder = _ => value; } }
-        /// <summary>
-        /// A function that returns the Container name to use for a given audit event.
-        /// </summary>
-        public Func<AuditEvent, string> ContainerBuilder { get; set; }
-        /// <summary>
-        /// Sets the Container name to use.
-        /// </summary>
-        public string Container { set { ContainerBuilder = _ => value; } }
+        public Setting<string> Container { get; set; }
         /// <summary>
         /// Allows to change the CosmosClientOptions when using the default cosmos client
         /// </summary>
@@ -66,7 +50,7 @@ namespace Audit.AzureCosmos.Providers
         /// </summary>
         public CosmosClient CosmosClient { get; set; }
         /// <summary>
-        /// A func that returns the document id to use for a given audit event. By default it will generate a new random Guid as the id.
+        /// A func that returns the document id to use for a given audit event. By default, it will generate a new random Guid as the id.
         /// </summary>
         public Func<AuditEvent, string> IdBuilder { get; set; }
 
@@ -78,10 +62,10 @@ namespace Audit.AzureCosmos.Providers
         {
             var cosmosDbConfig = new AzureCosmosProviderConfigurator();
             config.Invoke(cosmosDbConfig);
-            EndpointBuilder = cosmosDbConfig._endpointBuilder;
-            AuthKeyBuilder = cosmosDbConfig._authKeyBuilder;
-            ContainerBuilder = cosmosDbConfig._containerBuilder;
-            DatabaseBuilder = cosmosDbConfig._databaseBuilder;
+            Endpoint = cosmosDbConfig._endpoint;
+            AuthKey = cosmosDbConfig._authKey;
+            Container = cosmosDbConfig._container;
+            Database = cosmosDbConfig._database;
             CosmosClient = cosmosDbConfig._cosmosClient;
             CosmosClientOptionsAction = cosmosDbConfig._cosmosClientOptionsAction;
             IdBuilder = cosmosDbConfig._idBuilder;
@@ -198,14 +182,14 @@ namespace Audit.AzureCosmos.Providers
             {
                 CosmosClientOptionsAction.Invoke(options);
             }
-            CosmosClient = new CosmosClient(EndpointBuilder?.Invoke(auditEvent), AuthKeyBuilder?.Invoke(auditEvent), options);
+            CosmosClient = new CosmosClient(Endpoint.GetValue(auditEvent), AuthKey.GetValue(auditEvent), options);
             return CosmosClient;
         }
 
         private Container GetContainer(AuditEvent auditEvent)
         {
             var client = GetClient(auditEvent);
-            return client.GetContainer(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder?.Invoke(auditEvent));
+            return client.GetContainer(Database.GetValue(auditEvent), Container.GetValue(auditEvent));
         }
 
         private string GetSetId(AuditEvent auditEvent)

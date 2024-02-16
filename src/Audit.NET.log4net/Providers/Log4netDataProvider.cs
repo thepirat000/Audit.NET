@@ -9,28 +9,20 @@ namespace Audit.log4net.Providers
     /// </summary>
     /// <remarks>
     /// Settings:
-    ///     Logger/LoggerBuilder: A way to obtain the log4net ILog instance. Default is LogManager.GetLogger(auditEvent.GetType()).
-    ///     LogLevel/LogLevelBuilder: A way to obtain the log level for the audit events.
-    ///     LogBodyBuilder: A way to obtain the object to be logged. Default is the AuditEvent JSON including the EventId as a custom field.
+    ///     Logger: A way to obtain the log4net ILog instance. Default is LogManager.GetLogger(auditEvent.GetType()).
+    ///     LogLevel: A way to obtain the log level for the audit events.
+    ///     LogMessageBuilder: A way to obtain the object to be logged. Default is the AuditEvent JSON including the EventId as a custom field.
     /// </remarks>
     public class Log4netDataProvider : AuditDataProvider
     {
         /// <summary>
-        /// A function that given an audit event returns the log4net ILog implementation to use
-        /// </summary>
-        public Func<AuditEvent, ILog> LoggerBuilder { get; set; }
-        /// <summary>
         /// The log4net ILog implementation to use
         /// </summary>
-        public ILog Logger { set { LoggerBuilder = _ => value; } }
-        /// <summary>
-        /// A function that given an audit event returns the log4net Log Level to use
-        /// </summary>
-        public Func<AuditEvent, LogLevel> LogLevelBuilder { get; set; }
+        public Setting<ILog> Logger { get; set; }
         /// <summary>
         /// The log4net Log Level to use
         /// </summary>
-        public LogLevel LogLevel { set { LogLevelBuilder = _ => value; } }
+        public Setting<LogLevel?> LogLevel { get; set; }
         /// <summary>
         /// A function that given an audit event and an event id, returns the message to log
         /// </summary>
@@ -46,19 +38,20 @@ namespace Audit.log4net.Providers
             if (config != null)
             {
                 config.Invoke(logConfig);
-                LoggerBuilder = logConfig._loggerBuilder;
-                LogLevelBuilder = logConfig._logLevelBuilder;
+                Logger = logConfig._logger;
+                LogLevel = logConfig._logLevel;
                 LogMessageBuilder = logConfig._messageBuilder;
             }
         }
 
         private ILog GetLogger(AuditEvent auditEvent)
         {
-            return LoggerBuilder == null ? LogManager.GetLogger(auditEvent.GetType()) : LoggerBuilder.Invoke(auditEvent);
+            return Logger.GetValue(auditEvent) ?? LogManager.GetLogger(auditEvent.GetType());
         }
+        
         private LogLevel GetLogLevel(AuditEvent auditEvent)
         {
-            return LogLevelBuilder?.Invoke(auditEvent) ?? (auditEvent.Environment.Exception != null ? LogLevel.Error : LogLevel.Info);
+            return LogLevel.GetValue(auditEvent) ?? (auditEvent.Environment.Exception != null ? log4net.LogLevel.Error : log4net.LogLevel.Info);
         }
 
         private object GetLogObject(AuditEvent auditEvent, object eventId)
@@ -81,19 +74,18 @@ namespace Audit.log4net.Providers
             var value = GetLogObject(auditEvent, eventId);
             switch (level)
             {
-                case LogLevel.Debug:
+                case log4net.LogLevel.Debug:
                     logger.Debug(value);
                     break;
-                case LogLevel.Warn:
+                case log4net.LogLevel.Warn:
                     logger.Warn(value);
                     break;
-                case LogLevel.Error:
+                case log4net.LogLevel.Error:
                     logger.Error(value);
                     break;
-                case LogLevel.Fatal:
+                case log4net.LogLevel.Fatal:
                     logger.Fatal(value);
                     break;
-                case LogLevel.Info:
                 default:
                     logger.Info(value);
                     break;

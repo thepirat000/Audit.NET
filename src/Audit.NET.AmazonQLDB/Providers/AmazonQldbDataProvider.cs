@@ -32,7 +32,7 @@ namespace Audit.AmazonQLDB.Providers
         /// <summary>
         /// The table name to use when saving an audit event in the QLDB table. 
         /// </summary>
-        public Func<AuditEvent, string> TableNameBuilder { get; set; }
+        public Setting<string> TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the JSON serializer settings.
@@ -77,8 +77,8 @@ namespace Audit.AmazonQLDB.Providers
             if (config != null)
             {
                 config.Invoke(amazonQldbProviderConfigurator);
-                TableNameBuilder = amazonQldbProviderConfigurator._tableConfigurator?._tableNameBuilder;
-                CustomAttributes = amazonQldbProviderConfigurator._tableConfigurator?._attrConfigurator?._attributes;
+                TableName = amazonQldbProviderConfigurator._tableConfigurator._tableName;
+                CustomAttributes = amazonQldbProviderConfigurator._tableConfigurator._attrConfigurator?._attributes;
             }
         }
 
@@ -185,7 +185,7 @@ namespace Audit.AmazonQLDB.Providers
 
         private string GetTableName(AuditEvent auditEvent)
         {
-            return TableNameBuilder?.Invoke(auditEvent) ?? auditEvent.GetType().Name;
+            return TableName.GetValue(auditEvent) ?? auditEvent.GetType().Name;
         }
     }
 }

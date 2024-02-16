@@ -4,10 +4,9 @@ namespace Audit.Core.ConfigurationApi
 {
     public class FileLogProviderConfigurator : IFileLogProviderConfigurator
     {
-        internal string _directoryPath = "";
-        internal string _filenamePrefix = "";
+        internal Setting<string> _directoryPath = "";
+        internal Setting<string> _filenamePrefix = "";
         internal Func<AuditEvent, string> _filenameBuilder;
-        internal Func<AuditEvent, string> _directoryPathBuilder;
 
         public IFileLogProviderConfigurator Directory(string directoryPath)
         {
@@ -17,7 +16,7 @@ namespace Audit.Core.ConfigurationApi
 
         public IFileLogProviderConfigurator DirectoryBuilder(Func<AuditEvent, string> directoryPathBuilder)
         {
-            _directoryPathBuilder = directoryPathBuilder;
+            _directoryPath = directoryPathBuilder;
             return this;
         }
 

@@ -55,10 +55,25 @@ namespace Audit.UnitTest
                 .MessageBuilder(ev => "MessageBuilder")
                 .SourcePath("SourcePath")
             );
-            Assert.That(x.LogName, Is.EqualTo("LogName"));
-            Assert.That(x.MachineName, Is.EqualTo("MachineName"));
+            Assert.That(x.LogName.GetDefault(), Is.EqualTo("LogName"));
+            Assert.That(x.MachineName.GetDefault(), Is.EqualTo("MachineName"));
             Assert.That(x.MessageBuilder.Invoke(new AuditEvent()), Is.EqualTo("MessageBuilder"));
-            Assert.That(x.SourcePath, Is.EqualTo("SourcePath"));
+            Assert.That(x.SourcePath.GetDefault(), Is.EqualTo("SourcePath"));
+        }
+
+        [Test]
+        public void Test_EventLogDataProvider_FluentApi_Builder()
+        {
+            var x = new EventLogDataProvider(_ => _
+                .LogName(ev => "LogName")
+                .MachineName(ev => "MachineName")
+                .MessageBuilder(ev => "MessageBuilder")
+                .SourcePath(ev => "SourcePath")
+            );
+            Assert.That(x.LogName.GetValue(new AuditEvent()), Is.EqualTo("LogName"));
+            Assert.That(x.MachineName.GetValue(new AuditEvent()), Is.EqualTo("MachineName"));
+            Assert.That(x.MessageBuilder.Invoke(new AuditEvent()), Is.EqualTo("MessageBuilder"));
+            Assert.That(x.SourcePath.GetValue(new AuditEvent()), Is.EqualTo("SourcePath"));
         }
     }
 }

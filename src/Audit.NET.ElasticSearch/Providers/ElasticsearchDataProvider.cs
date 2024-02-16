@@ -30,12 +30,12 @@ namespace Audit.Elasticsearch.Providers
         public IConnectionSettingsValues ConnectionSettings { get; set; }
 
         /// <summary>
-        /// The Elasticsearch index to use when saving an audit event. Must be lowercase. NULL (or Func that returns NULL) to use the default global index.
+        /// The Elasticsearch index to use when saving an audit event. Must be lowercase. NULL to use the default global index.
         /// </summary>
-        public Func<AuditEvent, IndexName> IndexBuilder { get; set; }
+        public Setting<IndexName> Index { get; set; }
 
         /// <summary>
-        /// The Elasticsearch document id to use when savint an audit event
+        /// The Elasticsearch document id to use when saving an audit event
         /// </summary>
         public Func<AuditEvent, Id> IdBuilder { get; set; }
 
@@ -64,14 +64,14 @@ namespace Audit.Elasticsearch.Providers
                 config.Invoke(elConfig);
                 ConnectionSettings = elConfig._connectionSettings;
                 IdBuilder = elConfig._idBuilder;
-                IndexBuilder = elConfig._indexBuilder;
+                Index = elConfig._index;
             }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-            var createRequest = new IndexRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
+            var createRequest = new IndexRequest<AuditEvent>(auditEvent, Index.GetValue(auditEvent), id);
             var response = Client.Index(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
@@ -87,7 +87,7 @@ namespace Audit.Elasticsearch.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-            var createRequest = new IndexRequest<AuditEvent>(auditEvent, IndexBuilder?.Invoke(auditEvent), id);
+            var createRequest = new IndexRequest<AuditEvent>(auditEvent, Index.GetValue(auditEvent), id);
             var response = await Client.IndexAsync(createRequest, cancellationToken);
             if (response.IsValid && response.Result != Result.Error)
             {

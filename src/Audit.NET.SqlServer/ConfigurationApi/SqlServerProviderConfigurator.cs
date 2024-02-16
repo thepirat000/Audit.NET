@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,84 +8,84 @@ namespace Audit.SqlServer.Configuration
     [CLSCompliant(false)]
     public class SqlServerProviderConfigurator : ISqlServerProviderConfigurator
     {
-        internal Func<AuditEvent, string> _connectionStringBuilder = ev => "data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;";
-        internal Func<AuditEvent, string> _schemaBuilder = null;
-        internal Func<AuditEvent, string> _tableNameBuilder = ev => "Event";
-        internal Func<AuditEvent, string> _idColumnNameBuilder = ev => "Id";
-        internal Func<AuditEvent, string> _jsonColumnNameBuilder;
-        internal Func<AuditEvent, string> _lastUpdatedColumnNameBuilder = null;
+        internal Setting<string> _connectionString =  "data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;";
+        internal Setting<string> _schema = (string)null;
+        internal Setting<string> _tableName = "Event";
+        internal Setting<string> _idColumnName = "Id";
+        internal Setting<string> _jsonColumnName;
+        internal Setting<string> _lastUpdatedColumnName = (string)null;
         internal List<CustomColumn> _customColumns = new List<CustomColumn>();
-        internal Func<AuditEvent, DbContextOptions> _dbContextOptionsBuilder = null;
+        internal Setting<DbContextOptions> _dbContextOptions = (DbContextOptions)null;
 
         public ISqlServerProviderConfigurator ConnectionString(string connectionString)
         {
-            _connectionStringBuilder = ev => connectionString;
+            _connectionString = connectionString;
             return this;
         }
 
         public ISqlServerProviderConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder)
         {
-            _connectionStringBuilder = connectionStringBuilder;
+            _connectionString = connectionStringBuilder;
             return this;
         }
 
         public ISqlServerProviderConfigurator TableName(string tableName)
         {
-            _tableNameBuilder = ev => tableName;
+            _tableName = tableName;
             return this;
         }
 
         public ISqlServerProviderConfigurator TableName(Func<AuditEvent, string> tableNameBuilder)
         {
-            _tableNameBuilder = tableNameBuilder;
+            _tableName = tableNameBuilder;
             return this;
         }
 
         public ISqlServerProviderConfigurator IdColumnName(string idColumnName)
         {
-            _idColumnNameBuilder = ev => idColumnName;
+            _idColumnName = idColumnName;
             return this;
         }
 
         public ISqlServerProviderConfigurator IdColumnName(Func<AuditEvent, string> idColumnNameBuilder)
         {
-            _idColumnNameBuilder = idColumnNameBuilder;
+            _idColumnName = idColumnNameBuilder;
             return this;
         }
 
         public ISqlServerProviderConfigurator JsonColumnName(string jsonColumnName)
         {
-            _jsonColumnNameBuilder = ev => jsonColumnName;
+            _jsonColumnName = jsonColumnName;
             return this;
         }
 
         public ISqlServerProviderConfigurator JsonColumnName(Func<AuditEvent, string> jsonColumnNameBuilder)
         {
-            _jsonColumnNameBuilder = jsonColumnNameBuilder;
+            _jsonColumnName = jsonColumnNameBuilder;
             return this;
         }
 
         public ISqlServerProviderConfigurator LastUpdatedColumnName(string lastUpdatedColumnName)
         {
-            _lastUpdatedColumnNameBuilder = ev => lastUpdatedColumnName;
+            _lastUpdatedColumnName = lastUpdatedColumnName;
             return this;
         }
 
         public ISqlServerProviderConfigurator LastUpdatedColumnName(Func<AuditEvent, string> lastUpdatedColumnNameBuilder)
         {
-            _lastUpdatedColumnNameBuilder = lastUpdatedColumnNameBuilder;
+            _lastUpdatedColumnName = lastUpdatedColumnNameBuilder;
             return this;
         }
 
         public ISqlServerProviderConfigurator Schema(string schema)
         {
-            _schemaBuilder = ev => schema;
+            _schema = schema;
             return this;
         }
 
         public ISqlServerProviderConfigurator Schema(Func<AuditEvent, string> schemaBuilder)
         {
-            _schemaBuilder = schemaBuilder;
+            _schema = schemaBuilder;
             return this;
         }
 
@@ -105,12 +103,12 @@ namespace Audit.SqlServer.Configuration
 
         public ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder)
         {
-            _dbContextOptionsBuilder = dbContextOptionsBuilder;
+            _dbContextOptions = dbContextOptionsBuilder;
             return this;
         }
         public ISqlServerProviderConfigurator DbContextOptions(DbContextOptions dbContextOptions)
         {
-            _dbContextOptionsBuilder = ev => dbContextOptions;
+            _dbContextOptions = dbContextOptions;
             return this;
         }
     }

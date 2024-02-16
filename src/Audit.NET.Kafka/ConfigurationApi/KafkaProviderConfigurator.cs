@@ -10,8 +10,8 @@ namespace Audit.Kafka.Configuration
         internal ISerializer<AuditEvent> _auditEventSerializer;
         internal Func<AuditEvent, TKey> _keySelector;
         internal ISerializer<TKey> _keySerializer;
-        internal Func<AuditEvent, int?> _partitionSelector;
-        internal Func<AuditEvent, string> _topicSelector;
+        internal Setting<int?> _partition;
+        internal Setting<string> _topic;
         internal Action<ProducerBuilder<TKey, AuditEvent>> _producerBuilderAction;
         internal Action<DeliveryResult<TKey, AuditEvent>> _resultHandler;
 
@@ -35,13 +35,13 @@ namespace Audit.Kafka.Configuration
 
         public IKafkaProviderSubConfigurator<TKey> Partition(int? partition)
         {
-            _partitionSelector = _ => partition;
+            _partition = partition;
             return this;
         }
 
         public IKafkaProviderSubConfigurator<TKey> PartitionSelector(Func<AuditEvent, int?> partitionSelector)
         {
-            _partitionSelector = partitionSelector;
+            _partition = partitionSelector;
             return this;
         }
 
@@ -65,13 +65,13 @@ namespace Audit.Kafka.Configuration
 
         public IKafkaProviderSubConfigurator<TKey> Topic(string topic)
         {
-            _topicSelector = _ => topic;
+            _topic = topic;
             return this;
         }
 
         public IKafkaProviderSubConfigurator<TKey> TopicSelector(Func<AuditEvent, string> topicSelector)
         {
-            _topicSelector = topicSelector;
+            _topic = topicSelector;
             return this;
         }
     }

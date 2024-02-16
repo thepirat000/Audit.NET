@@ -20,9 +20,8 @@ namespace Audit.Core
         
         public static ICreationPolicyConfigurator UseEventLogProvider(this IConfigurator configurator, Action<IEventLogProviderConfigurator> config)
         {
-            var eventLogConfig = new EventLogProviderConfigurator();
-            config.Invoke(eventLogConfig);
-            return UseEventLogProvider(configurator, eventLogConfig._logName, eventLogConfig._sourcePath, eventLogConfig._machineName, eventLogConfig._messageBuilder);
+            Configuration.DataProvider = new EventLogDataProvider(config);
+            return new CreationPolicyConfigurator();
         }
     }
 }

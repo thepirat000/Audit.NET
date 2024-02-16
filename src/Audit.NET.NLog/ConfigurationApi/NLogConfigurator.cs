@@ -6,31 +6,31 @@ namespace Audit.NLog.Configuration
 {
     public class NLogConfigurator : INLogConfigurator
     {
-        internal Func<AuditEvent, ILogger> _loggerBuilder;
-        internal Func<AuditEvent, LogLevel> _logLevelBuilder;
+        internal Setting<ILogger> _logger;
+        internal Setting<LogLevel?> _logLevel;
         internal Func<AuditEvent, object, object> _messageBuilder;
 
         public INLogConfigurator Logger(Func<AuditEvent, ILogger> loggerBuilder)
         {
-            _loggerBuilder = loggerBuilder;
+            _logger = loggerBuilder;
             return this;
         }
 
         public INLogConfigurator Logger(ILogger logger)
         {
-            _loggerBuilder = _ => logger;
+            _logger  = new Setting<ILogger>(logger);
             return this;
         }
 
         public INLogConfigurator LogLevel(Func<AuditEvent, LogLevel> logLevelBuilder)
         {
-            _logLevelBuilder = logLevelBuilder;
+            _logLevel = new Setting<LogLevel?>(ev => logLevelBuilder.Invoke(ev));
             return this;
         }
 
         public INLogConfigurator LogLevel(LogLevel logLevel)
         {
-            _logLevelBuilder = _ => logLevel;
+            _logLevel = logLevel;
             return this;
         }
 

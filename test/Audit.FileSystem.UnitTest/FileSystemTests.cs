@@ -20,9 +20,9 @@ namespace Audit.FileSystem.UnitTest
                 .FilenameBuilder(ev => "fn")
                 .FilenamePrefix("px"));
 
-            Assert.That(x.DirectoryPath, Is.EqualTo(@"c:\t"));
+            Assert.That(x.DirectoryPath.GetDefault(), Is.EqualTo(@"c:\t"));
             Assert.That(x.FilenameBuilder.Invoke(null), Is.EqualTo("fn"));
-            Assert.That(x.FilenamePrefix, Is.EqualTo("px"));
+            Assert.That(x.FilenamePrefix.GetDefault(), Is.EqualTo("px"));
         }
 
         [Test]

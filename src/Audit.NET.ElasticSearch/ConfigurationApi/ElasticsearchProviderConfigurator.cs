@@ -1,4 +1,5 @@
 ﻿using System;
+using Audit.Core;
 using Elasticsearch.Net;
 using Nest;
 
@@ -7,7 +8,7 @@ namespace Audit.Elasticsearch.Configuration
     public class ElasticsearchProviderConfigurator : IElasticsearchProviderConfigurator
     {
         internal IConnectionSettingsValues _connectionSettings;
-        internal Func<Core.AuditEvent, IndexName> _indexBuilder;
+        internal Setting<IndexName> _index;
         internal Func<Core.AuditEvent, Id> _idBuilder;
 
         public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionSettingsValues connectionSettings)
@@ -42,13 +43,13 @@ namespace Audit.Elasticsearch.Configuration
 
         public IElasticsearchProviderConfigurator Index(string indexName)
         {
-            _indexBuilder = ev => indexName;
+            _index = (IndexName)indexName;
             return this;
         }
 
         public IElasticsearchProviderConfigurator Index(Func<Core.AuditEvent, IndexName> indexNameBuilder)
         {
-            _indexBuilder = indexNameBuilder;
+            _index = indexNameBuilder;
             return this;
         }
 

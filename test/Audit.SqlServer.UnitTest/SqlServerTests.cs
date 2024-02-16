@@ -105,13 +105,13 @@ namespace Audit.SqlServer.UnitTest
                     .TableName("table")
                     .CustomColumn("EventType", ev => ev.EventType)
             );
-            Assert.That(x.ConnectionStringBuilder.Invoke(null), Is.EqualTo("cnnString"));
-            Assert.That(x.IdColumnNameBuilder.Invoke(new AuditEvent() { EventType = "evType" }), Is.EqualTo("evType"));
-            Assert.That(x.JsonColumnNameBuilder.Invoke(null), Is.EqualTo("json"));
+            Assert.That(x.ConnectionString.GetDefault(), Is.EqualTo("cnnString"));
+            Assert.That(x.IdColumnName.GetValue(new AuditEvent() { EventType = "evType" }), Is.EqualTo("evType"));
+            Assert.That(x.JsonColumnName.GetDefault(), Is.EqualTo("json"));
             Assert.That(x.CustomColumns.Any(cc => cc.Name == "EventType" && (string)cc.Value.Invoke(new AuditEvent() { EventType = "pepe" }) == "pepe"), Is.True);
-            Assert.That(x.LastUpdatedDateColumnNameBuilder.Invoke(null), Is.EqualTo("last"));
-            Assert.That(x.SchemaBuilder.Invoke(null), Is.EqualTo("schema"));
-            Assert.That(x.TableNameBuilder.Invoke(null), Is.EqualTo("table"));
+            Assert.That(x.LastUpdatedDateColumnName.GetDefault(), Is.EqualTo("last"));
+            Assert.That(x.Schema.GetDefault(), Is.EqualTo("schema"));
+            Assert.That(x.TableName.GetDefault(), Is.EqualTo("table"));
         }
 
         [Test]

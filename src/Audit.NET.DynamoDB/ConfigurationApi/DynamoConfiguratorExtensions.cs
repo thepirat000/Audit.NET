@@ -19,7 +19,7 @@ namespace Audit.Core
             Configuration.DataProvider = new DynamoDataProvider()
             {
                 Client = clientFactory,
-                TableNameBuilder = tableNameBuilder
+                TableName = tableNameBuilder
             };
             return new CreationPolicyConfigurator();
         }
@@ -31,14 +31,7 @@ namespace Audit.Core
         /// <param name="config">DynamoDB fluent config</param>
         public static ICreationPolicyConfigurator UseDynamoDB(this IConfigurator configurator, Action<IDynamoProviderConfigurator> config)
         {
-            var dynaDbConfig = new DynamoProviderConfigurator();
-            config.Invoke(dynaDbConfig);
-            Configuration.DataProvider = new DynamoDataProvider()
-            {
-                Client = dynaDbConfig._clientFactory,
-                TableNameBuilder = dynaDbConfig._tableConfigurator?._tableNameBuilder,
-                CustomAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes
-            };
+            Configuration.DataProvider = new DynamoDataProvider(config);
             return new CreationPolicyConfigurator();
         }
     }

@@ -1,10 +1,11 @@
+using System;
+
+using Audit.Core.ConfigurationApi;
+using Audit.Serilog.Configuration;
+using Audit.Serilog.Providers;
+
 namespace Audit.Core
 {
-    using System;
-    using Audit.Core.ConfigurationApi;
-    using Audit.Serilog.Configuration;
-    using Audit.Serilog.Providers;
-
     /// <summary>
     ///     Extensions for serilog.
     /// </summary>
@@ -18,14 +19,7 @@ namespace Audit.Core
         /// <returns>Policy with serilog.</returns>
         public static ICreationPolicyConfigurator UseSerilog(this IConfigurator configurator, Action<ISerilogConfigurator> config)
         {
-            var seriLogConfig = new SerilogConfigurator();
-            config.Invoke(seriLogConfig);
-            Configuration.DataProvider = new SerilogDataProvider
-            {
-                LogLevelBuilder = seriLogConfig._logLevelBuilder,
-                LoggerBuilder = seriLogConfig._loggerBuilder,
-                LogMessageBuilder = seriLogConfig._messageBuilder,
-            };
+            Configuration.DataProvider = new SerilogDataProvider(config);
             return new CreationPolicyConfigurator();
         }
 

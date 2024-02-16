@@ -20,13 +20,13 @@ namespace Audit.AzureStorageBlobs.Providers
         /// </summary>
         public string ConnectionString { get; set; }
         /// <summary>
-        /// Azure Blob Container name builder
+        /// Azure Blob Container name 
         /// </summary>
-        public Func<AuditEvent, string> ContainerNameBuilder { get; set; }
+        public Setting<string> ContainerName { get; set; }
         /// <summary>
         /// Azure Blob name builder
         /// </summary>
-        public Func<AuditEvent, string> BlobNameBuilder { get; set; }
+        public Setting<string> BlobName { get; set; }
         /// <summary>
         /// The Azure.Storage.Blobs Client Options to use
         /// </summary>
@@ -48,13 +48,13 @@ namespace Audit.AzureStorageBlobs.Providers
         /// </summary>
         public TokenCredential TokenCredential { get; set; }
         /// <summary>
-        /// Gets or sets a function that returns the standard blob tier to use (or null to use the default).
+        /// Gets or sets the standard blob tier to use (or null to use the default).
         /// </summary>
-        public Func<AuditEvent, AccessTier?> AccessTierBuilder { get; set; }
+        public Setting<AccessTier?> AccessTier { get; set; }
         /// <summary>
-        /// Gets or sets a function that returns the metadata key/values to store on the blob.
+        /// Gets or sets the metadata key/values to store on the blob.
         /// </summary>
-        public Func<AuditEvent, IDictionary<string, string>> MetadataBuilder { get; set; }
+        public Setting<IDictionary<string, string>> Metadata { get; set; }
 
         private static readonly IDictionary<string, BlobContainerClient> ContainerClientCache = new ConcurrentDictionary<string, BlobContainerClient>();
 
@@ -68,11 +68,11 @@ namespace Audit.AzureStorageBlobs.Providers
             config.Invoke(cfg);
 
             ConnectionString = cfg._connectionString;
-            ContainerNameBuilder = cfg._containerConfig._containerNameBuilder;
-            BlobNameBuilder = cfg._containerConfig._blobNameBuilder;
+            ContainerName = cfg._containerConfig._containerName;
+            BlobName = cfg._containerConfig._blobName;
             ClientOptions = cfg._containerConfig._clientOptions;
-            AccessTierBuilder = cfg._containerConfig._accessTierBuilder;
-            MetadataBuilder = cfg._containerConfig._metadataBuilder;
+            AccessTier = cfg._containerConfig._accessTier;
+            Metadata = cfg._containerConfig._metadata;
             if (cfg._credentialConfig != null)
             {
                 ServiceUrl = cfg._credentialConfig._serviceUrl;
@@ -149,12 +149,12 @@ namespace Audit.AzureStorageBlobs.Providers
 
         private string Upload(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName)
         {
-            var blobName = existingBlobName ?? BlobNameBuilder?.Invoke(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
+            var blobName = existingBlobName ?? BlobName.GetValue(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
             var blob = client.GetBlobClient(blobName);
             var options = new BlobUploadOptions()
             {
-                Metadata = MetadataBuilder?.Invoke(auditEvent),
-                AccessTier = AccessTierBuilder?.Invoke(auditEvent)
+                Metadata = Metadata.GetValue(auditEvent),
+                AccessTier = AccessTier.GetValue(auditEvent)
             };
             blob.Upload(new BinaryData(auditEvent, Configuration.JsonSettings), options);
             
@@ -163,12 +163,12 @@ namespace Audit.AzureStorageBlobs.Providers
 
         private async Task<string> UploadAsync(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName, CancellationToken cancellationToken)
         {
-            var blobName = existingBlobName ?? BlobNameBuilder?.Invoke(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
+            var blobName = existingBlobName ?? BlobName.GetValue(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
             var blob = client.GetBlobClient(blobName);
             var options = new BlobUploadOptions()
             {
-                Metadata = MetadataBuilder?.Invoke(auditEvent),
-                AccessTier = AccessTierBuilder?.Invoke(auditEvent)
+                Metadata = Metadata.GetValue(auditEvent),
+                AccessTier = AccessTier.GetValue(auditEvent)
             };
             await blob.UploadAsync(new BinaryData(auditEvent, Core.Configuration.JsonSettings), options, cancellationToken);
 
@@ -179,7 +179,7 @@ namespace Audit.AzureStorageBlobs.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var containerName = ContainerNameBuilder.Invoke(auditEvent);
+            var containerName = ContainerName.GetValue(auditEvent);
             var client = EnsureContainerClient(containerName);
             var blobName = Upload(client, auditEvent, null);
             return blobName;
@@ -187,7 +187,7 @@ namespace Audit.AzureStorageBlobs.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var containerName = ContainerNameBuilder.Invoke(auditEvent);
+            var containerName = ContainerName.GetValue(auditEvent);
             var client = await EnsureContainerClientAsync(containerName, cancellationToken);
             var blobName = await UploadAsync(client, auditEvent, null, cancellationToken);
             return blobName;
@@ -195,26 +195,26 @@ namespace Audit.AzureStorageBlobs.Providers
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            var containerName = ContainerNameBuilder.Invoke(auditEvent);
+            var containerName = ContainerName.GetValue(auditEvent);
             var client = EnsureContainerClient(containerName);
             Upload(client, auditEvent, eventId.ToString());
         }
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var containerName = ContainerNameBuilder.Invoke(auditEvent);
+            var containerName = ContainerName.GetValue(auditEvent);
             var client = await EnsureContainerClientAsync(containerName, cancellationToken);
             await UploadAsync(client, auditEvent, eventId.ToString(), cancellationToken);
         }
 
         public override T GetEvent<T>(object blobName)
         {
-            var containerName = ContainerNameBuilder.Invoke(null);
+            var containerName = ContainerName.GetDefault();
             return GetEvent<T>(containerName, blobName.ToString());
         }
 
         public override async Task<T> GetEventAsync<T>(object blobName, CancellationToken cancellationToken = default)
         {
-            var containerName = ContainerNameBuilder.Invoke(null);
+            var containerName = ContainerName.GetDefault();
             return await GetEventAsync<T>(containerName, blobName.ToString(), cancellationToken);
         }
 

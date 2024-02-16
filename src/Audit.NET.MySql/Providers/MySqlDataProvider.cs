@@ -20,46 +20,25 @@ namespace Audit.MySql.Providers
     /// </remarks>
     public class MySqlDataProvider : AuditDataProvider
     {
-        private string _connectionString;
-        private string _tableName = "event";
-        private string _idColumnName = "id";
-        private string _jsonColumnName = "data";
-
         /// <summary>
         /// The MySQL connection string
         /// </summary>
-        public string ConnectionString
-        {
-            get { return _connectionString; }
-            set { _connectionString = value; }
-        }
+        public string ConnectionString { get; set; }
 
         /// <summary>
         /// The MySQL events Table Name
         /// </summary>
-        public string TableName
-        {
-            get { return _tableName; }
-            set { _tableName = value; }
-        }
+        public string TableName { get; set; } = "event";
 
         /// <summary>
         /// The Column Name that stores the JSON
         /// </summary>
-        public string JsonColumnName
-        {
-            get { return _jsonColumnName; }
-            set { _jsonColumnName = value; }
-        }
+        public string JsonColumnName { get; set; } = "data";
 
         /// <summary>
         /// The Column Name that is the primary ley
         /// </summary>
-        public string IdColumnName
-        {
-            get { return _idColumnName; }
-            set { _idColumnName = value; }
-        }
+        public string IdColumnName { get; set; } = "id";
 
         /// <summary>
         /// A collection of custom columns to be added when saving the audit event 
@@ -76,17 +55,17 @@ namespace Audit.MySql.Providers
             if (config != null)
             {
                 config.Invoke(mysqlConfig);
-                _connectionString = mysqlConfig._connectionString;
-                _idColumnName = mysqlConfig._idColumnName;
-                _jsonColumnName = mysqlConfig._jsonColumnName;
-                _tableName = mysqlConfig._tableName;
+                ConnectionString = mysqlConfig._connectionString;
+                IdColumnName = mysqlConfig._idColumnName;
+                JsonColumnName = mysqlConfig._jsonColumnName;
+                TableName = mysqlConfig._tableName;
                 CustomColumns = mysqlConfig._customColumns;
             }
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            using (var cnn = new MySqlConnection(_connectionString))
+            using (var cnn = new MySqlConnection(ConnectionString))
             {
                 var cmd = GetInsertCommand(cnn, auditEvent);
                 object id = cmd.ExecuteScalar();
@@ -96,7 +75,7 @@ namespace Audit.MySql.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            using (var cnn = new MySqlConnection(_connectionString))
+            using (var cnn = new MySqlConnection(ConnectionString))
             {
                 var cmd = GetInsertCommand(cnn, auditEvent);
                 object id = await cmd.ExecuteScalarAsync(cancellationToken);
@@ -106,7 +85,7 @@ namespace Audit.MySql.Providers
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            using (var cnn = new MySqlConnection(_connectionString))
+            using (var cnn = new MySqlConnection(ConnectionString))
             {
                 var cmd = GetReplaceCommand(cnn, eventId, auditEvent);
                 cmd.ExecuteNonQuery();
@@ -115,7 +94,7 @@ namespace Audit.MySql.Providers
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            using (var cnn = new MySqlConnection(_connectionString))
+            using (var cnn = new MySqlConnection(ConnectionString))
             {
                 var cmd = GetReplaceCommand(cnn, eventId, auditEvent);
                 await cmd.ExecuteNonQueryAsync(cancellationToken);
@@ -125,7 +104,7 @@ namespace Audit.MySql.Providers
         public override T GetEvent<T>(object eventId)
         {
             var idParam = new MySqlParameter("@id", eventId);
-            using (var cnn = new MySqlConnection(_connectionString))
+            using (var cnn = new MySqlConnection(ConnectionString))
             {
                 var cmd = GetSelectCommand(cnn, idParam);
                 using (var reader = cmd.ExecuteReader())
@@ -144,7 +123,7 @@ namespace Audit.MySql.Providers
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var idParam = new MySqlParameter("@id", eventId);
-            using (var cnn = new MySqlConnection(_connectionString))
+            using (var cnn = new MySqlConnection(ConnectionString))
             {
                 var cmd = GetSelectCommand(cnn, idParam);
                 using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
@@ -163,7 +142,7 @@ namespace Audit.MySql.Providers
         private MySqlCommand GetInsertCommand(MySqlConnection cnn, AuditEvent auditEvent)
         {
             var cmdText = string.Format("INSERT INTO `{0}` ({1}) VALUES({2}); SELECT LAST_INSERT_ID();", 
-                _tableName,
+                TableName,
                 GetColumnsForInsert(),
                 GetParameterNamesForInsert());
             cnn.Open();
@@ -176,9 +155,9 @@ namespace Audit.MySql.Providers
         private MySqlCommand GetReplaceCommand(MySqlConnection cnn, object eventId, AuditEvent auditEvent)
         {
             var cmdText = string.Format("UPDATE `{0}` SET {1} WHERE `{2}` = @id;", 
-                _tableName, 
+                TableName, 
                 GetSetForUpdate(auditEvent), 
-                _idColumnName);
+                IdColumnName);
             cnn.Open();
             var cmd = cnn.CreateCommand();
             cmd.CommandText = cmdText;
@@ -190,9 +169,9 @@ namespace Audit.MySql.Providers
         private string GetSetForUpdate(AuditEvent auditEvent)
         {
             var sets = new List<string>();
-            if (_jsonColumnName != null)
+            if (JsonColumnName != null)
             {
-                sets.Add($"`{_jsonColumnName}` = @value");
+                sets.Add($"`{JsonColumnName}` = @value");
             }
             if (CustomColumns != null && CustomColumns.Any())
             {
@@ -206,7 +185,7 @@ namespace Audit.MySql.Providers
 
         private MySqlCommand GetSelectCommand(MySqlConnection cnn, MySqlParameter idParam)
         {
-            var cmdText = string.Format("SELECT `{0}` FROM `{1}` WHERE `{2}` = @id;", _jsonColumnName, _tableName, _idColumnName);
+            var cmdText = string.Format("SELECT `{0}` FROM `{1}` WHERE `{2}` = @id;", JsonColumnName, TableName, IdColumnName);
             cnn.Open();
             var cmd = cnn.CreateCommand();
             cmd.CommandText = cmdText;
@@ -217,9 +196,9 @@ namespace Audit.MySql.Providers
         private string GetColumnsForInsert()
         {
             var columns = new List<string>();
-            if (_jsonColumnName != null)
+            if (JsonColumnName != null)
             {
-                columns.Add(_jsonColumnName);
+                columns.Add(JsonColumnName);
             }
             if (CustomColumns != null)
             {
@@ -234,7 +213,7 @@ namespace Audit.MySql.Providers
         private string GetParameterNamesForInsert()
         {
             var names = new List<string>();
-            if (_jsonColumnName != null)
+            if (JsonColumnName != null)
             {
                 names.Add("@value");
             }
@@ -251,7 +230,7 @@ namespace Audit.MySql.Providers
         private List<MySqlParameter> GetParameterValues(AuditEvent auditEvent)
         {
             var parameters = new List<MySqlParameter>();
-            if (_jsonColumnName != null)
+            if (JsonColumnName != null)
             {
                 parameters.Add(new MySqlParameter("@value", auditEvent.ToJson()));
             }

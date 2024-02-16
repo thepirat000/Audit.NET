@@ -12,88 +12,64 @@ namespace Audit.AzureCosmos.ConfigurationApi
 {
     public class AzureCosmosProviderConfigurator : IAzureCosmosProviderConfigurator
     {
-        internal Func<AuditEvent, string> _endpointBuilder = _ => string.Empty;
-        internal Func<AuditEvent, string> _authKeyBuilder = _ => null;
-        internal Func<AuditEvent, string> _databaseBuilder = _ => "Audit";
-        internal Func<AuditEvent, string> _containerBuilder = _ => "Events";
+        internal Setting<string> _endpoint = string.Empty;
+        internal Setting<string> _authKey;
+        internal Setting<string> _database = "Audit";
+        internal Setting<string> _container = "Events";
         internal Func<AuditEvent, string> _idBuilder;
 #if IS_COSMOS
         internal CosmosClient _cosmosClient;
         internal Action<CosmosClientOptions> _cosmosClientOptionsAction;
 #else
-        internal Func<ConnectionPolicy> _connectionPolicyBuilder = () => null;
+        internal Setting<ConnectionPolicy> _connectionPolicy;
         internal IDocumentClient _documentClient = null;
 #endif
 
         public IAzureCosmosProviderConfigurator Endpoint(Func<AuditEvent, string> endpointBuilder)
         {
-            _endpointBuilder = endpointBuilder;
+            _endpoint = endpointBuilder;
             return this;
         }
 
         public IAzureCosmosProviderConfigurator Endpoint(string endpoint)
         {
-            _endpointBuilder = _ => endpoint;
+            _endpoint = endpoint;
             return this;
         }
-
-        public IAzureCosmosProviderConfigurator Endpoint(Func<string> endpointBuilder)
-        {
-            _endpointBuilder = _ => endpointBuilder.Invoke();
-            return this;
-        }
-
-        public IAzureCosmosProviderConfigurator Database(Func<string> databaseBuilder)
-        {
-            _databaseBuilder = _ => databaseBuilder.Invoke();
-            return this;
-        }
-
+        
         public IAzureCosmosProviderConfigurator Database(Func<AuditEvent, string> databaseBuilder)
         {
-            _databaseBuilder = databaseBuilder;
+            _database = databaseBuilder;
             return this;
         }
 
         public IAzureCosmosProviderConfigurator Database(string database)
         {
-            _databaseBuilder = _ => database;
-            return this;
-        }
-
-        public IAzureCosmosProviderConfigurator Container(Func<string> containerBuilder)
-        {
-            _containerBuilder = _ => containerBuilder.Invoke();
+            _database = database;
             return this;
         }
 
         public IAzureCosmosProviderConfigurator Container(Func<AuditEvent, string> containerBuilder)
         {
-            _containerBuilder = containerBuilder;
+            _container = containerBuilder;
             return this;
         }
         
         public IAzureCosmosProviderConfigurator Container(string container)
         {
-            _containerBuilder = _ => container;
-            return this;
-        }
-
-        public IAzureCosmosProviderConfigurator AuthKey(Func<string> authKeyBuilder)
-        {
-            _authKeyBuilder = _ => authKeyBuilder.Invoke();
+            _container = container;
             return this;
         }
 
         public IAzureCosmosProviderConfigurator AuthKey(Func<AuditEvent, string> authKeyBuilder)
         {
-            _authKeyBuilder = authKeyBuilder;
+            _authKey = authKeyBuilder;
             return this;
         }
 
         public IAzureCosmosProviderConfigurator AuthKey(string authKey)
         {
-            _authKeyBuilder = _ => authKey;
+            _authKey = authKey;
             return this;
         }
 
@@ -116,14 +92,14 @@ namespace Audit.AzureCosmos.ConfigurationApi
             return this;
         }
 #else
-        public IAzureCosmosProviderConfigurator ConnectionPolicy(Func<ConnectionPolicy> connectionPolicyBuilder)
+        public IAzureCosmosProviderConfigurator ConnectionPolicy(Func<AuditEvent, ConnectionPolicy> connectionPolicyBuilder)
         {
-            _connectionPolicyBuilder = connectionPolicyBuilder;
+            _connectionPolicy = connectionPolicyBuilder;
             return this;
         }
         public IAzureCosmosProviderConfigurator ConnectionPolicy(ConnectionPolicy connectionPolicy)
         {
-            _connectionPolicyBuilder = () => connectionPolicy;
+            _connectionPolicy = connectionPolicy;
             return this;
         }
         public IAzureCosmosProviderConfigurator DocumentClient(IDocumentClient documentClient)

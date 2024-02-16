@@ -14,8 +14,6 @@ namespace Audit.RavenDB.ConfigurationApi
         /// <param name="config">The RavenDB provider configuration.</param>
         public static ICreationPolicyConfigurator UseRavenDB(this IConfigurator configurator, Action<IRavenDbProviderConfigurator> config)
         {
-            var ravenDbConfig = new RavenDbProviderConfigurator();
-            config.Invoke(ravenDbConfig);
             Configuration.DataProvider = new RavenDbDataProvider(config);
             return new CreationPolicyConfigurator();
         }

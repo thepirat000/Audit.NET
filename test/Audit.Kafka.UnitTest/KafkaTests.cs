@@ -14,6 +14,8 @@ namespace Audit.Kafka.UnitTest
     [TestFixture]
     public class KafkaTests
     {
+		private const string host = "127.0.0.1:59351";
+		
         [Test]
         public void Test_KafkaDataProvider_FluentApi()
         {
@@ -23,8 +25,8 @@ namespace Audit.Kafka.UnitTest
                 .Partition(0)
                 .KeySelector(ev => "key"));
 
-            Assert.That(x.TopicSelector.Invoke(null), Is.EqualTo("audit-topic"));
-            Assert.That(x.PartitionSelector.Invoke(null), Is.EqualTo(0));
+            Assert.That(x.Topic.GetDefault(), Is.EqualTo("audit-topic"));
+            Assert.That(x.Partition.GetDefault(), Is.EqualTo(0));
             Assert.That(x.KeySelector.Invoke(null), Is.EqualTo("key"));
         }
 
@@ -37,7 +39,7 @@ namespace Audit.Kafka.UnitTest
             var locker = new object();
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
             string topic = "topic-" + Guid.NewGuid();
-            const string host = "[::1]:9092";
+
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = host,
@@ -87,7 +89,7 @@ namespace Audit.Kafka.UnitTest
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
             const string topic = "my-audit-topic-happy-path-async";
-            const string host = "[::1]:9092";
+
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = host,
@@ -139,7 +141,7 @@ namespace Audit.Kafka.UnitTest
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
             const string topic = "my-audit-topic-happy-path";
-            const string host = "[::1]:9092";
+            
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = host,
@@ -194,7 +196,7 @@ namespace Audit.Kafka.UnitTest
         {
             var reports = new List<DeliveryResult<string, AuditEvent>>();
             const string topic = "my-audit-topic-keyed-happypath";
-            const string host = "[::1]:9092";
+
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = host,

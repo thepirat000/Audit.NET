@@ -12,8 +12,18 @@ Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence f
 
 With Audit.NET you can generate tracking information about operations being executed. It gathers environmental information such as the caller user ID, machine name, method name, and exceptions, including execution time and exposing an extensible mechanism to enrich the logs and handle the audit output.
 
+[**Interaction extensions**](#extensions) to audit different systems are provided, such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), 
+[MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), 
+[WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), 
+[WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
+[File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
+[SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md),
+[MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md) 
+and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
+
 [**Output extensions**](#storage-providers) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
-[Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
+[Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), 
+[SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
 [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), 
 [PostgreSQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md), 
 [RavenDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/README.md), 
@@ -26,14 +36,13 @@ With Audit.NET you can generate tracking information about operations being exec
 [DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), 
 [UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md) and more. 
 
-[**Interaction extensions**](#extensions) to audit different systems are provided, such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), 
-[MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), 
-[WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), 
-[WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
-[File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
-[SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md),
-[MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md) 
-and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
+[**Output wrappers**](#data-providers-wrappers) are included 
+to facilitate the encapsulation of other Data Provider for diverse purposes, like resilience or lazy instantiation, such as
+[Polly](#polly-data-provider), 
+[Lazy](#lazy-data-provider),
+[Deferred](#deferred-data-provider) and
+[Conditional](#conditional-data-provider).
+
 
 ## [NuGet](https://www.nuget.org/packages/Audit.NET/)
 
@@ -520,7 +529,7 @@ The data provider can be set globally for the entire application or per audit sc
 > 
 > If you don't specify a global data provider, it will default to a `FileDataProvider` that logs events as .json files into the current working directory.
 
-To set the global data provider, assign the `DataProvider` property on the static `Audit.Core.Configuration` object or call the fluent API `Use()`. For example:
+To set the global data provider, assign the `DataProvider` property on the static `Audit.Core.Configuration` object, or call the fluent API `Use()`. For example:
 
 ```c#
 Audit.Core.Configuration.DataProvider = new MyCustomDataProvider();
@@ -542,45 +551,34 @@ var scope = AuditScope.Create(new AuditScopeOptions
 );
 ```
 
-#### Lazy Factory data provider
+Every data provider is accompanied by a fluent API accessible during object construction or via its respective `Use___()` method. 
+For instance, in the case of the [SqlDataProvider]((https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)):
 
-You can set the global data provider using a deferred instantiation technique, with a **lazy factory method** that will be called upon its initial utilization. 
-For instance, in situations where dependency resolution is necessitated but not immediately accessible during initialization:
+```c#
+var sqlDataProvider = new SqlDataProvider(_ => _
+    .ConnectionString("your connection string")
+    .TableName("your table name")
+    .IdColumnName("your id column name")
+    .JsonColumnName("your json column name"));
+```
 
 ```c#
 Audit.Core.Configuration.Setup()
-    .UseLazyFactory(() => app.ApplicationServices.GetService<CustomDataProvider>());
+    .UseSqlServer(_ => _
+        .ConnectionString("your connection string")
+        .TableName("your table name")
+        .IdColumnName("your id column name")
+        .JsonColumnName("your json column name"));
 ```
 
-#### Deferred Factory data provider
+### Data provider wrappers
 
-You can defer creating the data provider for each Audit Event until it is ready to be saved by using a **deferred factory method**. 
-This factory method will be called for each Audit Event. For example:
+A special type of Data Providers that allows wrapping other Data Provider with different purposes.
 
-```c#
-var sqlDataProvider = new SqlDataProvider(config => config...);
-var fileDataProvider = new FileDataProvider(config => config...);
-
-Audit.Core.Configuration.Setup()
-    .UseDeferredFactory(auditEvent => auditEvent is AuditEventWebApi ? sqlDataProvider : fileDataProvider);
-
-```
-
-See [Wrapper data providers](#wrapper-data-providers) for more information.
-
-### Dynamic data providers 
+#### Dynamic data provider
 
 As an alternative to creating a data provider class, you can define the mechanism at run time by using the `DynamicDataProvider` or `DynamicAsyncDataProvider` classes. For example:
 
-```c#
-var dataProvider = new DynamicDataProvider();
-// Attach an action for insert
-dataProvider.AttachOnInsert(ev => Console.Write(ev.ToJson()));
-Audit.Core.Configuration.DataProvider = dataProvider;
-```
-
-Or by using the fluent API:
- 
 ```c#
 Audit.Core.Configuration.Setup()
 	.UseDynamicProvider(config => config
@@ -590,51 +588,76 @@ Audit.Core.Configuration.Setup()
 For async operations, you should use the `DynamicAsyncDataProvider`, for example:
 
 ```c#
-var dataProvider = new DynamicAsyncDataProvider();
-dataProvider.AttachOnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson()));
-Audit.Core.Configuration.DataProvider = dataProvider;
-```
-
-Or by using the fluent API:
- 
-```c#
 Audit.Core.Configuration.Setup()
     .UseDynamicAsyncProvider(config => config
         .OnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson())));
 ```
 
-### Wrapper data providers 
+#### Lazy Factory data provider
 
-A special type of Data Providers that allows wrapping other Data Providers with different purposes:
+You can set the global data provider using a deferred instantiation technique, with a **lazy factory method** that will be called upon its initial utilization. 
+For instance, in situations where dependency resolution is needed but not immediately accessible during initialization.
 
-- LazyDataProvider
+Allows to lazily instantiate the data provider to use. The data provider factory method will be called only once; the first time it's needed.
 
-  Allows to lazily instantiate the data provider to use. The data provider factory method will be called only once; the first time it's needed.
+For example:
 
-  ```c#
-  Configuration.DataProvider = new LazyDataProvider(() => app.ApplicationServices.GetService<MyCustomDataProvider>());
-  ```
+```c#
+Audit.Core.Configuration.Setup()
+    .UseLazyFactory(() => app.ApplicationServices.GetService<CustomDataProvider>());
+```
 
-- DeferredDataProvider
+#### Deferred Factory data provider
 
-  Allows to defer the data provider instantiation until the audit event is about to be saved. The data provider factory method will be called for each audit event being saved.
+You can defer creating the data provider for each Audit Event until it is ready to be saved by using a **deferred factory method**. 
+The factory method will be called for each audit event being saved. 
 
-  ```c#
-  Configuration.DataProvider = new DeferredDataProvider(auditEvent => auditEvent is AuditEventWebApi ? new FileDataProvider() : EventLogDataProvider());
-  ```
+For example:
 
-- ConditionalDataProvider
+```c#
+var sqlDataProvider = new SqlDataProvider(config => config...);
+var fileDataProvider = new FileDataProvider(config => config...);
 
-  Enables the configuration of different data providers based on conditions related to the audit event.
+Audit.Core.Configuration.Setup()
+    .UseDeferredFactory(auditEvent => auditEvent is AuditEventWebApi ? sqlDataProvider : fileDataProvider);
+```
 
-  ```c#
-  Configuration.DataProvider = new ConditionalDataProvider(config => config
-    .When(auditEvent => auditEvent.EventType.Equals("A"), new MyCustomDataProvider())
-    .When(auditEvent => auditEvent.EventType.Equals("B"), new SqlDataProvider())
-    .Otherwise(new FileDataProvider()));
-  ```
+#### Conditional data provider
 
-#### Data providers included
+Enables the configuration of different data providers based on conditions related to the audit event.
+  
+For example:
+
+```c#
+Configuration.DataProvider = new ConditionalDataProvider(config => config
+  .When(auditEvent => auditEvent.EventType.Equals("A"), new MyCustomDataProvider())
+  .When(auditEvent => auditEvent.EventType.Equals("B"), new SqlDataProvider())
+  .Otherwise(new FileDataProvider()));
+```
+
+#### Polly data provider
+
+Allows to define [Polly](https://www.pollydocs.org/index.html) resilience strategies to any [Data Provider](https://github.com/thepirat000/Audit.NET?tab=readme-ov-file#data-providers).
+
+This is useful when you want to add resilience to your data provider, for example, to retry failed operations, or to add a circuit breaker.
+
+For example:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UsePolly(p => p
+        .DataProvider(new SqlDataProvider(...))
+        .WithResilience(resilience => resilience
+            .AddRetry(new()
+            {
+                ShouldHandle = new PredicateBuilder().Handle<SqlException>(),
+                MaxRetryAttempts = 2
+            })));
+```       
+
+For more information, please refer to the [Audit.NET.Polly documentation](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Polly/README.md).
+
+### Data providers included
 
 The Data Providers included are summarized in the following table:
 

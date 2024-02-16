@@ -21,7 +21,7 @@ namespace Audit.Core
             Configuration.DataProvider = new AmazonQldbDataProvider
             {
                 QldbDriver = driverFactory,
-                TableNameBuilder = tableNameBuilder
+                TableName = tableNameBuilder
             };
             return new CreationPolicyConfigurator();
         }
@@ -38,8 +38,8 @@ namespace Audit.Core
             var provider = new AmazonQldbDataProvider
             {
                 QldbDriver = amazonQldbProviderConfigurator._driverFactory,
-                TableNameBuilder = amazonQldbProviderConfigurator._tableConfigurator?._tableNameBuilder,
-                CustomAttributes = amazonQldbProviderConfigurator._tableConfigurator?._attrConfigurator?._attributes
+                TableName = amazonQldbProviderConfigurator._tableConfigurator._tableName,
+                CustomAttributes = amazonQldbProviderConfigurator._tableConfigurator._attrConfigurator?._attributes
             };
             if (amazonQldbProviderConfigurator._jsonSettings != null)
             {

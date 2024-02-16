@@ -9,11 +9,11 @@ namespace Audit.RavenDB.ConfigurationApi
         internal string[] _urls = null;
         internal X509Certificate2 _certificate = null;
         internal string _databaseDefault = null;
-        internal Func<AuditEvent, string> _databaseFunc;
+        internal Setting<string> _database;
 
-        public IRavenDbProviderStoreConfigurator Database(Func<AuditEvent, string> database)
+        public IRavenDbProviderStoreConfigurator Database(Func<AuditEvent, string> databaseBuilder)
         {
-            _databaseFunc = database;
+            _database = databaseBuilder;
             return this;
         }
 

@@ -33,12 +33,12 @@ namespace Audit.PostgreSql.UnitTest
                 .TableName("t")
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
-            Assert.That(x.ConnectionStringBuilder(null), Is.EqualTo("c"));
-            Assert.That(x.DataColumnNameBuilder(null), Is.EqualTo("dc"));
-            Assert.That(x.IdColumnNameBuilder(null), Is.EqualTo("id"));
-            Assert.That(x.LastUpdatedDateColumnNameBuilder(null), Is.EqualTo("lud"));
-            Assert.That(x.SchemaBuilder(null), Is.EqualTo("sc"));
-            Assert.That(x.TableNameBuilder(null), Is.EqualTo("t"));
+            Assert.That(x.ConnectionString.GetValue(null), Is.EqualTo("c"));
+            Assert.That(x.DataColumnName.GetValue(null), Is.EqualTo("dc"));
+            Assert.That(x.IdColumnName.GetValue(null), Is.EqualTo("id"));
+            Assert.That(x.LastUpdatedDateColumnName.GetValue(null), Is.EqualTo("lud"));
+            Assert.That(x.Schema.GetValue(null), Is.EqualTo("sc"));
+            Assert.That(x.TableName.GetValue(null), Is.EqualTo("t"));
             Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
             Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
             Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));
@@ -58,12 +58,12 @@ namespace Audit.PostgreSql.UnitTest
                 .TableName(ev => "t")
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
-            Assert.That(x.ConnectionStringBuilder(null), Is.EqualTo("c"));
-            Assert.That(x.DataColumnNameBuilder(null), Is.EqualTo("dc"));
-            Assert.That(x.IdColumnNameBuilder(null), Is.EqualTo("id"));
-            Assert.That(x.LastUpdatedDateColumnNameBuilder(null), Is.EqualTo("lud"));
-            Assert.That(x.SchemaBuilder(null), Is.EqualTo("sc"));
-            Assert.That(x.TableNameBuilder(null), Is.EqualTo("t"));
+            Assert.That(x.ConnectionString.GetDefault(), Is.EqualTo("c"));
+            Assert.That(x.DataColumnName.GetDefault(), Is.EqualTo("dc"));
+            Assert.That(x.IdColumnName.GetDefault(), Is.EqualTo("id"));
+            Assert.That(x.LastUpdatedDateColumnName.GetDefault(), Is.EqualTo("lud"));
+            Assert.That(x.Schema.GetDefault(), Is.EqualTo("sc"));
+            Assert.That(x.TableName.GetDefault(), Is.EqualTo("t"));
             Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
             Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
             Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));

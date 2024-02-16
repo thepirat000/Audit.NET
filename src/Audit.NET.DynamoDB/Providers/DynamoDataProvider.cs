@@ -19,7 +19,7 @@ namespace Audit.DynamoDB.Providers
         /// <summary>
         /// Top-level attributes to be added to the event and document before saving
         /// </summary>
-        public Dictionary<string, Func<AuditEvent, object>> CustomAttributes { get; set; } = new Dictionary<string, Func<AuditEvent, object>>();
+        public Dictionary<string, Setting<object>> CustomAttributes { get; set; } = new Dictionary<string, Setting<object>>();
 
         /// <summary>
         /// Factory that creates the client
@@ -29,7 +29,7 @@ namespace Audit.DynamoDB.Providers
         /// <summary>
         /// The DynamoDB table name to use when saving an audit event. 
         /// </summary>
-        public Func<AuditEvent, string> TableNameBuilder { get; set; }
+        public Setting<string> TableName { get; set; }
 
         /// <summary>
         /// Creates a new DynamoDB data provider using the given client.
@@ -66,7 +66,7 @@ namespace Audit.DynamoDB.Providers
             {
                 config.Invoke(dynaDbConfig);
                 Client = dynaDbConfig._clientFactory;
-                TableNameBuilder = dynaDbConfig._tableConfigurator?._tableNameBuilder;
+                TableName = dynaDbConfig._tableConfigurator?._tableName ?? new Setting<string>();
                 CustomAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes;
             }
         }
@@ -246,7 +246,7 @@ namespace Audit.DynamoDB.Providers
 
         private Table GetTable(AuditEvent auditEvent)
         {
-            var tableName = TableNameBuilder?.Invoke(auditEvent) ?? auditEvent?.GetType().Name ?? "AuditEvent";
+            var tableName = TableName.GetValue(auditEvent) ?? auditEvent?.GetType().Name ?? "AuditEvent";
             if (TableCache.TryGetValue(tableName, out Table table))
             {
                 return table;
@@ -272,7 +272,7 @@ namespace Audit.DynamoDB.Providers
             {
                 foreach (var attrib in CustomAttributes)
                 {
-                    auditEvent.CustomFields[attrib.Key] = attrib.Value.Invoke(auditEvent);
+                    auditEvent.CustomFields[attrib.Key] = attrib.Value.GetValue(auditEvent);
                 }
             }
             return Document.FromJson(auditEvent.ToJson());

@@ -6,7 +6,7 @@ namespace Audit.DynamoDB.Configuration
 {
     public class DynamoProviderAttributeConfigurator : IDynamoProviderAttributeConfigurator
     {
-        internal Dictionary<string, Func<AuditEvent, object>> _attributes = new Dictionary<string, Func<AuditEvent, object>>();
+        internal Dictionary<string, Setting<object>> _attributes = new Dictionary<string, Setting<object>>();
 
         public IDynamoProviderAttributeConfigurator SetAttribute(string attributeName, Func<AuditEvent, object> valueBuilder)
         {

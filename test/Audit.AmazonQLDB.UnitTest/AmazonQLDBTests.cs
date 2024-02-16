@@ -24,7 +24,7 @@ namespace Audit.AmazonQLDB.UnitTest
                     .WithRetryLogging()
                     .WithMaxConcurrentTransactions(2)
                     .Build()),
-                TableNameBuilder = ev => ev.EventType
+                TableName = new Setting<string>(ev => ev.EventType)
             };
 
         [Test]

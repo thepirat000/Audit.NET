@@ -28,11 +28,11 @@ namespace Audit.Kafka.Providers
         /// <summary>
         /// Kafka Topic selector to be used. Default is "audit-topic".
         /// </summary>
-        public Func<AuditEvent, string> TopicSelector { get; set; }
+        public Setting<string> Topic { get; set; }
         /// <summary>
         /// Partition selector to be used as a function of the audit event. Default or NULL means any partition
         /// </summary>
-        public Func<AuditEvent, int?> PartitionSelector { get; set; }
+        public Setting<int?> Partition { get; set; }
         /// <summary>
         /// Key selector. Optional to use keyed messages. Return the key to be used for a given audit event.
         /// </summary>
@@ -42,7 +42,7 @@ namespace Audit.Kafka.Providers
         /// </summary>
         public ISerializer<TKey> KeySerializer { get; set; }
         /// <summary>
-        /// Custom AuditEvent serializer. By default the audit event is JSON serialized + UTF8 encoded.
+        /// Custom AuditEvent serializer. By default, the audit event is JSON serialized + UTF8 encoded.
         /// </summary>
         public ISerializer<AuditEvent> AuditEventSerializer { get; set; }
         /// <summary>
@@ -68,8 +68,8 @@ namespace Audit.Kafka.Providers
                 config.Invoke(kafkaConfig);
                 _producerConfig = kafkaConfig._producerConfig;
                 _producerBuilder = new ProducerBuilder<TKey, AuditEvent>(_producerConfig);
-                TopicSelector = kafkaConfig._topicSelector;
-                PartitionSelector = kafkaConfig._partitionSelector;
+                Topic = kafkaConfig._topic;
+                Partition = kafkaConfig._partition;
                 KeySelector = kafkaConfig._keySelector;
                 KeySerializer = kafkaConfig._keySerializer;
                 AuditEventSerializer = kafkaConfig._auditEventSerializer;
@@ -146,9 +146,9 @@ namespace Audit.Kafka.Providers
 
         private TopicPartition GetTopicPartition(AuditEvent auditEvent)
         {
-            var topic = TopicSelector?.Invoke(auditEvent) ?? "audit-topic";
-            var partitionIndex = PartitionSelector?.Invoke(auditEvent);
-            var partition = partitionIndex.HasValue ? new Partition(partitionIndex.Value) : Partition.Any;
+            var topic = Topic.GetValue(auditEvent) ?? "audit-topic";
+            var partitionIndex = Partition.GetValue(auditEvent);
+            var partition = partitionIndex.HasValue ? new Partition(partitionIndex.Value) : Confluent.Kafka.Partition.Any;
             return new TopicPartition(topic, partition);
         }
 

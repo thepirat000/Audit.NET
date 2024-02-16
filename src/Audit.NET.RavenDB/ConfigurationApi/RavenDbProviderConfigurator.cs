@@ -20,20 +20,20 @@ namespace Audit.RavenDB.ConfigurationApi
             documentStoreSettings.Invoke(_storeConfig);
         }
 
-        public void WithSettings(string[] urls, string database, X509Certificate2 certificate = null, Func<AuditEvent, string> databaseFunc = null)
+        public void WithSettings(string[] urls, string databaseDefault, X509Certificate2 certificate = null, Func<AuditEvent, string> databaseFunc = null)
         {
             _storeConfig._urls = urls;
-            _storeConfig._databaseDefault = database;
+            _storeConfig._databaseDefault = databaseDefault;
             _storeConfig._certificate = certificate;
-            _storeConfig._databaseFunc = databaseFunc;
+            _storeConfig._database = databaseFunc;
         }
 
-        public void WithSettings(string url, string database, X509Certificate2 certificate = null, Func<AuditEvent, string> databaseFunc = null)
+        public void WithSettings(string url, string databaseDefault, X509Certificate2 certificate = null, Func<AuditEvent, string> databaseFunc = null)
         {
             _storeConfig._urls = new [] { url };
-            _storeConfig._databaseDefault = database;
+            _storeConfig._databaseDefault = databaseDefault;
             _storeConfig._certificate = certificate;
-            _storeConfig._databaseFunc = databaseFunc;
+            _storeConfig._database = databaseFunc;
         }
     }
 }

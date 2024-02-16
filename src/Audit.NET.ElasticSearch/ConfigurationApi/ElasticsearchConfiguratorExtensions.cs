@@ -22,7 +22,7 @@ namespace Audit.Core
             {
                 ConnectionSettings = settings,
                 IdBuilder = idBuilder,
-                IndexBuilder = indexBuilder
+                Index = indexBuilder
             };
             return new CreationPolicyConfigurator();
         }
@@ -34,14 +34,7 @@ namespace Audit.Core
         /// <param name="configurator">The Audit.NET configurator object.</param>
         public static ICreationPolicyConfigurator UseElasticsearch(this IConfigurator configurator, Action<IElasticsearchProviderConfigurator> config)
         {
-            var elasDbConfig = new ElasticsearchProviderConfigurator();
-            config.Invoke(elasDbConfig);
-            Configuration.DataProvider = new ElasticsearchDataProvider()
-            {
-                ConnectionSettings = elasDbConfig._connectionSettings,
-                IdBuilder = elasDbConfig._idBuilder,
-                IndexBuilder = elasDbConfig._indexBuilder
-            };
+            Configuration.DataProvider = new ElasticsearchDataProvider(config);
             return new CreationPolicyConfigurator();
         }
     }

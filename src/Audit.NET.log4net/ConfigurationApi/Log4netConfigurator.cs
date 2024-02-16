@@ -6,31 +6,31 @@ namespace Audit.log4net.Configuration
 {
     public class Log4netConfigurator : ILog4netConfigurator
     {
-        internal Func<AuditEvent, ILog> _loggerBuilder;
-        internal Func<AuditEvent, LogLevel> _logLevelBuilder;
+        internal Setting<ILog> _logger;
+        internal Setting<LogLevel?> _logLevel;
         internal Func<AuditEvent, object, object> _messageBuilder;
 
         public ILog4netConfigurator Logger(Func<AuditEvent, ILog> loggerBuilder)
         {
-            _loggerBuilder = loggerBuilder;
+            _logger = loggerBuilder;
             return this;
         }
 
         public ILog4netConfigurator Logger(ILog logger)
         {
-            _loggerBuilder = _ => logger;
+            _logger = new Setting<ILog>(logger);
             return this;
         }
 
         public ILog4netConfigurator LogLevel(Func<AuditEvent, LogLevel> logLevelBuilder)
         {
-            _logLevelBuilder = logLevelBuilder;
+            _logLevel = new Setting<LogLevel?>(ev => logLevelBuilder.Invoke(ev));
             return this;
         }
 
         public ILog4netConfigurator LogLevel(LogLevel logLevel)
         {
-            _logLevelBuilder = _ => logLevel;
+            _logLevel = logLevel;
             return this;
         }
 

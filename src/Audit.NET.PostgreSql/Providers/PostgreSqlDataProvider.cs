@@ -23,105 +23,46 @@ namespace Audit.PostgreSql.Providers
     /// </remarks>
     public class PostgreSqlDataProvider : AuditDataProvider
     {
-        private string _dataType = "JSON";
-        private List<CustomColumn> _customColumns = new List<CustomColumn>();
-
         /// <summary>
-        /// Gets or sets the connection string builder.
+        /// The connection string
         /// </summary>
-        public Func<AuditEvent, string> ConnectionStringBuilder { get; set; } = _ => "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        public Setting<string> ConnectionString { get; set; } = "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
         /// <summary>
         /// Gets or sets the schema builder.
         /// </summary>
-        public Func<AuditEvent, string> SchemaBuilder { get; set; } = _ => null;
+        public Setting<string> Schema { get; set; }
         /// <summary>
         /// Gets or sets the table name builder.
         /// </summary>
-        public Func<AuditEvent, string> TableNameBuilder { get; set; } = _ => "event";
+        public Setting<string> TableName { get; set; } = "event";
         /// <summary>
         /// Gets or sets the identifier column name builder.
         /// </summary>
-        public Func<AuditEvent, string> IdColumnNameBuilder { get; set; } = _ => "id";
+        public Setting<string> IdColumnName { get; set; } = "id";
         /// <summary>
         /// Gets or sets the data column name builder.
         /// </summary>
         /// <value>The data column name builder.</value>
-        public Func<AuditEvent, string> DataColumnNameBuilder { get; set; } = _ => "data";
+        public Setting<string> DataColumnName { get; set; } = "data";
         /// <summary>
-        /// Gets or sets the function that returns the JSON string to store in the data column. By default it's the result of calling AuditEvent.ToJson().
+        /// Gets or sets the function that returns the JSON string to store in the data column. By default, it's the result of calling AuditEvent.ToJson().
         /// </summary>
         public Func<AuditEvent, string> DataJsonStringBuilder { get; set; } = ev => ev.ToJson();
         /// <summary>
         /// Gets or sets the last updated date column name builder.
         /// </summary>
         /// <value>The last updated date column name builder.</value>
-        public Func<AuditEvent, string> LastUpdatedDateColumnNameBuilder { get; set; } = _ => null;
-
-        /// <summary>
-        /// Sets a static connection string
-        /// </summary>
-        public string ConnectionString
-        {
-            set { ConnectionStringBuilder = _ => value; }
-        }
-
-        /// <summary>
-        /// Sets the events Table Name
-        /// </summary>
-        public string TableName
-        {
-            set { TableNameBuilder = _ => value; }
-        }
-
-        /// <summary>
-        /// Set the Column Name that stores the data
-        /// </summary>
-        public string DataColumnName
-        {
-            set { DataColumnNameBuilder = _ => value; }
-        }
+        public Setting<string> LastUpdatedDateColumnName { get; set; }
 
         /// <summary>
         /// The column data type to cast when inserting/updating the event data.
         /// </summary>
-        public string DataType
-        {
-            get { return _dataType; }
-            set { _dataType = value; }
-        }
-
-        /// <summary>
-        /// Sets the Column Name that stores the Last Updated Date (NULL to ignore)
-        /// </summary>
-        public string LastUpdatedDateColumnName
-        {
-            set { LastUpdatedDateColumnNameBuilder = _ => value; }
-        }
-
-        /// <summary>
-        /// Sets the Column Name that is the primary ley
-        /// </summary>
-        public string IdColumnName
-        {
-            set { IdColumnNameBuilder = _ => value; }
-        }
-
-        /// <summary>
-        /// Sets the Schema Name to use (NULL to ignore)
-        /// </summary>
-        public string Schema
-        {
-            set { SchemaBuilder = _ => value; }
-        }
+        public string DataType { get; set; } = "JSON";
 
         /// <summary>
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
-        public List<CustomColumn> CustomColumns
-        {
-            get => _customColumns;
-            set => _customColumns = value;
-        }
+        public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
 
         public PostgreSqlDataProvider()
         {
@@ -133,14 +74,14 @@ namespace Audit.PostgreSql.Providers
             if (config != null)
             {
                 config.Invoke(pgConfig);
-                ConnectionStringBuilder = pgConfig._connectionStringBuilder;
-                DataColumnNameBuilder = pgConfig._dataColumnNameBuilder;
+                ConnectionString = pgConfig._connectionString;
+                DataColumnName = pgConfig._dataColumnName;
                 DataJsonStringBuilder = pgConfig._dataJsonStringBuilder ?? (ev => ev.ToJson());
-                _dataType = pgConfig._dataColumnType.ToString();
-                IdColumnNameBuilder = pgConfig._idColumnNameBuilder;
-                LastUpdatedDateColumnNameBuilder = pgConfig._lastUpdatedColumnNameBuilder;
-                SchemaBuilder = pgConfig._schemaBuilder;
-                TableNameBuilder = pgConfig._tableNameBuilder;
+                DataType = pgConfig._dataColumnType.ToString();
+                IdColumnName = pgConfig._idColumnName;
+                LastUpdatedDateColumnName = pgConfig._lastUpdatedColumnName;
+                Schema = pgConfig._schema;
+                TableName = pgConfig._tableName;
                 CustomColumns = pgConfig._customColumns;
             }
         }
@@ -335,7 +276,7 @@ namespace Audit.PostgreSql.Providers
             var sets = new List<string>();
             if (GetDataColumnName(auditEvent) != null)
             {
-                var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
+                var data = string.IsNullOrWhiteSpace(DataType) ? "@data" : $"CAST (@data AS {DataType})";
                 sets.Add($@"""{GetDataColumnName(auditEvent)}"" = {data}");
             }
             if (ludScript != null)
@@ -388,7 +329,7 @@ namespace Audit.PostgreSql.Providers
             var values = new List<string>();
             if (GetDataColumnName(auditEvent) != null)
             {
-                var data = string.IsNullOrWhiteSpace(_dataType) ? "@data" : $"CAST (@data AS {_dataType})";
+                var data = string.IsNullOrWhiteSpace(DataType) ? "@data" : $"CAST (@data AS {DataType})";
                 values.Add(data);
             }
             if (CustomColumns != null)
@@ -438,18 +379,18 @@ namespace Audit.PostgreSql.Providers
 
         protected string GetConnectionString(AuditEvent auditEvent)
         {
-            return ConnectionStringBuilder?.Invoke(auditEvent);
+            return ConnectionString.GetValue(auditEvent);
         }
 
         protected string GetSchema(AuditEvent auditEvent)
         {
-            var schema = SchemaBuilder?.Invoke(auditEvent);
+            var schema = Schema.GetValue(auditEvent);
             return string.IsNullOrWhiteSpace(schema) ? "" : (@"""" + schema + @""".");
         }
 
         protected string GetTableName(AuditEvent auditEvent)
         {
-            return TableNameBuilder?.Invoke(auditEvent);
+            return TableName.GetValue(auditEvent);
         }
 
         protected string GetFullTableName(AuditEvent auditEvent)
@@ -459,17 +400,17 @@ namespace Audit.PostgreSql.Providers
 
         protected string GetIdColumnName(AuditEvent auditEvent)
         {
-            return IdColumnNameBuilder?.Invoke(auditEvent);
+            return IdColumnName.GetValue(auditEvent);
         }
 
         protected string GetDataColumnName(AuditEvent auditEvent)
         {
-            return DataColumnNameBuilder?.Invoke(auditEvent);
+            return DataColumnName.GetValue(auditEvent);
         }
 
         protected string GetLastUpdatedDateColumnName(AuditEvent auditEvent)
         {
-            return LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
+            return LastUpdatedDateColumnName.GetValue(auditEvent);
         }
     }
 }

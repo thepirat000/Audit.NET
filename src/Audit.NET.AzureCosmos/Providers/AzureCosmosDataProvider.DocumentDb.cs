@@ -40,51 +40,31 @@ namespace Audit.AzureCosmos.Providers
         };
 
         /// <summary>
-        /// A func that returns the endpoint URL to use.
+        /// The endpoint URL to use.
         /// </summary>
-        public Func<AuditEvent, string> EndpointBuilder { get; set; }
+        public Setting<string> Endpoint { get; set; }
         /// <summary>
-        /// Sets the endpoint URL.
+        /// The AuthKey to use
         /// </summary>
-        public string Endpoint { set { EndpointBuilder = _ => value; } }
+        public Setting<string> AuthKey { get; set; }
         /// <summary>
-        /// A func that returns the AuthKey to use for a given audit event.
+        /// The Database to use
         /// </summary>
-        public Func<AuditEvent, string> AuthKeyBuilder { get; set; }
+        public Setting<string> Database { get; set; }
         /// <summary>
-        /// Sets the AuthKey to use.
+        /// The Container to use
         /// </summary>
-        public string AuthKey { set { AuthKeyBuilder = _ => value; } }
+        public Setting<string> Container { get; set; }
         /// <summary>
-        /// A func that returns the Database to use for a given audit event.
+        /// The ConnectionPolicy to use
         /// </summary>
-        public Func<AuditEvent, string> DatabaseBuilder { get; set; }
-        /// <summary>
-        /// Sets the Database to use.
-        /// </summary>
-        public string Database { set { DatabaseBuilder = _ => value; } }
-        /// <summary>
-        /// A func that returns the Container to use for a given audit event.
-        /// </summary>
-        public Func<AuditEvent, string> ContainerBuilder { get; set; }
-        /// <summary>
-        /// Sets the Container to use.
-        /// </summary>
-        public string Container { set { ContainerBuilder = _ => value; } }
-        /// <summary>
-        /// A func that returns the ConnectionPolicy to use for a given audit event.
-        /// </summary>
-        public Func<ConnectionPolicy> ConnectionPolicyBuilder { get; set; }
-        /// <summary>
-        /// Sets the ConnectionPolicy to use.
-        /// </summary>
-        public ConnectionPolicy ConnectionPolicy { set { ConnectionPolicyBuilder = () => value; } }
+        public Setting<ConnectionPolicy> ConnectionPolicy { get; set; }
         /// <summary>
         /// Gets or Sets the custom DocumentClient to use. Default is NULL to use an internal cached client.
         /// </summary>
         public IDocumentClient DocumentClient { get; set; }
         /// <summary>
-        /// A func that returns the document id to use for a given audit event. By default it will generate a new random Guid as the id.
+        /// A func that returns the document id to use for a given audit event. By default, it will generate a new random Guid as the id.
         /// </summary>
         public Func<AuditEvent, string> IdBuilder { get; set; }
 
@@ -96,11 +76,11 @@ namespace Audit.AzureCosmos.Providers
         {
             var cosmosDbConfig = new AzureCosmosProviderConfigurator();
             config.Invoke(cosmosDbConfig);
-            EndpointBuilder = cosmosDbConfig._endpointBuilder;
-            AuthKeyBuilder = cosmosDbConfig._authKeyBuilder;
-            ContainerBuilder = cosmosDbConfig._containerBuilder;
-            DatabaseBuilder = cosmosDbConfig._databaseBuilder;
-            ConnectionPolicyBuilder = cosmosDbConfig._connectionPolicyBuilder;
+            Endpoint = cosmosDbConfig._endpoint;
+            AuthKey = cosmosDbConfig._authKey;
+            Container = cosmosDbConfig._container;
+            Database = cosmosDbConfig._database;
+            ConnectionPolicy = cosmosDbConfig._connectionPolicy;
             DocumentClient = cosmosDbConfig._documentClient;
             IdBuilder = cosmosDbConfig._idBuilder;
         }
@@ -147,7 +127,7 @@ namespace Audit.AzureCosmos.Providers
         public override void ReplaceEvent(object docId, AuditEvent auditEvent)
         {
             var client = GetClient(auditEvent);
-            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder?.Invoke(auditEvent), docId.ToString());
+            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent), docId.ToString());
             Document doc;
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
@@ -160,7 +140,7 @@ namespace Audit.AzureCosmos.Providers
         public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var client = GetClient(auditEvent);
-            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder?.Invoke(auditEvent), docId.ToString());
+            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent), docId.ToString());
             Document doc;
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
@@ -236,7 +216,7 @@ namespace Audit.AzureCosmos.Providers
         public async Task<T> GetEventAsync<T>(string docId, string partitionKey, CancellationToken cancellationToken = default)
         {
             var client = GetClient(null);
-            var docUri = UriFactory.CreateDocumentUri(DatabaseBuilder?.Invoke(null), ContainerBuilder?.Invoke(null), docId);
+            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(null), Container.GetValue(null), docId);
 #if NET45
             var pk = new PartitionKey(partitionKey);
 #else
@@ -252,13 +232,13 @@ namespace Audit.AzureCosmos.Providers
 
         private IDocumentClient InitializeClient(AuditEvent auditEvent)
         {
-            var policy = ConnectionPolicyBuilder?.Invoke()
+            var policy = ConnectionPolicy.GetValue(auditEvent)
                 ?? new ConnectionPolicy
                 {
                     ConnectionMode = ConnectionMode.Direct,
                     ConnectionProtocol = Protocol.Tcp
                 };
-            DocumentClient = new DocumentClient(new Uri(EndpointBuilder!.Invoke(auditEvent)), AuthKeyBuilder?.Invoke(auditEvent), policy);
+            DocumentClient = new DocumentClient(new Uri(Endpoint.GetValue(auditEvent)), AuthKey.GetValue(auditEvent), policy);
             Task.Run(() => { ((DocumentClient)DocumentClient).OpenAsync(); });
 
             return DocumentClient;
@@ -266,7 +246,7 @@ namespace Audit.AzureCosmos.Providers
 
         private Uri GetCollectionUri(AuditEvent auditEvent)
         {
-            return UriFactory.CreateDocumentCollectionUri(DatabaseBuilder?.Invoke(auditEvent), ContainerBuilder.Invoke(auditEvent));
+            return UriFactory.CreateDocumentCollectionUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent));
         }
 
         private void SetId(AuditEvent auditEvent)

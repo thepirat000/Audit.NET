@@ -14,14 +14,7 @@ namespace Audit.Core
         /// <param name="config">The NLog provider configuration.</param>
         public static ICreationPolicyConfigurator UseNLog(this IConfigurator configurator, Action<INLogConfigurator> config)
         {
-            var NLogConfig = new NLogConfigurator();
-            config.Invoke(NLogConfig);
-            Configuration.DataProvider = new NLogDataProvider()
-            {
-                LogLevelBuilder = NLogConfig._logLevelBuilder,
-                LoggerBuilder = NLogConfig._loggerBuilder,
-                LogMessageBuilder = NLogConfig._messageBuilder
-            };
+            Configuration.DataProvider = new NLogDataProvider(config);
             return new CreationPolicyConfigurator();
         }
         /// <summary>

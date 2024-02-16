@@ -771,8 +771,8 @@ namespace Audit.UnitTest
             var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
             Assert.That(Core.Configuration.DataProvider.GetType(), Is.EqualTo(typeof(FileDataProvider)));
-            Assert.That(Core.Configuration.DataProviderAs<FileDataProvider>().FilenamePrefix, Is.EqualTo("prefix"));
-            Assert.That(Core.Configuration.DataProviderAs<FileDataProvider>().DirectoryPath, Is.EqualTo(@"C:\"));
+            Assert.That(Core.Configuration.DataProviderAs<FileDataProvider>().FilenamePrefix.GetDefault(), Is.EqualTo("prefix"));
+            Assert.That(Core.Configuration.DataProviderAs<FileDataProvider>().DirectoryPath.GetDefault(), Is.EqualTo(@"C:\"));
             Assert.That(Core.Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
             Assert.True(Core.Configuration.AuditScopeActions.ContainsKey(ActionType.OnScopeCreated));
             Assert.That(x, Is.EqualTo(1));
@@ -788,9 +788,9 @@ namespace Audit.UnitTest
             var scope = new AuditScopeFactory().Create("test", null);
             scope.Dispose();
             Assert.That(Core.Configuration.DataProvider.GetType(), Is.EqualTo(typeof(EventLogDataProvider)));
-            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().LogName, Is.EqualTo("LogName"));
-            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().SourcePath, Is.EqualTo("SourcePath"));
-            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().MachineName, Is.EqualTo("MachineName"));
+            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().LogName.GetDefault(), Is.EqualTo("LogName"));
+            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().SourcePath.GetDefault(), Is.EqualTo("SourcePath"));
+            Assert.That(Configuration.DataProviderAs<EventLogDataProvider>().MachineName.GetDefault(), Is.EqualTo("MachineName"));
             Assert.That(Core.Configuration.CreationPolicy, Is.EqualTo(EventCreationPolicy.Manual));
         }
 #endif

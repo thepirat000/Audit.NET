@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Audit.SqlServer.Providers
 {
-
     /// <summary>
     /// SQL Server data access
     /// </summary>
@@ -26,62 +25,45 @@ namespace Audit.SqlServer.Providers
     public class SqlDataProvider : AuditDataProvider
     {
         /// <summary>
-        /// The SQL connection string builder
-        /// </summary>
-        public Func<AuditEvent, string> ConnectionStringBuilder { get; set; }
-        /// <summary>
         /// The SQL connection string
         /// </summary>
-        public string ConnectionString { set { ConnectionStringBuilder = _ => value; } }
-        /// <summary>
-        /// The SQL events Table Name builder
-        /// </summary>
-        public Func<AuditEvent, string> TableNameBuilder { get; set; } = ev => "Event";
+        public Setting<string> ConnectionString { get; set; }
+
         /// <summary>
         /// The SQL events Table Name 
         /// </summary>
-        public string TableName { set { TableNameBuilder = _ => value; } }
+        public Setting<string> TableName { get; set; } = "Event";
+
         /// <summary>
         /// The Column Name that stores the JSON
         /// </summary>
-        public Func<AuditEvent, string> JsonColumnNameBuilder { get; set; }
-        /// <summary>
-        /// The Column Name that stores the JSON
-        /// </summary>
-        public string JsonColumnName { set { JsonColumnNameBuilder = _ => value; } }
+        public Setting<string> JsonColumnName { get; set; }
+
         /// <summary>
         /// The Column Name that stores the Last Updated Date (NULL to ignore)
         /// </summary>
-        public Func<AuditEvent, string> LastUpdatedDateColumnNameBuilder { get; set; } = null;
-        /// <summary>
-        /// The Column Name that stores the Last Updated Date (NULL to ignore)
-        /// </summary>
-        public string LastUpdatedDateColumnName { set { LastUpdatedDateColumnNameBuilder = _ => value; } }
+        public Setting<string> LastUpdatedDateColumnName { get; set; }
+
         /// <summary>
         /// The Column Name that is the primary ley
         /// </summary>
-        public Func<AuditEvent, string> IdColumnNameBuilder { get; set; } = ev => "EventId";
-        /// <summary>
-        /// The Column Name that is the primary ley
-        /// </summary>
-        public string IdColumnName { set { IdColumnNameBuilder = _ => value; } }
+        public Setting<string> IdColumnName { get; set; }
+
         /// <summary>
         /// The Schema Name to use (NULL to ignore)
         /// </summary>
-        public Func<AuditEvent, string> SchemaBuilder { get; set; } = null;
-        /// <summary>
-        /// The Schema Name to use (NULL to ignore)
-        /// </summary>
-        public string Schema { set { SchemaBuilder = _ => value; } }
+        public Setting<string> Schema { get; set; }
+        
         /// <summary>
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
         public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
+        
         /// <summary>
         /// The DbContext options builder, to provide custom database options for the DbContext
         /// </summary>
         [CLSCompliant(false)]
-        public Func<AuditEvent, DbContextOptions> DbContextOptionsBuilder { get; set; } = null;
+        public Setting<DbContextOptions> DbContextOptions { get; set; }
 
         public SqlDataProvider()
         {
@@ -94,14 +76,14 @@ namespace Audit.SqlServer.Providers
             if (config != null)
             {
                 config.Invoke(sqlConfig);
-                ConnectionStringBuilder = sqlConfig._connectionStringBuilder;
-                IdColumnNameBuilder = sqlConfig._idColumnNameBuilder;
-                JsonColumnNameBuilder = sqlConfig._jsonColumnNameBuilder;
-                LastUpdatedDateColumnNameBuilder = sqlConfig._lastUpdatedColumnNameBuilder;
-                SchemaBuilder = sqlConfig._schemaBuilder;
-                TableNameBuilder = sqlConfig._tableNameBuilder;
+                ConnectionString = sqlConfig._connectionString;
+                IdColumnName = sqlConfig._idColumnName;
+                JsonColumnName = sqlConfig._jsonColumnName;
+                LastUpdatedDateColumnName = sqlConfig._lastUpdatedColumnName;
+                Schema = sqlConfig._schema;
+                TableName = sqlConfig._tableName;
                 CustomColumns = sqlConfig._customColumns;
-                DbContextOptionsBuilder = sqlConfig._dbContextOptionsBuilder;
+                DbContextOptions = sqlConfig._dbContextOptions;
             }
         }
 
@@ -149,7 +131,7 @@ namespace Audit.SqlServer.Providers
 
         public override T GetEvent<T>(object eventId)
         {
-            if (JsonColumnNameBuilder == null)
+            if (JsonColumnName.GetDefault() == null)
             {
                 return null;
             }
@@ -169,7 +151,7 @@ namespace Audit.SqlServer.Providers
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {   
-            if (JsonColumnNameBuilder == null)
+            if (JsonColumnName.GetDefault() == null)
             {
                 return null;
             }
@@ -189,9 +171,9 @@ namespace Audit.SqlServer.Providers
 
         private string GetFullTableName(AuditEvent auditEvent)
         {
-            return SchemaBuilder != null 
-                ? string.Format("[{0}].[{1}]", SchemaBuilder.Invoke(auditEvent), TableNameBuilder.Invoke(auditEvent))
-                : string.Format("[{0}]", TableNameBuilder.Invoke(auditEvent));
+            return Schema.GetDefault() != null 
+                ? string.Format("[{0}].[{1}]", Schema.GetValue(auditEvent), TableName.GetValue(auditEvent))
+                : string.Format("[{0}]", TableName.GetValue(auditEvent));
         }
 
         private string GetInsertCommandText(AuditEvent auditEvent)
@@ -199,14 +181,14 @@ namespace Audit.SqlServer.Providers
             return string.Format("INSERT INTO {0} ({1}) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES ({3})", 
                 GetFullTableName(auditEvent),
                 GetColumnsForInsert(auditEvent), 
-                IdColumnNameBuilder.Invoke(auditEvent),
+                IdColumnName.GetValue(auditEvent),
                 GetValuesForInsert(auditEvent)); 
         }
 
         private string GetColumnsForInsert(AuditEvent auditEvent)
         {
             var columns = new List<string>();
-            var jsonColumnName = JsonColumnNameBuilder?.Invoke(auditEvent);
+            var jsonColumnName = JsonColumnName.GetValue(auditEvent);
             if (jsonColumnName != null)
             {
                 columns.Add(jsonColumnName);
@@ -227,7 +209,7 @@ namespace Audit.SqlServer.Providers
         private string GetValuesForInsert(AuditEvent auditEvent)
         {
             var values = new List<string>();
-            if (JsonColumnNameBuilder != null)
+            if (JsonColumnName.GetValue(auditEvent) != null)
             {
                 values.Add("@json");
             }
@@ -249,7 +231,7 @@ namespace Audit.SqlServer.Providers
         private SqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
         {
             var parameters = new List<SqlParameter>();
-            if (JsonColumnNameBuilder != null)
+            if (JsonColumnName.GetValue(auditEvent) != null)
             {
                 parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
             }
@@ -271,7 +253,7 @@ namespace Audit.SqlServer.Providers
         private SqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
         {
             var parameters = new List<SqlParameter>();
-            if (JsonColumnNameBuilder != null)
+            if (JsonColumnName.GetValue(auditEvent) != null)
             {
                 parameters.Add(new SqlParameter("@json", auditEvent.ToJson()));
             }
@@ -296,14 +278,14 @@ namespace Audit.SqlServer.Providers
             var cmdText = string.Format("UPDATE {0} SET {1} WHERE [{2}] = @eventId",
                 GetFullTableName(auditEvent), 
                 GetSetForUpdate(auditEvent), 
-                IdColumnNameBuilder.Invoke(auditEvent));
+                IdColumnName.GetValue(auditEvent));
             return cmdText;
         }
 
         private string GetSetForUpdate(AuditEvent auditEvent)
         {
-            var jsonColumnName = JsonColumnNameBuilder?.Invoke(auditEvent);
-            var ludColumn = LastUpdatedDateColumnNameBuilder?.Invoke(auditEvent);
+            var jsonColumnName = JsonColumnName.GetValue(auditEvent);
+            var ludColumn = LastUpdatedDateColumnName.GetValue(auditEvent);
             var sets = new List<string>();
             if (jsonColumnName != null)
             {
@@ -331,21 +313,22 @@ namespace Audit.SqlServer.Providers
         private string GetSelectCommandText(AuditEvent auditEvent)
         {
             var cmdText = string.Format("SELECT [{0}] As [Id] FROM {1} WHERE [{2}] = @eventId",
-                JsonColumnNameBuilder.Invoke(auditEvent),
+                JsonColumnName.GetValue(auditEvent),
                 GetFullTableName(auditEvent), 
-                IdColumnNameBuilder.Invoke(auditEvent));
+                IdColumnName.GetValue(auditEvent));
             return cmdText;
         }
 
         private AuditContext CreateContext(AuditEvent auditEvent)
         {
-            if (DbContextOptionsBuilder != null)
+            var ctxOptions = DbContextOptions.GetValue(auditEvent);
+            if (ctxOptions != null)
             {
-                return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent), DbContextOptionsBuilder.Invoke(auditEvent));
+                return new AuditContext(ConnectionString.GetValue(auditEvent), ctxOptions);
             }
             else
             {
-                return new AuditContext(ConnectionStringBuilder?.Invoke(auditEvent));
+                return new AuditContext(ConnectionString.GetValue(auditEvent));
             }
         }
 

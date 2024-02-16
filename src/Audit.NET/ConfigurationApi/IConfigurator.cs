@@ -49,15 +49,6 @@ namespace Audit.Core.ConfigurationApi
         /// </summary>
         /// <param name="config">The file log provider configuration.</param>
         ICreationPolicyConfigurator UseFileLogProvider(Action<IFileLogProviderConfigurator> config);
-        /// <summary>
-        /// Store the events in files.
-        /// </summary>
-        /// <param name="directoryPath">Specifies the directory where to store the audit log files.</param>
-        /// <param name="filenamePrefix">Specifies the filename prefix to use in the audit log files.</param>
-        /// <param name="directoryPathBuilder">Specifies the directory builder to get the path where to store the audit log files. If this setting is provided, directoryPath setting will be ignored.</param>
-        /// <param name="filenameBuilder">Specifies the filename builder to get the filename to store the audit log for an event.</param>
-        ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "",
-            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null);
 
 #if NET462 || NET472 
         /// <summary>

@@ -5,18 +5,18 @@ namespace Audit.DynamoDB.Configuration
 {
     public class DynamoProviderTableConfigurator : IDynamoProviderTableConfigurator
     {
-        internal Func<AuditEvent, string> _tableNameBuilder;
+        internal Setting<string> _tableName;
         internal DynamoProviderAttributeConfigurator _attrConfigurator = new DynamoProviderAttributeConfigurator();
 
         public IDynamoProviderAttributeConfigurator Table(string tableName)
         {
-            _tableNameBuilder = _ => tableName;
+            _tableName = tableName;
             return _attrConfigurator;
         }
 
         public IDynamoProviderAttributeConfigurator Table(Func<AuditEvent, string> tableNameBuilder)
         {
-            _tableNameBuilder = tableNameBuilder;
+            _tableName = tableNameBuilder;
             return _attrConfigurator;
         }
     }

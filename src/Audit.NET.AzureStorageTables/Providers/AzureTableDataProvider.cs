@@ -17,9 +17,9 @@ namespace Audit.AzureStorageTables.Providers
         /// </summary>
         public string ConnectionString { get; set; }
         /// <summary>
-        /// Azure Tables table name builder
+        /// Azure Tables table name
         /// </summary>
-        public Func<AuditEvent, string> TableNameBuilder { get; set; }
+        public Setting<string> TableName { get; set; }
         /// <summary>
         /// The Azure.Data.Tables Client Options to use
         /// </summary>
@@ -70,14 +70,14 @@ namespace Audit.AzureStorageTables.Providers
                 // By connection string
                 ConnectionString = cfg._connectionString;
                 ClientOptions = cfg._tableConfig._clientOptions;
-                TableNameBuilder = cfg._tableConfig._tableNameBuilder;
+                TableName = cfg._tableConfig._tableName;
             }
             else if (cfg._endpointUri != null)
             {
                 // By endpoint
                 ServiceEndpoint = cfg._endpointUri;
                 ClientOptions = cfg._tableConfig._clientOptions;
-                TableNameBuilder = cfg._tableConfig._tableNameBuilder;
+                TableName = cfg._tableConfig._tableName;
                 SharedKeyCredential = cfg._sharedKeyCredential;
                 SasCredential = cfg._sasCredential;
                 TokenCredential = cfg._tokenCredential;
@@ -147,7 +147,7 @@ namespace Audit.AzureStorageTables.Providers
                 return TableClientFactory.Invoke(auditEvent);
             }
 
-            var tableName = TableNameBuilder?.Invoke(auditEvent) ?? "Audit";
+            var tableName = TableName.GetValue(auditEvent) ?? "Audit";
 
             if (TableClientCache.TryGetValue(tableName, out TableClient client))
             {
@@ -175,7 +175,7 @@ namespace Audit.AzureStorageTables.Providers
                 return TableClientFactory.Invoke(auditEvent);
             }
 
-            var tableName = TableNameBuilder?.Invoke(auditEvent) ?? "Audit";
+            var tableName = TableName.GetValue(auditEvent) ?? "Audit";
 
             if (TableClientCache.TryGetValue(tableName, out TableClient client))
             {

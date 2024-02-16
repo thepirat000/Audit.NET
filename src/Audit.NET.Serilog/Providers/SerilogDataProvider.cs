@@ -1,10 +1,12 @@
+using System;
+
+using Audit.Core;
+using Audit.Serilog.Configuration;
+
+using global::Serilog;
+
 namespace Audit.Serilog.Providers
 {
-    using System;
-    using Audit.Core;
-    using Audit.Serilog.Configuration;
-    using global::Serilog;
-
     /// <summary>
     ///     Store Audit logs using Serilog.
     /// </summary>
@@ -20,21 +22,13 @@ namespace Audit.Serilog.Providers
     public class SerilogDataProvider : AuditDataProvider
     {
         /// <summary>
-        /// A function that given an audit event returns the Serilog ILog implementation to use
-        /// </summary>
-        public Func<AuditEvent, ILogger> LoggerBuilder { get; set; }
-        /// <summary>
         /// The Serilog ILog implementation to use
         /// </summary>
-        public ILogger Logger { set { LoggerBuilder = _ => value; } }
-        /// <summary>
-        /// A function that given an audit event returns the Serilog Log Level to use
-        /// </summary>
-        public Func<AuditEvent, LogLevel> LogLevelBuilder { get; set; }
+        public Setting<ILogger> Logger { get; set; }
         /// <summary>
         /// The Serilog Log Level to use
         /// </summary>
-        public LogLevel LogLevel { set { LogLevelBuilder = _ => value; } }
+        public Setting<LogLevel?> LogLevel { get; set; }
         /// <summary>
         /// A function that given an audit event and an event id, returns the message to log
         /// </summary>
@@ -59,8 +53,8 @@ namespace Audit.Serilog.Providers
             }
             var logConfig = new SerilogConfigurator();
             config.Invoke(logConfig);
-            LoggerBuilder = logConfig._loggerBuilder;
-            LogLevelBuilder = logConfig._logLevelBuilder;
+            Logger = logConfig._logger;
+            LogLevel = logConfig._logLevel;
             LogMessageBuilder = logConfig._messageBuilder;
         }
 
@@ -88,13 +82,13 @@ namespace Audit.Serilog.Providers
 
         private ILogger GetLogger(AuditEvent auditEvent)
         {
-            return this.LoggerBuilder?.Invoke(auditEvent) ?? global::Serilog.Log.ForContext(auditEvent.GetType());
+            return this.Logger.GetValue(auditEvent) ?? global::Serilog.Log.ForContext(auditEvent.GetType());
         }
 
         private LogLevel GetLogLevel(AuditEvent auditEvent)
         {
-            return this.LogLevelBuilder?.Invoke(auditEvent) ??
-                   (auditEvent.Environment.Exception != null ? LogLevel.Error : LogLevel.Info);
+            return this.LogLevel.GetValue(auditEvent) ??
+                   (auditEvent.Environment.Exception != null ? Serilog.LogLevel.Error : Serilog.LogLevel.Info);
         }
 
         private object GetLogObject(AuditEvent auditEvent, object eventId)
@@ -118,20 +112,17 @@ namespace Audit.Serilog.Providers
 
             switch (level)
             {
-                case LogLevel.Debug:
+                case Serilog.LogLevel.Debug:
                     logger.Debug("{Value}", value);
                     break;
-                case LogLevel.Warn:
+                case Serilog.LogLevel.Warn:
                     logger.Warning("{Value}", value);
                     break;
-                case LogLevel.Error:
+                case Serilog.LogLevel.Error:
                     logger.Error("{Value}", value);
                     break;
-                case LogLevel.Fatal:
+                case Serilog.LogLevel.Fatal:
                     logger.Fatal("{Value}", value);
-                    break;
-                case LogLevel.Info:
-                    logger.Information("{Value}", value);
                     break;
                 default:
                     logger.Information("{Value}", value);

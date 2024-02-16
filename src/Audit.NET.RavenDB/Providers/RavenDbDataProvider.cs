@@ -16,8 +16,7 @@ namespace Audit.RavenDB.Providers
     [CLSCompliant(false)]
     public class RavenDbDataProvider : AuditDataProvider
     {
-        private IDocumentStore _documentStore;
-        private readonly Func<AuditEvent, string> _databaseNameFunc;
+        private readonly Setting<string> _databaseName;
 
         /// <summary>
         /// Json default settings
@@ -31,11 +30,7 @@ namespace Audit.RavenDB.Providers
         /// <summary>
         /// The Raven Document Store
         /// </summary>
-        public IDocumentStore DocumentStore
-        {
-            get => _documentStore;
-            set => _documentStore = value;
-        }
+        public IDocumentStore DocumentStore { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RavenDbDataProvider"/> class using a custom Document Store instance.
@@ -44,9 +39,9 @@ namespace Audit.RavenDB.Providers
         /// <param name="databaseFunc">The function to obtain the database name from the audit event.</param>
         public RavenDbDataProvider(IDocumentStore documentStore, Func<AuditEvent, string> databaseFunc = null)
         {
-            _databaseNameFunc = databaseFunc;
-            _documentStore = documentStore;
-            _documentStore.Initialize();
+            _databaseName = databaseFunc;
+            DocumentStore = documentStore;
+            DocumentStore.Initialize();
         }
 
         /// <summary>
@@ -58,25 +53,25 @@ namespace Audit.RavenDB.Providers
             var ravenConfig = new RavenDbProviderConfigurator();
             config.Invoke(ravenConfig);
 
-            _databaseNameFunc = ravenConfig._storeConfig._databaseFunc;
+            _databaseName = ravenConfig._storeConfig._database;
 
             if (ravenConfig._documentStore == null)
             {
-                _documentStore = new DocumentStore()
+                DocumentStore = new DocumentStore()
                 {
                     Certificate = ravenConfig._storeConfig._certificate, 
                     Urls = ravenConfig._storeConfig._urls, 
                     Database = ravenConfig._storeConfig._databaseDefault
                 };
-                ((NewtonsoftJsonSerializationConventions)_documentStore.Conventions.Serialization)
+                ((NewtonsoftJsonSerializationConventions)DocumentStore.Conventions.Serialization)
                     .JsonContractResolver = new AuditContractResolver();
             }
             else
             {
-                _documentStore = ravenConfig._documentStore;
+                DocumentStore = ravenConfig._documentStore;
             }
 
-            _documentStore.Initialize();
+            DocumentStore.Initialize();
         }
 
         public override object CloneValue<T>(T value, AuditEvent auditEvent)
@@ -100,7 +95,7 @@ namespace Audit.RavenDB.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            using (var session = _documentStore.OpenSession(GetDatabaseName(auditEvent)))
+            using (var session = DocumentStore.OpenSession(GetDatabaseName(auditEvent)))
             {
                 session.Store(auditEvent);
                 session.SaveChanges();
@@ -116,7 +111,7 @@ namespace Audit.RavenDB.Providers
         /// <returns></returns>
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            using (var session = _documentStore.OpenAsyncSession(GetDatabaseName(auditEvent)))
+            using (var session = DocumentStore.OpenAsyncSession(GetDatabaseName(auditEvent)))
             {
                 await session.StoreAsync(auditEvent, cancellationToken);
                 await session.SaveChangesAsync(cancellationToken);
@@ -133,7 +128,7 @@ namespace Audit.RavenDB.Providers
         /// <returns></returns>
         public override T GetEvent<T>(object eventId)
         {
-            using (var session = _documentStore.OpenSession(GetDatabaseName()))
+            using (var session = DocumentStore.OpenSession(GetDatabaseName()))
             {
                 var auditEvent = session.Load<T>(eventId.ToString());
                 return auditEvent;
@@ -149,7 +144,7 @@ namespace Audit.RavenDB.Providers
         /// <returns></returns>
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
-            using (var session = _documentStore.OpenAsyncSession(GetDatabaseName()))
+            using (var session = DocumentStore.OpenAsyncSession(GetDatabaseName()))
             {
                 var auditEvent = await session.LoadAsync<T>(eventId.ToString(), cancellationToken);
                 return auditEvent;
@@ -164,7 +159,7 @@ namespace Audit.RavenDB.Providers
         /// <param name="auditEvent">The audit event.</param>
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            using (var session = _documentStore.OpenSession(GetDatabaseName(auditEvent)))
+            using (var session = DocumentStore.OpenSession(GetDatabaseName(auditEvent)))
             {
                 session.Store(auditEvent, eventId.ToString());
                 session.SaveChanges();
@@ -180,7 +175,7 @@ namespace Audit.RavenDB.Providers
         /// <returns></returns>
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            using (var session = _documentStore.OpenAsyncSession(GetDatabaseName(auditEvent)))
+            using (var session = DocumentStore.OpenAsyncSession(GetDatabaseName(auditEvent)))
             {
                 await session.StoreAsync(auditEvent, eventId.ToString(), cancellationToken);
                 await session.SaveChangesAsync(cancellationToken);
@@ -189,7 +184,7 @@ namespace Audit.RavenDB.Providers
 
         internal string GetDatabaseName(AuditEvent auditEvent = null)
         {
-            return _databaseNameFunc?.Invoke(auditEvent);
+            return _databaseName.GetValue(auditEvent);
         }
     }
 }

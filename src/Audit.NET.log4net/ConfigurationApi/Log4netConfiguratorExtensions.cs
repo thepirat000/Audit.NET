@@ -16,14 +16,7 @@ namespace Audit.Core
         /// <param name="config">The log4net provider configuration.</param>
         public static ICreationPolicyConfigurator UseLog4net(this IConfigurator configurator, Action<ILog4netConfigurator> config)
         {
-            var log4netConfig = new Log4netConfigurator();
-            config.Invoke(log4netConfig);
-            Configuration.DataProvider = new Log4netDataProvider()
-            {
-                LogLevelBuilder = log4netConfig._logLevelBuilder,
-                LoggerBuilder = log4netConfig._loggerBuilder,
-                LogMessageBuilder = log4netConfig._messageBuilder
-            };
+            Configuration.DataProvider = new Log4netDataProvider(config);
             return new CreationPolicyConfigurator();
         }
         /// <summary>

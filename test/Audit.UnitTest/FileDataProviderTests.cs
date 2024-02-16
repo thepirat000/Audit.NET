@@ -230,8 +230,8 @@ namespace Audit.UnitTest
                 .Directory(@"Directory")
                 .FilenamePrefix("FilenamePrefix")
             );
-            Assert.That(x.DirectoryPath, Is.EqualTo("Directory"));
-            Assert.That(x.FilenamePrefix, Is.EqualTo("FilenamePrefix"));
+            Assert.That(x.DirectoryPath.GetDefault(), Is.EqualTo("Directory"));
+            Assert.That(x.FilenamePrefix.GetDefault(), Is.EqualTo("FilenamePrefix"));
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace Audit.UnitTest
                 .DirectoryBuilder(ev => @"Directory")
                 .FilenameBuilder(ev => "Filename")
             );
-            Assert.That(x.DirectoryPathBuilder.Invoke(new AuditEvent()), Is.EqualTo("Directory"));
+            Assert.That(x.DirectoryPath.GetValue(new AuditEvent()), Is.EqualTo("Directory"));
             Assert.That(x.FilenameBuilder.Invoke(new AuditEvent()), Is.EqualTo("Filename"));
         }
 

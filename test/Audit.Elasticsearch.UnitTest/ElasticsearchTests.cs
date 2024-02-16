@@ -29,7 +29,7 @@ namespace Audit.Elasticsearch.UnitTest
 
             Assert.That((x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()), Is.EqualTo("http://server/"));
             Assert.That(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")), Is.True);
-            Assert.That(x.IndexBuilder.Invoke(null).Name, Is.EqualTo("ix"));
+            Assert.That(x.Index.GetDefault().Name, Is.EqualTo("ix"));
         }
         
         [Test]
@@ -43,7 +43,7 @@ namespace Audit.Elasticsearch.UnitTest
             var indexName = "auditevent_order";
             
             var guids = new List<string>();
-            ela.IndexBuilder = ev => indexName;
+            ela.Index = (IndexName)indexName;
             ela.IdBuilder = ev => { var g = Guid.NewGuid().ToString().Replace("-", "/"); guids.Add(g); return g; };
 
             Audit.Core.Configuration.Setup()
@@ -96,7 +96,7 @@ namespace Audit.Elasticsearch.UnitTest
             var indexName = "auditevent_order";
 
             var guids = new List<string>();
-            ela.IndexBuilder = ev => indexName;
+            ela.Index = (IndexName)indexName;
             ela.IdBuilder = ev => { var g = Guid.NewGuid().ToString().Replace("-", "/"); guids.Add(g); return g; };
 
             Audit.Core.Configuration.Setup()
@@ -147,7 +147,7 @@ namespace Audit.Elasticsearch.UnitTest
             var ela = GetElasticsearchDataProvider(ins, repl);
             var indexName = "auto_" + new Random().Next(10000, 99999);
 
-            ela.IndexBuilder = ev => indexName;
+            ela.Index = (IndexName)indexName;
             ela.IdBuilder = ev => null;
 
             Audit.Core.Configuration.Setup()
@@ -195,7 +195,7 @@ namespace Audit.Elasticsearch.UnitTest
             var ela = GetElasticsearchDataProvider(ins, repl);
             var indexName = "auto_" + new Random().Next(10000, 99999);
 
-            ela.IndexBuilder = ev => indexName;
+            ela.Index = (IndexName)indexName;
             ela.IdBuilder = ev => null;
 
             Audit.Core.Configuration.Setup()

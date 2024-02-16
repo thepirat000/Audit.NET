@@ -41,7 +41,7 @@ namespace Audit.AzureStorageTables.UnitTest
 
             Assert.That(provider.TableClientFactory, Is.Null);
             Assert.That(provider.ConnectionString, Is.EqualTo(cnnString));
-            Assert.That(provider.TableNameBuilder.Invoke(null), Is.EqualTo(table));
+            Assert.That(provider.TableName.GetDefault(), Is.EqualTo(table));
             Assert.That(provider.ClientOptions.Retry.MaxRetries, Is.EqualTo(66));
             Assert.That(entity, Is.Not.Null);
             Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
@@ -72,7 +72,7 @@ namespace Audit.AzureStorageTables.UnitTest
             Assert.That(provider.TableClientFactory, Is.Null);
             Assert.That(provider.ConnectionString, Is.Null);
             Assert.That(provider.ServiceEndpoint, Is.EqualTo(new Uri(url)));
-            Assert.That(provider.TableNameBuilder.Invoke(null), Is.EqualTo(table));
+            Assert.That(provider.TableName.GetDefault(), Is.EqualTo(table));
             Assert.That(provider.ClientOptions.Retry.MaxRetries, Is.EqualTo(66));
             Assert.That(entity, Is.Not.Null);
             Assert.That(entity.PartitionKey, Is.EqualTo("Part"));
@@ -98,7 +98,7 @@ namespace Audit.AzureStorageTables.UnitTest
 
             Assert.That(provider.TableClientFactory, Is.Null);
             Assert.That(provider.ConnectionString, Is.EqualTo(cnnString));
-            Assert.That(provider.TableNameBuilder.Invoke(null), Is.EqualTo(table));
+            Assert.That(provider.TableName.GetDefault(), Is.EqualTo(table));
             Assert.That(provider.ClientOptions.Retry.MaxRetries, Is.EqualTo(66));
             Assert.That(entity, Is.Not.Null);
             Assert.That(entity.PartitionKey, Is.EqualTo("Part"));

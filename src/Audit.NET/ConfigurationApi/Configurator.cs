@@ -85,9 +85,8 @@ namespace Audit.Core.ConfigurationApi
         }
         public ICreationPolicyConfigurator UseFileLogProvider(Action<IFileLogProviderConfigurator> config)
         {
-            var fileLogConfig = new FileLogProviderConfigurator();
-            config.Invoke(fileLogConfig);
-            return UseFileLogProvider(fileLogConfig._directoryPath, fileLogConfig._filenamePrefix, fileLogConfig._directoryPathBuilder, fileLogConfig._filenameBuilder);
+            Configuration.DataProvider = new FileDataProvider(config);
+            return new CreationPolicyConfigurator();
         }
         public ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider)
         {
@@ -107,27 +106,13 @@ namespace Audit.Core.ConfigurationApi
             };
             return new CreationPolicyConfigurator();
         }
+
         public ICreationPolicyConfigurator UseEventLogProvider(Action<IEventLogProviderConfigurator> config)
         {
-            var eventLogConfig = new EventLogProviderConfigurator();
-            config.Invoke(eventLogConfig);
-            return UseEventLogProvider(eventLogConfig._logName, eventLogConfig._sourcePath, eventLogConfig._machineName, eventLogConfig._messageBuilder);
-        }
-#endif
-        public ICreationPolicyConfigurator UseFileLogProvider(string directoryPath = "", string filenamePrefix = "", 
-            Func<AuditEvent, string> directoryPathBuilder = null, Func<AuditEvent, string> filenameBuilder = null)
-        {
-            var fdp = new FileDataProvider()
-            {
-                DirectoryPath = directoryPath,
-                FilenamePrefix = filenamePrefix,
-                DirectoryPathBuilder = directoryPathBuilder,
-                FilenameBuilder = filenameBuilder
-            };
-            Configuration.DataProvider = fdp;
-
+            Configuration.DataProvider = new EventLogDataProvider(config);
             return new CreationPolicyConfigurator();
         }
+#endif
 
         public ICreationPolicyConfigurator UseInMemoryProvider()
         {

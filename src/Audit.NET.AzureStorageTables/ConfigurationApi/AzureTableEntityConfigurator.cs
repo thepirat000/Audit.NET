@@ -6,9 +6,9 @@ namespace Audit.AzureStorageTables.ConfigurationApi
 {
     public class AzureTableEntityConfigurator : IAzureTablesEntityConfigurator 
     {
-        internal Func<AuditEvent, string> _tableNameBuilder;
+        internal Setting<string> _tableName;
         internal TableClientOptions _clientOptions;
-        internal Func<AuditEvent, ITableEntity> _tableEntityBuilder = null;
+        internal Func<AuditEvent, ITableEntity> _tableEntityBuilder;
 
         public IAzureTablesEntityConfigurator EntityMapper(Func<AuditEvent, ITableEntity> tableEntityBuilder)
         {
@@ -30,13 +30,13 @@ namespace Audit.AzureStorageTables.ConfigurationApi
 
         public IAzureTablesEntityConfigurator TableName(string tableName)
         {
-            _tableNameBuilder = _ => tableName;
+            _tableName = tableName;
             return this;
         }
 
         public IAzureTablesEntityConfigurator TableName(Func<AuditEvent, string> tableNameBuilder)
         {
-            _tableNameBuilder = tableNameBuilder;
+            _tableName = tableNameBuilder;
             return this;
         }
 

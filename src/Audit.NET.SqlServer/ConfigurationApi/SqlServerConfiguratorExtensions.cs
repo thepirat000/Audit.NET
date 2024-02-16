@@ -19,14 +19,14 @@ namespace Audit.Core
             config.Invoke(sqlDbConfig);
             Configuration.DataProvider = new SqlDataProvider()
             {
-                ConnectionStringBuilder = sqlDbConfig._connectionStringBuilder,
-                TableNameBuilder = sqlDbConfig._tableNameBuilder,
-                IdColumnNameBuilder = sqlDbConfig._idColumnNameBuilder,
-                JsonColumnNameBuilder = sqlDbConfig._jsonColumnNameBuilder,
-                LastUpdatedDateColumnNameBuilder = sqlDbConfig._lastUpdatedColumnNameBuilder,
-                SchemaBuilder = sqlDbConfig._schemaBuilder,
+                ConnectionString = sqlDbConfig._connectionString,
+                TableName = sqlDbConfig._tableName,
+                IdColumnName = sqlDbConfig._idColumnName,
+                JsonColumnName = sqlDbConfig._jsonColumnName,
+                LastUpdatedDateColumnName = sqlDbConfig._lastUpdatedColumnName,
+                Schema = sqlDbConfig._schema,
                 CustomColumns = sqlDbConfig._customColumns,
-                DbContextOptionsBuilder = sqlDbConfig._dbContextOptionsBuilder
+                DbContextOptions = sqlDbConfig._dbContextOptions
             };
             return new CreationPolicyConfigurator();
         }
