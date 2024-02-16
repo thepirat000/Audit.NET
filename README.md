@@ -12,7 +12,7 @@ Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence f
 
 With Audit.NET you can generate tracking information about operations being executed. It gathers environmental information such as the caller user ID, machine name, method name, and exceptions, including execution time and exposing an extensible mechanism to enrich the logs and handle the audit output.
 
-[**Interaction extensions**](#extensions) to audit different systems are provided, such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), 
+- [**Interaction extensions**](#extensions) to audit different systems are provided, such as [Entity Framework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), 
 [MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), 
 [WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), 
 [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
@@ -21,7 +21,7 @@ With Audit.NET you can generate tracking information about operations being exec
 [MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md) 
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
-[**Output extensions**](#storage-providers) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
+- [**Output extensions**](#storage-providers) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
 [Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), 
 [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
 [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), 
@@ -36,7 +36,7 @@ and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.
 [DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), 
 [UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md) and more. 
 
-[**Output wrappers**](#data-providers-wrappers) are included 
+- [**Output wrappers**](#data-providers-wrappers) are included 
 to facilitate the encapsulation of other Data Provider for diverse purposes, like resilience or lazy instantiation, such as
 [Polly](#polly-data-provider), 
 [Lazy](#lazy-data-provider),
