@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 2/15/2024 - 5:43:43 AM |
+| Generated on: | 2/16/2024 - 7:41:17 PM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 22 |
-| Classes: | 254 |
-| Files: | 192 |
-| **Line coverage:** | 76.2% (7578 of 9933) |
-| Covered lines: | 7578 |
-| Uncovered lines: | 2355 |
-| Coverable lines: | 9933 |
-| Total lines: | 17881 |
-| **Branch coverage:** | 70.3% (2925 of 4160) |
-| Covered branches: | 2925 |
-| Total branches: | 4160 |
+| Classes: | 255 |
+| Files: | 193 |
+| **Line coverage:** | 76.5% (7569 of 9887) |
+| Covered lines: | 7569 |
+| Uncovered lines: | 2318 |
+| Coverable lines: | 9887 |
+| Total lines: | 17868 |
+| **Branch coverage:** | 70.5% (2903 of 4116) |
+| Covered branches: | 2903 |
+| Total branches: | 4116 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -154,7 +154,7 @@
 |Audit.Mvc.AuditPageFilter|112|28|140|295|80%|71|130|54.6%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1050**|**85**|**1135**|**4218**|**92.5%**|**232**|**302**|**76.8%**|
+|**Audit.NET**|**1032**|**93**|**1125**|**4202**|**91.7%**|**240**|**304**|**78.9%**|
 |Audit.Core.AuditActivityEvent|2|0|2|80|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|80|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|80|100%|0|0||
@@ -171,12 +171,12 @@
 |Audit.Core.ConfigurationApi.ActionConfigurator|5|0|5|19|100%|0|0||
 |Audit.Core.ConfigurationApi.ActionEventSelector|10|2|12|38|83.3%|0|0||
 |Audit.Core.ConfigurationApi.ConditionalDataProviderConfigurator|25|12|37|77|67.5%|2|6|33.3%|
-|Audit.Core.ConfigurationApi.Configurator|53|5|58|139|91.3%|0|0||
+|Audit.Core.ConfigurationApi.Configurator|34|13|47|124|72.3%|0|0||
 |Audit.Core.ConfigurationApi.CreationPolicyConfigurator|10|0|10|35|100%|0|0||
 |Audit.Core.ConfigurationApi.DynamicAsyncDataProviderConfigurator|21|2|23|79|91.3%|0|0||
 |Audit.Core.ConfigurationApi.DynamicDataProviderConfigurator|11|2|13|47|84.6%|0|0||
-|Audit.Core.ConfigurationApi.EventLogProviderConfigurator|9|2|11|37|81.8%|0|0||
-|Audit.Core.ConfigurationApi.FileLogProviderConfigurator|10|0|10|36|100%|0|0||
+|Audit.Core.ConfigurationApi.EventLogProviderConfigurator|9|8|17|54|52.9%|0|0||
+|Audit.Core.ConfigurationApi.FileLogProviderConfigurator|10|0|10|35|100%|0|0||
 |Audit.Core.DefaultSystemClock|1|0|1|12|100%|0|0||
 |Audit.Core.Extensions.ExceptionExtensions|3|0|3|25|100%|2|2|100%|
 |Audit.Core.Extensions.TypeExtensions|17|1|18|47|94.4%|9|10|90%|
@@ -185,29 +185,30 @@
 |Audit.Core.PlatformHelper|5|0|5|16|100%|0|0||
 |Audit.Core.Providers.DynamicAsyncDataProvider|41|6|47|169|87.2%|6|6|100%|
 |Audit.Core.Providers.DynamicDataProvider|28|3|31|106|90.3%|6|6|100%|
-|Audit.Core.Providers.EventLogDataProvider|6|20|26|78|23%|0|8|0%|
-|Audit.Core.Providers.FileDataProvider|65|1|66|187|98.4%|10|12|83.3%|
-|Audit.Core.Providers.FileDataProvider.HiResDateTime|7|0|7|187|100%|2|2|100%|
-|Audit.Core.Providers.FileDataProvider<T>|65|1|66|187|98.4%|10|12|83.3%|
+|Audit.Core.Providers.EventLogDataProvider|13|14|27|82|48.1%|2|8|25%|
+|Audit.Core.Providers.FileDataProvider|56|0|56|153|100%|12|12|100%|
+|Audit.Core.Providers.FileDataProvider.HiResDateTime|7|0|7|153|100%|2|2|100%|
+|Audit.Core.Providers.FileDataProvider<T>|56|0|56|153|100%|12|12|100%|
 |Audit.Core.Providers.InMemoryDataProvider|26|0|26|76|100%|0|0||
 |Audit.Core.Providers.NullDataProvider|6|0|6|36|100%|0|0||
 |Audit.Core.Providers.Wrappers.ConditionalDataProvider|27|5|32|114|84.3%|14|26|53.8%|
 |Audit.Core.Providers.Wrappers.ConditionalDataProvider.GuardCondition|2|0|2|114|100%|0|0||
 |Audit.Core.Providers.Wrappers.DeferredDataProvider|22|0|22|92|100%|9|18|50%|
 |Audit.Core.Providers.Wrappers.LazyDataProvider|22|0|22|89|100%|7|14|50%|
+|Audit.Core.Setting<T>|12|2|14|81|85.7%|2|2|100%|
 |**Audit.NET.JsonNewtonsoftAdapter**|**95**|**35**|**130**|**316**|**73%**|**48**|**66**|**72.7%**|
 |Audit.Core.ConfiguratorExtensions|4|0|4|32|100%|0|0||
 |Audit.Core.JsonNewtonsoftAdapter|17|17|34|91|50%|2|10|20%|
 |Audit.Core.JsonNewtonsoftAdapter<T>|17|17|34|91|50%|2|10|20%|
 |Audit.JsonNewtonsoftAdapter.AuditContractResolver|57|1|58|102|98.2%|44|46|95.6%|
-|**Audit.NET.log4net**|**40**|**23**|**63**|**210**|**63.4%**|**9**|**18**|**50%**|
-|Audit.Core.Log4netConfiguratorExtensions|9|2|11|39|81.8%|0|0||
+|**Audit.NET.log4net**|**39**|**15**|**54**|**195**|**72.2%**|**11**|**18**|**61.1%**|
+|Audit.Core.Log4netConfiguratorExtensions|2|2|4|32|50%|0|0||
 |Audit.log4net.Configuration.Log4netConfigurator|6|6|12|47|50%|0|0||
-|Audit.log4net.Providers.Log4netDataProvider|25|15|40|124|62.5%|9|18|50%|
-|**Audit.NET.NLog**|**40**|**23**|**63**|**209**|**63.4%**|**11**|**20**|**55%**|
-|Audit.Core.NLogConfiguratorExtensions|9|2|11|37|81.8%|0|0||
+|Audit.log4net.Providers.Log4netDataProvider|31|7|38|116|81.5%|11|18|61.1%|
+|**Audit.NET.NLog**|**39**|**15**|**54**|**193**|**72.2%**|**11**|**18**|**61.1%**|
+|Audit.Core.NLogConfiguratorExtensions|2|2|4|30|50%|0|0||
 |Audit.NLog.Configuration.NLogConfigurator|6|6|12|47|50%|0|0||
-|Audit.NLog.Providers.NLogDataProvider|25|15|40|125|62.5%|11|20|55%|
+|Audit.NLog.Providers.NLogDataProvider|31|7|38|116|81.5%|11|18|61.1%|
 |**Audit.NET.Polly**|**63**|**24**|**87**|**317**|**72.4%**|**4**|**6**|**66.6%**|
 |Audit.Core.PollyConfiguratorExtensions|2|0|2|19|100%|0|0||
 |Audit.Polly.Configuration.PollyProviderConfigurator|5|0|5|19|100%|0|0||
@@ -216,18 +217,18 @@
 |Audit.Polly.HedgingActionGeneratorArgumentsExtensions|7|10|17|65|41.1%|1|2|50%|
 |Audit.Polly.Providers.PollyDataProvider|30|12|42|120|71.4%|2|2|100%|
 |Audit.Polly.ResilienceContextExtensions|1|0|1|16|100%|0|0||
-|**Audit.NET.Serilog**|**37**|**30**|**67**|**238**|**55.2%**|**8**|**20**|**40%**|
-|Audit.Core.SerilogConfiguratorExtensions|9|2|11|43|81.8%|0|0||
+|**Audit.NET.Serilog**|**36**|**20**|**56**|**223**|**64.2%**|**8**|**18**|**44.4%**|
+|Audit.Core.SerilogConfiguratorExtensions|2|2|4|37|50%|0|0||
 |Audit.Serilog.Configuration.SerilogConfigurator|6|6|12|53|50%|0|0||
-|Audit.Serilog.Providers.SerilogDataProvider|22|22|44|142|50%|8|20|40%|
-|**Audit.NET.SqlServer**|**292**|**83**|**375**|**957**|**77.8%**|**164**|**196**|**83.6%**|
+|Audit.Serilog.Providers.SerilogDataProvider|28|12|40|133|70%|8|18|44.4%|
+|**Audit.NET.SqlServer**|**304**|**64**|**368**|**921**|**82.6%**|**132**|**154**|**85.7%**|
 |Audit.Core.SqlServerConfiguratorExtensions|14|0|14|34|100%|0|0||
 |Audit.SqlServer.AuditContext|10|0|10|34|100%|2|2|100%|
-|Audit.SqlServer.Configuration.SqlServerProviderConfigurator|23|13|36|117|63.8%|6|6|100%|
+|Audit.SqlServer.Configuration.SqlServerProviderConfigurator|29|10|39|115|74.3%|0|0||
 |Audit.SqlServer.CustomColumn|12|2|14|32|85.7%|0|0||
 |Audit.SqlServer.DynamicIdModel|1|0|1|34|100%|0|0||
-|Audit.SqlServer.Providers.SqlDataProvider|116|34|150|353|77.3%|78|94|82.9%|
-|Audit.SqlServer.Providers.SqlDataProvider<T>|116|34|150|353|77.3%|78|94|82.9%|
+|Audit.SqlServer.Providers.SqlDataProvider|119|26|145|336|82%|65|76|85.5%|
+|Audit.SqlServer.Providers.SqlDataProvider<T>|119|26|145|336|82%|65|76|85.5%|
 |**Audit.NET.Udp**|**81**|**10**|**91**|**308**|**89%**|**18**|**20**|**90%**|
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|4|4|100%|
