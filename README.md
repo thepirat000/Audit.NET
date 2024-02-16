@@ -239,27 +239,6 @@ public class SomethingThatStartsAndEnds
 
 For more information about the `EventCreationPolicy` please see [Event Creation Policy](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-creation-policy) section.
 
-## Asynchronous operations
-
-Asynchronous versions of the operations that save audit logs are also provided. For example:
-
-```c#
-public async Task SaveOrderAsync(Order order)
-{
-    AuditScope auditScope = null;
-    try
-    {
-        // async scope creation
-        auditScope = await AuditScope.CreateAsync("order", () => order);
-    }
-    finally
-    {
-        // async disposal
-        await auditScope.DisposeAsync();
-    }
-}
-```
-
 ## Output
 
 The library will generate an output (`AuditEvent`) for each operation, including:
