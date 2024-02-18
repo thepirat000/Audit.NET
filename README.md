@@ -518,7 +518,7 @@ Or using the fluent API `Use()` method:
 
 ```c#
 Audit.Core.Configuration.Setup()
-	.Use(new MyCustomDataProvider());
+  .Use(new MyCustomDataProvider());
 ```
 
 To set the data provider per-scope, use the `AuditScopeOptions` when creating an `AuditScope`. For example:
@@ -543,11 +543,11 @@ var sqlDataProvider = new SqlDataProvider(_ => _
 
 ```c#
 Audit.Core.Configuration.Setup()
-    .UseSqlServer(_ => _
-        .ConnectionString("your connection string")
-        .TableName("your table name")
-        .IdColumnName("your id column name")
-        .JsonColumnName("your json column name"));
+  .UseSqlServer(_ => _
+    .ConnectionString("your connection string")
+    .TableName("your table name")
+    .IdColumnName("your id column name")
+    .JsonColumnName("your json column name"));
 ```
 
 ### Data provider wrappers
@@ -560,16 +560,16 @@ As an alternative to creating a data provider class, you can define the mechanis
 
 ```c#
 Audit.Core.Configuration.Setup()
-	.UseDynamicProvider(config => config
-		.OnInsert(ev => Console.Write(ev.ToJson())));
+  .UseDynamicProvider(config => config
+    .OnInsert(ev => Console.Write(ev.ToJson())));
 ```
 
 For async operations, you should use the `DynamicAsyncDataProvider`, for example:
 
 ```c#
 Audit.Core.Configuration.Setup()
-    .UseDynamicAsyncProvider(config => config
-        .OnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson())));
+  .UseDynamicAsyncProvider(config => config
+    .OnInsert(async ev => await File.WriteAllTextAsync(filePath, ev.ToJson())));
 ```
 
 #### Lazy Factory data provider
@@ -624,14 +624,14 @@ For example:
 
 ```c#
 Audit.Core.Configuration.Setup()
-    .UsePolly(p => p
-        .DataProvider(new SqlDataProvider(...))
-        .WithResilience(resilience => resilience
-            .AddRetry(new()
-            {
-                ShouldHandle = new PredicateBuilder().Handle<SqlException>(),
-                MaxRetryAttempts = 2
-            })));
+  .UsePolly(p => p
+    .DataProvider(new SqlDataProvider(...))
+    .WithResilience(resilience => resilience
+      .AddRetry(new()
+      {
+        ShouldHandle = new PredicateBuilder().Handle<SqlException>(),
+        MaxRetryAttempts = 2
+      })));
 ```       
 
 For more information, please refer to the [Audit.NET.Polly documentation](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Polly/README.md).
