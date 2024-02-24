@@ -39,8 +39,8 @@ and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.
 - [**Output wrappers**](#data-provider-wrappers) are included 
 to facilitate the encapsulation of other Data Providers for diverse purposes, like resilience or lazy instantiation, such as
 [Polly](#polly-data-provider), 
-[Lazy](#lazy-data-provider),
-[Deferred](#deferred-data-provider) and
+[Lazy](#lazy-factory-data-provider),
+[Deferred](#deferred-factory-data-provider) and
 [Conditional](#conditional-data-provider).
 
 
