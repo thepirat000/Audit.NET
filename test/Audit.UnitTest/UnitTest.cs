@@ -12,6 +12,8 @@ using System.Reflection;
 using Configuration = Audit.Core.Configuration;
 using InMemoryDataProvider = Audit.Core.Providers.InMemoryDataProvider;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Channels;
 using Audit.Core.Providers;
 
 namespace Audit.UnitTest
@@ -31,7 +33,10 @@ namespace Audit.UnitTest
         {
             Configuration.IncludeTypeNamespaces = true;
             Configuration.IncludeStackTrace = true;
+#if NET6_0_OR_GREATER
             Configuration.IncludeActivityTrace = true;
+            Configuration.StartActivityTrace = true;
+#endif
             Configuration.DataProvider = new InMemoryDataProvider();
             Configuration.AuditDisabled = true;
             Configuration.AddOnCreatedAction(s => { });
@@ -41,7 +46,10 @@ namespace Audit.UnitTest
 
             Assert.That(Configuration.IncludeTypeNamespaces, Is.EqualTo(false));
             Assert.That(Configuration.IncludeStackTrace, Is.EqualTo(false));
+#if NET6_0_OR_GREATER
             Assert.That(Configuration.IncludeActivityTrace, Is.EqualTo(false));
+            Assert.That(Configuration.StartActivityTrace, Is.EqualTo(false));
+#endif
             Assert.IsInstanceOf<FileDataProvider>(Configuration.DataProvider);
             Assert.That(Configuration.AuditDisabled, Is.EqualTo(false));
             Assert.That(Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count, Is.EqualTo(0));
@@ -1117,6 +1125,51 @@ namespace Audit.UnitTest
             Assert.That(envRead.MachineName, Is.EqualTo(env.MachineName).And.EqualTo("machine"));
         }
 
+        [Test]
+        public void Test_ScopeDisposed_Action()
+        {
+            var disposed = 0;
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider()
+                .WithInsertOnEndCreationPolicy()
+                .WithAction(actions => actions
+                    .OnScopeDisposed(scope =>
+                    {
+                        disposed++;
+                    }));
+
+            AuditScope.Log("Test1", null);
+            AuditScope.Log("Test2", null);
+
+            using (var scope = AuditScope.Create("Test", null))
+            {
+                Assert.That(disposed, Is.EqualTo(2));
+            }
+
+            Assert.That(disposed, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Test_ScopeDisposed_Order()
+        {
+            var actions = new List<string>();
+
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider()
+                .WithInsertOnEndCreationPolicy()
+                .WithAction(a => a.OnScopeCreated(scope => actions.Add("Created")))
+                .WithAction(a => a.OnScopeDisposed(scope => actions.Add("Disposed")))
+                .WithAction(a => a.OnEventSaved(scope => actions.Add("Saved")))
+                .WithAction(a => a.OnEventSaving(scope => actions.Add("Saving")));
+
+            AuditScope.Log("Test1", null);
+
+            Assert.That(actions.Count, Is.EqualTo(4));
+            Assert.That(actions[0], Is.EqualTo("Created"));
+            Assert.That(actions[1], Is.EqualTo("Saving"));
+            Assert.That(actions[2], Is.EqualTo("Saved"));
+            Assert.That(actions[3], Is.EqualTo("Disposed"));
+        }
 
         public class SomeClass
         {

@@ -34,5 +34,15 @@ namespace Audit.Core.ConfigurationApi
         {
             Configuration.AddCustomAction(ActionType.OnScopeCreated, action);
         }
+
+        public void OnScopeDisposed(Func<AuditScope, Task> action)
+        {
+            Configuration.AddCustomAction(ActionType.OnScopeDisposed, action);
+        }
+
+        public void OnScopeDisposed(Action<AuditScope> action)
+        {
+            Configuration.AddCustomAction(ActionType.OnScopeDisposed, action);
+        }
     }
 }

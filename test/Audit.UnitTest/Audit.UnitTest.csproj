@@ -20,6 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\Audit.NET.Channels\Audit.NET.Channels.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET.log4net\Audit.NET.log4net.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET.NLog\Audit.NET.NLog.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />

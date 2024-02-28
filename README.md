@@ -34,7 +34,7 @@ and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.
 [Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md), 
 [Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md), 
 [DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), 
-[UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md) and more. 
+[UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md), [Channels](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Channels/README.md) and more. 
 
 - [**Output wrappers**](#data-provider-wrappers) are included 
 to facilitate the encapsulation of other Data Providers for diverse purposes, like resilience or lazy instantiation, such as
@@ -658,7 +658,9 @@ The Data Providers included are summarized in the following table:
 | NoSQL    | Redis             | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) / [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs)                                                                                      | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes, Streams or publish to a PubSub channel.                     | `.UseRedis()`                                          |
 | Local    | Windows Event Log | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [Audit.NET.EventLog.Core](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.EventLog.Core) 7 [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs)                        | Write the audit logs to the Windows EventLog.                                                                                | `.UseEventLogProvider()`                               |
 | Local    | File System       | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs)                                                                                                                                              | Store the audit logs as files. Dynamically configure the directory and path.                                                 | `.UseFileLogProvider()`                                |
-| Local    | In-Memory         | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [InMemoryDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/InMemoryDataProvider.cs)                                                                                                                                      | Store the audit logs in memory in a thread-safe list. Useful for testing purposes.                                           | `.UseInMemoryProvider()`                               |
+| InMemory | In-Memory List    | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [InMemoryDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/InMemoryDataProvider.cs)                                                                                                                                      | Store the audit logs in memory in a thread-safe list. Useful for testing purposes.                                           | `.UseInMemoryProvider()`                               |
+| InMemory | In-Memory Blocking Collection | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [BlockingCollectionDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/BlockingCollectionDataProvider.cs)                                                                                                      | Store the audit events in a BlockingCollection that can be accessed by different threads to consume the events               | `.UseInMemoryBlockingCollectionProvider()`             |
+| InMemory | In-Memory Channel | [Audit.NET.Channels](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Channels/README.md) / [ChannelDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Channels/Providers/ChannelDataProvider.cs)                                                                                                                                      | Store the audit events in a Channel (from System.Threading.Channels) that can be accessed to consume the events      | `.UseInMemoryChannelProvider()`                        |
 | Logging  | Log4net           | [Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md) / [Log4netDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/Providers/Log4netDataProvider.cs)                                                                            | Store the audit events using [Apache log4net™](https://logging.apache.org/log4net/).                                         | `.UseLog4net()`                                        |
 | Logging  | NLog              | [Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md) / [NLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/Providers/NLogDataProvider.cs)                                                                                           | Store the audit events using [NLog](https://nlog-project.org/).                                                              | `.UseNLog()`                                           |
 | Logging  | Serilog           | [Audit.NET.Serilog](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Serilog/README.md) / [SerilogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Serilog/Providers/SerilogDataProvider.cs)                                                                            | Store the audit events using [Serilog™](https://serilog.net/)                                                                | `.UseSerilog()`                                        |
@@ -770,6 +772,7 @@ The `ActionType` indicates when to perform the action. The allowed values are:
 - `OnScopeCreated`: When the Audit Scope is being created, before any saving. This is executed once per Audit Scope.
 - `OnEventSaving`: When an Audit Scope's Event is about to be saved. 
 - `OnEventSaved`: After an Audit Scope's Event is saved. 
+- `OnScopeDisposed`: When an Audit Scope is disposed.
 
 ### Stack Trace
 
@@ -788,7 +791,7 @@ Audit.Core.Configuration.Setup()
 
 ### Activity Trace
 
-To include the activity trace details from [System.Diagnostics.Activity](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activity?view=net-8.0) 
+To include the current activity trace details from [System.Diagnostics.Activity](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activity?view=net-8.0) 
 API into the event, ensure that the `IncludeActivityTrace` configuration is set to `true`. The default is `false`.
 
 It will include the current `Activity` operation name, ID, and StartTime, along with associated Tags and Events.
@@ -802,6 +805,13 @@ or
 ```c#
 Audit.Core.Configuration.Setup()
     .IncludeActivityTrace();
+```
+
+To create and start a new distributed activity trace, you can use the `StartActivityTrace` configuration:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .StartActivityTrace();
 ```
 
 ### Global switch off
@@ -975,6 +985,7 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/microsoftazure.svg" /> | **[Audit.NET.AzureStorage](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorage/README.md)** | Store the events in an **Azure Blob Storage** container or an **Azure Table** using the legacy client [WindowsAzure.Storage](https://www.nuget.org/packages/WindowsAzure.Storage/).
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/microsoftazure.svg" /> | **[Audit.NET.AzureStorageBlobs](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageBlobs/README.md)** | Store the events in an **Azure Blob Storage** container using the latest client [Azure.Storage.Blobs](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.blobs-readme).
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/microsoftazure.svg" /> | **[Audit.NET.AzureStorageTables](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageTables/README.md)** | Store the events in an **Azure Table Storage** using the latest client [Azure.Data.Tables](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/data.tables-readme).
+<img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.Channels](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Channels/README.md)** | Store the audit events in a Channel (from System.Threading.Channels) that can be accessed to consume the events.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/amazondynamodb.svg" /> | **[Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md)** | Store the audit events in Amazon DynamoDB tables.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/elasticsearch.svg" /> | **[Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md)** | Store the audit events in Elasticsearch indices.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/apachekafka.svg" /> | **[Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md)** | Stream the audit events to an **Apache Kafka** server.
@@ -988,7 +999,7 @@ Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, ther
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/redis.svg" /> | **[Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md)** | Store Audit Logs in a **Redis** database as String, List, Hash, Sorted Set, Streams or publishing to a Redis PubSub channel.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/microsoftsqlserver.svg" /> | **[Audit.NET.SqlServer](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md)** | Store the events as rows in a **SQL** Table, in JSON format.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.Serilog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Serilog/README.md)** | Store the audit events using [Serilog™](https://serilog.net/)
-<img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)** | Send Audit Logs as **UDP datagrams** to a network.
+<img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.Udp](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Udp/README.md)** | Send audit events as **UDP datagrams** to a network.
 
 # Change Log
 

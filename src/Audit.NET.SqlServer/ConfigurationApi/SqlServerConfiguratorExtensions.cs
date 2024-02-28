@@ -15,19 +15,8 @@ namespace Audit.Core
         [CLSCompliant(false)]
         public static ICreationPolicyConfigurator UseSqlServer(this IConfigurator configurator, Action<ISqlServerProviderConfigurator> config)
         {
-            var sqlDbConfig = new SqlServerProviderConfigurator();
-            config.Invoke(sqlDbConfig);
-            Configuration.DataProvider = new SqlDataProvider()
-            {
-                ConnectionString = sqlDbConfig._connectionString,
-                TableName = sqlDbConfig._tableName,
-                IdColumnName = sqlDbConfig._idColumnName,
-                JsonColumnName = sqlDbConfig._jsonColumnName,
-                LastUpdatedDateColumnName = sqlDbConfig._lastUpdatedColumnName,
-                Schema = sqlDbConfig._schema,
-                CustomColumns = sqlDbConfig._customColumns,
-                DbContextOptions = sqlDbConfig._dbContextOptions
-            };
+            Configuration.DataProvider = new SqlDataProvider(config);
+
             return new CreationPolicyConfigurator();
         }
     }

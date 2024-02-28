@@ -6,8 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Threading;
 using System.Linq;
+using System.Threading;
 
 namespace Audit.Core
 {
@@ -35,6 +35,11 @@ namespace Audit.Core
             _event.Environment = GetEnvironmentInfo(options);
             
 #if NET6_0_OR_GREATER
+            if (options.StartActivityTrace)
+            {
+                var activitySource = new ActivitySource(nameof(AuditScope), typeof(AuditScope).Assembly.GetName().Version!.ToString());
+                _activity = activitySource.StartActivity(_event.GetType().Name);
+            }
             if (options.IncludeActivityTrace)
             {
                 _event.Activity = GetActivityTrace();
@@ -68,57 +73,37 @@ namespace Audit.Core
         /// <summary>
         /// The current save mode. Useful on custom actions to determine the saving trigger.
         /// </summary>
-        public SaveMode SaveMode
-        {
-            get { return _saveMode; }
-        }
+        public SaveMode SaveMode => _saveMode;
 
         /// <summary>
         /// Indicates the change type
         /// </summary>
         public string EventType
         {
-            get { return _event.EventType; }
-            set { _event.EventType = value; }
+            get => _event.EventType;
+            set => _event.EventType = value;
         }
 
         /// <summary>
         /// Gets the event related to this scope.
         /// </summary>
-        public AuditEvent Event
-        {
-            get { return _event; }
-        }
+        public AuditEvent Event => _event;
 
         /// <summary>
         /// Gets the data provider for this AuditScope instance.
         /// </summary>
-        public AuditDataProvider DataProvider
-        {
-            get { return _dataProvider; }
-        }
+        public AuditDataProvider DataProvider => _dataProvider;
 
         /// <summary>
         /// Gets the current event ID, or NULL if not yet created.
         /// </summary>
-        public object EventId
-        {
-            get
-            {
-                return _eventId;
-            }
-        }
+        public object EventId => _eventId;
 
         /// <summary>
         /// Gets the creation policy for this scope.
         /// </summary>
-        public EventCreationPolicy EventCreationPolicy
-        {
-            get
-            {
-                return _creationPolicy;
-            }
-        }
+        public EventCreationPolicy EventCreationPolicy => _creationPolicy;
+
         #endregion
 
         #region Private fields
@@ -131,7 +116,10 @@ namespace Audit.Core
         private bool _ended;
         private readonly AuditDataProvider _dataProvider;
         private Func<object> _targetGetter;
-        #endregion
+#if NET6_0_OR_GREATER
+        private readonly Activity _activity;
+#endif
+#endregion
 
         #region Public Methods
         /// <summary>
@@ -160,7 +148,7 @@ namespace Audit.Core
         /// </summary>
         public void Comment(string text)
         {
-            Comment(text, new object[0]);
+            Comment(text, Array.Empty<object>());
         }
 
         /// <summary>
@@ -198,6 +186,11 @@ namespace Audit.Core
             }
             _disposed = true;
             End();
+#if NET6_0_OR_GREATER
+            _activity?.Dispose();
+            _activity?.Source?.Dispose();
+#endif
+            Configuration.InvokeScopeCustomActions(ActionType.OnScopeDisposed, this);
         }
 
         /// <summary>
@@ -212,6 +205,11 @@ namespace Audit.Core
             }
             _disposed = true;
             await EndAsync();
+#if NET6_0_OR_GREATER
+            _activity?.Dispose();
+            _activity?.Source?.Dispose();
+#endif
+            await Configuration.InvokeScopeCustomActionsAsync(ActionType.OnScopeDisposed, this, CancellationToken.None);
         }
 
         /// <summary>
@@ -339,7 +337,6 @@ namespace Audit.Core
                 ActivityIdFormat.W3C => activity.ParentSpanId.ToHexString(),
                 _ => null
             };
-
             
             var result = new AuditActivityTrace()
             {

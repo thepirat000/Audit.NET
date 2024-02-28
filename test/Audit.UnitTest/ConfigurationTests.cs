@@ -161,6 +161,7 @@ namespace Audit.UnitTest
         [TestCase(ActionType.OnScopeCreated)]
         [TestCase(ActionType.OnEventSaving)]
         [TestCase(ActionType.OnEventSaved)]
+        [TestCase(ActionType.OnScopeDisposed)]
         public void TestConfiguration_ResetCustomActionsByType(ActionType type)
         {
             // Arrange
@@ -169,15 +170,45 @@ namespace Audit.UnitTest
             Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, _ => { });
             Core.Configuration.AddCustomAction(ActionType.OnEventSaving, _ => { });
             Core.Configuration.AddCustomAction(ActionType.OnEventSaved, _ => { });
+            Core.Configuration.AddCustomAction(ActionType.OnScopeDisposed, _ => { });
 
             // Act
             Core.Configuration.ResetCustomActions(type);
 
             // Assert
-            Assert.That(Core.Configuration.AuditScopeActions.Count, Is.EqualTo(3));
+            Assert.That(Core.Configuration.AuditScopeActions.Count, Is.EqualTo(4));
             Assert.That(Core.Configuration.AuditScopeActions[type].Count, Is.Zero);
         }
 
+        [Test]
+        public void TestConfiguration_AddOnDisposedAction()
+        {
+            int onDisposed = 0;
+            Core.Configuration.AddOnDisposedAction(s =>
+            {
+                onDisposed++; 
 
+            });
+            Core.Configuration.AddOnDisposedAction(async s =>
+            {
+                await Task.Yield(); 
+                onDisposed++;
+            });
+            Core.Configuration.AddOnDisposedAction(async (s, ct) =>
+            {
+                await Task.Yield();
+                onDisposed++;
+            });
+            Core.Configuration.AddOnDisposedAction(async s =>
+            {
+                await Task.Yield();
+                onDisposed++;
+            });
+
+            var scope = AuditScope.Create(new AuditScopeOptions() { DataProvider = new NullDataProvider() });
+            scope.Dispose();
+            
+            Assert.That(onDisposed, Is.EqualTo(4));
+        }
     }
 }

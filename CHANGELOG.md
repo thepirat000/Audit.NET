@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [25.0.1] - 2024-02-28:
+- Audit.NET: Adding-new OnScopeDisposed action type for custom actions.
+- Audit.NET: New StartActivityTrace optional configuration to indicates whether each audit scope should create and start a new Distributed Tracing Activity.
+- Audit.NET: New BlockingCollectionDataProvider to store the audit events in a BlockingCollection that can be accessed to consume the events. (#651)
+- Audit.NET.Channels: New ChannelDataProvider to store the audit events in a System.Threading.Channels.Channel that can be accessed to consume the events. (#651)
+
 ## [25.0.0] - 2024-02-16:
 - Audit.NET: Adding a Weak Reference to the AuditScope in the AuditEvent class, to allow accessing the current AuditScope from the AuditEvent.
 - Audit.NET: Introducing a new struct `Audit.Core.Setting<T>` to standarize Data Provider settings, allowing the value to be set directly or as a function of the `AuditEvent`.

@@ -16,6 +16,10 @@
         /// <summary>
         /// After the Audit Event on the Scope is saved (inserted or replaced).
         /// </summary>
-        OnEventSaved = 2
+        OnEventSaved = 2,
+        /// <summary>
+        /// When the Audit Scope is disposed.
+        /// </summary>
+        OnScopeDisposed = 3
     }
 }

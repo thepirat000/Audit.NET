@@ -54,12 +54,19 @@ namespace Audit.Core
         /// Gets or Sets the value used to indicate whether the audit event's environment should include the full stack trace
         /// </summary>
         public static bool IncludeStackTrace { get; set; }
-
+        
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Gets or Sets the value used to indicate whether the audit event should include the activity trace
         /// </summary>
         public static bool IncludeActivityTrace { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether each audit scope should create and start a new Distributed Tracing Activity.
+        /// </summary>
+        public static bool StartActivityTrace { get; set; }
+#endif
+        
         /// <summary>
         /// Gets or Sets the Default audit scope factory.
         /// </summary>
@@ -114,7 +121,10 @@ namespace Audit.Core
             _auditScopeFactory = new AuditScopeFactory();
             IncludeTypeNamespaces = false;
             IncludeStackTrace = false;
+#if NET6_0_OR_GREATER
             IncludeActivityTrace = false;
+            StartActivityTrace = false;
+#endif
             ResetCustomActions();
         }
 
@@ -269,6 +279,53 @@ namespace Audit.Core
         }
 
         /// <summary>
+        /// Attaches a global action to be performed on the audit scope right after it is disposed.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        public static void AddOnDisposedAction(Action<AuditScope> action)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnScopeDisposed].Add((scope, ct) =>
+                {
+                    action.Invoke(scope);
+                    return Task.CompletedTask;
+
+                });
+            }
+        }
+
+        /// <summary>
+        /// Attaches a global action to be performed on the audit scope right after it is disposed.
+        /// </summary>
+        /// <param name="asyncAction">The asynchronous action to perform.</param>
+        public static void AddOnDisposedAction(Func<AuditScope, Task> asyncAction)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnScopeDisposed].Add(async (scope, _) =>
+                {
+                    await asyncAction.Invoke(scope);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Attaches a global action to be performed on the audit scope right after it is disposed.
+        /// </summary>
+        /// <param name="asyncAction">The asynchronous action to perform.</param>
+        public static void AddOnDisposedAction(Func<AuditScope, CancellationToken, Task> asyncAction)
+        {
+            lock (Locker)
+            {
+                AuditScopeActions[ActionType.OnScopeDisposed].Add(async (scope, ct) =>
+                {
+                    await asyncAction.Invoke(scope, ct);
+                });
+            }
+        }
+        
+        /// <summary>
         /// Resets the audit scope handlers. Removes all the attached actions for the Audit Scopes.
         /// </summary>
         public static void ResetCustomActions()
@@ -279,7 +336,8 @@ namespace Audit.Core
                 {
                     {ActionType.OnScopeCreated, new List<Func<AuditScope, CancellationToken,Task>>()},
                     {ActionType.OnEventSaving, new List<Func<AuditScope, CancellationToken,Task>>()},
-                    {ActionType.OnEventSaved, new List<Func<AuditScope, CancellationToken,Task>>()}
+                    {ActionType.OnEventSaved, new List<Func<AuditScope, CancellationToken,Task>>()},
+                    {ActionType.OnScopeDisposed, new List<Func<AuditScope, CancellationToken,Task>>()}
                 };
             }
         }

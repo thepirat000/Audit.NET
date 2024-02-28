@@ -1,49 +1,46 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>An extensible framework to audit executing operations in .NET and .NET Core.</Description>
-		<LangVersion>10</LangVersion>
-		<Copyright>Copyright 2016</Copyright>
-		<AssemblyTitle>Audit.NET</AssemblyTitle>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<LangVersion>9</LangVersion>
+		<Description></Description>
+		<Copyright>Copyright 2024</Copyright>
+		<AssemblyTitle>Audit.Channels</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
 		<TargetFrameworks>net462;net472;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<AssemblyName>Audit.NET</AssemblyName>
+		<AssemblyName>Audit.NET.Channels</AssemblyName>
 		<AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
 		<SignAssembly>true</SignAssembly>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-		<PackageId>Audit.NET</PackageId>
-		<PackageTags>Audit;Trail;Log</PackageTags>
+		<PackageId>Audit.NET.Channels</PackageId>
+		<PackageTags>Audit;Trail;Log;Channels</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/thepirat000/Audit.NET</PackageProjectUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<RootNamespace>Audit.Core</RootNamespace>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Audit.Channels</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
-		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="tools\Install.ps1">
-			<Pack>true</Pack>
-		</None>
+		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
-		<PackageReference Include="System.Text.Json" Version="6.0.9" />
+	<ItemGroup>
+		<PackageReference Include="System.Threading.Channels" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

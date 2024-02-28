@@ -163,6 +163,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Polly", "src\Audi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Polly.UnitTest", "test\Audit.Polly.UnitTest\Audit.Polly.UnitTest.csproj", "{E3097E23-9191-4028-83F2-D231590563FD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.Channels", "src\Audit.NET.Channels\Audit.NET.Channels.csproj", "{5574EA92-47A5-4483-BF7E-89231D38D318}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -707,6 +709,14 @@ Global
 		{E3097E23-9191-4028-83F2-D231590563FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E3097E23-9191-4028-83F2-D231590563FD}.Release|x64.ActiveCfg = Release|Any CPU
 		{E3097E23-9191-4028-83F2-D231590563FD}.Release|x64.Build.0 = Release|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Debug|x64.Build.0 = Debug|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Release|x64.ActiveCfg = Release|Any CPU
+		{5574EA92-47A5-4483-BF7E-89231D38D318}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -781,6 +791,7 @@ Global
 		{0DA81364-E5E3-40BD-A0EA-65A8A0C1BC09} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 		{CA13DD91-30D5-45E8-AD0E-4F9049E7DC78} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{E3097E23-9191-4028-83F2-D231590563FD} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
+		{5574EA92-47A5-4483-BF7E-89231D38D318} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}

@@ -29,13 +29,19 @@ namespace Audit.Core.ConfigurationApi
             Configuration.IncludeStackTrace = includeStackTrace;
             return this;
         }
-
+#if NET6_0_OR_GREATER
         public IConfigurator IncludeActivityTrace(bool includeActivityTrace = true)
         {
             Configuration.IncludeActivityTrace = includeActivityTrace;
             return this;
         }
 
+        public IConfigurator StartActivityTrace(bool startActivityTrace = true)
+        {
+            Configuration.StartActivityTrace = startActivityTrace;
+            return this;
+        }
+#endif
         public ICreationPolicyConfigurator UseNullProvider()
         {
             var dataProvider = new NullDataProvider();
@@ -94,7 +100,7 @@ namespace Audit.Core.ConfigurationApi
             return new CreationPolicyConfigurator();
         }
 
-#if NET462 || NET472 
+#if NET462 || NET472
         public ICreationPolicyConfigurator UseEventLogProvider(string logName = "Application", string sourcePath = "Application", string machineName = ".", Func<AuditEvent, string> messageBuilder = null)
         {
             Configuration.DataProvider = new EventLogDataProvider()
@@ -117,6 +123,20 @@ namespace Audit.Core.ConfigurationApi
         public ICreationPolicyConfigurator UseInMemoryProvider()
         {
             Configuration.DataProvider = new InMemoryDataProvider();
+
+            return new CreationPolicyConfigurator();
+        }
+
+        public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider(Action<IBlockingCollectionProviderConfigurator> config)
+        {
+            Configuration.DataProvider = new BlockingCollectionDataProvider(config);
+
+            return new CreationPolicyConfigurator();
+        }
+
+        public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider()
+        {
+            Configuration.DataProvider = new BlockingCollectionDataProvider();
 
             return new CreationPolicyConfigurator();
         }

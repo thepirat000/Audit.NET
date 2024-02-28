@@ -11,5 +11,7 @@ namespace Audit.Core.ConfigurationApi
         void OnScopeCreated(Func<AuditScope, Task> action);
         void OnEventSaving(Func<AuditScope, Task> action);
         void OnEventSaved(Func<AuditScope, Task> action);
+        void OnScopeDisposed(Func<AuditScope, Task> action);
+        void OnScopeDisposed(Action<AuditScope> action);
     }
 }

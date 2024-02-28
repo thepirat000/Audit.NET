@@ -37,28 +37,6 @@ namespace Audit.Core
         public abstract object InsertEvent(AuditEvent auditEvent);
 
         /// <summary>
-        /// Saves the specified audit event.
-        /// Triggered when the scope is saved.
-        /// Override this method to replace the specified audit event on the data source.
-        /// </summary>
-        /// <param name="auditEvent">The audit event.</param>
-        /// <param name="eventId">The event id being replaced.</param>
-        public virtual void ReplaceEvent(object eventId, AuditEvent auditEvent)
-        {
-            throw new NotImplementedException($"ReplaceEvent is not implemented on {GetType().Name}");
-        }
-
-        /// <summary>
-        /// Retrieves a saved audit event from its id.
-        /// Override this method to provide a way to access the audit events by id.
-        /// </summary>
-        /// <param name="eventId">The event id being retrieved.</param>
-        public virtual T GetEvent<T>(object eventId) where T : AuditEvent
-        {
-            throw new NotImplementedException($"GetEvent is not implemented on {GetType().Name}");
-        }
-
-        /// <summary>
         /// Insert an event to the data source returning the event id generated
         /// </summary>
         /// <param name="auditEvent">The audit event being inserted.</param>
@@ -68,17 +46,17 @@ namespace Audit.Core
             // Default implementation calls the sync operation
             return await Task.Factory.StartNew(() => InsertEvent(auditEvent), cancellationToken);
         }
-
+        
         /// <summary>
-        /// Asychronously retrieves a saved audit event from its id.
-        /// Override this method to provide a way to access the audit events by id.
+        /// Saves the specified audit event.
+        /// Triggered when the scope is saved.
+        /// Override this method to replace the specified audit event on the data source.
         /// </summary>
-        /// <param name="eventId">The event id being retrieved.</param>
-        /// <param name="cancellationToken">The Cancellation Token.</param>
-        public virtual async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default) where T : AuditEvent
+        /// <param name="auditEvent">The audit event.</param>
+        /// <param name="eventId">The event id being replaced.</param>
+        public virtual void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            // Default implementation calls the sync operation
-            return await Task.Factory.StartNew(() => GetEvent<T>(eventId), cancellationToken);
+            throw new NotImplementedException($"ReplaceEvent is not implemented on {GetType().Name}");
         }
 
         /// <summary>
@@ -103,6 +81,16 @@ namespace Audit.Core
         {
             return GetEvent<AuditEvent>(eventId);
         }
+        
+        /// <summary>
+        /// Retrieves a saved audit event from its id.
+        /// Override this method to provide a way to access the audit events by id.
+        /// </summary>
+        /// <param name="eventId">The event id being retrieved.</param>
+        public virtual T GetEvent<T>(object eventId) where T : AuditEvent
+        {
+            throw new NotImplementedException($"GetEvent is not implemented on {GetType().Name}");
+        }
 
         /// <summary>
         /// Asynchronously retrieves a saved audit event from its id.
@@ -112,6 +100,18 @@ namespace Audit.Core
         public async Task<AuditEvent> GetEventAsync(object eventId, CancellationToken cancellationToken = default)
         {
             return await GetEventAsync<AuditEvent>(eventId, cancellationToken);
+        }
+
+        /// <summary>
+        /// Asynchronously retrieves a saved audit event from its id.
+        /// Override this method to provide a way to access the audit events by id.
+        /// </summary>
+        /// <param name="eventId">The event id being retrieved.</param>
+        /// <param name="cancellationToken">The Cancellation Token.</param>
+        public virtual async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default) where T : AuditEvent
+        {
+            // Default implementation calls the sync operation
+            return await Task.Factory.StartNew(() => GetEvent<T>(eventId), cancellationToken);
         }
     }
 }

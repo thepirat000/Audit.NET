@@ -66,12 +66,17 @@ namespace Audit.Core
         /// Gets or sets a value indicating whether the audit event's environment should include the full stack trace.
         /// </summary>
         public bool IncludeStackTrace { get; set; }
-
+#if NET6_0_OR_GREATER
         /// <summary>
-        /// Gets or sets a value indicating whether the audit event should include the Distributed Tracing Activity data (ID, .
+        /// Gets or sets a value indicating whether the audit event should include the Distributed Tracing Activity data.
         /// </summary>
         public bool IncludeActivityTrace { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the audit scope should create and start a new Distributed Tracing Activity.
+        /// </summary>
+        public bool StartActivityTrace { get; set; }
+#endif
         /// <summary>
         /// Creates an instance of options for an audit scope creation.
         /// </summary>
@@ -85,6 +90,7 @@ namespace Audit.Core
         /// <param name="skipExtraFrames">Used to indicate how many frames in the stack should be skipped to determine the calling method.</param>
         /// <param name="includeStackTrace">Used to indicate whether the audit event's environment should include the full stack trace.</param>
         /// <param name="includeActivityTrace">Used to indicate whether the audit event should include the activity trace.</param>
+        /// <param name="startActivityTrace">Used to indicate whether the audit scope should create and start a new activity.</param>
         public AuditScopeOptions(
             string eventType = null,
             Func<object> targetGetter = null,
@@ -95,7 +101,8 @@ namespace Audit.Core
             AuditEvent auditEvent = null,
             int skipExtraFrames = 0,
             bool? includeStackTrace = null,
-            bool? includeActivityTrace = null)
+            bool? includeActivityTrace = null,
+            bool? startActivityTrace = null)
         {
             EventType = eventType;
             TargetGetter = targetGetter;
@@ -107,7 +114,10 @@ namespace Audit.Core
             SkipExtraFrames = skipExtraFrames;
             CallingMethod = null;
             IncludeStackTrace = includeStackTrace ?? Configuration.IncludeStackTrace;
+#if NET6_0_OR_GREATER
             IncludeActivityTrace = includeActivityTrace ?? Configuration.IncludeActivityTrace;
+            StartActivityTrace = startActivityTrace ?? Configuration.StartActivityTrace;
+#endif
         }
 
         /// <summary>
@@ -136,7 +146,10 @@ namespace Audit.Core
                 SkipExtraFrames = scopeConfig._options.SkipExtraFrames;
                 CallingMethod = scopeConfig._options.CallingMethod;
                 IncludeStackTrace = scopeConfig._options.IncludeStackTrace;
+#if NET6_0_OR_GREATER
                 IncludeActivityTrace = scopeConfig._options.IncludeActivityTrace;
+                StartActivityTrace = scopeConfig._options.StartActivityTrace;
+#endif
             }
 
         }

@@ -78,7 +78,7 @@ namespace Audit.Core
                 ExtraFields = extraFields,
                 IsCreateAndSave = true
             };
-            new AuditScope(options).Start();
+            new AuditScope(options).Start().Dispose();
         }
         /// <summary>
         /// Creates an audit scope with the given extra fields, and saves it right away
@@ -94,7 +94,7 @@ namespace Audit.Core
                 ExtraFields = extraFields,
                 IsCreateAndSave = true
             };
-            await new AuditScope(options).StartAsync(cancellationToken);
+            await (await new AuditScope(options).StartAsync(cancellationToken)).DisposeAsync();
         }
     }
 }
