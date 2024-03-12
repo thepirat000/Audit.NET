@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [25.0.2] - 2024-03-11:
+- Audit.NET.AzureStorageBlobs: Adding ability to configure Tags for the audit event BLOBs (#654)
+
 ## [25.0.1] - 2024-02-28:
 - Audit.NET: Adding-new OnScopeDisposed action type for custom actions.
 - Audit.NET: New StartActivityTrace optional configuration to indicates whether each audit scope should create and start a new Distributed Tracing Activity.

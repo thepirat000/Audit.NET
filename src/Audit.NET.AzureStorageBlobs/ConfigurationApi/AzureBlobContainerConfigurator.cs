@@ -13,6 +13,7 @@ namespace Audit.AzureStorageBlobs.ConfigurationApi
         internal BlobClientOptions _clientOptions;
         internal Setting<AccessTier?> _accessTier;
         internal Setting<IDictionary<string, string>> _metadata;
+        internal Setting<IDictionary<string, string>> _tags;
 
         public IAzureBlobContainerConfigurator BlobName(Func<AuditEvent, string> blobNameBuilder)
         {
@@ -53,6 +54,12 @@ namespace Audit.AzureStorageBlobs.ConfigurationApi
         public IAzureBlobContainerConfigurator Metadata(Func<AuditEvent, IDictionary<string, string>> metadataBuilder)
         {
             _metadata = metadataBuilder;
+            return this;
+        }
+
+        public IAzureBlobContainerConfigurator Tags(Func<AuditEvent, IDictionary<string, string>> tagsBuilder)
+        {
+            _tags = tagsBuilder;
             return this;
         }
     }

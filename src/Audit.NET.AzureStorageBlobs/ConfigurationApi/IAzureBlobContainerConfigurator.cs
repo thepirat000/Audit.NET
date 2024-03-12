@@ -36,5 +36,9 @@ namespace Audit.AzureStorageBlobs.ConfigurationApi
         /// Sets the metadata to associate to the given audit event blob (optional)
         /// </summary>
         IAzureBlobContainerConfigurator Metadata(Func<AuditEvent, IDictionary<string, string>> metadataBuilder);
+        /// <summary>
+        /// Sets the tags to associate to the given audit event blob (optional)
+        /// </summary>
+        IAzureBlobContainerConfigurator Tags(Func<AuditEvent, IDictionary<string, string>> tagsBuilder);
     }
 }

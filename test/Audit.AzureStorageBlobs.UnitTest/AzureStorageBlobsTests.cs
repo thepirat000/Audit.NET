@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.IntegrationTest;
@@ -9,11 +10,12 @@ using NUnit.Framework;
 
 namespace Audit.AzureStorageBlobs.UnitTest
 {
+    [TestFixture]
+    [Category("Integration")]
+    [Category("Azure")]
     public class AzureStorageBlobsTests
     {
         [Test]
-        [Category("Integration")]
-        [Category("Azure")]
         public void Test_AzureStorageBlobs_HappyPath()
         {
             var id = Guid.NewGuid().ToString();
@@ -46,8 +48,6 @@ namespace Audit.AzureStorageBlobs.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("Azure")]
         public async Task Test_AzureStorageBlobs_HappyPathAsync()
         {
             var id = Guid.NewGuid().ToString();
@@ -81,8 +81,6 @@ namespace Audit.AzureStorageBlobs.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("Azure")]
         public void Test_AzureStorageBlobs_ConnectionString()
         {
             var id = Guid.NewGuid().ToString();
@@ -116,6 +114,36 @@ namespace Audit.AzureStorageBlobs.UnitTest
         }
 
         [Test]
+        [Ignore("Ignored until https://github.com/Azure/Azurite/issues/1312 is implemented")]
+        public void Test_AzureStorageBlobs_Tags()
+        {
+            var id = Guid.NewGuid().ToString();
+            
+            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .AccessTier(AccessTier.Cool)
+                .BlobName(ev => ev.EventType + "_" + id + ".json")
+                .ContainerName(ev => containerName)
+                .Tags(ev => new Dictionary<string, string>() { { "eventType", ev.EventType }, { "id", id } }));
+
+            Configuration.ResetCustomActions();
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
+            Configuration.DataProvider = dp;
+
+            using (var scope = AuditScope.Create("Test", () => id, new { custom = 123 }))
+            {
+            }
+
+            var result = dp.GetEvent<AuditEvent>(containerName, "Test" + "_" + id + ".json");
+            var resultByTag = dp.GetContainerClient(result).FindBlobsByTags(@$"""id""=""{id}""").ToList();
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.EventType, Is.EqualTo("Test"));
+            Assert.That(resultByTag.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         [Category("Integration")]
         [Category("Azure")]
         public void Test_AzureStorageBlobs_Credential()
@@ -125,7 +153,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
                 .WithCredentials(_ => _
-                    .Url(AzureSettings.AzureBlobServiceUrl)
+                    .Url("http://127.0.0.1:10000/devstoreaccount1" /*AzureSettings.AzureBlobServiceUrl*/)
                     .Credential(new StorageSharedKeyCredential(AzureSettings.AzureBlobAccountName, AzureSettings.AzureBlobAccountKey)))
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")

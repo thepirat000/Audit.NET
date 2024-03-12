@@ -3,6 +3,8 @@ start wsl "-d ubuntu redis-server"
 start "D:\Elasticsearch\elasticsearch-7.5.0\bin\elasticsearch.bat" -workingdirectory "D:\Elasticsearch\elasticsearch-7.5.0\bin"
 start "D:\DynamoDb\Run.bat" -workingdirectory "D:\DynamoDb"
 start powershell {"D:\RavenDB\run.ps1"}
+start "azurite.exe" -workingdirectory "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator" 
+
 net start mongodb
 net start mysql80
 net start mssqlserver

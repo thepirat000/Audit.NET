@@ -39,7 +39,8 @@ Audit.Core.Configuration.Setup()
         .ContainerName(ev => $"{DateTime.Today:yyyyMMdd}")
         .BlobName(ev => $"{ev.EventType}/{Guid.NewGuid()}.json")
         .AccessTier(AccessTier.Cool)
-        .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName } }));
+        .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName } })
+        .Tags(ev => new Dictionary<string, string>() { { "eventType", ev.EventType } }));
 ```
 
 Using a shared key (SharedKeyCredential):
@@ -90,6 +91,7 @@ Depending on the authentication method, you can call one of the following method
 - **`BlobName`**: The unique blob name to use as a function of the Audit Event. The resulting name can include path information (slash separated sub-folders). 
 - **`AccessTier`**: (optional) The [Access Tier](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-storage-tiers) to use as a function of the Audit Event. 
 - **`Metadata`**: (optional) Extra information to include as metadata to be associated with the blob storage resource.
+- **`Tags`**: (optional) Extra information to include as tags to be associated with the blob storage resource. 
 
 #### Query events
 
