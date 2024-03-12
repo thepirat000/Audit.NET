@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.1" /> 
+	<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.3" /> 
   </ItemGroup>
 
   <ItemGroup>
