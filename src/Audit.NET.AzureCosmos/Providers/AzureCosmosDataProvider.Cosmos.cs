@@ -186,7 +186,7 @@ namespace Audit.AzureCosmos.Providers
             return CosmosClient;
         }
 
-        private Container GetContainer(AuditEvent auditEvent)
+        protected Container GetContainer(AuditEvent auditEvent)
         {
             var client = GetClient(auditEvent);
             return client.GetContainer(Database.GetValue(auditEvent), Container.GetValue(auditEvent));

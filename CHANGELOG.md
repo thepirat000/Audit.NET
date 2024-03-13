@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [25.0.3] - 2024-03-12:
+- Audit.NET.AzureCosmos: Exposing GetContainer method as protected to allow customization (#655)
+- Audit.NET.EventLog.Core: Security upgrade Microsoft.Windows.Compatibility from 8.0.1 to 8.0.3 (#656)
+
 ## [25.0.2] - 2024-03-11:
 - Audit.NET.AzureStorageBlobs: Adding ability to configure Tags for the audit event BLOBs (#654)
 
