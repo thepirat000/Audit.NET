@@ -176,7 +176,7 @@ namespace Audit.SqlServer.Providers
                 : string.Format("[{0}]", TableName.GetValue(auditEvent));
         }
 
-        private string GetInsertCommandText(AuditEvent auditEvent)
+        protected string GetInsertCommandText(AuditEvent auditEvent)
         {
             return string.Format("INSERT INTO {0} ({1}) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES ({3})", 
                 GetFullTableName(auditEvent),
@@ -228,7 +228,7 @@ namespace Audit.SqlServer.Providers
             return string.Join(", ", values);
         }
 
-        private SqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
+        protected SqlParameter[] GetParametersForInsert(AuditEvent auditEvent)
         {
             var parameters = new List<SqlParameter>();
             if (JsonColumnName.GetValue(auditEvent) != null)
@@ -250,7 +250,7 @@ namespace Audit.SqlServer.Providers
             return parameters.ToArray();
         }
 
-        private SqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
+        protected SqlParameter[] GetParametersForReplace(object eventId, AuditEvent auditEvent)
         {
             var parameters = new List<SqlParameter>();
             if (JsonColumnName.GetValue(auditEvent) != null)
@@ -273,7 +273,7 @@ namespace Audit.SqlServer.Providers
             return parameters.ToArray();
         }
 
-        private string GetReplaceCommandText(AuditEvent auditEvent)
+        protected string GetReplaceCommandText(AuditEvent auditEvent)
         {
             var cmdText = string.Format("UPDATE {0} SET {1} WHERE [{2}] = @eventId",
                 GetFullTableName(auditEvent), 
@@ -310,7 +310,7 @@ namespace Audit.SqlServer.Providers
             return string.Join(", ", sets);
         }
 
-        private string GetSelectCommandText(AuditEvent auditEvent)
+        protected string GetSelectCommandText(AuditEvent auditEvent)
         {
             var cmdText = string.Format("SELECT [{0}] As [Id] FROM {1} WHERE [{2}] = @eventId",
                 JsonColumnName.GetValue(auditEvent),

@@ -225,7 +225,7 @@ namespace Audit.AzureCosmos.Providers
             return (await client.ReadDocumentAsync<T>(docUri, new RequestOptions() { PartitionKey = pk }, cancellationToken)).Document;
         }
 
-        private IDocumentClient GetClient(AuditEvent auditEvent)
+        protected IDocumentClient GetClient(AuditEvent auditEvent)
         {
             return DocumentClient ?? InitializeClient(auditEvent);
         }
@@ -244,7 +244,7 @@ namespace Audit.AzureCosmos.Providers
             return DocumentClient;
         }
 
-        private Uri GetCollectionUri(AuditEvent auditEvent)
+        protected Uri GetCollectionUri(AuditEvent auditEvent)
         {
             return UriFactory.CreateDocumentCollectionUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent));
         }

@@ -116,7 +116,7 @@ namespace Audit.AzureStorageBlobs.Providers
         /// <summary>
         /// Returns the instance of the Azure.Storage.Blobs.BlobServiceClient to use for the given AuditEvent
         /// </summary>
-        public Task<BlobContainerClient> EnsureContainerClientAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
+        public Task<BlobContainerClient> GetContainerClientAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
         {
             var containerName = ContainerName.GetValue(auditEvent);
             return EnsureContainerClientAsync(containerName, cancellationToken);
@@ -171,7 +171,7 @@ namespace Audit.AzureStorageBlobs.Providers
             return serviceClient;
         }
 
-        private string Upload(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName)
+        protected string Upload(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName)
         {
             var blobName = existingBlobName ?? BlobName.GetValue(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
             var blob = client.GetBlobClient(blobName);
@@ -187,7 +187,7 @@ namespace Audit.AzureStorageBlobs.Providers
             return blobName;
         }
 
-        private async Task<string> UploadAsync(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName, CancellationToken cancellationToken)
+        protected async Task<string> UploadAsync(BlobContainerClient client, AuditEvent auditEvent, string existingBlobName, CancellationToken cancellationToken)
         {
             var blobName = existingBlobName ?? BlobName.GetValue(auditEvent) ?? string.Format("{0}.json", Guid.NewGuid());
             var blob = client.GetBlobClient(blobName);
@@ -215,7 +215,7 @@ namespace Audit.AzureStorageBlobs.Providers
         /// <inheritdoc />
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var client = await EnsureContainerClientAsync(auditEvent, cancellationToken);
+            var client = await GetContainerClientAsync(auditEvent, cancellationToken);
             var blobName = await UploadAsync(client, auditEvent, null, cancellationToken);
             return blobName;
         }
@@ -230,7 +230,7 @@ namespace Audit.AzureStorageBlobs.Providers
         /// <inheritdoc />
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var client = await EnsureContainerClientAsync(auditEvent, cancellationToken);
+            var client = await GetContainerClientAsync(auditEvent, cancellationToken);
             await UploadAsync(client, auditEvent, eventId.ToString(), cancellationToken);
         }
 

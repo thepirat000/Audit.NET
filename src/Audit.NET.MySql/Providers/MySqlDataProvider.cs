@@ -139,7 +139,7 @@ namespace Audit.MySql.Providers
             return null;
         }
 
-        private MySqlCommand GetInsertCommand(MySqlConnection cnn, AuditEvent auditEvent)
+        protected MySqlCommand GetInsertCommand(MySqlConnection cnn, AuditEvent auditEvent)
         {
             var cmdText = string.Format("INSERT INTO `{0}` ({1}) VALUES({2}); SELECT LAST_INSERT_ID();", 
                 TableName,
@@ -152,7 +152,7 @@ namespace Audit.MySql.Providers
             return cmd;
         }
 
-        private MySqlCommand GetReplaceCommand(MySqlConnection cnn, object eventId, AuditEvent auditEvent)
+        protected MySqlCommand GetReplaceCommand(MySqlConnection cnn, object eventId, AuditEvent auditEvent)
         {
             var cmdText = string.Format("UPDATE `{0}` SET {1} WHERE `{2}` = @id;", 
                 TableName, 
@@ -183,7 +183,7 @@ namespace Audit.MySql.Providers
             return string.Join(", ", sets);
         }
 
-        private MySqlCommand GetSelectCommand(MySqlConnection cnn, MySqlParameter idParam)
+        protected MySqlCommand GetSelectCommand(MySqlConnection cnn, MySqlParameter idParam)
         {
             var cmdText = string.Format("SELECT `{0}` FROM `{1}` WHERE `{2}` = @id;", JsonColumnName, TableName, IdColumnName);
             cnn.Open();

@@ -233,8 +233,8 @@ namespace Audit.PostgreSql.Providers
                 }
             }
         }
-        
-        private NpgsqlCommand GetInsertCommand(NpgsqlConnection cnn, AuditEvent auditEvent)
+
+        protected NpgsqlCommand GetInsertCommand(NpgsqlConnection cnn, AuditEvent auditEvent)
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
@@ -252,7 +252,7 @@ namespace Audit.PostgreSql.Providers
                 GetIdColumnName(auditEvent));
         }
 
-        private NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
+        protected NpgsqlCommand GetReplaceCommand(NpgsqlConnection cnn, AuditEvent auditEvent, object eventId)
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();
@@ -293,7 +293,7 @@ namespace Audit.PostgreSql.Providers
             return string.Join(", ", sets);
         }
 
-        private NpgsqlCommand GetSelectCommand(NpgsqlConnection cnn, object eventId)
+        protected NpgsqlCommand GetSelectCommand(NpgsqlConnection cnn, object eventId)
         {
             cnn.Open();
             var cmd = cnn.CreateCommand();

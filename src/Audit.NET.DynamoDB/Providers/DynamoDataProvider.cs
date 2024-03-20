@@ -244,7 +244,7 @@ namespace Audit.DynamoDB.Providers
             throw new ArgumentException("Parameter must be convertible to Primitive, Primitive[], DynamoDBEntry or DynamoDBEntry[]", "eventId");
         }
 
-        private Table GetTable(AuditEvent auditEvent)
+        protected Table GetTable(AuditEvent auditEvent)
         {
             var tableName = TableName.GetValue(auditEvent) ?? auditEvent?.GetType().Name ?? "AuditEvent";
             if (TableCache.TryGetValue(tableName, out Table table))
@@ -266,7 +266,7 @@ namespace Audit.DynamoDB.Providers
             return keyValues.ToArray();
         }
 
-        private Document CreateDocument(AuditEvent auditEvent, bool addCustomFields)
+        protected Document CreateDocument(AuditEvent auditEvent, bool addCustomFields)
         {
             if (addCustomFields && CustomAttributes != null)
             {
