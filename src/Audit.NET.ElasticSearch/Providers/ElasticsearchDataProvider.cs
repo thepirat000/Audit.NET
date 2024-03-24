@@ -71,7 +71,7 @@ namespace Audit.Elasticsearch.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-            var createRequest = new IndexRequest<AuditEvent>(auditEvent, Index.GetValue(auditEvent), id);
+            var createRequest = new IndexRequest<object>(auditEvent, Index.GetValue(auditEvent), id);
             var response = Client.Index(createRequest);
             if (response.IsValid && response.Result != Result.Error)
             {
@@ -87,7 +87,7 @@ namespace Audit.Elasticsearch.Providers
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var id = IdBuilder?.Invoke(auditEvent);
-            var createRequest = new IndexRequest<AuditEvent>(auditEvent, Index.GetValue(auditEvent), id);
+            var createRequest = new IndexRequest<object>(auditEvent, Index.GetValue(auditEvent), id);
             var response = await Client.IndexAsync(createRequest, cancellationToken);
             if (response.IsValid && response.Result != Result.Error)
             {
@@ -103,7 +103,7 @@ namespace Audit.Elasticsearch.Providers
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var el = eventId as ElasticsearchAuditEventId;
-            var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
+            var indexRequest = new IndexRequest<object>(auditEvent, el.Index, el.Id);
             var response = Client.Index(indexRequest);
             if (response.OriginalException != null)
             {
@@ -114,7 +114,7 @@ namespace Audit.Elasticsearch.Providers
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var el = eventId as ElasticsearchAuditEventId;
-            var indexRequest = new IndexRequest<AuditEvent>(auditEvent, el.Index, el.Id);
+            var indexRequest = new IndexRequest<object>(auditEvent, el.Index, el.Id);
             var response = await Client.IndexAsync(indexRequest, cancellationToken);
             if (response.OriginalException != null)
             {

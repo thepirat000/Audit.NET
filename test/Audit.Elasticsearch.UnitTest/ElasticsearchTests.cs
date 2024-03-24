@@ -19,6 +19,12 @@ namespace Audit.Elasticsearch.UnitTest
             return new ElasticsearchDataProviderForTest(ins, repl, client);
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [Test]
         public void Test_ElasticSearchDataProvider_FluentApi()
         {
@@ -233,7 +239,76 @@ namespace Audit.Elasticsearch.UnitTest
             Assert.That(evResult.CustomFields["MyCustomField"]?.ToString(), Is.EqualTo("value"));
         }
 
+        [Test]
+        [Category("Integration")]
+        [Category("Elasticsearch")]
+        public void Test_Elasticsearch_Polymorphic_Serialization()
+        {
+            var indexName = "auto_" + new Random().Next(10000, 99999);
+            var dp = new ElasticsearchDataProvider(c => c.ConnectionSettings(new Uri("http://localhost:9200/")).Index(indexName));
+
+            Audit.Core.Configuration.Setup().UseNullProvider();
+
+            var ev = new CustomAuditEvent()
+            {
+                CustomProperty = "test"
+            };
+
+            var scope = AuditScope.Create(new AuditScopeOptions() { AuditEvent = ev });
+            scope.SetCustomField("CustomField", "value");
+            scope.Discard();
+
+            var id = dp.InsertEvent(ev) as ElasticsearchAuditEventId;
+
+            var result = dp.GetEvent<CustomAuditEvent>(id);
+
+            dp.Client.Indices.Delete(new DeleteIndexRequest(indexName));
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.CustomFields.Count, Is.EqualTo(1));
+            Assert.That(result.CustomFields["CustomField"].ToString(), Is.EqualTo("value"));
+            Assert.That(result.CustomProperty, Is.EqualTo("test"));
+        }
+
+        [Test]
+        [Category("Integration")]
+        [Category("Elasticsearch")]
+        public async Task Test_Elasticsearch_Polymorphic_SerializationAsync()
+        {
+            var indexName = "auto_" + new Random().Next(10000, 99999);
+            var dp = new ElasticsearchDataProvider(c => c.ConnectionSettings(new Uri("http://localhost:9200/")).Index(indexName));
+
+            Audit.Core.Configuration.Setup().UseNullProvider();
+
+            var ev = new CustomAuditEvent()
+            {
+                CustomProperty = "test"
+            };
+
+            var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { AuditEvent = ev });
+            scope.SetCustomField("CustomField", "value");
+            scope.Discard();
+
+            var id = (await dp.InsertEventAsync(ev)) as ElasticsearchAuditEventId;
+            ev.CustomProperty = "updated";
+            await dp.ReplaceEventAsync(id, ev);
+
+            var result = await dp.GetEventAsync<CustomAuditEvent>(id);
+
+            await dp.Client.Indices.DeleteAsync(new DeleteIndexRequest(indexName));
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.CustomFields.Count, Is.EqualTo(1));
+            Assert.That(result.CustomFields["CustomField"].ToString(), Is.EqualTo("value"));
+            Assert.That(result.CustomProperty, Is.EqualTo("updated"));
+        }
     }
+
+    public class CustomAuditEvent : AuditEvent
+    {
+        public string CustomProperty { get; set; }
+    }
+
     public class ElasticsearchDataProviderForTest : ElasticsearchDataProvider
     {
         private List<Core.AuditEvent> _inserted;
