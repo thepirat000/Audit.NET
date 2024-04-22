@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Audit.Core;
 using Audit.Core.Providers;
 using NUnit.Framework;
@@ -159,31 +160,74 @@ namespace Audit.UnitTest
             using var listener = new ActivityListener
             {
                 ShouldListenTo = _ => true,
-                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded
             };
 
             ActivitySource.AddActivityListener(listener);
             
             var parentSource = new ActivitySource("Parent", "1.0");
 
-            var parentActivity = parentSource.StartActivity();
-
             Audit.Core.Configuration.Setup()
                 .StartActivityTrace()
                 .IncludeActivityTrace()
                 .UseInMemoryProvider();
 
+            Activity activity;
+            
             using (var scope = AuditScope.Create(new AuditScopeOptions() { AuditEvent = new TestAuditEvent() }))
             {
+                activity = Activity.Current;
             }
-
+            
             parentSource.Dispose();
+
+            var tags = activity.TagObjects.ToDictionary(k => k.Key, v => v.Value);
 
             var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEvents();
             Assert.That(evs.Count, Is.EqualTo(1));
             Assert.That(evs[0].Activity.Operation, Is.EqualTo(nameof(TestAuditEvent)));
+            Assert.That(tags, Contains.Key(nameof(AuditEvent)));
+            Assert.That(tags[nameof(AuditEvent)] as TestAuditEvent, Is.Not.Null);
+            Assert.That((tags[nameof(AuditEvent)] as TestAuditEvent)!.Environment.MachineName, Is.Not.Empty);
         }
-        
+
+        [Test]
+        public void Test_StartActivityTrace_ParentChildScope()
+        {
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            Audit.Core.Configuration.Setup()
+                .StartActivityTrace(true)
+                .UseInMemoryProvider();
+
+            Activity parentActivity;
+            Activity childActivity;
+
+            using (var scope1 = AuditScope.Create(new AuditScopeOptions() { AuditEvent = new TestAuditEvent() { EventType = "parent" } }))
+            {
+                parentActivity = Activity.Current;
+                using (var scope2 = AuditScope.Create(new AuditScopeOptions() { AuditEvent = new TestAuditEvent() { EventType = "child" } }))
+                {
+                    childActivity = Activity.Current;
+                }
+            }
+
+            Assert.That(parentActivity, Is.Not.Null);
+            Assert.That(childActivity, Is.Not.Null);
+
+            Assert.That(parentActivity.SpanId, Is.EqualTo(childActivity.ParentSpanId));
+            Assert.That(childActivity.TagObjects.Count(), Is.EqualTo(1));
+            Assert.That(childActivity.TagObjects.First().Key, Is.EqualTo(nameof(AuditEvent)));
+            Assert.That((childActivity.TagObjects.First().Value as AuditEvent)?.EventType, Is.EqualTo("child"));
+            Assert.That((parentActivity.TagObjects.First().Value as AuditEvent)?.EventType, Is.EqualTo("parent"));
+        }
+
         public class TestAuditEvent : AuditEvent
         {
         }

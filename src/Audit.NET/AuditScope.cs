@@ -38,7 +38,10 @@ namespace Audit.Core
             if (options.StartActivityTrace)
             {
                 var activitySource = new ActivitySource(nameof(AuditScope), typeof(AuditScope).Assembly.GetName().Version!.ToString());
-                _activity = activitySource.StartActivity(_event.GetType().Name);
+                _activity = activitySource.StartActivity(_event.GetType().Name, ActivityKind.Internal, null, tags: new Dictionary<string, object>
+                {
+                    { nameof(AuditEvent), _event }
+                });
             }
             if (options.IncludeActivityTrace)
             {
