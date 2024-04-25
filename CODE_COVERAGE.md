@@ -1,16 +1,16 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 3/24/2024 - 3:56:15 AM |
+| Generated on: | 4/25/2024 - 11:24:18 PM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 23 |
 | Classes: | 261 |
 | Files: | 199 |
-| **Line coverage:** | 76.7% (7695 of 10028) |
-| Covered lines: | 7695 |
+| **Line coverage:** | 76.7% (7698 of 10031) |
+| Covered lines: | 7698 |
 | Uncovered lines: | 2333 |
-| Coverable lines: | 10028 |
-| Total lines: | 18361 |
+| Coverable lines: | 10031 |
+| Total lines: | 18364 |
 | **Branch coverage:** | 70.5% (2940 of 4166) |
 | Covered branches: | 2940 |
 | Total branches: | 4166 |
@@ -154,7 +154,7 @@
 |Audit.Mvc.AuditPageFilter|112|28|140|295|80%|71|130|54.6%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1132**|**93**|**1225**|**4514**|**92.4%**|**268**|**342**|**78.3%**|
+|**Audit.NET**|**1135**|**93**|**1228**|**4517**|**92.4%**|**268**|**342**|**78.3%**|
 |Audit.Core.AuditActivityEvent|2|0|2|80|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|80|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|80|100%|0|0||
@@ -162,7 +162,7 @@
 |Audit.Core.AuditDataProvider<T>|16|0|16|118|100%|4|4|100%|
 |Audit.Core.AuditEvent|16|0|16|109|100%|0|0||
 |Audit.Core.AuditEventEnvironment|11|0|11|74|100%|0|0||
-|Audit.Core.AuditScope|243|9|252|665|96.4%|137|154|88.9%|
+|Audit.Core.AuditScope|246|9|255|668|96.4%|137|154|88.9%|
 |Audit.Core.AuditScopeFactory|25|0|25|158|100%|0|0||
 |Audit.Core.AuditScopeOptions|57|0|57|157|100%|9|12|75%|
 |Audit.Core.AuditScopeOptionsConfigurator|23|2|25|84|92%|0|0||
