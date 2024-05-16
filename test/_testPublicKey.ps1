@@ -26,8 +26,14 @@ Get-ChildItem -Directory -Path "..\src" -Filter "Audit.*" | ForEach-Object {
 }
 
 if ($hasErrors) {
+    Write-Host "Validation failed !" -ForegroundColor Red
     Exit 1
-} else {
+} elseif ($count -eq 0) {
+    Write-Host ""
+    Write-Host "No assemblies found to validate" -ForegroundColor Red
+    Exit 1
+}
+else {
     Write-Host "Successful public key validation of $($count) assemblies" -ForegroundColor Green
     Exit 0
 }
