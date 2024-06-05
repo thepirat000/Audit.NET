@@ -1,14 +1,14 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 4/25/2024 - 11:24:18 PM |
+| Generated on: | 6/5/2024 - 1:16:06 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 23 |
 | Classes: | 261 |
 | Files: | 199 |
-| **Line coverage:** | 76.7% (7698 of 10031) |
-| Covered lines: | 7698 |
-| Uncovered lines: | 2333 |
+| **Line coverage:** | 76.7% (7702 of 10031) |
+| Covered lines: | 7702 |
+| Uncovered lines: | 2329 |
 | Coverable lines: | 10031 |
 | Total lines: | 18364 |
 | **Branch coverage:** | 70.5% (2940 of 4166) |
@@ -154,7 +154,7 @@
 |Audit.Mvc.AuditPageFilter|112|28|140|295|80%|71|130|54.6%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1135**|**93**|**1228**|**4517**|**92.4%**|**268**|**342**|**78.3%**|
+|**Audit.NET**|**1136**|**92**|**1228**|**4517**|**92.5%**|**268**|**342**|**78.3%**|
 |Audit.Core.AuditActivityEvent|2|0|2|80|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|80|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|80|100%|0|0||
@@ -162,7 +162,7 @@
 |Audit.Core.AuditDataProvider<T>|16|0|16|118|100%|4|4|100%|
 |Audit.Core.AuditEvent|16|0|16|109|100%|0|0||
 |Audit.Core.AuditEventEnvironment|11|0|11|74|100%|0|0||
-|Audit.Core.AuditScope|246|9|255|668|96.4%|137|154|88.9%|
+|Audit.Core.AuditScope|247|8|255|668|96.8%|137|154|88.9%|
 |Audit.Core.AuditScopeFactory|25|0|25|158|100%|0|0||
 |Audit.Core.AuditScopeOptions|57|0|57|157|100%|9|12|75%|
 |Audit.Core.AuditScopeOptionsConfigurator|23|2|25|84|92%|0|0||
@@ -240,12 +240,12 @@
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|4|4|100%|
 |Audit.Udp.Providers.UdpDataProvider|60|2|62|196|96.7%|14|16|87.5%|
-|**Audit.SignalR**|**338**|**103**|**441**|**1106**|**76.6%**|**143**|**294**|**48.6%**|
+|**Audit.SignalR**|**341**|**100**|**441**|**1106**|**77.3%**|**143**|**294**|**48.6%**|
 |Audit.SignalR.AuditEventSignalr|1|0|1|15|100%|0|0||
 |Audit.SignalR.AuditHubFilter|99|9|108|196|91.6%|70|100|70%|
 |Audit.SignalR.AuditPipelineModule|159|48|207|348|76.8%|68|174|39%|
 |Audit.SignalR.Configuration.AuditHubConfigurator|11|4|15|58|73.3%|0|0||
-|Audit.SignalR.Configuration.AuditHubFilterConfigurator|3|21|24|90|12.5%|0|0||
+|Audit.SignalR.Configuration.AuditHubFilterConfigurator|6|18|24|90|25%|0|0||
 |Audit.SignalR.SignalrEventBase|1|2|3|33|33.3%|0|0||
 |Audit.SignalR.SignalrEventConnect|7|0|7|41|100%|0|0||
 |Audit.SignalR.SignalrEventDisconnect|9|0|9|43|100%|0|0||
