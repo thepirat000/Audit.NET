@@ -44,7 +44,7 @@ Audit.Core.Configuration.Setup()
         .TableName("events")
         .IdColumnName("event_id")
         .JsonColumnName("data")
-        .CustomColumn("user", ev => ev.Environment.UserName);
+        .CustomColumn("user", ev => ev.Environment.UserName));
 ```
 
 ### Provider Options
