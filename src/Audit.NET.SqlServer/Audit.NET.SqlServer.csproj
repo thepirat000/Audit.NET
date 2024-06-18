@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
 		<Description>Store Audit.NET Trail Logs into a SQL Server database</Description>
 		<Copyright>Copyright 2016</Copyright>
 		<AssemblyTitle>Audit.SqlServer</AssemblyTitle>

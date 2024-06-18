@@ -90,43 +90,35 @@ namespace Audit.SqlServer.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var parameters = GetParametersForInsert(auditEvent);
-            using (var ctx = CreateContext(auditEvent))
-            {
-                var cmdText = GetInsertCommandText(auditEvent);
-                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
-                return result.ToList().FirstOrDefault()?.Id;
-            }
+            using var ctx = CreateContext(auditEvent);
+            var cmdText = GetInsertCommandText(auditEvent);
+            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
+            return result.ToList().FirstOrDefault()?.Id;
         }
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var parameters = GetParametersForInsert(auditEvent);
-            using (var ctx = CreateContext(auditEvent))
-            {
-                var cmdText = GetInsertCommandText(auditEvent);
-                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
-                return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
-            }
+            await using var ctx = CreateContext(auditEvent);
+            var cmdText = GetInsertCommandText(auditEvent);
+            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
+            return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
-            using (var ctx = CreateContext(auditEvent))
-            {
-                var cmdText = GetReplaceCommandText(auditEvent);
-                ctx.Database.ExecuteSqlRaw(cmdText, parameters);
-            }
+            using var ctx = CreateContext(auditEvent);
+            var cmdText = GetReplaceCommandText(auditEvent);
+            ctx.Database.ExecuteSqlRaw(cmdText, parameters);
         }
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
-            using (var ctx = CreateContext(auditEvent))
-            {
-                var cmdText = GetReplaceCommandText(auditEvent);
-                await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters, cancellationToken);
-            }
+            await using var ctx = CreateContext(auditEvent);
+            var cmdText = GetReplaceCommandText(auditEvent);
+            await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters, cancellationToken);
         }
 
         public override T GetEvent<T>(object eventId)
@@ -135,17 +127,17 @@ namespace Audit.SqlServer.Providers
             {
                 return null;
             }
-            using (var ctx = CreateContext(null))
-            {
-                var cmdText = GetSelectCommandText(null);
-                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-                var json = result.FirstOrDefault()?.Id;
 
-                if (json != null)
-                {
-                    return AuditEvent.FromJson<T>(json);
-                }
+            using var ctx = CreateContext(null);
+            var cmdText = GetSelectCommandText(null);
+            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
+            var json = result.FirstOrDefault()?.Id;
+
+            if (json != null)
+            {
+                return AuditEvent.FromJson<T>(json);
             }
+
             return null;
         }
 
@@ -155,25 +147,26 @@ namespace Audit.SqlServer.Providers
             {
                 return null;
             }
-            using (var ctx = CreateContext(null))
-            {
-                var cmdText = GetSelectCommandText(null);
-                var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-                var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
 
-                if (json != null)
-                {
-                    return AuditEvent.FromJson<T>(json);
-                }
+            await using var ctx = CreateContext(null);
+            var cmdText = GetSelectCommandText(null);
+            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
+            var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
+
+            if (json != null)
+            {
+                return AuditEvent.FromJson<T>(json);
             }
+
             return null;
         }
 
-        private string GetFullTableName(AuditEvent auditEvent)
+        protected internal string GetFullTableName(AuditEvent auditEvent)
         {
-            return Schema.GetDefault() != null 
-                ? string.Format("[{0}].[{1}]", Schema.GetValue(auditEvent), TableName.GetValue(auditEvent))
-                : string.Format("[{0}]", TableName.GetValue(auditEvent));
+            var schema = Schema.GetValue(auditEvent);
+            var table = TableName.GetValue(auditEvent);
+
+            return schema != null ? $"[{schema}].[{table}]" : $"[{table}]";
         }
 
         protected string GetInsertCommandText(AuditEvent auditEvent)
@@ -322,14 +315,9 @@ namespace Audit.SqlServer.Providers
         private AuditContext CreateContext(AuditEvent auditEvent)
         {
             var ctxOptions = DbContextOptions.GetValue(auditEvent);
-            if (ctxOptions != null)
-            {
-                return new AuditContext(ConnectionString.GetValue(auditEvent), ctxOptions);
-            }
-            else
-            {
-                return new AuditContext(ConnectionString.GetValue(auditEvent));
-            }
+            return ctxOptions != null 
+                ? new AuditContext(ConnectionString.GetValue(auditEvent), ctxOptions) 
+                : new AuditContext(ConnectionString.GetValue(auditEvent));
         }
 
     }

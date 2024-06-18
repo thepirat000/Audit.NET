@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [25.0.5] - 2024-06-18:
+- Audit.NET.SqlServer: Fixing "Schema" configuration in the Fluent Api for SqlServer (#670)
+
 ## [25.0.4] - 2024-03-24:
 - Audit.NET.Elasticsearch: Allowing polymorphic serialization of Audit Events. (#660)
 
