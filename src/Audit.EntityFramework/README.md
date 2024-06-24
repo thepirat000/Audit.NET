@@ -38,12 +38,12 @@ The following table shows the entity framework package version used for each .NE
 
 <sub>Target</sub> \ <sup>Library</sup> | `Audit.EntityFramework` / `Audit.EntityFramework.Identity` | `Audit.EntityFramework.Core` / `Audit.EntityFramework.Identity.Core` |  
 ------------ | ---------------- |  -------------- |
-**.NET 4.6.2** | EntityFramework 6.4.4 | N/C | 
-**.NET 4.7.2** | EntityFramework 6.4.4 | N/C | 
-**.NET Standard 2.1** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 5.0.17 | 
-**.NET 6.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 6.0.25 | 
-**.NET 7.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 7.0.14 | 
-**.NET 8.0** | EntityFramework 6.4.4 | Microsoft.EntityFrameworkCore 8.0.0 | 
+**.NET 4.6.2** | EntityFramework 6.5.0 | N/C | 
+**.NET 4.7.2** | EntityFramework 6.5.0 | N/C | 
+**.NET Standard 2.1** | EntityFramework 6.5.0 | Microsoft.EntityFrameworkCore 5.0.17 | 
+**.NET 6.0** | EntityFramework 6.5.0 | Microsoft.EntityFrameworkCore 6.0.25 | 
+**.NET 7.0** | EntityFramework 6.5.0 | Microsoft.EntityFrameworkCore 7.0.14 | 
+**.NET 8.0** | EntityFramework 6.5.0 | Microsoft.EntityFrameworkCore 8.0.0 | 
 
 > N/C: Not Compatible
 

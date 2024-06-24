@@ -466,7 +466,7 @@ namespace Audit.EntityFramework
 
         private async Task<EntityFrameworkEvent> SaveChangesGetAuditAsyncImpl(IAuditDbContext context, Func<Task<int>> baseSaveChanges, CancellationToken cancellationToken = default)
         {
-            if (context.AuditDisabled)
+            if (context.AuditDisabled || Core.Configuration.AuditDisabled)
             {
                 return new EntityFrameworkEvent() { Result = await baseSaveChanges() };
             }
@@ -498,7 +498,7 @@ namespace Audit.EntityFramework
         
         private EntityFrameworkEvent SaveChangesGetAuditImpl(IAuditDbContext context, Func<int> baseSaveChanges)
         {
-            if (context.AuditDisabled)
+            if (context.AuditDisabled || Core.Configuration.AuditDisabled)
             {
                 return new EntityFrameworkEvent() { Result = baseSaveChanges() };
             }
@@ -530,7 +530,7 @@ namespace Audit.EntityFramework
 
         public IAuditScope BeginSaveChanges(IAuditDbContext context)
         {
-            if (context.AuditDisabled)
+            if (context.AuditDisabled || Core.Configuration.AuditDisabled)
             {
                 return null;
             }
@@ -549,7 +549,7 @@ namespace Audit.EntityFramework
 
         public async Task<IAuditScope> BeginSaveChangesAsync(IAuditDbContext context, CancellationToken cancellationToken = default)
         {
-            if (context.AuditDisabled)
+            if (context.AuditDisabled || Core.Configuration.AuditDisabled)
             {
                 return null;
             }

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [25.0.6] - 2024-06-24:
+- Audit.EntityFramework: Fixing EF audit helper to bypass the audit data collecting when the global Audit.Core.Configuration.AuditDisabled is set to true (#672)
+- Audit.EntityFramework: Upgrading EntityFramework package reference from 6.4.4 to 6.5.0
+
 ## [25.0.5] - 2024-06-18:
 - Audit.NET.SqlServer: Fixing "Schema" configuration in the Fluent Api for SqlServer (#670)
 

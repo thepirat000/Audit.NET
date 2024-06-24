@@ -20,7 +20,7 @@ namespace Audit.EntityFramework
         /// </summary>
         string AuditEventType { get; set; }
         /// <summary>
-        /// Indicates if the Audit is disabled.
+        /// Indicates if the Audit is disabled for this DbContext instance.
         /// Default is false.
         /// </summary>
         bool AuditDisabled { get; set; }

@@ -41,7 +41,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForAnyContext().Reset();
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DbCommandInterceptContext>().Reset();
-            Audit.Core.Configuration.ResetCustomActions();
+            Audit.Core.Configuration.Reset();
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
         }
 
@@ -569,6 +569,43 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
+        public void Test_DbCommandInterceptor_AuditDisabledFromGlobalConfig()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: null,
+                       auditDisabled: false,
+                       eventType: null,
+                       customFieldValue: null))
+            {
+                //NonQueryExecuting
+                var result = ctx.Database.ExecuteSqlRaw("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.That(result, Is.EqualTo(1));
+            }
+
+            Audit.Core.Configuration.AuditDisabled = false;
+            
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public async Task Test_DbCommandInterceptor_AuditDisabledFromAuditDbContextAsync()
         {
             var inserted = new List<AuditEventCommandEntityFramework>();
@@ -596,6 +633,43 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
                 Assert.That(result, Is.EqualTo(1));
             }
+
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_AuditDisabledFromGlobalConfigAsync()
+        {
+            var inserted = new List<AuditEventCommandEntityFramework>();
+            var replaced = new List<AuditEventCommandEntityFramework>();
+
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(d => d
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventCommandEntityFramework>(ev.ToJson()))));
+
+            int id = _rnd.Next();
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            var optionsWithInterceptor = new DbContextOptionsBuilder()
+                .AddInterceptors(new AuditCommandInterceptor())
+                .Options;
+            using (var ctx = new DbCommandInterceptContext_InheritingFromAuditDbContext(
+                       opt: optionsWithInterceptor,
+                       dataProvider: null,
+                       auditDisabled: false,
+                       eventType: null,
+                       customFieldValue: null))
+            {
+                //NonQueryExecuting
+                var result = await ctx.Database.ExecuteSqlRawAsync("INSERT INTO DEPARTMENTS (Id, Name, Comments) VALUES (" + id + ", 'test', {0})", "comments");
+                Assert.That(result, Is.EqualTo(1));
+            }
+
+            Audit.Core.Configuration.AuditDisabled = false;
 
             Assert.That(inserted.Count, Is.EqualTo(0));
             Assert.That(replaced.Count, Is.EqualTo(0));
