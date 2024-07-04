@@ -90,6 +90,7 @@ The `AuditHttpClientHandler` class allows to configure the following settings:
 - **IncludeContentHeaders**: Specifies whether the HTTP Content headers should be included on the audit output. Default is false.
 - **IncludeRequestBody**: Specifies whether the HTTP Request body should be included on the audit output. Default is false.
 - **IncludeResponseBody**: Specifies whether the HTTP Response body should be included on the audit output. Default is false.
+- **IncludeOptions**: Specifies which [HTTP Request Options](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage.options?view=net-8.0) should be included in the audit output. Useful to add contextual information to the HTTP Audit Event. By default, the options are not included.
 - **CreationPolicy**: Allows to set a specific event creation policy. By default the globally configured creation policy is used. See [Audit.NET Event Creation Policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) section for more information.
 - **AuditDataProvider**: Allows to set a specific audit data provider. By default the globally configured data provider is used. See [Audit.NET Data Providers](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers) section for more information.
 - **AuditScopeFactory**: Allows to set a specific audit scope factory. By default the general [`AuditScopeFactory`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeFactory.cs) is used. 

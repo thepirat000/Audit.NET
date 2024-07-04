@@ -66,6 +66,19 @@ namespace Audit.Http.ConfigurationApi
         /// </summary>
         /// <param name="includePredicate">A function of the executing context to determine whether the HTTP Response headers should be included on the audit output</param>
         IAuditClientHandlerConfigurator IncludeResponseHeaders(Func<HttpResponseMessage, bool> includePredicate);
+
+        /// <summary>
+        /// Specifies which HTTP Request Options should be included on the audit output.
+        /// </summary>
+        /// <param name="includePredicate">A function of the option key to determine which HTTP Request Options should be included on the audit output</param>
+        IAuditClientHandlerConfigurator IncludeOptions(Func<string, bool> includePredicate);
+
+        /// <summary>
+        /// Specifies whether the HTTP Request Options should be included on the audit output.
+        /// </summary>
+        /// <param name="include">True to include the HTTP Request Options, false otherwise</param>
+        IAuditClientHandlerConfigurator IncludeOptions(bool include = true);
+        
         /// <summary>
         /// Specifies a predicate to determine the event type name on the audit output.
         /// </summary>

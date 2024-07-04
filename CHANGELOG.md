@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [25.0.7] - 2024-07-04:
+- Audit.HttpClient: Allowing to audit the HttpRequestMessage.Options to add contextual information to the HTTP Audit Event.
+Adding GetRequestMessage() and GetResponseMessage() to the HttpAction to be able to retrieve the HttpRequestMessage and HttpResponseMessage objects from the audit event. (#673)
+
 ## [25.0.6] - 2024-06-24:
 - Audit.EntityFramework: Fixing EF audit helper to bypass the audit data collecting when the global Audit.Core.Configuration.AuditDisabled is set to true (#672)
 - Audit.EntityFramework: Upgrading EntityFramework package reference from 6.4.4 to 6.5.0

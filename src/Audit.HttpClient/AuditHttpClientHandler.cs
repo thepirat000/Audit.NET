@@ -45,6 +45,10 @@ namespace Audit.Http
         /// </summary>
         public bool IncludeResponseBody { set => _config._includeResponseBody = _ => value; }
         /// <summary>
+        /// Specifies whether the request options should be included on the audit output based on a predicate. Default is false.
+        /// </summary>
+        public Func<string, bool> IncludeOptions { set => _config._includeOptions = value; }
+        /// <summary>
         /// Specifies the event type name to use.
         /// The following placeholders can be used as part of the string: 
         /// - {url}: replaced with the requst URL.
@@ -121,6 +125,9 @@ namespace Audit.Http
                 Version = request.Version?.ToString(),
                 Request = await GetRequestAudit(request, cancellationToken)
             };
+
+            action.SetRequestMessage(request);
+            
             var auditEvent = new AuditEventHttpClient() { Action = action };
             var options = new AuditScopeOptions()
             {
@@ -151,6 +158,7 @@ namespace Audit.Http
             {
                 // Update the response and save
                 action.Response = await GetResponseAudit(response, cancellationToken);
+                action.SetResponseMessage(response);
                 scope.EventAs<AuditEventHttpClient>().Action = action;
                 await SaveDispose(scope, cancellationToken);
             }
@@ -176,9 +184,37 @@ namespace Audit.Http
                 Headers = _config._includeRequestHeaders != null && _config._includeRequestHeaders.Invoke(request)
                             ? GetHeaders(request.Headers)
                             : null,
-                Content = await GetRequestContent(request, cancellationToken)
+                Content = await GetRequestContent(request, cancellationToken),
+                Options = GetOptions(request)
             };
             return requestInfo;
+        }
+
+        private Dictionary<string, object> GetOptions(HttpRequestMessage request)
+        {
+            if (_config._includeOptions == null)
+            {
+                return null;
+            }
+            var result = new Dictionary<string, object>();
+#if NET6_0_OR_GREATER
+            foreach (var option in request.Options)
+            {
+                if (_config._includeOptions.Invoke(option.Key))
+                {
+                    result[option.Key] = option.Value;
+                }
+            }
+#else
+            foreach (var prop in request.Properties)
+            {
+                if (_config._includeOptions.Invoke(prop.Key))
+                {
+                    result[prop.Key] = prop.Value;
+                }
+            }
+#endif
+            return result.Count == 0 ? null : result;
         }
 
         private async Task<Response> GetResponseAudit(HttpResponseMessage response, CancellationToken cancellationToken)

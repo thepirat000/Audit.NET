@@ -449,5 +449,90 @@ namespace Audit.HttpClientUnitTest
             Assert.That(actions[0].Url, Is.EqualTo(url));
             Assert.That(actions[0].Method, Is.EqualTo("GET"));
         }
+
+        [Test]
+        public async Task Test_IncludeOptions()
+        {
+            // Arrange
+            var dataProvider = new InMemoryDataProvider();
+            using var client = new HttpClient(new AuditHttpClientHandler()
+            {
+                IncludeRequestBody = true,
+                IncludeContentHeaders = true,
+                IncludeOptions = key => !key.StartsWith("_"),
+                AuditDataProvider = dataProvider
+            });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "http://google.com/?q=test");
+            
+#if NET6_0_OR_GREATER
+            request.Options.Set(new HttpRequestOptionsKey<int>("test"), 12345);
+            request.Options.Set(new HttpRequestOptionsKey<int>("_untracked"), 1);
+#else
+            request.Properties["test"] = 12345;
+            request.Properties["_untracked"] = 1;
+#endif
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            var events = dataProvider.GetAllEvents();
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(events, Is.Not.Null);
+            Assert.That(events, Has.Count.EqualTo(1));
+            Assert.That(events[0], Is.TypeOf<AuditEventHttpClient>());
+            var ev = events[0] as AuditEventHttpClient;
+            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev.Action.Method, Is.EqualTo("GET"));
+            Assert.That(ev.Action.Request.Options, Has.Count.EqualTo(1));
+            Assert.That(ev.Action.Request.Options, Contains.Key("test"));
+            Assert.That(ev.Action.Request.Options["test"], Is.EqualTo(12345));
+        }
+
+        [Test]
+        public async Task Test_GetRequestMessage_GetResponseMessage()
+        {
+            // Arrange
+            var dataProvider = new InMemoryDataProvider();
+            var response = default(HttpResponseMessage);
+            using (var client = new HttpClient(new AuditHttpClientHandler() { AuditDataProvider = dataProvider, CreationPolicy = EventCreationPolicy.InsertOnEnd }))
+            {
+                var requestMessage = default(HttpRequestMessage);
+                var responseMessage = default(HttpResponseMessage);
+
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
+                {
+                    requestMessage ??= scope.GetHttpAction().GetRequestMessage();
+                    responseMessage ??= scope.GetHttpAction().GetResponseMessage();
+
+                    Assert.That(requestMessage, Is.Not.Null);
+                    Assert.That(responseMessage, Is.Null);
+                });
+
+                Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, scope =>
+                {
+                    requestMessage ??= scope.GetHttpAction().GetRequestMessage();
+                    responseMessage ??= scope.GetHttpAction().GetResponseMessage();
+
+                    Assert.That(requestMessage, Is.Not.Null);
+                    Assert.That(responseMessage, Is.Not.Null);
+                });
+
+                var request = new HttpRequestMessage(HttpMethod.Get, "http://google.com/?q=test");
+
+                // Act
+                response = await client.SendAsync(request);
+            }
+            
+            // Assert
+            var events = dataProvider.GetAllEvents();
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(events, Is.Not.Null);
+            Assert.That(events, Has.Count.EqualTo(1));
+            Assert.That(events[0], Is.TypeOf<AuditEventHttpClient>());
+        }
     }
 }

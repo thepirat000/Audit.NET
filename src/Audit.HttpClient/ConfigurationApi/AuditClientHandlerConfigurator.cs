@@ -14,6 +14,7 @@ namespace Audit.Http.ConfigurationApi
         internal Func<HttpRequestMessage, bool> _includeRequestBody;
         internal Func<HttpResponseMessage, bool> _includeResponseBody;
         internal Func<HttpRequestMessage, string> _eventTypeName;
+        internal Func<string, bool> _includeOptions;
         internal EventCreationPolicy? _eventCreationPolicy;
         internal AuditDataProvider _auditDataProvider;
         internal IAuditScopeFactory _auditScopeFactory;
@@ -93,6 +94,18 @@ namespace Audit.Http.ConfigurationApi
         public IAuditClientHandlerConfigurator IncludeResponseBody(Func<HttpResponseMessage, bool> includePredicate)
         {
             _includeResponseBody = includePredicate;
+            return this;
+        }
+
+        public IAuditClientHandlerConfigurator IncludeOptions(Func<string, bool> includePredicate)
+        {
+            _includeOptions = includePredicate;
+            return this;
+        }
+
+        public IAuditClientHandlerConfigurator IncludeOptions(bool include = true)
+        {
+            _includeOptions = _ => include;
             return this;
         }
 
