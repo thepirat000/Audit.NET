@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 6/25/2024 - 3:16:36 AM |
+| Generated on: | 7/4/2024 - 5:35:29 PM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 23 |
 | Classes: | 261 |
 | Files: | 199 |
-| **Line coverage:** | 76.8% (7704 of 10023) |
-| Covered lines: | 7704 |
-| Uncovered lines: | 2319 |
-| Coverable lines: | 10023 |
-| Total lines: | 18351 |
-| **Branch coverage:** | 70.6% (2956 of 4182) |
-| Covered branches: | 2956 |
-| Total branches: | 4182 |
+| **Line coverage:** | 76.9% (7729 of 10050) |
+| Covered lines: | 7729 |
+| Uncovered lines: | 2321 |
+| Coverable lines: | 10050 |
+| Total lines: | 18446 |
+| **Branch coverage:** | 70.7% (2971 of 4198) |
+| Covered branches: | 2971 |
+| Total branches: | 4198 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -118,16 +118,16 @@
 |Audit.FileSystem.FileSystemMonitor|102|24|126|248|80.9%|36|52|69.2%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
-|**Audit.HttpClient**|**156**|**24**|**180**|**509**|**86.6%**|**59**|**66**|**89.3%**|
-|Audit.Http.AuditEventExtensions|2|4|6|32|33.3%|1|6|16.6%|
+|**Audit.HttpClient**|**181**|**26**|**207**|**604**|**87.4%**|**74**|**82**|**90.2%**|
+|Audit.Http.AuditEventExtensions|3|3|6|32|50%|2|6|33.3%|
 |Audit.Http.AuditEventHttpClient|1|0|1|12|100%|0|0||
-|Audit.Http.AuditHttpClientHandler|115|2|117|246|98.2%|58|60|96.6%|
+|Audit.Http.AuditHttpClientHandler|130|1|131|282|99.2%|69|72|95.8%|
 |Audit.Http.ClientFactory|1|1|2|28|50%|0|0||
-|Audit.Http.ConfigurationApi.AuditClientHandlerConfigurator|18|16|34|123|52.9%|0|0||
+|Audit.Http.ConfigurationApi.AuditClientHandlerConfigurator|18|20|38|136|47.3%|0|0||
 |Audit.Http.Content|2|0|2|10|100%|0|0||
-|Audit.Http.HttpAction|6|0|6|12|100%|0|0||
+|Audit.Http.HttpAction|14|0|14|55|100%|3|4|75%|
 |Audit.Http.HttpClientBuilderAuditExtensions|0|1|1|19|0%|0|0||
-|Audit.Http.Request|5|0|5|13|100%|0|0||
+|Audit.Http.Request|6|0|6|16|100%|0|0||
 |Audit.Http.Response|6|0|6|14|100%|0|0||
 |**Audit.MongoClient**|**92**|**25**|**117**|**448**|**78.6%**|**27**|**30**|**90%**|
 |Audit.MongoClient.AuditEventMongoCommand|1|0|1|15|100%|0|0||
