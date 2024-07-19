@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using Audit.Core;
 using System.Threading.Tasks;
-using Nest;
+using Elastic.Clients.Elasticsearch;
 
 namespace Audit.Elasticsearch.Providers
 {
@@ -17,70 +17,87 @@ namespace Audit.Elasticsearch.Providers
     /// </remarks>
     public class ElasticsearchDataProvider : AuditDataProvider
     {
-        private readonly Lazy<IElasticClient> _client;
+        private Lazy<ElasticsearchClient> _client;
 
         /// <summary>
-        /// The Elasticsearch NEST client
+        /// Gets or sets the settings to use when creating the Elasticsearch client
         /// </summary>
-        public IElasticClient Client => _client.Value;
+        public IElasticsearchClientSettings Settings { get; set; } = new ElasticsearchClientSettings();
 
         /// <summary>
-        /// The Elasticsearch connection settings to use. 
-        /// </summary>
-        public IConnectionSettingsValues ConnectionSettings { get; set; }
-
-        /// <summary>
-        /// The Elasticsearch index to use when saving an audit event. Must be lowercase. NULL to use the default global index.
+        /// Gets or sets the Elasticsearch index to use when saving an audit event. Must be lowercase. NULL to use the default global index.
         /// </summary>
         public Setting<IndexName> Index { get; set; }
 
         /// <summary>
-        /// The Elasticsearch document id to use when saving an audit event
+        /// Gets or sets the function that returns the document ID to use for an AuditEvent.
         /// </summary>
         public Func<AuditEvent, Id> IdBuilder { get; set; }
 
-        public ElasticsearchDataProvider(IElasticClient client)
-        {
-            _client = new Lazy<IElasticClient>(() => client);
-        }
-
         /// <summary>
-        /// Creates an instance of ElasticsearchDataProvider with the given audit connection settings.
+        /// Creates an instance of ElasticsearchDataProvider
         /// </summary>
         public ElasticsearchDataProvider()
         {
-            _client = new Lazy<IElasticClient>(() => new ElasticClient(ConnectionSettings));
         }
-
+        
+        /// <summary>
+        /// Creates an instance of ElasticsearchDataProvider with the given Elasticsearch client.
+        /// </summary>
+        /// <param name="client">The Elasticsearch client to use</param>
+        public ElasticsearchDataProvider(ElasticsearchClient client)
+        {
+            _client = new Lazy<ElasticsearchClient>(() => client);
+        }
+        
         /// <summary>
         /// Creates an instance of ElasticsearchDataProvider with the given configuration.
         /// </summary>
         public ElasticsearchDataProvider(Action<Configuration.IElasticsearchProviderConfigurator> config)
         {
-            _client = new Lazy<IElasticClient>(() => new ElasticClient(ConnectionSettings));
             var elConfig = new Configuration.ElasticsearchProviderConfigurator();
+            
             if (config != null)
             {
                 config.Invoke(elConfig);
-                ConnectionSettings = elConfig._connectionSettings;
+                if (elConfig._client != null)
+                {
+                    _client = new Lazy<ElasticsearchClient>(() => elConfig._client);
+                }
+                Settings = elConfig._clientSettings;
                 IdBuilder = elConfig._idBuilder;
                 Index = elConfig._index;
             }
+        }
+
+        public ElasticsearchClient GetClient()
+        {
+            if (_client != null)
+            {
+                return _client.Value;
+            }
+            
+            _client = new Lazy<ElasticsearchClient>(() => new ElasticsearchClient(Settings));
+
+            return _client.Value;
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
             var id = IdBuilder?.Invoke(auditEvent);
             var createRequest = new IndexRequest<object>(auditEvent, Index.GetValue(auditEvent), id);
-            var response = Client.Index(createRequest);
-            if (response.IsValid && response.Result != Result.Error)
+            var response = GetClient().IndexAsync(createRequest).ConfigureAwait(false).GetAwaiter().GetResult();
+            
+            if (response.IsValidResponse && (response.Result == Result.Created || response.Result == Result.Updated))
             {
                 return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
             }
-            if (response.OriginalException != null)
+            
+            if (response.TryGetOriginalException(out var exception))
             {
-                throw response.OriginalException;
+                throw exception;
             }
+            
             return "/";
         }
 
@@ -88,15 +105,18 @@ namespace Audit.Elasticsearch.Providers
         {
             var id = IdBuilder?.Invoke(auditEvent);
             var createRequest = new IndexRequest<object>(auditEvent, Index.GetValue(auditEvent), id);
-            var response = await Client.IndexAsync(createRequest, cancellationToken);
-            if (response.IsValid && response.Result != Result.Error)
+            var response = await GetClient().IndexAsync(createRequest, cancellationToken);
+            
+            if (response.IsValidResponse && (response.Result == Result.Created || response.Result == Result.Updated))
             {
                 return new ElasticsearchAuditEventId() { Id = response.Id, Index = response.Index };
             }
-            if (response.OriginalException != null)
+            
+            if (response.TryGetOriginalException(out var exception))
             {
-                throw response.OriginalException;
+                throw exception;
             }
+            
             return "/";
         }
 
@@ -104,10 +124,11 @@ namespace Audit.Elasticsearch.Providers
         {
             var el = eventId as ElasticsearchAuditEventId;
             var indexRequest = new IndexRequest<object>(auditEvent, el.Index, el.Id);
-            var response = Client.Index(indexRequest);
-            if (response.OriginalException != null)
+            var response = GetClient().IndexAsync(indexRequest).ConfigureAwait(false).GetAwaiter().GetResult();
+            
+            if (!response.IsValidResponse && response.TryGetOriginalException(out var exception))
             {
-                throw response.OriginalException;
+                throw exception;
             }
         }
 
@@ -115,53 +136,62 @@ namespace Audit.Elasticsearch.Providers
         {
             var el = eventId as ElasticsearchAuditEventId;
             var indexRequest = new IndexRequest<object>(auditEvent, el.Index, el.Id);
-            var response = await Client.IndexAsync(indexRequest, cancellationToken);
-            if (response.OriginalException != null)
+            var response = await GetClient().IndexAsync(indexRequest, cancellationToken);
+            
+            if (!response.IsValidResponse && response.TryGetOriginalException(out var exception))
             {
-                throw response.OriginalException;
+                throw exception;
             }
         }
 
         public override T GetEvent<T>(object eventId)
         {
             var el = eventId as ElasticsearchAuditEventId ?? new ElasticsearchAuditEventId() { Id = eventId.ToString() };
+            
             return GetEvent<T>(el);
         }
 
         public T GetEvent<T>(ElasticsearchAuditEventId eventId) where T : AuditEvent
         {
             var request = new GetRequest(eventId.Index, eventId.Id);
-            var response = Client.Get(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index));
-            if (response.IsValid && response.Found)
+            var response = GetClient().GetAsync<T>(request).ConfigureAwait(false).GetAwaiter().GetResult();
+            
+            if (response.IsValidResponse && response.Found)
             {
                 return response.Source;
             }
-            if (response.OriginalException != null)
+            
+            if (response.TryGetOriginalException(out var exception))
             {
-                throw response.OriginalException;
+                throw exception;
             }
-            return default(T);
+            
+            return default;
         }
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var el = eventId as ElasticsearchAuditEventId ?? new ElasticsearchAuditEventId() { Id = eventId.ToString() };
+            
             return await GetEventAsync<T>(el, cancellationToken);
         }
 
         public async Task<T> GetEventAsync<T>(ElasticsearchAuditEventId eventId, CancellationToken cancellationToken = default) where T : AuditEvent
         {
             var request = new GetRequest(eventId.Index, eventId.Id);
-            var response = await Client.GetAsync(new DocumentPath<T>(eventId.Id), x => x.Index(eventId.Index), cancellationToken);
-            if (response.IsValid && response.Found)
+            var response = await GetClient().GetAsync<T>(request, cancellationToken);
+            
+            if (response.IsValidResponse && response.Found)
             {
                 return response.Source;
             }
-            if (response.OriginalException != null)
+            
+            if (response.TryGetOriginalException(out var exception))
             {
-                throw response.OriginalException;
+                throw exception;
             }
-            return default(T);
+            
+            return default;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 
 namespace Audit.Elasticsearch.Providers
 {

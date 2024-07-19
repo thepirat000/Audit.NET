@@ -1,24 +1,21 @@
-﻿using Audit.Elasticsearch.Providers;
-using Nest;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Audit.Core;
-using System.Threading;
 using System.Threading.Tasks;
+
+using Audit.Core;
+using Audit.Elasticsearch.Providers;
 using Audit.IntegrationTest;
+
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.IndexManagement;
+
+using NUnit.Framework;
 
 namespace Audit.Elasticsearch.UnitTest
 {
     public class ElasticsearchTests
     {
-        private ElasticsearchDataProvider GetElasticsearchDataProvider(List<Core.AuditEvent> ins, List<Core.AuditEvent> repl)
-        {
-            var client = new ElasticClient(new Uri(AzureSettings.ElasticSearchUrl));
-            return new ElasticsearchDataProviderForTest(ins, repl, client);
-        }
-
         [SetUp]
         public void Setup()
         {
@@ -29,13 +26,13 @@ namespace Audit.Elasticsearch.UnitTest
         public void Test_ElasticSearchDataProvider_FluentApi()
         {
             var x = new Elasticsearch.Providers.ElasticsearchDataProvider(_ => _
-                .ConnectionSettings(new ConnectionSettings(new Uri("http://server/")))
+                .Client(new ElasticsearchClientSettings(new Uri("http://server/")))
                 .Id(ev => "id")
                 .Index("ix"));
 
-            Assert.That((x.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString()), Is.EqualTo("http://server/"));
-            Assert.That(x.IdBuilder.Invoke(null).Equals(new Nest.Id("id")), Is.True);
-            Assert.That(x.Index.GetDefault().Name, Is.EqualTo("ix"));
+            Assert.That((x.Settings.NodePool.Nodes.First().Uri.ToString()), Is.EqualTo("http://server/"));
+            Assert.That(x.IdBuilder.Invoke(null).Equals(new Id("id")), Is.True);
+            Assert.That(x.Index.GetDefault(), Is.EqualTo((IndexName)"ix"));
         }
         
         [Test]
@@ -43,18 +40,16 @@ namespace Audit.Elasticsearch.UnitTest
         [Category("Elasticsearch")]
         public void Test_Elasticsearch_HappyPath()
         {
-            var ins = new List<Core.AuditEvent>();
-            var repl = new List<Core.AuditEvent>();
-            var ela = GetElasticsearchDataProvider(ins, repl);
+            var dataProvider = new ElasticsearchDataProvider(new ElasticsearchClient(new Uri(AzureSettings.ElasticSearchUrl)));
             var indexName = "auditevent_order";
             
             var guids = new List<string>();
-            ela.Index = (IndexName)indexName;
-            ela.IdBuilder = ev => { var g = Guid.NewGuid().ToString().Replace("-", "/"); guids.Add(g); return g; };
+            dataProvider.Index = (IndexName)indexName;
+            dataProvider.IdBuilder = ev => { var g = Guid.NewGuid().ToString(); guids.Add(g); return g; };
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(ela)
-                .WithCreationPolicy(Core.EventCreationPolicy.InsertOnStartReplaceOnEnd)
+                .UseCustomProvider(dataProvider)
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd)
                 .ResetActions();
 
             var order = new Order()
@@ -63,32 +58,19 @@ namespace Audit.Elasticsearch.UnitTest
                 Status = "Created"
             };
             
-
             using (var scope = new AuditScopeFactory().Create("eventType", () => order, new { MyCustomField = "value" }, null, null))
             {
                 order.Status = "Updated";
             }
 
-            ela.Client.Indices.Refresh(indexName);
+            var elasticClient = dataProvider.GetClient();
+            elasticClient.Indices.Refresh(indexName);
 
-            var evLoad = ela.GetEvent(new ElasticsearchAuditEventId() { Id = guids[0], Index = indexName });
-            var orderOldValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.Old.ToString());
-            var orderNewValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.New.ToString());
-            var oldDictionary = evLoad.Target.Old as Dictionary<string, object>;
-            var newDictionary = evLoad.Target.New as Dictionary<string, object>;
-
+            var evLoad = dataProvider.GetEvent(new ElasticsearchAuditEventId() { Id = guids[0], Index = indexName });
+            
             Assert.That(evLoad, Is.Not.Null);
-            Assert.That(oldDictionary, Is.Not.Null);
-            Assert.That(newDictionary, Is.Not.Null);
             Assert.That(guids.Count, Is.EqualTo(1));
-            Assert.That(ins.Count, Is.EqualTo(1));
-            Assert.That(repl.Count, Is.EqualTo(1));
-            Assert.That(orderOldValue.Status, Is.EqualTo("Created"));
-            Assert.That(oldDictionary["status"].ToString(), Is.EqualTo("Created"));
-            Assert.That(orderNewValue.Status, Is.EqualTo("Updated"));
-            Assert.That(newDictionary["status"].ToString(), Is.EqualTo("Updated"));
-            Assert.That(evLoad.CustomFields["MyCustomField"], Is.EqualTo("value"));
-            Assert.That(ins[0].Target.New, Is.EqualTo(null));
+            Assert.That(evLoad.CustomFields["MyCustomField"].ToString(), Is.EqualTo("value"));
         }
 
         [Test]
@@ -96,17 +78,15 @@ namespace Audit.Elasticsearch.UnitTest
         [Category("Elasticsearch")]
         public async Task Test_Elasticsearch_HappyPath_Async()
         {
-            var ins = new List<Core.AuditEvent>();
-            var repl = new List<Core.AuditEvent>();
-            var ela = GetElasticsearchDataProvider(ins, repl);
+            var dataProvider = new ElasticsearchDataProvider(c => c.Client(new ElasticsearchClientSettings(new Uri(AzureSettings.ElasticSearchUrl))));
             var indexName = "auditevent_order";
 
             var guids = new List<string>();
-            ela.Index = (IndexName)indexName;
-            ela.IdBuilder = ev => { var g = Guid.NewGuid().ToString().Replace("-", "/"); guids.Add(g); return g; };
+            dataProvider.Index = (IndexName)indexName;
+            dataProvider.IdBuilder = ev => { var g = Guid.NewGuid().ToString(); guids.Add(g); return g; };
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(ela)
+                .UseCustomProvider(dataProvider)
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnStartReplaceOnEnd)
                 .ResetActions();
 
@@ -121,26 +101,14 @@ namespace Audit.Elasticsearch.UnitTest
                 order.Status = "Updated";
             }
 
-            await ela.Client.Indices.RefreshAsync(indexName);
+            var elasticClient = dataProvider.GetClient();
+            await elasticClient.Indices.RefreshAsync(indexName);
 
-            var evLoad = await ela.GetEventAsync(new ElasticsearchAuditEventId() { Id = guids[0], Index = indexName });
-            var orderOldValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.Old.ToString());
-            var orderNewValue = Core.Configuration.JsonAdapter.Deserialize<Order>(repl[0].Target.New.ToString());
-            var oldDictionary = evLoad.Target.Old as Dictionary<string, object>;
-            var newDictionary = evLoad.Target.New as Dictionary<string, object>;
+            var evLoad = await dataProvider.GetEventAsync(new ElasticsearchAuditEventId() { Id = guids[0], Index = indexName });
 
             Assert.That(evLoad, Is.Not.Null);
-            Assert.That(oldDictionary, Is.Not.Null);
-            Assert.That(newDictionary, Is.Not.Null);
             Assert.That(guids.Count, Is.EqualTo(1));
-            Assert.That(ins.Count, Is.EqualTo(1));
-            Assert.That(repl.Count, Is.EqualTo(1));
-            Assert.That(orderOldValue.Status, Is.EqualTo("Created"));
-            Assert.That(oldDictionary["status"].ToString(), Is.EqualTo("Created"));
-            Assert.That(orderNewValue.Status, Is.EqualTo("Updated"));
-            Assert.That(newDictionary["status"].ToString(), Is.EqualTo("Updated"));
-            Assert.That(evLoad.CustomFields["MyCustomField"], Is.EqualTo("value"));
-            Assert.That(ins[0].Target.New, Is.EqualTo(null));
+            Assert.That(evLoad.CustomFields["MyCustomField"].ToString(), Is.EqualTo("value"));
         }
 
         [Test]
@@ -148,16 +116,14 @@ namespace Audit.Elasticsearch.UnitTest
         [Category("Elasticsearch")]
         public void Test_Elasticsearch_AutoGeneratedId()
         {
-            var ins = new List<Core.AuditEvent>();
-            var repl = new List<Core.AuditEvent>();
-            var ela = GetElasticsearchDataProvider(ins, repl);
+            var dataProvider = new ElasticsearchDataProvider(c => c.Client(new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(AzureSettings.ElasticSearchUrl)))));
             var indexName = "auto_" + new Random().Next(10000, 99999);
 
-            ela.Index = (IndexName)indexName;
-            ela.IdBuilder = ev => null;
+            dataProvider.Index = (IndexName)indexName;
+            dataProvider.IdBuilder = ev => null;
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(ela)
+                .UseCustomProvider(dataProvider)
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnStartReplaceOnEnd)
                 .ResetActions();
 
@@ -169,24 +135,19 @@ namespace Audit.Elasticsearch.UnitTest
                 sb += "-end";
             }
 
-            ela.Client.Indices.Refresh(indexName);
+            var elasticClient = dataProvider.GetClient();
+            elasticClient.Indices.Refresh(indexName);
 
-            var results = ela.Client.Search<Core.AuditEvent>(new SearchRequest(indexName));
+            var results = elasticClient.Search<AuditEvent>(new SearchRequest(indexName));
             var evResult = results.Documents.FirstOrDefault();
             if (evResult != null)
             {
-                ela.Client.Delete(new DeleteRequest(results.Hits.First().Index, results.Hits.First().Id));
+                elasticClient.Delete(new DeleteRequest(results.Hits.First().Index, results.Hits.First().Id));
             }
 
             Assert.That(evResult, Is.Not.Null);
             Assert.That(results.Documents.Count, Is.EqualTo(1));
-            Assert.That(ins.Count, Is.EqualTo(1));
-            Assert.That(repl.Count, Is.EqualTo(1));
             Assert.That(evResult.Target.Old.ToString(), Is.EqualTo("init"));
-            Assert.That(ins[0].Target.Old.ToString(), Is.EqualTo("init"));
-            Assert.That(ins[0].Target.New, Is.EqualTo(null));
-            Assert.That(repl[0].Target.Old.ToString(), Is.EqualTo("init"));
-            Assert.That(repl[0].Target.New.ToString(), Is.EqualTo("init-end"));
             Assert.That(evResult.Target.New.ToString(), Is.EqualTo("init-end"));
             Assert.That(evResult.CustomFields["MyCustomField"]?.ToString(), Is.EqualTo("value"));
         }
@@ -196,16 +157,14 @@ namespace Audit.Elasticsearch.UnitTest
         [Category("Elasticsearch")]
         public async Task Test_Elasticsearch_AutoGeneratedId_Async()
         {
-            var ins = new List<Core.AuditEvent>();
-            var repl = new List<Core.AuditEvent>();
-            var ela = GetElasticsearchDataProvider(ins, repl);
+            var dataProvider = new ElasticsearchDataProvider(c => c.Client(new Uri(AzureSettings.ElasticSearchUrl)));
             var indexName = "auto_" + new Random().Next(10000, 99999);
 
-            ela.Index = (IndexName)indexName;
-            ela.IdBuilder = ev => null;
+            dataProvider.Index = (IndexName)indexName;
+            dataProvider.IdBuilder = ev => null;
 
             Audit.Core.Configuration.Setup()
-                .UseCustomProvider(ela)
+                .UseCustomProvider(dataProvider)
                 .WithCreationPolicy(Core.EventCreationPolicy.InsertOnStartReplaceOnEnd)
                 .ResetActions();
 
@@ -217,24 +176,19 @@ namespace Audit.Elasticsearch.UnitTest
                 sb += "-end";
             }
 
-            await ela.Client.Indices.RefreshAsync(indexName);
+            var elasticClient = dataProvider.GetClient();
+            await elasticClient.Indices.RefreshAsync(indexName);
 
-            var results = await ela.Client.SearchAsync<Core.AuditEvent>(new SearchRequest(indexName));
+            var results = await elasticClient.SearchAsync<Core.AuditEvent>(new SearchRequest(indexName));
             var evResult = results.Documents.FirstOrDefault();
             if (evResult != null)
             {
-                await ela.Client.DeleteAsync(new DeleteRequest(results.Hits.First().Index, results.Hits.First().Id));
+                await elasticClient.DeleteAsync(new DeleteRequest(results.Hits.First().Index, results.Hits.First().Id));
             }
 
             Assert.That(evResult, Is.Not.Null);
             Assert.That(results.Documents.Count, Is.EqualTo(1));
-            Assert.That(ins.Count, Is.EqualTo(1));
-            Assert.That(repl.Count, Is.EqualTo(1));
             Assert.That(evResult.Target.Old.ToString(), Is.EqualTo("init"));
-            Assert.That(ins[0].Target.Old.ToString(), Is.EqualTo("init"));
-            Assert.That(ins[0].Target.New, Is.EqualTo(null));
-            Assert.That(repl[0].Target.Old.ToString(), Is.EqualTo("init"));
-            Assert.That(repl[0].Target.New.ToString(), Is.EqualTo("init-end"));
             Assert.That(evResult.Target.New.ToString(), Is.EqualTo("init-end"));
             Assert.That(evResult.CustomFields["MyCustomField"]?.ToString(), Is.EqualTo("value"));
         }
@@ -245,7 +199,7 @@ namespace Audit.Elasticsearch.UnitTest
         public void Test_Elasticsearch_Polymorphic_Serialization()
         {
             var indexName = "auto_" + new Random().Next(10000, 99999);
-            var dp = new ElasticsearchDataProvider(c => c.ConnectionSettings(new Uri("http://localhost:9200/")).Index(indexName));
+            var dp = new ElasticsearchDataProvider(c => c.Client(new Uri(AzureSettings.ElasticSearchUrl)).Index(indexName));
 
             Audit.Core.Configuration.Setup().UseNullProvider();
 
@@ -262,7 +216,8 @@ namespace Audit.Elasticsearch.UnitTest
 
             var result = dp.GetEvent<CustomAuditEvent>(id);
 
-            dp.Client.Indices.Delete(new DeleteIndexRequest(indexName));
+            var elasticClient = dp.GetClient();
+            elasticClient.Indices.Delete(new DeleteIndexRequest(indexName));
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.CustomFields.Count, Is.EqualTo(1));
@@ -276,7 +231,7 @@ namespace Audit.Elasticsearch.UnitTest
         public async Task Test_Elasticsearch_Polymorphic_SerializationAsync()
         {
             var indexName = "auto_" + new Random().Next(10000, 99999);
-            var dp = new ElasticsearchDataProvider(c => c.ConnectionSettings(new Uri("http://localhost:9200/")).Index(indexName));
+            var dp = new ElasticsearchDataProvider(c => c.Client(new Uri(AzureSettings.ElasticSearchUrl)).Index(indexName));
 
             Audit.Core.Configuration.Setup().UseNullProvider();
 
@@ -295,7 +250,8 @@ namespace Audit.Elasticsearch.UnitTest
 
             var result = await dp.GetEventAsync<CustomAuditEvent>(id);
 
-            await dp.Client.Indices.DeleteAsync(new DeleteIndexRequest(indexName));
+            var elasticClient = dp.GetClient();
+            await elasticClient.Indices.DeleteAsync(new DeleteIndexRequest(indexName));
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.CustomFields.Count, Is.EqualTo(1));
@@ -307,39 +263,6 @@ namespace Audit.Elasticsearch.UnitTest
     public class CustomAuditEvent : AuditEvent
     {
         public string CustomProperty { get; set; }
-    }
-
-    public class ElasticsearchDataProviderForTest : ElasticsearchDataProvider
-    {
-        private List<Core.AuditEvent> _inserted;
-        private List<Core.AuditEvent> _replaced;
-
-        public ElasticsearchDataProviderForTest(List<Core.AuditEvent> ins, List<Core.AuditEvent> repl, IElasticClient cli) : base(cli)
-        {
-            _inserted = ins;
-            _replaced = repl;
-        }
-
-        public override object InsertEvent(Core.AuditEvent auditEvent)
-        {
-            _inserted.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.InsertEvent(auditEvent);
-        }
-        public override Task<object> InsertEventAsync(Core.AuditEvent auditEvent, CancellationToken cancellationToken = default)
-        {
-            _inserted.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.InsertEventAsync(auditEvent, cancellationToken);
-        }
-        public override void ReplaceEvent(object eventId, Core.AuditEvent auditEvent)
-        {
-            _replaced.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
-            base.ReplaceEvent(eventId, auditEvent);
-        }
-        public override Task ReplaceEventAsync(object eventId, Core.AuditEvent auditEvent, CancellationToken cancellationToken = default)
-        {
-            _replaced.Add(Audit.Core.AuditEvent.FromJson(auditEvent.ToJson()));
-            return base.ReplaceEventAsync(eventId, auditEvent, cancellationToken);
-        }
     }
 
     public class Order

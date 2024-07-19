@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [26.0.0] - 2024-07-19:
+- Audit.NET.Elasticsearch: Upgrading the elasticsearch data provider to use the new client Elastic.Clients.Elasticsearch instead of the deprecated NEST client. [Migration guide](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/migration-guide.html) (#682)
+
 ## [25.0.7] - 2024-07-04:
 - Audit.HttpClient: Allowing to audit the HttpRequestMessage.Options to add contextual information to the HTTP Audit Event.
 Adding GetRequestMessage() and GetResponseMessage() to the HttpAction to be able to retrieve the HttpRequestMessage and HttpResponseMessage objects from the audit event. (#673)

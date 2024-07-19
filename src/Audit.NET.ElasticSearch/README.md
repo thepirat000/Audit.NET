@@ -1,7 +1,7 @@
 # Audit.NET.Elasticsearch
 **Elasticsearch provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
-Store the audit events in Elasticsearch database using the [NEST](https://www.nuget.org/packages/Nest) library.
+Store the audit events in Elasticsearch database using the [Elastic.Clients.Elasticsearch](https://www.nuget.org/packages/Elastic.Clients.Elasticsearch) library.
 
 ## Install
 
@@ -24,20 +24,22 @@ method on the fluent configuration. This should be done before any `AuditScope` 
 
 
 For example:
+
 ```c#
 Audit.Core.Configuration.DataProvider = new ElasticsearchDataProvider()
 {
-    ConnectionSettings = new ConnectionSettings(new Uri("http://localhost:9200")),
-    IndexBuilder = ev => ev.EventType,
+    ClientSettings = new ElasticsearchClientSettings(new Uri("http://localhost:9200")),
+    Index = new(ev => ev.EventType),
     IdBuilder = ev => Guid.NewGuid()
 };
 ```
 
 Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
+
 ```c#
 Audit.Core.Configuration.Setup()
     .UseElasticsearch(config => config
-        .ConnectionSettings(new Uri("http://localhost:9200"))
+        .Client(new ElasticsearchClient("<CLOUD ID>", new BasicAuthentication("user", "pass")))
         .Index(auditEvent => auditEvent.EventType)
         .Id(ev => Guid.NewGuid()));
 ```
@@ -48,11 +50,11 @@ Note that you can provide the settings as a function of the [Audit Event](https:
 ### Provider Options
 
 Mandatory:
-- **ConnectionSettings**: The Elasticsearch connection settings. 
+- **Client / ClientSettings**: Specifies how to create the Elasticsearch client. You can either pass an instance of the ElasticsearchClient or provide the ElasticsearchClientSettings.
 
 Optional:
 - **Index**: The Elasticsearch index name to use. Can be NULL to use the default index. 
-- **Id**: The id to use for the given audit event. Can be NULL to use an auto-generated id.
+- **Id / IdBuilder**: The id to use for the given audit event. Can be NULL to use an auto-generated id.
 
 ## Query events
 

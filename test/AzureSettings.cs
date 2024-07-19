@@ -13,7 +13,7 @@ namespace Audit.IntegrationTest
         public static string AzureDocDbAuthKey => GetFromEnv("AZUREDOCDBAUTHKEY");
         public static string BlobAccountName => GetFromEnv("BLOBACCOUNTNAME");
         public static string BlobTenantId => GetFromEnv("BLOBTENANTID");
-        public static string ElasticSearchUrl => "http://127.0.0.1:9200";
+        public static string ElasticSearchUrl => "http://elastic:elastic@127.0.0.1:9200";
         public static string PostgreSqlConnectionString => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
 
         private static string GetFromEnv(string key, string @default = null)

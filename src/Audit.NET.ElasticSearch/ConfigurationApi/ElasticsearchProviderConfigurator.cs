@@ -1,40 +1,37 @@
 ﻿using System;
 using Audit.Core;
-using Elasticsearch.Net;
-using Nest;
+using Elastic.Clients.Elasticsearch;
 
 namespace Audit.Elasticsearch.Configuration
 {
     public class ElasticsearchProviderConfigurator : IElasticsearchProviderConfigurator
     {
-        internal IConnectionSettingsValues _connectionSettings;
+        internal IElasticsearchClientSettings _clientSettings;
         internal Setting<IndexName> _index;
         internal Func<Core.AuditEvent, Id> _idBuilder;
+        internal ElasticsearchClient _client;
 
-        public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionSettingsValues connectionSettings)
+        public IElasticsearchProviderConfigurator Client(ElasticsearchClient client)
         {
-            _connectionSettings = connectionSettings;
+            _client = client;
+            _clientSettings = null;
             return this;
         }
 
-        public IElasticsearchProviderConfigurator ConnectionSettings(Uri uri)
+        public IElasticsearchProviderConfigurator Client(IElasticsearchClientSettings clientSettings)
         {
-            _connectionSettings = new ConnectionSettings(uri);
+            _clientSettings = clientSettings;
+            _client = null;
             return this;
         }
 
-        public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionPool connectionPool)
+        public IElasticsearchProviderConfigurator Client(Uri uri)
         {
-            _connectionSettings = new ConnectionSettings(connectionPool);
+            _clientSettings = new ElasticsearchClientSettings(uri);
+            _client = null;
             return this;
         }
-
-        public IElasticsearchProviderConfigurator ConnectionSettings(IConnectionPool connectionPool, IConnection connection)
-        {
-            _connectionSettings = new ConnectionSettings(connectionPool, connection);
-            return this;
-        }
-
+        
         public IElasticsearchProviderConfigurator Id(Func<Core.AuditEvent, Id> idBuilder)
         {
             _idBuilder = idBuilder;

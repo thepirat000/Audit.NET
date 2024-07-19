@@ -1,7 +1,6 @@
 ﻿using System;
 using Audit.Core;
-using Elastic = Elasticsearch.Net;
-using Nest;
+using Elastic.Clients.Elasticsearch;
 
 namespace Audit.Elasticsearch.Configuration
 {
@@ -11,29 +10,22 @@ namespace Audit.Elasticsearch.Configuration
     public interface IElasticsearchProviderConfigurator
     {
         /// <summary>
-        /// Specifies the Elasticsearch connection settings.
+        /// Specifies the Elasticsearch client settings.
         /// </summary>
-        /// <param name="connectionSettings">The elasticsearch connection settings.</param>
-        IElasticsearchProviderConfigurator ConnectionSettings(IConnectionSettingsValues connectionSettings);
+        /// <param name="clientSettings">The elasticsearch client settings.</param>
+        IElasticsearchProviderConfigurator Client(IElasticsearchClientSettings clientSettings);
 
         /// <summary>
-        /// Specifies the Elasticsearch connection settings by providing the single node URL.
+        /// Specifies the Elasticsearch client to use. 
+        /// </summary>
+        /// <param name="client">The elasticsearch client to use.</param>
+        IElasticsearchProviderConfigurator Client(ElasticsearchClient client);
+
+        /// <summary>
+        /// Specifies the Elasticsearch client settings by providing a single node URL.
         /// </summary>
         /// <param name="uri">The elasticsearch single node URL.</param>
-        IElasticsearchProviderConfigurator ConnectionSettings(Uri uri);
-
-        /// <summary>
-        /// Specifies the Elasticsearch connection settings by providing the connection pool.
-        /// </summary>
-        /// <param name="connectionPool">The connection pool to use.</param>
-        IElasticsearchProviderConfigurator ConnectionSettings(Elastic.IConnectionPool connectionPool);
-
-        /// <summary>
-        /// Specifies the Elasticsearch connection settings by providing the connection pool and the connection.
-        /// </summary>
-        /// <param name="connectionPool">The connection pool to use.</param>
-        /// <param name="connection">The connection to use.</param>
-        IElasticsearchProviderConfigurator ConnectionSettings(Elastic.IConnectionPool connectionPool, Elastic.IConnection connection);
+        IElasticsearchProviderConfigurator Client(Uri uri);
 
         /// <summary>
         /// Specifies the Elasticsearch Index name to use.
