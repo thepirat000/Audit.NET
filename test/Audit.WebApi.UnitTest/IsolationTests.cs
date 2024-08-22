@@ -3,16 +3,9 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Audit.Core;
 using Audit.Core.Providers;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -33,31 +26,6 @@ namespace Audit.WebApi.UnitTest
         }
     }
 
-    public class TestHelper
-    {
-        public static TestServer GetTestServer(AuditDataProvider dataProvider)
-        {
-            return new TestServer(WebHost.CreateDefaultBuilder()
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton(dataProvider);
-                    services.AddControllers();
-                })
-                .Configure((ctx, app) =>
-                {
-                    app.UseAuditMiddleware(cfg => cfg
-                        .FilterByRequest(r => r.Path.Value?.Contains("Action_Middleware") == true));
-                    app.UseRouting();
-                    app.UseEndpoints(e =>
-                    {
-                        e.MapControllers();
-                    });
-                })
-                .ConfigureLogging(log => log.SetMinimumLevel(LogLevel.Warning))
-            );
-        }
-    }
-
     [Parallelizable]
     public class IsolationTests
     {
@@ -72,7 +40,8 @@ namespace Audit.WebApi.UnitTest
         {
             var guid = Guid.NewGuid();
             var dataProvider = new InMemoryDataProvider();
-            using var app = TestHelper.GetTestServer(dataProvider);
+            using var app = TestHelper.GetTestServer(dataProvider, 
+                cfg => cfg.FilterByRequest(r => r.Path.Value?.Contains("Action_Middleware") == true));
             using var client = app.CreateClient();
 
             var response = await client.GetAsync($"/TestIsolation/Action_AuditApiAttribute?q={guid}");
@@ -93,7 +62,8 @@ namespace Audit.WebApi.UnitTest
         {
             var guid = Guid.NewGuid();
             var dataProvider = new InMemoryDataProvider();
-            using var app = TestHelper.GetTestServer(dataProvider);
+            using var app = TestHelper.GetTestServer(dataProvider, cfg => cfg
+                .FilterByRequest(r => r.Path.Value?.Contains("Action_Middleware") == true));
             using var client = app.CreateClient();
 
             var response = await client.GetAsync($"/TestIsolation/Action_Middleware?q={guid}");

@@ -155,11 +155,12 @@ namespace Audit.WebApi
                     auditAction.ResponseStatus = AuditApiHelper.GetStatusCodeString(statusCode);
                     if (includeResponseBody && auditAction.ResponseBody == null)
                     {
+                        var skipResponse = _config._skipRequestBodyBuilder != null && _config._skipRequestBodyBuilder.Invoke(context);
                         auditAction.ResponseBody = new BodyContent
                         {
                             Type = context.Response.ContentType,
                             Length = context.Response.ContentLength,
-                            Value = await AuditApiHelper.GetResponseBody(context, default)
+                            Value = skipResponse ? null : await AuditApiHelper.GetResponseBody(context, default)
                         };
                     }
                 }

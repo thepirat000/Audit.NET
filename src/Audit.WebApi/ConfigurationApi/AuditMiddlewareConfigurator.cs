@@ -12,6 +12,7 @@ namespace Audit.WebApi.ConfigurationApi
         internal Func<HttpContext, bool> _includeRequestBodyBuilder;
         internal Func<HttpContext, bool> _includeResponseBodyBuilder;
         internal Func<HttpContext, string> _eventTypeNameBuilder;
+        internal Func<HttpContext, bool> _skipRequestBodyBuilder;
 
         public IAuditMiddlewareConfigurator IncludeHeaders(bool include = true)
         {
@@ -61,6 +62,26 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
+        public IAuditMiddlewareConfigurator SkipResponseBodyContent(Func<HttpContext, bool> skipPredicate)
+        {
+            if (_includeResponseBodyBuilder == null)
+            {
+                _includeResponseBodyBuilder = _ => true;
+            }
+            _skipRequestBodyBuilder = skipPredicate;
+            return this;
+        }
+
+        public IAuditMiddlewareConfigurator SkipResponseBodyContent(bool skip)
+        {
+            if (_includeResponseBodyBuilder == null)
+            {
+                _includeResponseBodyBuilder = _ => true;
+            }
+            _skipRequestBodyBuilder = _ => skip;
+            return this;
+        }
+
         public IAuditMiddlewareConfigurator FilterByRequest(Func<HttpRequest, bool> requestPredicate)
         {
             _requestFilter = requestPredicate;
@@ -73,9 +94,9 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
-        public IAuditMiddlewareConfigurator WithEventType(Func<HttpContext, string> eventTypeNamePredicate)
+        public IAuditMiddlewareConfigurator WithEventType(Func<HttpContext, string> eventTypeNameBuilder)
         {
-            _eventTypeNameBuilder = eventTypeNamePredicate;
+            _eventTypeNameBuilder = eventTypeNameBuilder;
             return this;
         }
     }

@@ -16,6 +16,7 @@ namespace Audit.UnitTest
             Core.Configuration.Reset();
         }
 
+#if !NETCOREAPP3_1
         [Test]
         public void TestEventLogDataProvider_InsertReplaceEvent()
         {
@@ -45,6 +46,7 @@ namespace Audit.UnitTest
             // Assert
             Assert.That(eventId1, Is.Null);
         }
+#endif
 
         [Test]
         public void Test_EventLogDataProvider_FluentApi()

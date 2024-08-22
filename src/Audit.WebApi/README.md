@@ -283,7 +283,10 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 - **IncludeHeaders()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include the Http Request Headers or not. Default is false.
 - **IncludeResponseHeaders()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include the Http Response Headers or not. Default is false.
 - **IncludeRequestBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include or exclude the request body from the logs. Default is false. (Check the following note)
-- **IncludeResponseBody()**: Boolean (or function of the HTTP context that returns a boolean) to indicate whether to include response body or not. Default is false.
+- **IncludeResponseBody()**: Boolean (or a predicate of the HTTP context before execution) to indicate whether to include response body.
+The predicate is evaluated before action execution. Default is false. 
+- **SkipResponseBodyContent()**: Boolean (or a predicate of the HTTP context after execution) to indicate whether to skip or include the response body content. 
+The predicate is evaluated after action execution. Default is false. 
 - **WithEventType()**: A string (or a function of the HTTP context that returns a string) that identifies the event type. Can contain the following placeholders (default is "{verb} {url}"): 
   - \{verb}: replaced with the HTTP verb used (GET, POST, etc).
   - \{url}: replaced with the request URL.

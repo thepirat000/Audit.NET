@@ -52,21 +52,38 @@ namespace Audit.WebApi.ConfigurationApi
         /// <summary>
         /// Specifies a predicate to determine the event type name on the audit output.
         /// </summary>
-        /// <param name="eventTypeNamePredicate">A function of the executing context to determine the event type name. The following placeholders can be used as part of the string: 
+        /// <param name="eventTypeNameBuilder">A function of the executing context to determine the event type name. The following placeholders can be used as part of the string: 
         /// - {url}: replaced with the requst URL.
         /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </param>
-        IAuditMiddlewareConfigurator WithEventType(Func<HttpContext, string> eventTypeNamePredicate);
+        IAuditMiddlewareConfigurator WithEventType(Func<HttpContext, string> eventTypeNameBuilder);
         /// <summary>
         /// Specifies whether the response body should be included on the audit output.
         /// </summary>
         /// <param name="include">True to include the response body, false otherwise</param>
         IAuditMiddlewareConfigurator IncludeResponseBody(bool include = true);
+
         /// <summary>
         /// Specifies a predicate to determine whether the response body should be included on the audit output.
+        /// The predicate is evaluated before request execution.
         /// </summary>
-        /// <param name="includePredicate">A function of the executed context to determine whether the response body should be included on the audit output</param>
+        /// <param name="includePredicate">A function of the executed context to determine whether the response body should be included on the audit output.
+        /// This predicate is evaluated before request execution.</param>
         IAuditMiddlewareConfigurator IncludeResponseBody(Func<HttpContext, bool> includePredicate);
+
+        /// <summary>
+        /// Specifies a predicate to determine whether the response body content should be skipped or included in the audit output.
+        /// The predicate is evaluated after request execution.
+        /// </summary>
+        /// <param name="skipPredicate">A function of the executed context to determine whether the response body content should be skipped or included in the audit output.
+        /// This predicate is evaluated after request execution.</param>
+        IAuditMiddlewareConfigurator SkipResponseBodyContent(Func<HttpContext, bool> skipPredicate);
+
+        /// <summary>
+        /// Specifies whether the response body content should be skipped or included in the audit output.
+        /// </summary>
+        /// <param name="skip">A boolean to determine whether the response body should be skipped or included in the audit output.</param>
+        IAuditMiddlewareConfigurator SkipResponseBodyContent(bool skip);
     }
 }
 #endif

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [26.0.1] - 2024-08-22:
+- Audit.WebApi.Core: Adding new SkipResponseBodyContent() configuration to allow deciding whether to skip or include the response body content **after** the action is executed (#690)
+
 ## [26.0.0] - 2024-07-19:
 - Audit.NET.Elasticsearch: Upgrading the elasticsearch data provider to use the new client Elastic.Clients.Elasticsearch instead of the deprecated NEST client. [Migration guide](https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/migration-guide.html) (#682)
 
