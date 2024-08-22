@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 7/19/2024 - 5:30:13 AM |
+| Generated on: | 8/22/2024 - 1:10:30 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 23 |
 | Classes: | 261 |
 | Files: | 199 |
-| **Line coverage:** | 76.9% (7729 of 10050) |
-| Covered lines: | 7729 |
-| Uncovered lines: | 2321 |
-| Coverable lines: | 10050 |
-| Total lines: | 18446 |
-| **Branch coverage:** | 70.7% (2971 of 4198) |
-| Covered branches: | 2971 |
-| Total branches: | 4198 |
+| **Line coverage:** | 76.9% (7740 of 10059) |
+| Covered lines: | 7740 |
+| Uncovered lines: | 2319 |
+| Coverable lines: | 10059 |
+| Total lines: | 18468 |
+| **Branch coverage:** | 70.8% (2983 of 4210) |
+| Covered branches: | 2983 |
+| Total branches: | 4210 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -286,7 +286,7 @@
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|0|22|22|64|0%|0|4|0%|
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|0|26|26|109|0%|0|0||
 |Audit.WebApi.ContextWrapper|25|11|36|136|69.4%|17|38|44.7%|
-|**Audit.WebApi.Core**|**394**|**84**|**478**|**1417**|**82.4%**|**197**|**274**|**71.8%**|
+|**Audit.WebApi.Core**|**405**|**82**|**487**|**1439**|**83.1%**|**209**|**286**|**73%**|
 |Audit.WebApi.ApiControllerExtensions|1|5|6|92|16.6%|0|0||
 |Audit.WebApi.AuditApiAction|22|2|24|74|91.6%|0|0||
 |Audit.WebApi.AuditApiAdapter|115|27|142|305|80.9%|87|132|65.9%|
@@ -296,9 +296,9 @@
 |Audit.WebApi.AuditEventExtensions|2|4|6|32|33.3%|1|6|16.6%|
 |Audit.WebApi.AuditEventWebApi|1|0|1|16|100%|0|0||
 |Audit.WebApi.AuditIgnoreActionFilter|4|0|4|23|100%|0|0||
-|Audit.WebApi.AuditMiddleware|95|2|97|177|97.9%|40|46|86.9%|
+|Audit.WebApi.AuditMiddleware|96|2|98|178|97.9%|44|50|88%|
 |Audit.WebApi.AuditMiddlewareExtensions|3|0|3|24|100%|0|0||
 |Audit.WebApi.BodyContent|3|0|3|9|100%|0|0||
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|10|12|22|64|45.4%|1|6|16.6%|
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|12|14|26|109|46.1%|0|0||
-|Audit.WebApi.ConfigurationApi.AuditMiddlewareConfigurator|12|10|22|83|54.5%|0|0||
+|Audit.WebApi.ConfigurationApi.AuditMiddlewareConfigurator|22|8|30|104|73.3%|8|8|100%|
