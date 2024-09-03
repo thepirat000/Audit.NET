@@ -96,7 +96,7 @@ If you're using a DI container, you can register the `IAuditScopeFactory` as a s
 The default implementation of `IAuditScopeFactory` is provided by the `AuditScopeFactory` class.
 
 ```c#
-services.AddSingleton<IAuditScopeFactory, AuditScopeFactory>();
+services.AddScoped<IAuditScopeFactory, AuditScopeFactory>();
 ```
 
 Then you can inject the IAuditScopeFactory into your classes to create audit scopes:
