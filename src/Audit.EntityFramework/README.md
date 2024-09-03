@@ -163,7 +163,7 @@ builder.Services.AddDbContext<MyContext>(c => c
 
 ### Low-Level Command Interception
 
-A low-level command interceptor is also provided for EF Core ≥ 3.0. 
+A low-level command interceptor is also provided for Entity Framework Core. 
 
 In order to audit low-level operations like *reads*, *stored procedure calls* and *non-query commands*, you can attach the provided `AuditCommandInterceptor` to 
 your `DbContext` configuration. 
@@ -211,9 +211,51 @@ builder.Services.AddDbContext<MyContext>(c => c
 
 ### Output
 
-The EF audit events are stored using a _Data Provider_. 
-You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own. 
-This can be set per `DbContext` instance or globally. If you plan to store the audit logs with EF, you can use the [Entity Framework Data Provider](#entity-framework-data-provider). 
+EF audit events are stored via a _Data Provider_. You can either use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own.
+
+The Audit Data Provider can be configured in several ways:
+
+- Per `DbContext` instance by explicitly setting the `AuditDataProvider` property.
+  For example:
+  ```c#
+  public class MyContext : AuditDbContext
+  {
+    public MyContext()
+    {
+        AuditDataProvider = new SqlDataProvider(config => config...);
+    }
+  }
+  ```
+
+- By registering an `AuditDataProvider` instance in the dependency injection container.
+
+  For example:
+  ```c#
+  public class Program
+  {
+    public static void Main(string[] args)
+    {
+      var builder = WebApplication.CreateBuilder(args);
+
+      builder.Services.AddSingleton<AuditDataProvider>(new SqlDataProvider(config => config...));
+    }
+  }
+  ```
+
+- Globally, by setting the `AuditDataProvider` instance through the `Audit.Core.Configuration.DataProvider` static property or the `Audit.Core.Configuration.Use()` methods.
+
+  For example:
+  ```c#
+  public class Program
+  {
+    public static void Main(string[] args)
+    {
+      Audit.Core.Configuration.Setup().UseSqlServer(config => config...);
+    }
+  }
+  ```
+
+If you intend to store audit logs with EF, consider using the [Entity Framework Data Provider](#entity-framework-data-provider).
 
 ### Settings (low-Level interceptor)
 The low-level command interceptor can be configured by setting the `AuditCommandInterceptor` properties, for example:

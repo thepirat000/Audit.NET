@@ -62,7 +62,7 @@ namespace Audit.WCF
                 WcfEvent = auditWcfEvent
             };
             // Create the audit scope
-            using (var auditScope = AuditScope.Create(new AuditScopeOptions()
+            using (var auditScope = Configuration.AuditScopeFactory.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
                 CreationPolicy = _creationPolicy,
@@ -109,7 +109,7 @@ namespace Audit.WCF
                 WcfEvent = auditWcfEvent
             };
             // Create the audit scope
-            var auditScope = AuditScope.Create(new AuditScopeOptions()
+            var auditScope = Configuration.AuditScopeFactory.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
                 CreationPolicy = _creationPolicy,

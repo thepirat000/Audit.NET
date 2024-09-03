@@ -38,8 +38,9 @@ namespace Audit.Wcf.Client
             {
                 WcfClientEvent = auditWcfEvent
             };
+            
             // Create the audit scope
-            var auditScope = AuditScope.Create(new AuditScopeOptions()
+            var auditScope = Configuration.AuditScopeFactory.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = auditEventWcf,

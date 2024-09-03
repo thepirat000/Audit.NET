@@ -51,7 +51,7 @@ namespace Audit.NLog.Providers
 
         private LogLevel GetLogLevel(AuditEvent auditEvent)
         {
-            return LogLevel.GetValue(auditEvent) ?? (auditEvent.Environment.Exception != null ? NLog.LogLevel.Error : NLog.LogLevel.Info);
+            return LogLevel.GetValue(auditEvent) ?? (auditEvent.Environment?.Exception != null ? NLog.LogLevel.Error : NLog.LogLevel.Info);
         }
 
         private object GetLogObject(AuditEvent auditEvent, object eventId)

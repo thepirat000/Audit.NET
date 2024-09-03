@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<Description>An extensible framework to audit executing operations in .NET and .NET Core.</Description>
-		<LangVersion>10</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<Copyright>Copyright 2016</Copyright>
 		<AssemblyTitle>Audit.NET</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>

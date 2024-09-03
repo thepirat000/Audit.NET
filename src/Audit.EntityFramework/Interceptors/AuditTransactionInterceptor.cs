@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Audit.EntityFramework.Interceptors
 {
@@ -310,13 +311,15 @@ namespace Audit.EntityFramework.Interceptors
                 tranEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
             }
 
-            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var factory = _dbContextHelper.GetAuditScopeFactory(tranEvent.TransactionEvent.DbContext);
+            var dataProvider = _dbContextHelper.GetDataProvider(tranEvent.TransactionEvent.DbContext);
+
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = tranEvent,
                 SkipExtraFrames = 3,
-                DataProvider = context?.AuditDataProvider
+                DataProvider = dataProvider
             };
 
             var scope = factory.Create(options);
@@ -339,13 +342,15 @@ namespace Audit.EntityFramework.Interceptors
                 tranEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
             }
 
-            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var factory = _dbContextHelper.GetAuditScopeFactory(tranEvent.TransactionEvent.DbContext);
+            var dataProvider = _dbContextHelper.GetDataProvider(tranEvent.TransactionEvent.DbContext);
+
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = tranEvent,
                 SkipExtraFrames = 3,
-                DataProvider = context?.AuditDataProvider
+                DataProvider = dataProvider
             };
 
             var scope = await factory.CreateAsync(options, cancellationToken);

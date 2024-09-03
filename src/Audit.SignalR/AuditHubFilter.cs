@@ -170,8 +170,8 @@ namespace Audit.SignalR
 
             // Try to get IAuditScopeFactory / DataProvider as registered services
             var httpContext = signalrEvent.Hub.Context.GetHttpContext();
-            var scopeFactory = httpContext?.RequestServices.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
-            var dataProvider = AuditDataProvider ?? httpContext?.RequestServices.GetService<AuditDataProvider>();
+            var scopeFactory = httpContext?.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
+            var dataProvider = AuditDataProvider ?? httpContext?.RequestServices?.GetService<AuditDataProvider>();
             
             var scope = await scopeFactory.CreateAsync(new AuditScopeOptions()
             {

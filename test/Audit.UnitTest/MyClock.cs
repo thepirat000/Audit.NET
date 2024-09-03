@@ -5,15 +5,13 @@ namespace Audit.UnitTest
 {
     public class MyClock : ISystemClock
     {
-        public DateTime _start = new DateTime(2020, 1, 1);
-        public DateTime UtcNow
+        private DateTime _start = new DateTime(2020, 1, 1);
+
+        public DateTime GetCurrentDateTime()
         {
-            get
-            {
-                var dt = _start;
-                _start = _start.AddSeconds(10);
-                return dt;
-            }
+            var dt = _start;
+            _start = _start.AddSeconds(10);
+            return dt;
         }
     }
 }

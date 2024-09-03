@@ -180,7 +180,7 @@ namespace Audit.UnitTest
             var guid = "x" + Guid.NewGuid().ToString();
             try
             {
-                new AuditScopeFactory().Create(new AuditScopeOptions(guid, extraFields: loop, isCreateAndSave: true));
+                new AuditScopeFactory().Create(new AuditScopeOptions() { EventType = guid, ExtraFields = loop, IsCreateAndSave = true });
                 Assert.Fail("Should not get here. JsonSettings not respected?");
             }
             catch (Exception ex)
@@ -212,7 +212,7 @@ namespace Audit.UnitTest
             var guid = "x" + Guid.NewGuid().ToString();
             try
             {
-                await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(guid, extraFields: loop, isCreateAndSave: true));
+                await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { EventType = guid, ExtraFields = loop, IsCreateAndSave = true });
                 Assert.Fail("Should not get here. JsonSettings not respected?");
             }
             catch (Exception ex)

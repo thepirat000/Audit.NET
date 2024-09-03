@@ -12,12 +12,17 @@ namespace Audit.WebApi.UnitTest
 {
     public class TestHelper
     {
-        public static TestServer GetTestServer(AuditDataProvider dataProvider, Action<ConfigurationApi.IAuditMiddlewareConfigurator> middlewareConfig)
+        public static TestServer GetTestServer(AuditDataProvider dataProvider, Action<ConfigurationApi.IAuditMiddlewareConfigurator> middlewareConfig,
+            IAuditScopeFactory scopeFactory = null)
         {
             return new TestServer(WebHost.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton(dataProvider);
+                    if (scopeFactory != null)
+                    {
+                        services.AddSingleton(scopeFactory);
+                    }
                     services.AddControllers();
                 })
                 .Configure((ctx, app) =>

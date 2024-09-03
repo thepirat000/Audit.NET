@@ -88,7 +88,7 @@ namespace Audit.Serilog.Providers
         private LogLevel GetLogLevel(AuditEvent auditEvent)
         {
             return this.LogLevel.GetValue(auditEvent) ??
-                   (auditEvent.Environment.Exception != null ? Serilog.LogLevel.Error : Serilog.LogLevel.Info);
+                   (auditEvent.Environment?.Exception != null ? Serilog.LogLevel.Error : Serilog.LogLevel.Info);
         }
 
         private object GetLogObject(AuditEvent auditEvent, object eventId)

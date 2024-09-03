@@ -67,7 +67,7 @@ namespace Audit.Core.Providers
 
             using (var eventLog = new EventLog(logName, machine, source))
             {
-                eventLog.WriteEntry(message, auditEvent.Environment.Exception == null ? EventLogEntryType.Information : EventLogEntryType.Error);
+                eventLog.WriteEntry(message, auditEvent.Environment?.Exception == null ? EventLogEntryType.Information : EventLogEntryType.Error);
             }
 
             return null;

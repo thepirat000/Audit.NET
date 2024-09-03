@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
+
 using Audit.Core;
 using Audit.Core.Providers;
+
 using NUnit.Framework;
 
 namespace Audit.UnitTest
@@ -18,7 +18,63 @@ namespace Audit.UnitTest
         {
             Audit.Core.Configuration.Reset();
         }
-        
+
+        [Test]
+        public void Test_ScopeItems()
+        {
+            var testObject = new object();
+
+            object onCreatedObject = null;
+
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.Core.Configuration.AddOnCreatedAction(scope =>
+            {
+                onCreatedObject = scope.Items["TestObject"];
+            });
+
+            var scope = AuditScope.Create(c => c.EventType("Event").WithItem("TestObject", testObject));
+
+            var afterCreatedObject = scope.Items["TestObject"];
+
+            scope.Dispose();
+
+            var evs = dp.GetAllEvents();
+
+            Assert.That(evs, Has.Count.EqualTo(1));
+            Assert.That(onCreatedObject, Is.Not.Null);
+            Assert.That(onCreatedObject, Is.EqualTo(testObject));
+            Assert.That(afterCreatedObject, Is.Not.Null);
+            Assert.That(afterCreatedObject, Is.EqualTo(testObject));
+        }
+
+        [Test]
+        public void Test_ScopeItems_GetItem()
+        {
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+            
+            var scope = AuditScope.Create(new AuditScopeOptions()
+            {
+                Items = new() { { "Key", new ArgumentException("test") }}
+            });
+
+            var getItemAsObject = scope.GetItem<object>("Key");
+            var getItemAsException = scope.GetItem<Exception>("Key");
+            var getItemAsArgumentException = scope.GetItem<ArgumentException>("Key");
+            
+            var getItemDifferentType = scope.GetItem<OutOfMemoryException>("Key");
+            var getItemKeyNotFound = scope.GetItem<object>("NotFound");
+
+            scope.Dispose();
+
+            Assert.That(getItemAsObject, Is.Not.Null);
+            Assert.That(getItemAsException, Is.Not.Null);
+            Assert.That(getItemAsArgumentException, Is.Not.Null);
+            
+            Assert.That(getItemDifferentType, Is.Null);
+            Assert.That(getItemKeyNotFound, Is.Null);
+        }
+
         [Test]
         public void Test_AuditEvent_GetAuditScope_WeakReference()
         {

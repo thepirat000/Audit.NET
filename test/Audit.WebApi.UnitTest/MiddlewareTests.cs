@@ -1,6 +1,7 @@
 ﻿#if NETCOREAPP3_1 || NET6_0
 using System.Net;
 using System.Threading.Tasks;
+using Audit.Core;
 using Audit.Core.Providers;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
@@ -53,7 +54,7 @@ namespace Audit.WebApi.UnitTest
                         cfg.SkipResponseBodyContent(skipResponseBody!.Value);
                     }
                 }
-            });
+            }, new CustomAuditScopeFactory());
 
             using var client = app.CreateClient();
 
@@ -64,8 +65,30 @@ namespace Audit.WebApi.UnitTest
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
             Assert.That(events, Has.Count.EqualTo(1));
+            Assert.That(events[0].CustomFields, Contains.Key("TestField"));
+            Assert.That(events[0].CustomFields["TestField"].ToString(), Is.EqualTo("FromOnConfiguring"));
+            Assert.That(events[0].CustomFields, Contains.Key("TestField2"));
+            Assert.That(events[0].CustomFields["TestField2"].ToString(), Is.EqualTo("FromOnScopeCreated"));
             Assert.That(events[0].GetWebApiAuditAction().ResponseBody, expectNullResponseBody ? Is.Null : Is.Not.Null);
             Assert.That(events[0].GetWebApiAuditAction().ResponseBody?.Value, expectNullResponseBodyContent ? Is.Null : Is.Not.Null);
+        }
+    }
+
+    public class CustomAuditScopeFactory : AuditScopeFactory
+    {
+        public override void OnConfiguring(AuditScopeOptions options)
+        {
+            options.Items.Add("TestItem", "TestValue");
+            options.ExtraFields = new { TestField = "FromOnConfiguring" };
+        }
+
+        public override void OnScopeCreated(AuditScope auditScope)
+        {
+            if (auditScope.Items["TestItem"].ToString() != "TestValue")
+            {
+                Assert.Fail("TestItem not found");
+            }
+            auditScope.SetCustomField("TestField2", "FromOnScopeCreated");
         }
     }
 }

@@ -32,14 +32,10 @@ namespace Audit.Core.Extensions
                 return name;
             }
             var sb = new StringBuilder();
-            sb.Append(name.Substring(0, name.IndexOf("`")));
+            sb.Append(name.Substring(0, name.IndexOf("`", StringComparison.Ordinal)));
 
             sb.Append(genericTypes.Aggregate("<",
-                delegate (string aggregate, Type t)
-                {
-                    return aggregate + (aggregate == "<" ? "" : ",") + GetFullTypeName(t);
-                }
-                ));
+                (aggregate, t) => aggregate + (aggregate == "<" ? "" : ",") + GetFullTypeName(t)));
             sb.Append(">");
             return AnonymousTypeRegex.Replace(sb.ToString(), AnonymousReplacementString);
         }

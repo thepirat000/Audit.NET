@@ -205,7 +205,7 @@ namespace Audit.MongoClient.UnitTest
 
             var mockFactory = new Mock<IAuditScopeFactory>(MockBehavior.Strict);
             mockFactory.Setup(x => x.Create(It.IsAny<AuditScopeOptions>()))
-                .Returns(AuditScope.Create(new AuditScopeOptions(eventType)));
+                .Returns(AuditScope.Create(new AuditScopeOptions() { EventType = eventType }));
 
             var sut = new MongoAuditEventSubscriber()
             {

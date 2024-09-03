@@ -115,7 +115,7 @@ namespace Audit.Core.Providers
             }
             else
             {
-                fileName += $"{Configuration.SystemClock.UtcNow:yyyyMMddHHmmss}_{HiResDateTime.UtcNowTicks}.json";
+                fileName += $"{Configuration.SystemClock.GetCurrentDateTime():yyyyMMddHHmmss}_{HiResDateTime.UtcNowTicks}.json";
             }
             
             var directory = DirectoryPath.GetValue(auditEvent) ?? "";
@@ -131,7 +131,7 @@ namespace Audit.Core.Providers
         // Original from: http://stackoverflow.com/a/14369695/122195
         public class HiResDateTime
         {
-            private static long lastTimeStamp = Configuration.SystemClock.UtcNow.Ticks;
+            private static long lastTimeStamp = Configuration.SystemClock.GetCurrentDateTime().Ticks;
             public static long UtcNowTicks
             {
                 get
@@ -140,7 +140,7 @@ namespace Audit.Core.Providers
                     do
                     {
                         original = lastTimeStamp;
-                        long now = Configuration.SystemClock.UtcNow.Ticks;
+                        long now = Configuration.SystemClock.GetCurrentDateTime().Ticks;
                         newValue = Math.Max(now, original + 1);
                     } while (Interlocked.CompareExchange
                                  (ref lastTimeStamp, newValue, original) != original);

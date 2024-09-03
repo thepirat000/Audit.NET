@@ -1,6 +1,8 @@
 ﻿#if EF_CORE
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 #else
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -310,12 +312,15 @@ namespace Audit.EntityFramework
             {
                 auditEfEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
             }
-            var factory = context.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+
+            var factory = GetAuditScopeFactory(context.DbContext);
+            var dataProvider = GetDataProvider(context.DbContext);
+
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 CreationPolicy = EventCreationPolicy.Manual,
-                DataProvider = context.AuditDataProvider,
+                DataProvider = dataProvider,
                 AuditEvent = auditEfEvent,
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
                 SkipExtraFrames = 5
@@ -345,12 +350,15 @@ namespace Audit.EntityFramework
             {
                 auditEfEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
             }
-            var factory = context.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+
+            var factory = GetAuditScopeFactory(context.DbContext);
+            var dataProvider = GetDataProvider(context.DbContext);
+
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 CreationPolicy = EventCreationPolicy.Manual,
-                DataProvider = context.AuditDataProvider,
+                DataProvider = dataProvider,
                 AuditEvent = auditEfEvent,
                 SkipExtraFrames = 3
             };
@@ -358,6 +366,40 @@ namespace Audit.EntityFramework
             context.OnScopeCreated(scope);
             return scope;
         }
+
+        internal IAuditScopeFactory GetAuditScopeFactory(DbContext dbContext)
+        {
+            var auditDbContext = dbContext as IAuditDbContext;
+#if EF_CORE
+            return auditDbContext?.AuditScopeFactory ?? TryGetService<IAuditScopeFactory>(dbContext) ?? Core.Configuration.AuditScopeFactory;
+#else
+            return auditDbContext?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+#endif
+        }
+
+        internal AuditDataProvider GetDataProvider(DbContext dbContext)
+        {
+            var auditDbContext = dbContext as IAuditDbContext;
+#if EF_CORE
+            return auditDbContext?.AuditDataProvider ?? TryGetService<AuditDataProvider>(dbContext);
+#else
+            return auditDbContext?.AuditDataProvider;
+#endif
+        }
+
+#if EF_CORE
+        private T TryGetService<T>(DbContext dbContext) where T : class
+        {
+            var infrastructure = dbContext?.GetInfrastructure();
+
+            var service =
+                infrastructure?.GetService(typeof(T)) ??
+                infrastructure?.GetService<IDbContextOptions>()?.Extensions.OfType<CoreOptionsExtension>()
+                    .FirstOrDefault()?.ApplicationServiceProvider?.GetService(typeof(T));
+
+            return service as T;
+        }
+#endif
 
         /// <summary>
         /// Gets the modified entries to process.

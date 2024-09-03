@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+
 using Audit.Core.Providers.Wrappers;
 
 namespace Audit.Core
@@ -38,7 +40,7 @@ namespace Audit.Core
         public AuditDataProvider DataProvider { get; set; }
 
         /// <summary>
-        /// Gets or sets the event creation policy to use.
+        /// Gets or sets the event creation policy to use. When NULL, it will use the static Audit.Core.Configuration.CreationPolicy.
         /// </summary>
         public EventCreationPolicy? CreationPolicy { get; set; }
 
@@ -48,7 +50,7 @@ namespace Audit.Core
         public bool IsCreateAndSave { get; set; }
 
         /// <summary>
-        /// Gets or sets the initial audit event to use, or NULL to create a new instance of AuditEvent
+        /// Gets or sets the initial audit event to use. When NULL, it will create a new instance of AuditEvent
         /// </summary>
         public AuditEvent AuditEvent { get; set; }
 
@@ -58,78 +60,50 @@ namespace Audit.Core
         public int SkipExtraFrames { get; set; }
 
         /// <summary>
-        /// Gets or sets a specific calling method to store on the event. NULL to use the calling stack to determine the calling method.
+        /// Gets or sets a specific calling method to store on the event. When NULL, it will use the calling stack to determine the calling method.
         /// </summary>
         public MethodBase CallingMethod { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the audit event's environment should include the full stack trace.
+        /// Gets or sets a value indicating whether the audit event's environment should include the full stack trace. When NULL, it will use the static Audit.Core.Configuration.IncludeStackTrace.
         /// </summary>
-        public bool IncludeStackTrace { get; set; }
-#if NET6_0_OR_GREATER
-        /// <summary>
-        /// Gets or sets a value indicating whether the audit event should include the Distributed Tracing Activity data.
-        /// </summary>
-        public bool IncludeActivityTrace { get; set; }
+        public bool? IncludeStackTrace { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the audit scope should create and start a new Distributed Tracing Activity.
+        /// Gets or sets the custom items to be included in the audit scope.
         /// </summary>
-        public bool StartActivityTrace { get; set; }
-#endif
+        public Dictionary<string, object> Items { get; set; } = new();
+
         /// <summary>
-        /// Creates an instance of options for an audit scope creation.
+        /// Gets or sets the system clock to use. When NULL, it uses the static Audit.Core.Configuration.SystemClock.
         /// </summary>
-        /// <param name="eventType">A string representing the type of the event.</param>
-        /// <param name="targetGetter">The target object getter.</param>
-        /// <param name="extraFields">An anonymous object that contains additional fields to be merged into the audit event.</param>
-        /// <param name="creationPolicy">The event creation policy to use. NULL to use the configured default creation policy.</param>
-        /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
-        /// <param name="isCreateAndSave">To indicate if the scope should be immediately saved after creation.</param>
-        /// <param name="auditEvent">The initialized audit event to use, or NULL to create a new instance of AuditEvent.</param>
-        /// <param name="skipExtraFrames">Used to indicate how many frames in the stack should be skipped to determine the calling method.</param>
-        /// <param name="includeStackTrace">Used to indicate whether the audit event's environment should include the full stack trace.</param>
-        /// <param name="includeActivityTrace">Used to indicate whether the audit event should include the activity trace.</param>
-        /// <param name="startActivityTrace">Used to indicate whether the audit scope should create and start a new activity.</param>
-        public AuditScopeOptions(
-            string eventType = null,
-            Func<object> targetGetter = null,
-            object extraFields = null,
-            AuditDataProvider dataProvider = null,
-            EventCreationPolicy? creationPolicy = null,
-            bool isCreateAndSave = false,
-            AuditEvent auditEvent = null,
-            int skipExtraFrames = 0,
-            bool? includeStackTrace = null,
-            bool? includeActivityTrace = null,
-            bool? startActivityTrace = null)
-        {
-            EventType = eventType;
-            TargetGetter = targetGetter;
-            ExtraFields = extraFields;
-            CreationPolicy = creationPolicy ?? Configuration.CreationPolicy;
-            DataProvider = dataProvider ?? Configuration.DataProvider;
-            IsCreateAndSave = isCreateAndSave;
-            AuditEvent = auditEvent;
-            SkipExtraFrames = skipExtraFrames;
-            CallingMethod = null;
-            IncludeStackTrace = includeStackTrace ?? Configuration.IncludeStackTrace;
+        public ISystemClock SystemClock { get; set; }
+
 #if NET6_0_OR_GREATER
-            IncludeActivityTrace = includeActivityTrace ?? Configuration.IncludeActivityTrace;
-            StartActivityTrace = startActivityTrace ?? Configuration.StartActivityTrace;
+        /// <summary>
+        /// Gets or sets a value indicating whether the audit event should include the Distributed Tracing Activity data. When NULL, it will use the static Audit.Core.Configuration.IncludeActivityTrace.
+        /// </summary>
+        public bool? IncludeActivityTrace { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the audit scope should create and start a new Distributed Tracing Activity. When NULL, it will use the static Audit.Core.Configuration.StartActivityTrace.
+        /// </summary>
+        public bool? StartActivityTrace { get; set; }
 #endif
-        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the environment information should be excluded from the audit event. When NULL, it will use the static Audit.Core.Configuration.ExcludeEnvironmentInfo.
+        /// </summary>
+        public bool? ExcludeEnvironmentInfo { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditScopeOptions"/> class.
         /// </summary>
         public AuditScopeOptions()
-            : this(null, null, null, null, null)
         {
         }
 
         public AuditScopeOptions(Action<IAuditScopeOptionsConfigurator> config)
-            : this(null, null, null, null, null)
         {
             if (config != null)
             {
@@ -146,12 +120,14 @@ namespace Audit.Core
                 SkipExtraFrames = scopeConfig._options.SkipExtraFrames;
                 CallingMethod = scopeConfig._options.CallingMethod;
                 IncludeStackTrace = scopeConfig._options.IncludeStackTrace;
+                Items = scopeConfig._options.Items;
+                SystemClock = scopeConfig._options.SystemClock;
+                ExcludeEnvironmentInfo = scopeConfig._options.ExcludeEnvironmentInfo;
 #if NET6_0_OR_GREATER
                 IncludeActivityTrace = scopeConfig._options.IncludeActivityTrace;
                 StartActivityTrace = scopeConfig._options.StartActivityTrace;
 #endif
             }
-
         }
     }
 }

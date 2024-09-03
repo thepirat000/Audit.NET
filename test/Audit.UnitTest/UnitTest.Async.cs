@@ -523,7 +523,7 @@ namespace Audit.UnitTest
                         //do nothing, just bother
                         var d = ev.Event.Duration * 1234567;
                     });
-                    await factory.CreateAsync(new AuditScopeOptions("LoginFailed", extraFields: new { username = "adriano", id = i * -1 }, isCreateAndSave: true));
+                    await factory.CreateAsync(new AuditScopeOptions() { EventType = "LoginFailed", ExtraFields = new { username = "adriano", id = i * -1 }, IsCreateAndSave = true });
                 }));
             }
             await Task.WhenAll(tasks.ToArray());
@@ -567,7 +567,7 @@ namespace Audit.UnitTest
 
             var eventType = "event type";
 
-            await new AuditScopeFactory().CreateAsync(new AuditScopeOptions(eventType, extraFields: new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, dataProvider: provider.Object, isCreateAndSave: true));
+            await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { EventType = eventType, ExtraFields = new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, DataProvider = provider.Object, IsCreateAndSave = true });
             provider.Verify(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
             provider.Verify(p => p.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -821,7 +821,7 @@ namespace Audit.UnitTest
         public async Task Test_ExtraFields_Async()
         {
             Core.Configuration.DataProvider = new FileDataProvider();
-            var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent", null, new { @class = "class value", DATA = 123 }, null, EventCreationPolicy.Manual));
+            var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { EventType = "SomeEvent", ExtraFields = new { @class = "class value", DATA = 123 }, CreationPolicy = EventCreationPolicy.Manual });
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
@@ -836,9 +836,9 @@ namespace Audit.UnitTest
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             provider.Setup(p => p.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult((object)Guid.NewGuid()));
             Core.Configuration.DataProvider = provider.Object;
-            var scope1 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, null, EventCreationPolicy.Manual));
+            var scope1 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { EventType = "SomeEvent1", ExtraFields = new { @class = "class value1", DATA = 111 }, CreationPolicy = EventCreationPolicy.Manual });
             await scope1.SaveAsync();
-            var scope2 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, null, EventCreationPolicy.Manual));
+            var scope2 = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { EventType = "SomeEvent2", ExtraFields = new { @class = "class value2", DATA = 222 }, CreationPolicy = EventCreationPolicy.Manual });
             await scope2.SaveAsync();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);

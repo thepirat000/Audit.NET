@@ -1,20 +1,19 @@
 ﻿#if ASP_NET
-using System;
-using Audit.Core;
-using System.Threading.Tasks;
-using Audit.Core.Extensions;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using System.Net.Http.Headers;
-using System.Collections.Specialized;
-using System.Reflection;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
+
+using Audit.Core;
+using Audit.Core.Extensions;
 using Audit.Core.Providers;
 
 namespace Audit.WebApi
@@ -68,8 +67,11 @@ namespace Audit.WebApi
             {
                 Action = auditAction
             };
+            var httpContext = contextWrapper.GetHttpContext(); 
 
-            var dataProvider = contextWrapper.GetHttpContext()?.GetService(typeof(AuditDataProvider)) as AuditDataProvider;
+            var scopeFactory = (httpContext?.GetService(typeof(IAuditScopeFactory)) as IAuditScopeFactory) ?? Core.Configuration.AuditScopeFactory;
+            var dataProvider = httpContext?.GetService(typeof(AuditDataProvider)) as AuditDataProvider;
+
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
@@ -78,7 +80,7 @@ namespace Audit.WebApi
                 // the inner ActionDescriptor is of type ReflectedHttpActionDescriptor even when using api versioning:
                 CallingMethod = (actionContext.ActionDescriptor?.ActionBinding?.ActionDescriptor as ReflectedHttpActionDescriptor)?.MethodInfo
             };
-            var auditScope = await Configuration.AuditScopeFactory.CreateAsync(options, cancellationToken);
+            var auditScope = await scopeFactory.CreateAsync(options, cancellationToken);
             contextWrapper.Set(AuditApiHelper.AuditApiActionKey, auditAction);
             contextWrapper.Set(AuditApiHelper.AuditApiScopeKey, auditScope);
         }

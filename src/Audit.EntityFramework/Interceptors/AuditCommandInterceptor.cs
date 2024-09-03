@@ -9,6 +9,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Audit.EntityFramework.Interceptors
 {
@@ -363,13 +365,15 @@ namespace Audit.EntityFramework.Interceptors
                 cmdEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
             }
 
-            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
+            var factory = _dbContextHelper.GetAuditScopeFactory(cmdEvent.CommandEvent.DbContext);
+            var dataProvider = _dbContextHelper.GetDataProvider(cmdEvent.CommandEvent.DbContext);
+
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = cmdEvent,
                 SkipExtraFrames = 3,
-                DataProvider = context?.AuditDataProvider
+                DataProvider = dataProvider
             };
             
             var scope = factory.Create(options);
@@ -396,14 +400,16 @@ namespace Audit.EntityFramework.Interceptors
             {
                 cmdEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
             }
+            
+            var factory = _dbContextHelper.GetAuditScopeFactory(cmdEvent.CommandEvent.DbContext);
+            var dataProvider = _dbContextHelper.GetDataProvider(cmdEvent.CommandEvent.DbContext);
 
-            var factory = context?.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = cmdEvent,
                 SkipExtraFrames = 3,
-                DataProvider = context?.AuditDataProvider
+                DataProvider = dataProvider
             };
 
             var scope = await factory.CreateAsync(options, cancellationToken);

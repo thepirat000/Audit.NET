@@ -51,7 +51,7 @@ namespace Audit.log4net.Providers
         
         private LogLevel GetLogLevel(AuditEvent auditEvent)
         {
-            return LogLevel.GetValue(auditEvent) ?? (auditEvent.Environment.Exception != null ? log4net.LogLevel.Error : log4net.LogLevel.Info);
+            return LogLevel.GetValue(auditEvent) ?? (auditEvent.Environment?.Exception != null ? log4net.LogLevel.Error : log4net.LogLevel.Info);
         }
 
         private object GetLogObject(AuditEvent auditEvent, object eventId)

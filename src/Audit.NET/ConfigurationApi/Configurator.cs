@@ -127,6 +127,15 @@ namespace Audit.Core.ConfigurationApi
             return new CreationPolicyConfigurator();
         }
 
+        public ICreationPolicyConfigurator UseInMemoryProvider(out InMemoryDataProvider dataProvider)
+        {
+            dataProvider = new InMemoryDataProvider();
+
+            Configuration.DataProvider = dataProvider;
+            
+            return new CreationPolicyConfigurator();
+        }
+
         public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider(Action<IBlockingCollectionProviderConfigurator> config)
         {
             Configuration.DataProvider = new BlockingCollectionDataProvider(config);
