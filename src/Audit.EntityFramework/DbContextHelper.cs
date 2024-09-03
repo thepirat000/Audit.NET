@@ -392,6 +392,7 @@ namespace Audit.EntityFramework
         {
             var infrastructure = dbContext?.GetInfrastructure();
 
+            // Based on EF Core code from: https://github.com/dotnet/efcore/blob/ecfee78eb1fa2b2eaa0dbf945f1d4f8fa571be74/src/EFCore/Infrastructure/Internal/InfrastructureExtensions.cs#L32
             var service =
                 infrastructure?.GetService(typeof(T)) ??
                 infrastructure?.GetService<IDbContextOptions>()?.Extensions.OfType<CoreOptionsExtension>()
