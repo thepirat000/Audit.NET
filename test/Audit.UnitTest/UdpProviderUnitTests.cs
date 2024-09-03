@@ -64,7 +64,7 @@ namespace Audit.UnitTest
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
             await Task.Delay(1000);
-            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions("Test_UdpDataProvider_BasicTest", null, null, null, EventCreationPolicy.InsertOnStartReplaceOnEnd)))
+            using (var scope = await new AuditScopeFactory().CreateAsync(new AuditScopeOptions() { EventType = "Test_UdpDataProvider_BasicTest", CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd }))
             {
                 Task.Delay(100).Wait();
                 await scope.SaveAsync();

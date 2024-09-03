@@ -13,6 +13,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core.Providers;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {

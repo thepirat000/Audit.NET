@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Audit.Core.Providers.Wrappers;
 
@@ -77,6 +78,28 @@ namespace Audit.Core
         public IAuditScopeOptionsConfigurator IncludeStackTrace(bool includeStackTrace = true)
         {
             _options.IncludeStackTrace = includeStackTrace;
+            return this;
+        }
+
+        public IAuditScopeOptionsConfigurator ExcludeEnvironmentInfo(bool excludeEnvironmentInfo = true)
+        {
+            _options.ExcludeEnvironmentInfo = excludeEnvironmentInfo;
+            return this;
+        }
+
+        public IAuditScopeOptionsConfigurator SystemClock(ISystemClock systemClock)
+        {
+            _options.SystemClock = systemClock;
+            return this;
+        }
+
+        public IAuditScopeOptionsConfigurator WithItem(string key, object value)
+        {
+            if (_options.Items == null)
+            {
+                _options.Items = new Dictionary<string, object>();
+            }
+            _options.Items[key] = value;
             return this;
         }
     }

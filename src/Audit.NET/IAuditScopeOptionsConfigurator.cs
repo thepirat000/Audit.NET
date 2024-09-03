@@ -53,6 +53,22 @@ namespace Audit.Core
         /// Sets the value used to indicate whether the audit event's environment should include the full stack trace
         /// </summary>
         IAuditScopeOptionsConfigurator IncludeStackTrace(bool includeStackTrace = true);
+        /// <summary>
+        /// Sets the value used to indicate whether the audit event's should exclude the environment information
+        /// </summary>
+        IAuditScopeOptionsConfigurator ExcludeEnvironmentInfo(bool excludeEnvironmentInfo = true);
+        /// <summary>
+        /// Sets the system clock to use within this scope.
+        /// </summary>
+        /// <param name="systemClock">The system clock to use</param>
+        IAuditScopeOptionsConfigurator SystemClock(ISystemClock systemClock);
+        /// <summary>
+        /// Adds an item to the custom items collection within the audit scope.
+        /// These items are excluded from the audit event output but may be utilized by data providers or custom actions
+        /// </summary>
+        /// <param name="key">The item key</param>
+        /// <param name="value">The item value</param>
+        IAuditScopeOptionsConfigurator WithItem(string key, object value);
     }
 
 }

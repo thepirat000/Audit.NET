@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
@@ -95,7 +96,7 @@ namespace Audit.Mvc
             {
                 UserName = httpContext.User?.Identity?.Name,
                 IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
-                RequestUrl = string.Format("{0}://{1}{2}{3}", request.Scheme, request.Host, request.Path, request.QueryString),
+                RequestUrl = $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}",
                 HttpMethod = request.Method,
                 FormVariables = request.HasFormContentType ? AuditHelper.ToDictionary(request.Form) : null,
                 Headers = IncludeHeaders ? AuditHelper.ToDictionary(request.Headers) : null,
@@ -124,13 +125,21 @@ namespace Audit.Mvc
             {
                 Action = auditAction
             };
+
+            var scopeFactory = httpContext?.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
+            var dataProvider = httpContext?.RequestServices?.GetService<AuditDataProvider>();
+
             var auditScopeOptions = new AuditScopeOptions()
             {
-                EventType = eventType, 
-                AuditEvent = auditEventAction, 
-                CallingMethod = context.HandlerMethod?.MethodInfo
+                EventType = eventType,
+                AuditEvent = auditEventAction,
+                CallingMethod = context.HandlerMethod?.MethodInfo,
+                DataProvider = dataProvider
             };
-            var auditScope = await AuditScope.CreateAsync(auditScopeOptions, requestCancellationToken);
+
+            var auditScope = await scopeFactory.CreateAsync(auditScopeOptions, requestCancellationToken);
+
+
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
         }

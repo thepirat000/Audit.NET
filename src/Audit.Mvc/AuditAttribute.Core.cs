@@ -15,6 +15,7 @@ using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Audit.Mvc
 {
@@ -100,13 +101,17 @@ namespace Audit.Mvc
             {
                 Action = auditAction
             };
+            var scopeFactory = httpContext.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
+            var dataProvider = httpContext.RequestServices?.GetService<AuditDataProvider>();
+
             var auditScopeOptions = new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = auditEventAction,
-                CallingMethod = actionDescriptor?.MethodInfo
+                CallingMethod = actionDescriptor?.MethodInfo,
+                DataProvider = dataProvider
             };
-            var auditScope = await AuditScope.CreateAsync(auditScopeOptions, requestCancellationToken);
+            var auditScope = await scopeFactory.CreateAsync(auditScopeOptions, requestCancellationToken);
             httpContext.Items[AuditActionKey] = auditAction;
             httpContext.Items[AuditScopeKey] = auditScope;
         }

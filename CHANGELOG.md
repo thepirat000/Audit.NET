@@ -3,6 +3,18 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.0.0] - 2024-09-03:
+- Audit.NET: Introducing an `Items` collection in the `AuditScope` to store custom data accessible throughout the audit scope's lifecycle.
+- Audit.NET: Refactoring `AuditScopeOptions` to eliminate the dependency on the static `Audit.Core.Configuration`.
+- Audit.NET: Adding virtual methods `OnConfiguring`/`OnScopeCreated` method to the `AuditScopeFactory` to enable custom configuration of the audit scope.
+- Audit.NET: Refactoring the `ISystemClock` interface to use a method instead of a property to get the current time.
+- Audit.NET: Enabling Custom Actions to optionally return a boolean value, signaling whether to proceed with or halt the processing of subsequent actions of the same type.
+- Audit.NET: Adding `ExcludeEnvironmentInfo` configuration to the `Audit.Core.Configuration` and `AuditScopeOptions` to allow excluding the environment information from the audit event.
+- Audit.EntityFramework.Core: Enabling configuration of the `IAuditScopeFactory` and `AuditDataProvider` through dependency injection.
+- Audit.WebApi.Core: Enabling configuration of the `IAuditScopeFactory` and `AuditDataProvider` through dependency injection.
+- Audit.Mvc.Core: Enabling configuration of the `IAuditScopeFactory` and `AuditDataProvider` through dependency injection.
+- Audit.SignalR: Enabling configuration of the `IAuditScopeFactory` and `AuditDataProvider` through dependency injection.
+
 ## [26.0.1] - 2024-08-22:
 - Audit.WebApi.Core: Adding new SkipResponseBodyContent() configuration to allow deciding whether to skip or include the response body content **after** the action is executed (#690)
 

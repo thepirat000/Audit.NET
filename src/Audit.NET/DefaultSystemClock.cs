@@ -7,6 +7,10 @@ namespace Audit.Core
     /// </summary>
     public class DefaultSystemClock : ISystemClock
     {
-        public virtual DateTime UtcNow => DateTime.UtcNow;
+        /// <inheritdoc />
+        public DateTime GetCurrentDateTime()
+        {
+            return DateTime.UtcNow;
+        }
     }
 }

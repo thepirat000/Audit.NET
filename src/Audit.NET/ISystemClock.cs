@@ -8,11 +8,9 @@ namespace Audit.Core
     public interface ISystemClock
     {
         /// <summary>
-        /// Retrieves the current system time in UTC.
+        /// Retrieves the current system time to be stored in the audit event.
         /// </summary>
-        DateTime UtcNow
-        {
-            get;
-        }
+        /// <returns></returns>
+        DateTime GetCurrentDateTime();
     }
 }

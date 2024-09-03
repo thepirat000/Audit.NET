@@ -711,7 +711,7 @@ namespace Audit.UnitTest
                         //do nothing, just bother
                         var d = ev.Event.Duration * 1234567;
                     });
-                    factory.Create(new AuditScopeOptions("LoginFailed", null, new { username = "adriano", id = i * -1 }, null, null, true));
+                    factory.Create(new AuditScopeOptions() { EventType = "LoginFailed", ExtraFields = new { username = "adriano", id = i * -1 }, IsCreateAndSave = true });
                 }));
             }
             Task.WaitAll(tasks.ToArray());
@@ -811,7 +811,7 @@ namespace Audit.UnitTest
 
             var eventType = "event type";
 
-            new AuditScopeFactory().Create(new AuditScopeOptions(eventType, null, new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, provider.Object, null, true));
+            new AuditScopeFactory().Create(new AuditScopeOptions() { EventType = eventType, ExtraFields = new { Extra1 = new { SubExtra1 = "test1" }, Extra2 = "test2" }, DataProvider = provider.Object, IsCreateAndSave = true });
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Once);
             provider.Verify(p => p.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>()), Times.Never);
         }
@@ -1071,7 +1071,7 @@ namespace Audit.UnitTest
         public void Test_ExtraFields()
         {
             Core.Configuration.DataProvider = new FileDataProvider();
-            var scope = new AuditScopeFactory().Create(new AuditScopeOptions("SomeEvent", null, new { @class = "class value", DATA = 123 }, null, EventCreationPolicy.Manual));
+            var scope = new AuditScopeFactory().Create(new AuditScopeOptions() { EventType = "SomeEvent", ExtraFields = new { @class = "class value", DATA = 123 }, CreationPolicy = EventCreationPolicy.Manual });
             scope.Comment("test");
             var ev = scope.Event;
             scope.Discard();
@@ -1085,9 +1085,9 @@ namespace Audit.UnitTest
             var provider = new Mock<AuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
-            var scope1 = new AuditScopeFactory().Create(new AuditScopeOptions("SomeEvent1", null, new { @class = "class value1", DATA = 111 }, null, EventCreationPolicy.Manual));
+            var scope1 = new AuditScopeFactory().Create(new AuditScopeOptions() { EventType = "SomeEvent1", ExtraFields = new { @class = "class value1", DATA = 111 }, CreationPolicy = EventCreationPolicy.Manual });
             scope1.Save();
-            var scope2 = new AuditScopeFactory().Create(new AuditScopeOptions("SomeEvent2", null, new { @class = "class value2", DATA = 222 }, null, EventCreationPolicy.Manual));
+            var scope2 = new AuditScopeFactory().Create(new AuditScopeOptions() { EventType = "SomeEvent2", ExtraFields = new { @class = "class value2", DATA = 222 }, CreationPolicy = EventCreationPolicy.Manual });
             scope2.Save();
             Assert.NotNull(scope1.EventId);
             Assert.NotNull(scope2.EventId);

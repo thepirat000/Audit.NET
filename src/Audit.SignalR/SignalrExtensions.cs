@@ -31,6 +31,25 @@ namespace Audit.SignalR
             return (auditEvent as AuditEventSignalr)?.Event as T;
         }
 
+        /// <summary>
+        /// Gets the SignalR Event portion from the Audit Scope.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        public static SignalrEventBase GetSignalrEvent(this AuditScope auditScope)
+        {
+            return (auditScope.Event as AuditEventSignalr)?.Event;
+        }
+
+        /// <summary>
+        /// Gets the SignalR Event portion from the Audit Scope.
+        /// </summary>
+        /// <param name="auditScope">The audit scope.</param>
+        public static T GetSignalrEvent<T>(this AuditScope auditScope)
+            where T : SignalrEventBase
+        {
+            return (auditScope.Event as AuditEventSignalr)?.Event as T;
+        }
+
 #if ASP_NET
         /// <summary>
         /// Adds a custom field to the current Incoming event

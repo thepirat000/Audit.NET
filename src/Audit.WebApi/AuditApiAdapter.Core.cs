@@ -77,8 +77,11 @@ namespace Audit.WebApi
             {
                 Action = auditAction
             };
+
+            var scopeFactory = httpContext.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
             var dataProvider = httpContext.RequestServices?.GetService<AuditDataProvider>();
-            var auditScope = await Core.Configuration.AuditScopeFactory.CreateAsync(new AuditScopeOptions()
+
+            var auditScope = await scopeFactory.CreateAsync(new AuditScopeOptions()
             {
                 EventType = eventType, 
                 AuditEvent = auditEventAction, 

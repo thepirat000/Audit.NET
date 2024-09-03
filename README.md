@@ -81,7 +81,74 @@ The `AuditEvent` is typically serialized into a format suitable for storage or t
 
 The audit events are stored using a **Data Provider**. You can use one of the [available data providers](https://github.com/thepirat000/Audit.NET?tab=readme-ov-file#storage-providers) or [implement your own](https://github.com/thepirat000/Audit.NET?tab=readme-ov-file#data-providers).
 
-# SUPPORT FOR OLDER .NET FRAMEWORKS
+### Audit Scope Factory
+
+The preferred method for creating audit scopes is by using an `IAuditScopeFactory` instance. 
+This approach ensures a centralized and consistent configuration for all audit scopes.
+
+```c#
+var factory = new AuditScopeFactory();
+using var scope = factory.Create(new AuditScopeOptions(...));
+...
+```
+
+If you're using a DI container, you can register the `IAuditScopeFactory` as a service and inject it into your classes. 
+The default implementation of `IAuditScopeFactory` is provided by the `AuditScopeFactory` class.
+
+```c#
+services.AddSingleton<IAuditScopeFactory, AuditScopeFactory>();
+```
+
+Then you can inject the IAuditScopeFactory into your classes to create audit scopes:
+
+```c#
+public class MyService
+{
+	private readonly IAuditScopeFactory _auditScopeFactory;
+
+	public MyService(IAuditScopeFactory auditScopeFactory)
+	{
+		_auditScopeFactory = auditScopeFactory;
+	}
+
+	public void MyMethod()
+	{
+		using var scope = _auditScopeFactory.Create(new AuditScopeOptions(...));
+		...
+	}
+}
+```
+
+You can also implement your own `IAuditScopeFactory` to customize the creation of audit scopes. 
+The recommended approach is to inherit from the `AuditScopeFactory` class. 
+By overriding the `OnConfiguring` and `OnScopeCreated` methods, you can configure the audit scope options before creation and customize the audit scope after creation, respectively.
+
+For example:
+
+```c#
+public class MyAuditScopeFactory : AuditScopeFactory
+{
+    private readonly IMyService _myService;
+    public MyAuditScopeFactory(IMyService myService)
+    {
+        _myService = myService;
+    }
+
+    public override void OnConfiguring(AuditScopeOptions options)
+    {
+        // Set the data provider to use
+        options.DataProvider = new SqlDataProvider(...);
+    }
+
+    public override void OnScopeCreated(AuditScope auditScope)
+    {
+        // Add a custom field to the audit scope
+        auditScope.SetCustomField("CustomId", _myService.GetId());
+    }
+}
+```
+
+# Support for older .NET frameworks
 
 Beginning with version 23.0.0, this library and its extensions have discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
 
@@ -96,45 +163,21 @@ This library and its extensions will maintain support for the following **minimu
 - .NET Standard 2.0 (netstandard2.0)
 - .NET 6 (net6.0)
 
-The following frameworks were **deprecated and removed** from the list of target frameworks:
-
-- net45, net451, net452, net461
-- netstandard1.3, netstandard1.4, netstandard1.5, netstandard1.6
-- netcoreapp2.1, netcoreapp3.0
-- net5.0
-
-This discontinuation led to the following modifications:
-
-- All library versions will now use `System.Text.Json` as the default (Newtonsoft.Json will be deprecated but can still be used through the JsonAdapter).
-- Support for EF Core versions 3 and earlier has been discontinued in the `Audit.EntityFramework.Core` libraries. The minimum supported version is now EF Core 5 (`Audit.EntityFramework` will continue to support .NET Entity Framework 6).
-- The libraries `Audit.EntityFramework.Core.v3` and `Audit.EntityFramework.Identity.Core.v3` has been deprecated.
-- `Audit.NET.JsonSystemAdapter` has been deprecated.
-
-
 ## Usage
 
 The **Audit Scope** is the central object of this framework. It encapsulates an audit event, controlling its life cycle. 
 The **Audit Event** is an extensible information container of an audited operation. 
 
-
 There are several ways to create an Audit Scope:
 
-- Calling the `Create()` / `CreateAsync()` method of an `AuditScopeFactory` instance, for example:
+- Calling the `Create()` / `CreateAsync()` methods of an `AuditScopeFactory` instance.
+This is the recommended approach. For example:
 
     ```c#
-    var factory = new AuditScopeFactory();
-    var scope = factory.Create(new AuditScopeOptions(...));
+    var scope = auditScopeFactory.Create(new AuditScopeOptions(...));
     ```
 
 - Using the overloads of the static methods `Create()` / `CreateAsync()` on `AuditScope`, for example:
-
-    ```c#
-    var scope = AuditScope.Create("Order:Update", () => order, new { MyProperty = "value" });
-    ```
-
-    The first parameter of the `AuditScope.Create` method is an _event type name_ intended to identify and group the events. The second is the delegate to obtain the object to track (target object). This object is passed as a `Func<object>` to allow the library to inspect the value at the beginning and the disposal of the scope. It is not mandatory to supply a target object.
-    
-    You can use the overload that accepts an `AuditScopeOptions` instance to configure any of the available options for the scope:
 
     ```c#
     var scope = AuditScope.Create(new AuditScopeOptions()
@@ -167,6 +210,7 @@ IsCreateAndSave | `bool` | Value indicating whether this scope should be immedia
 AuditEvent | `AuditEvent` | Custom initial audit event to use. By default it will create a new instance of basic `AuditEvent`
 SkipExtraFrames | `int` | Value used to indicate how many frames in the stack should be skipped to determine the calling method. Default is 0
 CallingMethod | `MethodBase` | Specific calling method to store on the event. Default is to use the calling stack to determine the calling method.
+Items | `Dictionary<string, object>` | A dictionary of items that can be used to store additional information on the scope, accessible from the `AuditScope` instance.
 
 Suppose you have the following code to _cancel an order_ that you want to audit:
 
@@ -732,7 +776,8 @@ Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
 > If you don't specify a Creation Policy, the default `Insert on End` will be used.
 
 ### Custom Actions
-You can configure Custom Actions that are executed for all the Audit Scopes in your application. This allows to globally change the behavior and data, intercepting the scopes after they are created or before they are saved.
+You can configure Custom Actions to be executed across all Audit Scopes in your application. 
+This allows you to globally modify behavior and data, intercepting scopes after they are created, before they are saved, or during disposal
 
 Call the static `AddCustomAction()` method on `Audit.Core.Configuration` class to attach a custom action. 
 
@@ -740,12 +785,19 @@ For example, to globally discard the events under a certain condition:
 ```c#
 Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
-    if (DateTime.Now.Hour == 17) // Tea time
+    if (DateTime.Now.Hour >= 17)
     {
         scope.Discard();
+        return false;
     }
+    return true;
 });
 ```
+
+> **Note**
+> 
+> The custom actions can return a boolean value to indicate if subsequent actions of the same type should be executed.
+
 
 Or to add custom fields/comments globally to all scopes:
 ```c#

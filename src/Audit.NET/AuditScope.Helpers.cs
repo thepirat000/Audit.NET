@@ -49,7 +49,7 @@ namespace Audit.Core
         /// <param name="extraFields">An anonymous object that contains additional fields to be merged into the audit event.</param>
         public static AuditScope Create(string eventType, Func<object> target, object extraFields = null)
         {
-            var options = new AuditScopeOptions(eventType: eventType, targetGetter: target, extraFields: extraFields);
+            var options = new AuditScopeOptions() { EventType = eventType, TargetGetter = target, ExtraFields = extraFields };
             return new AuditScope(options).Start();
         }
         /// <summary>
@@ -61,7 +61,7 @@ namespace Audit.Core
         /// <param name="cancellationToken">The Cancellation Token.</param>
         public static async Task<AuditScope> CreateAsync(string eventType, Func<object> target, object extraFields = null, CancellationToken cancellationToken = default)
         {
-            var options = new AuditScopeOptions(eventType: eventType, targetGetter: target, extraFields: extraFields);
+            var options = new AuditScopeOptions() { EventType = eventType, TargetGetter = target, ExtraFields = extraFields };
             return await new AuditScope(options).StartAsync(cancellationToken);
         }
 

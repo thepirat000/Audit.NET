@@ -93,7 +93,7 @@ namespace Audit.Mvc
                 AuditEvent = auditEventAction,
                 CallingMethod = (filterContext.ActionDescriptor as ReflectedActionDescriptor)?.MethodInfo
             };
-            var auditScope = AuditScope.Create(options);
+            var auditScope = Configuration.AuditScopeFactory.Create(options);
             filterContext.HttpContext.Items[AuditActionKey] = auditAction;
             filterContext.HttpContext.Items[AuditScopeKey] = auditScope;
             base.OnActionExecuting(filterContext);

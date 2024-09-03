@@ -1,4 +1,5 @@
 using System;
+using Audit.Core.Providers;
 
 namespace Audit.Core.ConfigurationApi
 {
@@ -111,6 +112,12 @@ namespace Audit.Core.ConfigurationApi
         /// Store the events in memory in a thread-safe list. Useful for testing purposes.
         /// </summary>
         ICreationPolicyConfigurator UseInMemoryProvider();
+
+        /// <summary>
+        /// Store the events in memory in a thread-safe list. Useful for testing purposes. Returns the created InMemoryDataProvider instance as an out parameter.
+        /// </summary>
+        /// <param name="dataProvider">The created InMemoryDataProvider instance</param>
+        ICreationPolicyConfigurator UseInMemoryProvider(out InMemoryDataProvider dataProvider);
 
         /// <summary>
         /// Store the events in memory in a thread-safe BlockingCollection. Useful for scenarios where the events need to be consumed by another thread.
