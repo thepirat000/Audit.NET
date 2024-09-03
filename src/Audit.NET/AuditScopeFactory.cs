@@ -49,12 +49,7 @@ namespace Audit.Core
             return await auditScope.StartAsync(cancellationToken);
         }
 
-        #endregion
-
-        /// <summary>
-        /// Creates an audit scope with the given creation options as a Fluent API.
-        /// </summary>
-        /// <param name="config">Fluent API to configure the Audit Scope creation options</param>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.NoInlining)]
         public IAuditScope Create(Action<IAuditScopeOptionsConfigurator> config)
         {
@@ -65,11 +60,7 @@ namespace Audit.Core
             return auditScope.Start();
         }
 
-        /// <summary>
-        /// Creates an audit scope with the given creation options as a Fluent API.
-        /// </summary>
-        /// <param name="config">Fluent API to configure the Audit Scope creation options</param>
-        /// <param name="cancellationToken">The Cancellation Token.</param>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task<IAuditScope> CreateAsync(Action<IAuditScopeOptionsConfigurator> config, CancellationToken cancellationToken = default)
         {
@@ -79,6 +70,8 @@ namespace Audit.Core
             OnScopeCreated(auditScope);
             return await auditScope.StartAsync(cancellationToken);
         }
+
+        #endregion
 
         /// <summary>
         /// Creates an audit scope for a target object and an event type.
