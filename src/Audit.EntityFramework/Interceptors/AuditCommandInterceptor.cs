@@ -1,16 +1,17 @@
 ﻿#if EF_CORE_5_OR_GREATER
-using Audit.Core;
-using Audit.Core.Extensions;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Audit.Core;
+using Audit.Core.Extensions;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Audit.EntityFramework.Interceptors
 {
@@ -26,13 +27,20 @@ namespace Audit.EntityFramework.Interceptors
     public class AuditCommandInterceptor : DbCommandInterceptor
     {
         /// <summary>
-        /// Boolean value to indicate whether to log the command parameter values. By default (when null) it will depend on EnableSensitiveDataLogging setting on the DbContext.
+        /// Boolean value to indicate whether to log the command parameter values. By default, (when null) it will depend on EnableSensitiveDataLogging setting on the DbContext.
         /// </summary>
         public bool? LogParameterValues { get; set; }
+
         /// <summary>
         /// Boolean value to indicate whether to exclude the events handled by ReaderExecuting. Default is false to include the ReaderExecuting events.
         /// </summary>
         public bool ExcludeReaderEvents { get; set; }
+
+        /// <summary>
+        /// Predicate to include the ReaderExecuting events based on the event data. By default, all the ReaderExecuting events are included.
+        /// This predicate is ignored if ExcludeReaderEvents is set to true.
+        /// </summary>
+        public Func<CommandEventData, bool> IncludeReaderEventsPredicate { get; set; }
         
         /// <summary>
         /// Boolean value to indicate whether to exclude the events handled by NonQueryExecuting. Default is false to include the NonQueryExecuting events.
@@ -61,10 +69,19 @@ namespace Audit.EntityFramework.Interceptors
         private readonly DbContextHelper _dbContextHelper = new DbContextHelper();
         private IAuditScope _currentScope;
 
+        /// <summary>
+        /// Returns the current audit scope, if any
+        /// </summary>
+        /// <returns></returns>
+        protected IAuditScope GetAuditScope()
+        {
+            return _currentScope;
+        }
+
 #region "Reader"
         public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
         {
-            if (Core.Configuration.AuditDisabled || ExcludeReaderEvents)
+            if (Core.Configuration.AuditDisabled || ExcludeReaderEvents || IncludeReaderEventsPredicate?.Invoke(eventData) == false)
             {
                 return result;
             }
@@ -78,7 +95,7 @@ namespace Audit.EntityFramework.Interceptors
 
         public override DbDataReader ReaderExecuted(DbCommand command, CommandExecutedEventData eventData, DbDataReader result)
         {
-            if (ExcludeReaderEvents)
+            if (_currentScope == null)
             {
                 return result;
             }
@@ -93,7 +110,7 @@ namespace Audit.EntityFramework.Interceptors
 
         public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
         {
-            if (Core.Configuration.AuditDisabled || ExcludeReaderEvents)
+            if (Core.Configuration.AuditDisabled || ExcludeReaderEvents || IncludeReaderEventsPredicate?.Invoke(eventData) == false)
             {
                 return await base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
             }
@@ -107,7 +124,7 @@ namespace Audit.EntityFramework.Interceptors
 
         public override async ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command, CommandExecutedEventData eventData, DbDataReader result, CancellationToken cancellationToken = default)
         {
-            if (ExcludeReaderEvents)
+            if (_currentScope == null)
             {
                 return await base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
             }
@@ -139,7 +156,7 @@ namespace Audit.EntityFramework.Interceptors
         
         public override int NonQueryExecuted(DbCommand command, CommandExecutedEventData eventData, int result)
         {
-            if (ExcludeNonQueryEvents)
+            if (_currentScope == null)
             {
                 return result;
             }
@@ -162,7 +179,7 @@ namespace Audit.EntityFramework.Interceptors
         }
         public override async ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
         {
-            if (ExcludeNonQueryEvents)
+            if (_currentScope == null)
             {
                 return await base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
             }
@@ -190,7 +207,7 @@ namespace Audit.EntityFramework.Interceptors
         
         public override object ScalarExecuted(DbCommand command, CommandExecutedEventData eventData, object result)
         {
-            if (ExcludeScalarEvents)
+            if (_currentScope == null)
             {
                 return result;
             }
@@ -198,6 +215,7 @@ namespace Audit.EntityFramework.Interceptors
             EndScope();
             return result;
         }
+
         public override async ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
         {
             if (Core.Configuration.AuditDisabled || ExcludeScalarEvents)
@@ -211,9 +229,10 @@ namespace Audit.EntityFramework.Interceptors
             _currentScope = await CreateAuditScopeAsync(auditEvent, cancellationToken);
             return await base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
         }
+
         public override async ValueTask<object> ScalarExecutedAsync(DbCommand command, CommandExecutedEventData eventData, object result, CancellationToken cancellationToken = default)
         {
-            if (ExcludeScalarEvents)
+            if (_currentScope == null)
             {
                 return await base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
             }
@@ -248,6 +267,9 @@ namespace Audit.EntityFramework.Interceptors
             {
                 CommandText = command.CommandText,
                 CommandType = command.CommandType,
+#if NET6_0_OR_GREATER
+                CommandSource = eventData.CommandSource,
+#endif
                 ConnectionId = _dbContextHelper.GetClientConnectionId(command.Connection),
                 DbConnectionId = eventData.ConnectionId.ToString(),
                 Database = command.Connection?.Database,

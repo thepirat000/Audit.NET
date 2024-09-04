@@ -16,14 +16,24 @@ namespace Audit.EntityFramework
         /// The command method (NonQuery, Scalar, Reader)
         /// </summary>
         public DbCommandMethod Method { get; set; }
+
         /// <summary>
         /// The command type (Text, StoredProcedure)
         /// </summary>
         public CommandType CommandType { get; set; }
+        
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Indicates the source of the <see cref="T:System.Data.Common.DbCommand" /> being used to execute the command.
+        /// </summary>
+        public CommandSource CommandSource { get; set; }
+#endif
+
         /// <summary>
         /// The command text
         /// </summary>
         public string CommandText { get; set; }
+
         /// <summary>
         /// The parameter values
         /// </summary>

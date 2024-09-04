@@ -5,6 +5,9 @@ using System.ServiceModel.Configuration;
 
 namespace Audit.Wcf.Client
 {
+    /// <summary>
+    /// WCF client audit behavior configuration
+    /// </summary>
     public class AuditBehavior : BehaviorExtensionElement
     {
         /// <summary>

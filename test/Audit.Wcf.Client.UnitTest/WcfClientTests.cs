@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading;
+using Audit.Core.Providers;
 #if NETCOREAPP3_1
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +38,12 @@ namespace Audit.Wcf.UnitTest
             _cancellationToken.Dispose();
         }
 
+        [SetUp]
+        public void SetupTest()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
 #if NETCOREAPP3_1
         public static IWebHostBuilder CreateWebHostBuilder() =>
             Microsoft.AspNetCore.WebHost.CreateDefaultBuilder()
@@ -54,13 +61,16 @@ namespace Audit.Wcf.UnitTest
             var inserted = new List<AuditEvent>();
             var replaced = new List<AuditEvent>();
             var idsReplaced = new List<object>();
-            Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(_ => _
-                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson(ev.ToJson())))
-                    .OnReplace((id, ev) => { replaced.Add(AuditEvent.FromJson(ev.ToJson())); idsReplaced.Add(id); }))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
-            var channel = GetServiceProxy(out ICatalogService svc);
+            Audit.Core.Configuration.Setup().UseNullProvider().WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var dynamicProvider = new DynamicDataProvider(_ => _
+                    .OnInsert(ev => inserted.Add(AuditEvent.FromJson(ev.ToJson())))
+                    .OnReplace((id, ev) => { replaced.Add(AuditEvent.FromJson(ev.ToJson())); idsReplaced.Add(id); }));
+
+            var auditScopeFactory = new TestAuditScopeFactory();
+
+            var channel = GetServiceProxy(out ICatalogService svc, auditScopeFactory, dynamicProvider);
 
             using (var scope = new OperationContextScope(channel))
             {
@@ -81,6 +91,7 @@ namespace Audit.Wcf.UnitTest
                 }
             }
 
+            Assert.That(auditScopeFactory.OnScopeCreatedCount, Is.EqualTo(1));
             Assert.That(inserted.Count, Is.EqualTo(1));
             Assert.That(replaced.Count, Is.EqualTo(1));
             Assert.That(idsReplaced.Count, Is.EqualTo(1));
@@ -134,7 +145,7 @@ namespace Audit.Wcf.UnitTest
                     .OnReplace((id, ev) => { replaced.Add(AuditEvent.FromJson(ev.ToJson())); idsReplaced.Add(id); }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
-            var channel = GetServiceProxy(out ICatalogService svc);
+            var channel = GetServiceProxy(out ICatalogService svc, null, null);
 
             using (var scope = new OperationContextScope(channel))
             {
@@ -196,7 +207,7 @@ namespace Audit.Wcf.UnitTest
             Assert.That(actionReplaced.IsFault, Is.True);
         }
 
-        public static IContextChannel GetServiceProxy(out ICatalogService svc)
+        public static IContextChannel GetServiceProxy(out ICatalogService svc, IAuditScopeFactory scopeFactory, AuditDataProvider dataProvider)
         {
 #if NET462_OR_GREATER
             var channelFactory = new ChannelFactory<ICatalogService>(new BasicHttpBinding(), new EndpointAddress("http://localhost:8733/Design_Time_Addresses/Audit.Wcf.UnitTest/CatalogService/"));
@@ -207,11 +218,24 @@ namespace Audit.Wcf.UnitTest
             {
                 EventType = "Catalog:{action}",
                 IncludeRequestHeaders = true,
-                IncludeResponseHeaders = true
+                IncludeResponseHeaders = true,
+                AuditScopeFactory = scopeFactory,
+                AuditDataProvider = dataProvider
+
             });
             var x = channelFactory.CreateChannel();
             svc = x;
             return x as IContextChannel;
+        }
+    }
+
+    public class TestAuditScopeFactory : AuditScopeFactory
+    {
+        public int OnScopeCreatedCount { get; set; }
+
+        public override void OnScopeCreated(AuditScope auditScope)
+        {
+            OnScopeCreatedCount++;
         }
     }
 }

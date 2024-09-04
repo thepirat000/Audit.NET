@@ -93,6 +93,8 @@ The Audit Behavior can be configured with the following properties:
   - \{action}: Replaced with the action URL 
 - **IncludeRequestHeaders**: Boolean value that indicates whether the output should include the request headers. Default is false.
 - **IncludeResponseHeaders**: Boolean value that indicates whether the output should include the response headers. Default is false.
+- **AuditDataProvider**: Allows to set a specific audit data provider. By default the globally configured data provider is used. See [Audit.NET Data Providers](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers) section for more information.
+- **AuditScopeFactory**: Allows to set a specific audit scope factory. By default the globally configured [`AuditScopeFactory`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeFactory.cs) is used. 
 
 ### Output mechanism
 

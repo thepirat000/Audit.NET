@@ -271,6 +271,7 @@ optionsBuilder.AddInterceptors(new AuditCommandInterceptor()
 
 - **LogParameterValues**: Boolean value to indicate whether to log the command parameter values. By default (when null) it will depend on EnableSensitiveDataLogging setting on the DbContext.
 - **ExcludeReaderEvents**: Boolean value to indicate whether to exclude the events handled by ReaderExecuting. Default is false to include the ReaderExecuting events.
+- **IncludeReaderEventsPredicate**: Predicate to include the ReaderExecuting events based on the event data. By default, all the ReaderExecuting events are included. This predicate is ignored if ExcludeReaderEvents is set to true.
 - **ExcludeNonQueryEvents**: Boolean value to indicate whether to exclude the events handled by NonQueryExecuting. Default is false to include the NonQueryExecuting events.
 - **ExcludeScalarEvents**: Boolean value to indicate whether to exclude the events handled by ScalarExecuting. Default is false to include the ScalarExecuting events.
 - **AuditEventType**: To indicate the event type to use on the audit event. (Default is the execute method name). Can contain the following placeholders: 
@@ -520,7 +521,8 @@ The following table describes the output fields for the low-level command interc
 | **ConnectionId** | Guid | A unique identifier for the database connection. |
 | **ContextId** | string | A unique identifier for the context instance and pool lease. |
 | **Method** | string | The command method executed (NonQuery, Scalar, Reader) |
-| **CommandType** | string | The command type (Text, StoredProcedure) |
+| **CommandType** | [CommandType](https://learn.microsoft.com/en-us/dotnet/api/system.data.commandtype) | The command type (Text, StoredProcedure, etc) |
+| **CommandSource** | [CommandSource](https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.diagnostics.commandsource) | The command source type (SaveChanges, LinqQuery, etc) |
 | **CommandText** | string | The command text |
 | **Parameters** | Dictionary | The parameter values, if any, when `EnableSensitiveDataLogging` is enabled |
 | **IsAsync** | boolean | Indicates whether the call was asynchronous |

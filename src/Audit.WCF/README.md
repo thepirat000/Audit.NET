@@ -83,6 +83,8 @@ The `AuditBehavior` attribute or extension can be configured with the following 
 - **EventTypeName**: A string that identifies the event type. Can contain the following placeholders: 
   - \{contract}: Replaced with the contract name (service interface name)
   - \{operation}: Replaces with the operation name (service method name)
+- **AuditDataProvider**: Allows to set a specific audit data provider. By default the globally configured data provider is used. See [Audit.NET Data Providers](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers) section for more information.
+- **AuditScopeFactory**: Allows to set a specific audit scope factory. By default the globally configured [`AuditScopeFactory`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeFactory.cs) is used. 
 
 To globally configure the output persistence mechanism, use the `Audit.Core.Configuration` class. For more details please see [Event Output Configuration](https://github.com/thepirat000/Audit.NET/blob/master/README.md#event-output).
 
@@ -113,6 +115,10 @@ public class OrderService : IOrderService
 ```
 
 The library will automatically detect the property and use the given data provider for that service instance.
+
+You can do the same with the `AuditScopeFactory` property to provide a custom `IAuditScopeFactory` instance.
+
+```c#
 
 ## Output
 

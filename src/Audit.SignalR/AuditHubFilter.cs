@@ -18,7 +18,7 @@ namespace Audit.SignalR
         public Func<SignalrEventConnect, bool> ConnectEventsFilter { get; set; }
         public Func<SignalrEventDisconnect, bool> DisconnectEventsFilter { get; set; }
 
-        public AuditDataProvider AuditDataProvider { get; set; }
+        public AuditDataProvider? AuditDataProvider { get; set; }
         public EventCreationPolicy? CreationPolicy { get; set; }
         public string AuditEventType { get; set; }
         public bool AuditDisabled { get; set; }

@@ -157,7 +157,9 @@ namespace Audit.WCF.UnitTest
             Assert.That(inserted.Count, Is.EqualTo(0));
             Assert.That(replaced.Count, Is.EqualTo(0));
         }
-       
+
+        [TestCase(2, 10)]
+        [TestCase(6, 10)]
         public void WCFTest_Concurrency_AuditScope(int threads, int callsPerThread)
         {
             var provider = new Mock<AuditDataProvider>();
@@ -178,8 +180,10 @@ namespace Audit.WCF.UnitTest
                 return Guid.NewGuid();
             });
 
+            var auditScopeFactory = new TestAuditScopeFactory();
+
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
-            using (var host = new ServiceHost(new OrderService_AsyncConcurrent_Test(provider.Object), basePipeAddress))
+            using (var host = new ServiceHost(new OrderService_AsyncConcurrent_Test(provider.Object, auditScopeFactory), basePipeAddress))
             {
                 var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
                 host.Open();
@@ -191,6 +195,7 @@ namespace Audit.WCF.UnitTest
             Console.WriteLine("Times: {0}.", threads * callsPerThread);
             Assert.That(bag.Count, Is.EqualTo(bag.Distinct().Count()));
             Assert.That(bag.Count, Is.EqualTo(threads * callsPerThread));
+            Assert.That(auditScopeFactory.OnScopeCreatedCount, Is.EqualTo(threads * callsPerThread));
 
         }
 
@@ -276,14 +281,17 @@ namespace Audit.WCF.UnitTest
         IncludeExceptionDetailInFaults = true)]
     public class OrderService_AsyncConcurrent_Test : OrderService, IOrderService
     {
+        private IAuditScopeFactory _auditScopeFactory;
         private AuditDataProvider _auditDataProvider;
 
-        public OrderService_AsyncConcurrent_Test(AuditDataProvider dp)
+        public OrderService_AsyncConcurrent_Test(AuditDataProvider dp, IAuditScopeFactory auditScopeFactory)
         {
             _auditDataProvider = dp;
+            _auditScopeFactory = auditScopeFactory;
         }
 
         public AuditDataProvider AuditDataProvider => _auditDataProvider;
+        public IAuditScopeFactory AuditScopeFactory => _auditScopeFactory;
     }
 
 
@@ -338,6 +346,15 @@ namespace Audit.WCF.UnitTest
             await Task.Delay(sleep);
             return sleep.ToString();
         }
+    }
+    
+    public class TestAuditScopeFactory : AuditScopeFactory
+    {
+        public int OnScopeCreatedCount { get; set; }
 
+        public override void OnScopeCreated(AuditScope auditScope)
+        {
+            OnScopeCreatedCount++;
+        }
     }
 }

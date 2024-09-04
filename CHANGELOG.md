@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.0.1] - 2024-09-05:
+- Audit.EntityFramework.Core: Introducing the CommandSource property to the audit output for EF Core 6 and above, along with configurable options to determine whether to include reader events based on the command event data
+- Audit.WCF: Allow configuring custom `IAuditScopeFactory` and `AuditDataProvider`. 
+- Audit.WCF.Client: Allow configuring custom `IAuditScopeFactory` and `AuditDataProvider`. 
+
 ## [27.0.0] - 2024-09-03:
 - Audit.NET: Introducing an `Items` collection in the `AuditScope` to store custom data accessible throughout the audit scope's lifecycle.
 - Audit.NET: Refactoring `AuditScopeOptions` to eliminate the dependency on the static `Audit.Core.Configuration`.

@@ -16,16 +16,21 @@ namespace Audit.Wcf.Client
         private readonly string _eventType = "{action}";
         private readonly bool _includeRequestHeaders;
         private readonly bool _includeResponseHeaders;
+        private readonly IAuditScopeFactory _auditScopeFactory;
+        private readonly AuditDataProvider _auditDataProvider;
 
         public AuditMessageInspector()
         {
         }
 
-        public AuditMessageInspector(string eventType, bool includeRequestHeaders, bool includeResponseHeaders)
+        public AuditMessageInspector(string eventType, bool includeRequestHeaders, bool includeResponseHeaders, IAuditScopeFactory auditScopeFactory,
+            AuditDataProvider auditDataProvider)
         {
             _eventType = eventType ?? "{action}";
             _includeRequestHeaders = includeRequestHeaders;
             _includeResponseHeaders = includeResponseHeaders;
+            _auditScopeFactory = auditScopeFactory;
+            _auditDataProvider = auditDataProvider;
         }
 
         public object BeforeSendRequest(ref Message request, IClientChannel channel)
@@ -39,12 +44,15 @@ namespace Audit.Wcf.Client
                 WcfClientEvent = auditWcfEvent
             };
             
+            var auditScopeFactory = _auditScopeFactory ?? Configuration.AuditScopeFactory;
+
             // Create the audit scope
-            var auditScope = Configuration.AuditScopeFactory.Create(new AuditScopeOptions()
+            var auditScope = auditScopeFactory.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
                 AuditEvent = auditEventWcf,
-                SkipExtraFrames = 8
+                SkipExtraFrames = 8,
+                DataProvider = _auditDataProvider
             });
             return auditScope;
         }

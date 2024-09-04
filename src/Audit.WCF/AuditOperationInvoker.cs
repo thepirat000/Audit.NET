@@ -62,12 +62,13 @@ namespace Audit.WCF
                 WcfEvent = auditWcfEvent
             };
             // Create the audit scope
-            using (var auditScope = Configuration.AuditScopeFactory.Create(new AuditScopeOptions()
+            var auditScopeFactory = GetProperty<IAuditScopeFactory>(instance, "AuditScopeFactory") ?? Configuration.AuditScopeFactory;
+            using (var auditScope = auditScopeFactory.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
                 CreationPolicy = _creationPolicy,
                 AuditEvent = auditEventWcf,
-                DataProvider = GetAuditDataProvider(instance),
+                DataProvider = GetProperty<AuditDataProvider>(instance, "AuditDataProvider"),
                 CallingMethod = _operationDescription.SyncMethod ?? _operationDescription.TaskMethod
             }))
             {
@@ -109,12 +110,13 @@ namespace Audit.WCF
                 WcfEvent = auditWcfEvent
             };
             // Create the audit scope
-            var auditScope = Configuration.AuditScopeFactory.Create(new AuditScopeOptions()
+            var auditScopeFactory = GetProperty<IAuditScopeFactory>(instance, "AuditScopeFactory") ?? Configuration.AuditScopeFactory;
+            var auditScope = auditScopeFactory.Create(new AuditScopeOptions()
             {
                 EventType = eventType,
                 CreationPolicy = _creationPolicy,
                 AuditEvent = auditEventWcf,
-                DataProvider = GetAuditDataProvider(instance),
+                DataProvider = GetProperty<AuditDataProvider>(instance, "AuditDataProvider"),
                 CallingMethod = _operationDescription.SyncMethod ?? _operationDescription.TaskMethod
             });
             // Store a reference to this audit scope
@@ -201,12 +203,12 @@ namespace Audit.WCF
         /// <summary>
         /// Get the dataprovider from property AuditDataProvider
         /// </summary>
-        private AuditDataProvider GetAuditDataProvider(object instance)
+        private T GetProperty<T>(object instance, string propertyName) where T : class
         {
-            var prop = instance.GetType().GetProperty("AuditDataProvider", typeof(AuditDataProvider));
+            var prop = instance.GetType().GetProperty(propertyName, typeof(T));
             if (prop != null)
             {
-                return prop.GetGetMethod().Invoke(instance, null) as AuditDataProvider;
+                return prop.GetGetMethod().Invoke(instance, null) as T;
             }
             return null;
         }

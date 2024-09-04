@@ -89,7 +89,7 @@ The `MongoAuditEventSubscriber` class allows to configure the following settings
 - **CommandFilter**: Set a filter function to determine which command events to log depending on the command start information. By default all commands are logged.
 - **CreationPolicy**: Allows to set a specific event creation policy. By default the globally configured creation policy is used. See [Audit.NET Event Creation Policy](https://github.com/thepirat000/Audit.NET#event-creation-policy) section for more information.
 - **AuditDataProvider**: Allows to set a specific audit data provider. By default the globally configured data provider is used. See [Audit.NET Data Providers](https://github.com/thepirat000/Audit.NET/blob/master/README.md#data-providers) section for more information.
-- **AuditScopeFactory**: Allows to set a specific audit scope factory. By default the general [`AuditScopeFactory`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeFactory.cs) is used. 
+- **AuditScopeFactory**: Allows to set a specific audit scope factory. By default the globally configured [`AuditScopeFactory`](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditScopeFactory.cs) is used. 
 
 You can customize these settings using the fluent API provided. Additionally, some settings can be set as functions of the 
 executed command, allowing you to adapt the behavior based on the specific command, such as including the reply only in specific cases.

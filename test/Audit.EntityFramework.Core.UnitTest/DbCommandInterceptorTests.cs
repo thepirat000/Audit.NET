@@ -1,9 +1,4 @@
 ﻿#if EF_CORE_5_OR_GREATER
-using Audit.Core;
-using Audit.EntityFramework.Interceptors;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,8 +7,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Audit.Core;
 using Audit.Core.Providers;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using Audit.EntityFramework.Interceptors;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
+using NUnit.Framework;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -316,6 +318,47 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(resultList.Values.First()[0]["Comments"], Is.EqualTo("Comment"));
             Assert.That(resultList.Values.First()[0]["Name"], Is.EqualTo("Test"));
         }
+
+#if EF_CORE_6_OR_GREATER
+        [TestCase(CommandSource.LinqQuery)]
+        [TestCase(CommandSource.SaveChanges)]
+        public void Test_DbCommandInterceptor_IncludeReaderPredicate(CommandSource sourceToInclude)
+        {
+            var commandEvents = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => commandEvents.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            int newId = new Random().Next();
+
+            var interceptor = new AuditCommandInterceptor()
+            {
+                LogParameterValues = true,
+                IncludeReaderEventsPredicate = c => c.CommandSource == sourceToInclude
+            };
+
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
+            {
+                // Intercepted SaveChanges
+                var dept = new DbCommandInterceptContext.Department() { Id = newId, Name = "Test", Comments = "Comment" };
+                ctx.Departments.Add(dept);
+                ctx.SaveChanges();
+
+                // intercepted LinqQuery
+                dept = ctx.Departments.FirstOrDefault(d => d.Id == newId);
+
+                Assert.That(dept, Is.Not.Null);
+            }
+
+            Assert.That(commandEvents.Count, Is.EqualTo(1));
+            Assert.That(commandEvents[0].Parameters, Is.Not.Null);
+            Assert.That(commandEvents[0].Parameters.Any(), Is.True);
+            Assert.That(commandEvents[0].Parameters.First().Value, Is.EqualTo(newId));
+            Assert.That(commandEvents[0].Result, Is.Null);
+            Assert.That(commandEvents[0].CommandSource, Is.EqualTo(sourceToInclude));
+        }
+#endif
 
 #if EF_CORE_7_OR_GREATER
         [Test]
