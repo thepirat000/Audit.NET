@@ -23,9 +23,9 @@ namespace Audit.WebApi.Template.Services
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public IEnumerable<string?> GetValues()
+        public List<string?> GetValues()
         {
-            return _dbContext.Values.Select(x => x.Value);
+            return _dbContext.Values.Select(x => x.Value).ToList();
         }
 
         public async Task<string?> GetAsync(int id)

@@ -1,10 +1,9 @@
-﻿
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container and configure the audit global filter
 builder.Services.AddControllers(mvc => 
 {
-    mvc.AuditSetupFilter(); 
+    mvc.AuditSetupMvcFilter(); 
 });
 
 // Swagger
@@ -14,16 +13,20 @@ builder.Services.AddSwaggerGen();
 // HTTP context accessor
 builder.Services.AddHttpContextAccessor();
 
+// Configure a custom scope factory and data provider
+builder.Services.AddAuditScopeFactory();
+builder.Services.AddAuditDataProvider();
+
 // TODO: Configure your services
 #if ServiceInterception
-builder.Services.AddAuditedTransient<IValuesService, ValuesService>();
+builder.Services.AddScopedAuditedService<IValuesService, ValuesService>();
 #else
-builder.Services.AddTransient<IValuesService, ValuesService>();
+builder.Services.AddScoped<IValuesService, ValuesService>();
 #endif
 
 #if EnableEntityFramework
 // TODO: Configure your context connection
-builder.Services.AddDbContext<MyContext>(_ => _.UseInMemoryDatabase("default"));
+builder.Services.AddDbContextFactory<MyContext>(_ => _.UseInMemoryDatabase("default"), ServiceLifetime.Scoped);
 #endif
 
 var app = builder.Build();
@@ -53,7 +56,4 @@ app.AuditSetupMiddleware();
 app.AuditSetupDbContext();
 #endif
 
-// Configure the audit output.
-app.AuditSetupOutput();
-
-app.Run();
+await app.RunAsync();

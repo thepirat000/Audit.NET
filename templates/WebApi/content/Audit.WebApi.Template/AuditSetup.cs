@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Audit.Core.Providers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Audit.WebApi.Template
 {
@@ -9,8 +10,10 @@ namespace Audit.WebApi.Template
     {
         /// <summary>Event type to identify the MVC audit logs</summary>
         private const string EventTypeMvc = "MVC";
+
         /// <summary>Event type to identify the HTTP audit logs from the middleware</summary>
         private const string EventTypeHttp = "HTTP";
+
 #if EnableEntityFramework
         /// <summary>Event type to identify the Entity Framework audit logs</summary>
         private const string EventTypeEntityFramework = "EF";
@@ -22,19 +25,26 @@ namespace Audit.WebApi.Template
 
 #if ServiceInterception
         /// <summary>
-        /// Adds an audited service to the service collection
+        /// Adds an audited service to the service collection. The service will be intercepted to log the calls to its methods.
         /// </summary>
-        public static IServiceCollection AddAuditedTransient<TService, TImplementation>(this IServiceCollection services)
+        public static IServiceCollection AddScopedAuditedService<TService, TImplementation>(this IServiceCollection services)
             where TService : class
             where TImplementation : class, TService
         {
-            return services.AddTransient<TService>(s =>
+            return services.AddScoped<TService>(s =>
             {
-                var svc = (TService)ActivatorUtilities.CreateInstance<TImplementation>(s);
-                return AuditProxy.Create(svc, new InterceptionSettings()
+                // AuditProxy lacks awareness of the service provider, defaulting to the globally configured ScopeFactory and DataProvider.
+                // To prevent this, we retrieve the ScopeFactory and DataProvider from the service provider and set them in the InterceptionSettings.
+                var interceptionSettings = new InterceptionSettings()
                 {
-                    EventType = EventTypeServiceInterception
-                });
+                    EventType = EventTypeServiceInterception,
+                    AuditScopeFactory = s.GetRequiredService<IAuditScopeFactory>(),
+                    AuditDataProvider = s.GetRequiredService<AuditDataProvider>()
+                };
+
+                var service = (TService)ActivatorUtilities.CreateInstance<TImplementation>(s);
+
+                return AuditProxy.Create(service, interceptionSettings);
             });
         }
 #endif
@@ -42,7 +52,7 @@ namespace Audit.WebApi.Template
         /// <summary>
         /// Add the global audit filter to the MVC pipeline
         /// </summary>
-        public static MvcOptions AuditSetupFilter(this MvcOptions mvcOptions)
+        public static MvcOptions AuditSetupMvcFilter(this MvcOptions mvcOptions)
         {
             // Add the global MVC Action Filter to the filter chain
             mvcOptions.AddAuditFilter(a => a
@@ -85,25 +95,27 @@ namespace Audit.WebApi.Template
 #endif
 
         /// <summary>
+        /// Setups the audit scope creation
+        /// </summary>
+        public static IServiceCollection AddAuditScopeFactory(this IServiceCollection services)
+        {
+            services.AddScoped<IAuditScopeFactory, MyAuditScopeFactory>();
+
+            return services;
+        }
+
+        /// <summary>
         /// Setups the audit output
         /// </summary>
-        public static void AuditSetupOutput(this WebApplication app)
+        public static IServiceCollection AddAuditDataProvider(this IServiceCollection services)
         {
-            // TODO: Configure the audit output.
-            // For more info, see https://github.com/thepirat000/Audit.NET#data-providers.
-            Audit.Core.Configuration.Setup()
-                .UseFileLogProvider(_ => _
-                    .Directory(@"C:\Logs")
-                    .FilenameBuilder(ev => $"{ev.StartDate:yyyyMMddHHmmssffff}_{ev.EventType}.json"));
-
             Audit.Core.Configuration.JsonSettings.WriteIndented = true;
 
-            // Include the trace identifier in the audit events
-            var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
-            Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
-            {
-                scope.SetCustomField("TraceId", httpContextAccessor.HttpContext?.TraceIdentifier);
-            });
+            services.AddSingleton<AuditDataProvider>(new FileDataProvider(cfg => cfg
+                .Directory(@"C:\Logs")
+                .FilenameBuilder(ev => $"{ev.StartDate:yyyyMMddHHmmssffff}_{ev.EventType}.json")));
+
+            return services;
         }
     }
 }
