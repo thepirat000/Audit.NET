@@ -212,7 +212,7 @@ SkipExtraFrames | `int` | Value used to indicate how many frames in the stack sh
 CallingMethod | `MethodBase` | Specific calling method to store on the event. Default is to use the calling stack to determine the calling method.
 Items | `Dictionary<string, object>` | A dictionary of items that can be used to store additional information on the scope, accessible from the `AuditScope` instance.
 
-Suppose you have the following code to _cancel an order_ that you want to audit:
+For instance, consider the following code to _cancel an order_ that you want to audit:
 
 ```c#
 Order order = Db.GetOrder(orderId);
@@ -221,21 +221,21 @@ order.OrderItems = null;
 order = Db.OrderUpdate(order);
 ```
 
-To audit this operation, you can surround the code with a `using` block that creates an `AuditScope`, indicating a target object to track:
+To audit this operation, you can wrap the code in a `using` block that initializes an `AuditScope`, specifying the target object to monitor:
 
 ```c#
 Order order = Db.GetOrder(orderId);
 using (AuditScope.Create("Order:Update", () => order))
 {
-    order.Status = -1;
-    order.OrderItems = null;
-    order = Db.OrderUpdate(order);
+  order.Status = -1;
+  order.OrderItems = null;
+  order = Db.OrderUpdate(order);
 }
 ```
 
 > **Note**
 > 
-> It is not mandatory to use a `using` block, but it simplifies the syntax when the code to audit is on a single block, allowing the detection of exceptions and calculating the duration by implicitly saving the event on disposal. 
+> Using a `using` block is not required, but it streamlines the syntax when auditing a single code block. It also enables automatic exception detection and duration calculation by implicitly saving the event upon disposal. 
 
 > **Note**
 > 
