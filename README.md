@@ -104,47 +104,47 @@ Then you can inject the IAuditScopeFactory into your classes to create audit sco
 ```c#
 public class MyService
 {
-	private readonly IAuditScopeFactory _auditScopeFactory;
+  private readonly IAuditScopeFactory _auditScopeFactory;
 
-	public MyService(IAuditScopeFactory auditScopeFactory)
-	{
-		_auditScopeFactory = auditScopeFactory;
-	}
+  public MyService(IAuditScopeFactory auditScopeFactory)
+  {
+    _auditScopeFactory = auditScopeFactory;
+  }
 
-	public void MyMethod()
-	{
-		using var scope = _auditScopeFactory.Create(new AuditScopeOptions(...));
-		...
-	}
+  public void MyMethod()
+  {
+    using var scope = _auditScopeFactory.Create(new AuditScopeOptions(...));
+    ...
+  }
 }
 ```
 
 You can also implement your own `IAuditScopeFactory` to customize the creation of audit scopes. 
 The recommended approach is to inherit from the `AuditScopeFactory` class. 
-By overriding the `OnConfiguring` and `OnScopeCreated` methods, you can configure the audit scope options before creation and customize the audit scope after creation, respectively.
+By overriding the `OnConfiguring` and `OnScopeCreated` methods, you can configure the audit scope options before creation and customize the audit scope after creation respectively.
 
 For example:
 
 ```c#
 public class MyAuditScopeFactory : AuditScopeFactory
 {
-    private readonly IMyService _myService;
-    public MyAuditScopeFactory(IMyService myService)
-    {
-        _myService = myService;
-    }
+  private readonly IMyService _myService;
+  public MyAuditScopeFactory(IMyService myService)
+  {
+    _myService = myService;
+  }
 
-    public override void OnConfiguring(AuditScopeOptions options)
-    {
-        // Set the data provider to use
-        options.DataProvider = new SqlDataProvider(...);
-    }
+  public override void OnConfiguring(AuditScopeOptions options)
+  {
+    // Set the data provider to use
+    options.DataProvider = new SqlDataProvider(...);
+  }
 
-    public override void OnScopeCreated(AuditScope auditScope)
-    {
-        // Add a custom field to the audit scope
-        auditScope.SetCustomField("CustomId", _myService.GetId());
-    }
+  public override void OnScopeCreated(AuditScope auditScope)
+  {
+    // Add a custom field to the audit scope
+    auditScope.SetCustomField("CustomId", _myService.GetId());
+  }
 }
 ```
 
