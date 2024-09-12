@@ -148,6 +148,8 @@ public class MyAuditScopeFactory : AuditScopeFactory
 }
 ```
 
+Several extensions for generating audit events, such as [Audit.EntityFramework.Core](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md), [Audit.WebApi.Core](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), [Audit.Mvc.Core](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), and [Audit.SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md), will automatically attempt to resolve the `IAuditScopeFactory` and `AuditDataProvider` instances from the service provider.
+
 # Support for older .NET frameworks
 
 Beginning with version 23.0.0, this library and its extensions have discontinued support for older .NET Framework and Entity Framework (versions that lost Microsoft support before 2023).
