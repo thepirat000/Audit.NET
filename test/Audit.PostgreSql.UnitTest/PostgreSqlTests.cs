@@ -159,10 +159,45 @@ namespace Audit.PostgreSql.UnitTest
 
             Assert.That(ev, Is.Not.Null);
         }
-        
+
+        [Test]
+        public void Test_AuditEventData_AsText()
+        {
+            // Arrange
+            var dp = new CustomPostgreSqlDataProvider(config => config
+                .ConnectionString(AzureSettings.PostgreSqlConnectionString)
+                .TableName("event_text")
+                .IdColumnName("id")
+                .DataColumn("data", Configuration.DataType.String)
+                .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
+                .CustomColumn("event_type", ev => ev.EventType)
+                .CustomColumn("some_date", ev => DateTime.UtcNow)
+                .CustomColumn("some_null", ev => null));
+            
+            var auditEvent = new AuditEvent()
+            {
+                EventType = "EventType",
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"Field1", "Value1"}
+                }
+            };
+
+            // Act
+            var id = (long)dp.InsertEvent(auditEvent);
+            var auditEventLoaded = dp.GetEvent<AuditEvent>(id);
+
+            // Assert
+            Assert.That(id, Is.TypeOf<long>());
+            Assert.That(auditEventLoaded, Is.Not.Null);
+            Assert.That(auditEventLoaded.EventType, Is.EqualTo("EventType"));
+            Assert.That(auditEventLoaded.CustomFields, Is.Not.Null);
+            Assert.That(auditEventLoaded.CustomFields.Count, Is.EqualTo(1));
+            Assert.That(auditEventLoaded.CustomFields["Field1"].ToString(), Is.EqualTo("Value1"));
+        }
+
         private static string GetLastUpdatedColumnNameColumnName()
         {
-            /* this value is encapsulated so both RunLocalAuditConfiguration and Test_PostgreDataProvider_Paging_With_Where use the same value */
             return "updated_date";
         }
 
@@ -179,7 +214,7 @@ namespace Audit.PostgreSql.UnitTest
                     .ConnectionString(AzureSettings.PostgreSqlConnectionString)
                     .TableName("event")
                     .IdColumnName(_ => "id")
-                    .DataColumn("data", Audit.PostgreSql.Configuration.DataType.JSONB, auditEvent =>
+                    .DataColumn("data", Configuration.DataType.JSONB, auditEvent =>
                     {
                         auditEvent.EventType = overrideEventType;
                         return auditEvent.ToJson();

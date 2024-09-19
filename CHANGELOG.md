@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.0.2] - 2024-09-18:
+- Audit.NET.PostgreSql: Fixing issue with the PostgreSql data provider when using String data column (#695) 
+
 ## [27.0.1] - 2024-09-05:
 - Audit.EntityFramework.Core: Introducing the CommandSource property to the audit output for EF Core 6 and above, along with configurable options to determine whether to include reader events based on the command event data
 - Audit.WCF: Allow configuring custom `IAuditScopeFactory` and `AuditDataProvider`. 

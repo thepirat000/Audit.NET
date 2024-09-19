@@ -276,8 +276,7 @@ namespace Audit.PostgreSql.Providers
             var sets = new List<string>();
             if (GetDataColumnName(auditEvent) != null)
             {
-                var data = string.IsNullOrWhiteSpace(DataType) ? "@data" : $"CAST (@data AS {DataType})";
-                sets.Add($@"""{GetDataColumnName(auditEvent)}"" = {data}");
+                sets.Add($@"""{GetDataColumnName(auditEvent)}"" = {GetDataColumnValue()}");
             }
             if (ludScript != null)
             {
@@ -329,8 +328,7 @@ namespace Audit.PostgreSql.Providers
             var values = new List<string>();
             if (GetDataColumnName(auditEvent) != null)
             {
-                var data = string.IsNullOrWhiteSpace(DataType) ? "@data" : $"CAST (@data AS {DataType})";
-                values.Add(data);
+                values.Add(GetDataColumnValue());
             }
             if (CustomColumns != null)
             {
@@ -375,6 +373,13 @@ namespace Audit.PostgreSql.Providers
                 }
             }
             return parameters.ToArray();
+        }
+
+        private string GetDataColumnValue()
+        {
+            return string.IsNullOrWhiteSpace(DataType) || DataType == Configuration.DataType.String.ToString() 
+                ? "@data" 
+                : $"CAST (@data AS {DataType})";
         }
 
         protected string GetConnectionString(AuditEvent auditEvent)
