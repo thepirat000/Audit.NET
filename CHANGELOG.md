@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.0.3] - 2024-09-25:
+- Audit.EntityFramework.Core: Fixing issue with Complex Type properties when using the EF DataProvider Property Matching (#697)
+
 ## [27.0.2] - 2024-09-18:
 - Audit.NET.PostgreSql: Fixing issue with the PostgreSql data provider when using String data column (#695) 
 

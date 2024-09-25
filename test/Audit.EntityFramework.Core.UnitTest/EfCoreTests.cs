@@ -30,6 +30,13 @@ namespace Audit.EntityFramework.Core.UnitTest
             new DemoContext().Database.EnsureCreated();
         }
 
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            new BlogsContext().Database.EnsureDeleted();
+            new DemoContext().Database.EnsureDeleted();
+        }
+
 #if EF_CORE_8_OR_GREATER
         [Test]
         public void Test_EF_ComplexType()
@@ -88,7 +95,62 @@ namespace Audit.EntityFramework.Core.UnitTest
 
             Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.OriginalValue, Is.EqualTo("AU"));
             Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.NewValue, Is.EqualTo("NEWALIAS"));
+
+            context.Database.EnsureDeleted();
         }
+
+        [Test]
+        public void Test_EF_ComplexType_EntityFrameworkDataProvider_PropertyMatching()
+        {
+            // Arrange
+            Audit.Core.Configuration.Setup().UseEntityFramework(ef => ef
+                .AuditTypeExplicitMapper(m => m
+                    .Map<Context_ComplexTypes.Person, Context_ComplexTypes.AuditLog>()
+                    .AuditEntityAction<Context_ComplexTypes.AuditLog>((ev, entry, auditLog) =>
+                    {
+                        auditLog.TableName = entry.Table;
+                        auditLog.Action = entry.Action;
+                    }))
+                .IgnoreMatchedProperties(false));
+
+            using var context = new Context_ComplexTypes();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var name = Guid.NewGuid().ToString();
+            var city = "Rosario";
+            var alias = "alias";
+
+            // Act
+            var person = new Context_ComplexTypes.Person()
+            {
+                Id = 10,
+                Name = name,
+                Address = new Context_ComplexTypes.Address()
+                {
+                    Country = new Context_ComplexTypes.Country() { Name = "Argentina", Alias = alias },
+                    City = city,
+                    Line1 = "Street",
+                    PostCode = "1234"
+                }
+            };
+
+            context.People.Add(person);
+            context.SaveChanges();
+            var auditLogs = context.AuditLogs.ToList();
+
+            context.Database.EnsureDeleted();
+
+            // Assert
+            Assert.That(auditLogs, Has.Count.EqualTo(1));
+            Assert.That(auditLogs[0].Action, Is.EqualTo("Insert"));
+            Assert.That(auditLogs[0].Name, Is.EqualTo(name));
+            Assert.That(auditLogs[0].Address, Is.Not.Null);
+            Assert.That(auditLogs[0].Address.City, Is.EqualTo(city));
+            Assert.That(auditLogs[0].Address.Country, Is.Not.Null);
+            Assert.That(auditLogs[0].Address.Country.Alias, Is.EqualTo(alias));
+        }
+
 #endif
 
 #if EF_CORE_5_OR_GREATER
@@ -173,6 +235,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 };
                 context.Posts.Add(post);
                 context.SaveChanges();
+
+                context.Database.EnsureDeleted();
             }
 
             Assert.That(evs.Count, Is.EqualTo(1));
@@ -246,6 +310,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == "10" && pt.Action == "Insert" && pt.Extra == "extra"));
                 Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 102 && pt.PostsId == "10" && pt.Action == "Insert" && pt.Extra == "extra"));
                 Assert.True(context.Audit_PostTags.Any(pt => pt.TagsId == 101 && pt.PostsId == "10" && pt.Action == "Delete" && pt.Extra == "extra"));
+
+                context.Database.EnsureDeleted();
             }
 
         }
@@ -278,6 +344,8 @@ namespace Audit.EntityFramework.Core.UnitTest
 				});
 
                 context.SaveChanges();
+
+                context.Database.EnsureDeleted();
             }
 
             Assert.That(evs.Count, Is.EqualTo(1));

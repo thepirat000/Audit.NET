@@ -37,7 +37,20 @@ namespace Audit.EntityFramework.Core.UnitTest
             public string Alias { get; init; }
         }
 
+        [AuditIgnore]
+        public class AuditLog
+        {
+            [Key]
+            public int AuditId { get; set; }
+            public string TableName { get; set; }
+            public string Action { get; set; }
+            [Required]
+            public Address Address { get; set; }
+            public string Name { get; set; }
+        }
+
         public DbSet<Person> People { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -51,6 +64,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Person>().ComplexProperty(e => e.Address).ComplexProperty(a => a.Country);
+            modelBuilder.Entity<AuditLog>().ComplexProperty(e => e.Address).ComplexProperty(a => a.Country);
         }
     }
 #endif
