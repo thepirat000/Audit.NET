@@ -1028,9 +1028,15 @@ The following packages are extensions to log interactions with different systems
 <img src="https://i.imgur.com/9go2b0f.png" alt="icon" width="90"/> | **[Audit.WebApi](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md)** | Generate detailed audit logs by decorating **Web API** Methods and Controllers with an action filter attribute, or by using a middleware. Includes support for ASP.NET Core.
 <img src="https://i.imgur.com/1nMVLQo.png" alt="icon" width="90"/> | **[Audit.MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md)** | Generate detailed audit logs by adding a [Command Event Subscriber](https://mongodb.github.io/mongo-csharp-driver/2.8/reference/driver_core/events/) into the configuration of the MongoDB Driver.
 
-# Storage providers
+# Data providers
 
-Apart from the _FileLog_, _EventLog_ and _Dynamic_ event storage providers, there are others included in different packages:
+A Data Provider (or Storage Provider) is a component responsible for handling how audit event data is stored or processed. The purpose of the Data Provider is to manage the persistence of audit logs once an audit event is triggered and captured. The Data Provider defines how the Audit Event is saved.
+
+Audit.NET offers a range of built-in Data Providers for various storage solutions, including [File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), [Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), [InMemory List](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/InMemoryDataProvider.cs), and [InMemory Blocking Collection](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/BlockingCollectionDataProvider.cs). 
+
+Moreover, several [Data Provider Wrappers](#data-provider-wrappers) are available to encapsulate other Data Providers for various purposes, such as resilience and lazy instantiation. Examples include [Polly](#polly-data-provider), [Lazy](#lazy-factory-data-provider), [Deferred](#deferred-factory-data-provider), and [Conditional](#conditional-data-provider).
+
+In addition, a variety of other Data Providers are available through separate packages, as shown below:
 
 <a></a> | Package | Description
 ------------- | ------------------- | ------------------
