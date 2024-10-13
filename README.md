@@ -742,7 +742,7 @@ using (var scope = AuditScope.Create(new AuditScopeOptions { CreationPolicy = Ev
 
 > **Note**
 > 
-> If you don't provide a Creation Policy, the default Creation Policy configured will be used (see the [configuration](#configuration) section).
+> If you don't provide a Creation Policy when creating the `AuditScope`, the globally configured Creation Policy will be used (see the [configuration](#configuration) section)
 
 ## AuditScope statechart
 
