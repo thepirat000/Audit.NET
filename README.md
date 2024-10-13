@@ -717,22 +717,21 @@ The Data Providers included are summarized in the following table:
 | Wrapper  | Lazy              | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [LazyDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/Wrappers/LazyDataProvider.cs)                                                                                                                                     | Facilitates delayed data provider instantiation via a factory method that is invoked just once, upon the initial need.       | `.UseLazyFactory()`                                    |
 | Wrapper  | Polly             | [Audit.NET.Polly](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Polly/README.md) / [PollyDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Polly/Providers/PollyDataProvider.cs)                                                                                      | Allows to define [Polly](https://www.pollydocs.org/index.html) resilience strategies to any Data Provider                    | `.UsePolly()`                                          |
 
+
 ## Event Creation Policy
 
-The audit scope can be configured to call its data provider in different ways:
-- **Insert on End:** (**default**)
-The audit event is inserted when the scope is disposed. 
+The audit scope allows configuration for invoking its data provider through different approaches:
 
-- **Insert on Start, Replace on End:**
-The event (in its initial state) is inserted when the scope is created, and then the complete event information is replaced when the scope is disposed. 
+- **Insert on End** (default): The audit event is recorded when the scope is disposed.
 
-- **Insert on Start, Insert on End:**
-Two versions of the event are inserted, the initial when the scope is created, and the final when the scope is disposed.
+- **Insert on Start, Replace on End**: The initial state of the event is recorded upon scope creation, and the complete event information is updated when the scope is disposed.
 
-- **Manual:**
-The event saving (insert/replace) should be explicitly invoked by calling the `Save()` method on the `AuditScope`.
+- **Insert on Start, Insert on End**: Two versions of the event are recorded—one at scope creation and another at scope disposal.
 
-You can set the Creation Policy per scope, for example, to explicitly set the Creation Policy to Manual:
+- **Manual**: Event saving (insert or replace) must be explicitly triggered by calling the `Save()` method on the `AuditScope`.
+
+The Creation Policy can be set on a per-scope basis. For example, to configure the policy explicitly to Manual:
+
 ```c#
 using (var scope = AuditScope.Create(new AuditScopeOptions { CreationPolicy = EventCreationPolicy.Manual }))
 {
