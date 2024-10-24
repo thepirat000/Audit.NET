@@ -39,7 +39,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Text.Json" Version="6.0.9" />
+		<PackageReference Include="System.Text.Json" Version="6.0.10" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.3.0" />
 		<Reference Include="System.Web" />

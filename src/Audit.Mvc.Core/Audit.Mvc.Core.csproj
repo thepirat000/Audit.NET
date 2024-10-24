@@ -65,7 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' ">
-		<PackageReference Include="System.Text.Json" Version="6.0.9" />
+		<PackageReference Include="System.Text.Json" Version="6.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -240,6 +240,27 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
+        /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
+        /// </summary>
+        /// <returns>The generated EF audit event</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public EntityFrameworkEvent SaveChangesGetAudit()
+        {
+            return _helper.SaveChangesGetAudit(this, () => base.SaveChanges());
+        }
+
+        /// <summary>
+        /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The generated EF audit event</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(CancellationToken cancellationToken = default)
+        {
+            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
+        }
+
+        /// <summary>
         /// Saves the changes asynchronously.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
