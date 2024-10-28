@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;netcoreapp3.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>net462;net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<LangVersion>8.0</LangVersion>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.1.1] - 2024-10-28:
+- Audit.NET.MongoDB: Upgrading MongoDB.Driver to latest version 3.0.0 (#708)
+
 ## [27.1.0] - 2024-10-24:
 - Audit.EntityFramework.Identity and Audit.EntityFramework.Identity.Core: Adding `SaveChangesGetAudit()` methods to the `AuditIdentityDbContext` (#707)
 - Audit.NET: Upgrading System.Text.Json 6.0.9 to the latest 6.0.10 ([CVE-2024-43485](https://www.cve.org/CVERecord?id=CVE-2024-43485))
