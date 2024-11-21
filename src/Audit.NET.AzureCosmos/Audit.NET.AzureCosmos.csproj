@@ -44,7 +44,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' != 'net462' ">
-		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.37.0" />
+		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.46.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
