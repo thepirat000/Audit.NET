@@ -35,8 +35,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
-	</ItemGroup>
+    <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
+    <ProjectReference Include="..\Audit.Attribute\Audit.Attribute.csproj" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="6.5.0" />
