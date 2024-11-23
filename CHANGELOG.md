@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.2.0] - 2024-11-23:
+ - Audit.EntityFramework.Abstractions: Introducing `Audit.EntityFramework.Abstractions` assembly to decouple your domain layer from direct dependencies on EntityFramework or EntityFrameworkCore (#714)
+
 ## [27.1.1] - 2024-10-28:
 - Audit.NET.MongoDB: Upgrading MongoDB.Driver to latest version 3.0.0 (#708)
 

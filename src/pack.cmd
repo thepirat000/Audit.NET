@@ -11,6 +11,7 @@ del "audit.net.azurecosmos\bin\release\*.nupkg"
 del "audit.net.mongodb\bin\release\*.nupkg"
 del "audit.net.sqlserver\bin\release\*.nupkg"
 del "audit.net.mysql\bin\release\*.nupkg"
+del "Audit.EntityFramework.Abstractions\bin\release\*.nupkg"
 del "audit.entityframework\bin\release\*.nupkg"
 del "audit.entityframework.core\bin\release\*.nupkg"
 del "audit.entityframework.Identity\bin\release\*.nupkg"
@@ -56,6 +57,7 @@ dotnet pack "Audit.NET.AzureCosmos/" -c Release
 dotnet pack "Audit.NET.MongoDB/" -c Release
 dotnet pack "Audit.NET.SqlServer/" -c Release
 dotnet pack "Audit.NET.MySql/" -c Release
+dotnet pack "Audit.EntityFramework.Abstractions/" -c Release
 dotnet pack "Audit.EntityFramework/" -c Release
 dotnet pack "Audit.EntityFramework.Core/" -c Release
 dotnet pack "Audit.EntityFramework.Identity/" -c Release

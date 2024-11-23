@@ -48,6 +48,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Audit.EntityFramework.Abstractions\Audit.EntityFramework.Abstractions.csproj" />
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 

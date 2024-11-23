@@ -23,7 +23,7 @@ if ($totalProjs -eq 0) {
 $hasFailed = $false;
 
 $projects | ForEach {
-    & dotnet test $_ --"logger:console;verbosity=normal" --no-build -c Release $extraParams
+    & dotnet test $_ --"logger:console;verbosity=normal" --no-build -c Release -m:1 $extraParams
     if ($LASTEXITCODE -ne 0) {
         $hasFailed = $true;
     }

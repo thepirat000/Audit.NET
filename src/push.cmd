@@ -39,6 +39,7 @@ del "Audit.NET.Serilog\bin\release\*.symbols.nupkg"
 del "Audit.MongoClient\bin\release\*.symbols.nupkg"
 del "Audit.NET.Polly\bin\release\*.symbols.nupkg"
 del "Audit.NET.Channels\bin\release\*.symbols.nupkg"
+del "Audit.EntityFramework.Abstractions\bin\release\*.symbols.nupkg"
 
 nuget push "audit.net\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.nupkg" -NoSymbols -source %1
@@ -78,3 +79,4 @@ nuget push "Audit.NET.Serilog\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.MongoClient\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Polly\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Channels\bin\release\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.EntityFramework.Abstractions\bin\release\*.nupkg" -NoSymbols -source %1

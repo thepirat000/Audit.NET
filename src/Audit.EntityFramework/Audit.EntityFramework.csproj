@@ -31,10 +31,11 @@
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
-		<None Include="README.md" Pack="true" PackagePath="\"/>
+		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Audit.EntityFramework.Abstractions\Audit.EntityFramework.Abstractions.csproj" />
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
