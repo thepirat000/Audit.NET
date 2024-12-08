@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -40,7 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Threading.Channels" Version="8.0.0" />
+		<PackageReference Include="System.Threading.Channels" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

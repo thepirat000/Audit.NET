@@ -3,6 +3,12 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.3.0] - 2024-12-08:
+- Adding support for NET 9 (#711)
+- Audit.NET.AzureCosmos: Security upgrade Microsoft.Azure.Cosmos from 3.37.0 to 3.46.0 (#713)
+- Audit.NET.Kafka: Adding support to add custom headers to the Kafka messages (#715)
+- Audit.MongoClient: Upgrade MongoDB.Driver reference to the latest version 3.1.0 (#708)
+
 ## [27.2.0] - 2024-11-23:
  - Audit.EntityFramework.Abstractions: Introducing `Audit.EntityFramework.Abstractions` assembly to decouple your domain layer from direct dependencies on EntityFramework or EntityFrameworkCore (#714)
 

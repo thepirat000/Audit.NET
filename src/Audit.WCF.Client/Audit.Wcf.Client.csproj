@@ -47,7 +47,7 @@
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
 		<Reference Include="System.ServiceModel" />
-		<PackageReference Include="System.ServiceModel.Federation" Version="4.9.0" />
+		<PackageReference Include="System.ServiceModel.Federation" Version="4.10.3" />
 	</ItemGroup>
 
 	<ItemGroup>

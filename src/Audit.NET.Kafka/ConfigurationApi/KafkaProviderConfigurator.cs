@@ -14,6 +14,7 @@ namespace Audit.Kafka.Configuration
         internal Setting<string> _topic;
         internal Action<ProducerBuilder<TKey, AuditEvent>> _producerBuilderAction;
         internal Action<DeliveryResult<TKey, AuditEvent>> _resultHandler;
+        internal Func<AuditEvent, Headers> _headersSelector;
 
         public IKafkaProviderSubConfigurator<TKey> AuditEventSerializer(ISerializer<AuditEvent> auditEventSerializer)
         {
@@ -72,6 +73,12 @@ namespace Audit.Kafka.Configuration
         public IKafkaProviderSubConfigurator<TKey> TopicSelector(Func<AuditEvent, string> topicSelector)
         {
             _topic = topicSelector;
+            return this;
+        }
+
+        public IKafkaProviderSubConfigurator<TKey> HeadersSelector(Func<AuditEvent, Headers> headersSelector)
+        {
+            _headersSelector = headersSelector;
             return this;
         }
     }

@@ -4,6 +4,10 @@ using System;
 
 namespace Audit.Kafka.Providers
 {
+    /// <summary>
+    /// Default JSON serializer for Kafka messages using Audit.Core.JsonAdapter
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class DefaultJsonSerializer<T> : ISerializer<T>, IDeserializer<T>
     {
         public T Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context) =>

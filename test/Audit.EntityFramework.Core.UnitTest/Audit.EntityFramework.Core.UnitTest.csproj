@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<AssemblyName>Audit.EntityFramework.Core.UnitTest</AssemblyName>
@@ -27,6 +27,9 @@
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
 		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER</DefineConstants>
 	</PropertyGroup>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER;EF_CORE_9_OR_GREATER</DefineConstants>
+	</PropertyGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
@@ -37,10 +40,10 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.36" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.36" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.36" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.36" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
@@ -51,10 +54,17 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

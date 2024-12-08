@@ -55,6 +55,7 @@ Audit.Core.Configuration.Setup()
 - **TopicSelector**: A function of the audit event that returns the topic name to use.
 - **PartitionSelector**: (optional) A function of the audit event that returns the partition index to use.
 - **KeySelector**: When using keyed messages, a function of the audit event that returns the key to use.
+- **HeadersSelector**: Optional to use message headers. Configure the message headers to be used for a given audit event.
 - **KeySerializer**: When using keyed messages to set a custom serializer for the key.
 - **AuditEventSerializer**: Custom AuditEvent serializer. By default the audit event is JSON serialized + UTF8 encoded.
 - **ResultHandler**: An action to be called for each kafka response.

@@ -1,20 +1,23 @@
-﻿using Audit.Core;
-using Audit.Kafka.Providers;
-using Confluent.Kafka;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
+using System.Text;
 using System.Threading.Tasks;
+
+using Audit.Core;
+using Audit.Kafka.Providers;
+
+using Confluent.Kafka;
+
+using NUnit.Framework;
 
 namespace Audit.Kafka.UnitTest
 {
     [TestFixture]
     public class KafkaTests
     {
-		private const string host = "127.0.0.1:59351";
+		private const string BootstrapHost = "127.0.0.1:52062";
 		
         [Test]
         public void Test_KafkaDataProvider_FluentApi()
@@ -42,7 +45,7 @@ namespace Audit.Kafka.UnitTest
 
             var pConfig = new ProducerConfig()
             {
-                BootstrapServers = host,
+                BootstrapServers = BootstrapHost,
                 ClientId = Dns.GetHostName()
             };
             Audit.Core.Configuration.Setup()
@@ -53,6 +56,7 @@ namespace Audit.Kafka.UnitTest
                     {
                         lock (locker)
                         {
+                            rpt.Value = AuditEvent.FromJson(rpt.Value.ToJson());
                             reports.Add(rpt);
                         }
                     }))
@@ -92,15 +96,17 @@ namespace Audit.Kafka.UnitTest
 
             var pConfig = new ProducerConfig()
             {
-                BootstrapServers = host,
+                BootstrapServers = BootstrapHost,
                 ClientId = Dns.GetHostName()
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka(_ => _
                     .ProducerConfig(pConfig)
                     .Topic(topic)
+                    .HeadersSelector(ev => new Headers { { "Type", Encoding.UTF8.GetBytes(ev.EventType) } })
                     .ResultHandler(rpt =>
                     {
+                        rpt.Value = AuditEvent.FromJson(rpt.Value.ToJson());
                         reports.Add(rpt);
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
@@ -111,27 +117,21 @@ namespace Audit.Kafka.UnitTest
             await scope.DisposeAsync();
 
             Assert.That(reports.Count, Is.EqualTo(2));
-            Assert.That(reports[0].Status, Is.EqualTo(PersistenceStatus.Persisted));
-            Assert.That(reports[1].Status, Is.EqualTo(PersistenceStatus.Persisted));
 
-            var cv = new ConsumerBuilder<Null, AuditEvent>(new ConsumerConfig()
-            {
-                BootstrapServers = host,
-                ClientId = Dns.GetHostName(),
-                GroupId = "test-" + guid,
-                AutoOffsetReset = AutoOffsetReset.Earliest, 
-            }).SetValueDeserializer(new DefaultJsonSerializer<AuditEvent>()).Build();
-            cv.Subscribe(topic);
-            await Task.Delay(1000);
-            cv.Seek(new TopicPartitionOffset(topic, reports[0].Partition, reports[0].Offset));
-            var r1 = cv.Consume(1000);
-            cv.Seek(new TopicPartitionOffset(topic, reports[1].Partition, reports[1].Offset));
-            var r2 = cv.Consume(1000);
+            var r1 = reports[0];
+            var r2 = reports[1];
 
+            Assert.That(r1.Status, Is.EqualTo(PersistenceStatus.Persisted));
+            Assert.That(r2.Status, Is.EqualTo(PersistenceStatus.Persisted));
+            
             Assert.That(r1, Is.Not.Null);
             Assert.That(r2, Is.Not.Null);
             Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo(guid.ToString()));
             Assert.That(r2.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
+            Assert.That(r1.Headers[0].Key, Is.EqualTo("Type"));
+            Assert.That(r1.Headers[0].GetValueBytes(), Is.EqualTo(Encoding.UTF8.GetBytes("type1")));
+            Assert.That(r2.Headers[0].Key, Is.EqualTo("Type"));
+            Assert.That(r2.Headers[0].GetValueBytes(), Is.EqualTo(Encoding.UTF8.GetBytes("type1")));
         }
 
         [Test]
@@ -140,21 +140,23 @@ namespace Audit.Kafka.UnitTest
         public void Test_KafkaDataProvider_HappyPath()
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
-            const string topic = "my-audit-topic-happy-path";
+            var topic = "my-audit-topic-happy-path";
             
             var pConfig = new ProducerConfig()
             {
-                BootstrapServers = host,
+                BootstrapServers = BootstrapHost,
                 ClientId = Dns.GetHostName(), 
                 AllowAutoCreateTopics = true
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka(_ => _
                     .ProducerConfig(pConfig)
+                    .HeadersSelector(ev => new Headers { { "Type", Encoding.UTF8.GetBytes(ev.EventType) } })
                     .Topic(topic)
                     .Partition(0)
                     .ResultHandler(rpt =>
                     {
+                        rpt.Value = AuditEvent.FromJson(rpt.Value.ToJson());
                         reports.Add(rpt);
                     }))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
@@ -167,26 +169,24 @@ namespace Audit.Kafka.UnitTest
             Assert.That(reports.Count, Is.EqualTo(2));
             Assert.That(reports[0].Status, Is.EqualTo(PersistenceStatus.Persisted));
             Assert.That(reports[1].Status, Is.EqualTo(PersistenceStatus.Persisted));
+            
+            Assert.That(reports.Count, Is.EqualTo(2));
 
-            var cv = new ConsumerBuilder<Null, AuditEvent>(new ConsumerConfig()
-            {
-                BootstrapServers = host,
-                ClientId = Dns.GetHostName(),
-                GroupId = "test-" + guid,
-                AutoOffsetReset = AutoOffsetReset.Earliest
-            }).SetValueDeserializer(new DefaultJsonSerializer<AuditEvent>()).Build();
+            var msg1 = reports[0];
+            var msg2 = reports[1];
 
-            cv.Subscribe(topic);
-            Thread.Sleep(1000);
-            cv.Seek(new TopicPartitionOffset(topic, reports[0].Partition, reports[0].Offset));
-            var r1 = cv.Consume(1000);
-            cv.Seek(new TopicPartitionOffset(topic, reports[0].Partition, reports[1].Offset));
-            var r2 = cv.Consume(1000);
+            Assert.That(msg1, Is.Not.Null);
+            Assert.That(msg2, Is.Not.Null);
 
-            Assert.That(r1, Is.Not.Null);
-            Assert.That(r2, Is.Not.Null);
-            Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo(guid.ToString()));
-            Assert.That(r2.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
+            Assert.That(msg1.Status, Is.EqualTo(PersistenceStatus.Persisted));
+            Assert.That(msg2.Status, Is.EqualTo(PersistenceStatus.Persisted));
+
+            Assert.That(msg1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo(guid.ToString()));
+            Assert.That(msg2.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
+            Assert.That(msg1.Headers[0].Key, Is.EqualTo("Type"));
+            Assert.That(msg1.Headers[0].GetValueBytes(), Is.EqualTo(Encoding.UTF8.GetBytes("type1")));
+            Assert.That(msg2.Headers[0].Key, Is.EqualTo("Type"));
+            Assert.That(msg2.Headers[0].GetValueBytes(), Is.EqualTo(Encoding.UTF8.GetBytes("type1")));
         }
 
         [Test]
@@ -199,15 +199,17 @@ namespace Audit.Kafka.UnitTest
 
             var pConfig = new ProducerConfig()
             {
-                BootstrapServers = host,
+                BootstrapServers = BootstrapHost,
                 ClientId = Dns.GetHostName()
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka<string>(_ => _
                     .ProducerConfig(pConfig)
+                    .HeadersSelector(ev => new Headers { { "Type", Encoding.UTF8.GetBytes(ev.EventType) } })
                     .Topic(topic)
                     .ResultHandler(rpt =>
                     {
+                        rpt.Value = AuditEvent.FromJson(rpt.Value.ToJson());
                         reports.Add(rpt);
                     })
                     .KeySelector(ev => ev.EventType))
@@ -221,19 +223,11 @@ namespace Audit.Kafka.UnitTest
             Assert.That(reports.Count, Is.EqualTo(1));
             Assert.That(reports[0].Status, Is.EqualTo(PersistenceStatus.Persisted));
 
-            var cv = new ConsumerBuilder<string, AuditEvent>(new ConsumerConfig()
-            {
-                BootstrapServers = host,
-                ClientId = Dns.GetHostName(),
-                GroupId = "test-" + guid,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-            }).SetValueDeserializer(new DefaultJsonSerializer<AuditEvent>()).Build();
-            cv.Subscribe(topic);
-            Thread.Sleep(1000);
-            cv.Seek(new TopicPartitionOffset(topic, reports[0].Partition, reports[0].Offset));
-            var r1 = cv.Consume(1000);
+            Assert.That(reports.Count, Is.EqualTo(1));
 
-            Assert.That(r1, Is.Not.Null);
+            var r1 = reports[0];
+            
+            Assert.That(r1.Status, Is.EqualTo(PersistenceStatus.Persisted));
             Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
             Assert.That(r1.Message.Key, Is.EqualTo("key1"));
         }

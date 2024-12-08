@@ -21,35 +21,47 @@ namespace Audit.Kafka.Providers
     /// </summary>
     public class KafkaDataProvider<TKey> : AuditDataProvider
     {
-        private readonly ProducerConfig _producerConfig;
-        private static readonly object _producerLocker = new object();
         private readonly ProducerBuilder<TKey, AuditEvent> _producerBuilder;
         private IProducer<TKey, AuditEvent> _producer;
+
+        private static readonly object ProducerLocker = new object();
+
         /// <summary>
         /// Kafka Topic selector to be used. Default is "audit-topic".
         /// </summary>
         public Setting<string> Topic { get; set; }
+
         /// <summary>
         /// Partition selector to be used as a function of the audit event. Default or NULL means any partition
         /// </summary>
         public Setting<int?> Partition { get; set; }
+
         /// <summary>
         /// Key selector. Optional to use keyed messages. Return the key to be used for a given audit event.
         /// </summary>
         public Func<AuditEvent, TKey> KeySelector { get; set; }
+
+        /// <summary>
+        /// Headers Selector. Optional to use message headers. Return the message headers to be used for a given audit event.
+        /// </summary>
+        public Func<AuditEvent, Headers> HeadersSelector { get; set; }
+
         /// <summary>
         /// Key serializer. Optional when using keyed messages and a custom serializer for the key is needed.
         /// </summary>
         public ISerializer<TKey> KeySerializer { get; set; }
+
         /// <summary>
         /// Custom AuditEvent serializer. By default, the audit event is JSON serialized + UTF8 encoded.
         /// </summary>
         public ISerializer<AuditEvent> AuditEventSerializer { get; set; }
+
         /// <summary>
         /// Gets or sets the result handler action. An action to be called for each kafka response
         /// </summary>
         /// <value>An action to be called for each kafka response.</value>
         public Action<DeliveryResult<TKey, AuditEvent>> ResultHandler { get; set; }
+
         /// <summary>
         /// Gets or sets the producer builder action. An action to be called before building the producer.
         /// </summary>
@@ -66,8 +78,7 @@ namespace Audit.Kafka.Providers
             if (config != null)
             {
                 config.Invoke(kafkaConfig);
-                _producerConfig = kafkaConfig._producerConfig;
-                _producerBuilder = new ProducerBuilder<TKey, AuditEvent>(_producerConfig);
+                _producerBuilder = new ProducerBuilder<TKey, AuditEvent>(kafkaConfig._producerConfig);
                 Topic = kafkaConfig._topic;
                 Partition = kafkaConfig._partition;
                 KeySelector = kafkaConfig._keySelector;
@@ -75,6 +86,7 @@ namespace Audit.Kafka.Providers
                 AuditEventSerializer = kafkaConfig._auditEventSerializer;
                 ResultHandler = kafkaConfig._resultHandler;
                 ProducerBuilderAction = kafkaConfig._producerBuilderAction;
+                HeadersSelector = kafkaConfig._headersSelector;
             }
         }
 
@@ -84,15 +96,14 @@ namespace Audit.Kafka.Providers
         /// <param name="producerConfig">The producer configuration.</param>
         public KafkaDataProvider(ProducerConfig producerConfig)
         {
-            _producerConfig = producerConfig;
-            _producerBuilder = new ProducerBuilder<TKey, AuditEvent>(_producerConfig);
+            _producerBuilder = new ProducerBuilder<TKey, AuditEvent>(producerConfig);
         }
 
         private void EnsureProducer()
         {
             if (_producer == null)
             {
-                lock(_producerLocker)
+                lock(ProducerLocker)
                 {
                     if (_producer == null)
                     {
@@ -144,7 +155,10 @@ namespace Audit.Kafka.Providers
             throw new NotImplementedException();
         }
 
-        private TopicPartition GetTopicPartition(AuditEvent auditEvent)
+        /// <summary>
+        /// Gets the topic and partition for the given audit event. Override this method to customize the topic and partition selection.
+        /// </summary>
+        public virtual TopicPartition GetTopicPartition(AuditEvent auditEvent)
         {
             var topic = Topic.GetValue(auditEvent) ?? "audit-topic";
             var partitionIndex = Partition.GetValue(auditEvent);
@@ -152,10 +166,19 @@ namespace Audit.Kafka.Providers
             return new TopicPartition(topic, partition);
         }
 
-        private TKey Produce(AuditEvent auditEvent)
+        /// <summary>
+        /// Creates a Kafka message from an AuditEvent. Override this method to customize the message creation.
+        /// </summary>
+        public virtual Message<TKey, AuditEvent> CreateMessage(AuditEvent auditEvent)
         {
             var key = KeySelector == null ? default : KeySelector.Invoke(auditEvent);
-            var message = new Message<TKey, AuditEvent> { Key = key, Value = auditEvent };
+            var headers = HeadersSelector?.Invoke(auditEvent);
+            return new Message<TKey, AuditEvent> { Key = key, Value = auditEvent, Headers = headers };
+        }
+
+        private TKey Produce(AuditEvent auditEvent)
+        {
+            var message = CreateMessage(auditEvent);
             var topic = GetTopicPartition(auditEvent);
             var result = _producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
             ResultHandler?.Invoke(result);
@@ -164,8 +187,7 @@ namespace Audit.Kafka.Providers
 
         private async Task<TKey> ProduceAsync(AuditEvent auditEvent, CancellationToken cancellationToken)
         {
-            var key = KeySelector == null ? default : KeySelector.Invoke(auditEvent);
-            var message = new Message<TKey, AuditEvent> { Key = key, Value = auditEvent };
+            var message = CreateMessage(auditEvent);
             var topic = GetTopicPartition(auditEvent);
             var result = await _producer.ProduceAsync(topic, message, cancellationToken);
             ResultHandler?.Invoke(result);

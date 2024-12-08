@@ -34,8 +34,12 @@
     <ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="npgsql" Version="8.0.3" />
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' ">
+	  <PackageReference Include="npgsql" Version="8.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <PackageReference Include="npgsql" Version="9.0.2" />
   </ItemGroup>
 
   <ItemGroup>

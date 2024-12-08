@@ -4,7 +4,10 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Net.Http;
 using Audit.IntegrationTest;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Documents.Client;
 
 namespace Audit.AzureCosmos.UnitTest
 {
@@ -23,7 +26,17 @@ namespace Audit.AzureCosmos.UnitTest
                 Database = "Audit",
                 Container = "AuditTest",
                 AuthKey = AzureSettings.AzureDocDbAuthKey,
-                IdBuilder = _ => id
+                IdBuilder = _ => id,
+#if IS_COSMOS
+                CosmosClientOptionsAction = options =>
+                {
+                    options.HttpClientFactory = () => new HttpClient(new HttpClientHandler()
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    });
+                    options.ConnectionMode = ConnectionMode.Gateway;
+                }
+#endif
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
             var auditEvent = new AuditEvent();
@@ -58,7 +71,17 @@ namespace Audit.AzureCosmos.UnitTest
                 Database = "Audit",
                 Container = "AuditTest",
                 AuthKey = AzureSettings.AzureDocDbAuthKey,
-                IdBuilder = _ => id
+                IdBuilder = _ => id,
+#if IS_COSMOS
+                CosmosClientOptionsAction = options =>
+                {
+                    options.HttpClientFactory = () => new HttpClient(new HttpClientHandler()
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    });
+                    options.ConnectionMode = ConnectionMode.Gateway;
+                }
+#endif
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
             var auditEvent = new AuditEvent();

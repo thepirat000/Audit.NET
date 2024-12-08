@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<VersionPrefix>3.0.0</VersionPrefix>
-		<TargetFrameworks>net462;net472;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net462;net472;netcoreapp3.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>

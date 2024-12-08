@@ -38,7 +38,7 @@
 	<ItemGroup>
 		<PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
 		<PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.3" />
-		<PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="4.5.1" />
+		<PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

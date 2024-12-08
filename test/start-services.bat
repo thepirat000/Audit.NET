@@ -4,6 +4,8 @@ start "ELASTIC" /D D:\Elasticsearch\elasticsearch-8.14.3\bin "D:\Elasticsearch\e
 start "DYNAMO" /D D:\DynamoDb "D:\DynamoDb\Run.bat"
 start "RavenDB" /D D:\RavenDB powershell D:\RavenDB\run.ps1
 start "Azurite" /D "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator" azurite.exe
+docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmos-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+
 net start mongodb
 net start mysql80
 net start mssqlserver

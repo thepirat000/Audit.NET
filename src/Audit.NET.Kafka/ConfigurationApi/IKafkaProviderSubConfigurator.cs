@@ -32,6 +32,12 @@ namespace Audit.Kafka.Configuration
         /// <param name="keySelector">The key selector.</param>
         IKafkaProviderSubConfigurator<TKey> KeySelector(Func<AuditEvent, TKey> keySelector);
         /// <summary>
+        /// Sets the Headers selector. Optional to use message headers. Configure the message headers to be used for a given audit event.
+        /// </summary>
+        /// <param name="headersSelector"></param>
+        /// <returns></returns>
+        IKafkaProviderSubConfigurator<TKey> HeadersSelector(Func<AuditEvent, Headers> headersSelector);
+        /// <summary>
         /// Sets the Key serializer. Optional when using keyed messages and a custom serializer for the key is needed.
         /// </summary>
         /// <param name="keySerializer">The key serializer.</param>

@@ -39,6 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
+    <PackageReference Include="Confluent.Kafka" Version="2.6.1" />
   </ItemGroup>
 </Project>
