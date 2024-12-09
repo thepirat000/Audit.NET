@@ -174,6 +174,7 @@ namespace Audit.WCF.UnitTest
             Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
+        [Category("Integration")]
         [TestCase(2, 10)]
         [TestCase(6, 10)]
         public async Task WCFTest_Concurrency_AuditScopeAsync(int threads, int callsPerThread)
