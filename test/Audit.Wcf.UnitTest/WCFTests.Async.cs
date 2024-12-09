@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Text.Json;
+using Polly;
 
 namespace Audit.WCF.UnitTest
 {
@@ -173,6 +174,74 @@ namespace Audit.WCF.UnitTest
             Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
+        [TestCase(2, 10)]
+        [TestCase(6, 10)]
+        public async Task WCFTest_Concurrency_AuditScopeAsync(int threads, int callsPerThread)
+        {
+            var provider = new Mock<AuditDataProvider>();
+            provider.Setup(p => p.CloneValue(It.IsAny<object>(), It.IsAny<AuditEvent>())).CallBase();
+            var bag = new ConcurrentBag<string>();
+            provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent ev) =>
+            {
+                var wcfEvent = ev.GetWcfAuditAction();
+                var request = wcfEvent.InputParameters[0].Value as GetOrderRequest;
+                var result = wcfEvent.Result.Value as GetOrderResponse;
+                Assert.NotNull(request.OrderId);
+                Assert.That(ev.CustomFields["Test-Field-1"], Is.EqualTo(request.OrderId));
+                Assert.False(bag.Contains(request.OrderId));
+                bag.Add(request.OrderId);
+                Assert.That(ev.CustomFields["Test-Field-2"], Is.EqualTo(ev.CustomFields["Test-Field-1"]));
+                Assert.That(result.Order.OrderId, Is.EqualTo(request.OrderId));
+                Assert.That(ev.Environment.CallingMethodName.Contains("GetOrder"), Is.True);
+                return Guid.NewGuid();
+            });
+
+            var auditScopeFactory = new TestAuditScopeFactory();
+
+            var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
+            using (var host = new ServiceHost(new OrderService_AsyncConcurrent_Test(provider.Object, auditScopeFactory), basePipeAddress))
+            {
+                var serviceEndpoint = host.AddServiceEndpoint(typeof(IOrderService), CreateBinding(), string.Empty);
+                host.Open();
+
+                await WCFTest_Concurrency_AuditScope_ThreadRunAsync(threads, callsPerThread, serviceEndpoint.Address);
+
+                host.Close();
+            }
+            Console.WriteLine("Times: {0}.", threads * callsPerThread);
+            Assert.That(bag.Count, Is.EqualTo(bag.Distinct().Count()));
+            Assert.That(bag.Count, Is.EqualTo(threads * callsPerThread));
+            Assert.That(auditScopeFactory.OnScopeCreatedCount, Is.EqualTo(threads * callsPerThread));
+
+        }
+
+        static async Task WCFTest_Concurrency_AuditScope_ThreadRunAsync(int internalThreads, int callsPerThread, EndpointAddress address)
+        {
+            var tasks = new List<ValueTask>();
+
+            var rateLimiter = new ResiliencePipelineBuilder()
+                .AddConcurrencyLimiter(8, internalThreads)
+                .Build();
+
+            for (int i = 0; i < internalThreads; i++)
+            {
+                tasks.Add(rateLimiter.ExecuteAsync(async ct =>
+                {
+                    using (var factory = new ChannelFactory<IOrderService>(CreateBinding()))
+                    {
+                        for (int j = 0; j < callsPerThread; j++)
+                        {
+                            var id = Guid.NewGuid();
+                            var proxy = factory.CreateChannel(address);
+                            await proxy.GetOrder2Async(new GetOrderRequest() { OrderId = id.ToString() });
+                        }
+                        factory.Close();
+                    }
+                }));
+            }
+
+            await Task.WhenAll(tasks.Select(t => t.AsTask()).ToArray());
+        }
         private static BasicHttpBinding CreateBinding()
         {
             var binding = new BasicHttpBinding()
