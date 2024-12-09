@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 9/4/2024 - 3:46:34 AM |
+| Generated on: | 12/9/2024 - 9:07:00 PM |
 | Parser: | MultiReport (2x Cobertura) |
-| Assemblies: | 23 |
-| Classes: | 261 |
+| Assemblies: | 24 |
+| Classes: | 260 |
 | Files: | 199 |
-| **Line coverage:** | 76.8% (7872 of 10240) |
-| Covered lines: | 7872 |
-| Uncovered lines: | 2368 |
-| Coverable lines: | 10240 |
-| Total lines: | 18833 |
-| **Branch coverage:** | 70.6% (3015 of 4268) |
-| Covered branches: | 3015 |
-| Total branches: | 4268 |
+| **Line coverage:** | 76.9% (7893 of 10252) |
+| Covered lines: | 7893 |
+| Uncovered lines: | 2359 |
+| Coverable lines: | 10252 |
+| Total lines: | 18927 |
+| **Branch coverage:** | 70.8% (3029 of 4276) |
+| Covered branches: | 3029 |
+| Total branches: | 4276 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -27,7 +27,7 @@
 |Audit.DynamicProxy.AuditProxy|11|0|11|59|100%|4|4|100%|
 |Audit.DynamicProxy.InterceptEvent|12|0|12|59|100%|0|0||
 |Audit.DynamicProxy.InterceptionSettings|7|0|7|48|100%|0|0||
-|**Audit.EntityFramework**|**1769**|**577**|**2346**|**5257**|**75.4%**|**644**|**856**|**75.2%**|
+|**Audit.EntityFramework**|**1769**|**571**|**2340**|**5254**|**75.5%**|**644**|**852**|**75.5%**|
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AssociationEntry|0|3|3|18|0%|0|0||
 |Audit.EntityFramework.AssociationEntryRecord|0|5|5|19|0%|0|0||
@@ -35,7 +35,6 @@
 |Audit.EntityFramework.AuditDbContextAttribute|3|19|22|124|13.6%|0|10|0%|
 |Audit.EntityFramework.AuditEventEntityFramework|1|0|1|15|100%|0|0||
 |Audit.EntityFramework.AuditEventExtensions|2|4|6|82|33.3%|1|6|16.6%|
-|Audit.EntityFramework.AuditOverrideAttribute|0|6|6|20|0%|0|0||
 |Audit.EntityFramework.Configuration|40|9|49|135|81.6%|5|6|83.3%|
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping|180|53|233|357|77.2%|31|42|73.8%|
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping<T>|180|53|233|357|77.2%|31|42|73.8%|
@@ -44,7 +43,7 @@
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping<TSourceEntity>|180|53|233|357|77.2%|31|42|73.8%|
 |Audit.EntityFramework.ConfigurationApi.ContextConfigurator|8|0|8|35|100%|4|4|100%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity, TProp>|4|2|6|85|66.6%|2|4|50%|
-|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|20|8|28|85|71.4%|2|8|25%|
+|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|20|8|28|85|71.4%|2|4|50%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|4|2|6|85|66.6%|2|4|50%|
 |Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator<T>|12|4|16|56|75%|0|0||
 |Audit.EntityFramework.ConfigurationApi.EfEntitySettings|3|0|3|30|100%|0|0||
@@ -62,8 +61,10 @@
 |Audit.EntityFramework.EntityName|2|0|2|11|100%|0|0||
 |Audit.EntityFramework.EventEntry|12|4|16|68|75%|0|0||
 |Audit.EntityFramework.EventEntryChange|3|0|3|9|100%|0|0||
-|Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|379|87.1%|81|102|79.4%|
-|**Audit.EntityFramework.Core**|**1851**|**819**|**2670**|**6101**|**69.3%**|**796**|**1040**|**76.5%**|
+|Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|396|87.1%|81|102|79.4%|
+|**Audit.EntityFramework.Abstractions**|**4**|**2**|**6**|**20**|**66.6%**|**0**|**0**|****|
+|Audit.EntityFramework.AuditOverrideAttribute|4|2|6|20|66.6%|0|0||
+|**Audit.EntityFramework.Core**|**1859**|**817**|**2676**|**6130**|**69.4%**|**804**|**1046**|**76.8%**|
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AuditDbContext|33|0|33|249|100%|0|0||
 |Audit.EntityFramework.AuditDbContextAttribute|9|10|19|124|47.3%|0|8|0%|
@@ -71,9 +72,8 @@
 |Audit.EntityFramework.AuditEventEntityFramework|1|0|1|15|100%|0|0||
 |Audit.EntityFramework.AuditEventExtensions|9|9|18|82|50%|6|18|33.3%|
 |Audit.EntityFramework.AuditEventTransactionEntityFramework|1|0|1|14|100%|0|0||
-|Audit.EntityFramework.AuditOverrideAttribute|4|2|6|20|66.6%|0|0||
 |Audit.EntityFramework.AuditSaveChangesInterceptor|21|0|21|61|100%|0|0||
-|Audit.EntityFramework.CommandEvent|6|1|7|48|85.7%|0|0||
+|Audit.EntityFramework.CommandEvent|7|1|8|58|87.5%|0|0||
 |Audit.EntityFramework.Configuration|41|6|47|135|87.2%|6|6|100%|
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping|113|120|233|357|48.4%|29|42|69%|
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping<T>|113|120|233|357|48.4%|29|42|69%|
@@ -82,7 +82,7 @@
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping<TSourceEntity>|113|120|233|357|48.4%|29|42|69%|
 |Audit.EntityFramework.ConfigurationApi.ContextConfigurator|8|0|8|35|100%|4|4|100%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity, TProp>|3|3|6|85|50%|1|4|25%|
-|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|20|8|28|85|71.4%|2|8|25%|
+|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|20|8|28|85|71.4%|2|4|50%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|3|3|6|85|50%|1|4|25%|
 |Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator<T>|14|0|14|56|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.EfEntitySettings|3|0|3|30|100%|0|0||
@@ -100,14 +100,14 @@
 |Audit.EntityFramework.EventEntry|15|1|16|68|93.7%|0|0||
 |Audit.EntityFramework.EventEntryChange|3|0|3|9|100%|0|0||
 |Audit.EntityFramework.InterceptorEventBase|8|0|8|56|100%|0|0||
-|Audit.EntityFramework.Interceptors.AuditCommandInterceptor|170|38|208|449|81.7%|105|138|76%|
+|Audit.EntityFramework.Interceptors.AuditCommandInterceptor|175|38|213|471|82.1%|112|146|76.7%|
 |Audit.EntityFramework.Interceptors.AuditTransactionInterceptor|156|29|185|390|84.3%|57|86|66.2%|
-|Audit.EntityFramework.Providers.EntityFrameworkDataProvider|118|9|127|379|92.9%|95|104|91.3%|
+|Audit.EntityFramework.Providers.EntityFrameworkDataProvider|124|9|133|396|93.2%|96|106|90.5%|
 |Audit.EntityFramework.TransactionEvent|4|1|5|32|80%|0|0||
-|**Audit.EntityFramework.Identity.Core**|**27**|**32**|**59**|**1163**|**45.7%**|**0**|**0**|****|
-|Audit.EntityFramework.AuditIdentityDbContext|2|6|8|337|25%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|21|14|35|337|60%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|2|6|8|337|25%|0|0||
+|**Audit.EntityFramework.Identity.Core**|**27**|**29**|**56**|**1150**|**48.2%**|**0**|**0**|****|
+|Audit.EntityFramework.AuditIdentityDbContext|2|8|10|358|20%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|21|7|28|282|75%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|2|8|10|358|20%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey>|2|2|4|76|50%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|4|4|76|0%|0|0||
 |**Audit.FileSystem**|**136**|**29**|**165**|**413**|**82.4%**|**36**|**52**|**69.2%**|
@@ -254,24 +254,24 @@
 |Audit.SignalR.SignalrEventOutgoing|7|0|7|25|100%|0|0||
 |Audit.SignalR.SignalrEventReconnect|7|0|7|25|100%|0|0||
 |Audit.SignalR.SignalrExtensions|8|20|28|169|28.5%|5|24|20.8%|
-|**Audit.WCF**|**148**|**77**|**225**|**624**|**65.7%**|**21**|**62**|**33.8%**|
+|**Audit.WCF**|**150**|**77**|**227**|**626**|**66%**|**25**|**66**|**37.8%**|
 |Audit.WCF.AuditBehavior|2|6|8|72|25%|0|0||
 |Audit.WCF.AuditBehaviorAttribute|9|11|20|90|45%|0|10|0%|
 |Audit.WCF.AuditEventExtensions|0|6|6|32|0%|0|6|0%|
 |Audit.WCF.AuditEventWcfAction|1|0|1|15|100%|0|0||
-|Audit.WCF.AuditOperationInvoker|104|34|138|258|75.3%|20|42|47.6%|
+|Audit.WCF.AuditOperationInvoker|106|34|140|260|75.7%|24|46|52.1%|
 |Audit.WCF.AuditScopeAsyncResult|8|3|11|27|72.7%|0|0||
 |Audit.WCF.AuditScopeState|3|0|3|12|100%|0|0||
 |Audit.WCF.AuditWcfEventElement|6|0|6|19|100%|1|2|50%|
 |Audit.WCF.AuditWcfEventFault|0|6|6|15|0%|0|0||
 |Audit.WCF.WcfEvent|15|0|15|26|100%|0|0||
 |Audit.WCF.WcfOperationContext|0|11|11|58|0%|0|2|0%|
-|**Audit.Wcf.Client**|**75**|**23**|**98**|**319**|**76.5%**|**28**|**48**|**58.3%**|
-|Audit.Wcf.Client.AuditBehavior|0|11|11|71|0%|0|0||
-|Audit.Wcf.Client.AuditEndpointBehavior|9|6|15|48|60%|0|0||
+|**Audit.Wcf.Client**|**82**|**23**|**105**|**341**|**78%**|**30**|**50**|**60%**|
+|Audit.Wcf.Client.AuditBehavior|0|11|11|74|0%|0|0||
+|Audit.Wcf.Client.AuditEndpointBehavior|11|6|17|59|64.7%|0|0||
 |Audit.Wcf.Client.AuditEventExtensions|4|2|6|31|66.6%|2|6|33.3%|
 |Audit.Wcf.Client.AuditEventWcfClient|1|0|1|12|100%|0|0||
-|Audit.Wcf.Client.AuditMessageInspector|51|4|55|107|92.7%|26|42|61.9%|
+|Audit.Wcf.Client.AuditMessageInspector|56|4|60|115|93.3%|28|44|63.6%|
 |Audit.Wcf.Client.WcfClientAction|10|0|10|50|100%|0|0||
 |**Audit.WebApi**|**189**|**143**|**332**|**1193**|**56.9%**|**102**|**226**|**45.1%**|
 |Audit.WebApi.ApiControllerExtensions|1|3|4|92|25%|0|0||
