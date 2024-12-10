@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<LangVersion>8.0</LangVersion>
 		<Description>Store Audit.NET Trail Logs into RavenDB</Description>
 		<PackageDescription>Store Audit.NET Trail Logs into a RavenDB document store</PackageDescription>
 		<Copyright>Copyright 2022</Copyright>

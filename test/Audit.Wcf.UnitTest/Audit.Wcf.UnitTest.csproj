@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net462</TargetFrameworks>
-		<LangVersion>8.0</LangVersion>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<AssemblyName>Audit.Wcf.UnitTest</AssemblyName>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ namespace Audit.SqlServer.Configuration
     public class SqlServerProviderConfigurator : ISqlServerProviderConfigurator
     {
         internal Setting<string> _connectionString =  "data source=localhost;initial catalog=Audit;integrated security=true;Encrypt=False;";
+        internal Setting<DbConnection> _dbConnection;
+        internal Setting<DbContext> _dbContext;
         internal Setting<string> _schema = (string)null;
         internal Setting<string> _tableName = "Event";
         internal Setting<string> _idColumnName = "Id";
@@ -26,6 +29,24 @@ namespace Audit.SqlServer.Configuration
         public ISqlServerProviderConfigurator ConnectionString(Func<AuditEvent, string> connectionStringBuilder)
         {
             _connectionString = connectionStringBuilder;
+            _dbConnection = new();
+            _dbContext = new();
+            return this;
+        }
+
+        public ISqlServerProviderConfigurator DbConnection(Func<AuditEvent, DbConnection> dbConnection)
+        {
+            _connectionString = new();
+            _dbConnection = dbConnection;
+            _dbContext = new();
+            return this;
+        }
+
+        public ISqlServerProviderConfigurator DbContext(Func<AuditEvent, DbContext> dbContext)
+        {
+            _connectionString = new();
+            _dbConnection = new();
+            _dbContext = dbContext;
             return this;
         }
 

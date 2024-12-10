@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace Audit.SqlServer.Providers
 {
@@ -14,7 +15,8 @@ namespace Audit.SqlServer.Providers
     /// </summary>
     /// <remarks>
     /// Settings:
-    /// - ConnectionString: SQL connection string
+    /// - ConnectionString: Database connection string
+    /// - DbConnection: Alternatively to ConnectionString, you can pass a DbConnection object
     /// - TableName: Table name (default is 'Event')
     /// - JsonColumnName: Column name where the JSON will be stored (default is 'Data')
     /// - IdColumnName: Column name with the primary key (default is 'EventId')
@@ -25,9 +27,19 @@ namespace Audit.SqlServer.Providers
     public class SqlDataProvider : AuditDataProvider
     {
         /// <summary>
-        /// The SQL connection string
+        /// The Database connection string to use.
         /// </summary>
         public Setting<string> ConnectionString { get; set; }
+
+        /// <summary>
+        /// The Db Connection to use. Alternative to ConnectionString.
+        /// </summary>
+        public Setting<DbConnection> DbConnection { get; set; }
+
+        /// <summary>
+        /// The Db Context instance to use. Alternative to ConnectionString and DbConnection.
+        /// </summary>
+        public Setting<DbContext> DbContext { get; set; }
 
         /// <summary>
         /// The SQL events Table Name 
@@ -58,9 +70,9 @@ namespace Audit.SqlServer.Providers
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
         public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
-        
+
         /// <summary>
-        /// The DbContext options builder, to provide custom database options for the DbContext
+        /// The DbContext options builder, to provide custom database options for the Default Audit DbContext. This setting is ignored if a DbContext instance is provided.
         /// </summary>
         [CLSCompliant(false)]
         public Setting<DbContextOptions> DbContextOptions { get; set; }
@@ -77,6 +89,8 @@ namespace Audit.SqlServer.Providers
             {
                 config.Invoke(sqlConfig);
                 ConnectionString = sqlConfig._connectionString;
+                DbConnection = sqlConfig._dbConnection;
+                DbContext = sqlConfig._dbContext;
                 IdColumnName = sqlConfig._idColumnName;
                 JsonColumnName = sqlConfig._jsonColumnName;
                 LastUpdatedDateColumnName = sqlConfig._lastUpdatedColumnName;
@@ -89,11 +103,17 @@ namespace Audit.SqlServer.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var parameters = GetParametersForInsert(auditEvent);
+            object[] parameters = GetParametersForInsert(auditEvent);
             using var ctx = CreateContext(auditEvent);
             var cmdText = GetInsertCommandText(auditEvent);
-            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
-            return result.ToList().FirstOrDefault()?.Id;
+#if NET7_0_OR_GREATER
+            var result = ctx.Database.SqlQueryRaw<string>(cmdText, parameters);
+            var id = result.ToList().FirstOrDefault();
+#else
+            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, parameters);
+            var id = result.ToList().FirstOrDefault()?.Value;
+#endif
+            return id;
         }
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
@@ -101,8 +121,14 @@ namespace Audit.SqlServer.Providers
             var parameters = GetParametersForInsert(auditEvent);
             await using var ctx = CreateContext(auditEvent);
             var cmdText = GetInsertCommandText(auditEvent);
-            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, parameters);
-            return (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Id;
+#if NET7_0_OR_GREATER
+            var result = ctx.Database.SqlQueryRaw<string>(cmdText, parameters);
+            var id = (await result.ToListAsync(cancellationToken)).FirstOrDefault();
+#else
+            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, parameters);
+            var id = (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Value;
+#endif
+            return id;
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
@@ -130,8 +156,13 @@ namespace Audit.SqlServer.Providers
 
             using var ctx = CreateContext(null);
             var cmdText = GetSelectCommandText(null);
-            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-            var json = result.FirstOrDefault()?.Id;
+#if NET7_0_OR_GREATER
+            var result = ctx.Database.SqlQueryRaw<string>(cmdText, new SqlParameter("@eventId", eventId));
+            var json = result.FirstOrDefault();
+#else
+            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
+            var json = result.FirstOrDefault()?.Value;
+#endif
 
             if (json != null)
             {
@@ -150,8 +181,14 @@ namespace Audit.SqlServer.Providers
 
             await using var ctx = CreateContext(null);
             var cmdText = GetSelectCommandText(null);
-            var result = ctx.FakeIdSet.FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-            var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Id;
+#if NET7_0_OR_GREATER
+            var result = ctx.Database.SqlQueryRaw<string>(cmdText, new SqlParameter("@eventId", eventId));
+            var json = await result.FirstOrDefaultAsync(cancellationToken);
+#else
+            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
+            var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Value;
+#endif
+
 
             if (json != null)
             {
@@ -171,7 +208,7 @@ namespace Audit.SqlServer.Providers
 
         protected string GetInsertCommandText(AuditEvent auditEvent)
         {
-            return string.Format("INSERT INTO {0} ({1}) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Id] VALUES ({3})", 
+            return string.Format("INSERT INTO {0} ({1}) OUTPUT CONVERT(NVARCHAR(MAX), INSERTED.[{2}]) AS [Value] VALUES ({3})", 
                 GetFullTableName(auditEvent),
                 GetColumnsForInsert(auditEvent), 
                 IdColumnName.GetValue(auditEvent),
@@ -305,20 +342,35 @@ namespace Audit.SqlServer.Providers
 
         protected string GetSelectCommandText(AuditEvent auditEvent)
         {
-            var cmdText = string.Format("SELECT [{0}] As [Id] FROM {1} WHERE [{2}] = @eventId",
+            var cmdText = string.Format("SELECT [{0}] As [Value] FROM {1} WHERE [{2}] = @eventId",
                 JsonColumnName.GetValue(auditEvent),
                 GetFullTableName(auditEvent), 
                 IdColumnName.GetValue(auditEvent));
             return cmdText;
         }
 
-        private AuditContext CreateContext(AuditEvent auditEvent)
+        protected virtual DbContext CreateContext(AuditEvent auditEvent)
         {
-            var ctxOptions = DbContextOptions.GetValue(auditEvent);
-            return ctxOptions != null 
-                ? new AuditContext(ConnectionString.GetValue(auditEvent), ctxOptions) 
-                : new AuditContext(ConnectionString.GetValue(auditEvent));
-        }
+            // Use the DbContext if provided
+            var dbContext = DbContext.GetValue(auditEvent);
+            
+            if (dbContext != null)
+            {
+                return dbContext;
+            }
 
+            // Use the connection string or the db connection
+            var ctxOptions = DbContextOptions.GetValue(auditEvent);
+            var dbConnection = DbConnection.GetValue(auditEvent);
+
+            if (dbConnection != null)
+            {
+                return ctxOptions != null ? new DefaultAuditDbContext(dbConnection, ctxOptions) : new DefaultAuditDbContext(dbConnection);
+            }
+
+            var connectionString = ConnectionString.GetValue(auditEvent);
+
+            return ctxOptions != null ? new DefaultAuditDbContext(connectionString, ctxOptions) : new DefaultAuditDbContext(connectionString);
+        }
     }
 }

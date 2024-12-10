@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<LangVersion>8.0</LangVersion>
 		<Description>Store Audit.NET Trail Logs into an Azure Cosmos database</Description>
 		<Copyright>Copyright 2021</Copyright>
 		<AssemblyTitle>Audit.AzureCosmos</AssemblyTitle>

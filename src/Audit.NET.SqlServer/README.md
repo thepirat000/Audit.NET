@@ -66,15 +66,15 @@ Audit.Core.Configuration.Setup()
 ### Provider Options
 
 - **ConnectionString**: The SQL Server connection string.
-- **DbConnection**: The `DbConnection` to use, alternative to ConnectionString when you need more control or configuration over the DB connection. (optional, only for .NET Framework) 
+- **DbConnection**: The `DbConnection` to use, alternative to ConnectionString.
+- **DbContextOptions**: To set custom options to use with the default Audit EF DbContext. This setting is ignored if a DbContext instance is provided.
+- **DbContext**: Specifies a custom EntityFramework DbContext for querying and inserting audit events. When this option is provided, the ConnectionString, DbConnection, and DbContextOptions settings are ignored.
 - **Schema**: The SQL schema for the table. (optional)
 - **TableName**: The audit events table name.
 - **IdColumnName**: The column name of the event identifier (the primary key).
 - **JsonColumnName**: The column name of the event table where the audit event JSON will be stored. (optional)
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events. (optional)
 - **CustomColumn**: Additional columns to store information from the audit event. (optional)
-- **SetDatabaseInitializerNull**: To set the database initializer to NULL on the internal DbContext. (optional, only for .NET Framework)
-- **DbContextOptions**: To set custom options for the internal EntityFramework DbContext (optional, only for .NET Core)
 
 ## Query events
 

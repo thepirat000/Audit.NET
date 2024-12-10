@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data.Common;
+
 using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,20 +13,35 @@ namespace Audit.SqlServer.Configuration
     public interface ISqlServerProviderConfigurator
     {
         /// <summary>
-        /// Specifies the DB context options as a function of the audit event.
+        /// Specifies the DB context options to use with the DefaultAuditDbContext. This setting is ignored if a DbContext instance is provided.
         /// </summary>
         /// <param name="dbContextOptionsBuilder">The DB context options as a function of the audit event.</param>
         ISqlServerProviderConfigurator DbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptionsBuilder);
+
         /// <summary>
-        /// Specifies the DB context options.
+        /// Specifies the DB context options to use with the DefaultAuditDbContext. This setting is ignored if a DbContext instance is provided.
         /// </summary>
         /// <param name="dbContextOptions">The DB context options as a function of the audit event.</param>
         ISqlServerProviderConfigurator DbContextOptions(DbContextOptions dbContextOptions);
+
         /// <summary>
         /// Specifies the Sql Server connection string.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         ISqlServerProviderConfigurator ConnectionString(string connectionString);
+
+        /// <summary>
+        /// Specifies the DbContext instance to use as a function of the audit event. Alternative to ConnectionString.
+        /// </summary>
+        /// <param name="dbContext">The DbContext instance.</param>
+        ISqlServerProviderConfigurator DbContext(Func<AuditEvent, DbContext> dbContext);
+
+        /// <summary>
+        /// Specifies the Database connection to use as a function of the audit event. Alternative to ConnectionString.
+        /// </summary>
+        /// <param name="dbConnection">The Database connection.</param>
+        ISqlServerProviderConfigurator DbConnection(Func<AuditEvent, DbConnection> dbConnection);
+
         /// <summary>
         /// Specifies the Sql Server Table Name.
         /// </summary>

@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.3.1] - 2024-12-10:
+- Audit.NET.SqlServer:  Introducing configuration options in the SQL Server data provider to enable the use of a custom Entity Framework DbContext for storing and querying audit events.
+- Audit.EntityFramework.Core: New DbContext Data Provider to store audit events using a custom Entity Framework DbContext. (#716)
+
 ## [27.3.0] - 2024-12-08:
 - Adding support for NET 9 (#711)
 - Audit.NET.AzureCosmos: Security upgrade Microsoft.Azure.Cosmos from 3.37.0 to 3.46.0 (#713)

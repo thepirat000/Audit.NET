@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<LangVersion>9</LangVersion>
 		<Description>Log Audit.NET Audit Trail Polly™</Description>
 		<Copyright>Copyright 2024</Copyright>
 		<AssemblyTitle>Audit.Polly</AssemblyTitle>

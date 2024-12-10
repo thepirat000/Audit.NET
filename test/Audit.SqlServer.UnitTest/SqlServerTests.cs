@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -94,6 +93,112 @@ namespace Audit.SqlServer.UnitTest
         }
 
         [Test]
+        public async Task Test_SqlServer_Provider_GuardConditionAsync()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseSqlServer(_ => _
+                    .ConnectionString(SqlTestHelper.GetConnectionString())
+                    .TableName(ev => SqlTestHelper.TableName)
+                    .IdColumnName(ev => "EventId")
+                    .JsonColumnName(ev => "Data")
+                    .LastUpdatedColumnName("LastUpdatedDate")
+                    .CustomColumn("DoesNotExists1", ev => throw new Exception("Should not happen"), ev => false)
+                    .CustomColumn("DoesNotExists2", ev => null, ev => false)
+                    .CustomColumn("EventType", ev => ev.EventType, ev => ev.EventType == nameof(Test_SqlServer_Provider)))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            var ids = new List<object>();
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+            {
+                ids.Add(scope.EventId);
+            });
+
+            await using (var scope = await AuditScope.CreateAsync(nameof(Test_SqlServer_Provider), null, new { field = "initial" }))
+            {
+                scope.SetCustomField("field", "final");
+            }
+
+            var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
+
+            Assert.That(ids.Count, Is.EqualTo(2));
+            Assert.That(ids[1], Is.EqualTo(ids[0]));
+            var auditEvent = await sqlDp.GetEventAsync(ids[0]);
+
+            Assert.That(auditEvent, Is.Not.Null);
+            Assert.That(auditEvent.EventType, Is.EqualTo(nameof(Test_SqlServer_Provider)));
+            Assert.That(auditEvent.CustomFields["field"]?.ToString(), Is.EqualTo("final"));
+        }
+
+        [Test]
+        public void Test_SqlServer_Provider_WithDbConnection()
+        {
+            var ctx = new MyContext();
+            Audit.Core.Configuration.Setup()
+                .UseSqlServer(s => s
+                    .DbConnection(ev => ctx.Database.GetDbConnection())
+                    .TableName(ev => SqlTestHelper.TableName)
+                    .IdColumnName(ev => "EventId")
+                    .JsonColumnName(ev => "Data")
+                    .LastUpdatedColumnName("LastUpdatedDate")
+                    .CustomColumn("EventType", ev => ev.EventType, ev => ev.EventType == nameof(Test_SqlServer_Provider)))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var ids = new List<object>();
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+            {
+                ids.Add(scope.EventId);
+            });
+
+            using (var scope = AuditScope.Create(nameof(Test_SqlServer_Provider), null, new { field = "initial" }))
+            {
+                scope.SetCustomField("field", "final");
+            }
+
+            var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
+
+            Assert.That(ids.Count, Is.EqualTo(1));
+            var auditEvent = sqlDp.GetEvent(ids[0]);
+
+            Assert.That(auditEvent, Is.Not.Null);
+            Assert.That(auditEvent.EventType, Is.EqualTo(nameof(Test_SqlServer_Provider)));
+            Assert.That(auditEvent.CustomFields["field"]?.ToString(), Is.EqualTo("final"));
+        }
+
+        [Test]
+        public void Test_SqlServer_Provider_WithDbContextInstance()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseSqlServer(s => s
+                    .DbContext(ev => new MyContext())
+                    .TableName(ev => SqlTestHelper.TableName)
+                    .IdColumnName(ev => "EventId")
+                    .JsonColumnName(ev => "Data")
+                    .LastUpdatedColumnName("LastUpdatedDate")
+                    .CustomColumn("EventType", ev => ev.EventType, ev => ev.EventType == nameof(Test_SqlServer_Provider)))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var ids = new List<object>();
+            Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
+            {
+                ids.Add(scope.EventId);
+            });
+
+            using (var scope = AuditScope.Create(nameof(Test_SqlServer_Provider), null, new { field = "initial" }))
+            {
+                scope.SetCustomField("field", "final");
+            }
+
+            var sqlDp = Audit.Core.Configuration.DataProviderAs<SqlDataProvider>();
+
+            Assert.That(ids.Count, Is.EqualTo(1));
+            var auditEvent = sqlDp.GetEvent(ids[0]);
+
+            Assert.That(auditEvent, Is.Not.Null);
+            Assert.That(auditEvent.EventType, Is.EqualTo(nameof(Test_SqlServer_Provider)));
+            Assert.That(auditEvent.CustomFields["field"]?.ToString(), Is.EqualTo("final"));
+        }
+
+        [Test]
         public void Test_SqlDataProvider_FluentApi()
         {
             var x = new SqlDataProvider(_ => _
@@ -157,6 +262,21 @@ namespace Audit.SqlServer.UnitTest
                 Count++;
                 return result;
             }
+        }
+
+        public class MyContext : DbContext
+        {
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                optionsBuilder.UseSqlServer(SqlTestHelper.GetConnectionString());
+            }
+
+#if !NET7_0_OR_GREATER
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<AuditEventValueModel>();
+            }
+#endif
         }
     }
 }
