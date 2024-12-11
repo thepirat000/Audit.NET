@@ -38,6 +38,7 @@ namespace Audit.SqlServer.Providers
 
         /// <summary>
         /// The Db Context instance to use. Alternative to ConnectionString and DbConnection.
+        /// When a DbContext instance is provided with this setting, the DbContext will not be disposed by the library.
         /// </summary>
         public Setting<DbContext> DbContext { get; set; }
 
@@ -104,47 +105,94 @@ namespace Audit.SqlServer.Providers
         public override object InsertEvent(AuditEvent auditEvent)
         {
             object[] parameters = GetParametersForInsert(auditEvent);
-            using var ctx = CreateContext(auditEvent);
+            var ctx = CreateContext(auditEvent, out var isLocal);
             var cmdText = GetInsertCommandText(auditEvent);
+
+            try
+            {
 #if NET7_0_OR_GREATER
-            var result = ctx.Database.SqlQueryRaw<string>(cmdText, parameters);
-            var id = result.ToList().FirstOrDefault();
+                var result = ctx.Database.SqlQueryRaw<string>(cmdText, parameters);
+                var id = result.ToList().FirstOrDefault();
 #else
-            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, parameters);
-            var id = result.ToList().FirstOrDefault()?.Value;
+                var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, parameters);
+                var id = result.ToList().FirstOrDefault()?.Value;
 #endif
-            return id;
+                return id;
+            }
+            finally
+            {
+                if (isLocal && ctx != null)
+                {
+                    ctx.Dispose();
+                }
+            }
         }
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var parameters = GetParametersForInsert(auditEvent);
-            await using var ctx = CreateContext(auditEvent);
+            var ctx = CreateContext(auditEvent, out var isLocal);
             var cmdText = GetInsertCommandText(auditEvent);
+
+            try
+            {
 #if NET7_0_OR_GREATER
-            var result = ctx.Database.SqlQueryRaw<string>(cmdText, parameters);
-            var id = (await result.ToListAsync(cancellationToken)).FirstOrDefault();
+                var result = ctx.Database.SqlQueryRaw<string>(cmdText, parameters);
+                var id = (await result.ToListAsync(cancellationToken)).FirstOrDefault();
 #else
-            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, parameters);
-            var id = (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Value;
+                var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, parameters);
+                var id = (await result.ToListAsync(cancellationToken)).FirstOrDefault()?.Value;
 #endif
-            return id;
+                return id;
+            }
+            finally
+            {
+                if (isLocal && ctx != null)
+                {
+                    await ctx.DisposeAsync();
+                }
+            }
+
+
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
-            using var ctx = CreateContext(auditEvent);
+            var ctx = CreateContext(auditEvent, out var isLocal);
             var cmdText = GetReplaceCommandText(auditEvent);
-            ctx.Database.ExecuteSqlRaw(cmdText, parameters);
+
+            try
+            {
+                ctx.Database.ExecuteSqlRaw(cmdText, parameters);
+            }
+            finally
+            {
+                if (isLocal && ctx != null)
+                {
+                    ctx.Dispose();
+                }
+            }
+
         }
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var parameters = GetParametersForReplace(eventId, auditEvent);
-            await using var ctx = CreateContext(auditEvent);
+            var ctx = CreateContext(auditEvent, out var isLocal);
             var cmdText = GetReplaceCommandText(auditEvent);
-            await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters, cancellationToken);
+
+            try
+            {
+                await ctx.Database.ExecuteSqlRawAsync(cmdText, parameters, cancellationToken);
+            }
+            finally
+            {
+                if (isLocal && ctx != null)
+                {
+                    await ctx.DisposeAsync();
+                }
+            }
         }
 
         public override T GetEvent<T>(object eventId)
@@ -154,22 +202,33 @@ namespace Audit.SqlServer.Providers
                 return null;
             }
 
-            using var ctx = CreateContext(null);
+            var ctx = CreateContext(null, out var isLocal);
             var cmdText = GetSelectCommandText(null);
+
+            try
+            {
 #if NET7_0_OR_GREATER
-            var result = ctx.Database.SqlQueryRaw<string>(cmdText, new SqlParameter("@eventId", eventId));
-            var json = result.FirstOrDefault();
+                var result = ctx.Database.SqlQueryRaw<string>(cmdText, new SqlParameter("@eventId", eventId));
+                var json = result.FirstOrDefault();
 #else
-            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-            var json = result.FirstOrDefault()?.Value;
+                var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
+                var json = result.FirstOrDefault()?.Value;
 #endif
 
-            if (json != null)
-            {
-                return AuditEvent.FromJson<T>(json);
-            }
+                if (json != null)
+                {
+                    return AuditEvent.FromJson<T>(json);
+                }
 
-            return null;
+                return null;
+            }
+            finally
+            {
+                if (isLocal && ctx != null)
+                {
+                    ctx.Dispose();
+                }
+            }
         }
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
@@ -179,23 +238,34 @@ namespace Audit.SqlServer.Providers
                 return null;
             }
 
-            await using var ctx = CreateContext(null);
+            var ctx = CreateContext(null, out var isLocal);
             var cmdText = GetSelectCommandText(null);
+
+            try
+            {
 #if NET7_0_OR_GREATER
-            var result = ctx.Database.SqlQueryRaw<string>(cmdText, new SqlParameter("@eventId", eventId));
-            var json = await result.FirstOrDefaultAsync(cancellationToken);
+                var result = ctx.Database.SqlQueryRaw<string>(cmdText, new SqlParameter("@eventId", eventId));
+                var json = await result.FirstOrDefaultAsync(cancellationToken);
 #else
-            var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
-            var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Value;
+                var result = ctx.Set<AuditEventValueModel>().FromSqlRaw(cmdText, new SqlParameter("@eventId", eventId));
+                var json = (await result.FirstOrDefaultAsync(cancellationToken))?.Value;
 #endif
 
 
-            if (json != null)
-            {
-                return AuditEvent.FromJson<T>(json);
-            }
+                if (json != null)
+                {
+                    return AuditEvent.FromJson<T>(json);
+                }
 
-            return null;
+                return null;
+            }
+            finally
+            {
+                if (isLocal && ctx != null)
+                {
+                    await ctx.DisposeAsync();
+                }
+            }
         }
 
         protected internal string GetFullTableName(AuditEvent auditEvent)
@@ -349,15 +419,19 @@ namespace Audit.SqlServer.Providers
             return cmdText;
         }
 
-        protected virtual DbContext CreateContext(AuditEvent auditEvent)
+        protected virtual DbContext CreateContext(AuditEvent auditEvent, out bool isLocal)
         {
             // Use the DbContext if provided
             var dbContext = DbContext.GetValue(auditEvent);
             
             if (dbContext != null)
             {
+                isLocal = false;
+
                 return dbContext;
             }
+
+            isLocal = true;
 
             // Use the connection string or the db connection
             var ctxOptions = DbContextOptions.GetValue(auditEvent);

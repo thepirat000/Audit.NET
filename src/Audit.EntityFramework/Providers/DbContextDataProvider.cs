@@ -34,7 +34,7 @@ namespace Audit.EntityFramework.Providers
         public Action<AuditEvent, TEntity> Mapper { get; set; }
 
         /// <summary>
-        /// Whether to dispose the DbContextBuilder after each operation.
+        /// Whether to dispose the DbContext after each operation. Default is false.
         /// </summary>
         public bool DisposeDbContext { get; set; }
 

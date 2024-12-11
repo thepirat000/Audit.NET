@@ -32,6 +32,7 @@ namespace Audit.SqlServer.Configuration
 
         /// <summary>
         /// Specifies the DbContext instance to use as a function of the audit event. Alternative to ConnectionString.
+        /// When a DbContext instance is provided using this setting, the DbContext will not be disposed by the library.
         /// </summary>
         /// <param name="dbContext">The DbContext instance.</param>
         ISqlServerProviderConfigurator DbContext(Func<AuditEvent, DbContext> dbContext);
