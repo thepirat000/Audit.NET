@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 12/10/2024 - 7:29:50 PM |
+| Generated on: | 12/11/2024 - 5:55:32 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 24 |
 | Classes: | 266 |
 | Files: | 203 |
-| **Line coverage:** | 77.4% (8059 of 10400) |
-| Covered lines: | 8059 |
+| **Line coverage:** | 77.5% (8095 of 10436) |
+| Covered lines: | 8095 |
 | Uncovered lines: | 2341 |
-| Coverable lines: | 10400 |
-| Total lines: | 19358 |
-| **Branch coverage:** | 71% (3063 of 4314) |
-| Covered branches: | 3063 |
-| Total branches: | 4314 |
+| Coverable lines: | 10436 |
+| Total lines: | 19432 |
+| **Branch coverage:** | 71.3% (3111 of 4362) |
+| Covered branches: | 3111 |
+| Total branches: | 4362 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -234,14 +234,14 @@
 |Audit.Core.SerilogConfiguratorExtensions|2|2|4|37|50%|0|0||
 |Audit.Serilog.Configuration.SerilogConfigurator|6|6|12|53|50%|0|0||
 |Audit.Serilog.Providers.SerilogDataProvider|28|12|40|133|70%|9|20|45%|
-|**Audit.NET.SqlServer**|**378**|**27**|**405**|**1119**|**93.3%**|**150**|**168**|**89.2%**|
+|**Audit.NET.SqlServer**|**414**|**27**|**441**|**1267**|**93.8%**|**198**|**216**|**91.6%**|
 |Audit.Core.SqlServerConfiguratorExtensions|2|0|2|23|100%|0|0||
 |Audit.SqlServer.AuditEventValueModel|1|0|1|88|100%|0|0||
 |Audit.SqlServer.Configuration.SqlServerProviderConfigurator|37|12|49|136|75.5%|0|0||
 |Audit.SqlServer.CustomColumn|12|2|14|32|85.7%|0|0||
 |Audit.SqlServer.DefaultAuditDbContext|16|3|19|88|84.2%|4|4|100%|
-|Audit.SqlServer.Providers.SqlDataProvider|155|5|160|376|96.8%|73|82|89%|
-|Audit.SqlServer.Providers.SqlDataProvider<T>|155|5|160|376|96.8%|73|82|89%|
+|Audit.SqlServer.Providers.SqlDataProvider|173|5|178|450|97.1%|97|106|91.5%|
+|Audit.SqlServer.Providers.SqlDataProvider<T>|173|5|178|450|97.1%|97|106|91.5%|
 |**Audit.NET.Udp**|**81**|**10**|**91**|**308**|**89%**|**18**|**20**|**90%**|
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|4|4|100%|
