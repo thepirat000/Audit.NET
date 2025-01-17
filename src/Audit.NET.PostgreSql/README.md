@@ -55,10 +55,10 @@ Audit.Core.Configuration.Setup()
 ### Provider Options
 
 Mandatory:
-- **ConnectionString**: The PostgreSQL Server connection string.
-- **TableName**: The events table name.
-- **DataColumnName**: The column name of the event table where the JSON will be stored.
-- **IdColumnName**: The column name of the event identifier (the primary key).
+- **ConnectionString**: The PostgreSQL Server connection string. Defaults is `Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;`
+- **TableName**: The events table name. If not specified, the default table name is `event`.
+- **DataColumnName**: The column name of the event table where the JSON will be stored. Can be set to NULL to avoid including the JSON column. If not specified, the default column name is `data`.
+- **IdColumnName**: The column name of the event identifier (the primary key). If not specified, the default column name is `id`.
 
 Optional:
 - **Schema**: The PostgreSQL schema to use.
