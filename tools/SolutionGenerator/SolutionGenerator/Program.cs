@@ -1,5 +1,6 @@
 ﻿// MvsSln Doc: https://github.com/3F/MvsSln
 
+using System.Reflection;
 using net.r_eg.MvsSln;
 using net.r_eg.MvsSln.Core;
 using net.r_eg.MvsSln.Core.ObjHandlers;
@@ -15,15 +16,20 @@ namespace SolutionGenerator
         //   1: Output sln path
         static void Main(string[] args)
         {
-            if (args.Length < 3)
+            if (args.Length < 2)
             {
-                Console.WriteLine("Usage: SolutionGenerator <input sln path> <filters> <output sln path>");
+                Console.WriteLine("Usage: SolutionGenerator <input sln path> <filters> [<output sln path>]");
                 return;
             }
 
             var inputSlnPath = args[0];
             var filters = args[1].Split(",").Where(f => f.Length > 0).ToList();
-            var outputSlnPath = args[2];
+            var outputSlnPath = args.Length > 2 && args[2].Length > 0 ? args[2] : $"{new DirectoryInfo(Environment.CurrentDirectory).Name}.sln";
+
+            if (!outputSlnPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+            {
+                outputSlnPath += ".sln";
+            }
 
             var sln = new Sln(inputSlnPath, SlnItems.AllNoLoad);
 
