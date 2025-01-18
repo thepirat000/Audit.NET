@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SolutionGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\MIOS\\Proyectos .NET\\Audit.NET\\Audit.NET.sln\" \"\" \"Audit.NET.modified.sln\""
+    }
+  }
+}
