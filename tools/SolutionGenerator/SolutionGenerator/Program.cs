@@ -37,9 +37,27 @@ namespace SolutionGenerator
                 .Where(p => IncludeProject(p, filters))
                 .ToList();
 
+            if (projects.Count == 1)
+            {
+                Console.WriteLine("No projects found");
+
+                return;
+            }
+
+            var includedProjects = new HashSet<string>(projects.Select(p => p.pGuid));
+
+            foreach (var projectGuid in sln.Result.ProjectDependencies.Dependencies.Keys.Where(k => !includedProjects.Contains(k)))
+            {
+                sln.Result.ProjectDependencies.Dependencies.Remove(projectGuid);
+                sln.Result.ProjectDependencies.GuidList.Remove(projectGuid);
+                sln.Result.ProjectDependencies.Projects.Remove(projectGuid);
+            }
+
+            Console.WriteLine();
             for (int i = 0; i < projects.Count; i++)
             {
                 Console.WriteLine($"Adding {projects[i].name}");
+                
                 // Replace relative path with full path
                 projects[i] = projects[i] with { path = projects[i].fullPath };
             }
@@ -50,6 +68,7 @@ namespace SolutionGenerator
             var handlers = new Dictionary<Type, HandlerValue>()
             {
                 [typeof(LProject)] = new(new WProject(projects, sln.Result.ProjectDependencies)),
+                [typeof(LNestedProjects)] = new(new WNestedProjects(sln.Result.SolutionFolders, projects))
             };
 
             using var w = new SlnWriter(outputSlnPath, handlers);
