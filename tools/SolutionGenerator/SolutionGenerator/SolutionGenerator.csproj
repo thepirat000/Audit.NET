@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="MvsSln" Version="2.7.0" />
+    <PackageReference Include="Microsoft.Build" Version="17.12.6" />
   </ItemGroup>
 
 </Project>

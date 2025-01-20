@@ -2,7 +2,7 @@
   "profiles": {
     "SolutionGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\MIOS\\Proyectos .NET\\Audit.NET\\Audit.NET.sln\" \"polly\" \"Audit.NET.modified.sln\""
+      "commandLineArgs": "\"D:\\MIOS\\Proyectos .NET\\Audit.NET\\Audit.NET.sln\" \"entityframework,!core\" \"C:\\Temp\\test1\\Test2.sln\""
     }
   }
 }
