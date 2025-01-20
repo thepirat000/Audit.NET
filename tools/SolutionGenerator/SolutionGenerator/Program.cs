@@ -13,7 +13,7 @@ namespace SolutionGenerator
         // Args:
         //   0: Input sln path
         //   1: Filters (comma separated)
-        //   1: Output sln path
+        //   2: Output sln path
         static void Main(string[] args)
         {
             if (args.Length < 2)
