@@ -18,7 +18,7 @@ namespace SolutionGenerator
         // Args:
         //   0: Input sln path
         //   1: Filters (comma separated, e.g.: "entityframework,!core,tests")
-        //      Include the filter "tests" to also include the matching test projects, otherwise they will be excluded.
+        //      To include the matching test projects, add the filter "tests", otherwise they will be excluded.
         //   2: Output sln path
         static void Main(string[] args)
         {
