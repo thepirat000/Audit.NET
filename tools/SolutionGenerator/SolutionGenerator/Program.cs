@@ -17,7 +17,8 @@ namespace SolutionGenerator
     {
         // Args:
         //   0: Input sln path
-        //   1: Filters (comma separated, e.g.: "entityframework,!core")
+        //   1: Filters (comma separated, e.g.: "entityframework,!core,tests")
+        //      Include the filter "tests" to also include the matching test projects, otherwise they will be excluded.
         //   2: Output sln path
         static void Main(string[] args)
         {
@@ -33,6 +34,8 @@ namespace SolutionGenerator
             
             var outputSlnPath = args.Length > 2 && args[2].Length > 0 ? args[2] : $"{currentDirectory.Name}.sln";
             var outputDir = Path.GetDirectoryName(outputSlnPath)!;
+
+            var flags = args.Length > 3 ? args[3] : string.Empty;
 
             if (!outputSlnPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
             {
@@ -105,9 +108,17 @@ namespace SolutionGenerator
                 return true;
             }
 
-            if (project.name.EndsWith(".UnitTest") || project.name.EndsWith(".Template"))
+            if (project.name.EndsWith(".Template"))
             {
                 return false;
+            }
+
+            if (!filters.Exists(f => f.Equals("tests", StringComparison.OrdinalIgnoreCase)))
+            {
+                if (project.name.EndsWith(".UnitTest"))
+                {
+                    return false;
+                }
             }
 
             if (filters.Count == 0)
