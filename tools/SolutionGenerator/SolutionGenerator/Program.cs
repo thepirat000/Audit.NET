@@ -44,15 +44,6 @@ namespace SolutionGenerator
                 return;
             }
 
-            var includedProjects = new HashSet<string>(projects.Select(p => p.pGuid));
-
-            foreach (var projectGuid in sln.Result.ProjectDependencies.Dependencies.Keys.Where(k => !includedProjects.Contains(k)))
-            {
-                sln.Result.ProjectDependencies.Dependencies.Remove(projectGuid);
-                sln.Result.ProjectDependencies.GuidList.Remove(projectGuid);
-                sln.Result.ProjectDependencies.Projects.Remove(projectGuid);
-            }
-
             Console.WriteLine();
             for (int i = 0; i < projects.Count; i++)
             {
