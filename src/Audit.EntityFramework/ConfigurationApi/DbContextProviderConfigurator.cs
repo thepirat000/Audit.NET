@@ -40,4 +40,47 @@ public class DbContextProviderConfigurator<TDbContext, TEntity> : IDbContextProv
         return _entityConfiguration;
     }
 }
+
+public class DbContextProviderConfigurator : IDbContextProviderConfigurator
+{
+    internal Func<AuditEvent, DbContext> _dbContextBuilder;
+    internal Setting<DbContextOptions> _dbContextOptions;
+    internal DbContextProviderEntityConfigurator _entityConfiguration = new();
+
+    public IDbContextProviderEntityConfigurator DbContextBuilder(Func<AuditEvent, DbContext> dbContextBuilder)
+    {
+        _dbContextBuilder = dbContextBuilder;
+        _dbContextOptions = new();
+
+        _entityConfiguration = new DbContextProviderEntityConfigurator();
+        return _entityConfiguration;
+    }
+
+    public IDbContextProviderEntityConfigurator DbContext(DbContext dbContext)
+    {
+        _dbContextBuilder = _ => dbContext;
+        _dbContextOptions = new();
+
+        _entityConfiguration = new DbContextProviderEntityConfigurator();
+        return _entityConfiguration;
+    }
+
+    public IDbContextProviderEntityConfigurator UseDbContextOptions(DbContextOptions dbContextOptions)
+    {
+        _dbContextBuilder = null;
+        _dbContextOptions = dbContextOptions;
+
+        _entityConfiguration = new DbContextProviderEntityConfigurator();
+        return _entityConfiguration;
+    }
+
+    public IDbContextProviderEntityConfigurator UseDbContextOptions(Func<AuditEvent, DbContextOptions> dbContextOptions)
+    {
+        _dbContextBuilder = null;
+        _dbContextOptions = dbContextOptions;
+
+        _entityConfiguration = new DbContextProviderEntityConfigurator();
+        return _entityConfiguration;
+    }
+}
 #endif

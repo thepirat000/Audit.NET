@@ -1,5 +1,6 @@
 ﻿#if NET7_0_OR_GREATER
 using System;
+using System.Collections.Generic;
 using Audit.Core;
 
 namespace Audit.EntityFramework.ConfigurationApi;
@@ -17,6 +18,30 @@ public class DbContextProviderEntityConfigurator<TEntity> : IDbContextProviderEn
     }
     
     public IDbContextProviderEntityConfigurator<TEntity> DisposeDbContext(bool dispose = true)
+    {
+        _disposeDbContext = dispose;
+        return this;
+    }
+}
+
+public class DbContextProviderEntityConfigurator : IDbContextProviderEntityConfigurator
+{
+    internal Func<AuditEvent, IEnumerable<object>> _entityBuilder;
+    internal bool _disposeDbContext;
+
+    public IDbContextProviderEntityConfigurator EntityBuilder(Func<AuditEvent, IEnumerable<object>> entityBuilder)
+    {
+        _entityBuilder = entityBuilder;
+        return this;
+    }
+
+    public IDbContextProviderEntityConfigurator EntityBuilder(Func<AuditEvent, object> entityBuilder)
+    {
+        _entityBuilder = ev => new List<object>() { entityBuilder?.Invoke(ev) };
+        return this;
+    }
+
+    public IDbContextProviderEntityConfigurator DisposeDbContext(bool dispose = true)
     {
         _disposeDbContext = dispose;
         return this;

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.3.3] - 2025-01-21:
+- Audit.EntityFramework.Core: New non-generic DbContext Data Provider to store audit events using a custom Entity Framework DbContext.
+
 ## [27.3.2] - 2024-12-11:
 - Audit.NET.SqlServer: Avoid disposing the DbContext when an instance is provided.
 

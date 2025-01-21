@@ -1,5 +1,6 @@
 ﻿#if NET7_0_OR_GREATER
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,30 +10,43 @@ using Audit.EntityFramework.ConfigurationApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
+#pragma warning disable EF1001
+#pragma warning disable S3011
+
 namespace Audit.EntityFramework.Providers
 {
     /// <summary>
-    /// Generic Audit Data Provider using Entity Framework Core to write and read audit events
+    /// Audit Data Provider using Entity Framework Core to store audit events in multiple entities or tables.
     /// </summary>
-    public class DbContextDataProvider<TDbContext, TEntity> : AuditDataProvider 
-        where TDbContext : DbContext
-        where TEntity : class, new()
+    /// <remarks>
+    /// <para>
+    /// This provider is suitable for scenarios where audit events are distributed across different entities or tables or when a single audit event spans multiple unrelated tables.
+    /// Use the alternative generic <see cref="DbContextDataProvider{TDbContext,TEntity}"/> for scenarios where all audit events are stored in a single entity or table and event replacement (update) is needed.
+    /// </para>
+    /// <para>
+    /// Note: Replacing events is not supported with this provider. The <see cref="EventCreationPolicy.InsertOnStartReplaceOnEnd"/> is not allowed when using this data provider.
+    /// </para>
+    /// </remarks>
+    public class DbContextDataProvider : AuditDataProvider 
     {
         /// <summary>
         /// Provides the Db Context instance to use.
         /// </summary>
-        public Func<AuditEvent, TDbContext> DbContextBuilder { get; set; }
+        public Func<AuditEvent, DbContext> DbContextBuilder { get; set; }
 
         /// <summary>
         /// Provides the Db Context Options to use when creating a new instance of the DbContextBuilder. Alternative to DbContextBuilder.
         /// </summary>
-        public Setting<DbContextOptions<TDbContext>> DbContextOptions { get; set; }
+        public Setting<DbContextOptions> DbContextOptions { get; set; }
 
         /// <summary>
-        /// Provides the mapping function to map the AuditEvent to the Entity instance.
-        /// </summary>
-        public Action<AuditEvent, TEntity> Mapper { get; set; }
-
+        /// Provides the function that maps an AuditEvent to Entities to be saved in the database.
+        /// This method should return the entity to be inserted.
+        /// The DbContext must have a DbSet of the Entity type defined.
+        /// If this method returns NULL, the event will be skipped.
+        /// </summary> 
+        public Func<AuditEvent, IEnumerable<object>> EntityBuilder { get; set; }
+       
         /// <summary>
         /// Whether to dispose the DbContext after each operation. Default is false.
         /// </summary>
@@ -43,130 +57,106 @@ namespace Audit.EntityFramework.Providers
         /// </summary>
         public DbContextDataProvider()
         {
-
         }
 
         /// <summary>
         /// Creates a new instance of DbContextDataProvider with the given configuration
         /// </summary>
         /// <param name="config">The configuration to use</param>
-        public DbContextDataProvider(Action<IDbContextProviderConfigurator<TDbContext, TEntity>> config)
+        public DbContextDataProvider(Action<IDbContextProviderConfigurator> config)
         {
-            var dbContextProviderConfig = new DbContextProviderConfigurator<TDbContext, TEntity>();
+            var dbContextProviderConfig = new DbContextProviderConfigurator();
             if (config != null)
             {
                 config.Invoke(dbContextProviderConfig);
                 DbContextBuilder = dbContextProviderConfig._dbContextBuilder;
                 DbContextOptions = dbContextProviderConfig._dbContextOptions;
-                Mapper = dbContextProviderConfig._entityConfiguration._mapper;
+                EntityBuilder = dbContextProviderConfig._entityConfiguration._entityBuilder;
                 DisposeDbContext = dbContextProviderConfig._entityConfiguration._disposeDbContext;
             }
-            
         }
 
         /// <inheritdoc />
         public override object InsertEvent(AuditEvent auditEvent)
         {
+            var entities = EntityBuilder.Invoke(auditEvent)?.ToList();
+
+            if (entities == null || entities.Count == 0 || entities.TrueForAll(e => e == null))
+            {
+                return null;
+            }
+
             var dbContext = GetDbContext(auditEvent);
-
-            var entity = new TEntity();
-
-            Mapper.Invoke(auditEvent, entity);
             
-            var dbSet = dbContext.Set<TEntity>();
-
-            dbSet.Add(entity);
+            AddEntities(dbContext, entities);
 
             dbContext.SaveChanges();
 
-            var id = GetPrimaryKeyValue(dbContext.Entry(entity));
+            var ids = GetPrimaryKeysValues(dbContext, entities);
 
             if (DisposeDbContext)
             {
                 dbContext.Dispose();
             }
 
-            return id;
+            return ids.Count == 1 ? ids[0] : ids;
         }
 
         /// <inheritdoc />
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
+            var entities = EntityBuilder.Invoke(auditEvent)?.ToList();
+
+            if (entities == null || entities.Count == 0 || entities.TrueForAll(e => e == null))
+            {
+                return null;
+            }
+
             var dbContext = GetDbContext(auditEvent);
 
-            var entity = new TEntity();
-
-            var dbSet = dbContext.Set<TEntity>();
-
-            Mapper.Invoke(auditEvent, entity);
-            
-            await dbSet.AddAsync(entity, cancellationToken);
+            await AddEntitiesAsync(dbContext, entities, cancellationToken);
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var id = GetPrimaryKeyValue(dbContext.Entry(entity));
+            var ids = GetPrimaryKeysValues(dbContext, entities);
 
             if (DisposeDbContext)
             {
                 await dbContext.DisposeAsync();
             }
 
-            return id;
+            return ids.Count == 1 ? ids[0] : ids;
         }
 
-        /// <inheritdoc />
-        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+        private static void AddEntities(DbContext dbContext, List<object> entities)
         {
-            var dbContext = GetDbContext(auditEvent);
-
-            var dbSet = dbContext.Set<TEntity>();
-
-            var primaryKey = (object[])eventId;
-
-            var entity = dbSet.Find(primaryKey);
-
-            if (entity == null)
+            foreach (var entity in entities.FindAll(e => e != null))
             {
-                throw new InvalidOperationException($"Entity of type {typeof(TEntity).Name} with id {eventId} not found.");
-            }
-
-            Mapper.Invoke(auditEvent, entity);
-
-            dbContext.SaveChanges();
-
-            if (DisposeDbContext)
-            {
-                dbContext.Dispose();
+                AddEntity(dbContext, entity);
             }
         }
 
-        /// <inheritdoc />
-        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
+        private static async Task AddEntitiesAsync(DbContext dbContext, List<object> entities, CancellationToken cancellationToken)
         {
-            var dbContext = GetDbContext(auditEvent);
-
-            var dbSet = dbContext.Set<TEntity>();
-
-            var primaryKey = (object[])eventId;
-
-            var entity = await dbSet.FindAsync(primaryKey, cancellationToken: cancellationToken);
-
-            if (entity == null)
+            foreach (var entity in entities.FindAll(e => e != null))
             {
-                throw new InvalidOperationException($"Entity of type {typeof(TEntity).Name} with id {eventId} not found.");
-            }
-
-            Mapper.Invoke(auditEvent, entity);
-
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            if (DisposeDbContext)
-            {
-                await dbContext.DisposeAsync();
+                await AddEntityAsync(dbContext, entity, cancellationToken);
             }
         }
 
-        internal TDbContext GetDbContext(AuditEvent auditEvent)
+        private static void AddEntity(DbContext dbContext, object entity)
+        {
+            var dbSet = (dynamic)dbContext.Set(entity.GetType());
+            dbSet.Add((dynamic)entity);
+        }
+
+        private static async Task AddEntityAsync(DbContext dbContext, object entity, CancellationToken cancellationToken)
+        {
+            var dbSet = (dynamic)dbContext.Set(entity.GetType());
+            await dbSet.AddAsync((dynamic)entity, cancellationToken);
+        }
+
+        internal DbContext GetDbContext(AuditEvent auditEvent)
         {
             var dbContext = DbContextBuilder?.Invoke(auditEvent);
 
@@ -177,16 +167,26 @@ namespace Audit.EntityFramework.Providers
 
             var options = DbContextOptions.GetValue(auditEvent);
 
-            if (options != null)
+            if (options == null)
             {
-                dbContext = (TDbContext)Activator.CreateInstance(typeof(TDbContext), options);
-            }
-            else
-            {
-                dbContext = Activator.CreateInstance<TDbContext>();
+                throw new InvalidOperationException("DbContextBuilder or DbContextOptions must be provided.");
             }
 
+            dbContext = (DbContext)Activator.CreateInstance(options.ContextType, options);
+
             return dbContext;
+        }
+
+        private static List<object[]> GetPrimaryKeysValues(DbContext dbContext, List<object> entities)
+        {
+            var primaryKeys = new List<object[]>();
+
+            foreach (var entity in entities.FindAll(e => e != null))
+            {
+                primaryKeys.Add(GetPrimaryKeyValue(dbContext.Entry(entity)));
+            }
+
+            return primaryKeys;
         }
 
         private static object[] GetPrimaryKeyValue(EntityEntry entry)
@@ -194,16 +194,6 @@ namespace Audit.EntityFramework.Providers
             var values = entry.Properties.Where(p => p.Metadata.IsPrimaryKey()).Select(prop => prop.CurrentValue).ToArray();
 
             return values;
-        }
-
-        public override T GetEvent<T>(object eventId)
-        {
-            throw new NotImplementedException($"GetEvent is not implemented on {nameof(DbContextDataProvider<TDbContext, TEntity>)}");
-        }
-
-        public override Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException($"GetEventAsync is not implemented on {nameof(DbContextDataProvider<TDbContext, TEntity>)}");
         }
     }
 }

@@ -916,7 +916,7 @@ Audit.Core.Configuration.Setup()
 
 ## Overview
 
-The `DbContextDataProvider<TDbContext, TEntity>` class is a generic audit data provider that uses Entity Framework Core to write and read audit events. 
+The `DbContextDataProvider<TDbContext, TEntity>` class is a generic audit data provider that uses Entity Framework Core to store the audit events. 
 It is designed to be flexible and configurable, allowing to map any kind of audit events to a specific entity in a DbContext.
 
 > **Note**
@@ -940,7 +940,7 @@ The following example shows how to configure the `DbContextDataProvider` to stor
 
 ```c#
 Audit.Core.Configuration.Setup()
-    .UseDbContext<MyDbContext, AuditLog>(x => x
+    .UseDbContext<MyDbContext, AuditLog>(config => config
         .DbContextBuilder(_ => new MyDbContext())
         .Mapper((auditEvent, auditEntity) =>
         {
@@ -954,6 +954,90 @@ public class MyDbContext : DbContext
 {
     public DbSet<AuditLog> AuditLogs { get; set; }
 }
+```
+
+# Non-Generic DbContext Data Provider
+
+## Overview
+
+The `DbContextDataProvider` class uses Entity Framework Core to manage the writing of audit events. 
+It enables the mapping of each audit event to a specific entity (or multiple entities) within a `DbContext`.
+
+> **Note**  
+> Unlike the generic version, `DbContextDataProvider<TDbContext, TEntity>`, the non-generic `DbContextDataProvider` 
+is suited for scenarios where audit events are distributed across various entities or tables, or when a single audit event spans multiple unrelated tables. This behavior makes the non-generic version ideal for cases requiring more dynamic or diverse mappings.
+
+## DbContext Provider Options
+
+- **DbContextBuilder / UseDbContext()**: A function that returns the DbContext to use for storing the audit events. If not specified, it will use the parameterless constructor to create the DbContext instance. 
+- **DbContextOptions / UseDbContextOptions()**: The DbContextOptions to use for creating the DbContext instance. Alternative to the DbContextBuilder.
+- **EntityBuilder**: A function that maps an `AuditEvent` to the entity or entities that will be inserted into the database. The function takes the audit event as input and should return the corresponding entity or entities. If the function returns `NULL`, the event will be ignored and not inserted.
+- **DisposeDbContext**: A boolean value to indicate if the audit DbContext should be disposed after saving the audit. Default is false.
+
+## DbContext Provider configuration examples
+
+### Basic configuration
+
+The following example shows how to configure the `DbContextDataProvider` to store the audit events in a custom DbContext.
+
+In this case, `MyDbContext` is a custom DbContext that contains the `AuditLog` entity.  
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseDbContext(config => config
+        .DbContextBuilder(_ => new MyDbContext())
+        .EntityBuilder(auditEvent => new AuditLog
+        {
+            JsonData = auditEvent.ToJson(),
+            CreatedDate = DateTime.Now
+        }));
+```
+
+### Different audit entities
+
+The following example shows how to configure the `DbContextDataProvider` to store the audit events in a custom DbContext.
+
+In this case, `MyDbContext` is a custom DbContext that contains the `AuditLog` and `AuditLogSpecial` entities. 
+Depending on the `EventType` property of the audit event, the `EntityBuilder` function will return the corresponding entity to insert:
+
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseDbContext(config => config
+        .UseDbContextOptions(new DbContextOptionsBuilder<MyDbContext>().UseSqlServer("Connection string...").Options))
+        .EntityBuilder(auditEvent =>
+        {
+            if (auditEvent.EventType == "A")
+            {
+                return new AuditLogSpecial { JsonData = auditEvent.ToJson(), CreatedDate = DateTime.Now };
+            }
+            
+            return new AuditLog { JsonData = auditEvent.ToJson(), CreatedDate = DateTime.Now };
+        }));
+```
+
+### Multiple audit entities
+
+The following example shows how to configure the `DbContextDataProvider` to store the audit events as multiple entities in a custom DbContext.
+
+In this case, the entity builder function return a list of unrelated entities to insert:
+
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseDbContext(config => config
+        .DbContextBuilder(_ => new MyDbContext())
+        .EntityBuilder(auditEvent =>
+        {
+            var entities = new List<AuditLog>();
+
+            foreach (var entry in auditEvent.GetEntityFrameworkEvent().Entries)
+            {
+                entities.Add(new AuditLog { JsonData = auditEvent.ToJson(), CreatedDate = DateTime.Now });
+            }
+
+            return entities;
+        }));
 ```
 
 # Contribute
