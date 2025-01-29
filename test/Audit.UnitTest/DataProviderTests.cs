@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Audit.Core.Providers.Wrappers;
+using Moq;
+using System;
 
 namespace Audit.UnitTest
 {
@@ -156,6 +158,109 @@ namespace Audit.UnitTest
             Assert.That(events_replaced[0].CustomFields["f"].ToString(), Is.EqualTo("2"));
         }
 
-        
+        [Test]
+        public void Test_DataProvider_CloneValue_String()
+        {
+            // Arrange
+            var dataProvider = new Mock<AuditDataProvider>(MockBehavior.Loose);
+            dataProvider.CallBase = true;
+
+
+            // Act
+            var value = "StringValue";
+
+            var cloned = dataProvider.Object.CloneValue<string>(value, null);
+
+            // Assert
+            Assert.That(cloned, Is.EqualTo(value));
+        }
+
+        [Test]
+        public void Test_DataProvider_CloneValue_Null()
+        {
+            // Arrange
+            var dataProvider = new Mock<AuditDataProvider>(MockBehavior.Loose);
+            dataProvider.CallBase = true;
+
+            // Act
+            string value = null;
+
+            var cloned = dataProvider.Object.CloneValue<string>(value, null);
+
+            // Assert
+            Assert.That(cloned, Is.Null);
+        }
+
+        [Test]
+        public void Test_DataProvider_CloneValue_ICloneable()
+        {
+            // Arrange
+            var dataProvider = new Mock<AuditDataProvider>(MockBehavior.Loose);
+            dataProvider.CallBase = true;
+
+
+            // Act
+            var value = new MyValue() { Id = 1 };
+            var cloned = dataProvider.Object.CloneValue<MyValue>(value, null);
+
+            // Assert
+            Assert.That(cloned, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(cloned, Is.TypeOf<MyValue>());
+                Assert.That(((MyValue)cloned).Status, Is.EqualTo("Cloned"));
+            });
+        }
+
+        [Test]
+        public void Test_DataProvider_CloneValue_Json()
+        {
+            // Arrange
+            var dataProvider = new Mock<AuditDataProvider>(MockBehavior.Loose);
+            dataProvider.CallBase = true;
+
+            // Act
+            var value = new List<string>() { "1", "2" };
+            var cloned = dataProvider.Object.CloneValue<List<string>>(value, null);
+
+            // Assert
+            Assert.That(cloned, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(cloned, Is.TypeOf<List<string>>());
+                Assert.That(((List<string>)cloned).Count, Is.EqualTo(2));
+            });
+        }
+
+        [Test]
+        public void Test_DataProvider_CloneValue_Primitive()
+        {
+            // Arrange
+            var dataProvider = new Mock<AuditDataProvider>(MockBehavior.Loose);
+            dataProvider.CallBase = true;
+
+            // Act
+            var value = 1000L;
+            var cloned = dataProvider.Object.CloneValue<long>(value, null);
+
+            // Assert
+            Assert.That(cloned, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(cloned, Is.TypeOf<long>());
+                Assert.That((long)cloned, Is.EqualTo(value));
+            });
+        }
+
+        public class MyValue : ICloneable
+        {
+            public int Id { get; set; }
+            public string Status { get; set; }
+            public object Clone()
+            {
+                return new MyValue() { Id = this.Id, Status = "Cloned" };
+            }
+        }
+
     }
 }

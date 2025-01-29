@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.4.0] - 2025-01-28:
+- Audit.NET: Changing the default implementation of `AuditDataProvider.CloneValue` to use the `Clone` method
+when the target value implements `ICloneable`
+
 ## [27.3.3] - 2025-01-21:
 - Audit.EntityFramework.Core: New non-generic DbContext Data Provider to store audit events using a custom Entity Framework DbContext.
 

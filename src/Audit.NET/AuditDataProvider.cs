@@ -26,6 +26,16 @@ namespace Audit.Core
             {
                 return value;
             }
+
+            if (value.GetType().IsPrimitive)
+            {
+                return value;
+            }
+
+            if (value is ICloneable cloneable)
+            {
+                return cloneable.Clone();
+            }
             
             return Configuration.JsonAdapter.Deserialize(Configuration.JsonAdapter.Serialize(value), value.GetType());
         }
