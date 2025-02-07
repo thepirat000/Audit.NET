@@ -14,13 +14,11 @@ using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 #endif
 
-namespace Audit.EntityFramework
-{
+namespace Audit.EntityFramework {
     /// <summary>
     /// Base DbContext class for Audit. Inherit your DbContext from this class to enable audit.
     /// </summary>
-    public abstract partial class AuditDbContext : DbContext, IAuditDbContext, IAuditBypass
-    {
+    public abstract partial class AuditDbContext : DbContext, IAuditDbContext, IAuditBypass {
         private readonly DbContextHelper _helper = new DbContextHelper();
 
 #if EF_CORE
@@ -28,8 +26,7 @@ namespace Audit.EntityFramework
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>
         /// <param name="options">The options.</param>
-        protected AuditDbContext(DbContextOptions options) : base(options)
-        {
+        protected AuditDbContext(DbContextOptions options) : base(options) {
             _helper.SetConfig(this);
         }
 #else
@@ -79,8 +76,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditDbContext" /> class.
         /// </summary>
-        protected AuditDbContext() : base()
-        {
+        protected AuditDbContext() : base() {
             _helper.SetConfig(this);
         }
 
@@ -129,18 +125,15 @@ namespace Audit.EntityFramework
 
         #region Public methods
         /// <inheritdoc/>
-        public virtual void OnScopeCreated(IAuditScope auditScope)
-        {
+        public virtual void OnScopeCreated(IAuditScope auditScope) {
         }
 
         /// <inheritdoc/>
-        public virtual void OnScopeSaving(IAuditScope auditScope)
-        {
+        public virtual void OnScopeSaving(IAuditScope auditScope) {
         }
 
         /// <inheritdoc/>
-        public virtual void OnScopeSaved(IAuditScope auditScope)
-        {
+        public virtual void OnScopeSaved(IAuditScope auditScope) {
         }
 
         /// <summary>
@@ -149,21 +142,17 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="fieldName">The field name.</param>
         /// <param name="value">The value.</param>
-        public void AddAuditCustomField(string fieldName, object value)
-        {
+        public void AddAuditCustomField(string fieldName, object value) {
             ExtraFields[fieldName] = value;
         }
 
-#if EF_FULL
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public override int SaveChanges()
-        {
+        public override int SaveChanges() {
             return _helper.SaveChanges(this, () => base.SaveChanges());
         }
-        
+
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
-        {
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
 
@@ -172,41 +161,43 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <returns>The generated EF audit event</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public EntityFrameworkEvent SaveChangesGetAudit()
-        {
+        public EntityFrameworkEvent SaveChangesGetAudit() {
             return _helper.SaveChangesGetAudit(this, () => base.SaveChanges());
         }
-        
+
         /// <summary>
         /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
         /// </summary>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The generated EF audit event</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(CancellationToken cancellationToken = default)
-        {
+        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(CancellationToken cancellationToken = default) {
             return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
-        
-        int IAuditBypass.SaveChangesBypassAudit()
-        {
-            return base.SaveChanges();
-        }
-        
-        Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
-        {
-            return base.SaveChangesAsync(cancellationToken);
-        }
+
+        int IAuditBypass.SaveChangesBypassAudit() {
+#if EF_CORE
+            return base.SaveChanges(true);
 #else
+            return base.SaveChanges();
+#endif
+        }
+
+        Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken) {
+#if EF_CORE
+            return base.SaveChangesAsync(true, cancellationToken);
+#else
+            return base.SaveChangesAsync(cancellationToken);
+#endif
+        }
+#if EF_CORE
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
+        public override int SaveChanges(bool acceptAllChangesOnSuccess) {
             return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-        {
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default) {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
         }
 
@@ -216,8 +207,7 @@ namespace Audit.EntityFramework
         /// <param name="acceptAllChangesOnSuccess">Indicates whether ChangeTracker.AcceptAllChanges is called after the changes have been sent successfully to the database.</param>
         /// <returns>The generated EF audit event</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public EntityFrameworkEvent SaveChangesGetAudit(bool acceptAllChangesOnSuccess = true)
-        {
+        public EntityFrameworkEvent SaveChangesGetAudit(bool acceptAllChangesOnSuccess) {
             return _helper.SaveChangesGetAudit(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
         }
 
@@ -229,20 +219,11 @@ namespace Audit.EntityFramework
         /// <returns>The generated EF audit event</returns>
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
-        {
+        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default) {
             return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
         }
-       
-        int IAuditBypass.SaveChangesBypassAudit()
-        {
-            return base.SaveChanges(true);
-        }
 
-        Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
-        {
-            return base.SaveChangesAsync(true, cancellationToken);
-        }
+
 #endif
         #endregion
     }

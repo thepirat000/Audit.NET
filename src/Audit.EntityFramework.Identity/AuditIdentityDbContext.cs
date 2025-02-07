@@ -236,8 +236,21 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public override int SaveChanges()
         {
+#if EF_CORE
+             return this.SaveChanges(acceptAllChangesOnSuccess: true);
+#else
             return _helper.SaveChanges(this, () => base.SaveChanges());
+#endif
         }
+
+#if EF_CORE
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public override int SaveChanges(bool acceptAllChangesOnSuccess) 
+        {
+            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+#endif
 
         /// <summary>
         /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
@@ -246,8 +259,28 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public EntityFrameworkEvent SaveChangesGetAudit()
         {
+#if EF_CORE
+            return this.SaveChangesGetAudit(acceptAllChangesOnSuccess: true);
+#else
             return _helper.SaveChangesGetAudit(this, () => base.SaveChanges());
+#endif
         }
+
+#if EF_CORE
+        /// <summary>
+        /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
+        /// </summary>
+        /// <param name="acceptAllChangesOnSuccess">
+        ///     Indicates whether <see cref="Microsoft.EntityFrameworkCore.ChangeTracking.ChangeTracker.AcceptAllChanges" />
+        ///     is called after the changes have been sent successfully to the database.
+        /// </param>
+        /// <returns>The generated EF audit event</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public EntityFrameworkEvent SaveChangesGetAudit(bool acceptAllChangesOnSuccess) 
+        {
+            return _helper.SaveChangesGetAudit(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+#endif
 
         /// <summary>
         /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
@@ -257,8 +290,30 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(CancellationToken cancellationToken = default)
         {
+#if EF_CORE
+            return await this.SaveChangesGetAuditAsync(acceptAllChangesOnSuccess: true, cancellationToken);
+#else
             return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
+#endif
         }
+
+#if EF_CORE
+        /// <summary>
+        /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
+        /// </summary>
+        /// <param name="acceptAllChangesOnSuccess">
+        ///     Indicates whether <see cref="Microsoft.EntityFrameworkCore.ChangeTracking.ChangeTracker.AcceptAllChanges" />
+        ///     is called after the changes have been sent successfully to the database.
+        /// </param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The generated EF audit event</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default) 
+        {
+            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
+        }
+#endif
+
 
         /// <summary>
         /// Saves the changes asynchronously.
@@ -267,8 +322,21 @@ namespace Audit.EntityFramework
         [MethodImpl(MethodImplOptions.NoInlining)]
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+#if EF_CORE
+            return await this.SaveChangesAsync(acceptAllChangesOnSuccess: true, cancellationToken);
+#else
+            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
+#endif
+        }
+
+#if EF_CORE
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
             return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
+#endif
 
         int IAuditBypass.SaveChangesBypassAudit()
         {
