@@ -11,18 +11,18 @@ namespace Audit.EntityFramework
     /// <summary>
     /// Base IdentityDbContext class for Audit. Inherit your IdentityDbContext from this class to enable audit.
     /// </summary>
-    public abstract class AuditIdentityDbContext : AuditIdentityDbContext<IdentityUser, IdentityRole, string>, IAuditBypass
+    public abstract class AuditIdentityDbContext : AuditIdentityDbContext<IdentityUser, IdentityRole, string>
     {
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
         /// <param name="options">The options to be used by a Microsoft.EntityFrameworkCore.DbContext</param>
-        public AuditIdentityDbContext(DbContextOptions options) : base(options)
+        protected AuditIdentityDbContext(DbContextOptions options) : base(options)
         { }
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
-        public AuditIdentityDbContext() : base()
+        protected AuditIdentityDbContext() : base()
         { }
     }
 
@@ -36,12 +36,12 @@ namespace Audit.EntityFramework
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
         /// <param name="options">The options to be used by a Microsoft.EntityFrameworkCore.DbContext</param>
-        public AuditIdentityDbContext(DbContextOptions options) : base(options)
+        protected AuditIdentityDbContext(DbContextOptions options) : base(options)
         { }
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
-        public AuditIdentityDbContext() : base()
+        protected AuditIdentityDbContext() : base()
         { }
     }
 
@@ -63,12 +63,12 @@ namespace Audit.EntityFramework
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
         /// <param name="options">The options to be used by a Microsoft.EntityFrameworkCore.DbContext</param>
-        public AuditIdentityDbContext(DbContextOptions options) : base(options)
+        protected AuditIdentityDbContext(DbContextOptions options) : base(options)
         { }
         /// <summary>
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
-        public AuditIdentityDbContext() : base()
+        protected AuditIdentityDbContext() : base()
         { }
     }
 }

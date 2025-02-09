@@ -79,7 +79,6 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
         [Test]
         public void Test_EFDataProvider_IdentityContext_Error()
         {
-            // Issue #106
             Audit.Core.Configuration.Setup()
                 .UseEntityFramework(config =>
                 {
@@ -98,6 +97,166 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                     db.SaveChanges();
                 });
             }
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_IdentityContext_Error_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config =>
+                {
+                    config
+                        .AuditTypeMapper(typeName => Type.GetType(typeName + "Audit"))
+                        .AuditEntityAction((ev, ent, audEnt) =>
+                        {
+                            ((dynamic)audEnt).Username = "test";
+                        });
+                });
+
+            await using (var db = new AuditNetTestContext())
+            {
+                await db.Database.EnsureCreatedAsync();
+                db.Foos.Add(new Foo());
+                Assert.ThrowsAsync<DbUpdateException>(async () => {
+                    await db.SaveChangesAsync();
+                });
+            }
+        }
+
+        [Test]
+        public void Test_EFDataProvider_IdentityContext_SaveChanges()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.EnsureCreated();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                db.SaveChanges();
+            }
+
+            var auditEvents = dp.GetAllEvents();
+
+            Assert.That(auditEvents, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_IdentityContext_SaveChanges_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            using (var db = new AuditNetTestContext())
+            {
+                await db.Database.EnsureCreatedAsync();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                await db.SaveChangesAsync();
+            }
+
+            var auditEvents = dp.GetAllEvents();
+
+            Assert.That(auditEvents, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void Test_IdentityContext_SaveChanges_Overload()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.EnsureCreated();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                db.AddAuditCustomField("Field", "Value");
+                db.SaveChanges(acceptAllChangesOnSuccess: true);
+            }
+
+            var auditEvents = dp.GetAllEvents();
+
+            Assert.That(auditEvents, Has.Count.EqualTo(1));
+            Assert.That(auditEvents[0].CustomFields["Field"].ToString(), Is.EqualTo("Value"));
+        }
+
+        [Test]
+        public async Task Test_IdentityContext_SaveChanges_Overload_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            await using (var db = new AuditNetTestContext(new DbContextOptionsBuilder<AuditNetTestContext>().UseSqlServer(AuditNetTestContext.CnnString).Options))
+            {
+                await db.Database.EnsureCreatedAsync();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                await db.SaveChangesAsync(acceptAllChangesOnSuccess: true);
+            }
+
+            var auditEvents = dp.GetAllEvents();
+
+            Assert.That(auditEvents, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void Test_IdentityContext_SaveChangesGetAudit()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider();
+
+            EntityFrameworkEvent audit;
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.EnsureCreated();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                audit = db.SaveChangesGetAudit();
+            }
+
+            Assert.That(audit, Is.Not.Null);
+            Assert.That(audit.Database, Is.EqualTo("FooBar"));
+        }
+
+        [Test]
+        public async Task Test_IdentityContext_SaveChangesGetAudit_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider();
+
+            EntityFrameworkEvent audit;
+
+            await using (var db = new AuditNetTestContext())
+            {
+                await db.Database.EnsureCreatedAsync();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                audit = await db.SaveChangesGetAuditAsync();
+            }
+
+            Assert.That(audit, Is.Not.Null);
+            Assert.That(audit.Database, Is.EqualTo("FooBar"));
         }
 
         [Test]
@@ -1333,6 +1492,11 @@ SET IDENTITY_INSERT Posts OFF
         public DbSet<Foo> Foos { get; set; }
         public DbSet<FooAudit> FooAudits { get; set; }
         public AuditNetTestContext()
+        {
+
+        }
+
+        public AuditNetTestContext(DbContextOptions<AuditNetTestContext> options) : base(options)
         {
 
         }

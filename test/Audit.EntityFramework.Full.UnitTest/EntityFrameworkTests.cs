@@ -1,14 +1,17 @@
-﻿using Audit.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using NUnit.Framework;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
-using Audit.EntityFramework.Full.UnitTest;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Data.Entity.Validation;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Audit.Core;
+using Audit.EntityFramework.Full.UnitTest;
+
+using NUnit.Framework;
 
 namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
 {
@@ -951,6 +954,146 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
 #endif
         }
 
+        [Test]
+        public void Test_EFDataProvider_IdentityContext_Error()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config =>
+                {
+                    config
+                        .AuditTypeMapper(typeName => Type.GetType(typeName + "Audit"))
+                        .AuditEntityAction((ev, ent, audEnt) =>
+                        {
+                            ((dynamic)audEnt).Username = "test";
+                        });
+                });
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.CreateIfNotExists();
+                db.Foos.Add(new Foo());
+                Assert.Throws<DbEntityValidationException>(() => {
+                    db.SaveChanges();
+                });
+            }
+        }
+
+        [Test]
+        public void Test_EFDataProvider_IdentityContext_Error_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework(config =>
+                {
+                    config
+                        .AuditTypeMapper(typeName => Type.GetType(typeName + "Audit"))
+                        .AuditEntityAction((ev, ent, audEnt) =>
+                        {
+                            ((dynamic)audEnt).Username = "test";
+                        });
+                });
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.CreateIfNotExists();
+                db.Foos.Add(new Foo());
+                Assert.ThrowsAsync<DbEntityValidationException>(async () => {
+                    await db.SaveChangesAsync();
+                });
+            }
+        }
+
+        [Test]
+        public void Test_EFDataProvider_IdentityContext_SaveChanges()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.CreateIfNotExists();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                db.SaveChanges();
+            }
+
+            var auditEvents = dp.GetAllEvents();
+
+            Assert.That(auditEvents, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public async Task Test_EFDataProvider_IdentityContext_SaveChanges_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.CreateIfNotExists();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                db.AddAuditCustomField("Field", "Value");
+                await db.SaveChangesAsync();
+            }
+
+            var auditEvents = dp.GetAllEvents();
+
+            Assert.That(auditEvents, Has.Count.EqualTo(1));
+            Assert.That(auditEvents[0].CustomFields, Has.Count.EqualTo(1));
+            Assert.That(auditEvents[0].CustomFields["Field"].ToString(), Is.EqualTo("Value"));
+        }
+
+        [Test]
+        public void Test_IdentityContext_SaveChangesGetAudit()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider();
+
+            EntityFrameworkEvent audit;
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.CreateIfNotExists();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                audit = db.SaveChangesGetAudit();
+            }
+
+            Assert.That(audit, Is.Not.Null);
+            Assert.That(audit.Database, Is.EqualTo("FooBar2"));
+        }
+
+        [Test]
+        public async Task Test_IdentityContext_SaveChangesGetAudit_Async()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider();
+
+            EntityFrameworkEvent audit;
+
+            using (var db = new AuditNetTestContext())
+            {
+                db.Database.CreateIfNotExists();
+                var foo = new Foo()
+                {
+                    Bar = "Test"
+                };
+                db.Foos.Add(foo);
+                audit = await db.SaveChangesGetAuditAsync();
+            }
+
+            Assert.That(audit, Is.Not.Null);
+            Assert.That(audit.Database, Is.EqualTo("FooBar2"));
+        }
+
         private DbContextTransaction GetCurrentTran(DbContext context)
         {
             return context.Database.CurrentTransaction;
@@ -1089,6 +1232,33 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                 {
                     Database.CurrentTransaction.Commit();
                 }
+            }
+        }
+
+        public class Foo
+        {
+            public int Id { get; set; }
+            [Required]
+            public string Bar { get; set; }
+            public string Car { get; set; }
+        }
+        [AuditIgnore]
+        public class FooAudit
+        {
+            public int Id { get; set; }
+            public string Bar { get; set; }
+            public string Username { get; set; }
+        }
+        public class AuditNetTestContext : Audit.EntityFramework.AuditIdentityDbContext
+        {
+            public static string CnnString = TestHelper.GetConnectionString("FooBar2");
+            
+            public DbSet<Foo> Foos { get; set; }
+            public DbSet<FooAudit> FooAudits { get; set; }
+
+            public AuditNetTestContext() : base(CnnString)
+            {
+
             }
         }
     }

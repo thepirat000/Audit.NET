@@ -55,7 +55,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Initializes a new instance of the AuditIdentityDbContext
         /// </summary>
-        public AuditIdentityDbContext() : base()
+        protected AuditIdentityDbContext() : base()
         {
             _helper.SetConfig(this);
         }
@@ -64,7 +64,7 @@ namespace Audit.EntityFramework
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
         /// <param name="options">The options to be used by a Microsoft.EntityFrameworkCore.DbContext</param>
-        public AuditIdentityDbContext(DbContextOptions options) : base(options)
+        protected AuditIdentityDbContext(DbContextOptions options) : base(options)
         {
             _helper.SetConfig(this);
         }
@@ -73,7 +73,7 @@ namespace Audit.EntityFramework
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
         /// <param name="nameOrConnectionString">Either the database name or a connection string.</param>
-        public AuditIdentityDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        protected AuditIdentityDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
         { 
             _helper.SetConfig(this);
         }
@@ -81,7 +81,7 @@ namespace Audit.EntityFramework
         /// Initializes a new instance of AuditIdentityDbContext
         /// </summary>
         /// <param name="model">The model that will back this context.</param>
-        public AuditIdentityDbContext(DbCompiledModel model) : base(model)
+        protected AuditIdentityDbContext(DbCompiledModel model) : base(model)
         { 
             _helper.SetConfig(this);
         }
@@ -90,7 +90,7 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="contextOwnsConnection">If set to true the connection is disposed when the context is disposed, otherwise the caller must dispose the connection.</param>
         /// <param name="existingConnection">An existing connection to use for the new context.</param>
-        public AuditIdentityDbContext(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection)
+        protected AuditIdentityDbContext(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection)
         { 
             _helper.SetConfig(this);
         }
@@ -99,7 +99,7 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="nameOrConnectionString">Either the database name or a connection string.</param>
         /// <param name="model">The model that will back this context.</param>
-        public AuditIdentityDbContext(string nameOrConnectionString, DbCompiledModel model) : base(nameOrConnectionString, model)
+        protected AuditIdentityDbContext(string nameOrConnectionString, DbCompiledModel model) : base(nameOrConnectionString, model)
         { 
             _helper.SetConfig(this);
         }
@@ -109,7 +109,7 @@ namespace Audit.EntityFramework
         /// <param name="existingConnection">An existing connection to use for the new context.</param>
         /// <param name="model">The model that will back this context.</param>
         /// <param name="contextOwnsConnection">If set to true the connection is disposed when the context is disposed, otherwise the caller must dispose the connection.</param>
-        public AuditIdentityDbContext(DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection) : base (existingConnection, model, contextOwnsConnection)
+        protected AuditIdentityDbContext(DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection) : base (existingConnection, model, contextOwnsConnection)
         { 
             _helper.SetConfig(this);
         }
@@ -141,7 +141,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// The Db Context for this instance
         /// </summary>
-        public DbContext DbContext { get { return this; } }
+        public DbContext DbContext => this;
 
         /// <summary>
         /// Optional custom fields added to the audit event
@@ -191,7 +191,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// A collection of settings per entity type.
         /// </summary>
-        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set;  }
+        public Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
 
         /// <summary>
         /// Called after the audit scope is created.
@@ -230,6 +230,7 @@ namespace Audit.EntityFramework
             ExtraFields[fieldName] = value;
         }
 
+#if EF_FULL
         /// <summary>
         /// Saves the changes synchronously.
         /// </summary>
@@ -237,6 +238,16 @@ namespace Audit.EntityFramework
         public override int SaveChanges()
         {
             return _helper.SaveChanges(this, () => base.SaveChanges());
+        }
+
+        /// <summary>
+        /// Saves the changes asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
 
         /// <summary>
@@ -260,23 +271,69 @@ namespace Audit.EntityFramework
             return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
         }
 
-        /// <summary>
-        /// Saves the changes asynchronously.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(cancellationToken), cancellationToken);
-        }
-
         int IAuditBypass.SaveChangesBypassAudit()
         {
             return base.SaveChanges();
         }
+
         async Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
         {
             return await base.SaveChangesAsync(cancellationToken);
         }
+#else
+        /// <summary>
+        /// Saves the changes synchronously.
+        /// </summary>
+        /// <param name="acceptAllChangesOnSuccess">Indicates whether ChangeTracker.AcceptAllChanges is called after the changes have been sent successfully to the database.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            return _helper.SaveChanges(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+
+        /// <summary>
+        /// Saves the changes asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="acceptAllChangesOnSuccess">Indicates whether ChangeTracker.AcceptAllChanges is called after the changes have been sent successfully to the database.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            return await _helper.SaveChangesAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
+        /// </summary>
+        /// <returns>The generated EF audit event</returns>
+        /// <param name="acceptAllChangesOnSuccess">Indicates whether ChangeTracker.AcceptAllChanges is called after the changes have been sent successfully to the database.</param>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public EntityFrameworkEvent SaveChangesGetAudit(bool acceptAllChangesOnSuccess = true)
+        {
+            return _helper.SaveChangesGetAudit(this, () => base.SaveChanges(acceptAllChangesOnSuccess));
+        }
+
+        /// <summary>
+        /// Executes the SaveChanges operation in the DbContext and returns the EF audit event generated
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <param name="acceptAllChangesOnSuccess">Indicates whether ChangeTracker.AcceptAllChanges is called after the changes have been sent successfully to the database.</param>
+        /// <returns>The generated EF audit event</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public async Task<EntityFrameworkEvent> SaveChangesGetAuditAsync(bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
+        {
+            return await _helper.SaveChangesGetAuditAsync(this, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
+        }
+
+        int IAuditBypass.SaveChangesBypassAudit()
+        {
+            return base.SaveChanges(true);
+        }
+
+        async Task<int> IAuditBypass.SaveChangesBypassAuditAsync(CancellationToken cancellationToken)
+        {
+            return await base.SaveChangesAsync(true, cancellationToken);
+        }
+#endif
     }
 }

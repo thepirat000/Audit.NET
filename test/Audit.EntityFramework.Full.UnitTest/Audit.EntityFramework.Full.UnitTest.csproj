@@ -32,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Audit.EntityFramework\Audit.EntityFramework.csproj" />
+		<ProjectReference Include="..\..\src\Audit.EntityFramework.Identity\Audit.EntityFramework.Identity.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
