@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.5.0] - 2025-02-08:
+- Audit.NET.MongoDB: Fixing issue with RegisterClassMap "An item with the same key has already been added" when calling `UseMongoDB` (#732)
+
 ## [27.4.1] - 2025-02-08:
 - Audit.EntityFramework.Identity / Audit.EntityFramework.Identity.Core: Fixing issue with `AuditIdentityDbContext` when using the `SaveChanges(bool)` overload (#729)
 - Audit.WebApi.Core: Security upgrade Microsoft.AspNetCore.Mvc from 2.2.0 to 2.3.0 (#719)

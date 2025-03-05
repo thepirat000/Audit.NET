@@ -36,18 +36,30 @@ namespace Audit.MongoDB.Providers
             };
             ConventionRegistry.Register("Ignore null properties for AuditEvent", pack, type => type == typeof(AuditEvent));
 
+#if NET462
             BsonClassMap.RegisterClassMap<AuditTarget>(cm =>
+#else
+            BsonClassMap.TryRegisterClassMap<AuditTarget>(cm =>
+#endif
             {
                 cm.AutoMap();
             });
 
+#if NET462
             BsonClassMap.RegisterClassMap<AuditEvent>(cm =>
+#else
+            BsonClassMap.TryRegisterClassMap<AuditEvent>(cm =>
+#endif
             {
                 cm.AutoMap();
                 cm.MapExtraElementsField(c => c.CustomFields);
             });
 
+#if NET462
             BsonClassMap.RegisterClassMap<AuditEventEnvironment>(cm =>
+#else
+            BsonClassMap.TryRegisterClassMap<AuditEventEnvironment>(cm =>
+#endif
             {
                 cm.AutoMap();
                 cm.MapExtraElementsField(c => c.CustomFields);
