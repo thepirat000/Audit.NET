@@ -52,7 +52,7 @@ Mandatory config with an Endpoint and an AuthKey:
 Or with a previously configured instance of DocumentClient/CosmosClient:
 - **DocumentClient** / **CosmosClient**: Sets an already configured document/cosmos client. 
 
-Container seetings:
+Container settings:
 - **Database** / **DatabaseBuilder**: The audit database name.
 - **Container** / **ContainerBuilder**: The events container name.
 - **WithId** / **IdBuilder**: A func that returns the document id to use for a given audit event. By default it will generate a new random id.
