@@ -31,7 +31,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="OpenSearch.Client" Version="1.8.0" />
-		<PackageReference Include="OpenSearch.Net" Version="1.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>

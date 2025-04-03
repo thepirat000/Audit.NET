@@ -4,7 +4,6 @@ using Audit.Core;
 using System.Threading.Tasks;
 using Audit.OpenSearch.Extensions;
 using OpenSearch.Client;
-using OpenSearch.Net;
 using AuditEvent = Audit.Core.AuditEvent;
 
 namespace Audit.OpenSearch.Providers

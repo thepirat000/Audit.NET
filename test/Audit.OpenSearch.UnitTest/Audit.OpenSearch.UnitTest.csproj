@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<AssemblyName>Audit.Wcf.UnitTest</AssemblyName>
@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
+		<ProjectReference Include="..\..\src\Audit.NET.OpenSearch\Audit.NET.OpenSearch.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
