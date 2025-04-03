@@ -1,10 +1,9 @@
 using System;
 using System.Threading;
-using Audit.Core;
 using System.Threading.Tasks;
+using Audit.Core;
 using Audit.OpenSearch.Extensions;
 using OpenSearch.Client;
-using AuditEvent = Audit.Core.AuditEvent;
 
 namespace Audit.OpenSearch.Providers
 {
@@ -24,7 +23,7 @@ namespace Audit.OpenSearch.Providers
         /// <summary>
         /// Gets or sets the settings to use when creating the OpenSearch client
         /// </summary>
-        public IConnectionSettingsValues Settings { get; set; } = new ConnectionSettings();
+        public IConnectionSettingsValues ClientSettings { get; set; } = new ConnectionSettings();
 
         /// <summary>
         /// Gets or sets the OpenSearch index to use when saving an audit event. Must be lowercase. NULL to use the default global index.
@@ -66,7 +65,7 @@ namespace Audit.OpenSearch.Providers
                 {
                     _client = new Lazy<OpenSearchClient>(() => elConfig._client);
                 }
-                Settings = elConfig._clientSettings;
+                ClientSettings = elConfig._clientSettings;
                 IdBuilder = elConfig._idBuilder;
                 Index = elConfig._index;
             }
@@ -79,7 +78,7 @@ namespace Audit.OpenSearch.Providers
                 return _client.Value;
             }
             
-            _client = new Lazy<OpenSearchClient>(() => new OpenSearchClient(Settings));
+            _client = new Lazy<OpenSearchClient>(() => new OpenSearchClient(ClientSettings));
 
             return _client.Value;
         }
