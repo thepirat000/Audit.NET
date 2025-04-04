@@ -33,6 +33,7 @@ StartDotnetUnitTests 'Audit.RavenDB.UnitTest' 'RavenDB';
 StartDotnetUnitTests 'Audit.SqlServer.UnitTest' 'SqlServer';
 StartDotnetUnitTests 'Audit.MongoClient.UnitTest' 'MongoClient';
 StartDotnetUnitTests 'Audit.Elasticsearch.UnitTest' 'Elasticsearch';
+StartDotnetUnitTests 'Audit.OpenSearch.UnitTest' 'OpenSearch';
 StartDotnetUnitTests 'Audit.MongoDB.UnitTest' 'MongoDB';
 StartDotnetUnitTests 'Audit.MySql.UnitTest' 'MySql';
 StartDotnetUnitTests 'Audit.PostgreSql.UnitTest' 'PostgreSql';
