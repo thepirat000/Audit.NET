@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 4/4/2025 - 1:07:26 PM |
+| Generated on: | 4/4/2025 - 11:28:50 PM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 26 |
-| Classes: | 281 |
-| Files: | 211 |
-| **Line coverage:** | 76.5% (8396 of 10964) |
+| Classes: | 280 |
+| Files: | 210 |
+| **Line coverage:** | 76.6% (8396 of 10953) |
 | Covered lines: | 8396 |
-| Uncovered lines: | 2568 |
-| Coverable lines: | 10964 |
-| Total lines: | 20416 |
-| **Branch coverage:** | 70.5% (3256 of 4618) |
+| Uncovered lines: | 2557 |
+| Coverable lines: | 10953 |
+| Total lines: | 20387 |
+| **Branch coverage:** | 70.9% (3256 of 4590) |
 | Covered branches: | 3256 |
-| Total branches: | 4618 |
+| Total branches: | 4590 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -83,8 +83,8 @@
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping<TSourceEntity>|113|120|233|357|48.4%|29|42|69%|
 |Audit.EntityFramework.ConfigurationApi.ContextConfigurator|8|0|8|35|100%|4|4|100%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity, TProp>|3|3|6|85|50%|1|4|25%|
-|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|3|3|6|85|50%|1|4|25%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|20|8|28|85|71.4%|2|4|50%|
+|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|3|3|6|85|50%|1|4|25%|
 |Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator<T>|14|0|14|56|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator|5|13|18|86|27.7%|0|0||
 |Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator<TDbContext, TEntity>|5|8|13|86|38.4%|0|0||
@@ -116,10 +116,10 @@
 |Audit.EntityFramework.TransactionEvent|4|1|5|32|80%|0|0||
 |**Audit.EntityFramework.Identity**|**47**|**110**|**157**|**2552**|**29.9%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|7|17|24|638|29.1%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|638|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|26|15|41|339|63.4%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|44|44|299|0%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|638|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser>|7|17|24|638|29.1%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|44|44|299|0%|0|0||
 |**Audit.EntityFramework.Identity.Core**|**54**|**6**|**60**|**1321**|**90%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|11|1|12|415|91.6%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|28|0|28|339|100%|0|0||
@@ -232,13 +232,12 @@
 |Audit.Core.NLogConfiguratorExtensions|2|2|4|30|50%|0|0||
 |Audit.NLog.Configuration.NLogConfigurator|6|6|12|47|50%|0|0||
 |Audit.NLog.Providers.NLogDataProvider|31|7|38|116|81.5%|11|20|55%|
-|**Audit.NET.OpenSearch**|**31**|**135**|**166**|**504**|**18.6%**|**8**|**104**|**7.6%**|
+|**Audit.NET.OpenSearch**|**31**|**124**|**155**|**466**|**20%**|**8**|**76**|**10.5%**|
 |Audit.Core.OpenSearchConfiguratorExtensions|0|2|2|21|0%|0|0||
 |Audit.OpenSearch.Configuration.OpenSearchProviderConfigurator|7|8|15|54|46.6%|0|0||
-|Audit.OpenSearch.Extensions.OpenSearchExtensions|0|5|5|20|0%|0|4|0%|
 |Audit.OpenSearch.Providers.OpenSearchAuditEventId|0|2|2|13|0%|0|0||
-|Audit.OpenSearch.Providers.OpenSearchDataProvider|12|59|71|198|16.9%|4|50|8%|
-|Audit.OpenSearch.Providers.OpenSearchDataProvider<T>|12|59|71|198|16.9%|4|50|8%|
+|Audit.OpenSearch.Providers.OpenSearchDataProvider|12|56|68|189|17.6%|4|38|10.5%|
+|Audit.OpenSearch.Providers.OpenSearchDataProvider<T>|12|56|68|189|17.6%|4|38|10.5%|
 |**Audit.NET.Polly**|**63**|**24**|**87**|**317**|**72.4%**|**4**|**6**|**66.6%**|
 |Audit.Core.PollyConfiguratorExtensions|2|0|2|19|100%|0|0||
 |Audit.Polly.Configuration.PollyProviderConfigurator|5|0|5|19|100%|0|0||
