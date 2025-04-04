@@ -3,7 +3,7 @@
 		<Description>Store Audit.NET Trail Logs into OpenSearch database</Description>
 		<Copyright>Copyright 2018</Copyright>
 		<AssemblyTitle>Audit.OpenSearch</AssemblyTitle>
-		<Authors>Federico Colombo</Authors>
+		<Authors>Federico Colombo;Marco van den Oever</Authors>
 		<TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
