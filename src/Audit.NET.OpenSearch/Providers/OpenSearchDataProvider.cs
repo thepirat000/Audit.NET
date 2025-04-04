@@ -1,8 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Audit.Core;
-using Audit.OpenSearch.Extensions;
+
 using OpenSearch.Client;
 
 namespace Audit.OpenSearch.Providers
@@ -94,10 +95,7 @@ namespace Audit.OpenSearch.Providers
                 return new OpenSearchAuditEventId() { Id = response.Id, Index = response.Index };
             }
 
-            if (response.TryGetOriginalException(out var exception))
-            {
-                throw exception;
-            }
+            ThrowIfApiCallFailed(response);
             
             return "/";
         }
@@ -108,41 +106,32 @@ namespace Audit.OpenSearch.Providers
             var createRequest = new IndexRequest<object>(auditEvent, Index.GetValue(auditEvent), id);
             var response = await GetClient().IndexAsync(createRequest, cancellationToken);
 
-            if (response.IsValid && (response.Result == Result.Created || response.Result == Result.Updated))
+            if (response.IsValid && response.Result is Result.Created or Result.Updated)
             {
                 return new OpenSearchAuditEventId() { Id = response.Id, Index = response.Index };
             }
 
-            if (response.TryGetOriginalException(out var exception))
-            {
-                throw exception;
-            }
-            
+            ThrowIfApiCallFailed(response);
+
             return "/";
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            var el = eventId as OpenSearchAuditEventId;
+            var el = (OpenSearchAuditEventId)eventId;
             var indexRequest = new IndexRequest<object>(auditEvent, el.Index, el.Id);
             var response = GetClient().IndexAsync(indexRequest).ConfigureAwait(false).GetAwaiter().GetResult();
             
-            if (!response.IsValid && response.TryGetOriginalException(out var exception))
-            {
-                throw exception;
-            }
+            ThrowIfApiCallFailed(response);
         }
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var el = eventId as OpenSearchAuditEventId;
+            var el = (OpenSearchAuditEventId)eventId;
             var indexRequest = new IndexRequest<object>(auditEvent, el.Index, el.Id);
             var response = await GetClient().IndexAsync(indexRequest, cancellationToken);
             
-            if (!response.IsValid && response.TryGetOriginalException(out var exception))
-            {
-                throw exception;
-            }
+            ThrowIfApiCallFailed(response);
         }
 
         public override T GetEvent<T>(object eventId)
@@ -162,11 +151,8 @@ namespace Audit.OpenSearch.Providers
                 return response.Source;
             }
 
-            if (response.TryGetOriginalException(out var exception))
-            {
-                throw exception;
-            }
-            
+            ThrowIfApiCallFailed(response);
+
             return default;
         }
 
@@ -186,13 +172,18 @@ namespace Audit.OpenSearch.Providers
             {
                 return response.Source;
             }
-            
-            if (response.TryGetOriginalException(out var exception))
-            {
-                throw exception;
-            }
-            
+
+            ThrowIfApiCallFailed(response);
+
             return default;
+        }
+
+        private static void ThrowIfApiCallFailed(ResponseBase response)
+        {
+            if (response.ApiCall?.OriginalException is not null)
+            {
+                throw response.ApiCall.OriginalException;
+            }
         }
     }
 }

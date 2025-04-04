@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using Audit.Core;
 
@@ -14,6 +15,72 @@ namespace Audit.UnitTest
         public void Setup()
         {
             Audit.Core.Configuration.Reset();
+        }
+
+        [Test]
+        public void Test_Activity_Taqs_ExistingActivity()
+        {
+            Audit.Core.Configuration.AddOnSavingAction(scope =>
+            {
+                var activity = Activity.Current;
+
+                if (activity?.Tags.Any() == true)
+                {
+                    scope.Event.Activity.Tags = [];
+                    scope.Event.Activity.Tags.AddRange(activity.Tags.Select(tag => new AuditActivityTag() { Key = tag.Key, Value = tag.Value }));
+                }
+            });
+
+            ActivitySource.AddActivityListener(new ActivityListener()
+            {
+                ShouldListenTo = f => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
+            });
+
+            Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            var auditScopeFactory = new AuditScopeFactory();
+
+            var activitySource = new ActivitySource("test", "1.2.3");
+            var activity = activitySource.StartActivity("TEST", ActivityKind.Internal, null);
+
+            
+
+            using (var scope = auditScopeFactory.Create(new AuditScopeOptions() { IncludeActivityTrace = true, StartActivityTrace = true }))
+            {
+                Activity.Current!.SetTag("Tag1", "1");
+
+                //Debug.WriteLine(string.Join(", ", scope.Event.Activity.Tags.Select(t => t.Key + ": " + t.Value)));
+            }
+
+            var xxx = dp.GetAllEvents();
+        }
+
+        [Test]
+        public void Test_Activity_Trace_MultipleScopes()
+        {
+            ActivitySource.AddActivityListener(new ActivityListener()
+            {
+                ShouldListenTo = f => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
+            });
+
+            Configuration.Setup().UseInMemoryProvider();
+
+            var auditScopeFactory = new AuditScopeFactory();
+
+            var activitySource = new ActivitySource("test", "1.2.3");
+            var activity = activitySource.StartActivity("TEST", ActivityKind.Internal, null);
+
+            using (var scope = auditScopeFactory.Create(new AuditScopeOptions() { IncludeActivityTrace = true, StartActivityTrace = true , ExtraFields = new { test = 1 }}))
+            {
+                Debug.WriteLine($"{scope.Event.Activity.TraceId} | {scope.Event.Activity.SpanId}");
+            }
+
+            using (var scope = auditScopeFactory.Create(new AuditScopeOptions() { IncludeActivityTrace = true, StartActivityTrace = true, ExtraFields = new { test = 2 } }))
+            {
+                Debug.WriteLine($"{scope.Event.Activity.TraceId} | {scope.Event.Activity.SpanId}");
+            }
         }
 
         [Test]

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Audit.Core;
-using Audit.OpenSearch.Providers;
 using Audit.IntegrationTest;
-
-using OpenSearch.Client;
+using Audit.OpenSearch.Providers;
 
 using NUnit.Framework;
+
+using OpenSearch.Client;
 
 namespace Audit.OpenSearch.UnitTest
 {
@@ -33,7 +33,7 @@ namespace Audit.OpenSearch.UnitTest
             Assert.That(x.IdBuilder.Invoke(null).Equals(new Id("id")), Is.True);
             Assert.That(x.Index.GetDefault(), Is.EqualTo((IndexName)"ix"));
         }
-        
+
         [Test]
         [Category("Integration")]
         [Category("OpenSearch")]

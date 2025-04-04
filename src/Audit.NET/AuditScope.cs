@@ -297,7 +297,7 @@ namespace Audit.Core
         #region Private Methods
 
 #if NET6_0_OR_GREATER
-        private AuditActivityTrace GetActivityTrace()
+        public AuditActivityTrace GetActivityTrace()
         {
             var activity = Activity.Current;
 

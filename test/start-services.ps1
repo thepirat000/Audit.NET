@@ -3,6 +3,7 @@ start wsl "-d ubuntu redis-server"
 start "D:\Elasticsearch\elasticsearch-8.14.3\bin\elasticsearch.bat" -workingdirectory "D:\Elasticsearch\elasticsearch-8.14.3\bin"
 start "D:\DynamoDb\Run.bat" -workingdirectory "D:\DynamoDb"
 start powershell {"D:\RavenDB\run.ps1"}
+start "D:\opensearch-2.19.1-windows-x64\opensearch-2.19.1\bin\opensearch.bat" -workingdirectory "D:\opensearch-2.19.1-windows-x64\opensearch-2.19.1\bin"
 start "azurite.exe" -workingdirectory "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator" 
 docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmos-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview -protocol https
 

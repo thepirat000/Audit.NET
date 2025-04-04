@@ -64,7 +64,6 @@ namespace Audit.AzureCosmos.UnitTest
         public async Task TestAzureCosmos_CustomIdAsync()
         {
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
-
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
                 Endpoint = AzureSettings.AzureDocDbUrl,
@@ -85,8 +84,7 @@ namespace Audit.AzureCosmos.UnitTest
             };
             var eventType = TestContext.CurrentContext.Test.Name + new Random().Next(1000, 9999);
             var auditEvent = new AuditEvent();
-
-            using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
+            await using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
             {
                 DataProvider = dp,
                 EventType = eventType,

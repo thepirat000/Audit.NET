@@ -388,10 +388,10 @@ namespace Audit.EntityFramework
         }
 
 #if EF_CORE
-        private T TryGetService<T>(DbContext dbContext) where T : class
+        private static T TryGetService<T>(DbContext dbContext) where T : class
         {
             var infrastructure = dbContext?.GetInfrastructure();
-
+            
             // Based on EF Core code from: https://github.com/dotnet/efcore/blob/ecfee78eb1fa2b2eaa0dbf945f1d4f8fa571be74/src/EFCore/Infrastructure/Internal/InfrastructureExtensions.cs#L32
             var service =
                 infrastructure?.GetService(typeof(T)) ??

@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.5.1] - 2025-04-04:
+- Audit.NET.OpenSearch: New OpenSearch data provider to store audit events in OpenSearch, **thanks to @flyingpie !** (#747)
+
 ## [27.5.0] - 2025-02-08:
 - Audit.NET.MongoDB: Fixing issue with RegisterClassMap "An item with the same key has already been added" when calling `UseMongoDB` (#732)
 

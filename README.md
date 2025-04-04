@@ -33,8 +33,10 @@ and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.
 [AzureCosmos](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureCosmos/README.md), 
 [Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md), 
 [Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md), 
+[OpenSearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.OpenSearch/README.md), 
 [DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md), 
-[UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md), [Channels](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Channels/README.md) and more. 
+[UDP datagrams](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Udp/README.md), 
+[Channels](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Channels/README.md) and more. 
 
 - [**Output wrappers**](#data-provider-wrappers) are included 
 to facilitate the encapsulation of other Data Providers for diverse purposes, like resilience or lazy instantiation, such as
@@ -701,6 +703,7 @@ The Data Providers included are summarized in the following table:
 | NoSQL    | Elasticsearch     | [Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md) / [ElasticsearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/Providers/ElasticsearchDataProvider.cs)                                              | Store audit events in Elasticsearch indices.                                                                                 | `.UseElasticsearch()`                                  |
 | NoSQL    | Kafka             | [Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md) / [KafkaDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/Providers/KafkaDataProvider.cs)                                                                                      | Stream the audit events to [Apache Kafka](https://kafka.apache.org/) topics.                                                 | `.UseKafka()` / `.UseKafka<TKey>()`                    |
 | NoSQL    | Mongo DB          | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) / [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs)                                                                          | Store the events in a **Mongo DB** collection, in BSON format.                                                               | `.UseMongoDB()`                                        |
+| NoSQL    | OpenSearch        | [Audit.NET.OpenSearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.OpenSearch/README.md) / [OpenSearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.OpenSearch/Providers/OpenSearchDataProvider.cs)                                                             | Store audit events in OpenSearch indices.                                                                                    | `.UseOpenSearch()`                                  |
 | NoSQL    | Raven DB          | [Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.RavenDB#auditnetravendb) / [RavenDbDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/Providers/RavenDbSqlDataProvider.cs)                                                                   | Store the events as documents in a **Raven DB** database table, in JSON format.                                              | `.UseRavenDB()`                                        |
 | NoSQL    | Redis             | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) / [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs)                                                                                      | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes, Streams or publish to a PubSub channel.                     | `.UseRedis()`                                          |
 | Local    | Windows Event Log | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [Audit.NET.EventLog.Core](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.EventLog.Core) 7 [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs)                        | Write the audit logs to the Windows EventLog.                                                                                | `.UseEventLogProvider()`                               |
@@ -1013,7 +1016,7 @@ Audit.Core.Configuration.Setup()
 
 # Extensions
 
-The following packages are extensions to log interactions with different systems such as MVC, WebApi, WCF, and Entity Framework: 
+The following packages are extensions to log interactions with different systems such as MVC, ASP.NET Web APIs, WCF, and Entity Framework: 
 
 <a></a> | Package | Description 
 ------------ | ------------------- | ------------------
@@ -1053,6 +1056,7 @@ In addition, a variety of other Data Providers are available through separate pa
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/mongodb.svg" /> | **[Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/README.md)** | Store the events in a **Mongo DB** Collection, in BSON format.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/mysql.svg" /> | **[Audit.NET.MySql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md)** | Store the events as rows in **MySQL** database, in JSON format.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.NLog](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.NLog/README.md)** | Store the audit events using NLog™.
+<img width="80" src="https://unpkg.com/simple-icons@v11/icons/opensearch.svg" /> | **[Audit.NET.OpenSearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.OpenSearch/README.md)** | Store the audit events in OpenSearch indices.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.Polly](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Polly/README.md)** | Define [Polly](https://www.pollydocs.org/) resiliencie strategies to any data provider.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/postgresql.svg" /> | **[Audit.NET.PostgreSql](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md)** | Store the events as rows in a **PostgreSQL** database, in JSON format.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.RavenDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.RavenDB/README.md)** | Store the events as documents in a **Raven DB** database, in JSON format.
