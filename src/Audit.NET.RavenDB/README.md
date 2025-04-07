@@ -130,3 +130,13 @@ To create a database from a Raven DB Data Provider instance you can use the `Doc
 ```c#
 ravenProvider.DocumentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord("AuditEvents")));
 ```
+
+## ZZZ Projects - Sponsorship
+
+[Entity Framework Extensions](https://entityframework-extensions.net/) and [Dapper Plus](https://dapper-plus.net/) are major sponsors and are proud to contribute to the development of Audit.NET
+
+Combine the power of auditing with the speed of Bulk Operations to get the best of both worlds — audit and performance.
+
+<a href="https://entityframework-extensions.net/bulk-insert"><img width="728" height="90" alt="Entity Framework Extensions - Sponsor" src="https://raw.githubusercontent.com/JonathanMagnan/Audit.NET/master/entity-framework-extensions-sponsor.png" /></a>
+
+<a href="https://dapper-plus.net/bulk-insert"><img width="728" height="90" alt="Dapper Plus - Sponsor" src="https://raw.githubusercontent.com/JonathanMagnan/Audit.NET/master/dapper-plus-sponsor.png" /></a>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>Generate Audit Logs from EntityFramework context changes</Description>
+		<Description>Automatically generates audit logs for Entity Framework operations. Special thanks to 'ZZZ Projects' for sponsoring this project.</Description>
 		<Copyright>Copyright 2016</Copyright>
 		<AssemblyTitle>Audit.EntityFramework</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
@@ -31,7 +31,7 @@
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
-		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\documents\entityframework\README.md" Link="readme.md" Pack="true" PackagePath="/" Visible="false" />
 	</ItemGroup>
 
 	<ItemGroup>

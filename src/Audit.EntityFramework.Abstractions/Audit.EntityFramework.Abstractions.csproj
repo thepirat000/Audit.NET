@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Abstractions for Audit.EntityFramework and Audit.EntityFramework.Core</Description>
+    <Description>Abstractions for Audit.EntityFramework and Audit.EntityFramework.Core. Special thanks to 'ZZZ Projects' for sponsoring this project.</Description>
     <Copyright>Copyright 2024</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Abstractions</AssemblyTitle>
     <Authors>Federico Colombo</Authors>

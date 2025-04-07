@@ -25,6 +25,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
+    <RootNamespace>Audit.NLog</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Generate Audit Logs from EntityFramework identity context changes</Description>
+    <Description>Generate Audit Logs from EntityFramework identity context changes. Special thanks to 'ZZZ Projects' for sponsoring this project.</Description>
     <Copyright>Copyright 2018</Copyright>
     <AssemblyTitle>Audit.EntityFramework.Identity</AssemblyTitle>
     <Authors>Federico Colombo</Authors>

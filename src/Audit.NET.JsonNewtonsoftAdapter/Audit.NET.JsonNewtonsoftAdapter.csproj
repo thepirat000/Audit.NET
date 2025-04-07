@@ -23,6 +23,7 @@
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RootNamespace>Audit.JsonNewtonsoftAdapter</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

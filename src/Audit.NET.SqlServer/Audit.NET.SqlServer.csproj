@@ -23,6 +23,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RootNamespace>Audit.SqlServer</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

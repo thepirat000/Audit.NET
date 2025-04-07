@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Description>An extensible framework to audit executing operations in .NET and .NET Core.</Description>
+		<Description>An extensible framework to audit executing operations in .NET and .NET Core. Special thanks to 'ZZZ Projects' for sponsoring this project.</Description>
 		<Copyright>Copyright 2016</Copyright>
 		<AssemblyTitle>Audit.NET</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>

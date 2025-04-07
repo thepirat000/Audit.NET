@@ -24,6 +24,7 @@
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AzureCosmosDisableNewtonsoftJsonCheck>true</AzureCosmosDisableNewtonsoftJsonCheck>
+		<RootNamespace>Audit.AzureCosmos</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(TargetFramework)' != 'net462' ">

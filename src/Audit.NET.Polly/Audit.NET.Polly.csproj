@@ -26,6 +26,7 @@
 		<RepositoryUrl>https://github.com/thepirat000/Audit.NET</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Nullable>enable</Nullable>
+		<RootNamespace>Audit.Polly</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
