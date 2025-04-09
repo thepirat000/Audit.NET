@@ -1,4 +1,4 @@
-﻿# Audit.DynamicProxy
+# Audit.DynamicProxy
 
 **Dynamic Proxy Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 

@@ -1,4 +1,4 @@
-﻿# Audit.EntityFramework.Abstractions
+# Audit.EntityFramework.Abstractions
 
 **This assembly provides the abstractions for Audit.EntityFramework and Audit.EntityFramework.core.**
 

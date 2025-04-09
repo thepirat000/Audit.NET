@@ -1,4 +1,4 @@
-﻿# Audit.NET.PostgreSql
+# Audit.NET.PostgreSql
 **PostgreSQL Server provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
 Store the audit events in a PostgreSQL Table, in JSON format.

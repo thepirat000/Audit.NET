@@ -26,7 +26,7 @@ For full .NET framework (>= 4.5), the event log provider is included on the main
 
 [Entity Framework Extensions](https://entityframework-extensions.net/) and [Dapper Plus](https://dapper-plus.net/) are major sponsors and are proud to contribute to the development of Audit.NET
 
-Combine the power of auditing with the speed of Bulk Operations to get the best of both worlds — audit and performance.
+Combine the power of auditing with the speed of Bulk Operations to get the best of both worlds â€” audit and performance.
 
 [![Entity Framework Extensions - Sponsor](https://raw.githubusercontent.com/thepirat000/Audit.NET/master/documents/entity-framework-extensions-sponsor.png)](https://entityframework-extensions.net/bulk-insert)
 

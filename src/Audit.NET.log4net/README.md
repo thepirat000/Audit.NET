@@ -1,4 +1,4 @@
-﻿# Audit.NET.log4net
+# Audit.NET.log4net
 **log4net storage provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
 Store the audit events using [Apache log4net™](https://logging.apache.org/log4net/).

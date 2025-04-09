@@ -1,4 +1,4 @@
-﻿# Audit.SignalR
+# Audit.SignalR
 
 **SignalR Auditing Extension for [Audit.NET](https://github.com/thepirat000/Audit.NET) library.**
 

@@ -1,4 +1,4 @@
-﻿# Audit.NET.Serilog
+# Audit.NET.Serilog
 **Serilog storage provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
 Store the audit events using [Serilog™](https://serilog.net/).

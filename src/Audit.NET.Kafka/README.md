@@ -1,4 +1,4 @@
-﻿# Audit.NET.Kafka
+# Audit.NET.Kafka
 **Apache Kafka Server provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
 Send the audit events to an Apache Kafka topic.

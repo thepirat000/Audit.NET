@@ -1,4 +1,4 @@
-﻿# Audit.NET.Udp
+# Audit.NET.Udp
 **UDP provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)** (An extensible framework to audit executing operations in .NET).
 
 Sends Audit Logs as UDP datagrams to a network remote host or a multicast group.

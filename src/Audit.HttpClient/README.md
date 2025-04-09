@@ -1,4 +1,4 @@
-﻿# Audit.HttpClient
+# Audit.HttpClient
 
 **HttpClient audit extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 

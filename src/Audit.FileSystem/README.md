@@ -1,4 +1,4 @@
-﻿# Audit.FileSystem
+# Audit.FileSystem
 
 **File System Extension for [Audit.NET library](https://github.com/thepirat000/Audit.NET).** 
 

@@ -1,4 +1,4 @@
-﻿# Audit.EntityFramework.Identity
+# Audit.EntityFramework.Identity
 
 **AspNet.Identity integration for [Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md) extension
 for [Audit.NET](https://github.com/thepirat000/Audit.NET)**

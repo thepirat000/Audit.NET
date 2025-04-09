@@ -1,4 +1,4 @@
-﻿# Audit.NET.Polly
+# Audit.NET.Polly
 
 **Resilience wrapper Data Provider for [Audit.NET library](https://github.com/thepirat000/Audit.NET)**
 
