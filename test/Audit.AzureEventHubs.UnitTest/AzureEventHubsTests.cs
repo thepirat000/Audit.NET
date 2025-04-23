@@ -17,14 +17,6 @@ namespace Audit.AzureEventHubs.UnitTest
     [Category("Azure")]
     public class AzureEventHubsTests
     {
-        public void Pepe(IServiceProvider serviceProvider)
-        {
-            var Settings = new { ConnectionString = "", HubName = ""};
-
-
-
-        }
-
         [Test]
         public void Test_AzureEventHubs_Configuration_ConnectionString()
         {
