@@ -46,6 +46,7 @@ StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
 StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
 StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
 StartDotnetUnitTests 'Audit.Polly.UnitTest' 'Polly';
+StartDotnetUnitTests 'Audit.AzureEventHubs.UnitTest' 'AzureEventHubs';
 
 
 # Run sequential tests

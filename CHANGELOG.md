@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [27.5.3] - 2025-04-22:
+- New Audit.NET.AzureEventHubs: New data provider to send audit events to Azure Event Hubs. 
+
 ## [27.5.2] - 2025-04-08:
 - Fixing root namespace setting. Adding sponsorship text to nuget packages.
 

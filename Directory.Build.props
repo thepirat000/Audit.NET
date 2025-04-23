@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-	 <Version>27.5.2</Version>
+	 <Version>27.5.3</Version>
 	 <PackageReleaseNotes></PackageReleaseNotes>
 	 <CheckEolTargetFramework>false</CheckEolTargetFramework>
 	 <LangVersion>latest</LangVersion>

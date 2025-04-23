@@ -41,6 +41,7 @@ del "Audit.MongoClient\bin\release\*.nupkg"
 del "Audit.NET.Polly\bin\release\*.nupkg"
 del "Audit.NET.Channels\bin\release\*.nupkg"
 del "Audit.NET.OpenSearch\bin\release\*.nupkg"
+del "Audit.NET.AzureEventHubs\bin\release\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -88,6 +89,7 @@ dotnet pack "Audit.MongoClient/" -c Release
 dotnet pack "Audit.NET.Polly/" -c Release
 dotnet pack "Audit.NET.Channels/" -c Release
 dotnet pack "Audit.NET.OpenSearch/" -c Release
+dotnet pack "Audit.NET.AzureEventHubs/" -c Release
 
 ECHO.
 ECHO ADD TAG NOW !

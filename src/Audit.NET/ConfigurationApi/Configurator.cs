@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+
 using Audit.Core.Providers;
 using Audit.Core.Providers.Wrappers;
 
@@ -136,6 +138,10 @@ namespace Audit.Core.ConfigurationApi
             return new CreationPolicyConfigurator();
         }
 
+        /// <summary>
+        /// Uses a BlockingCollection to store the audit events in memory.
+        /// </summary>
+        /// <param name="config">The BlockingCollection provider configuration.</param>
         public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider(Action<IBlockingCollectionProviderConfigurator> config)
         {
             Configuration.DataProvider = new BlockingCollectionDataProvider(config);
@@ -143,10 +149,38 @@ namespace Audit.Core.ConfigurationApi
             return new CreationPolicyConfigurator();
         }
 
+        /// <summary>
+        /// Uses a BlockingCollection to store the audit events in memory.
+        /// </summary>
         public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider()
         {
             Configuration.DataProvider = new BlockingCollectionDataProvider();
 
+            return new CreationPolicyConfigurator();
+        }
+
+        /// <summary>
+        /// Uses a BlockingCollection to store the audit events in memory.
+        /// </summary>
+        /// <param name="config">The BlockingCollection provider configuration.</param>
+        /// <param name="blockingCollection">The created BlockingCollection instance</param>
+        public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider(Action<IBlockingCollectionProviderConfigurator> config, out BlockingCollection<AuditEvent> blockingCollection)
+        {
+            var dataProvider = new BlockingCollectionDataProvider(config);
+            Configuration.DataProvider = dataProvider;
+            blockingCollection = dataProvider.GetBlockingCollection();
+            return new CreationPolicyConfigurator();
+        }
+
+        /// <summary>
+        /// Uses a BlockingCollection to store the audit events in memory.
+        /// </summary>
+        /// <param name="blockingCollection">The created BlockingCollection instance</param>
+        public ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider(out BlockingCollection<AuditEvent> blockingCollection)
+        {
+            var dataProvider = new BlockingCollectionDataProvider();
+            Configuration.DataProvider = dataProvider;
+            blockingCollection = dataProvider.GetBlockingCollection();
             return new CreationPolicyConfigurator();
         }
     }
