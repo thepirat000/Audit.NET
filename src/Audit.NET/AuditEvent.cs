@@ -20,12 +20,10 @@ namespace Audit.Core
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public AuditEventEnvironment Environment { get; set; }
         
-#if NET6_0_OR_GREATER
         /// <summary>
         /// The current distributed tracing activity information 
         /// </summary>
         public AuditActivityTrace Activity { get; set; }
-#endif
 
         /// <summary>
         /// The extension data. 

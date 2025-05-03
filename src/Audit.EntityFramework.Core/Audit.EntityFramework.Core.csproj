@@ -56,7 +56,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-		<PackageReference Include="System.Text.Json" Version="6.0.10" />
+		<PackageReference Include="System.Text.Json" Version="9.0.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.17" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />

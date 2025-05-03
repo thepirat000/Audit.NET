@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -70,24 +69,22 @@ namespace Audit.UnitTest
             {
                 childActivity = Activity.Current;
 
+                Assert.That(childActivity, Is.Not.Null);
                 Assert.That(childActivity.OperationName, Is.EqualTo(nameof(TestAuditEvent)));
                 Assert.That(childActivity.Parent, Is.Not.Null);
                 Assert.That(childActivity.Parent.OperationName, Is.EqualTo(nameof(Test_StartActivityTrace_CreatesChildActivity)));
                 Assert.That(childActivity.Parent.Parent, Is.Null);
-#if NET7_0_OR_GREATER
+#if !NET6_0
                 Assert.That(childActivity.IsStopped, Is.False);
                 Assert.That(childActivity.Parent.IsStopped, Is.False);
 #endif
             }
 
             parentActivity!.Dispose();
-            
-#if NET7_0_OR_GREATER
+#if !NET6_0
             Assert.That(parentActivity.IsStopped, Is.True);
             Assert.That(childActivity.IsStopped, Is.True);
 #endif
-            Assert.That(parentActivity.Source.HasListeners(), Is.True);
-            Assert.That(childActivity.Source.HasListeners(), Is.False);
             Assert.That(started.Count, Is.EqualTo(2));
             Assert.That(stopped.Count, Is.EqualTo(2));
             parentSource.Dispose();
@@ -181,14 +178,13 @@ namespace Audit.UnitTest
             
             parentSource.Dispose();
 
-            var tags = activity.TagObjects.ToDictionary(k => k.Key, v => v.Value);
+            var auditEventProp = activity.GetCustomProperty(nameof(AuditEvent));
 
             var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEvents();
             Assert.That(evs.Count, Is.EqualTo(1));
             Assert.That(evs[0].Activity.Operation, Is.EqualTo(nameof(TestAuditEvent)));
-            Assert.That(tags, Contains.Key(nameof(AuditEvent)));
-            Assert.That(tags[nameof(AuditEvent)] as TestAuditEvent, Is.Not.Null);
-            Assert.That((tags[nameof(AuditEvent)] as TestAuditEvent)!.Environment.MachineName, Is.Not.Empty);
+            Assert.That(auditEventProp, Is.Not.Null);
+            Assert.That(auditEventProp, Is.TypeOf<TestAuditEvent>());
         }
 
         [Test]
@@ -222,10 +218,18 @@ namespace Audit.UnitTest
             Assert.That(childActivity, Is.Not.Null);
 
             Assert.That(parentActivity.SpanId, Is.EqualTo(childActivity.ParentSpanId));
-            Assert.That(childActivity.TagObjects.Count(), Is.EqualTo(1));
-            Assert.That(childActivity.TagObjects.First().Key, Is.EqualTo(nameof(AuditEvent)));
-            Assert.That((childActivity.TagObjects.First().Value as AuditEvent)?.EventType, Is.EqualTo("child"));
-            Assert.That((parentActivity.TagObjects.First().Value as AuditEvent)?.EventType, Is.EqualTo("parent"));
+            Assert.That(childActivity.TagObjects.Count(), Is.EqualTo(0));
+            
+            var childAuditProp = childActivity.GetCustomProperty(nameof(AuditEvent));
+            var parentAuditProp = parentActivity.GetCustomProperty(nameof(AuditEvent));
+
+            Assert.That(childAuditProp, Is.Not.Null);
+            Assert.That(childAuditProp, Is.TypeOf<TestAuditEvent>());
+            Assert.That((childAuditProp as TestAuditEvent)!.EventType, Is.EqualTo("child"));
+
+            Assert.That(parentAuditProp, Is.Not.Null);
+            Assert.That(parentAuditProp, Is.TypeOf<TestAuditEvent>());
+            Assert.That((parentAuditProp as TestAuditEvent)!.EventType, Is.EqualTo("parent"));
         }
 
         public class TestAuditEvent : AuditEvent
@@ -233,4 +237,3 @@ namespace Audit.UnitTest
         }
     }
 }
-#endif

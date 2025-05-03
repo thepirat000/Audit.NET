@@ -55,7 +55,6 @@ namespace Audit.Core
         /// </summary>
         public static bool IncludeStackTrace { get; set; }
         
-#if NET6_0_OR_GREATER
         /// <summary>
         /// Gets or Sets the value used to indicate whether the audit event should include the activity trace
         /// </summary>
@@ -65,7 +64,7 @@ namespace Audit.Core
         /// Gets or sets a value indicating whether each audit scope should create and start a new Distributed Tracing Activity.
         /// </summary>
         public static bool StartActivityTrace { get; set; }
-#endif
+
         /// <summary>
         /// Gets or Sets a value that indicates if the environment information should be excluded from the audit output. Default is false to include the environment object.
         /// </summary>

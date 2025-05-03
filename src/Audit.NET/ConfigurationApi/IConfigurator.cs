@@ -27,7 +27,7 @@ namespace Audit.Core.ConfigurationApi
         /// Globally include the full stack trace in the audit events.
         /// </summary>
         IConfigurator IncludeStackTrace(bool includeStackTrace = true);
-#if NET6_0_OR_GREATER
+
         /// <summary>
         /// Globally include the activity trace in the audit events.
         /// </summary>
@@ -36,7 +36,7 @@ namespace Audit.Core.ConfigurationApi
         /// Indicates whether each audit scope should create and start a new Distributed Tracing Activity.
         /// </summary>
         IConfigurator StartActivityTrace(bool startActivityTrace = true);
-#endif
+
         /// <summary>
         /// Use a null provider. No audit events will be saved. Useful for testing purposes or to disable the audit logs.
         /// </summary>
@@ -128,5 +128,10 @@ namespace Audit.Core.ConfigurationApi
         /// Store the events in memory in a thread-safe BlockingCollection. Useful for scenarios where the events need to be consumed by another thread.
         /// </summary>
         ICreationPolicyConfigurator UseInMemoryBlockingCollectionProvider();
+
+        /// <summary>
+        /// Record audit events as OpenTelemetry-compatible <see cref="System.Diagnostics.Activity"/> spans.
+        /// </summary>
+        ICreationPolicyConfigurator UseActivityProvider(Action<IActivityProviderConfigurator> config);
     }
 }

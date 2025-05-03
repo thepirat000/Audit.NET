@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+#pragma warning disable CS3002 // Activity not CLS-compliant
 
 namespace Audit.Core
 {
@@ -16,6 +17,8 @@ namespace Audit.Core
     /// </summary>
     public sealed partial class AuditScope : IAuditScope
     {
+        private static readonly Lazy<ActivitySource> ActivitySource = new(() => new ActivitySource(typeof(AuditScope).FullName!, typeof(AuditScope).Assembly.GetName().Version!.ToString()));
+
         #region Constructors
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -35,20 +38,18 @@ namespace Audit.Core
 
             _event.Environment = GetEnvironmentInfo(options);
             
-#if NET6_0_OR_GREATER
             if (options.StartActivityTrace ?? Configuration.StartActivityTrace)
             {
-                var activitySource = new ActivitySource(nameof(AuditScope), typeof(AuditScope).Assembly.GetName().Version!.ToString());
-                _activity = activitySource.StartActivity(_event.GetType().Name, ActivityKind.Internal, null, tags: new Dictionary<string, object>
-                {
-                    { nameof(AuditEvent), _event }
-                });
+                _activity = ActivitySource.Value.StartActivity(_event.GetType()!.Name);
+
+                _activity?.SetCustomProperty(nameof(AuditEvent), _event);
             }
+
             if (options.IncludeActivityTrace ?? Configuration.IncludeActivityTrace)
             {
-                _event.Activity = GetActivityTrace();
+                _event.Activity = GetActivityTraceData();
             }
-#endif
+
             if (options.EventType != null)
             {
                 _event.EventType = options.EventType;
@@ -115,9 +116,8 @@ namespace Audit.Core
         private readonly ISystemClock _systemClock;
         private Func<object> _targetGetter;
         private readonly IDictionary<string, object> _items;
-#if NET6_0_OR_GREATER
         private readonly Activity _activity;
-#endif
+
         #endregion
 
         #region Public Methods
@@ -187,10 +187,7 @@ namespace Audit.Core
             }
             _disposed = true;
             End();
-#if NET6_0_OR_GREATER
             _activity?.Dispose();
-            _activity?.Source?.Dispose();
-#endif
             Configuration.InvokeCustomActions(ActionType.OnScopeDisposed, this);
         }
 
@@ -206,10 +203,7 @@ namespace Audit.Core
             }
             _disposed = true;
             await EndAsync();
-#if NET6_0_OR_GREATER
             _activity?.Dispose();
-            _activity?.Source?.Dispose();
-#endif
             await Configuration.InvokeCustomActionsAsync(ActionType.OnScopeDisposed, this, CancellationToken.None);
         }
 
@@ -291,13 +285,18 @@ namespace Audit.Core
         {
             return _event as T;
         }
-        
+
+        /// <inheritdoc />
+        public Activity GetActivity()
+        {
+            return _activity;
+        }
+
         #endregion
 
         #region Private Methods
 
-#if NET6_0_OR_GREATER
-        public AuditActivityTrace GetActivityTrace()
+        public static AuditActivityTrace GetActivityTraceData()
         {
             var activity = Activity.Current;
 
@@ -356,7 +355,6 @@ namespace Audit.Core
 
             return result;
         }
-#endif
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private AuditEventEnvironment GetEnvironmentInfo(AuditScopeOptions options)

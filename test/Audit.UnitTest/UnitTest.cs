@@ -33,10 +33,8 @@ namespace Audit.UnitTest
         {
             Configuration.IncludeTypeNamespaces = true;
             Configuration.IncludeStackTrace = true;
-#if NET6_0_OR_GREATER
             Configuration.IncludeActivityTrace = true;
             Configuration.StartActivityTrace = true;
-#endif
             Configuration.DataProvider = new InMemoryDataProvider();
             Configuration.AuditDisabled = true;
             Configuration.AddOnCreatedAction(s => { });
@@ -46,10 +44,8 @@ namespace Audit.UnitTest
 
             Assert.That(Configuration.IncludeTypeNamespaces, Is.EqualTo(false));
             Assert.That(Configuration.IncludeStackTrace, Is.EqualTo(false));
-#if NET6_0_OR_GREATER
             Assert.That(Configuration.IncludeActivityTrace, Is.EqualTo(false));
             Assert.That(Configuration.StartActivityTrace, Is.EqualTo(false));
-#endif
             Assert.IsInstanceOf<FileDataProvider>(Configuration.DataProvider);
             Assert.That(Configuration.AuditDisabled, Is.EqualTo(false));
             Assert.That(Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count, Is.EqualTo(0));
@@ -1095,7 +1091,6 @@ namespace Audit.UnitTest
             provider.Verify(p => p.InsertEvent(It.IsAny<AuditEvent>()), Times.Exactly(2));
         }
 
-#if NET6_0_OR_GREATER
         [Test]
         public void AuditActivityTrace_Serialization()
         {
@@ -1109,7 +1104,6 @@ namespace Audit.UnitTest
             // Assert
             Assert.That(traceRead.SpanId, Is.EqualTo(trace.SpanId).And.EqualTo("span"));
         }
-#endif
 
         [Test]
         public void AuditEventEnvironment_Serialization()

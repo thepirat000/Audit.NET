@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+#pragma warning disable CS3002 // Activity not CLS-compliant
 
 namespace Audit.Core
 {
@@ -97,5 +99,10 @@ namespace Audit.Core
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="key">The key.</param>
         T GetItem<T>(string key);
+
+        /// <summary>
+        /// Returns the associated Activity instance, or null if no activity is linked to the audit scope (for example, when StartActivityTrace is disabled).
+        /// </summary>
+        Activity GetActivity();
     }
 }

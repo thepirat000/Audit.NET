@@ -31,7 +31,7 @@ namespace Audit.Core.ConfigurationApi
             Configuration.IncludeStackTrace = includeStackTrace;
             return this;
         }
-#if NET6_0_OR_GREATER
+
         public IConfigurator IncludeActivityTrace(bool includeActivityTrace = true)
         {
             Configuration.IncludeActivityTrace = includeActivityTrace;
@@ -43,7 +43,7 @@ namespace Audit.Core.ConfigurationApi
             Configuration.StartActivityTrace = startActivityTrace;
             return this;
         }
-#endif
+
         public ICreationPolicyConfigurator UseNullProvider()
         {
             var dataProvider = new NullDataProvider();
@@ -181,6 +181,14 @@ namespace Audit.Core.ConfigurationApi
             var dataProvider = new BlockingCollectionDataProvider();
             Configuration.DataProvider = dataProvider;
             blockingCollection = dataProvider.GetBlockingCollection();
+            return new CreationPolicyConfigurator();
+        }
+
+        /// <inheritdoc />
+        public ICreationPolicyConfigurator UseActivityProvider(Action<IActivityProviderConfigurator> config)
+        {
+            var dataProvider = new ActivityDataProvider(config);
+            Configuration.DataProvider = dataProvider;
             return new CreationPolicyConfigurator();
         }
     }

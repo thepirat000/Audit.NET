@@ -79,7 +79,6 @@ namespace Audit.Core
         /// </summary>
         public ISystemClock SystemClock { get; set; }
 
-#if NET6_0_OR_GREATER
         /// <summary>
         /// Gets or sets a value indicating whether the audit event should include the Distributed Tracing Activity data. When NULL, it will use the static Audit.Core.Configuration.IncludeActivityTrace.
         /// </summary>
@@ -89,7 +88,6 @@ namespace Audit.Core
         /// Gets or sets a value indicating whether the audit scope should create and start a new Distributed Tracing Activity. When NULL, it will use the static Audit.Core.Configuration.StartActivityTrace.
         /// </summary>
         public bool? StartActivityTrace { get; set; }
-#endif
 
         /// <summary>
         /// Gets or sets a value indicating whether the environment information should be excluded from the audit event. When NULL, it will use the static Audit.Core.Configuration.ExcludeEnvironmentInfo.
@@ -123,10 +121,8 @@ namespace Audit.Core
                 Items = scopeConfig._options.Items;
                 SystemClock = scopeConfig._options.SystemClock;
                 ExcludeEnvironmentInfo = scopeConfig._options.ExcludeEnvironmentInfo;
-#if NET6_0_OR_GREATER
                 IncludeActivityTrace = scopeConfig._options.IncludeActivityTrace;
                 StartActivityTrace = scopeConfig._options.StartActivityTrace;
-#endif
             }
         }
     }

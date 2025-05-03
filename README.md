@@ -23,6 +23,7 @@ and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.
 
 - [**Output extensions**](#data-providers-included) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
 [Event Log](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs), 
+[Open Telemetry Spans](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/ActivityDataProvider.cs), 
 [SQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.SqlServer/README.md), 
 [MySQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MySql/README.md), 
 [PostgreSQL](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.PostgreSql/README.md), 
@@ -720,6 +721,7 @@ The Data Providers included are summarized in the following table:
 | NoSQL    | Redis             | [Audit.NET.Redis](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/README.md) / [RedisDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Redis/Providers/RedisDataProvider.cs)                                                                                      | Store audit logs in Redis as Strings, Lists, SortedSets, Hashes, Streams or publish to a PubSub channel.                     | `.UseRedis()`                                          |
 | Local    | Windows Event Log | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [Audit.NET.EventLog.Core](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.EventLog.Core) 7 [EventLogDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/EventLogDataProvider.cs)                        | Write the audit logs to the Windows EventLog.                                                                                | `.UseEventLogProvider()`                               |
 | Local    | File System       | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [FileDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs)                                                                                                                                              | Store the audit logs as files. Dynamically configure the directory and path.                                                 | `.UseFileLogProvider()`                                |
+| Tracing  | OpenTelemetry     | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [ActivityDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/ActivityDataProvider.cs)                                                                                                                                      | Emits each AuditEvent as a System.Diagnostics.Activity span via an ActivitySource.                                           | `.UseActivityProvider()`                               |
 | InMemory | In-Memory List    | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [InMemoryDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/InMemoryDataProvider.cs)                                                                                                                                      | Store the audit logs in memory in a thread-safe list. Useful for testing purposes.                                           | `.UseInMemoryProvider()`                               |
 | InMemory | In-Memory Blocking Collection | [Audit.NET](https://github.com/thepirat000/Audit.NET) / [BlockingCollectionDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/BlockingCollectionDataProvider.cs)                                                                                                      | Store the audit events in a BlockingCollection that can be accessed by different threads to consume the events               | `.UseInMemoryBlockingCollectionProvider()`             |
 | InMemory | In-Memory Channel | [Audit.NET.Channels](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Channels/README.md) / [ChannelDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Channels/Providers/ChannelDataProvider.cs)                                                                                                                                      | Store the audit events in a Channel (from System.Threading.Channels) that can be accessed to consume the events      | `.UseInMemoryChannelProvider()`                        |
@@ -883,6 +885,8 @@ Audit.Core.Configuration.Setup()
     .StartActivityTrace();
 ```
 
+If you require more control over the creation of the activity trace, use the ActivityDataProvider instead.
+
 ### Global switch off
 
 You can disable audit logging by setting the static property `Configuration.AuditDisabled` to `true`. 
@@ -1022,6 +1026,26 @@ Audit.Core.Configuration.Setup()
     .UseConditional(c => c
         .When(ev => ev.EventType == "API", sqlDataProvider)
         .Otherwise(fileDataProvider));
+```
+
+##### Activity data provider:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseActivityProvider(config => config
+        .Source("MyApp", "2.0")
+        .ActivityName(auditEvent => auditEvent.EventType)
+        .IncludeDefaultTags()
+        .AdditionalTags(auditEvent => new Dictionary<string, object>
+        {
+            { "Application", "MyApp" }
+        })
+        .OnActivityCreated((activity, auditEvent) =>
+        {
+            activity.SetTag("event.json", auditEvent.ToJson());
+            activity.SetCustomProperty("event", auditEvent);
+        }));
+
 ```
 
 -----------

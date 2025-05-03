@@ -1,11 +1,10 @@
-﻿#if NET6_0_OR_GREATER
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+
 using Audit.Core;
+
+using NUnit.Framework;
 
 namespace Audit.UnitTest
 {
@@ -20,6 +19,9 @@ namespace Audit.UnitTest
         [Test]
         public void Test_Activity_Taqs_ExistingActivity()
         {
+            // Enabling Non‑Zero Span IDs
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+
             Audit.Core.Configuration.AddOnSavingAction(scope =>
             {
                 var activity = Activity.Current;
@@ -44,43 +46,65 @@ namespace Audit.UnitTest
             var activitySource = new ActivitySource("test", "1.2.3");
             var activity = activitySource.StartActivity("TEST", ActivityKind.Internal, null);
 
-            
-
+            Activity activity1;
             using (var scope = auditScopeFactory.Create(new AuditScopeOptions() { IncludeActivityTrace = true, StartActivityTrace = true }))
             {
                 Activity.Current!.SetTag("Tag1", "1");
-
-                //Debug.WriteLine(string.Join(", ", scope.Event.Activity.Tags.Select(t => t.Key + ": " + t.Value)));
+                activity1 = Activity.Current;
             }
 
-            var xxx = dp.GetAllEvents();
+            // Assert
+            Assert.That(dp.GetAllEvents().Count, Is.EqualTo(1));
+            var auditEvent = dp.GetAllEvents()[0];
+            Assert.That(auditEvent.Activity, Is.Not.Null);
+            Assert.That(activity1, Is.Not.Null);
+            Assert.That(auditEvent.GetScope().GetActivity(), Is.EqualTo(activity1));
+            Assert.That(activity1.ParentId, Is.EqualTo(activity!.Id));
         }
 
         [Test]
         public void Test_Activity_Trace_MultipleScopes()
         {
+            // Enabling Non‑Zero Span IDs
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+
             ActivitySource.AddActivityListener(new ActivityListener()
             {
                 ShouldListenTo = f => true,
                 Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData
             });
 
-            Configuration.Setup().UseInMemoryProvider();
+            Configuration.Setup().UseInMemoryProvider(out var dp);
 
             var auditScopeFactory = new AuditScopeFactory();
 
             var activitySource = new ActivitySource("test", "1.2.3");
             var activity = activitySource.StartActivity("TEST", ActivityKind.Internal, null);
 
+            Activity activity1;
+            Activity activity2;
+
             using (var scope = auditScopeFactory.Create(new AuditScopeOptions() { IncludeActivityTrace = true, StartActivityTrace = true , ExtraFields = new { test = 1 }}))
             {
-                Debug.WriteLine($"{scope.Event.Activity.TraceId} | {scope.Event.Activity.SpanId}");
+                activity1 = scope.GetActivity();
             }
 
             using (var scope = auditScopeFactory.Create(new AuditScopeOptions() { IncludeActivityTrace = true, StartActivityTrace = true, ExtraFields = new { test = 2 } }))
             {
-                Debug.WriteLine($"{scope.Event.Activity.TraceId} | {scope.Event.Activity.SpanId}");
+                activity2 = scope.GetActivity();
             }
+
+            Assert.That(activity1, Is.Not.Null);
+            Assert.That(activity2, Is.Not.Null);
+            Assert.That(activity1, Is.Not.EqualTo(activity2));
+            Assert.That(activity1.SpanId, Is.Not.EqualTo(activity2.SpanId));
+            Assert.That(activity1.TraceId, Is.EqualTo(activity2.TraceId));
+            Assert.That(activity1.ParentId, Is.EqualTo(activity2.ParentId));
+            Assert.That(activity1.ParentId, Is.EqualTo(activity.Id));
+            var auditEvents = dp.GetAllEvents();
+            Assert.That(auditEvents, Has.Count.EqualTo(2));
+            Assert.That(auditEvents[0].Activity.SpanId, Is.EqualTo(activity1.SpanId.ToString()));
+            Assert.That(auditEvents[1].Activity.SpanId, Is.EqualTo(activity2.SpanId.ToString()));
         }
 
         [Test]
@@ -143,4 +167,3 @@ namespace Audit.UnitTest
         }
     }
 }
-#endif

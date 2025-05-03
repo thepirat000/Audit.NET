@@ -1,5 +1,4 @@
-﻿#if NET6_0_OR_GREATER
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -77,4 +76,3 @@ namespace Audit.Core
         public string Name { get; set; }
     }
 }
-#endif
