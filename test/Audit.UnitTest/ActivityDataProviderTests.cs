@@ -139,7 +139,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void ReplaceEvent_ShouldStopActivity_WhenReplacePolicy()
+        public void ReplaceEvent_NotImplemented()
         {
             // Arrange
             var provider = new ActivityDataProvider();
@@ -150,13 +150,11 @@ namespace Audit.UnitTest
                 EndDate = DateTime.UtcNow.AddSeconds(1)
             };
 
-            var eventId = provider.InsertEvent(auditEvent);
-
-            // Act
-            provider.ReplaceEvent(eventId, auditEvent);
-
-            // Assert
-            // No exception should be thrown, and the activity should be stopped.
+            // Act & Assert
+            Assert.Throws<NotImplementedException>(() =>
+            {
+                provider.ReplaceEvent(null, auditEvent);
+            });
         }
 
         [Test]
@@ -236,7 +234,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void ActivityAction_ShouldInvokeCustomAction()
+        public void ActivityAction_InsertEvent_ShouldInvokeCustomAction_WhenEnded()
         {
             // Arrange
             var customTagSet = false;
@@ -252,7 +250,8 @@ namespace Audit.UnitTest
             var auditEvent = new AuditEvent
             {
                 EventType = "TestEvent",
-                StartDate = DateTime.UtcNow
+                StartDate = DateTime.UtcNow.AddSeconds(-10),
+                EndDate = DateTime.UtcNow
             };
 
             // Act
@@ -264,26 +263,49 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void ReplaceEvent_ShouldHandleMissingActivityGracefully()
+        public void ActivityAction_ReplaceEvent_ShouldInvokeCustomAction_WhenNotEnded()
         {
             // Arrange
-            var provider = new ActivityDataProvider();
+            var activityNameCount = 0;
+            var activityCreatedCount = 0;
+            var additionalCount = 0;
+
+            var provider = new ActivityDataProvider
+            {
+                AdditionalTags = new(ev =>
+                {
+                    additionalCount++;
+                    return new();
+                }),
+                ActivityName = new(ev =>
+                {
+                    activityNameCount++;
+
+                    return "Test";
+                }),
+                OnActivityCreated = (activity, auditEvent) =>
+                {
+                    activityCreatedCount++;
+                }
+            };
+
             var auditEvent = new AuditEvent
             {
                 EventType = "TestEvent",
-                StartDate = DateTime.UtcNow
+                StartDate = DateTime.UtcNow.AddSeconds(-10),
+                EndDate = null
             };
 
-            // Act
-            provider.ReplaceEvent("NonExistentEventId", auditEvent);
-
-            // Assert
-            Assert.Pass("No exception thrown");
+            // Act & Assert
+            var eventId = provider.InsertEvent(auditEvent);
+            Assert.That(activityCreatedCount, Is.EqualTo(1));
+            Assert.That(additionalCount, Is.EqualTo(1));
+            Assert.That(activityNameCount, Is.EqualTo(1));
+            Assert.IsNotNull(eventId);
         }
         
         [TestCase(EventCreationPolicy.InsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
-        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
         public void Test_ActivityCreation_WithEventCreationPolicy(EventCreationPolicy eventCreationPolicy)
         {
@@ -367,8 +389,11 @@ namespace Audit.UnitTest
             Assert.That(activity.Source.Version, Is.EqualTo("2.0.0"));
         }
 
-        [Test]
-        public void Test_ActivityCreation_WithCreateAndSave()
+        [TestCase(EventCreationPolicy.InsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
+        [TestCase(EventCreationPolicy.Manual)]
+        public void Test_ActivityCreation_WithCreateAndSave(EventCreationPolicy eventCreationPolicy)
         {
             // Arrange
             var started = new List<Activity>();
@@ -405,6 +430,7 @@ namespace Audit.UnitTest
             {
                 IsCreateAndSave = true,
                 DataProvider = dataProvider,
+                CreationPolicy = eventCreationPolicy,
                 ExtraFields = new { Field1 = 1 },
                 EventType = "Test.EventType"
             });
@@ -441,7 +467,6 @@ namespace Audit.UnitTest
 
         [TestCase(EventCreationPolicy.InsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
-        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
         public async Task Test_ActivityCreation_WithEventCreationPolicyAsync(EventCreationPolicy eventCreationPolicy)
         {

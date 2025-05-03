@@ -32,6 +32,9 @@ namespace Audit.Core.Providers;
 /// <para>
 /// This provider is ideal for integrating Audit.NET with distributed tracing systems via OpenTelemetry, enabling you to correlate audit trails with application traces and visualize them in your observability backend.
 /// </para>
+/// <para>
+/// This provider does not implement ReplaceEvent/ReplaceEventAsync so it cannot be used with EventCreationPolicy.InsertOnStartReplaceOnEnd.
+/// </para>
 /// </remarks>
 public class ActivityDataProvider : AuditDataProvider
 {
@@ -65,8 +68,6 @@ public class ActivityDataProvider : AuditDataProvider
     public static string DefaultTagCustomFieldFormat { get; set; } = "audit.custom.{0}";
     
     private static readonly ConcurrentDictionary<(string Name, string Version), ActivitySource> ActivitySources = new();
-
-    private readonly ConcurrentDictionary<string, Activity> _activeSpans = new();
 
     /// <summary>
     /// The name of the ActivitySource object to use for the given AuditEvent.
@@ -161,44 +162,13 @@ public class ActivityDataProvider : AuditDataProvider
 
         SetActivityStartAndEndTime(activity, auditEvent);
 
-        var isReplacePolicy = auditEvent.GetScope()?.EventCreationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd;
-
-        if (!isReplacePolicy)
-        {
-            // Call the action only when the event is not under replace policy, otherwise the action will be called when the event is replaced
-            CallActivityAction(activity, auditEvent);
-
-            // Not in a replacing policy, stop the activity
-            activity.Stop();
-        }
-        else
-        {
-            // AuditEvent not ended yet, keep the activity for ReplaceEvent
-            _activeSpans[eventId] = activity!;
-        }
-
-        return eventId;
-    }
-
-    /// <inheritdoc />
-    public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
-    {
-        if (!_activeSpans.TryRemove(eventId.ToString(), out var activity))
-        {
-            return;
-        }
-
-        SetActivityDefaultTags(activity, auditEvent);
-
-        SetActivityExtraTags(activity, auditEvent);
-
-        SetActivityStartAndEndTime(activity, auditEvent);
-
         CallActivityAction(activity, auditEvent);
 
         activity.Stop();
-    }
 
+        return eventId;
+    }
+    
     /// <summary>
     /// Creates and starts an activity for the given AuditEvent.
     /// </summary>
