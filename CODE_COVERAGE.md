@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 4/23/2025 - 4:07:47 AM |
+| Generated on: | 5/4/2025 - 4:46:27 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 26 |
-| Classes: | 280 |
-| Files: | 210 |
-| **Line coverage:** | 76.5% (8396 of 10969) |
-| Covered lines: | 8396 |
-| Uncovered lines: | 2573 |
-| Coverable lines: | 10969 |
-| Total lines: | 20453 |
-| **Branch coverage:** | 70.9% (3256 of 4590) |
-| Covered branches: | 3256 |
-| Total branches: | 4590 |
+| Classes: | 282 |
+| Files: | 212 |
+| **Line coverage:** | 76.6% (8482 of 11071) |
+| Covered lines: | 8482 |
+| Uncovered lines: | 2589 |
+| Coverable lines: | 11071 |
+| Total lines: | 20805 |
+| **Branch coverage:** | 71.1% (3285 of 4616) |
+| Covered branches: | 3285 |
+| Total branches: | 4616 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -83,8 +83,8 @@
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping<TSourceEntity>|113|120|233|357|48.4%|29|42|69%|
 |Audit.EntityFramework.ConfigurationApi.ContextConfigurator|8|0|8|35|100%|4|4|100%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity, TProp>|3|3|6|85|50%|1|4|25%|
-|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|3|3|6|85|50%|1|4|25%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|20|8|28|85|71.4%|2|4|50%|
+|Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<TEntity>|3|3|6|85|50%|1|4|25%|
 |Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator<T>|14|0|14|56|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator|5|13|18|86|27.7%|0|0||
 |Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator<TDbContext, TEntity>|5|8|13|86|38.4%|0|0||
@@ -170,26 +170,27 @@
 |Audit.Mvc.AuditPageFilter|115|28|143|304|80.4%|77|140|55%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1250**|**141**|**1391**|**4840**|**89.8%**|**292**|**368**|**79.3%**|
-|Audit.Core.AuditActivityEvent|2|0|2|80|100%|0|0||
-|Audit.Core.AuditActivityTag|2|0|2|80|100%|0|0||
-|Audit.Core.AuditActivityTrace|10|0|10|80|100%|0|0||
+|**Audit.NET**|**1336**|**157**|**1493**|**5188**|**89.4%**|**321**|**394**|**81.4%**|
+|Audit.Core.AuditActivityEvent|2|0|2|78|100%|0|0||
+|Audit.Core.AuditActivityTag|2|0|2|78|100%|0|0||
+|Audit.Core.AuditActivityTrace|10|0|10|78|100%|0|0||
 |Audit.Core.AuditDataProvider|20|0|20|128|100%|8|8|100%|
 |Audit.Core.AuditDataProvider<T>|20|0|20|128|100%|8|8|100%|
-|Audit.Core.AuditEvent|16|0|16|109|100%|0|0||
+|Audit.Core.AuditEvent|16|0|16|107|100%|0|0||
 |Audit.Core.AuditEventEnvironment|11|0|11|74|100%|0|0||
-|Audit.Core.AuditScope|257|8|265|663|96.9%|155|174|89%|
+|Audit.Core.AuditScope|254|8|262|661|96.9%|152|168|90.4%|
 |Audit.Core.AuditScopeFactory|67|0|67|209|100%|0|0||
-|Audit.Core.AuditScopeOptions|38|0|38|133|100%|2|2|100%|
+|Audit.Core.AuditScopeOptions|38|0|38|129|100%|2|2|100%|
 |Audit.Core.AuditScopeOptionsConfigurator|28|5|33|107|84.8%|1|2|50%|
 |Audit.Core.AuditTarget|3|0|3|26|100%|0|0||
-|Audit.Core.Configuration|217|42|259|604|83.7%|8|10|80%|
+|Audit.Core.Configuration|217|42|259|601|83.7%|8|10|80%|
 |Audit.Core.ConfigurationApi.ActionConfigurator|5|0|5|19|100%|0|0||
 |Audit.Core.ConfigurationApi.ActionEventSelector|14|2|16|48|87.5%|0|0||
+|Audit.Core.ConfigurationApi.ActivityProviderConfigurator|17|16|33|106|51.5%|2|2|100%|
 |Audit.Core.ConfigurationApi.BlockingCollectionProviderConfigurator|10|0|10|32|100%|0|0||
 |Audit.Core.ConfigurationApi.BlockingCollectionProviderExtraConfigurator|2|0|2|13|100%|0|0||
 |Audit.Core.ConfigurationApi.ConditionalDataProviderConfigurator|25|12|37|77|67.5%|2|6|33.3%|
-|Audit.Core.ConfigurationApi.Configurator|41|23|64|187|64%|0|0||
+|Audit.Core.ConfigurationApi.Configurator|44|23|67|195|65.6%|0|0||
 |Audit.Core.ConfigurationApi.CreationPolicyConfigurator|10|0|10|35|100%|0|0||
 |Audit.Core.ConfigurationApi.DynamicAsyncDataProviderConfigurator|21|2|23|79|91.3%|0|0||
 |Audit.Core.ConfigurationApi.DynamicDataProviderConfigurator|11|2|13|47|84.6%|0|0||
@@ -201,6 +202,7 @@
 |Audit.Core.JsonAdapter|11|3|14|53|78.5%|4|8|50%|
 |Audit.Core.JsonAdapter<T>|11|3|14|53|78.5%|4|8|50%|
 |Audit.Core.PlatformHelper|5|0|5|16|100%|0|0||
+|Audit.Core.Providers.ActivityDataProvider|69|0|69|251|100%|30|30|100%|
 |Audit.Core.Providers.BlockingCollectionDataProvider|37|2|39|169|94.8%|17|22|77.2%|
 |Audit.Core.Providers.DynamicAsyncDataProvider|41|6|47|169|87.2%|6|6|100%|
 |Audit.Core.Providers.DynamicDataProvider|28|3|31|106|90.3%|6|6|100%|
