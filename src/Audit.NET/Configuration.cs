@@ -125,10 +125,8 @@ namespace Audit.Core
             IncludeTypeNamespaces = false;
             IncludeStackTrace = false;
             ExcludeEnvironmentInfo = false;
-#if NET6_0_OR_GREATER
             IncludeActivityTrace = false;
             StartActivityTrace = false;
-#endif
             ResetCustomActions();
         }
 
