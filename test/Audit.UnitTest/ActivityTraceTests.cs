@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-
+using System.Threading.Tasks;
 using Audit.Core;
 
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace Audit.UnitTest
 {
@@ -14,6 +16,41 @@ namespace Audit.UnitTest
         public void Setup()
         {
             Audit.Core.Configuration.Reset();
+        }
+
+        [Test]
+        public async Task Test_CurrentActivityInCustomAction_Async()
+        {
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            Audit.Core.Configuration.Setup()
+                .StartActivityTrace()
+                .UseNullProvider();
+
+            Audit.Core.Configuration.AddOnCreatedAction(scope => scope.GetActivity().SetTag("onCreated", 123));
+            Audit.Core.Configuration.AddOnSavingAction(scope => scope.GetActivity().SetTag("onSaving", 456));
+
+            var scope = await AuditScope.CreateAsync("Test", null, new { Field = 1 });
+            
+            Assert.That(started, Has.Count.EqualTo(1));
+            Assert.That(stopped, Has.Count.EqualTo(0));
+
+            await scope.DisposeAsync();
+
+            Assert.That(stopped, Has.Count.EqualTo(1));
+            Assert.That(stopped[0].GetTagItem("onCreated"), Is.EqualTo(123));
+            Assert.That(stopped[0].GetTagItem("onSaving"), Is.EqualTo(456));
         }
 
         [Test]
