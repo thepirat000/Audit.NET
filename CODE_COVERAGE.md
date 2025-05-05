@@ -1,7 +1,7 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 5/4/2025 - 4:46:27 AM |
+| Generated on: | 5/5/2025 - 2:17:27 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 26 |
 | Classes: | 282 |
@@ -11,8 +11,8 @@
 | Uncovered lines: | 2589 |
 | Coverable lines: | 11071 |
 | Total lines: | 20805 |
-| **Branch coverage:** | 71.1% (3285 of 4616) |
-| Covered branches: | 3285 |
+| **Branch coverage:** | 71.1% (3286 of 4616) |
+| Covered branches: | 3286 |
 | Total branches: | 4616 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -116,10 +116,10 @@
 |Audit.EntityFramework.TransactionEvent|4|1|5|32|80%|0|0||
 |**Audit.EntityFramework.Identity**|**47**|**110**|**157**|**2552**|**29.9%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|7|17|24|638|29.1%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|638|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|26|15|41|339|63.4%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|44|44|299|0%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|638|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser>|7|17|24|638|29.1%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|44|44|299|0%|0|0||
 |**Audit.EntityFramework.Identity.Core**|**54**|**6**|**60**|**1321**|**90%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|11|1|12|415|91.6%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|28|0|28|339|100%|0|0||
@@ -170,7 +170,7 @@
 |Audit.Mvc.AuditPageFilter|115|28|143|304|80.4%|77|140|55%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1336**|**157**|**1493**|**5188**|**89.4%**|**321**|**394**|**81.4%**|
+|**Audit.NET**|**1336**|**157**|**1493**|**5188**|**89.4%**|**322**|**394**|**81.7%**|
 |Audit.Core.AuditActivityEvent|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|78|100%|0|0||
@@ -178,7 +178,7 @@
 |Audit.Core.AuditDataProvider<T>|20|0|20|128|100%|8|8|100%|
 |Audit.Core.AuditEvent|16|0|16|107|100%|0|0||
 |Audit.Core.AuditEventEnvironment|11|0|11|74|100%|0|0||
-|Audit.Core.AuditScope|254|8|262|661|96.9%|152|168|90.4%|
+|Audit.Core.AuditScope|254|8|262|661|96.9%|153|168|91%|
 |Audit.Core.AuditScopeFactory|67|0|67|209|100%|0|0||
 |Audit.Core.AuditScopeOptions|38|0|38|129|100%|2|2|100%|
 |Audit.Core.AuditScopeOptionsConfigurator|28|5|33|107|84.8%|1|2|50%|
