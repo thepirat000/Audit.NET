@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [28.0.0] - 2025-05-04:
+- Audit.NET: Adding OpenTelemetry `ActivityDataProvider` (#752)
+- Audit.NET: adding dependency to 'System.Diagnostics.DiagnosticSource' to older frameworks (< NET6.0) to support OpenTelemetry tracing.
+
 ## [27.5.3] - 2025-04-22:
 - Audit.NET.AzureEventHubs: New data provider to send audit events to Azure Event Hubs. 
 
