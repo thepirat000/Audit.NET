@@ -1,7 +1,7 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 5/5/2025 - 2:17:27 AM |
+| Generated on: | 5/5/2025 - 4:08:28 AM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 26 |
 | Classes: | 282 |
@@ -116,8 +116,8 @@
 |Audit.EntityFramework.TransactionEvent|4|1|5|32|80%|0|0||
 |**Audit.EntityFramework.Identity**|**47**|**110**|**157**|**2552**|**29.9%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|7|17|24|638|29.1%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|26|15|41|339|63.4%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|638|29.1%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|26|15|41|339|63.4%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser>|7|17|24|638|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|44|44|299|0%|0|0||
 |**Audit.EntityFramework.Identity.Core**|**54**|**6**|**60**|**1321**|**90%**|**0**|**0**|****|
