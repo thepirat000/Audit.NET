@@ -55,7 +55,6 @@ namespace Audit.EntityFramework
             context.AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
             context.EntitySettings = MergeEntitySettings(attrConfig?.EntitySettings, localConfig?.EntitySettings, globalConfig?.EntitySettings);
             context.ExcludeTransactionId = attrConfig?.ExcludeTransactionId ?? localConfig?.ExcludeTransactionId ?? globalConfig?.ExcludeTransactionId ?? false;
-            context.EarlySavingAudit = attrConfig?.EarlySavingAudit ?? localConfig?.EarlySavingAudit ?? globalConfig?.EarlySavingAudit ?? false;
 #if EF_FULL
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
@@ -136,26 +135,26 @@ namespace Audit.EntityFramework
         }
 
         /// <summary>
-        /// Saves the scope.
+        /// Ends the audit scope.
         /// </summary>
-        public void SaveScope(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event)
+        public void EndAuditScope(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event)
         {
             UpdateAuditEvent(@event, context);
             scope.EventAs<AuditEventEntityFramework>().EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
-            scope.Save();
+            scope.Dispose();
             context.OnScopeSaved(scope);
         }
 
         /// <summary>
-        /// Saves the scope asynchronously.
+        /// Ends the audit scope asynchronously.
         /// </summary>
-        public async Task SaveScopeAsync(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event, CancellationToken cancellationToken = default)
+        public async Task EndAuditScopeAsync(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event, CancellationToken cancellationToken = default)
         {
             UpdateAuditEvent(@event, context);
             scope.EventAs<AuditEventEntityFramework>().EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
-            await scope.SaveAsync(cancellationToken);
+            await scope.DisposeAsync();
             context.OnScopeSaved(scope);
         }
 
@@ -319,7 +318,6 @@ namespace Audit.EntityFramework
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
-                CreationPolicy = EventCreationPolicy.Manual,
                 DataProvider = dataProvider,
                 AuditEvent = auditEfEvent,
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
@@ -357,7 +355,6 @@ namespace Audit.EntityFramework
             var options = new AuditScopeOptions()
             {
                 EventType = eventType,
-                CreationPolicy = EventCreationPolicy.Manual,
                 DataProvider = dataProvider,
                 AuditEvent = auditEfEvent,
                 SkipExtraFrames = 3
@@ -519,10 +516,6 @@ namespace Audit.EntityFramework
                 return new EntityFrameworkEvent() { Result = await baseSaveChanges() };
             }
             var scope = await CreateAuditScopeAsync(context, efEvent, cancellationToken);
-            if (context.EarlySavingAudit)
-            {
-                await SaveScopeAsync(context, scope, efEvent, cancellationToken);
-            }
             try
             {
                 efEvent.Result = await baseSaveChanges();
@@ -531,11 +524,11 @@ namespace Audit.EntityFramework
             {
                 efEvent.Success = false;
                 efEvent.ErrorMessage = ex.GetExceptionInfo();
-                await SaveScopeAsync(context, scope, efEvent, cancellationToken);
+                await EndAuditScopeAsync(context, scope, efEvent, cancellationToken);
                 throw;
             }
             efEvent.Success = true;
-            await SaveScopeAsync(context, scope, efEvent, cancellationToken);
+            await EndAuditScopeAsync(context, scope, efEvent, cancellationToken);
             return efEvent;
         }
         
@@ -551,10 +544,6 @@ namespace Audit.EntityFramework
                 return new EntityFrameworkEvent() { Result = baseSaveChanges() };
             }
             var scope = CreateAuditScope(context, efEvent);
-            if (context.EarlySavingAudit)
-            {
-                SaveScope(context, scope, efEvent);
-            }
             try
             {
                 efEvent.Result = baseSaveChanges();
@@ -563,11 +552,11 @@ namespace Audit.EntityFramework
             {
                 efEvent.Success = false;
                 efEvent.ErrorMessage = ex.GetExceptionInfo();
-                SaveScope(context, scope, efEvent);
+                EndAuditScope(context, scope, efEvent);
                 throw;
             }
             efEvent.Success = true;
-            SaveScope(context, scope, efEvent);
+            EndAuditScope(context, scope, efEvent);
             return efEvent;
         }
 
@@ -583,10 +572,6 @@ namespace Audit.EntityFramework
                 return null;
             }
             var scope = CreateAuditScope(context, efEvent);
-            if (context.EarlySavingAudit)
-            {
-                SaveScope(context, scope, efEvent);
-            }
             return scope;
         }
 
@@ -602,10 +587,6 @@ namespace Audit.EntityFramework
                 return null;
             }
             var scope = await CreateAuditScopeAsync(context, efEvent, cancellationToken);
-            if (context.EarlySavingAudit)
-            {
-                await SaveScopeAsync(context, scope, efEvent, cancellationToken);
-            }
             return scope;
         }
 
@@ -619,7 +600,7 @@ namespace Audit.EntityFramework
             efEvent.Success = exception == null;
             efEvent.Result = result;
             efEvent.ErrorMessage = exception?.GetExceptionInfo();
-            SaveScope(context, scope, efEvent);
+            EndAuditScope(context, scope, efEvent);
         }
 
         public async Task EndSaveChangesAsync(IAuditDbContext context, IAuditScope scope, int result, Exception exception = null, CancellationToken cancellationToken = default)
@@ -632,7 +613,7 @@ namespace Audit.EntityFramework
             efEvent.Success = exception == null;
             efEvent.Result = result;
             efEvent.ErrorMessage = exception?.GetExceptionInfo();
-            await SaveScopeAsync(context, scope, efEvent, cancellationToken);
+            await EndAuditScopeAsync(context, scope, efEvent, cancellationToken);
         }
     }
 }

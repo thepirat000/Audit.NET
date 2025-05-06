@@ -39,12 +39,6 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="exclude">if set to <c>true</c> the Transation Id will not be included on the output.</param>
         IContextSettingsConfigurator<T> ExcludeTransactionId(bool exclude = true);
-        /// <summary>
-        /// Value to indicate if the audit event should be saved before the entity saving operation takes place. 
-        /// Default is false to save the audit event after the entity saving operation completes or fails.
-        /// </summary>
-        /// <param name="earlySaving">if set to <c>true</c> the audit event will be saved before the entity saving operation takes place.</param>
-        IContextSettingsConfigurator<T> EarlySavingAudit(bool earlySaving = true);
 
 #if EF_FULL
         /// <summary>

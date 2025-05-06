@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Core.Providers;
-
+using Moq;
 using NUnit.Framework;
 #pragma warning disable S2925
 
@@ -139,22 +139,109 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void ReplaceEvent_NotImplemented()
+        public void ReplaceEvent_WithInsertOnStartReplaceOnEnd_StopsActivityOnReplace()
         {
             // Arrange
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
             var provider = new ActivityDataProvider();
+
+            var startDate = new DateTime(2025, 1, 1, 14, 30, 0, DateTimeKind.Utc);
+            var endDate = startDate.AddSeconds(100);
+
             var auditEvent = new AuditEvent
             {
                 EventType = "TestEvent",
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddSeconds(1)
+                StartDate = startDate,
+                EndDate = null
             };
+            var auditScope = new Mock<IAuditScope>(MockBehavior.Strict);
+
+            auditScope.Setup(x => x.EventCreationPolicy)
+                .Returns(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            auditEvent.SetScope(auditScope.Object);
 
             // Act & Assert
-            Assert.Throws<NotImplementedException>(() =>
+            var eventId = provider.InsertEvent(auditEvent);
+            
+            Assert.That(started, Has.Count.EqualTo(1));
+            Assert.That(stopped, Has.Count.EqualTo(0));
+            
+            provider.AdditionalTags = new(ev => new Dictionary<string, object>
             {
-                provider.ReplaceEvent(null, auditEvent);
+                { "tag", "value" }
             });
+            auditEvent.EndDate = endDate;
+            provider.ReplaceEvent(eventId, auditEvent);
+
+            Assert.That(started, Has.Count.EqualTo(1));
+            Assert.That(stopped, Has.Count.EqualTo(1));
+            Assert.That(stopped[0].GetTagItem("tag")!.ToString(), Is.EqualTo("value"));
+            auditScope.Verify(s => s.EventCreationPolicy, Times.Once);
+        }
+
+        [Test]
+        public async Task ReplaceEvent_WithInsertOnStartReplaceOnEnd_StopsActivityOnReplaceAsync()
+        {
+            // Arrange
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            var provider = new ActivityDataProvider();
+
+            var startDate = new DateTime(2025, 1, 1, 14, 30, 0, DateTimeKind.Utc);
+            var endDate = startDate.AddSeconds(100);
+
+            var auditEvent = new AuditEvent
+            {
+                EventType = "TestEvent",
+                StartDate = startDate,
+                EndDate = null
+            };
+            var auditScope = new Mock<IAuditScope>(MockBehavior.Strict);
+
+            auditScope.Setup(x => x.EventCreationPolicy)
+                .Returns(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+
+            auditEvent.SetScope(auditScope.Object);
+
+            // Act & Assert
+            var eventId = await provider.InsertEventAsync(auditEvent);
+
+            Assert.That(started, Has.Count.EqualTo(1));
+            Assert.That(stopped, Has.Count.EqualTo(0));
+
+            provider.AdditionalTags = new(ev => new Dictionary<string, object>
+            {
+                { "tag", "value" }
+            });
+            auditEvent.EndDate = endDate;
+            await provider.ReplaceEventAsync(eventId, auditEvent);
+
+            Assert.That(started, Has.Count.EqualTo(1));
+            Assert.That(stopped, Has.Count.EqualTo(1));
+            Assert.That(stopped[0].GetTagItem("tag")!.ToString(), Is.EqualTo("value"));
+            auditScope.Verify(s => s.EventCreationPolicy, Times.Once);
         }
 
         [Test]
@@ -300,12 +387,13 @@ namespace Audit.UnitTest
             var eventId = provider.InsertEvent(auditEvent);
             Assert.That(activityCreatedCount, Is.EqualTo(1));
             Assert.That(additionalCount, Is.EqualTo(1));
-            Assert.That(activityNameCount, Is.EqualTo(1));
+            Assert.That(activityNameCount, Is.EqualTo(2));
             Assert.IsNotNull(eventId);
         }
         
         [TestCase(EventCreationPolicy.InsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
         public void Test_ActivityCreation_WithEventCreationPolicy(EventCreationPolicy eventCreationPolicy)
         {
@@ -467,6 +555,7 @@ namespace Audit.UnitTest
 
         [TestCase(EventCreationPolicy.InsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
         public async Task Test_ActivityCreation_WithEventCreationPolicyAsync(EventCreationPolicy eventCreationPolicy)
         {
@@ -731,6 +820,90 @@ namespace Audit.UnitTest
 
             var tags = activity.TagObjects.ToList();
             Assert.That(tags, Has.Count.Zero);
+        }
+
+        [TestCase(EventCreationPolicy.InsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
+        [TestCase(EventCreationPolicy.Manual)]
+        public void Test_ActivityCreation_ReUsingAuditScopeActivity(EventCreationPolicy eventCreationPolicy)
+        {
+            // Arrange
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            var dataProvider = new ActivityDataProvider()
+            {
+                TryUseAuditScopeActivity = true,
+                IncludeDefaultTags = true,
+                ActivityName = new(ev => ev.EventType),
+                AdditionalTags = new(ev => new Dictionary<string, object>() { { "domain.tag", ev.Environment.DomainName } }),
+                OnActivityCreated = (activity, ev) =>
+                {
+                    activity.SetTag("custom.tag", "custom.value");
+                    activity.SetCustomProperty("event", ev);
+                }
+            };
+
+            ActivityDataProvider.DefaultTagCustomFieldFormat = "audit.custom.field.{0}";
+            
+            var minSleepMs = 10;
+
+            // Act
+            using (var scope = AuditScope.Create(new AuditScopeOptions()
+            {
+                CreationPolicy = eventCreationPolicy,
+                DataProvider = dataProvider,
+                ExtraFields = new { Field1 = 1 },
+                EventType = "Test.EventType",
+                StartActivityTrace = true
+            }))
+            {
+                Thread.Sleep(minSleepMs);
+                scope.SetCustomField("Field2", 2);
+                if (eventCreationPolicy == EventCreationPolicy.Manual)
+                {
+                    scope.Save();
+                }
+            }
+
+            // Assert
+            Assert.That(started, Has.Count.EqualTo(1));
+            Assert.That(stopped, Has.Count.EqualTo(1));
+            Assert.That(stopped[0], Is.EqualTo(started[0]));
+            var activity = stopped[0];
+            var auditEvent = activity.GetCustomProperty("event") as AuditEvent;
+            Assert.That(auditEvent, Is.Not.Null);
+            Assert.That(auditEvent.EventType, Is.EqualTo("Test.EventType"));
+            var tags = activity.TagObjects.ToList();
+            Assert.That(tags.Exists(t => t.Key == "audit.custom.field.Field1" && t.Value!.ToString() == 1.ToString()), Is.True);
+            Assert.That(tags.Exists(t => t.Key == "audit.custom.field.Field2" && t.Value!.ToString() == 2.ToString()), Is.True);
+            Assert.That(tags.Exists(t => t.Key == ActivityDataProvider.DefaultTagStartTime), Is.True);
+            Assert.That(tags.Exists(t => t.Key == ActivityDataProvider.DefaultTagDurationMs), Is.True);
+            Assert.That(tags.Exists(t => t.Key == ActivityDataProvider.DefaultTagEndTime), Is.True);
+            Assert.That(tags.Exists(t => t.Key == ActivityDataProvider.DefaultTagEventType), Is.True);
+            Assert.That(tags.Exists(t => t.Key == ActivityDataProvider.DefaultTagMachine), Is.True);
+            Assert.That(tags.Exists(t => t.Key == ActivityDataProvider.DefaultTagUser), Is.True);
+            Assert.That(tags.Exists(t => t.Key == "domain.tag" && t.Value!.ToString() == auditEvent.Environment.DomainName), Is.True);
+            Assert.That(tags.Exists(t => t.Key == "custom.tag" && t.Value!.ToString() == "custom.value"), Is.True);
+
+            Assert.That(activity.StartTimeUtc, Is.EqualTo(auditEvent.StartDate));
+            Assert.That(activity.Duration.TotalMilliseconds, Is.InRange(auditEvent.Duration - 1, auditEvent.Duration + 1).And.GreaterThanOrEqualTo(minSleepMs));
+
+            Assert.That(activity.OperationName, Is.EqualTo("AuditEvent"));
+            Assert.That(activity.DisplayName, Is.EqualTo(auditEvent.EventType));
+            Assert.That(activity.Source.Name, Is.EqualTo("Audit.Core.AuditScope"));
+            Assert.That(activity.Kind, Is.EqualTo(ActivityKind.Internal));
+            Assert.That(activity.Source.Version, Is.EqualTo(typeof(ActivityDataProvider).Assembly.GetName().Version!.ToString()));
         }
     }
 }

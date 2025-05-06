@@ -112,9 +112,6 @@ namespace Audit.EntityFramework
         /// <inheritdoc/>
         public bool ExcludeTransactionId { get; set; }
 
-        /// <inheritdoc/>
-        public bool EarlySavingAudit { get; set; }
-
         public DbContext DbContext { get { return this; } }
 #if EF_FULL
         /// <inheritdoc/>

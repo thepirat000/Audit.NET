@@ -84,4 +84,22 @@ public interface IActivityProviderConfigurator
     /// </summary>
     /// <param name="onActivityCreated">The action that takes an Activity and an AuditEvent.</param>
     IActivityProviderConfigurator OnActivityCreated(Action<Activity, AuditEvent> onActivityCreated);
+
+    /// <summary>
+    /// Indicates whether to use the activity created by the AuditScope instead of creating a new one.
+    /// <para>
+    /// The AuditScope activity will be reused only when StartActivityTrace configuration is enabled (Audit.Core.Configuration.StartActivityTrace = true) and only if there are listeners configured for the source "Audit.Core.AuditScope".
+    /// </para>
+    /// </summary>
+    /// <param name="tryUseAuditScopeActivity">A boolean value indicating whether to use the activity created by the AuditScope.</param>
+    IActivityProviderConfigurator TryUseAuditScopeActivity(bool tryUseAuditScopeActivity = true);
+
+    /// <summary>
+    /// Indicates whether to use the activity created by the AuditScope instead of creating a new one.
+    /// <para>
+    /// The AuditScope activity will be reused only when StartActivityTrace configuration is enabled (Audit.Core.Configuration.StartActivityTrace = true) and only if there are listeners configured for the source "Audit.Core.AuditScope". 
+    /// </para>
+    /// </summary>
+    /// <param name="tryUseAuditScopeActivityBuilder">A function that takes an AuditEvent and returns a boolean value indicating whether to use the activity created by the AuditScope.</param>
+    IActivityProviderConfigurator TryUseAuditScopeActivity(Func<AuditEvent, bool> tryUseAuditScopeActivityBuilder);
 }

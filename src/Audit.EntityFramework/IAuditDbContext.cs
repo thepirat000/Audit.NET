@@ -55,10 +55,8 @@ namespace Audit.EntityFramework
         /// </summary>
         bool ExcludeTransactionId { get; set; }
         /// <summary>
-        /// To indicate if the audit event should be saved before the entity saving operation takes place. 
-        /// Default is false to save the audit event after the entity saving operation completes or fails.
+        /// The DbContext instance that is being audited.
         /// </summary>
-        bool EarlySavingAudit { get; set; }
         DbContext DbContext { get; }
         /// <summary>
         /// A collection of settings per entity type.

@@ -20,9 +20,39 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
     [Category("SqlServer")]
     public class EntityFrameworkTests
     {
+        [OneTimeSetUp]
+        public void Init()
+        {
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Database.CreateIfNotExists();
+
+                if (!ctx.Blogs.Any())
+                {
+                    ctx.Blogs.Add(new Blog()
+                    {
+                        BloggerName = "Blogger 1",
+                        Title = "Blog 1",
+                        Posts = new List<Post>()
+                        {
+                            new Post() { Title = "Post 1", Content = "Content 1", DateCreated = DateTime.UtcNow },
+                            new Post() { Title = "Post 2", Content = "Content 2", DateCreated = DateTime.UtcNow }
+                        }
+                    });
+                    ctx.SaveChanges();
+                }
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                ctx.Database.CreateIfNotExists();
+            }
+        }
+
         [SetUp]
         public void Setup()
         {
+            Audit.Core.Configuration.Reset();
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
         }
@@ -898,7 +928,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
                     {
                         logs.Add(ev);
                     }))
-                 .WithCreationPolicy(EventCreationPolicy.Manual);
+                 .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             using (var ctx = new MyTransactionalContext())
             {
@@ -1068,7 +1098,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             }
 
             Assert.That(audit, Is.Not.Null);
-            Assert.That(audit.Database, Is.EqualTo("FooBar2"));
+            Assert.That(audit.Database, Is.EqualTo("FooBar2Full"));
         }
 
         [Test]
@@ -1091,7 +1121,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             }
 
             Assert.That(audit, Is.Not.Null);
-            Assert.That(audit.Database, Is.EqualTo("FooBar2"));
+            Assert.That(audit.Database, Is.EqualTo("FooBar2Full"));
         }
 
         private DbContextTransaction GetCurrentTran(DbContext context)
@@ -1102,7 +1132,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
         [AuditDbContext(IncludeEntityObjects = true)]
         public class AuditPerTableContext : AuditDbContext
         {
-            public static string CnnString = TestHelper.GetConnectionString("Audit");
+            public static string CnnString = TestHelper.GetConnectionString("AuditFull");
 
             public AuditPerTableContext()
                 : base(CnnString)
@@ -1122,7 +1152,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
         }
         public class MyBaseContext : AuditDbContext
         {
-            public static string CnnString = TestHelper.GetConnectionString("Blogs");
+            public static string CnnString = TestHelper.GetConnectionString("BlogsFull");
             public override bool AuditDisabled { get; set; }
 
             public MyBaseContext()
@@ -1251,7 +1281,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
         }
         public class AuditNetTestContext : Audit.EntityFramework.AuditIdentityDbContext
         {
-            public static string CnnString = TestHelper.GetConnectionString("FooBar2");
+            public static string CnnString = TestHelper.GetConnectionString("FooBar2Full");
             
             public DbSet<Foo> Foos { get; set; }
             public DbSet<FooAudit> FooAudits { get; set; }

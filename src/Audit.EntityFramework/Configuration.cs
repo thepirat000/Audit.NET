@@ -51,11 +51,6 @@ namespace Audit.EntityFramework
             EnsureConfigFor<T>().ExcludeTransactionId = exclude;
         }
 
-        internal static void SetEarlySavingAudit<T>(bool earlySaving)
-        {
-            EnsureConfigFor<T>().EarlySavingAudit = earlySaving;
-        }
-
 #if EF_FULL
         internal static void SetIncludeIndependantAssociations<T>(bool include)
         {

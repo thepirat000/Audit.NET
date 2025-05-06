@@ -13,6 +13,7 @@ public class ActivityProviderConfigurator : IActivityProviderConfigurator
     internal Setting<string> _activityName = new(ev => ev.GetType().Name);
     internal Setting<ActivityKind> _activityKind = System.Diagnostics.ActivityKind.Internal;
     internal Setting<bool> _includeDefaultTags = false;
+    internal Setting<bool> _tryUseAuditScopeActivity = false;
     internal Func<AuditEvent, Dictionary<string, object>> _additionalTags;
     internal Action<Activity, AuditEvent> _onActivityCreated;
 
@@ -100,6 +101,20 @@ public class ActivityProviderConfigurator : IActivityProviderConfigurator
     public IActivityProviderConfigurator OnActivityCreated(Action<Activity, AuditEvent> onActivityCreated)
     {
         _onActivityCreated = onActivityCreated;
+
+        return this;
+    }
+
+    public IActivityProviderConfigurator TryUseAuditScopeActivity(bool tryUseAuditScopeActivity = true)
+    {
+        _tryUseAuditScopeActivity = tryUseAuditScopeActivity;
+
+        return this;
+    }
+
+    public IActivityProviderConfigurator TryUseAuditScopeActivity(Func<AuditEvent, bool> tryUseAuditScopeActivityBuilder)
+    {
+        _tryUseAuditScopeActivity = tryUseAuditScopeActivityBuilder;
 
         return this;
     }

@@ -11,7 +11,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         [SetUp]
         public void SetUp()
         {
-            Audit.Core.Configuration.AuditDisabled = false;
+            Audit.Core.Configuration.Reset();
         }
 
         [Test]

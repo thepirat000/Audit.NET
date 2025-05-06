@@ -33,7 +33,7 @@ namespace Audit.Core.Providers;
 /// This provider is ideal for integrating Audit.NET with distributed tracing systems via OpenTelemetry, enabling you to correlate audit trails with application traces and visualize them in your observability backend.
 /// </para>
 /// <para>
-/// This provider does not implement ReplaceEvent/ReplaceEventAsync so it cannot be used with EventCreationPolicy.InsertOnStartReplaceOnEnd.
+/// This provider implements ReplaceEvent/ReplaceEventAsync and can be used with EventCreationPolicy.InsertOnStartReplaceOnEnd, in which case the Activity will be kept until the event is replaced.
 /// </para>
 /// </remarks>
 public class ActivityDataProvider : AuditDataProvider
@@ -69,9 +69,11 @@ public class ActivityDataProvider : AuditDataProvider
     
     private static readonly ConcurrentDictionary<(string Name, string Version), ActivitySource> ActivitySources = new();
 
+    private readonly ConcurrentDictionary<string, Activity> _activeSpans = new();
+
     /// <summary>
     /// The name of the ActivitySource object to use for the given AuditEvent.
-    /// Defaults to "Audit.Core.Providers.OpenTelemetrySpanDataProvider".
+    /// Defaults to "Audit.Core.Providers.ActivityDataProvider".
     /// </summary>
     public Setting<string> SourceName { get; set; } = typeof(ActivityDataProvider).FullName!;
 
@@ -95,17 +97,33 @@ public class ActivityDataProvider : AuditDataProvider
 
     /// <summary>
     /// Indicates whether to include the Audit.NET's default tags in the Activity. Default to false meaning the default tags will not be set.
-    /// 
+    /// <para>
     /// The default tags are:
-    /// - audit.event_type: The type of the event (AuditEvent.EventType)
-    /// - audit.start_time: The start time of the event (AuditEvent.StartDate)
-    /// - audit.end_time: The end time of the event (AuditEvent.EndDate)
-    /// - audit.duration_ms: The duration of the event in milliseconds (AuditEvent.Duration)
-    /// - audit.user: The username from the environment (AuditEvent.Environment.UserName)
-    /// - audit.machine: The machine name from the environment (AuditEvent.Environment.MachineName)
-    /// - audit.custom.{key}: The custom fields of the event (AuditEvent.CustomFields) 
+    /// <list type="bullet">
+    ///   <item>audit.event_type: The type of the event (AuditEvent.EventType)</item>
+    ///   <item>audit.start_time: The start time of the event (AuditEvent.StartDate)</item>
+    ///   <item>audit.end_time: The end time of the event (AuditEvent.EndDate)</item>
+    ///   <item>audit.duration_ms: The duration of the event in milliseconds (AuditEvent.Duration)</item>
+    ///   <item>audit.user: The username from the environment (AuditEvent.Environment.UserName)</item>
+    ///   <item>audit.machine: The machine name from the environment (AuditEvent.Environment.MachineName)</item>
+    ///   <item>audit.custom.{key}: The custom fields of the event (AuditEvent.CustomFields) </item>
+    /// </list>
+    /// </para>
     /// </summary>
     public Setting<bool> IncludeDefaultTags { get; set; } = false;
+
+    /// <summary>
+    /// Indicates whether to use the internal AuditScope activity as the activity for the given AuditEvent.
+    /// <para>
+    /// When this is set to true:
+    /// <list type="bullet">
+    ///   <item>Make sure the `StartActivityTrace` option is set to true in the `AuditScopeOptions` or in the global configuration `Audit.Core.Configuration.StartActivityTrace`</item>
+    ///   <item>This data provider will enrich the activity created by the AuditScope and will not create a new one</item>
+    ///   <item>The SourceName, SourceVersion and ActivityKind settings will be ignored since the AuditScope will create the activity with its own ActivitySource</item>
+    /// </list>
+    /// </para>
+    /// </summary>
+    public Setting<bool> TryUseAuditScopeActivity { get; set; } = false;
 
     /// <summary>
     /// The tags to set on the Activity. This is used to set additional tags on the Activity when it is created.
@@ -148,30 +166,81 @@ public class ActivityDataProvider : AuditDataProvider
     {
         var eventId = Guid.NewGuid().ToString();
 
-        var activity = CreateAuditActivity(auditEvent);
+        var activity = GetOrCreateAuditActivity(auditEvent, out var reusingActivity);
 
         if (activity == null)
         {
             // No listeners or sampling
             return eventId;
         }
-        
-        SetActivityDefaultTags(activity, auditEvent);
 
-        SetActivityExtraTags(activity, auditEvent);
+        UpdateActivity(activity, auditEvent);
 
-        SetActivityStartAndEndTime(activity, auditEvent);
+        if (reusingActivity)
+        {
+            return eventId;
+        }
 
-        CallActivityAction(activity, auditEvent);
-
-        activity.Stop();
+        if (auditEvent.EndDate == null && auditEvent.GetScope()?.EventCreationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd)
+        {
+            // AuditEvent not ended yet, keep the activity
+            _activeSpans[eventId] = activity!;
+        }
+        else
+        {
+            activity.Stop();
+        }
 
         return eventId;
     }
-    
+
+    /// <inheritdoc />
+    public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
+    {
+        Activity activity = null;
+
+        // Check if we are using the AuditScope activity
+        if (TryUseAuditScopeActivity.GetValue(auditEvent))
+        {
+            activity = auditEvent.GetScope()?.GetActivity();
+            if (activity != null)
+            {
+                UpdateActivity(activity, auditEvent);
+                return;
+            }
+        }
+
+        // Check if we have an active span
+        if (!_activeSpans.TryRemove(eventId.ToString()!, out activity))
+        {
+            return;
+        }
+
+        UpdateActivity(activity, auditEvent);
+
+        activity.Stop();
+    }
+
     /// <summary>
     /// Creates and starts an activity for the given AuditEvent.
     /// </summary>
+    private Activity GetOrCreateAuditActivity(AuditEvent auditEvent, out bool reusingActivity)
+    {
+        if (TryUseAuditScopeActivity.GetValue(auditEvent))
+        {
+            var activity = auditEvent.GetScope()?.GetActivity();
+
+            if (activity != null)
+            {
+                reusingActivity = true;
+                return activity;
+            }
+        }
+
+        reusingActivity = false;
+        return CreateAuditActivity(auditEvent);
+    }
+
     protected virtual Activity CreateAuditActivity(AuditEvent auditEvent)
     {
         var source = GetActivitySource(auditEvent);
@@ -190,9 +259,27 @@ public class ActivityDataProvider : AuditDataProvider
         return ActivitySources.GetOrAdd((SourceName.GetValue(auditEvent), SourceVersion.GetValue(auditEvent)), key => new ActivitySource(key.Name, key.Version));
     }
 
-    private static void SetActivityStartAndEndTime(Activity activity, AuditEvent auditEvent)
+    private void UpdateActivity(Activity activity, AuditEvent auditEvent)
     {
+        SetActivityDefaultTags(activity, auditEvent);
+
+        SetActivityExtraTags(activity, auditEvent);
+
+        SetActivityNameStartAndEndTime(activity, auditEvent);
+        
+        CallActivityAction(activity, auditEvent);
+    }
+
+    private void SetActivityNameStartAndEndTime(Activity activity, AuditEvent auditEvent)
+    {
+        var name = ActivityName.GetValue(auditEvent);
+        if (name != null)
+        {
+            activity.DisplayName = name;
+        }
+
         activity.SetStartTime(auditEvent.StartDate);
+
         if (auditEvent.EndDate != null)
         {
             activity.SetEndTime(auditEvent.EndDate.Value);

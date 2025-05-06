@@ -3,6 +3,15 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [29.0.0] - 2025-05-06:
+- **Audit.EntityFramework (Breaking change):** The `SaveChanges` interceptor and `AuditDbContext` will now honor the configured `EventCreationPolicy` (default is `InsertOnEnd`).
+This allows to save the audit event **before** or **after** the entity persistence operation.
+- **Audit.EntityFramework (Breaking change):** The obsolete `EarlySavingAudit` setting has been removed from `AuditDbContext`. 
+Clients should use `EventCreationPolicy` to control when the audit event is saved. 
+If you were using the `EarlySavingAudit` setting, update your configuration to use `EventCreationPolicy.InsertOnStartInsertOnEnd` or `EventCreationPolicy.InsertOnStartReplaceOnEnd` as appropriate.
+- **Audit.NET**: Introduced the `TryUseAuditScopeActivity` configuration in `ActivityDataProvider` to enable the use and enrichment of the `Activity` created by `AuditScope` when `StartActivityTrace` is set to `true`.
+- **Audit.NET**: Adding ReplaceEvent capabilities to the `ActivityDataProvider`
+
 ## [28.0.0] - 2025-05-04:
 - Audit.NET: Adding OpenTelemetry `ActivityDataProvider` (#752)
 - Audit.NET: adding dependency to 'System.Diagnostics.DiagnosticSource' to older frameworks (< NET6.0) to support OpenTelemetry tracing.

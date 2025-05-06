@@ -30,13 +30,82 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                         create table posts ( Id int identity(1,1) not null primary key, Title nvarchar(max), DateCreated datetime, Content nvarchar(max), BlogId int not null constraint FK_P_B foreign key references Blogs (id) );";
             using (var ctx = new MyAuditedVerboseContext())
             {
+                ctx.Database.EnsureCreated();
+
                 ctx.Database.ExecuteSqlRaw(sql);
+            }
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Database.EnsureCreated();
+
+                if (!ctx.Blogs.Any())
+                {
+                    ctx.Blogs.Add(new Blog()
+                    {
+                        BloggerName = "Blogger 1",
+                        Title = "Blog 1",
+                        Posts = new List<Post>()
+                        {
+                            new Post() { Title = "Post 1", Content = "Content 1", DateCreated = DateTime.UtcNow },
+                            new Post() { Title = "Post 2", Content = "Content 2", DateCreated = DateTime.UtcNow }
+                        }
+                    });
+                    ctx.SaveChanges();
+                }
+            }
+            
+            using (var ctx = new MyUnauditedContext())
+            {
+                ctx.Database.EnsureCreated();
+
+                if (!ctx.Blogs.Any())
+                {
+                    ctx.Blogs.Add(new Blog()
+                    {
+                        BloggerName = "Blogger 1",
+                        Title = "Blog 1",
+                        Posts = new List<Post>()
+                        {
+                            new Post() { Title = "Post 1", Content = "Content 1", DateCreated = DateTime.UtcNow },
+                            new Post() { Title = "Post 2", Content = "Content 2", DateCreated = DateTime.UtcNow }
+                        }
+                    });
+                    ctx.SaveChanges();
+                }
+            }
+
+            using (var ctx = new MyAuditedContext())
+            {
+                ctx.Database.EnsureCreated();
+
+                if (!ctx.Blogs.Any())
+                {
+                    ctx.Blogs.Add(new Blog()
+                    {
+                        BloggerName = "Blogger 1",
+                        Title = "Blog 1",
+                        Posts = new List<Post>()
+                        {
+                            new Post() { Title = "Post 1", Content = "Content 1", DateCreated = DateTime.UtcNow },
+                            new Post() { Title = "Post 2", Content = "Content 2", DateCreated = DateTime.UtcNow }
+                        }
+                    });
+                    ctx.SaveChanges();
+                }
+            }
+
+            using (var ctx = new AuditPerTableContext())
+            {
+                ctx.Database.EnsureCreated();
             }
         }
 
         [SetUp]
         public void Setup()
         {
+            Audit.Core.Configuration.Reset();
+                
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
         }
@@ -590,7 +659,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                     return typeof(OrderlineAudit);
                 return null;
             };
-            
+
             dp.AuditEntityAction = (ev, entry, obj) =>
             {
                 var ab = obj as AuditBase;
@@ -600,6 +669,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action; 
                 }
+
                 return Task.FromResult(true);
             };
 
@@ -698,6 +768,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                     ab.UserName = ev.Environment.UserName;
                     ab.AuditStatus = entry.Action;
                 }
+
                 return await Task.FromResult(true);
             };
 
@@ -1078,7 +1149,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                 .WithAction(x => x.OnScopeCreated(sc =>
                 {
                     var wcfEvent = sc.GetEntityFrameworkEvent();
-                    Assert.That(wcfEvent.Database, Is.EqualTo("Blogs"));
+                    Assert.That(wcfEvent.Database, Is.EqualTo("BlogsVerbose"));
                 }));
             int blogId;
             using (var ctx = new MyAuditedVerboseContext())
@@ -1167,7 +1238,7 @@ SET IDENTITY_INSERT Posts OFF
                 var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
 
                 Assert.That(result, Is.EqualTo(4));
-                Assert.That(auditEvent.EventType, Is.EqualTo("Blogs" + "_" + ctx.GetType().Name));
+                Assert.That(auditEvent.EventType, Is.EqualTo("BlogsVerbose" + "_" + ctx.GetType().Name));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
@@ -1232,7 +1303,7 @@ SET IDENTITY_INSERT Posts OFF
                 var efEvent = (auditEvent as AuditEventEntityFramework).EntityFrameworkEvent;
 
                 Assert.That(result, Is.EqualTo(4));
-                Assert.That(auditEvent.EventType, Is.EqualTo("Blogs" + "_" + ctx.GetType().Name));
+                Assert.That(auditEvent.EventType, Is.EqualTo("BlogsVerbose" + "_" + ctx.GetType().Name));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Insert" && e.ColumnValues["Title"].Equals("title") && (e.Entity as Post)?.Title == "title"));
                 Assert.True(efEvent.Entries.Any(e => e.Action == "Update" && (e.Entity as Blog)?.Id == 1 && e.Changes[0].ColumnName == "BloggerName"));
@@ -1263,7 +1334,11 @@ SET IDENTITY_INSERT Posts OFF
     }
     
     public class MyUnauditedContext : MyBaseContext
-    {
+    { 
+        public MyUnauditedContext() : base("BlogsUnaudited")
+        {
+        }
+        
         public override bool AuditDisabled
         {
             get { return true; }
@@ -1274,6 +1349,10 @@ SET IDENTITY_INSERT Posts OFF
     [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = true, AuditEventType = "{database}_{context}")]
     public class MyAuditedVerboseContext : MyBaseContext
     {
+        public MyAuditedVerboseContext() : base("BlogsVerbose")
+        {
+        }
+
         public void SetDataProvider(AuditDataProvider dataProvider)
         {
             this.AuditDataProvider = dataProvider;
@@ -1283,18 +1362,25 @@ SET IDENTITY_INSERT Posts OFF
     [AuditDbContext(IncludeEntityObjects = false)]
     public class MyAuditedContext : MyBaseContext
     {
-
+        public MyAuditedContext() : base("BlogsAudited")
+        {
+        }
     }
 
     public class MyBaseContext : AuditDbContext
     {
-        public static string CnnString = TestHelper.GetConnectionString("Blogs");
+        private string _cnnString;
 
         public override bool AuditDisabled { get; set; }
 
+        public MyBaseContext(string dbName)
+        {
+            _cnnString = TestHelper.GetConnectionString(dbName);
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(CnnString);
+            optionsBuilder.UseSqlServer(_cnnString);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1308,7 +1394,11 @@ SET IDENTITY_INSERT Posts OFF
     }
 
     public class MyTransactionalContext : MyBaseContext
-    {
+    { 
+        public MyTransactionalContext() : base("BlogsTran")
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -1409,6 +1499,10 @@ SET IDENTITY_INSERT Posts OFF
     public class OrderAudit : AuditBase
     {
         public virtual long Id { get; set; }
+
+        [Key]
+        public virtual long OrderAuditId { get; set; }
+        public virtual long OrderId { get; set; }
         public virtual string Number { get; set; }
         public virtual string Status { get; set; }
     }
@@ -1416,6 +1510,9 @@ SET IDENTITY_INSERT Posts OFF
     public class OrderlineAudit : AuditBase
     {
         public virtual long Id { get; set; }
+
+        [Key]
+        public virtual long OrderlineAuditId { get; set; }
         public virtual string Product { get; set; }
         public virtual int Quantity { get; set; }
         public virtual long OrderId { get; set; }

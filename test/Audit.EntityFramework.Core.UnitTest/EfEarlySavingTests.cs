@@ -58,20 +58,29 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
 
-        [Test]
-        public async Task EarlySavingAudit_Enabled()
+        [TestCase(EventCreationPolicy.InsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
+        [TestCase(EventCreationPolicy.Manual)]
+        public async Task SavingAudit_ByCreationPolicy(EventCreationPolicy eventCreationPolicy)
         {
+            // InsertOnEnd, will call InsertEvent once
+            // InsertOnStartInsertOnEnd, will call InsertEvent twice
+            // InsertOnStartReplaceOnEnd, will call InsertEvent once and ReplaceEvent once
+            // Manual, will never call InsertEvent or ReplaceEvent
+
             var inserted = new List<EntityFrameworkEvent>();
             var updated = new List<EntityFrameworkEvent>();
             var messageId = Guid.NewGuid();
 
             Audit.EntityFramework.Configuration.Setup()
-                .ForContext<TestContext>(_ => _.EarlySavingAudit(true));
+                .ForContext<TestContext>();
 
             Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(_ => _
                     .OnInsert(ev => inserted.Add(EntityFrameworkEvent.FromJson(ev.GetEntityFrameworkEvent().ToJson())))
-                    .OnReplace((id, ev) => updated.Add(EntityFrameworkEvent.FromJson(ev.GetEntityFrameworkEvent().ToJson()))));
+                    .OnReplace((id, ev) => updated.Add(EntityFrameworkEvent.FromJson(ev.GetEntityFrameworkEvent().ToJson()))))
+                .WithCreationPolicy(eventCreationPolicy);
 
             using (var context = new TestContext())
             {
@@ -83,51 +92,41 @@ namespace Audit.EntityFramework.Core.UnitTest
                 await context.SaveChangesAsync();
             }
 
-            Assert.That(inserted.Count, Is.EqualTo(1));
-            Assert.That(updated.Count, Is.EqualTo(1));
-            Assert.That(inserted[0].Result, Is.EqualTo(0));
-            Assert.That(updated[0].Result, Is.EqualTo(1));
-            Assert.That(inserted[0].Entries.Count, Is.EqualTo(1));
-            Assert.That(updated[0].Entries.Count, Is.EqualTo(1));
-        }
+            var expectedInserted = eventCreationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd || eventCreationPolicy == EventCreationPolicy.InsertOnEnd 
+                ? 1 
+                : eventCreationPolicy == EventCreationPolicy.InsertOnStartInsertOnEnd 
+                    ? 2 
+                    : 0;
+            var expectedUpdated = eventCreationPolicy == EventCreationPolicy.InsertOnStartReplaceOnEnd ? 1 : 0;
 
-        [Test]
-        public async Task EarlySavingAudit_Disabled()
-        {
-            var inserted = new List<EntityFrameworkEvent>();
-            var updated = new List<EntityFrameworkEvent>();
-            var messageId = Guid.NewGuid();
-
-            Audit.EntityFramework.Configuration.Setup()
-                .ForContext<TestContext>(_ => _.EarlySavingAudit(false));
-
-            Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(_ => _
-                    .OnInsert(ev => inserted.Add(EntityFrameworkEvent.FromJson(ev.GetEntityFrameworkEvent().ToJson())))
-                    .OnReplace((id, ev) => updated.Add(EntityFrameworkEvent.FromJson(ev.GetEntityFrameworkEvent().ToJson()))));
-
-            using (var context = new TestContext())
+            Assert.That(inserted.Count, Is.EqualTo(expectedInserted));
+            Assert.That(updated.Count, Is.EqualTo(expectedUpdated));
+            
+            switch (eventCreationPolicy)
             {
-                Message message = new Message
-                {
-                    MessageId = messageId
-                };
-                await context.AddAsync(message);
-                await context.SaveChangesAsync();
+                case EventCreationPolicy.InsertOnStartReplaceOnEnd:
+                    Assert.That(inserted[0].Result, Is.EqualTo(0));
+                    Assert.That(updated[0].Result, Is.EqualTo(1));
+                    break;
+                case EventCreationPolicy.InsertOnStartInsertOnEnd:
+                    Assert.That(inserted[0].Result, Is.EqualTo(0));
+                    Assert.That(inserted[1].Result, Is.EqualTo(1));
+                    break;
+                case EventCreationPolicy.InsertOnEnd:
+                    Assert.That(inserted[0].Result, Is.EqualTo(1));
+                    Assert.That(inserted[0].Entries.Count, Is.EqualTo(1));
+                    break;
             }
 
-            Assert.That(inserted.Count, Is.EqualTo(1));
-            Assert.That(updated.Count, Is.EqualTo(0));
-            Assert.That(inserted[0].Result, Is.EqualTo(1));
         }
 
         [Test]
-        public async Task ExceptionInAuditEntity()
+        public async Task ExceptionInAuditEntity_InsertOnEnd()
         {
             var messageId = Guid.NewGuid();
 
             Audit.EntityFramework.Configuration.Setup()
-                .ForContext<TestContext>(_ => _.EarlySavingAudit(true));
+                .ForContext<TestContext>();
 
             Audit.Core.Configuration.Setup()
                 .UseEntityFramework(ef => ef
@@ -140,7 +139,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                             entity.AuditAction = eventEntry.Action;
                         })
                     )
-                );
+                )
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
 
             using (var context = new TestContext())
             {
@@ -176,7 +176,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             var messageId = Guid.NewGuid();
 
             Audit.EntityFramework.Configuration.Setup()
-                .ForContext<TestContext>(_ => _.EarlySavingAudit());
+                .ForContext<TestContext>();
 
             Audit.Core.Configuration.Setup()
                 .UseEntityFramework(ef => ef
@@ -191,7 +191,8 @@ namespace Audit.EntityFramework.Core.UnitTest
 #pragma warning restore CS0162
                         })
                     )
-                );
+                )
+                .WithCreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd);
 
             using (var context = new TestContext())
             {

@@ -194,12 +194,6 @@ namespace Audit.EntityFramework
         public bool ExcludeTransactionId { get; set; }
 
         /// <summary>
-        /// To indicate if the audit event should be saved before the entity saving operation takes place. 
-        /// Default is false to save the audit event after the entity saving operation completes or fails.
-        /// </summary>
-        public bool EarlySavingAudit { get; set; }
-
-        /// <summary>
         /// Value to indicate if the original values of the audited entities should be queried from database explicitly, before any modification or delete operation.
         /// Default is false.
         /// </summary>
