@@ -52,14 +52,6 @@ jobs:
         catalog: Audit
         extra-params: "Encrypt=False;"
 
-    - name: Extra SQL 
-      shell: pwsh
-      run: |
-          echo "Execute SqlScript.sql"
-          sqlcmd -i ".\src\Audit.NET.SqlServer\SqlScript.sql" -d "master" -I
-          echo "Execute Demo.sql"
-          sqlcmd -i ".\test\Audit.EntityFramework.Core.UnitTest\Demo.sql" -d "master" -I
-
     - name: Dotnet Restore 
       run: dotnet restore
       
