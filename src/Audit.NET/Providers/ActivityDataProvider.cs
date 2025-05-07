@@ -38,33 +38,25 @@ namespace Audit.Core.Providers;
 /// </remarks>
 public class ActivityDataProvider : AuditDataProvider
 {
-    /// <summary>
-    /// The default tag key to use for the event type. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+    /// <summary>The default tag key to use for the event type. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagEventType { get; set; } = "audit.event_type";
-    /// <summary>
-    /// The default tag key to use for the start time. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+
+    /// <summary>The default tag key to use for the start time. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagStartTime { get; set; } = "audit.start_time";
-    /// <summary>
-    /// The default tag key to use for the end time. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+
+    /// <summary>The default tag key to use for the end time. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagEndTime { get; set; } = "audit.end_time";
-    /// <summary>
-    /// The default tag key to use for the duration in milliseconds. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+
+    /// <summary>The default tag key to use for the duration in milliseconds. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagDurationMs { get; set; } = "audit.duration_ms";
-    /// <summary>
-    /// The default tag key to use for the username. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+
+    /// <summary>The default tag key to use for the username. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagUser { get; set; } = "audit.user";
-    /// <summary>
-    /// The default tag key to use for the machine name. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+
+    /// <summary>The default tag key to use for the machine name. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagMachine { get; set; } = "audit.machine";
-    /// <summary>
-    /// The default tag key format to use for the custom fields. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.
-    /// </summary>
+
+    /// <summary>The default tag key format to use for the custom fields. This is used to set the tag on the Activity when it is created and SkipDefaultTags is set to false.</summary>
     public static string DefaultTagCustomFieldFormat { get; set; } = "audit.custom.{0}";
     
     private static readonly ConcurrentDictionary<(string Name, string Version), ActivitySource> ActivitySources = new();
@@ -226,15 +218,18 @@ public class ActivityDataProvider : AuditDataProvider
     /// </summary>
     private Activity GetOrCreateAuditActivity(AuditEvent auditEvent, out bool reusingActivity)
     {
-        if (TryUseAuditScopeActivity.GetValue(auditEvent))
-        {
-            var activity = auditEvent.GetScope()?.GetActivity();
+        var auditScopeActivity = auditEvent.GetScope()?.GetActivity();
 
-            if (activity != null)
-            {
-                reusingActivity = true;
-                return activity;
-            }
+        if (auditScopeActivity != null && TryUseAuditScopeActivity.GetValue(auditEvent))
+        {
+            reusingActivity = true;
+            return auditScopeActivity;
+        }
+
+        if (auditScopeActivity != null && Activity.Current != auditScopeActivity)
+        {
+            // If there is a scope activity, we want to make sure we are using it as the parent
+            Activity.Current = auditScopeActivity;
         }
 
         reusingActivity = false;

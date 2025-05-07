@@ -222,12 +222,11 @@ namespace Audit.SqlServer.UnitTest
         [Test]
         public void Test_Sql_DbContextOptions()
         {
-            var cnnString = TestHelper.GetConnectionString("Audit");
             TestInterceptor.Count = 0;
             var sqlProvider = new SqlDataProvider(config => config
-                    .ConnectionString(cnnString)
+                    .ConnectionString(SqlTestHelper.GetConnectionString())
+                    .TableName(ev => SqlTestHelper.TableName)
                     .DbContextOptions(new DbContextOptionsBuilder().AddInterceptors(new TestInterceptor()).Options)
-                    .TableName(ev => "Event")
                     .IdColumnName(ev => "EventId")
                     .JsonColumnName(ev => "Data")
                     .LastUpdatedColumnName("LastUpdatedDate")

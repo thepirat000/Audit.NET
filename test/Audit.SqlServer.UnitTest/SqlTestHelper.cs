@@ -5,12 +5,12 @@ namespace Audit.SqlServer.UnitTest
 {
     internal static class SqlTestHelper
     {
-        internal static string CnnStringAudit = TestHelper.GetConnectionString("Audit");
-        internal static string CnnStringMaster = TestHelper.GetConnectionString("master");
-
         internal const string DatabaseName = "AuditSqlServerTests";
         internal const string TableName = "AuditEvent";
 
+        internal static string CnnStringAudit = TestHelper.GetConnectionString(DatabaseName);
+        internal static string CnnStringMaster = TestHelper.GetConnectionString("master");
+        
         internal static string GetConnectionString()
         {
             return CnnStringAudit;

@@ -169,6 +169,8 @@ namespace Audit.UnitTest
 
             auditScope.Setup(x => x.EventCreationPolicy)
                 .Returns(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+            auditScope.Setup(x => x.GetActivity())
+                .Returns((Activity)null);
 
             auditEvent.SetScope(auditScope.Object);
 
@@ -222,6 +224,8 @@ namespace Audit.UnitTest
 
             auditScope.Setup(x => x.EventCreationPolicy)
                 .Returns(EventCreationPolicy.InsertOnStartReplaceOnEnd);
+            auditScope.Setup(x => x.GetActivity())
+                .Returns((Activity)null);
 
             auditEvent.SetScope(auditScope.Object);
 
@@ -395,7 +399,7 @@ namespace Audit.UnitTest
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
-        public void Test_ActivityCreation_WithEventCreationPolicy(EventCreationPolicy eventCreationPolicy)
+        public void ActivityCreation_WithEventCreationPolicy(EventCreationPolicy eventCreationPolicy)
         {
             // Arrange
             var started = new List<Activity>();
@@ -481,7 +485,7 @@ namespace Audit.UnitTest
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
-        public void Test_ActivityCreation_WithCreateAndSave(EventCreationPolicy eventCreationPolicy)
+        public void ActivityCreation_WithCreateAndSave(EventCreationPolicy eventCreationPolicy)
         {
             // Arrange
             var started = new List<Activity>();
@@ -557,7 +561,7 @@ namespace Audit.UnitTest
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
-        public async Task Test_ActivityCreation_WithEventCreationPolicyAsync(EventCreationPolicy eventCreationPolicy)
+        public async Task ActivityCreation_WithEventCreationPolicyAsync(EventCreationPolicy eventCreationPolicy)
         {
             // Arrange
             var started = new List<Activity>();
@@ -640,7 +644,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public async Task Test_ActivityCreation_WithCreateAndSaveAsync()
+        public async Task ActivityCreation_WithCreateAndSaveAsync()
         {
             // Arrange
             var started = new List<Activity>();
@@ -712,7 +716,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ActivityCreation_NoListenerShouldNotCreateActivity()
+        public void ActivityCreation_NoListenerShouldNotCreateActivity()
         {
             // Arrange
             _listener.Dispose();
@@ -745,7 +749,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public async Task Test_ActivityCreation_NoListenerShouldNotCreateActivityAsync()
+        public async Task ActivityCreation_NoListenerShouldNotCreateActivityAsync()
         {
             // Arrange
             _listener.Dispose();
@@ -778,7 +782,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ActivityCreation_NoAllData_CreatesNoTags()
+        public void ActivityCreation_NoAllData_CreatesNoTags()
         {
             // Arrange
             _listener.Dispose();
@@ -826,7 +830,7 @@ namespace Audit.UnitTest
         [TestCase(EventCreationPolicy.InsertOnStartInsertOnEnd)]
         [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
         [TestCase(EventCreationPolicy.Manual)]
-        public void Test_ActivityCreation_ReUsingAuditScopeActivity(EventCreationPolicy eventCreationPolicy)
+        public void ActivityCreation_ReUsingAuditScopeActivity(EventCreationPolicy eventCreationPolicy)
         {
             // Arrange
             var started = new List<Activity>();
@@ -907,7 +911,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public void Test_ActivityCreation_StartActivityTrace_NotReUsingAuditScopeActivity_ShouldNestActivities()
+        public void ActivityCreation_StartActivityTrace_NotReUsingAuditScopeActivity_ShouldNestActivities()
         {
             // Arrange
             var started = new List<Activity>();
@@ -962,6 +966,132 @@ namespace Audit.UnitTest
             Assert.That(stopped[1].Source.Name, Is.EqualTo("Audit.Core.AuditScope"));
             Assert.That(stopped[0].TraceId, Is.EqualTo(stopped[1].TraceId));
             Assert.That(stopped[0].Parent!.SpanId.ToString(), Is.EqualTo(stopped[1].SpanId.ToString()));
+        }
+
+        [TestCase(EventCreationPolicy.InsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
+        public async Task ActivityCreation_StartActivityTrace_NotReUsingAuditScopeActivity_ShouldNestActivitiesAsync(EventCreationPolicy eventCreationPolicy)
+        {
+            // Arrange
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            var dataProvider = new ActivityDataProvider()
+            {
+                TryUseAuditScopeActivity = false,
+                IncludeDefaultTags = true,
+                ActivityName = new(ev => ev.EventType),
+                AdditionalTags = new(ev => new Dictionary<string, object>() { { "domain.tag", ev.Environment.DomainName } }),
+                OnActivityCreated = (activity, ev) =>
+                {
+                    activity.SetTag("custom.tag", "custom.value");
+                    activity.SetCustomProperty("event", ev);
+                }
+            };
+
+            ActivityDataProvider.DefaultTagCustomFieldFormat = "audit.custom.field.{0}";
+
+            var minSleepMs = 10;
+
+            // Act
+            await using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
+            {
+                CreationPolicy = eventCreationPolicy,
+                DataProvider = dataProvider,
+                ExtraFields = new { Field1 = 1 },
+                EventType = "Test.EventType",
+                StartActivityTrace = true
+            }))
+            {
+                Thread.Sleep(minSleepMs);
+                scope.SetCustomField("Field2", 2);
+            }
+
+            // Assert
+            Assert.That(started, Has.Count.EqualTo(2));
+            Assert.That(stopped, Has.Count.EqualTo(2));
+            Assert.That(stopped[0], Is.EqualTo(started[1]));
+            Assert.That(stopped[1], Is.EqualTo(started[0]));
+            Assert.That(stopped[0].Source.Name, Is.EqualTo("Audit.Core.Providers.ActivityDataProvider"));
+            Assert.That(stopped[1].Source.Name, Is.EqualTo("Audit.Core.AuditScope"));
+            Assert.That(stopped[0].TraceId, Is.EqualTo(stopped[1].TraceId));
+            Assert.That(stopped[0].Parent!.SpanId.ToString(), Is.EqualTo(stopped[1].SpanId.ToString()));
+        }
+
+        [TestCase(EventCreationPolicy.InsertOnEnd)]
+        [TestCase(EventCreationPolicy.InsertOnStartReplaceOnEnd)]
+        public async Task ActivityCreation_StartActivityTrace_OuterActivity_NotReUsingAuditScopeActivity_ShouldNestActivitiesAsync(EventCreationPolicy eventCreationPolicy)
+        {
+            // Arrange
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            var dataProvider = new ActivityDataProvider()
+            {
+                TryUseAuditScopeActivity = false,
+                IncludeDefaultTags = true,
+                ActivityName = new(ev => ev.EventType),
+                AdditionalTags = new(ev => new Dictionary<string, object>() { { "domain.tag", ev.Environment.DomainName } }),
+                OnActivityCreated = (activity, ev) =>
+                {
+                    activity.SetTag("custom.tag", "custom.value");
+                    activity.SetCustomProperty("event", ev);
+                }
+            };
+
+            ActivityDataProvider.DefaultTagCustomFieldFormat = "audit.custom.field.{0}";
+
+            var minSleepMs = 10;
+
+            var outerActivity = new ActivitySource("Outer").StartActivity("OuterActivity");
+
+            // Act
+            await using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
+            {
+                CreationPolicy = eventCreationPolicy,
+                DataProvider = dataProvider,
+                ExtraFields = new { Field1 = 1 },
+                EventType = "Test.EventType",
+                StartActivityTrace = true
+            }))
+            {
+                Thread.Sleep(minSleepMs);
+                scope.SetCustomField("Field2", 2);
+            }
+
+            outerActivity!.Dispose();
+
+            // Assert
+            Assert.That(started, Has.Count.EqualTo(3));
+            Assert.That(stopped, Has.Count.EqualTo(3));
+            Assert.That(stopped[0], Is.EqualTo(started[2]));
+            Assert.That(stopped[1], Is.EqualTo(started[1]));
+            Assert.That(stopped[2], Is.EqualTo(started[0]));
+            Assert.That(started[0].Source.Name, Is.EqualTo("Outer"));
+            Assert.That(started[1].Source.Name, Is.EqualTo("Audit.Core.AuditScope"));
+            Assert.That(started[2].Source.Name, Is.EqualTo("Audit.Core.Providers.ActivityDataProvider"));
+            Assert.That(started[0].TraceId, Is.EqualTo(started[1].TraceId));
+            Assert.That(started[1].TraceId, Is.EqualTo(started[2].TraceId));
+            Assert.That(started[1].Parent!.SpanId, Is.EqualTo(outerActivity!.SpanId));
+            Assert.That(started[2].Parent!.SpanId, Is.EqualTo(started[1]!.SpanId));
         }
     }
 }
