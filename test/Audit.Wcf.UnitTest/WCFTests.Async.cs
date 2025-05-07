@@ -15,6 +15,12 @@ namespace Audit.WCF.UnitTest
 {
     public class WCFTests_Async
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [Test]
         public async Task WCFTest_CreationPolicy_InsertOnStartReplaceOnEnd_Async()
         {
@@ -199,6 +205,8 @@ namespace Audit.WCF.UnitTest
 
             var auditScopeFactory = new TestAuditScopeFactory();
 
+            Audit.Core.Configuration.AuditScopeFactory = auditScopeFactory;
+
             var basePipeAddress = new Uri(string.Format(@"http://localhost:{0}/test/", 10000 + new Random().Next(1, 9999)));
             using (var host = new ServiceHost(new OrderService_AsyncConcurrent_Test(provider.Object, auditScopeFactory), basePipeAddress))
             {
@@ -213,7 +221,6 @@ namespace Audit.WCF.UnitTest
             Assert.That(bag.Count, Is.EqualTo(bag.Distinct().Count()));
             Assert.That(bag.Count, Is.EqualTo(threads * callsPerThread));
             Assert.That(auditScopeFactory.OnScopeCreatedCount, Is.EqualTo(threads * callsPerThread));
-
         }
 
         static async Task WCFTest_Concurrency_AuditScope_ThreadRunAsync(int internalThreads, int callsPerThread, EndpointAddress address)

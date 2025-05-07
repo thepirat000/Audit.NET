@@ -15,6 +15,12 @@ namespace Audit.WCF.UnitTest
 {
     public class WCFTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [Test]
         public void WCFTest_CreationPolicy_InsertOnStartReplaceOnEnd()
         {
@@ -284,11 +290,15 @@ namespace Audit.WCF.UnitTest
     
     public class TestAuditScopeFactory : AuditScopeFactory
     {
-        public int OnScopeCreatedCount { get; set; }
+        public int OnScopeCreatedCount;
+        private static object locker = new object();
 
         public override void OnScopeCreated(AuditScope auditScope)
         {
-            OnScopeCreatedCount++;
+            lock (locker)
+            {
+                OnScopeCreatedCount++;
+            }
         }
     }
 }
