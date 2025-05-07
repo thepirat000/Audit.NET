@@ -905,5 +905,63 @@ namespace Audit.UnitTest
             Assert.That(activity.Kind, Is.EqualTo(ActivityKind.Internal));
             Assert.That(activity.Source.Version, Is.EqualTo(typeof(ActivityDataProvider).Assembly.GetName().Version!.ToString()));
         }
+
+        [Test]
+        public void Test_ActivityCreation_StartActivityTrace_NotReUsingAuditScopeActivity_ShouldNestActivities()
+        {
+            // Arrange
+            var started = new List<Activity>();
+            var stopped = new List<Activity>();
+            using var listener = new ActivityListener
+            {
+                ShouldListenTo = _ => true,
+                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+                ActivityStarted = activity => started.Add(activity),
+                ActivityStopped = activity => stopped.Add(activity)
+            };
+
+            ActivitySource.AddActivityListener(listener);
+
+            var dataProvider = new ActivityDataProvider()
+            {
+                TryUseAuditScopeActivity = false,
+                IncludeDefaultTags = true,
+                ActivityName = new(ev => ev.EventType),
+                AdditionalTags = new(ev => new Dictionary<string, object>() { { "domain.tag", ev.Environment.DomainName } }),
+                OnActivityCreated = (activity, ev) =>
+                {
+                    activity.SetTag("custom.tag", "custom.value");
+                    activity.SetCustomProperty("event", ev);
+                }
+            };
+
+            ActivityDataProvider.DefaultTagCustomFieldFormat = "audit.custom.field.{0}";
+
+            var minSleepMs = 10;
+
+            // Act
+            using (var scope = AuditScope.Create(new AuditScopeOptions()
+            {
+                CreationPolicy = EventCreationPolicy.InsertOnEnd,
+                DataProvider = dataProvider,
+                ExtraFields = new { Field1 = 1 },
+                EventType = "Test.EventType",
+                StartActivityTrace = true
+            }))
+            {
+                Thread.Sleep(minSleepMs);
+                scope.SetCustomField("Field2", 2);
+            }
+
+            // Assert
+            Assert.That(started, Has.Count.EqualTo(2));
+            Assert.That(stopped, Has.Count.EqualTo(2));
+            Assert.That(stopped[0], Is.EqualTo(started[1]));
+            Assert.That(stopped[1], Is.EqualTo(started[0]));
+            Assert.That(stopped[0].Source.Name, Is.EqualTo("Audit.Core.Providers.ActivityDataProvider"));
+            Assert.That(stopped[1].Source.Name, Is.EqualTo("Audit.Core.AuditScope"));
+            Assert.That(stopped[0].TraceId, Is.EqualTo(stopped[1].TraceId));
+            Assert.That(stopped[0].Parent!.SpanId.ToString(), Is.EqualTo(stopped[1].SpanId.ToString()));
+        }
     }
 }
