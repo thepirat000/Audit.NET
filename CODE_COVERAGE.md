@@ -1,7 +1,7 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 5/8/2025 - 3:07:52 PM |
+| Generated on: | 5/8/2025 - 6:16:35 PM |
 | Parser: | MultiReport (2x Cobertura) |
 | Assemblies: | 26 |
 | Classes: | 282 |
@@ -116,10 +116,10 @@
 |Audit.EntityFramework.TransactionEvent|4|1|5|32|80%|0|0||
 |**Audit.EntityFramework.Identity**|**46**|**109**|**155**|**2508**|**29.6%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|7|17|24|627|29.1%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|627|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|25|15|40|334|62.5%|0|0||
-|Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|43|43|293|0%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim>|7|17|24|627|29.1%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser>|7|17|24|627|29.1%|0|0||
+|Audit.EntityFramework.AuditIdentityDbContext<TUser>|0|43|43|293|0%|0|0||
 |**Audit.EntityFramework.Identity.Core**|**53**|**6**|**59**|**1306**|**89.8%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditIdentityDbContext|11|1|12|410|91.6%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>|27|0|27|334|100%|0|0||
