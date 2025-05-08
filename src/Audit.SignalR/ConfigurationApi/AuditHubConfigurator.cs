@@ -11,7 +11,7 @@ namespace Audit.SignalR.Configuration
         internal bool _auditDisabled;
         internal IAuditHubFilterConfigurator _filters;
         internal EventCreationPolicy? _creationPolicy;
-        internal AuditDataProvider _dataProvider;
+        internal IAuditDataProvider _dataProvider;
 
         public IAuditHubConfigurator Filters(Action<IAuditHubFilterConfigurator> config)
         {
@@ -49,7 +49,7 @@ namespace Audit.SignalR.Configuration
             return this;
         }
 
-        public IAuditHubConfigurator WithDataProvider(AuditDataProvider provider)
+        public IAuditHubConfigurator WithDataProvider(IAuditDataProvider provider)
         {
             _dataProvider = provider;
             return this;

@@ -17,14 +17,14 @@ namespace Audit.Wcf.Client
         private readonly bool _includeRequestHeaders;
         private readonly bool _includeResponseHeaders;
         private readonly IAuditScopeFactory _auditScopeFactory;
-        private readonly AuditDataProvider _auditDataProvider;
+        private readonly IAuditDataProvider _auditDataProvider;
 
         public AuditMessageInspector()
         {
         }
 
         public AuditMessageInspector(string eventType, bool includeRequestHeaders, bool includeResponseHeaders, IAuditScopeFactory auditScopeFactory,
-            AuditDataProvider auditDataProvider)
+            IAuditDataProvider auditDataProvider)
         {
             _eventType = eventType ?? "{action}";
             _includeRequestHeaders = includeRequestHeaders;

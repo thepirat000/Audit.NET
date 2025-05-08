@@ -207,7 +207,7 @@ namespace Audit.Wcf.UnitTest
             Assert.That(actionReplaced.IsFault, Is.True);
         }
 
-        public static IContextChannel GetServiceProxy(out ICatalogService svc, IAuditScopeFactory scopeFactory, AuditDataProvider dataProvider)
+        public static IContextChannel GetServiceProxy(out ICatalogService svc, IAuditScopeFactory scopeFactory, IAuditDataProvider dataProvider)
         {
 #if NET462_OR_GREATER
             var channelFactory = new ChannelFactory<ICatalogService>(new BasicHttpBinding(), new EndpointAddress("http://localhost:8733/Design_Time_Addresses/Audit.Wcf.UnitTest/CatalogService/"));

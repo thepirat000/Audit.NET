@@ -62,7 +62,7 @@ namespace Audit.Http
         /// <summary>
         /// Specifies the audit data provider to use. Default is NULL to use the globally configured data provider.
         /// </summary>
-        public AuditDataProvider AuditDataProvider { set => _config._auditDataProvider = value; }
+        public IAuditDataProvider AuditDataProvider { set => _config._auditDataProvider = value; }
         /// <summary>
         /// Specifies the Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
         /// </summary>

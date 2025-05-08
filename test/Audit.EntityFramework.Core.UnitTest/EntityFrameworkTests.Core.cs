@@ -1134,7 +1134,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
         [Test]
         public void Test_EF_Transaction()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             var auditEvents = new List<AuditEvent>();
             provider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent ev) =>
             {
@@ -1187,7 +1187,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
         [Test]
         public void Test_EF_Actions()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             AuditEvent auditEvent = null;
             provider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent ev) =>
             {
@@ -1252,7 +1252,7 @@ SET IDENTITY_INSERT Posts OFF
         [Test]
         public async Task Test_EF_Actions_Async()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             AuditEvent auditEvent = null;
             provider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync((AuditEvent ev, CancellationToken ct) =>
             {
@@ -1353,7 +1353,7 @@ SET IDENTITY_INSERT Posts OFF
         {
         }
 
-        public void SetDataProvider(AuditDataProvider dataProvider)
+        public void SetDataProvider(IAuditDataProvider dataProvider)
         {
             this.AuditDataProvider = dataProvider;
         }

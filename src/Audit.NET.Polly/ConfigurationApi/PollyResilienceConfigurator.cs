@@ -6,7 +6,7 @@ namespace Audit.Polly.Configuration
 {
     public class PollyResilienceConfigurator : IPollyResilienceConfigurator
     {
-        internal AuditDataProvider? _innerDataProvider;
+        internal IAuditDataProvider? _innerDataProvider;
         internal ResiliencePipeline<object>? _pipeline;
 
         public void WithResilience(Action<ResiliencePipelineBuilder<object>> resilienceBuilder)

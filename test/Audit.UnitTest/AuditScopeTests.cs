@@ -126,7 +126,7 @@ namespace Audit.UnitTest
         }
         
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void DoScope(AuditEvent auditEvent, AuditDataProvider dp)
+        private void DoScope(AuditEvent auditEvent, IAuditDataProvider dp)
         {
             using var scope = AuditScope.Create(c => c
                 .AuditEvent(auditEvent)
@@ -138,7 +138,7 @@ namespace Audit.UnitTest
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private async Task DoScopeAsync(AuditEvent auditEvent, AuditDataProvider dp)
+        private async Task DoScopeAsync(AuditEvent auditEvent, IAuditDataProvider dp)
         {
             using var scope = await AuditScope.CreateAsync(c => c
                 .AuditEvent(auditEvent)

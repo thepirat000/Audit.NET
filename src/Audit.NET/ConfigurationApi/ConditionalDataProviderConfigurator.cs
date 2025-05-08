@@ -9,7 +9,7 @@ namespace Audit.Core.ConfigurationApi
         internal List<ConditionalDataProvider.GuardCondition> _guardConditions = new List<ConditionalDataProvider.GuardCondition>();
 
         /// <inheritdoc />
-        public IConditionalDataProviderConfigurator When(Func<AuditEvent, bool> guardCondition, Func<AuditEvent, AuditDataProvider> dataProviderFactory)
+        public IConditionalDataProviderConfigurator When(Func<AuditEvent, bool> guardCondition, Func<AuditEvent, IAuditDataProvider> dataProviderFactory)
         {
             _guardConditions.Add(new ConditionalDataProvider.GuardCondition()
             {
@@ -21,7 +21,7 @@ namespace Audit.Core.ConfigurationApi
         }
 
         /// <inheritdoc />
-        public IConditionalDataProviderConfigurator When(Func<AuditEvent, bool> guardCondition, Func<AuditDataProvider> dataProviderInitializer)
+        public IConditionalDataProviderConfigurator When(Func<AuditEvent, bool> guardCondition, Func<IAuditDataProvider> dataProviderInitializer)
         {
             _guardConditions.Add(new ConditionalDataProvider.GuardCondition()
             {
@@ -33,7 +33,7 @@ namespace Audit.Core.ConfigurationApi
         }
 
         /// <inheritdoc />
-        public IConditionalDataProviderConfigurator When(Func<AuditEvent, bool> guardCondition, AuditDataProvider dataProvider)
+        public IConditionalDataProviderConfigurator When(Func<AuditEvent, bool> guardCondition, IAuditDataProvider dataProvider)
         {
             _guardConditions.Add(new ConditionalDataProvider.GuardCondition()
             {
@@ -45,7 +45,7 @@ namespace Audit.Core.ConfigurationApi
         }
 
         /// <inheritdoc />
-        public void Otherwise(Func<AuditEvent, AuditDataProvider> dataProviderFactory)
+        public void Otherwise(Func<AuditEvent, IAuditDataProvider> dataProviderFactory)
         {
             _guardConditions.Add(new ConditionalDataProvider.GuardCondition()
             {
@@ -55,7 +55,7 @@ namespace Audit.Core.ConfigurationApi
         }
 
         /// <inheritdoc />
-        public void Otherwise(Func<AuditDataProvider> dataProviderInitializer)
+        public void Otherwise(Func<IAuditDataProvider> dataProviderInitializer)
         {
             _guardConditions.Add(new ConditionalDataProvider.GuardCondition()
             {
@@ -65,7 +65,7 @@ namespace Audit.Core.ConfigurationApi
         }
 
         /// <inheritdoc />
-        public void Otherwise(AuditDataProvider dataProvider)
+        public void Otherwise(IAuditDataProvider dataProvider)
         {
             _guardConditions.Add(new ConditionalDataProvider.GuardCondition()
             {

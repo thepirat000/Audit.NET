@@ -11,6 +11,6 @@ namespace Audit.Polly.Configuration
         /// Sets the primary data provider to use
         /// </summary>
         /// <param name="primaryDataProvider">The primary data provider</param>
-        IPollyResilienceConfigurator DataProvider(AuditDataProvider primaryDataProvider);
+        IPollyResilienceConfigurator DataProvider(IAuditDataProvider primaryDataProvider);
     }
 }

@@ -30,7 +30,7 @@ namespace Audit.DynamicProxy
         /// <summary>
         /// Gets or sets the audit data provider to use.
         /// </summary>
-        public AuditDataProvider AuditDataProvider { get; set; }
+        public IAuditDataProvider AuditDataProvider { get; set; }
         /// <summary>
         /// Gets or sets the methods filter, a function that returns true for the methods to be included or false otherwise.
         /// By default all methods are included.

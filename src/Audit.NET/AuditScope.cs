@@ -91,7 +91,7 @@ namespace Audit.Core
         public AuditEvent Event => _event;
 
         /// <inheritdoc />
-        public AuditDataProvider DataProvider => _dataProvider;
+        public IAuditDataProvider DataProvider => _dataProvider;
 
         /// <inheritdoc />
         public object EventId => _eventId;
@@ -112,7 +112,7 @@ namespace Audit.Core
         private object _eventId;
         private bool _disposed;
         private bool _ended;
-        private readonly AuditDataProvider _dataProvider;
+        private readonly IAuditDataProvider _dataProvider;
         private readonly ISystemClock _systemClock;
         private Func<object> _targetGetter;
         private readonly IDictionary<string, object> _items;

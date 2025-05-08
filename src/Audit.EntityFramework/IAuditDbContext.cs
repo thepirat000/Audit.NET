@@ -41,7 +41,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// To indicate the Audit Data Provider to use. (Default is NULL to use the configured default data provider). 
         /// </summary>
-        AuditDataProvider AuditDataProvider { get; set; }
+        IAuditDataProvider AuditDataProvider { get; set; }
         /// <summary>
         /// To indicate a custom audit scope factory. (Default is NULL to use the Audit.Core.Configuration.DefaultAuditScopeFactory). 
         /// </summary>

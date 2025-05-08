@@ -56,7 +56,7 @@ namespace Audit.Mvc.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
@@ -130,7 +130,7 @@ namespace Audit.Mvc.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
@@ -210,7 +210,7 @@ namespace Audit.Mvc.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
@@ -275,7 +275,7 @@ namespace Audit.Mvc.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
@@ -345,7 +345,7 @@ namespace Audit.Mvc.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
@@ -425,7 +425,7 @@ namespace Audit.Mvc.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;

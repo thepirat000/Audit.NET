@@ -27,19 +27,19 @@ namespace Audit.Core
             return this;
         }
 
-        public IAuditScopeOptionsConfigurator DataProvider(AuditDataProvider dataProvider)
+        public IAuditScopeOptionsConfigurator DataProvider(IAuditDataProvider dataProvider)
         {
             _options.DataProvider = dataProvider;
             return this;
         }
 
-        public IAuditScopeOptionsConfigurator DataProviderLazyFactory(Func<AuditDataProvider> dataProviderFactory)
+        public IAuditScopeOptionsConfigurator DataProviderLazyFactory(Func<IAuditDataProvider> dataProviderFactory)
         {
             _options.DataProviderFactory = dataProviderFactory;
             return this;
         }
 
-        public IAuditScopeOptionsConfigurator DataProviderDeferredFactory(Func<AuditEvent, AuditDataProvider> dataProviderFactory)
+        public IAuditScopeOptionsConfigurator DataProviderDeferredFactory(Func<AuditEvent, IAuditDataProvider> dataProviderFactory)
         {
             _options.DataProvider = new DeferredDataProvider(dataProviderFactory);
             return this;

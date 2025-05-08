@@ -12,7 +12,7 @@ namespace Audit.Core
         /// <summary>
         /// Gets the data provider for this AuditScope instance.
         /// </summary>
-        AuditDataProvider DataProvider { get; }
+        IAuditDataProvider DataProvider { get; }
 
         /// <summary>
         /// Gets the event related to this scope.

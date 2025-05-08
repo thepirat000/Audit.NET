@@ -72,7 +72,7 @@ namespace Audit.FileSystem
         /// <summary>
         /// To indicate the Audit Data Provider to use. (Default is NULL to use the configured default data provider). 
         /// </summary>
-        public AuditDataProvider AuditDataProvider { get; set; }
+        public IAuditDataProvider AuditDataProvider { get; set; }
         /// <summary>
         /// Gets or sets the event creation policy to use. By default it will use the global Configuration.CreationPolicy.
         /// </summary>

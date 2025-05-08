@@ -12,7 +12,7 @@ namespace Audit.Polly
         /// </summary>
         /// <param name="args">The Polly's fallback action arguments</param>
         /// <param name="fallbackDataProvider">The Audit Data Provider instance to use for fallback</param>
-        public static async ValueTask<Outcome<object>> FallbackToDataProvider(this FallbackActionArguments<object> args, AuditDataProvider fallbackDataProvider)
+        public static async ValueTask<Outcome<object>> FallbackToDataProvider(this FallbackActionArguments<object> args, IAuditDataProvider fallbackDataProvider)
         {
             var auditEvent = args.Context.GetAuditEvent();
 

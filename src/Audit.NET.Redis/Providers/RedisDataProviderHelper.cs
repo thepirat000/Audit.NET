@@ -44,7 +44,7 @@ namespace Audit.Redis.Providers
         /// Returns a data provider that stores the events as Redis Strings.
         /// </summary>
         /// <param name="config">The redis string configuration.</param>
-        public AuditDataProvider AsString(Action<IRedisStringConfigurator> config)
+        public IAuditDataProvider AsString(Action<IRedisStringConfigurator> config)
         {
             var strConfig = new RedisStringConfigurator();
             config.Invoke(strConfig);
@@ -56,7 +56,7 @@ namespace Audit.Redis.Providers
         /// Returns a data provider that stores the events in Redis Hashes.
         /// </summary>
         /// <param name="config">The redis hash configuration.</param>
-        public AuditDataProvider AsHash(Action<IRedisHashConfigurator> config)
+        public IAuditDataProvider AsHash(Action<IRedisHashConfigurator> config)
         {
             var hashConfig = new RedisHashConfigurator();
             config.Invoke(hashConfig);
@@ -69,7 +69,7 @@ namespace Audit.Redis.Providers
         /// Returns a data provider that stores the events in Redis Lists.
         /// </summary>
         /// <param name="config">The redis list configuration.</param>
-        public AuditDataProvider AsList(Action<IRedisListConfigurator> config)
+        public IAuditDataProvider AsList(Action<IRedisListConfigurator> config)
         {
             var listConfig = new RedisListConfigurator();
             config.Invoke(listConfig);
@@ -82,7 +82,7 @@ namespace Audit.Redis.Providers
         /// Returns a data provider that stores the events in Redis Sorted Sets.
         /// </summary>
         /// <param name="config">The redis sorted set configuration.</param>
-        public AuditDataProvider AsSortedSet(Action<IRedisSortedSetConfigurator> config)
+        public IAuditDataProvider AsSortedSet(Action<IRedisSortedSetConfigurator> config)
         {
             var ssConfig = new RedisSortedSetConfigurator();
             config.Invoke(ssConfig);
@@ -96,7 +96,7 @@ namespace Audit.Redis.Providers
         /// Returns a data provider that sends the events to a Redis PubSub channel.
         /// </summary>
         /// <param name="config">The redis pub-sub configuration.</param>
-        public AuditDataProvider AsPubSub(Action<IRedisPubSubConfigurator> config)
+        public IAuditDataProvider AsPubSub(Action<IRedisPubSubConfigurator> config)
         {
             var pubConfig = new RedisPubSubConfigurator();
             config.Invoke(pubConfig);
@@ -107,7 +107,7 @@ namespace Audit.Redis.Providers
         /// Returns a data provider that adds the events to Redis Streams.
         /// </summary>
         /// <param name="config">The redis stream configuration.</param>
-        public AuditDataProvider AsStream(Action<IRedisStreamConfigurator> config)
+        public IAuditDataProvider AsStream(Action<IRedisStreamConfigurator> config)
         {
             var streamConfig = new RedisStreamConfigurator();
             config.Invoke(streamConfig);

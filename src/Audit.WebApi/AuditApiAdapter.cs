@@ -70,7 +70,8 @@ namespace Audit.WebApi
             var httpContext = contextWrapper.GetHttpContext(); 
 
             var scopeFactory = (httpContext?.GetService(typeof(IAuditScopeFactory)) as IAuditScopeFactory) ?? Core.Configuration.AuditScopeFactory;
-            var dataProvider = httpContext?.GetService(typeof(AuditDataProvider)) as AuditDataProvider;
+            var dataProvider = httpContext?.GetService(typeof(IAuditDataProvider)) as IAuditDataProvider 
+                               ?? httpContext?.GetService(typeof(AuditDataProvider)) as IAuditDataProvider;
 
             var options = new AuditScopeOptions()
             {

@@ -880,7 +880,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public List<CommandEvent> ScopeSavingCommands { get; set; } = new List<CommandEvent>();
         public List<CommandEvent> ScopeSavedCommands { get; set; } = new List<CommandEvent>();
 
-        public DbCommandInterceptContext_InheritingFromAuditDbContext(DbContextOptions opt, AuditDataProvider dataProvider, bool auditDisabled, string eventType, string customFieldValue) : base(opt)
+        public DbCommandInterceptContext_InheritingFromAuditDbContext(DbContextOptions opt, IAuditDataProvider dataProvider, bool auditDisabled, string eventType, string customFieldValue) : base(opt)
         {
             base.AuditDataProvider = dataProvider;
             base.AuditDisabled = auditDisabled;

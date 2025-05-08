@@ -14,7 +14,7 @@ namespace Audit.Core.Providers.Wrappers
         public class GuardCondition
         {
             public Func<AuditEvent, bool> Guard { get; set; }
-            public AuditDataProvider DataProvider { get; set; }
+            public IAuditDataProvider DataProvider { get; set; }
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Audit.Core.Providers.Wrappers
         /// <summary>
         /// Returns the data provider for a given audit event, or NULL if no condition is met.
         /// </summary>
-        protected virtual AuditDataProvider GetDataProvider(AuditEvent auditEvent)
+        protected virtual IAuditDataProvider GetDataProvider(AuditEvent auditEvent)
         {
             if (GuardConditions != null)
             {

@@ -10,7 +10,7 @@ namespace Audit.MongoClient.ConfigurationApi
         internal Func<CommandStartedEvent, bool> _commandFilter;
         internal Func<CommandStartedEvent, string> _eventTypePredicate;
         internal EventCreationPolicy? _eventCreationPolicy;
-        internal AuditDataProvider _auditDataProvider;
+        internal IAuditDataProvider _auditDataProvider;
         internal IAuditScopeFactory _auditScopeFactory;
 
         /// <inheritdoc />
@@ -63,7 +63,7 @@ namespace Audit.MongoClient.ConfigurationApi
         }
 
         /// <inheritdoc />
-        public IAuditMongoConfigurator AuditDataProvider(AuditDataProvider auditDataProvider)
+        public IAuditMongoConfigurator AuditDataProvider(IAuditDataProvider auditDataProvider)
         {
             _auditDataProvider = auditDataProvider;
             return this;

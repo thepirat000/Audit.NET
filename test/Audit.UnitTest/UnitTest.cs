@@ -815,7 +815,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_CustomAction_OnCreating()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             
             var eventType = "event type 1";
@@ -847,7 +847,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_CustomAction_OnSaving()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             //provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent e) => e.Comments);
             var eventType = "event type 1";
@@ -892,7 +892,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_CustomAction_OnSaving_Discard()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
@@ -913,7 +913,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_CustomAction_OnCreating_Double()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             var eventType = "event type 1";
             var target = "test";
@@ -943,7 +943,7 @@ namespace Audit.UnitTest
         [Test]
         public void TestSave()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
@@ -966,7 +966,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_Dispose()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
 
             using (var scope = new AuditScopeFactory().Create(null, null, EventCreationPolicy.InsertOnEnd, provider.Object))
             {
@@ -978,7 +978,7 @@ namespace Audit.UnitTest
         [Test]
         public void TestDiscard()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<string>(), It.IsAny<AuditEvent>())).CallBase();
             Core.Configuration.DataProvider = provider.Object;
             var target = "initial";
@@ -1001,7 +1001,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_EventCreationPolicy_InsertOnEnd()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnEnd, null))
             {
@@ -1015,7 +1015,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_EventCreationPolicy_InsertOnStartReplaceOnEnd()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
@@ -1029,7 +1029,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_EventCreationPolicy_InsertOnStartInsertOnEnd()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.InsertOnStartInsertOnEnd, null))
@@ -1043,7 +1043,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_EventCreationPolicy_Manual()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
             using (var scope = new AuditScopeFactory().Create("SomeEvent", () => "target", EventCreationPolicy.Manual, null))
@@ -1078,7 +1078,7 @@ namespace Audit.UnitTest
         [Test]
         public void Test_TwoScopes()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns(() => Guid.NewGuid());
             Core.Configuration.DataProvider = provider.Object;
             var scope1 = new AuditScopeFactory().Create(new AuditScopeOptions() { EventType = "SomeEvent1", ExtraFields = new { @class = "class value1", DATA = 111 }, CreationPolicy = EventCreationPolicy.Manual });

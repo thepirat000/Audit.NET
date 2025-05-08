@@ -18,7 +18,7 @@ namespace Audit.SignalR
         public Func<SignalrEventConnect, bool> ConnectEventsFilter { get; set; }
         public Func<SignalrEventDisconnect, bool> DisconnectEventsFilter { get; set; }
 
-        public AuditDataProvider? AuditDataProvider { get; set; }
+        public IAuditDataProvider? AuditDataProvider { get; set; }
         public EventCreationPolicy? CreationPolicy { get; set; }
         public string AuditEventType { get; set; }
         public bool AuditDisabled { get; set; }
@@ -171,7 +171,7 @@ namespace Audit.SignalR
             // Try to get IAuditScopeFactory / DataProvider as registered services
             var httpContext = signalrEvent.Hub.Context.GetHttpContext();
             var scopeFactory = httpContext?.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
-            var dataProvider = AuditDataProvider ?? httpContext?.RequestServices?.GetService<AuditDataProvider>();
+            var dataProvider = AuditDataProvider ?? httpContext?.RequestServices?.GetService<IAuditDataProvider>() ?? httpContext?.RequestServices?.GetService<AuditDataProvider>();
             
             var scope = await scopeFactory.CreateAsync(new AuditScopeOptions()
             {

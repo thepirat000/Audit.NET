@@ -403,7 +403,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         public List<TransactionEvent> ScopeSavingTransactions { get; set; } = new List<TransactionEvent>();
         public List<TransactionEvent> ScopeSavedTransactions { get; set; } = new List<TransactionEvent>();
 
-        public DbTransactionInterceptContext_InheritingFromAuditDbContext(DbContextOptions opt, AuditDataProvider dataProvider, bool auditDisabled, string eventType, string customFieldValue) : base(opt)
+        public DbTransactionInterceptContext_InheritingFromAuditDbContext(DbContextOptions opt, IAuditDataProvider dataProvider, bool auditDisabled, string eventType, string customFieldValue) : base(opt)
         {
             base.AuditDataProvider = dataProvider;
             base.AuditDisabled = auditDisabled;

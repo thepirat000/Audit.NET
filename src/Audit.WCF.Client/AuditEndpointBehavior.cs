@@ -29,7 +29,7 @@ namespace Audit.Wcf.Client
         /// <summary>
         /// The data provider to use. Default is NULL to use the globally configured AuditDataProvider.
         /// </summary>
-        public AuditDataProvider AuditDataProvider { get; set; }
+        public IAuditDataProvider AuditDataProvider { get; set; }
 
         public AuditEndpointBehavior()
         {

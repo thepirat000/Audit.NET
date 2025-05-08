@@ -23,7 +23,7 @@ namespace Audit.EntityFramework
         public virtual AuditOptionMode Mode { get; set; }
         public virtual Dictionary<string, object> ExtraFields { get; set; }
         public virtual Dictionary<Type, EfEntitySettings> EntitySettings { get; set; }
-        public virtual AuditDataProvider AuditDataProvider { get; set; }
+        public virtual IAuditDataProvider AuditDataProvider { get; set; }
         public virtual IAuditScopeFactory AuditScopeFactory { get; set; }
         public virtual void OnScopeCreated(IAuditScope auditScope) { }
         public virtual void OnScopeSaving(IAuditScope auditScope) { }

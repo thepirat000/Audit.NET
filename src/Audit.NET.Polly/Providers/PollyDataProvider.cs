@@ -15,7 +15,7 @@ namespace Audit.Polly.Providers
         /// <summary>
         /// The primary data provider
         /// </summary>
-        public AuditDataProvider? PrimaryDataProvider { get; set; }
+        public IAuditDataProvider? PrimaryDataProvider { get; set; }
 
         /// <summary>
         /// The resilience pipeline
@@ -34,7 +34,7 @@ namespace Audit.Polly.Providers
             PrimaryDataProvider = cfg._resilienceConfigurator._innerDataProvider;
         }
 
-        public PollyDataProvider(ResiliencePipeline<object> resiliencePipeline, AuditDataProvider primaryDataProvider)
+        public PollyDataProvider(ResiliencePipeline<object> resiliencePipeline, IAuditDataProvider primaryDataProvider)
         {
             ResiliencePipeline = resiliencePipeline;
             PrimaryDataProvider = primaryDataProvider;

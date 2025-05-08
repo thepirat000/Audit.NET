@@ -102,7 +102,7 @@ namespace Audit.Mvc
                 Action = auditAction
             };
             var scopeFactory = httpContext.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
-            var dataProvider = httpContext.RequestServices?.GetService<AuditDataProvider>();
+            var dataProvider = httpContext.RequestServices?.GetService<IAuditDataProvider>() ?? httpContext.RequestServices?.GetService<AuditDataProvider>();
 
             var auditScopeOptions = new AuditScopeOptions()
             {

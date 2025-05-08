@@ -9,9 +9,9 @@ namespace Audit.Core.Providers.Wrappers
     /// </summary>
     public class DeferredDataProvider : AuditDataProvider
     {
-        private Func<AuditEvent, AuditDataProvider> _factory;
+        private Func<AuditEvent, IAuditDataProvider> _factory;
 
-        public Func<AuditEvent, AuditDataProvider> Factory
+        public Func<AuditEvent, IAuditDataProvider> Factory
         {
             set => _factory = value;
         }
@@ -20,7 +20,7 @@ namespace Audit.Core.Providers.Wrappers
         {
         }
 
-        public DeferredDataProvider(Func<AuditEvent, AuditDataProvider> dataProviderFactory)
+        public DeferredDataProvider(Func<AuditEvent, IAuditDataProvider> dataProviderFactory)
         {
             _factory = dataProviderFactory;
         }
@@ -28,7 +28,7 @@ namespace Audit.Core.Providers.Wrappers
         /// <summary>
         /// Returns the data provider for a given audit event.
         /// </summary>
-        protected virtual AuditDataProvider GetDataProvider(AuditEvent auditEvent)
+        protected virtual IAuditDataProvider GetDataProvider(AuditEvent auditEvent)
         {
             return _factory.Invoke(auditEvent);
         }

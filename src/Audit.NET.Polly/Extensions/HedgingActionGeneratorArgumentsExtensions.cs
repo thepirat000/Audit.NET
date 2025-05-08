@@ -13,12 +13,12 @@ namespace Audit.Polly
         /// </summary>
         /// <param name="args">The Polly's hedging action arguments</param>
         /// <param name="hedgingDataProvider">The Audit Data Provider instance to use for hedging</param>
-        public static Func<ValueTask<Outcome<object>>> FallbackToDataProvider(this HedgingActionGeneratorArguments<object> args, AuditDataProvider hedgingDataProvider)
+        public static Func<ValueTask<Outcome<object>>> FallbackToDataProvider(this HedgingActionGeneratorArguments<object> args, IAuditDataProvider hedgingDataProvider)
         {
             return () => FallbackToDataProviderInternal(args, hedgingDataProvider);
         }
         
-        internal static async ValueTask<Outcome<object>> FallbackToDataProviderInternal(this HedgingActionGeneratorArguments<object> args, AuditDataProvider hedgingDataProvider)
+        internal static async ValueTask<Outcome<object>> FallbackToDataProviderInternal(this HedgingActionGeneratorArguments<object> args, IAuditDataProvider hedgingDataProvider)
         {
             var auditEvent = args.PrimaryContext.GetAuditEvent();
 

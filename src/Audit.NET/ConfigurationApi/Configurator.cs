@@ -54,12 +54,12 @@ namespace Audit.Core.ConfigurationApi
         {
             return UseDynamicProvider(config);
         }
-        public ICreationPolicyConfigurator UseDeferredFactory(Func<AuditEvent, AuditDataProvider> dataProviderFactory)
+        public ICreationPolicyConfigurator UseDeferredFactory(Func<AuditEvent, IAuditDataProvider> dataProviderFactory)
         {
             Configuration.DataProvider = new DeferredDataProvider(dataProviderFactory);
             return new CreationPolicyConfigurator();
         }
-        public ICreationPolicyConfigurator UseLazyFactory(Func<AuditDataProvider> dataProviderInitializer)
+        public ICreationPolicyConfigurator UseLazyFactory(Func<IAuditDataProvider> dataProviderInitializer)
         {
             Configuration.DataProvider = new LazyDataProvider(dataProviderInitializer);
             return new CreationPolicyConfigurator();
@@ -71,7 +71,7 @@ namespace Audit.Core.ConfigurationApi
             return new CreationPolicyConfigurator();
         }
 
-        public ICreationPolicyConfigurator Use(AuditDataProvider provider)
+        public ICreationPolicyConfigurator Use(IAuditDataProvider provider)
         {
             return UseCustomProvider(provider);
         }
@@ -96,7 +96,7 @@ namespace Audit.Core.ConfigurationApi
             Configuration.DataProvider = new FileDataProvider(config);
             return new CreationPolicyConfigurator();
         }
-        public ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider)
+        public ICreationPolicyConfigurator UseCustomProvider(IAuditDataProvider provider)
         {
             Configuration.DataProvider = provider;
             return new CreationPolicyConfigurator();

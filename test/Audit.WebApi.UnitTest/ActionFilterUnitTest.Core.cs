@@ -98,7 +98,7 @@ namespace Audit.WebApi.UnitTest
             httpContext.SetupGet(c => c.Items).Returns(() => itemsDict);
             httpContext.SetupGet(c => c.Response).Returns(() => httpResponse.Object);
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
 
             Mock<IServiceProvider> svcProvider = null;
@@ -107,7 +107,7 @@ namespace Audit.WebApi.UnitTest
                 Audit.Core.Configuration.DataProvider = null;
                 svcProvider = new Mock<IServiceProvider>();
                 svcProvider.Setup(s => s.GetService(It.IsAny<Type>()))
-                    .Returns((Type t) => t == typeof(AuditDataProvider) ? dataProvider.Object : null);
+                    .Returns((Type t) => t == typeof(IAuditDataProvider) ? dataProvider.Object : null);
 
                 httpContext.SetupGet(c => c.RequestServices).Returns(() => svcProvider.Object);
             }
@@ -277,7 +277,7 @@ namespace Audit.WebApi.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
@@ -351,7 +351,7 @@ namespace Audit.WebApi.UnitTest
             };
             var filters = new List<IFilterMetadata>();
             var controller = new Mock<Controller>();
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;

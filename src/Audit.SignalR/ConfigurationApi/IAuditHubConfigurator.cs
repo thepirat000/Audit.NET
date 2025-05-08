@@ -55,6 +55,6 @@ namespace Audit.SignalR.Configuration
         /// </summary>
         /// <param name="provider">The data provider to use for storing the events</param>
         /// <returns></returns>
-        IAuditHubConfigurator WithDataProvider(AuditDataProvider provider);
+        IAuditHubConfigurator WithDataProvider(IAuditDataProvider provider);
     }
 }

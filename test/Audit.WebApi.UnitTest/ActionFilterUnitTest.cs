@@ -117,7 +117,7 @@ namespace Audit.WebApi.UnitTest
                 { "test1", "value1" }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             
@@ -145,7 +145,7 @@ namespace Audit.WebApi.UnitTest
             if (injectDataProvider)
             {
                 Audit.Core.Configuration.DataProvider = null;
-                httpContext.Setup(h => h.GetService(typeof(AuditDataProvider)))
+                httpContext.Setup(h => h.GetService(typeof(IAuditDataProvider)))
                     .Returns(dataProvider.Object);
             }
             else
@@ -221,7 +221,7 @@ namespace Audit.WebApi.UnitTest
                 {"test1", "value1" }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
@@ -297,7 +297,7 @@ namespace Audit.WebApi.UnitTest
 
             var arg = new AuditEvent() { EventType = "TEST_REFERENCE_TYPE" };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
@@ -376,7 +376,7 @@ namespace Audit.WebApi.UnitTest
 
             var arg = new AuditEvent() { EventType = "TEST_REFERENCE_TYPE" };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => Task.FromResult(Guid.NewGuid()));
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;

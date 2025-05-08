@@ -222,15 +222,15 @@ namespace Audit.WCF.UnitTest
     public class OrderService_AsyncConcurrent_Test : OrderService, IOrderService
     {
         private IAuditScopeFactory _auditScopeFactory;
-        private AuditDataProvider _auditDataProvider;
+        private IAuditDataProvider _auditDataProvider;
 
-        public OrderService_AsyncConcurrent_Test(AuditDataProvider dp, IAuditScopeFactory auditScopeFactory)
+        public OrderService_AsyncConcurrent_Test(IAuditDataProvider dp, IAuditScopeFactory auditScopeFactory)
         {
             _auditDataProvider = dp;
             _auditScopeFactory = auditScopeFactory;
         }
 
-        public AuditDataProvider AuditDataProvider => _auditDataProvider;
+        public IAuditDataProvider AuditDataProvider => _auditDataProvider;
         public IAuditScopeFactory AuditScopeFactory => _auditScopeFactory;
     }
 

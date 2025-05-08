@@ -61,7 +61,7 @@ namespace Audit.Mvc.UnitTest
                 {"x", new AuditEvent(){ EventType="TEST_REFERENCE_TYPE" } }
             };
             
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
@@ -151,7 +151,7 @@ namespace Audit.Mvc.UnitTest
                 {"test1", "value1" }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.Manual;
@@ -235,7 +235,7 @@ namespace Audit.Mvc.UnitTest
                 {"test1", "value1" }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
@@ -325,7 +325,7 @@ namespace Audit.Mvc.UnitTest
                 {"test1", "value1" }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
@@ -412,7 +412,7 @@ namespace Audit.Mvc.UnitTest
                 {"x", new AuditAttribute(){ EventTypeName="TEST_REFERENCE_TYPE" } }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
@@ -485,7 +485,7 @@ namespace Audit.Mvc.UnitTest
                 {"x", new AuditEvent() { EventType = "TEST" } }
             };
 
-            var dataProvider = new Mock<AuditDataProvider>();
+            var dataProvider = new Mock<IAuditDataProvider>();
             dataProvider.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns(Guid.NewGuid());
             Audit.Core.Configuration.DataProvider = dataProvider.Object;
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;

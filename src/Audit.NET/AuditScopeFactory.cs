@@ -112,7 +112,7 @@ namespace Audit.Core
         /// <param name="creationPolicy">The event creation policy to use.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public IAuditScope Create(string eventType, Func<object> target, EventCreationPolicy creationPolicy, AuditDataProvider dataProvider)
+        public IAuditScope Create(string eventType, Func<object> target, EventCreationPolicy creationPolicy, IAuditDataProvider dataProvider)
         {
             var options = new AuditScopeOptions() { EventType = eventType, TargetGetter = target, DataProvider = dataProvider, CreationPolicy = creationPolicy };
             OnConfiguring(options);
@@ -130,7 +130,7 @@ namespace Audit.Core
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider, CancellationToken cancellationToken = default)
+        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, EventCreationPolicy? creationPolicy, IAuditDataProvider dataProvider, CancellationToken cancellationToken = default)
         {
             var options = new AuditScopeOptions() { EventType = eventType, TargetGetter = target, DataProvider = dataProvider, CreationPolicy = creationPolicy };
             OnConfiguring(options);
@@ -148,7 +148,7 @@ namespace Audit.Core
         /// <param name="creationPolicy">The event creation policy to use. NULL to use the configured default policy.</param>
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public IAuditScope Create(string eventType, Func<object> target, object extraFields, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider)
+        public IAuditScope Create(string eventType, Func<object> target, object extraFields, EventCreationPolicy? creationPolicy, IAuditDataProvider dataProvider)
         {
             var options = new AuditScopeOptions() { EventType = eventType, TargetGetter = target, ExtraFields = extraFields, DataProvider = dataProvider, CreationPolicy = creationPolicy };
             OnConfiguring(options);
@@ -166,7 +166,7 @@ namespace Audit.Core
         /// <param name="dataProvider">The data provider to use. NULL to use the configured default data provider.</param>
         /// <param name="cancellationToken">The Cancellation Token.</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, object extraFields, EventCreationPolicy? creationPolicy, AuditDataProvider dataProvider, CancellationToken cancellationToken = default)
+        public async Task<IAuditScope> CreateAsync(string eventType, Func<object> target, object extraFields, EventCreationPolicy? creationPolicy, IAuditDataProvider dataProvider, CancellationToken cancellationToken = default)
         {
             var options = new AuditScopeOptions() { EventType = eventType, TargetGetter = target, ExtraFields = extraFields, DataProvider = dataProvider, CreationPolicy = creationPolicy };
             OnConfiguring(options);

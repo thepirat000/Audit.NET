@@ -23,7 +23,7 @@ namespace Audit.UnitTest
         {
             int getProviderCount = 0;
 
-            AuditDataProvider GetProvider()
+            IAuditDataProvider GetProvider()
             {
                 getProviderCount++;
                 return new NullDataProvider();
@@ -70,7 +70,7 @@ namespace Audit.UnitTest
         {
             int getProviderCount = 0;
 
-            AuditDataProvider GetProvider()
+            IAuditDataProvider GetProvider()
             {
                 getProviderCount++;
                 return new NullDataProvider();
@@ -93,7 +93,7 @@ namespace Audit.UnitTest
         {
             int getProviderCount = 0;
 
-            AuditDataProvider GetProvider()
+            IAuditDataProvider GetProvider()
             {
                 getProviderCount++;
                 return new NullDataProvider();

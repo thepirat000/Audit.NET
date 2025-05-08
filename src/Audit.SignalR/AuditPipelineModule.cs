@@ -24,7 +24,7 @@ namespace Audit.SignalR
         public Func<SignalrEventReconnect, bool> ReconnectEventsFilter { get; set; }
         public Func<SignalrEventError, bool> ErrorEventsFilter { get; set; }
 
-        public AuditDataProvider AuditDataProvider { get; set; }
+        public IAuditDataProvider AuditDataProvider { get; set; }
         public IAuditScopeFactory AuditScopeFactory { get; set; }
         public EventCreationPolicy? CreationPolicy { get; set; }
         public string AuditEventType { get; set; }
@@ -34,7 +34,7 @@ namespace Audit.SignalR
 
         public AuditPipelineModule() { }
 
-        public AuditPipelineModule(AuditDataProvider dataProvider = null, EventCreationPolicy? creationPolicy = null,
+        public AuditPipelineModule(IAuditDataProvider dataProvider, EventCreationPolicy? creationPolicy = null,
             string auditEventType = null, bool includeHeaders = false, bool includeQueryString = false, bool auditDisabled = false, IAuditScopeFactory auditScopeFactory = null)
         {
             AuditDataProvider = dataProvider;

@@ -29,7 +29,7 @@ namespace Audit.Core
         /// <summary>
         /// Sets the Default data provider as a factory method that will be invoked the first time it's needed and only once. This is a shortcut to set a LazyDataProvider.
         /// </summary>
-        public static Func<AuditDataProvider> DataProviderFactory 
+        public static Func<IAuditDataProvider> DataProviderFactory 
         {
             set => DataProvider = new LazyDataProvider(value);
         }
@@ -37,13 +37,13 @@ namespace Audit.Core
         /// <summary>
         /// Gets or Sets the Default data provider instance.
         /// </summary>
-        public static AuditDataProvider DataProvider { get; set; }
+        public static IAuditDataProvider DataProvider { get; set; }
 
         /// <summary>
         /// Gets the Default data provider instance as the specified type. Returns null if the data provider is not of the given type.
         /// </summary>
-        /// <typeparam name="T">The AuditDataProvider type</typeparam>
-        public static T DataProviderAs<T>() where T : AuditDataProvider { return DataProvider as T; } 
+        /// <typeparam name="T">The IAuditDataProvider type</typeparam>
+        public static T DataProviderAs<T>() where T : class, IAuditDataProvider { return DataProvider as T; } 
 
         /// <summary>
         /// Gets or Sets a value that indicates if the logged Type Names should include the namespace. Default is false.

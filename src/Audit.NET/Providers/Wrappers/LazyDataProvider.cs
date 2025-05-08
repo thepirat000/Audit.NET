@@ -9,23 +9,23 @@ namespace Audit.Core.Providers.Wrappers
     /// </summary>
     public class LazyDataProvider : AuditDataProvider
     {
-        private Lazy<AuditDataProvider> _factory;
+        private Lazy<IAuditDataProvider> _factory;
 
-        public Func<AuditDataProvider> Factory
+        public Func<IAuditDataProvider> Factory
         {
-            set => _factory = new Lazy<AuditDataProvider>(value);
+            set => _factory = new Lazy<IAuditDataProvider>(value);
         }
 
         public LazyDataProvider()
         {
         }
 
-        public LazyDataProvider(Func<AuditDataProvider> dataProviderFactory)
+        public LazyDataProvider(Func<IAuditDataProvider> dataProviderFactory)
         {
-            _factory = new Lazy<AuditDataProvider>(dataProviderFactory);
+            _factory = new Lazy<IAuditDataProvider>(dataProviderFactory);
         }
 
-        protected virtual AuditDataProvider GetDataProvider()
+        protected virtual IAuditDataProvider GetDataProvider()
         {
             return _factory.Value;
         }

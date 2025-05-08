@@ -25,7 +25,7 @@ namespace Audit.UnitTest
         public void Test_Retry_With_Fallback()
         {
             // Arrange
-            var fallbackDataProvider = new Mock<AuditDataProvider>();
+            var fallbackDataProvider = new Mock<IAuditDataProvider>();
 
             var predicateBuilder = new PredicateBuilder().Handle<Exception>();
 

@@ -25,13 +25,13 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent() { EventType = eventType };
 
-            var dp_1 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1.Setup(x => x.InsertEvent(auditEvent)).Returns((object)null);
 
-            var dp_2 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2.Setup(x => x.InsertEvent(auditEvent)).Returns((object)null);
 
-            var dp_3 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_3 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_3.Setup(x => x.InsertEvent(auditEvent)).Returns((object)null);
 
             var conditionalDataProvider = new ConditionalDataProvider(config => config
@@ -56,13 +56,13 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent() { EventType = eventType };
 
-            var dp_1 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1.Setup(x => x.InsertEventAsync(auditEvent, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
 
-            var dp_2 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2.Setup(x => x.InsertEventAsync(auditEvent, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
 
-            var dp_3 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_3 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_3.Setup(x => x.InsertEventAsync(auditEvent, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
 
             var conditionalDataProvider = new ConditionalDataProvider(config => config
@@ -87,13 +87,13 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent() { EventType = eventType };
 
-            var dp_1 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1.Setup(x => x.ReplaceEvent(It.IsAny<object>(), auditEvent));
 
-            var dp_2 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2.Setup(x => x.ReplaceEvent(It.IsAny<object>(), auditEvent));
 
-            var dp_3 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_3 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_3.Setup(x => x.ReplaceEvent(It.IsAny<object>(), auditEvent));
 
             var conditionalDataProvider = new ConditionalDataProvider(config => config
@@ -119,13 +119,13 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent() { EventType = eventType };
 
-            var dp_1 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1.Setup(x => x.ReplaceEventAsync(It.IsAny<object>(), auditEvent, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
 
-            var dp_2 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2.Setup(x => x.ReplaceEventAsync(It.IsAny<object>(), auditEvent, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
 
-            var dp_3 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_3 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_3.Setup(x => x.ReplaceEventAsync(It.IsAny<object>(), auditEvent, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
 
             var conditionalDataProvider = new ConditionalDataProvider(config => config
@@ -146,13 +146,13 @@ namespace Audit.UnitTest
         public void Test_Creation_Strategies()
         {
             // Arrange
-            var dp_1_direct = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1_direct = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1_direct.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns((object)null);
 
-            var dp_2_factory = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2_factory = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2_factory.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns((object)null);
 
-            var dp_3_lazy = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_3_lazy = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_3_lazy.Setup(x => x.InsertEvent(It.IsAny<AuditEvent>())).Returns((object)null);
 
             var dcount = 0;
@@ -197,10 +197,10 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent() { EventType = "B" };
 
-            var dp_1 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1.Setup(x => x.CloneValue("test", auditEvent)).Returns((object)null);
 
-            var dp_2 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2.Setup(x => x.CloneValue("test", auditEvent)).Returns((object)null);
 
             var conditionalDataProvider = new ConditionalDataProvider(config => config
@@ -222,10 +222,10 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
 
-            var dp_1 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_1 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_1.Setup(x => x.GetEvent<AuditEvent>("test")).Returns(auditEvent);
 
-            var dp_2 = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp_2 = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp_2.Setup(x => x.GetEvent<AuditEvent>("test")).Returns(auditEvent);
 
             var conditionalDataProvider = new ConditionalDataProvider(config => config
@@ -246,7 +246,7 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
 
-            var dp = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp.Setup(x => x.GetEventAsync<AuditEvent>(1, It.IsAny<CancellationToken>())).Returns(Task.FromResult(auditEvent));
 
             int count = 0;

@@ -12,7 +12,7 @@ namespace Audit.DynamicProxy.UnitTest
         [Test]
         public void Test_Concurrency()
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             var real = new InterceptTest();
             var intercepted = AuditProxy.Create(real, new InterceptionSettings() { AuditDataProvider = provider.Object });
             intercepted.M1(Guid.NewGuid());

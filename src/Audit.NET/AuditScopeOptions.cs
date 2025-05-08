@@ -29,7 +29,7 @@ namespace Audit.Core
         /// <summary>
         /// Sets the data provider as a factory method that will be invoked the first time it's needed and only once. This is a shortcut to set a LazyDataProvider.
         /// </summary>
-        public Func<AuditDataProvider> DataProviderFactory 
+        public Func<IAuditDataProvider> DataProviderFactory 
         {
             set => DataProvider = new LazyDataProvider(value);
         }
@@ -37,7 +37,7 @@ namespace Audit.Core
         /// <summary>
         /// Gets or sets the data provider to use.
         /// </summary>
-        public AuditDataProvider DataProvider { get; set; }
+        public IAuditDataProvider DataProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the event creation policy to use. When NULL, it will use the static Audit.Core.Configuration.CreationPolicy.

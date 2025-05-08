@@ -124,7 +124,7 @@ namespace Audit.WebApi
             };
             
             var scopeFactory = context.RequestServices?.GetService<IAuditScopeFactory>() ?? Core.Configuration.AuditScopeFactory;
-            var dataProvider = context.RequestServices?.GetService<AuditDataProvider>();
+            var dataProvider = context.RequestServices?.GetService<IAuditDataProvider>() ?? context.RequestServices?.GetService<AuditDataProvider>();
 
             var auditScope = await scopeFactory.CreateAsync(new AuditScopeOptions()
             {

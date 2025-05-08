@@ -185,7 +185,7 @@ namespace Audit.WCF.UnitTest
         [TestCase(6, 10)]
         public async Task WCFTest_Concurrency_AuditScopeAsync(int threads, int callsPerThread)
         {
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             provider.Setup(p => p.CloneValue(It.IsAny<object>(), It.IsAny<AuditEvent>())).CallBase();
             var bag = new ConcurrentBag<string>();
             provider.Setup(p => p.InsertEvent(It.IsAny<AuditEvent>())).Returns((AuditEvent ev) =>

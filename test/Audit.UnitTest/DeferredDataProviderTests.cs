@@ -23,7 +23,7 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
 
-            var dp = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp.Setup(x => x.InsertEvent(auditEvent)).Returns((object)null);
             dp.Setup(x => x.ReplaceEvent(It.IsAny<object>(), auditEvent));
 
@@ -53,7 +53,7 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
 
-            var dp = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp.Setup(x => x.InsertEventAsync(auditEvent, It.IsAny<CancellationToken>())).ReturnsAsync((object)null);
             dp.Setup(x => x.ReplaceEventAsync(It.IsAny<object>(), auditEvent, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
@@ -85,7 +85,7 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
             
-            var dp = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp.Setup(x => x.CloneValue("test", auditEvent)).Returns((object)null);
 
             int count = 0;
@@ -114,7 +114,7 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
 
-            var dp = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp.Setup(x => x.GetEvent<AuditEvent>(1)).Returns(auditEvent);
 
             int count = 0;
@@ -142,7 +142,7 @@ namespace Audit.UnitTest
             // Arrange
             var auditEvent = new AuditEvent();
 
-            var dp = new Mock<AuditDataProvider>(MockBehavior.Strict);
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
             dp.Setup(x => x.GetEventAsync<AuditEvent>(1, It.IsAny<CancellationToken>())).Returns(Task.FromResult(auditEvent));
 
             int count = 0;

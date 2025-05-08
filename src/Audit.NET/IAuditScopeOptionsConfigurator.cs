@@ -24,15 +24,15 @@ namespace Audit.Core
         /// <summary>
         /// Sets the data provider to use within this scope.
         /// </summary>
-        IAuditScopeOptionsConfigurator DataProvider(AuditDataProvider dataProvider);
+        IAuditScopeOptionsConfigurator DataProvider(IAuditDataProvider dataProvider);
         /// <summary>
         /// Use a deferred factory to resolve the data provider for each audit event. The factory will be called for each individual Audit Event to be saved. This is a shortcut to set a DeferredDataProvider.
         /// </summary>
-        IAuditScopeOptionsConfigurator DataProviderDeferredFactory(Func<AuditEvent, AuditDataProvider> dataProviderFactory);
+        IAuditScopeOptionsConfigurator DataProviderDeferredFactory(Func<AuditEvent, IAuditDataProvider> dataProviderFactory);
         /// <summary>
         /// Sets the data provider factory to use within this scope. The initializer method will be invoked the first time it's needed and only once. This is a shortcut to set a LazyDataProvider.
         /// </summary>
-        IAuditScopeOptionsConfigurator DataProviderLazyFactory(Func<AuditDataProvider> dataProviderFactory);
+        IAuditScopeOptionsConfigurator DataProviderLazyFactory(Func<IAuditDataProvider> dataProviderFactory);
         /// <summary>
         /// To indicate whether this scope should be immediately saved after creation
         /// </summary>

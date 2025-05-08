@@ -76,7 +76,7 @@ namespace Audit.Core.ConfigurationApi
         /// Use a custom provider for the event output.
         /// </summary>
         /// <param name="provider">The data provider instance to use</param>
-        ICreationPolicyConfigurator UseCustomProvider(AuditDataProvider provider);
+        ICreationPolicyConfigurator UseCustomProvider(IAuditDataProvider provider);
 
         /// <summary>
         /// Shortcut for UseDynamicProvider, to use a dynamic custom provider for the event output.
@@ -88,14 +88,14 @@ namespace Audit.Core.ConfigurationApi
         /// The factory will be called for each individual Audit Event to be saved.
         /// </summary>
         /// <param name="dataProviderFactory">The data provider factory to use. A delegate that is invoked to instantiate a Data Provider based on the Audit Event information</param>
-        ICreationPolicyConfigurator UseDeferredFactory(Func<AuditEvent, AuditDataProvider> dataProviderFactory);
+        ICreationPolicyConfigurator UseDeferredFactory(Func<AuditEvent, IAuditDataProvider> dataProviderFactory);
 
         /// <summary>
         /// Use a lazy initializer to create the data provider. 
         /// The factory method is invoked the first time it's needed and only once.
         /// </summary>
         /// <param name="dataProviderInitializer">The data provider initializer to use. A delegate that is invoked only once to instantiate a Data Provider</param>
-        ICreationPolicyConfigurator UseLazyFactory(Func<AuditDataProvider> dataProviderInitializer);
+        ICreationPolicyConfigurator UseLazyFactory(Func<IAuditDataProvider> dataProviderInitializer);
 
         /// <summary>
         /// Use a conditional data provider wrapper that facilitates the configuration of data providers based on the audit event information.
@@ -106,7 +106,7 @@ namespace Audit.Core.ConfigurationApi
         /// <summary>
         /// Shortcut for UseCustomProvider, to use a custom provider instance for the event output.
         /// </summary>
-        ICreationPolicyConfigurator Use(AuditDataProvider provider);
+        ICreationPolicyConfigurator Use(IAuditDataProvider provider);
 
         /// <summary>
         /// Store the events in memory in a thread-safe list. Useful for testing purposes.

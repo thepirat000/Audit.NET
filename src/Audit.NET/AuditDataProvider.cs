@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 namespace Audit.Core
 {
     /// <summary>
-    /// Base class for the persistence classes.
+    /// Base class for the Audit Data Providers that are responsible for saving and retrieving audit events.
     /// </summary>
-    public abstract class AuditDataProvider
+    public abstract class AuditDataProvider : IAuditDataProvider
     {
         /// <summary>
         /// Override this method to provide a different cloning method for the values that need to be pre-serialized before saving.
@@ -17,7 +17,7 @@ namespace Audit.Core
         /// <param name="auditEvent">The audit event associated to the value being serialized</param>
         public virtual object CloneValue<T>(T value, AuditEvent auditEvent)
         {
-            if (value == null)
+            if (value is null)
             {
                 return null;
             }

@@ -374,11 +374,11 @@ namespace Audit.EntityFramework
 #endif
         }
 
-        internal AuditDataProvider GetDataProvider(DbContext dbContext)
+        internal IAuditDataProvider GetDataProvider(DbContext dbContext)
         {
             var auditDbContext = dbContext as IAuditDbContext;
 #if EF_CORE
-            return auditDbContext?.AuditDataProvider ?? TryGetService<AuditDataProvider>(dbContext);
+            return auditDbContext?.AuditDataProvider ?? TryGetService<IAuditDataProvider>(dbContext) ?? TryGetService<AuditDataProvider>(dbContext);
 #else
             return auditDbContext?.AuditDataProvider;
 #endif

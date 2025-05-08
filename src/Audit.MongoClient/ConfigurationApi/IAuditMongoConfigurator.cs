@@ -47,7 +47,7 @@ namespace Audit.MongoClient.ConfigurationApi
         /// <summary>
         /// Specifies the audit data provider to use. Default is NULL to use the globally configured data provider.
         /// </summary>
-        IAuditMongoConfigurator AuditDataProvider(AuditDataProvider auditDataProvider);
+        IAuditMongoConfigurator AuditDataProvider(IAuditDataProvider auditDataProvider);
 
         /// <summary>
         /// Specifies the Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.

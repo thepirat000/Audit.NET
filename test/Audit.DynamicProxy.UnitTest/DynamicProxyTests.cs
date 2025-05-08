@@ -197,7 +197,7 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var real = new InterceptMe("test");
             var guid = Guid.NewGuid().ToString();
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
             var x = AuditProxy.Create<IInterceptMe>(real, null);
@@ -213,7 +213,7 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var real = new InterceptMe("test");
             var guid = Guid.NewGuid().ToString();
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
             var x = AuditProxy.Create<IInterceptMe>(real, new InterceptionSettings() { IgnoreEvents = true });
@@ -230,7 +230,7 @@ namespace Audit.DynamicProxy.UnitTest
         {
             var real = new InterceptMe("test");
             var guid = Guid.NewGuid().ToString();
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
             var x = AuditProxy.Create<IInterceptMe>(real, new InterceptionSettings() { IgnoreEvents = true });
@@ -248,7 +248,7 @@ namespace Audit.DynamicProxy.UnitTest
             var real = new InterceptMe("");
             var realMocked = new Mock<InterceptMe>();
             realMocked.Setup(_ => _.IamVirtual()).Throws(new ArgumentOutOfRangeException("test exception"));
-            var provider = new Mock<AuditDataProvider>();
+            var provider = new Mock<IAuditDataProvider>();
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(provider.Object);
             var x = AuditProxy.Create<InterceptMe>(realMocked.Object);

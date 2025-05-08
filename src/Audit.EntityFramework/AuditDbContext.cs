@@ -101,7 +101,7 @@ namespace Audit.EntityFramework
         public virtual AuditOptionMode Mode { get; set; }
 
         /// <inheritdoc/>
-        public virtual AuditDataProvider AuditDataProvider { get; set; }
+        public virtual IAuditDataProvider AuditDataProvider { get; set; }
 
         /// <inheritdoc/>
         public virtual IAuditScopeFactory AuditScopeFactory { get; set; }

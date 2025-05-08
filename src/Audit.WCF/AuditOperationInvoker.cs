@@ -68,7 +68,7 @@ namespace Audit.WCF
                 EventType = eventType,
                 CreationPolicy = _creationPolicy,
                 AuditEvent = auditEventWcf,
-                DataProvider = GetProperty<AuditDataProvider>(instance, "AuditDataProvider"),
+                DataProvider = GetProperty<IAuditDataProvider>(instance, "AuditDataProvider"),
                 CallingMethod = _operationDescription.SyncMethod ?? _operationDescription.TaskMethod
             }))
             {
@@ -116,7 +116,7 @@ namespace Audit.WCF
                 EventType = eventType,
                 CreationPolicy = _creationPolicy,
                 AuditEvent = auditEventWcf,
-                DataProvider = GetProperty<AuditDataProvider>(instance, "AuditDataProvider"),
+                DataProvider = GetProperty<IAuditDataProvider>(instance, "AuditDataProvider"),
                 CallingMethod = _operationDescription.SyncMethod ?? _operationDescription.TaskMethod
             });
             // Store a reference to this audit scope
