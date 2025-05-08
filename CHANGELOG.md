@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [29.0.1] - 2025-05-08:
+- **Audit.NET**: Change in ActivityDataProvider to set the current Activity to the AuditScope activity when present. This ensures the use of the AusitScope Activity as a parent for the child activity created by the data provider.
+
 ## [29.0.0] - 2025-05-06:
 - **Audit.EntityFramework (Breaking change):** The `SaveChanges` interceptor and `AuditDbContext` will now honor the configured `EventCreationPolicy` (default is `InsertOnEnd`).
 This allows to save the audit event **before** or **after** the entity persistence operation.
