@@ -27,13 +27,6 @@ jobs:
        
     - name: Checkout
       uses: actions/checkout@v3
-      
-    - name: Test ST
-      shell: pwsh
-      run: |
-        $secret = $Env:SONAR_TOKEN
-        $suffix = $secret.Substring($secret.Length - 4)
-        Write-Host "suffix: $suffix"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -72,12 +65,12 @@ jobs:
           /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**" `
           /d:sonar.coverage.exclusions="**/templates/**"
 
-    # - name: Install SQL Server
-    #   uses: Particular/install-sql-server-action@v1.0.0
-    #   with:
-    #     connection-string-env-var: SQL_SERVER_CONNECTION_STRING
-    #     catalog: Audit
-    #     extra-params: "Encrypt=False;"
+    - name: Install SQL Server
+      uses: Particular/install-sql-server-action@v1.0.0
+      with:
+        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
+        catalog: Audit
+        extra-params: "Encrypt=False;"
 
     - name: Dotnet Restore 
       run: dotnet restore
@@ -87,8 +80,7 @@ jobs:
 
     - name: Run tests
       run: |
-        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
-        dotnet test .\test\Audit.Mvc.UnitTest --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
