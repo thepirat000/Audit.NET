@@ -13,10 +13,8 @@ on:
 env:
   AUDIT_NET_AZUREDOCDBAUTHKEY: ${{ secrets.AUDIT_NET_AZUREDOCDBAUTHKEY }}
   AUDIT_NET_AZUREDOCDBURL: ${{ secrets.AUDIT_NET_AZUREDOCDBURL }}
-  AUDIT_NET_AZURETABLECNNSTRING: ${{ secrets.AUDIT_NET_AZURETABLECNNSTRING }}
+  AUDIT_NET_AZURETABLECNNSTRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
   AUDIT_NET_AZUREBLOBSERVICEURL: ${{ secrets.AUDIT_NET_AZUREBLOBSERVICEURL }}
-  AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
-  AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
@@ -41,7 +39,7 @@ jobs:
         $conn = '${{ steps.azurite.outputs.connstring }}'
 
         # 2. Persist the full connection string
-        "AZURITE_CNNSTRING=$conn" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+        "AUDIT_NET_AZUREBLOBCNNSTRING=$conn" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
 
         # 3. Split and extract AccountName and AccountKey
         $parts = $conn -split ';'
@@ -49,16 +47,16 @@ jobs:
         $key   = ($parts | Where-Object { $_ -like 'AccountKey=*'  }) -replace 'AccountKey=', ''
 
         # 4. Persist each extracted value
-        "AZURITE_ACCOUNTNAME=$name" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-        "AZURITE_ACCOUNTKEY=$key"   | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+        "AUDIT_NET_AZUREBLOBACCOUNTNAME=$name" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+        "AUDIT_NET_AZUREBLOBACCOUNTKEY=$key"   | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Show Azurite variables
+    - name: Display Azurite variables
       run: |
-        echo "$Env:AZURITE_ACCOUNTNAME"
-        echo "$Env:AZURITE_ACCOUNTKEY"
-        echo "$Env:AZURITE_CNNSTRING"
+        echo "AUDIT_NET_AZUREBLOBACCOUNTNAME = $Env:AUDIT_NET_AZUREBLOBACCOUNTNAME"
+        echo "AUDIT_NET_AZUREBLOBACCOUNTKEY = $Env:AUDIT_NET_AZUREBLOBACCOUNTKEY"
+        echo "AUDIT_NET_AZUREBLOBCNNSTRING = $Env:AUDIT_NET_AZUREBLOBCNNSTRING"
+        echo "AUDIT_NET_AZURETABLECNNSTRING = $Env:AUDIT_NET_AZURETABLECNNSTRING"
       shell: pwsh
-
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -112,11 +110,11 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer|TestCategory=Azure" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
+        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: SonarScanner End
       shell: pwsh
