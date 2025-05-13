@@ -2,16 +2,15 @@
 $ErrorActionPreference = 'Stop'
 cls
 
-[xml]$doc = Get-Content -Path "./Directory.Build.props"
-$version = $doc.Project.PropertyGroup.Version
-
-
 try {
+    [xml]$doc = Get-Content -Path "./Directory.Build.props"
+    $version = $doc.Project.PropertyGroup.Version
+
     # start Sonar analysis
     dotnet sonarscanner begin `
         /k:'Audit.NET-local' `
         "/d:sonar.host.url=http://localhost:9000" `
-        "/d:sonar.projectVersion=$version" `
+        "/v:$version" `
         "/d:sonar.token=$env:LOCAL_SONAR_TOKEN" `
         "/d:sonar.cs.vstest.reportsPaths=/test/TestResult/**/*.trx" `
         "/d:sonar.cs.opencover.reportsPaths=/test/TestResult/**/*.xml" `

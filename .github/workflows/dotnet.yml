@@ -52,10 +52,14 @@ jobs:
       shell: pwsh
       run: |
         & dotnet sonarscanner begin `
+          /o:"thepirat000" `
           /k:"Audit.NET" `
           /d:sonar.host.url="https://sonarcloud.io" `
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
-          /o:"thepirat000"
+          /d:sonar.cs.vstest.reportsPaths="/test/TestResult/**/*.trx" `
+          /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.xml" `
+          /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**" `
+          /d:sonar.coverage.exclusions="**/templates/**"
 
     - name: Install SQL Server
       uses: Particular/install-sql-server-action@v1.0.0
@@ -89,8 +93,10 @@ jobs:
         dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: SonarScanner End
-      run: dotnet sonarscanner end \
-        /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+      shell: pwsh
+      run: |
+        & dotnet sonarscanner end \ `
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4
