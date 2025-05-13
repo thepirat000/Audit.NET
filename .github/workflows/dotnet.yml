@@ -45,8 +45,11 @@ jobs:
       with:
         nuget-version: '6.x'      
 
-    - name: Install SonarScanner for .NET
-      run: dotnet tool install --global dotnet-sonarscanner --version 5.15.0
+    - name: Install Required Tools
+      run: |
+        dotnet new tool-manifest
+        dotnet tool install dotnet-reportgenerator-globaltool
+        dotnet tool install --global dotnet-sonarscanner --version 10.1.2
 
     - name: SonarScanner Begin
       shell: pwsh
@@ -72,13 +75,7 @@ jobs:
       run: dotnet restore
       
     - name: Dotnet Build Audit.NET.sln
-      run: dotnet build .\Audit.NET.sln --no-restore --configuration release
-
-    - name: Install Required Tools
-      run: |
-        dotnet new tool-manifest
-        dotnet tool install dotnet-reportgenerator-globaltool
-        # dotnet tool install dotnet-coverage
+      run: dotnet build .\Audit.NET.sln --no-restore -c release
 
     - name: Run tests
       run: |
@@ -99,10 +96,10 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coveragereport
-        path: ${{ github.workspace }}/Tests/coveragereport
+        path: ${{ github.workspace }}\Tests\coveragereport
     
     - name: Rename summary coverage file
-      run: mv -force "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
+      run: mv -force "${{ github.workspace }}\Tests\coveragereport\Summary.md" "${{ github.workspace }}\CODE_COVERAGE.md"
 
     - name: Commit CODE_COVERAGE.md
       uses: stefanzweifel/git-auto-commit-action@v5

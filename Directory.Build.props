@@ -8,10 +8,6 @@
 
 	<Choose>
 		<When Condition="$(MSBuildProjectName.Contains('UnitTest'))">
-			<ItemGroup>
-				<VSTestLogger Include="trx;LogFileName=$(MSBuildProjectName).trx" />
-			</ItemGroup>
-
 			<PropertyGroup>
 				<IsTestProject>True</IsTestProject>
 			
