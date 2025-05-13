@@ -1,8 +1,32 @@
 <Project>
- <PropertyGroup>
-	 <Version>29.0.1</Version>
-	 <PackageReleaseNotes></PackageReleaseNotes>
-	 <CheckEolTargetFramework>false</CheckEolTargetFramework>
-	 <LangVersion>latest</LangVersion>
- </PropertyGroup>
+	 <PropertyGroup>
+		 <Version>29.0.1</Version>
+		 <PackageReleaseNotes></PackageReleaseNotes>
+		 <CheckEolTargetFramework>false</CheckEolTargetFramework>
+		 <LangVersion>latest</LangVersion>
+	 </PropertyGroup>
+
+	<Choose>
+		<When Condition="$(MSBuildProjectName.Contains('UnitTest'))">
+			<ItemGroup>
+				<VSTestLogger Include="trx;LogFileName=$(MSBuildProjectName).trx" />
+			</ItemGroup>
+
+			<PropertyGroup>
+				<IsTestProject>True</IsTestProject>
+			
+				<!-- Enable coverage collection -->
+				<IsCollectCoverage>true</IsCollectCoverage>
+				<CollectCoverage>true</CollectCoverage>
+
+				<!-- TRX -->
+				<VSTestResultsDirectory>..\TestResult\$(MSBuildProjectName)</VSTestResultsDirectory>
+				<ResultsDirectory>..\TestResult\$(MSBuildProjectName)\</ResultsDirectory>
+
+				<!-- Output to ../TestResult/{ProjectName}.xml -->
+				<CoverletOutput>..\TestResult\$(MSBuildProjectName)\</CoverletOutput>
+				<CoverletOutputFormat>opencover,cobertura</CoverletOutputFormat>
+			</PropertyGroup>
+		</When>
+	</Choose>
 </Project>

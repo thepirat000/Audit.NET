@@ -61,12 +61,12 @@ jobs:
           /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**" `
           /d:sonar.coverage.exclusions="**/templates/**"
 
-    - name: Install SQL Server
-      uses: Particular/install-sql-server-action@v1.0.0
-      with:
-        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
-        catalog: Audit
-        extra-params: "Encrypt=False;"
+    # - name: Install SQL Server
+    #   uses: Particular/install-sql-server-action@v1.0.0
+    #   with:
+    #     connection-string-env-var: SQL_SERVER_CONNECTION_STRING
+    #     catalog: Audit
+    #     extra-params: "Encrypt=False;"
 
     - name: Dotnet Restore 
       run: dotnet restore
@@ -78,19 +78,16 @@ jobs:
       run: |
         dotnet new tool-manifest
         dotnet tool install dotnet-reportgenerator-globaltool
-        dotnet tool install dotnet-coverage
+        # dotnet tool install dotnet-coverage
 
-    - name: Run unit tests (no integration)
+    - name: Run tests
       run: |
-        dotnet coverage collect dotnet test --no-build --configuration release -m:1 --filter=TestCategory!=Integration --output ${{ github.workspace }}/Tests/Coverage.UnitTest.cobertura.xml --output-format cobertura
-
-    - name: Run integration tests (SqlServer)
-      run: |
-        dotnet coverage collect dotnet test --no-build --configuration release -m:1 --filter=TestCategory=SqlServer --output ${{ github.workspace }}/Tests/Coverage.SqlServer.cobertura.xml --output-format cobertura
+        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\test\Audit.Mvc.UnitTest --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
+        dotnet reportgenerator -reports:${{ github.workspace }}/test/TestResult/**/*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: SonarScanner End
       shell: pwsh
