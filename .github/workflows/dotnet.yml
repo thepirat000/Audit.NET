@@ -53,7 +53,7 @@ jobs:
         extra-params: "Encrypt=False;"
 
     - name: SonarCloud Scan (Begin)
-      uses: SonarSource/sonarcloud-github-action@v4
+      uses: SonarSource/sonarcloud-github-action@v5
       with:
         args: >
           -Dsonar.login=${{ env.SONAR_TOKEN }}
@@ -88,7 +88,7 @@ jobs:
         dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: SonarCloud Scan (End)
-      uses: SonarSource/sonarcloud-github-action@v4
+      uses: SonarSource/sonarcloud-github-action@v5
       with:
         args: -Dsonar.login=${{ env.SONAR_TOKEN }}
       env:
