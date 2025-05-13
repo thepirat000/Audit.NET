@@ -52,6 +52,17 @@ jobs:
         catalog: Audit
         extra-params: "Encrypt=False;"
 
+    - name: SonarCloud Scan (Begin)
+      uses: SonarSource/sonarcloud-github-action@v4
+      with:
+        args: >
+          -Dsonar.login=${{ env.SONAR_TOKEN }}
+          -Dsonar.projectKey=Audit.NET
+          -Dsonar.organization=thepirat000
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Dotnet Restore 
       run: dotnet restore
       
@@ -75,6 +86,14 @@ jobs:
     - name: Generate Code Coverage Report
       run: |
         dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
+
+    - name: SonarCloud Scan (End)
+      uses: SonarSource/sonarcloud-github-action@v4
+      with:
+        args: -Dsonar.login=${{ env.SONAR_TOKEN }}
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4
