@@ -62,8 +62,8 @@ jobs:
           /d:sonar.login="$Env:SONAR_TOKEN" `
           /d:sonar.cs.vstest.reportsPaths="/test/TestResult/**/*.trx" `
           /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.opencover.xml" `
-          /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**" `
-          /d:sonar.coverage.exclusions="**/templates/**"
+          /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**,**/Tests/**" `
+          /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**"
 
     - name: Install SQL Server
       uses: Particular/install-sql-server-action@v1.0.0
