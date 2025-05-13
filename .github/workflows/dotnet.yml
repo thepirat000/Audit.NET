@@ -45,23 +45,23 @@ jobs:
       with:
         nuget-version: '6.x'      
 
+    - name: Install SonarScanner for .NET
+      run: dotnet tool install --global dotnet-sonarscanner --version 5.15.0
+
+    - name: SonarScanner Begin
+      run: |
+        dotnet sonarscanner begin \
+        /k:"Audit.NET" \
+        /d:sonar.host.url="https://sonarcloud.io" \
+        /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+        /d:sonar.organization="thepirat000"
+
     - name: Install SQL Server
       uses: Particular/install-sql-server-action@v1.0.0
       with:
         connection-string-env-var: SQL_SERVER_CONNECTION_STRING
         catalog: Audit
         extra-params: "Encrypt=False;"
-
-    - name: SonarCloud Scan (Begin)
-      uses: sonarsource/sonarqube-scan-action@v1
-      with:
-        args: >
-          -Dsonar.login=${{ env.SONAR_TOKEN }}
-          -Dsonar.projectKey=Audit.NET
-          -Dsonar.organization=thepirat000
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Dotnet Restore 
       run: dotnet restore
@@ -87,13 +87,9 @@ jobs:
       run: |
         dotnet reportgenerator -reports:${{ github.workspace }}/Tests/Coverage.*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
-    - name: SonarCloud Scan (End)
-      uses: sonarsource/sonarqube-scan-action@v1
-      with:
-        args: -Dsonar.login=${{ env.SONAR_TOKEN }}
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: SonarScanner End
+      run: dotnet sonarscanner end \
+        /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4
