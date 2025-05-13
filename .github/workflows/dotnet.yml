@@ -87,12 +87,12 @@ jobs:
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}/test/TestResult/**/*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
+        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: SonarScanner End
       shell: pwsh
       run: |
-        & dotnet sonarscanner end \ `
+        & dotnet sonarscanner end `
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
     - name: Upload Code Coverage Report artifact
