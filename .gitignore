@@ -261,3 +261,4 @@ __pycache__/
 
 Docs/
 /src/StrongName/Audit.NET.snk
+.sonarqube

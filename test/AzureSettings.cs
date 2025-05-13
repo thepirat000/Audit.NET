@@ -16,7 +16,7 @@ namespace Audit.IntegrationTest
         public static string AzureEventHubCnnString => GetFromEnv("AZUREEVTHUBCNNSTRING");
 
         public static string ElasticSearchUrl => "http://elastic:elastic@127.0.0.1:9200";
-        public static string OpenSearchUrl => "http://admin:Messi1708!!!@127.0.0.1:9200";
+        public static string OpenSearchUrl => "http://admin:Messi1708!!!@127.0.0.1:9250";
         public static string PostgreSqlConnectionString => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
 
         private static string GetFromEnv(string key, string @default = null)

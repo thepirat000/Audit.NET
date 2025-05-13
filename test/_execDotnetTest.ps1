@@ -1,5 +1,4 @@
 ﻿param([Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][String[]]$projects,
-[Parameter(Mandatory=$false)][String]$extraParams='',
 [Parameter(Mandatory=$false)][String]$title='',
 [Parameter(Mandatory=$false)][switch]$nopause = $false,
 [Parameter(Mandatory=$false)][int32]$delay = 0) 
@@ -23,8 +22,9 @@ if ($totalProjs -eq 0) {
 $hasFailed = $false;
 
 $projects | ForEach {
-    & dotnet test $_ --"logger:console;verbosity=normal" --no-build -c Release -m:1 $extraParams
+    & dotnet test "$_" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=$_" --results-directory "./TestResult" "-m:1" --no-build -c Release 
     if ($LASTEXITCODE -ne 0) {
+        Write-Host $LASTEXITCODE -ForegroundColor Red
         $hasFailed = $true;
     }
 }

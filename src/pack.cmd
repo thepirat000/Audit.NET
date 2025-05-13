@@ -91,6 +91,8 @@ dotnet pack "Audit.NET.Channels/" -c Release
 dotnet pack "Audit.NET.OpenSearch/" -c Release
 dotnet pack "Audit.NET.AzureEventHubs/" -c Release
 
+type ..\Directory.Build.props
+
 ECHO.
 ECHO ADD TAG NOW !
 ECHO git tag -a x.x.x -m x.x.x

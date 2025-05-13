@@ -504,17 +504,17 @@ using (var scope = AuditScope.Create(new AuditScopeOptions("SomeEvent", () => so
 A _data provider_ (or _storage sink_) contains the logic to handle the audit event output, where you define what to do with the audit logs.
 
 You can use one of the [data providers included](#data-providers-included) or inject your own mechanism 
-by creating a class that inherits from `AuditDataProvider` and overrides its methods:
+by creating a class that implements `IAuditDataProvider` or inherits from `AuditDataProvider` and overrides its methods:
 
 - `InsertEvent`: should store the event and return a unique ID. 
 - `ReplaceEvent`: should update an event given its ID. This method is only used for [Creation Policies](#event-creation-policy) **Manual** or **InsertOnStartReplaceOnEnd**.
 
-If your data provider will support asynchronous operations, you must also implement the following methods:
+If your data provider supports asynchronous operations, you must also implement the following methods:
 
 - `InsertEventAsync`: Asynchronous implementation of the InsertEvent method. 
 - `ReplaceEventAsync`: Asynchronous implementation of the ReplaceEvent method.
 
-Also, if your data provider will support event retrieval, you should implement the following methods:
+If your data provider will support event retrieval, you should implement the following methods:
 
 - `GetEvent`: Retrieves an event by id. 
 - `GetEventAsync`: Asynchronous implementation of the GetEvent method. 
