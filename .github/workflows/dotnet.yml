@@ -60,7 +60,7 @@ jobs:
           /d:sonar.host.url="https://sonarcloud.io" `
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
           /d:sonar.cs.vstest.reportsPaths="/test/TestResult/**/*.trx" `
-          /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.xml" `
+          /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.opencover.xml" `
           /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**" `
           /d:sonar.coverage.exclusions="**/templates/**"
 
