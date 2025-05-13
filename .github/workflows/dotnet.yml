@@ -49,11 +49,12 @@ jobs:
       run: dotnet tool install --global dotnet-sonarscanner --version 5.15.0
 
     - name: SonarScanner Begin
+      shell: pwsh
       run: |
-        dotnet sonarscanner begin \
-          /k:"Audit.NET" \
-          /d:sonar.host.url="https://sonarcloud.io" \
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+        & dotnet sonarscanner begin `
+          /k:"Audit.NET" `
+          /d:sonar.host.url="https://sonarcloud.io" `
+          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
           /d:sonar.organization="thepirat000"
 
     - name: Install SQL Server
