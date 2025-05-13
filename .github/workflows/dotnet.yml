@@ -55,7 +55,7 @@ jobs:
           /k:"Audit.NET" `
           /d:sonar.host.url="https://sonarcloud.io" `
           /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
-          /d:sonar.organization="thepirat000"
+          /o:"thepirat000"
 
     - name: Install SQL Server
       uses: Particular/install-sql-server-action@v1.0.0
