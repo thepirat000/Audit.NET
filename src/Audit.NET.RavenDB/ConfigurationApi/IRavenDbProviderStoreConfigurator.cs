@@ -30,7 +30,7 @@ namespace Audit.RavenDB.ConfigurationApi
         /// <summary>
         /// Specifies the RavenDB database name to use at the session level.
         /// </summary>
-        /// <param name="database">A function of the audit event that returns the database name to use.</param>
-        IRavenDbProviderStoreConfigurator Database(Func<AuditEvent, string> database);
+        /// <param name="databaseBuilder">A function of the audit event that returns the database name to use.</param>
+        IRavenDbProviderStoreConfigurator Database(Func<AuditEvent, string> databaseBuilder);
     }
 }

@@ -26,7 +26,7 @@ namespace Audit.PostgreSql.Providers
         /// <summary>
         /// The connection string
         /// </summary>
-        public Setting<string> ConnectionString { get; set; } = "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        public Setting<string> ConnectionString { get; set; }
         /// <summary>
         /// Gets or sets the schema builder.
         /// </summary>

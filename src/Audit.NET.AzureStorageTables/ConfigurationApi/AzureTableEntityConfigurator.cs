@@ -10,9 +10,9 @@ namespace Audit.AzureStorageTables.ConfigurationApi
         internal TableClientOptions _clientOptions;
         internal Func<AuditEvent, ITableEntity> _tableEntityBuilder;
 
-        public IAzureTablesEntityConfigurator EntityMapper(Func<AuditEvent, ITableEntity> tableEntityBuilder)
+        public IAzureTablesEntityConfigurator EntityMapper(Func<AuditEvent, ITableEntity> tableEntityMapper)
         {
-            _tableEntityBuilder = tableEntityBuilder;
+            _tableEntityBuilder = tableEntityMapper;
             return this;
         }
 

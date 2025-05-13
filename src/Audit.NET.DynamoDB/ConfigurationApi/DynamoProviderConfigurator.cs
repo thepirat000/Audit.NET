@@ -32,9 +32,9 @@ namespace Audit.DynamoDB.Configuration
             return _tableConfigurator;
         }
 
-        public IDynamoProviderTableConfigurator UseUrl(string serviceUrl)
+        public IDynamoProviderTableConfigurator UseUrl(string url)
         {
-            _clientFactory = new Lazy<IAmazonDynamoDB>(() => new AmazonDynamoDBClient(new AmazonDynamoDBConfig() { ServiceURL = serviceUrl }));
+            _clientFactory = new Lazy<IAmazonDynamoDB>(() => new AmazonDynamoDBClient(new AmazonDynamoDBConfig() { ServiceURL = url }));
             return _tableConfigurator;
         }
     }

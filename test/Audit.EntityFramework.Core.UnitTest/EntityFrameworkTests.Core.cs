@@ -1338,12 +1338,8 @@ SET IDENTITY_INSERT Posts OFF
         public MyUnauditedContext() : base("BlogsUnaudited")
         {
         }
-        
-        public override bool AuditDisabled
-        {
-            get { return true; }
-            set { }
-        }
+
+        public override bool AuditDisabled { get; set; } = true;
     }
 
     [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = true, AuditEventType = "{database}_{context}")]

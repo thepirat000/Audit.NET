@@ -28,16 +28,16 @@ namespace Audit.MongoClient.ConfigurationApi
         }
         
         /// <inheritdoc />
-        public IAuditMongoConfigurator EventType(Func<CommandStartedEvent, string> eventTypePredicate)
+        public IAuditMongoConfigurator EventType(Func<CommandStartedEvent, string> eventTypeNamePredicate)
         {
-            _eventTypePredicate = eventTypePredicate;
+            _eventTypePredicate = eventTypeNamePredicate;
             return this;
         }
 
         /// <inheritdoc />
-        public IAuditMongoConfigurator EventType(string eventType)
+        public IAuditMongoConfigurator EventType(string eventTypeName)
         {
-            _eventTypePredicate = _ => eventType;
+            _eventTypePredicate = _ => eventTypeName;
             return this;
         }
 

@@ -87,7 +87,7 @@ namespace Audit.DynamicProxy.UnitTest
                 t2.Wait();
             });
 
-            var source = new CancellationTokenSource();
+            using var source = new CancellationTokenSource();
             source.CancelAfter(TimeSpan.FromSeconds(1));
             Assert.ThrowsAsync<OperationCanceledException>(async () =>
             {

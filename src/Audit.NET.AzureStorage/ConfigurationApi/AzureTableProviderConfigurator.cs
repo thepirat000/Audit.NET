@@ -22,9 +22,9 @@ namespace Audit.AzureTableStorage.ConfigurationApi
             return this;
         }
 
-        public IAzureTableProviderConfigurator EntityMapper(Func<AuditEvent, ITableEntity> tableEntityBuilder)
+        public IAzureTableProviderConfigurator EntityMapper(Func<AuditEvent, ITableEntity> tableEntityMapper)
         {
-            _tableEntityBuilder = tableEntityBuilder;
+            _tableEntityBuilder = tableEntityMapper;
             return this;
         }
 
@@ -40,9 +40,9 @@ namespace Audit.AzureTableStorage.ConfigurationApi
             return this;
         }
 
-        public IAzureTableProviderConfigurator TableName(Func<AuditEvent, string> tableNamebuilder)
+        public IAzureTableProviderConfigurator TableName(Func<AuditEvent, string> tableNameBuilder)
         {
-            _tableNameBuilder = tableNamebuilder;
+            _tableNameBuilder = tableNameBuilder;
             return this;
         }
 

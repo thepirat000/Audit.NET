@@ -46,9 +46,9 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
-        public IAuditApiGlobalConfigurator IncludeHeaders(Func<ActionExecutingContext, bool> includeBuilder)
+        public IAuditApiGlobalConfigurator IncludeHeaders(Func<ActionExecutingContext, bool> includePredicate)
         {
-            _includeRequestHeadersBuilder = includeBuilder;
+            _includeRequestHeadersBuilder = includePredicate;
             return this;
         }
 
@@ -58,9 +58,9 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
-        public IAuditApiGlobalConfigurator IncludeResponseHeaders(Func<ActionExecutedContext, bool> includeBuilder)
+        public IAuditApiGlobalConfigurator IncludeResponseHeaders(Func<ActionExecutedContext, bool> includePredicate)
         {
-            _includeResponseHeadersBuilder = includeBuilder;
+            _includeResponseHeadersBuilder = includePredicate;
             return this;
         }
 
@@ -70,9 +70,9 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
-        public IAuditApiGlobalConfigurator IncludeModelState(Func<ActionExecutedContext, bool> includeBuilder)
+        public IAuditApiGlobalConfigurator IncludeModelState(Func<ActionExecutedContext, bool> includePredicate)
         {
-            _includeModelStateBuilder = includeBuilder;
+            _includeModelStateBuilder = includePredicate;
             return this;
         }
 
@@ -82,9 +82,9 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
-        public IAuditApiGlobalConfigurator IncludeRequestBody(Func<ActionExecutingContext, bool> includeBuilder)
+        public IAuditApiGlobalConfigurator IncludeRequestBody(Func<ActionExecutingContext, bool> includePredicate)
         {
-            _includeRequestBodyBuilder = includeBuilder;
+            _includeRequestBodyBuilder = includePredicate;
             return this;
         }
 
@@ -94,9 +94,9 @@ namespace Audit.WebApi.ConfigurationApi
             return this;
         }
 
-        public IAuditApiGlobalConfigurator IncludeResponseBody(Func<ActionExecutedContext, bool> includeBuilder)
+        public IAuditApiGlobalConfigurator IncludeResponseBody(Func<ActionExecutedContext, bool> includePredicate)
         {
-            _includeResponseBodyBuilder = includeBuilder;
+            _includeResponseBodyBuilder = includePredicate;
             return this;
         }
 

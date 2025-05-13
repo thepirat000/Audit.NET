@@ -81,7 +81,7 @@ namespace Audit.UnitTest
             var auditEvent = new Audit.Core.AuditEvent() { EventType = evType };
             dataProvider.InsertEvent(auditEvent);
 
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             cts.Cancel();
 
             Assert.Throws<OperationCanceledException>(() => dataProvider.Take(cts.Token));
@@ -169,7 +169,7 @@ namespace Audit.UnitTest
 
             var guid = Guid.NewGuid().ToString();
 
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
 
             var consumed = 0;
 

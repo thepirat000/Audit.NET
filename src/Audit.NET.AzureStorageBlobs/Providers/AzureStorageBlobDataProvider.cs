@@ -235,17 +235,17 @@ namespace Audit.AzureStorageBlobs.Providers
         }
 
         /// <inheritdoc />
-        public override T GetEvent<T>(object blobName)
+        public override T GetEvent<T>(object eventId)
         {
             var containerName = ContainerName.GetDefault();
-            return GetEvent<T>(containerName, blobName.ToString());
+            return GetEvent<T>(containerName, eventId.ToString());
         }
 
         /// <inheritdoc />
-        public override async Task<T> GetEventAsync<T>(object blobName, CancellationToken cancellationToken = default)
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
             var containerName = ContainerName.GetDefault();
-            return await GetEventAsync<T>(containerName, blobName.ToString(), cancellationToken);
+            return await GetEventAsync<T>(containerName, eventId.ToString(), cancellationToken);
         }
 
         /// <summary>

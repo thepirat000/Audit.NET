@@ -52,12 +52,12 @@ namespace Audit.WebApi.ConfigurationApi
         /// <summary>
         /// Specifies a predicate to determine the event type name on the audit output.
         /// </summary>
-        /// <param name="eventTypeNamePredicate">A function of the executing context to determine the event type name. The following placeholders can be used as part of the string: 
+        /// <param name="eventTypeNameBuilder">A function of the executing context to determine the event type name. The following placeholders can be used as part of the string: 
         /// - {controller}: replaced with the controller name.
         /// - {action}: replaced with the action name.
         /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
         /// </param>
-        IAuditApiGlobalConfigurator WithEventType(Func<ActionExecutingContext, string> eventTypeNamePredicate);
+        IAuditApiGlobalConfigurator WithEventType(Func<ActionExecutingContext, string> eventTypeNameBuilder);
         /// <summary>
         /// Specifies whether the model state should be included on the audit output.
         /// </summary>

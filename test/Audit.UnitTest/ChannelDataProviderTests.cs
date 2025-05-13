@@ -97,7 +97,7 @@ namespace Audit.UnitTest
             var auditEvent = new Audit.Core.AuditEvent() { EventType = evType };
             dataProvider.InsertEvent(auditEvent);
 
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             cts.Cancel();
 
             Assert.Throws<TaskCanceledException>(() => dataProvider.Take(cts.Token));
@@ -108,7 +108,7 @@ namespace Audit.UnitTest
         public async Task Test_ChannelDataProvider_TryTake_Timeout()
         {
             var dataProvider = new ChannelDataProvider();
-            var cts = new CancellationTokenSource(5000);
+            using var cts = new CancellationTokenSource(5000);
             var auditEvent = await dataProvider.TryTakeAsync(10, cts.Token);
 
             Assert.That(auditEvent, Is.Null);
@@ -135,7 +135,7 @@ namespace Audit.UnitTest
         public void Test_ChannelDataProvider_TryTake_Cancels()
         {
             var dataProvider = new ChannelDataProvider();
-            var cts = new CancellationTokenSource(100);
+            using var cts = new CancellationTokenSource(100);
             
             Assert.ThrowsAsync<OperationCanceledException>(async () => await dataProvider.TryTakeAsync(30000, cts.Token));
         }

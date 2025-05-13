@@ -113,7 +113,7 @@ namespace Audit.UnitTest
         [TestCase(false)]
         public async Task Test_DataProvider_CancellationToken(bool cancel)
         {
-            var cs = new CancellationTokenSource();
+            using var cs = new CancellationTokenSource();
             var events_inserted = new List<AuditEvent>();
             var events_replaced = new List<AuditEvent>();
             bool tokenCancelled_inserted = !cancel;

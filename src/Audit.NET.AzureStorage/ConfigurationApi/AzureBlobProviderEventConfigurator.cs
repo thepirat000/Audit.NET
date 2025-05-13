@@ -27,9 +27,9 @@ namespace Audit.AzureTableStorage.ConfigurationApi
             return this;
         }
 
-        public IAzureBlobProviderEventConfigurator BlobName(Func<AuditEvent, string> blobNamebuilder)
+        public IAzureBlobProviderEventConfigurator BlobName(Func<AuditEvent, string> blobNameBuilder)
         {
-            _blobNameBuilder = blobNamebuilder;
+            _blobNameBuilder = blobNameBuilder;
             return this;
         }
         

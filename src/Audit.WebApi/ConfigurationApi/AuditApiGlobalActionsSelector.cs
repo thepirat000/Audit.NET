@@ -11,14 +11,14 @@ namespace Audit.WebApi.ConfigurationApi
     {
         internal AuditApiGlobalConfigurator _config = new AuditApiGlobalConfigurator();
 
-        public IAuditApiGlobalConfigurator LogActionIf(Func<ControllerActionDescriptor, bool> controllerActionSelector)
+        public IAuditApiGlobalConfigurator LogActionIf(Func<ControllerActionDescriptor, bool> controllerActionPredicate)
         {
             _config._logDisabledBuilder = ctx =>
             {
                 var actionDescriptior = ctx.ActionDescriptor as ControllerActionDescriptor;
                 if (actionDescriptior != null)
                 {
-                    return !controllerActionSelector.Invoke(actionDescriptior);
+                    return !controllerActionPredicate.Invoke(actionDescriptior);
                 }
                 return true;
             };
@@ -39,13 +39,13 @@ namespace Audit.WebApi.ConfigurationApi
             return _config;
         }
 #else
-        public IAuditApiGlobalConfigurator LogRequestIf(Func<System.Net.Http.HttpRequestMessage, bool> requestSelector)
+        public IAuditApiGlobalConfigurator LogRequestIf(Func<System.Net.Http.HttpRequestMessage, bool> requestPredicate)
         {
             _config._logDisabledBuilder = ctx =>
             {
                 if (ctx.Request != null)
                 {
-                    return !requestSelector.Invoke(ctx.Request);
+                    return !requestPredicate.Invoke(ctx.Request);
                 }
                 return true;
             };

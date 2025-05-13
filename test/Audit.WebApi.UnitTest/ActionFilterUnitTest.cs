@@ -157,7 +157,7 @@ namespace Audit.WebApi.UnitTest
             response.Headers.Add("header-one", "1");
             response.Headers.Add("header-two", "2");
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = response };
-            var ct = new CancellationTokenSource();
+            using var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
@@ -243,7 +243,7 @@ namespace Audit.WebApi.UnitTest
             actionExecutingContext.ActionArguments.Add("test1", "value1");
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
-            var ct = new CancellationTokenSource();
+            using var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
@@ -320,7 +320,7 @@ namespace Audit.WebApi.UnitTest
             actionExecutingContext.ActionArguments.Add("x", arg);
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
-            var ct = new CancellationTokenSource();
+            using var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();
@@ -403,7 +403,7 @@ namespace Audit.WebApi.UnitTest
 
             actionExecutingContext.Request.Properties.Add("MS_HttpContext", httpContext.Object);
             var actionExecutedContext = new HttpActionExecutedContext(actionContext, null) { Response = new HttpResponseMessage(HttpStatusCode.OK) };
-            var ct = new CancellationTokenSource();
+            using var ct = new CancellationTokenSource();
             await filter.OnActionExecutingAsync(actionExecutingContext, ct.Token);
             var scopeFromController = AuditApiAdapter.GetCurrentScope(controllerContext.Request, null);
             var actionFromController = scopeFromController.Event.GetWebApiAuditAction();

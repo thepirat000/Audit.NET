@@ -29,9 +29,9 @@ public class DbContextProviderEntityConfigurator : IDbContextProviderEntityConfi
     internal Func<AuditEvent, IEnumerable<object>> _entityBuilder;
     internal bool _disposeDbContext;
 
-    public IDbContextProviderEntityConfigurator EntityBuilder(Func<AuditEvent, IEnumerable<object>> entityBuilder)
+    public IDbContextProviderEntityConfigurator EntityBuilder(Func<AuditEvent, IEnumerable<object>> entitiesBuilder)
     {
-        _entityBuilder = entityBuilder;
+        _entityBuilder = entitiesBuilder;
         return this;
     }
 

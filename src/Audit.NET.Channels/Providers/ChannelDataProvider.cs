@@ -94,7 +94,7 @@ namespace Audit.Channels.Providers
         /// <param name="cancellationToken">The cancellation token.</param>
         public async Task<AuditEvent> TryTakeAsync(int millisecondsTimeout, CancellationToken cancellationToken = default)
         {
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, new CancellationTokenSource(millisecondsTimeout).Token);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, new CancellationTokenSource(millisecondsTimeout).Token);
             var dataAvailable = false;
             try
             {

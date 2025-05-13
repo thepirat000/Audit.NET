@@ -25,7 +25,7 @@ namespace Audit.UnitTest
             var p = new Udp.Providers.UdpDataProvider();
             p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
@@ -59,7 +59,7 @@ namespace Audit.UnitTest
                     .RemoteAddress(ip)
                     .RemotePort(port));
 
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
@@ -114,7 +114,7 @@ namespace Audit.UnitTest
             var p = new Udp.Providers.UdpDataProvider();
             p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();
@@ -157,7 +157,7 @@ namespace Audit.UnitTest
             p.RemoteAddress = UdpProviderConfigurator.GetIPAddress(ip);
             p.RemotePort = port;
 
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             var re = new ManualResetEvent(false);
             var listener = Task.Factory.StartNew(() => { Listen(re, ip, port, multicast); }, cts.Token);
             re.WaitOne();

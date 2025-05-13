@@ -6,7 +6,7 @@ namespace Audit.PostgreSql.Configuration
 {
     public class PostgreSqlProviderConfigurator : IPostgreSqlProviderConfigurator
     {
-        internal Setting<string> _connectionString = "Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
+        internal Setting<string> _connectionString;
         internal Setting<string> _schema;
         internal Setting<string> _tableName = "event";
         internal Setting<string> _idColumnName = "id";

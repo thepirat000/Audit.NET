@@ -27,8 +27,10 @@ namespace Audit.EntityFramework.ConfigurationApi
             _dbContextBuilder = dbContextBuilder;
             return this;
         }
-        
+
+#pragma warning disable S1006
         public IEntityFrameworkProviderConfigurator UseDbContext<T>(object[] constructorArgs = null) where T : DbContext
+#pragma warning restore S1006
         {
             _dbContextBuilder = ev => (T)Activator.CreateInstance(typeof(T), constructorArgs);
             return this;

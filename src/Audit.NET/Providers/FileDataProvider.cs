@@ -64,29 +64,29 @@ namespace Audit.Core.Providers
             return fullPath;
         }
 
-        public override void ReplaceEvent(object path, AuditEvent auditEvent)
+        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            var fullPath = path.ToString();
+            var fullPath = eventId.ToString();
             var json = Configuration.JsonAdapter.Serialize(auditEvent);
             File.WriteAllText(fullPath, json);
         }
 
-        public override T GetEvent<T>(object path)
+        public override T GetEvent<T>(object eventId)
         {
-            var fullPath = path.ToString();
+            var fullPath = eventId.ToString();
             var json = File.ReadAllText(fullPath);
             return Configuration.JsonAdapter.Deserialize<T>(json);
         }
 
-        public override async Task ReplaceEventAsync(object path, AuditEvent auditEvent, CancellationToken cancellationToken = default)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var fullPath = path.ToString();
+            var fullPath = eventId.ToString();
             await SaveFileAsync(fullPath, auditEvent, cancellationToken);
         }
 
-        public override async Task<T> GetEventAsync<T>(object path, CancellationToken cancellationToken = default) 
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default) 
         {
-            var fullPath = path.ToString();
+            var fullPath = eventId.ToString();
             return await GetFromFileAsync<T>(fullPath, cancellationToken);
         }
 
