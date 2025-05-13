@@ -17,6 +17,7 @@ env:
   AUDIT_NET_AZUREBLOBSERVICEURL: ${{ secrets.AUDIT_NET_AZUREBLOBSERVICEURL }}
   AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
   AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
   build_and_test:
@@ -27,6 +28,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       
+    - name: Test ST
+      shell: pwsh
+      run: |
+        $secret = $Env:SONAR_TOKEN
+        $suffix = $secret.Substring($secret.Length - 4)
+        Write-Host "suffix: $suffix"
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -58,7 +66,7 @@ jobs:
           /o:"thepirat000" `
           /k:"Audit.NET" `
           /d:sonar.host.url="https://sonarcloud.io" `
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
+          /d:sonar.login="$Env:SONAR_TOKEN" `
           /d:sonar.cs.vstest.reportsPaths="/test/TestResult/**/*.trx" `
           /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.opencover.xml" `
           /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**" `
@@ -90,7 +98,7 @@ jobs:
       shell: pwsh
       run: |
         & dotnet sonarscanner end `
-          /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          /d:sonar.login="$Env:SONAR_TOKEN"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4
