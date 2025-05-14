@@ -36,7 +36,7 @@ jobs:
     - name: Reload PS environment
       shell: pwsh
       run: |
-        Update-SessionEnvironment
+        $dummy = Get-ChildItem Env:
 
     - name: Start RavenDB in in‑memory mode
       shell: pwsh
