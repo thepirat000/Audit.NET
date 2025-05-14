@@ -36,10 +36,11 @@ jobs:
     - name: Start RavenDB on port 8080
       shell: pwsh
       run: |
-        & "C:\RavenDB\Server\Raven.Server.exe" `
-          --RunInMemory `
-          --ServerUrl=http://127.0.0.1:8080 `
-          &
+        $args = '--RunInMemory=true --ServerUrl="http://127.0.0.1:8080"'
+        Start-Process `
+          -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
+          -ArgumentList $args `
+          -NoNewWindow
         Start-Sleep -Seconds 10
 
     # Cosmos 
