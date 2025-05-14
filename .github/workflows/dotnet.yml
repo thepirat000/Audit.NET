@@ -38,7 +38,7 @@ jobs:
       run: |
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
-          -ArgumentList "--RunInMemory" `
+          -ArgumentList "--RunInMemory", "--ServerUrl=http://127.0.0.1:8080" `
           -NoNewWindow
         Start-Sleep -Seconds 10
 
@@ -110,7 +110,7 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
