@@ -33,16 +33,13 @@ jobs:
     - name: Install RavenDB 
       run: choco install -y RavenDB --version=5.4.205
 
-    - name: Reload PS environment
+    - name: Start RavenDB in in-memory mode
       shell: pwsh
       run: |
-        $dummy = Get-ChildItem Env:
-
-    - name: Start RavenDB in in‑memory mode
-      shell: pwsh
-      run: |
-        Start-Process -FilePath "Raven.Server.exe" `
-          -ArgumentList "--RunInMemory" -NoNewWindo
+        Start-Process `
+          -FilePath "C:/ProgramData/chocolatey/lib/RavenDB/tools/Raven.Server.exe" `
+          -ArgumentList "--RunInMemory" `
+          -NoNewWindow
         Start-Sleep -Seconds 10
 
     # Cosmos 
