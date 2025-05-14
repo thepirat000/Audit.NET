@@ -58,7 +58,7 @@ jobs:
               break
             }
           } catch {
-            Write-Host "RavenDB not ready yet. Retrying in $retryInterval seconds..."
+            Write-Host "Error encountered: $_. Retrying in $retryInterval seconds..."
             Start-Sleep -Seconds $retryInterval
           }
         }
