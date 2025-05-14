@@ -40,7 +40,7 @@ jobs:
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
           -ArgumentList $args `
-          -NoNewWindow
+          -NoNewWindow &
         Start-Sleep -Seconds 10
 
     - name: Wait for RavenDB to become ready
