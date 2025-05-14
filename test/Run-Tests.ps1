@@ -33,6 +33,7 @@ StartDotnetUnitTests 'Audit.AspNetCore.UnitTest' 'AspNetCore';
 StartDotnetUnitTests 'Audit.AzureCosmos.UnitTest' 'AzureCosmos';
 StartDotnetUnitTests 'Audit.AzureEventHubs.UnitTest' 'AzureEventHubs';
 StartDotnetUnitTests 'Audit.AzureStorageBlobs.UnitTest' 'AzureStorageBlobs';
+StartDotnetUnitTests 'Audit.AzureStorageTables.UnitTest' 'AzureStorageTables';
 StartDotnetUnitTests 'Audit.DynamicProxy.UnitTest' 'DynamicProxy';
 StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
 StartDotnetUnitTests 'Audit.Elasticsearch.UnitTest' 'Elasticsearch';
