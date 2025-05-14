@@ -38,7 +38,10 @@ jobs:
       run: |
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
-          -ArgumentList "--RunInMemory", "--ServerUrl=http://127.0.0.1:8080" `
+          -ArgumentList @(
+            "--RunInMemory"
+            "--ServerUrl=http://127.0.0.1:8080"
+          ) `
           -NoNewWindow
         Start-Sleep -Seconds 10
 
