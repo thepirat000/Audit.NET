@@ -28,6 +28,23 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Start Azure Event Hubs emulator
+      shell: bash
+      run: |
+        git clone https://github.com/Azure/azure-event-hubs-emulator-installer.git emulator-installer
+        cd emulator-installer/EventHub-Emulator
+        wsl ./LaunchEmulator.sh
+
+    - name: Extract SharedAccessKey for Azure Event Hubs emulator
+      shell: bash
+      run: |
+        # Grab the last 100 lines and extract the key
+        raw_key=$(docker logs eventhubs-emulator --tail 100 2>&1 \
+          | grep -oP 'SharedAccessKey=\K[^;]+')
+        echo "Discovered emulator SAS key: $raw_key"
+        # Persist it to GitHub Actions environment
+        echo "EVENTHUBS_SAS_KEY=$raw_key" >> $GITHUB_ENV
+
     - name: Start Azure Cosmos DB emulator
       shell: pwsh
       run: |
