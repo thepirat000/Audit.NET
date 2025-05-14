@@ -31,13 +31,13 @@ jobs:
 
     # RavenDB
     - name: Install RavenDB 
-      run: choco install -y RavenDB --version=5.4.205
+      run: choco install -y RavenDB --version=7.0.2
 
     - name: Start RavenDB in in-memory mode
       shell: pwsh
       run: |
         Start-Process `
-          -FilePath "C:/ProgramData/chocolatey/lib/RavenDB/tools/Raven.Server.exe" `
+          -FilePath "C:\RavenDB\tools\Raven.Server.exe" `
           -ArgumentList "--RunInMemory" `
           -NoNewWindow
         Start-Sleep -Seconds 10
