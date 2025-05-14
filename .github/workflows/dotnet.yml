@@ -37,7 +37,7 @@ jobs:
       shell: pwsh
       run: |
         Start-Process `
-          -FilePath "C:\RavenDB\tools\Raven.Server.exe" `
+          -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
           -ArgumentList "--RunInMemory" `
           -NoNewWindow
         Start-Sleep -Seconds 10
