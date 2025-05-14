@@ -18,6 +18,7 @@ env:
   AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
   AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  ACCEPT_EULA: 'Y'
 
 jobs:
   build_and_test:
@@ -35,7 +36,7 @@ jobs:
         cd emulator-installer\EventHub-Emulator\Scripts\Windows
         Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
         # Launch the emulator (starts both Event Hubs emulator + Azurite)
-        "Y" | .\LaunchEmulator.ps1
+        .\LaunchEmulator.ps1
 
     - name: Extract SharedAccessKey for Azure Event Hubs emulator
       shell: bash
