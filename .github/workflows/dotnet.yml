@@ -13,8 +13,10 @@ on:
 env:
   AUDIT_NET_AZUREDOCDBAUTHKEY: ${{ secrets.AUDIT_NET_AZUREDOCDBAUTHKEY }}
   AUDIT_NET_AZUREDOCDBURL: ${{ secrets.AUDIT_NET_AZUREDOCDBURL }}
-  AUDIT_NET_AZURETABLECNNSTRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;
-  AUDIT_NET_AZUREBLOBSERVICEURL: ${{ secrets.AUDIT_NET_AZUREBLOBSERVICEURL }}
+  AUDIT_NET_AZURETABLECNNSTRING: ${{ secrets.AUDIT_NET_AZURETABLECNNSTRING }}
+  AUDIT_NET_AZUREBLOBCNNSTRING: ${{ secrets.AUDIT_NET_AZUREBLOBCNNSTRING }}
+  AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
+  AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
@@ -31,24 +33,6 @@ jobs:
       uses: potatoqualitee/azuright@v1
       with:
         version: latest
-
-    - name: Export Azurite environment variables
-      shell: pwsh
-      run: |
-        # 1. Capture the raw connection string
-        $conn = '${{ steps.azurite.outputs.connstring }}'
-
-        # 2. Persist the full connection string
-        "AUDIT_NET_AZUREBLOBCNNSTRING=$conn" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-
-        # 3. Split and extract AccountName and AccountKey
-        $parts = $conn -split ';'
-        $name  = ($parts | Where-Object { $_ -like 'AccountName=*' }) -replace 'AccountName=', ''
-        $key   = ($parts | Where-Object { $_ -like 'AccountKey=*'  }) -replace 'AccountKey=', ''
-
-        # 4. Persist each extracted value
-        "AUDIT_NET_AZUREBLOBACCOUNTNAME=$name" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-        "AUDIT_NET_AZUREBLOBACCOUNTKEY=$key"   | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Display Azurite variables
       run: |
