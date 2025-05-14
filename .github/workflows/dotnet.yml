@@ -41,7 +41,9 @@ jobs:
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
           -ArgumentList $args `
           -NoNewWindow
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 60
+        $response = Invoke-WebRequest -Uri "http://localhost:8090/admin/monitoring/v1/server" -UseBasicParsing
+        Write-Host "RavenDB status code $($response.StatusCode)."
 
     - name: Wait for RavenDB to become ready
       shell: pwsh
