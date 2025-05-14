@@ -36,6 +36,7 @@ jobs:
     - name: Start RavenDB on port 8080
       shell: pwsh
       run: |
+        netstat -ano | findstr :8080
         $args = '--ServerUrl="http://127.0.0.1:8080" --RunInMemory'
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
@@ -47,7 +48,6 @@ jobs:
       shell: pwsh
       run: |
         $ErrorActionPreference = 'Stop'
-        netstat -ano | findstr :8080
         $maxRetries = 30
         $retryInterval = 2
         for ($i = 0; $i -lt $maxRetries; $i++) {
