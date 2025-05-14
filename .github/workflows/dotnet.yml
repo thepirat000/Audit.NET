@@ -47,6 +47,7 @@ jobs:
       shell: pwsh
       run: |
         $ErrorActionPreference = 'Stop'
+        netstat -ano | findstr :8080
         $maxRetries = 30
         $retryInterval = 2
         for ($i = 0; $i -lt $maxRetries; $i++) {
