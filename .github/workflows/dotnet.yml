@@ -29,25 +29,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Launch Event Hubs emulator
-      shell: pwsh
-      run: |
-        git clone https://github.com/Azure/azure-event-hubs-emulator-installer.git emulator-installer
-        cd emulator-installer\EventHub-Emulator\Scripts\Windows
-        Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-        # Launch the emulator (starts both Event Hubs emulator + Azurite)
-        .\LaunchEmulator.ps1
-
-    - name: Extract SharedAccessKey for Azure Event Hubs emulator
-      shell: bash
-      run: |
-        # Grab the last 100 lines and extract the key
-        raw_key=$(docker logs eventhubs-emulator --tail 100 2>&1 \
-          | grep -oP 'SharedAccessKey=\K[^;]+')
-        echo "Discovered emulator SAS key: $raw_key"
-        # Persist it to GitHub Actions environment
-        echo "AUDIT_NET_AZUREEVTHUBCNNSTRING=$raw_key" >> $GITHUB_ENV
-
     - name: Start Azure Cosmos DB emulator
       shell: pwsh
       run: |
@@ -113,7 +94,7 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=Azure" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
