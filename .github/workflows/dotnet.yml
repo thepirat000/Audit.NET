@@ -37,7 +37,7 @@ jobs:
       shell: pwsh
       run: |
         netstat -ano | findstr :8080
-        $args = '--ServerUrl="http://127.0.0.1:8080" --RunInMemory'
+        $args = '--ServerUrl="http://127.0.0.1:8429" --RunInMemory'
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
           -ArgumentList $args `
@@ -52,7 +52,7 @@ jobs:
         $retryInterval = 2
         for ($i = 0; $i -lt $maxRetries; $i++) {
           try {
-            $response = Invoke-WebRequest -Uri "http://127.0.0.1:8080/admin/monitoring/v1/server" -UseBasicParsing
+            $response = Invoke-WebRequest -Uri "http://127.0.0.1:8429/admin/monitoring/v1/server" -UseBasicParsing
             Write-Host "RavenDB status code $($response.StatusCode)."
             if ($response.StatusCode -eq 200 -or $response.StatusCode -eq 402) {
               Write-Host "RavenDB is ready."
