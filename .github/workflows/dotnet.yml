@@ -30,14 +30,12 @@ jobs:
 
     - name: Launch Event Hubs emulator
       shell: pwsh
-      env:
-        ACCEPT_EULA: 'Y'
       run: |
         git clone https://github.com/Azure/azure-event-hubs-emulator-installer.git emulator-installer
         cd emulator-installer\EventHub-Emulator\Scripts\Windows
         Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
         # Launch the emulator (starts both Event Hubs emulator + Azurite)
-        .\LaunchEmulator.ps1
+        "Y" | .\LaunchEmulator.ps1
 
     - name: Extract SharedAccessKey for Azure Event Hubs emulator
       shell: bash
