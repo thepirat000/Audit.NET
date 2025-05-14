@@ -30,6 +30,8 @@ jobs:
 
     - name: Launch Event Hubs emulator
       shell: pwsh
+      env:
+        ACCEPT_EULA: 'Y'
       run: |
         git clone https://github.com/Azure/azure-event-hubs-emulator-installer.git emulator-installer
         cd emulator-installer\EventHub-Emulator\Scripts\Windows
