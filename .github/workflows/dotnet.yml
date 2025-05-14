@@ -28,19 +28,25 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Start Azure Cosmos DB emulator
+      shell: pwsh
+      run: |
+        Write-Host "Launching Cosmos DB Emulator"
+        Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+        Start-CosmosDbEmulator
+
     - name: Start Azurite
       id: azurite
       uses: potatoqualitee/azuright@v1
       with:
         version: latest
 
-    - name: Display Azurite variables
-      run: |
-        echo "AUDIT_NET_AZUREBLOBACCOUNTNAME = $Env:AUDIT_NET_AZUREBLOBACCOUNTNAME"
-        echo "AUDIT_NET_AZUREBLOBACCOUNTKEY = $Env:AUDIT_NET_AZUREBLOBACCOUNTKEY"
-        echo "AUDIT_NET_AZUREBLOBCNNSTRING = $Env:AUDIT_NET_AZUREBLOBCNNSTRING"
-        echo "AUDIT_NET_AZURETABLECNNSTRING = $Env:AUDIT_NET_AZURETABLECNNSTRING"
-      shell: pwsh
+    - name: Install SQL Server
+      uses: Particular/install-sql-server-action@v1.0.0
+      with:
+        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
+        catalog: Audit
+        extra-params: "Encrypt=False;"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -79,13 +85,6 @@ jobs:
           /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**,**/Tests/**" `
           /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**"
 
-    - name: Install SQL Server
-      uses: Particular/install-sql-server-action@v1.0.0
-      with:
-        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
-        catalog: Audit
-        extra-params: "Encrypt=False;"
-
     - name: Dotnet Restore 
       run: dotnet restore
       
@@ -94,7 +93,7 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer|TestCategory=AzureTables|TestCategory=AzureBlobs" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer|TestCategory=AzureTables|TestCategory=AzureBlobs|TestCategory=AzureCosmos" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
