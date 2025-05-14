@@ -36,14 +36,12 @@ jobs:
     - name: Start RavenDB on port 8080
       shell: pwsh
       run: |
-        $args = '--ServerUrl="http://localhost:8090" --RunInMemory -l'
+        $args = '--ServerUrl="http://127.0.0.1:12945" --RunInMemory -l'
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
           -ArgumentList $args `
           -NoNewWindow
         Start-Sleep -Seconds 60
-        $response = Invoke-WebRequest -Uri "http://localhost:8090/admin/monitoring/v1/server" -UseBasicParsing
-        Write-Host "RavenDB status code $($response.StatusCode)."
 
     - name: Wait for RavenDB to become ready
       shell: pwsh
@@ -52,16 +50,11 @@ jobs:
         $maxRetries = 30
         $retryInterval = 2
         for ($i = 0; $i -lt $maxRetries; $i++) {
-          try {
-            $response = Invoke-WebRequest -Uri "http://localhost:8090/admin/monitoring/v1/server" -UseBasicParsing
-            Write-Host "RavenDB status code $($response.StatusCode)."
-            if ($response.StatusCode -eq 200 -or $response.StatusCode -eq 402) {
-              Write-Host "RavenDB is ready."
-              break
-            }
-          } catch {
-            Write-Host "Error encountered: $_. Retrying in $retryInterval seconds..."
-            Start-Sleep -Seconds $retryInterval
+          $response = Invoke-WebRequest -Uri "http://localhost:12945/admin/monitoring/v1/server" -UseBasicParsing
+          Write-Host "RavenDB status code $($response.StatusCode)."
+          if ($response.StatusCode -eq 200 -or $response.StatusCode -eq 402) {
+            Write-Host "RavenDB is ready."
+            break
           }
         }
         if ($i -eq $maxRetries) {
