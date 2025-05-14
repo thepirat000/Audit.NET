@@ -1,4 +1,4 @@
-# This workflow will build a .NET project
+﻿# This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: BUILD & RUN TESTS
@@ -29,6 +29,23 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    # RavenDB
+    - name: Install RavenDB 
+      run: choco install -y RavenDB --version=5.4.205
+
+    - name: Reload PS environment
+      shell: pwsh
+      run: |
+        Update-SessionEnvironment
+
+    - name: Start RavenDB in in‑memory mode
+      shell: pwsh
+      run: |
+        Start-Process -FilePath "Raven.Server.exe" `
+          -ArgumentList "--RunInMemory" -NoNewWindo
+        Start-Sleep -Seconds 10
+
+    # Cosmos 
     - name: Start Azure Cosmos DB emulator
       shell: pwsh
       run: |
@@ -36,12 +53,14 @@ jobs:
         Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
         Start-CosmosDbEmulator
 
+    # Azurite
     - name: Start Azurite
       id: azurite
       uses: potatoqualitee/azuright@v1
       with:
         version: latest
 
+    # SQL Server
     - name: Install SQL Server
       uses: Particular/install-sql-server-action@v1.0.0
       with:
