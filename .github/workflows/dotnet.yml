@@ -28,12 +28,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Start Azure Event Hubs emulator
-      shell: bash
+    - name: Launch Event Hubs emulator
+      shell: pwsh
       run: |
         git clone https://github.com/Azure/azure-event-hubs-emulator-installer.git emulator-installer
-        cd emulator-installer/EventHub-Emulator
-        wsl ./LaunchEmulator.sh
+        cd emulator-installer\EventHub-Emulator\Scripts\Windows
+        Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+        # Launch the emulator (starts both Event Hubs emulator + Azurite)
+        .\LaunchEmulator.ps1
 
     - name: Extract SharedAccessKey for Azure Event Hubs emulator
       shell: bash
