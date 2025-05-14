@@ -36,12 +36,12 @@ jobs:
     - name: Start RavenDB on port 8080
       shell: pwsh
       run: |
-        $args = '--ServerUrl="http://127.0.0.1:12945" --RunInMemory -l'
+        $args = '--ServerUrl="http://localhost:8090" --RunInMemory -l'
         Start-Process `
           -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
           -ArgumentList $args `
           -NoNewWindow
-        Start-Sleep -Seconds 60
+        Start-Sleep -Seconds 10
 
     - name: Wait for RavenDB to become ready
       shell: pwsh
@@ -50,7 +50,7 @@ jobs:
         $maxRetries = 30
         $retryInterval = 2
         for ($i = 0; $i -lt $maxRetries; $i++) {
-          $response = Invoke-WebRequest -Uri "http://localhost:12945/admin/monitoring/v1/server" -UseBasicParsing
+          $response = Invoke-WebRequest -Uri "http://localhost:8090/admin/monitoring/v1/server" -UseBasicParsing
           Write-Host "RavenDB status code $($response.StatusCode)."
           if ($response.StatusCode -eq 200 -or $response.StatusCode -eq 402) {
             Write-Host "RavenDB is ready."
