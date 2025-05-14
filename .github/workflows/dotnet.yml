@@ -43,24 +43,6 @@ jobs:
           -NoNewWindow &
         Start-Sleep -Seconds 10
 
-    - name: Wait for RavenDB to become ready
-      shell: pwsh
-      run: |
-        $ErrorActionPreference = 'Stop'
-        $maxRetries = 30
-        $retryInterval = 2
-        for ($i = 0; $i -lt $maxRetries; $i++) {
-          $response = Invoke-WebRequest -Uri "http://localhost:8080/admin/monitoring/v1/server" -UseBasicParsing
-          Write-Host "RavenDB status code $($response.StatusCode)."
-          if ($response.StatusCode -eq 200 -or $response.StatusCode -eq 402) {
-            Write-Host "RavenDB is ready."
-            break
-          }
-        }
-        if ($i -eq $maxRetries) {
-          throw "RavenDB did not become ready in time."
-        }
-
     # Cosmos 
     - name: Start Azure Cosmos DB emulator
       shell: pwsh
