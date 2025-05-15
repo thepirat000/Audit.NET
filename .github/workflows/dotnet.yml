@@ -32,7 +32,7 @@ jobs:
     # Redis
     - name: Download Redis for Windows
       run: |
-        Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/redis-5.0.14.1.zip -OutFile redis.zip
+        Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
         Expand-Archive redis.zip -DestinationPath redis
 
     - name: Start Redis
