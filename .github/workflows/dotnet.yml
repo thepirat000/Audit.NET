@@ -39,6 +39,7 @@ jobs:
       run: |
         redis\redis-server.exe --daemonize no &
         Start-Sleep -Seconds 10
+        netstat -a -n -o | findstr :6379
 
     - name: Verify Redis is running
       run: |
