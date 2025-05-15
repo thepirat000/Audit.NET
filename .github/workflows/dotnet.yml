@@ -29,11 +29,21 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # ElasticSearch
-    - name: Set up Elasticsearch
-      uses: ankane/setup-elasticsearch@v1
-      with:
-        elasticsearch-version: 9
+    # Redis
+    - name: Download Redis for Windows
+      run: |
+        Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/redis-5.0.14.1.zip -OutFile redis.zip
+        Expand-Archive redis.zip -DestinationPath redis
+
+    - name: Start Redis
+      run: |
+        redis\redis-server.exe --daemonize no &
+
+    # # ElasticSearch
+    # - name: Set up Elasticsearch
+    #   uses: ankane/setup-elasticsearch@v1
+    #   with:
+    #     elasticsearch-version: 9
 
     # # OpenSearch
     # - name: Set up OpenSearch
@@ -131,8 +141,8 @@ jobs:
 
     - name: Run tests
       run: |
-        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
-        dotnet test .\test\Audit.Elasticsearch.UnitTest --no-build -c release --filter "TestCategory=Elasticsearch" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\test\Audit.Redis.UnitTest --no-build -c release --filter "TestCategory=Redis" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
