@@ -29,26 +29,32 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # Redis
-    - name: Download Redis for Windows
-      run: |
-        Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
-        Expand-Archive redis.zip -DestinationPath redis
+    # MySql
+    - name: Set up MySQL
+      uses: shogo82148/actions-setup-mysql@v1
+      with:
+        mysql-version: '9.0'
 
-    - name: Start Redis
-      shell: pwsh
-      run: |
-        $args = '--daemonize no'
-        Start-Process `
-          -FilePath "redis\redis-server.exe" `
-          -ArgumentList $args `
-          -NoNewWindow &
-        Start-Sleep -Seconds 10
-        netstat -a -n -o | findstr :6379
+    - name: Verify MySQL installation
+      run: mysql -uroot -e "SELECT VERSION();"
 
-    - name: Verify Redis is running
-      run: |
-        netstat -a -n -o | findstr :6379
+    # # Redis
+    # - name: Download Redis for Windows
+    #   shell: pwsh
+    #   run: |
+    #     Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
+    #     Expand-Archive redis.zip -DestinationPath redis
+
+    # - name: Start Redis
+    #   shell: pwsh
+    #   run: |
+    #     $args = '--daemonize no'
+    #     Start-Process `
+    #       -FilePath "redis\redis-server.exe" `
+    #       -ArgumentList $args `
+    #       -NoNewWindow &
+    #     Start-Sleep -Seconds 10
+    #     netstat -a -n -o | findstr :6379
 
     # # ElasticSearch
     # - name: Set up Elasticsearch
@@ -152,8 +158,8 @@ jobs:
 
     - name: Run tests
       run: |
-        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
-        dotnet test .\test\Audit.Redis.UnitTest --no-build -c release --filter "TestCategory=Redis" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\test\Audit.MySql.UnitTest --no-build -c release --filter "TestCategory=MySql" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
