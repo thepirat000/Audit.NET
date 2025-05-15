@@ -14,7 +14,7 @@ namespace Audit.Redis.UnitTest
     [Category("Redis")]
     public class RedisTests
     {
-        private const string RedisCnnString = "localhost:6379,allowAdmin=true";
+        private const string RedisCnnString = "127.0.0.1:6379,allowAdmin=true";
 
         [Test, Order(10)]
         [TestCase(-1)]

@@ -37,7 +37,12 @@ jobs:
 
     - name: Start Redis
       run: |
-        redis\redis-server.exe --daemonize no
+        redis\redis-server.exe --daemonize no &
+        Start-Sleep -Seconds 10
+
+    - name: Verify Redis is running
+      run: |
+        netstat -a -n -o | findstr :6379
 
     # # ElasticSearch
     # - name: Set up Elasticsearch
