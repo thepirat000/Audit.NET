@@ -29,42 +29,48 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # RavenDB
-    - name: Install RavenDB 
-      run: choco install -y RavenDB --version=7.0.2
-
-    - name: Start RavenDB on port 8080
-      shell: pwsh
+    # Mongo DB
+    - name: Start MongoDB service
       run: |
-        $args = '--ServerUrl="http://localhost:8080" --RunInMemory -l'
-        Start-Process `
-          -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
-          -ArgumentList $args `
-          -NoNewWindow &
-        Start-Sleep -Seconds 10
+        Set-Service -Name 'MongoDB' -StartupType Automatic
+        Start-Service -Name 'MongoDB'
 
-    # Cosmos 
-    - name: Start Azure Cosmos DB emulator
-      shell: pwsh
-      run: |
-        Write-Host "Launching Cosmos DB Emulator"
-        Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-        Start-CosmosDbEmulator
+    # # RavenDB
+    # - name: Install RavenDB 
+    #   run: choco install -y RavenDB --version=7.0.2
 
-    # Azurite
-    - name: Start Azurite
-      id: azurite
-      uses: potatoqualitee/azuright@v1
-      with:
-        version: latest
+    # - name: Start RavenDB on port 8080
+    #   shell: pwsh
+    #   run: |
+    #     $args = '--ServerUrl="http://localhost:8080" --RunInMemory -l'
+    #     Start-Process `
+    #       -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
+    #       -ArgumentList $args `
+    #       -NoNewWindow &
+    #     Start-Sleep -Seconds 10
 
-    # SQL Server
-    - name: Install SQL Server
-      uses: Particular/install-sql-server-action@v1.0.0
-      with:
-        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
-        catalog: Audit
-        extra-params: "Encrypt=False;"
+    # # Cosmos 
+    # - name: Start Azure Cosmos DB emulator
+    #   shell: pwsh
+    #   run: |
+    #     Write-Host "Launching Cosmos DB Emulator"
+    #     Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+    #     Start-CosmosDbEmulator
+
+    # # Azurite
+    # - name: Start Azurite
+    #   id: azurite
+    #   uses: potatoqualitee/azuright@v1
+    #   with:
+    #     version: latest
+
+    # # SQL Server
+    # - name: Install SQL Server
+    #   uses: Particular/install-sql-server-action@v1.0.0
+    #   with:
+    #     connection-string-env-var: SQL_SERVER_CONNECTION_STRING
+    #     catalog: Audit
+    #     extra-params: "Encrypt=False;"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -111,7 +117,9 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        #dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureCosmos|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\test\Audit.MongoClient.UnitTest --no-build -c release --filter "TestCategory=Mongo" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\test\Audit.MongoDB.UnitTest --no-build -c release --filter "TestCategory=Mongo" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
