@@ -34,23 +34,8 @@ jobs:
       uses: ankane/setup-opensearch@v1
       with:
         opensearch-version: 2.19.2  # Specify a version >= 2.4 for Windows compatibility
-
-    - name: Change OpenSearch HTTP port to 9250
-      shell: pwsh
-      run: |
-        $configPath = "$env:OPENSEARCH_HOME\config\opensearch.yml"
-        if (Test-Path $configPath) {
-          Add-Content -Path $configPath -Value "`nhttp.port: 9250"
-        } else {
-          Write-Error "OpenSearch configuration file not found at $configPath"
-          exit 1
-        } 
-        
-    - name: Start OpenSearch
-      shell: pwsh
-      run: |
-        Start-Process -FilePath "$env:OPENSEARCH_HOME\bin\opensearch.bat" -NoNewWindow
-        Start-Sleep -Seconds 10  # Wait for OpenSearch to initialize
+        config: |
+            http.port: 9250    
 
     # # Mongo DB
     # - name: Start MongoDB service
