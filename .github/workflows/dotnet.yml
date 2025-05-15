@@ -37,7 +37,7 @@ jobs:
 
     - name: Start Redis
       run: |
-        redis\redis-server.exe --daemonize no &
+        redis\redis-server.exe --daemonize no
 
     # # ElasticSearch
     # - name: Set up Elasticsearch
