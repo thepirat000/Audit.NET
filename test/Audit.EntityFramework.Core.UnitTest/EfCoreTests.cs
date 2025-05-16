@@ -1,12 +1,12 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
+
 using Audit.Core;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.Threading.Tasks;
+
+using NUnit.Framework;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
