@@ -104,13 +104,13 @@ jobs:
         Start-Sleep -Seconds 10
         netstat -a -n -o | findstr :8080
 
-    # Cosmos 
-    - name: Start Azure Cosmos DB emulator
-      shell: pwsh
-      run: |
-        Write-Host "Launching Cosmos DB Emulator"
-        Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-        Start-CosmosDbEmulator
+    # # Cosmos 
+    # - name: Start Azure Cosmos DB emulator
+    #   shell: pwsh
+    #   run: |
+    #     Write-Host "Launching Cosmos DB Emulator"
+    #     Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+    #     Start-CosmosDbEmulator
 
     # Azurite
     - name: Start Azurite
