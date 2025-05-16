@@ -39,11 +39,10 @@ jobs:
       run: |
         mysql -uroot -e "
           CREATE DATABASE test;
-          USE test;
           CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
           GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
           FLUSH PRIVILEGES;
-          CREATE TABLE event (
+          CREATE TABLE test.event (
             id INT unsigned NOT NULL AUTO_INCREMENT,
             inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_updated_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
