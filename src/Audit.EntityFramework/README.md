@@ -116,7 +116,7 @@ public class MyContext : DbContext
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
     {
-        return await _helper.SaveChangesAsync(_auditContext, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken));
+        return await _helper.SaveChangesAsync(_auditContext, () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken);
     }
 }
 ```
