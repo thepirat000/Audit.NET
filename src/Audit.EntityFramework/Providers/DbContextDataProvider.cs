@@ -146,13 +146,13 @@ namespace Audit.EntityFramework.Providers
 
         private static void AddEntity(DbContext dbContext, object entity)
         {
-            var dbSet = (dynamic)dbContext.Set(entity.GetType());
+            dynamic dbSet = dbContext.Set(entity.GetType());
             dbSet.Add((dynamic)entity);
         }
 
         private static async Task AddEntityAsync(DbContext dbContext, object entity, CancellationToken cancellationToken)
         {
-            var dbSet = (dynamic)dbContext.Set(entity.GetType());
+            dynamic dbSet = dbContext.Set(entity.GetType());
             await dbSet.AddAsync((dynamic)entity, cancellationToken);
         }
 
