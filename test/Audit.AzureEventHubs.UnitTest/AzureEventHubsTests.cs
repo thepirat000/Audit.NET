@@ -15,6 +15,7 @@ namespace Audit.AzureEventHubs.UnitTest
     [TestFixture]
     [Category("Integration")]
     [Category("Azure")]
+    [Category("AzureEventHubs")]
     public class AzureEventHubsTests
     {
         [Test]

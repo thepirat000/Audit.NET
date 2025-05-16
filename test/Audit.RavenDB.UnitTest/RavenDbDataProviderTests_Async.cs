@@ -17,7 +17,7 @@ namespace Audit.RavenDB.UnitTest
     [Category("RavenDB")]
     public class RavenDbDataProviderTests_Async
     {
-        private const string ravenServerUrl = "http://localhost:8080";
+        private const string ravenServerUrl = "http://127.0.0.1:8080";
         private const string eventType = "SysTxtJson";
 
         public class DailyTemperature

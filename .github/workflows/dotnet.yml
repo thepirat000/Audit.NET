@@ -1,4 +1,4 @@
-# This workflow will build a .NET project
+﻿# This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: BUILD & RUN TESTS
@@ -14,10 +14,11 @@ env:
   AUDIT_NET_AZUREDOCDBAUTHKEY: ${{ secrets.AUDIT_NET_AZUREDOCDBAUTHKEY }}
   AUDIT_NET_AZUREDOCDBURL: ${{ secrets.AUDIT_NET_AZUREDOCDBURL }}
   AUDIT_NET_AZURETABLECNNSTRING: ${{ secrets.AUDIT_NET_AZURETABLECNNSTRING }}
-  AUDIT_NET_AZUREBLOBSERVICEURL: ${{ secrets.AUDIT_NET_AZUREBLOBSERVICEURL }}
+  AUDIT_NET_AZUREBLOBCNNSTRING: ${{ secrets.AUDIT_NET_AZUREBLOBCNNSTRING }}
   AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
   AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  ACCEPT_EULA: 'Y'
 
 jobs:
   build_and_test:
@@ -27,6 +28,104 @@ jobs:
        
     - name: Checkout
       uses: actions/checkout@v3
+
+    # MySql
+    - name: Set up MySQL
+      uses: shogo82148/actions-setup-mysql@v1
+      with:
+        mysql-version: '9.0'
+    
+    - name: Create MySql objects
+      run: |
+        mysql -uroot -e "
+          CREATE DATABASE test;
+          CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+          GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
+          FLUSH PRIVILEGES;
+          CREATE TABLE test.event (
+            id INT unsigned NOT NULL AUTO_INCREMENT,
+            inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_updated_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            data JSON NOT NULL,
+            user VARCHAR(25) NULL,
+            PRIMARY KEY (id)
+          );"
+
+    # Redis
+    - name: Download Redis for Windows
+      shell: pwsh
+      run: |
+        Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
+        Expand-Archive redis.zip -DestinationPath redis
+
+    - name: Start Redis
+      shell: pwsh
+      run: |
+        $args = '--daemonize no'
+        Start-Process `
+          -FilePath "redis\redis-server.exe" `
+          -ArgumentList $args `
+          -NoNewWindow &
+        Start-Sleep -Seconds 10
+        netstat -a -n -o | findstr :6379
+
+    # ElasticSearch
+    - name: Set up Elasticsearch
+      uses: ankane/setup-elasticsearch@v1
+      with:
+        elasticsearch-version: 9
+
+    # OpenSearch
+    - name: Set up OpenSearch
+      uses: ankane/setup-opensearch@v1
+      with:
+        opensearch-version: 2.19.2  # Specify a version >= 2.4 for Windows compatibility
+        config: |
+            http.port: 9250    
+
+    # Mongo DB
+    - name: Start MongoDB service
+      run: |
+        Set-Service -Name 'MongoDB' -StartupType Automatic
+        Start-Service -Name 'MongoDB'
+
+    # RavenDB
+    - name: Install RavenDB 
+      run: choco install -y RavenDB --version=7.0.2
+
+    - name: Start RavenDB on port 8080
+      shell: pwsh
+      run: |
+        $args = '--ServerUrl="http://localhost:8080" --RunInMemory -l'
+        Start-Process `
+          -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
+          -ArgumentList $args `
+          -NoNewWindow &
+        Start-Sleep -Seconds 10
+        netstat -a -n -o | findstr :8080
+
+    # # Cosmos 
+    # - name: Start Azure Cosmos DB emulator
+    #   shell: pwsh
+    #   run: |
+    #     Write-Host "Launching Cosmos DB Emulator"
+    #     Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+    #     Start-CosmosDbEmulator
+
+    # Azurite
+    - name: Start Azurite
+      id: azurite
+      uses: potatoqualitee/azuright@v1
+      with:
+        version: latest
+
+    # SQL Server
+    - name: Install SQL Server
+      uses: Particular/install-sql-server-action@v1.0.0
+      with:
+        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
+        catalog: Audit
+        extra-params: "Encrypt=False;"
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -65,13 +164,6 @@ jobs:
           /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**,**/Tests/**" `
           /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**"
 
-    - name: Install SQL Server
-      uses: Particular/install-sql-server-action@v1.0.0
-      with:
-        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
-        catalog: Audit
-        extra-params: "Encrypt=False;"
-
     - name: Dotnet Restore 
       run: dotnet restore
       
@@ -80,11 +172,11 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=SqlServer" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Azure*;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
+        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.ElasticSearch;-Audit.NET.Kafka;-Audit.NET.MongoDB;-Audit.NET.MySql;-Audit.NET.PostgreSql;-Audit.NET.RavenDB;-Audit.NET.Redis"
 
     - name: SonarScanner End
       shell: pwsh

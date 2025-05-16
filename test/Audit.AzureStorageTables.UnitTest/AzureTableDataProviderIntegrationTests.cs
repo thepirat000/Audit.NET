@@ -11,6 +11,7 @@ namespace Audit.AzureStorageTables.UnitTest
     [TestFixture]
     [Category("Integration")]
     [Category("Azure")]
+    [Category("AzureTables")]
     public class AzureTableDataProviderIntegrationTests
     {
         #region Sync

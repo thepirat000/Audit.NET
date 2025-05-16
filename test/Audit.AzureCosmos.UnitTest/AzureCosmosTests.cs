@@ -17,6 +17,7 @@ namespace Audit.AzureCosmos.UnitTest
         [Test]
         [Category("Integration")]
         [Category("Azure")]
+        [Category("AzureCosmos")]
         public void TestAzureCosmos_CustomId()
         {
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();

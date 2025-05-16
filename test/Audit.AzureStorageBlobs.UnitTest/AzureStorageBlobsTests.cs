@@ -13,6 +13,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
     [TestFixture]
     [Category("Integration")]
     [Category("Azure")]
+    [Category("AzureBlobs")]
     public class AzureStorageBlobsTests
     {
         [Test]
