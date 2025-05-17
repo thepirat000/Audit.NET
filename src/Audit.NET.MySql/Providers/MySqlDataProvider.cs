@@ -156,7 +156,7 @@ namespace Audit.MySql.Providers
         {
             var cmdText = string.Format("UPDATE `{0}` SET {1} WHERE `{2}` = @id;", 
                 TableName, 
-                GetSetForUpdate(auditEvent), 
+                GetSetForUpdate(), 
                 IdColumnName);
             cnn.Open();
             var cmd = cnn.CreateCommand();
@@ -166,7 +166,7 @@ namespace Audit.MySql.Providers
             return cmd;
         }
 
-        private string GetSetForUpdate(AuditEvent auditEvent)
+        private string GetSetForUpdate()
         {
             var sets = new List<string>();
             if (JsonColumnName != null)

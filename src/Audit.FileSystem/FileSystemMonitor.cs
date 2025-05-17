@@ -193,7 +193,7 @@ namespace Audit.FileSystem
                 {
                     if (!_options.IgnoreMD5)
                     {
-                        fsEvent.MD5 = ComputeMD5(e.FullPath);
+                        fsEvent.MD5 = ComputeMd5(e.FullPath);
                     }
                     if (_options.IncludeContentPredicate != null)
                     {
@@ -225,24 +225,21 @@ namespace Audit.FileSystem
             fsEvent.LastWriteTime = fsInfo.LastWriteTime;
         }
 
-        private string ComputeMD5(string filePath)
+        private static string ComputeMd5(string filePath)
         {
             byte[] hash;
-            using (var md5 = MD5.Create())
+            using var md5 = MD5.Create();
+            try
             {
-                try
-                {
-                    using (var stream = File.OpenRead(filePath))
-                    {
-                        hash = md5.ComputeHash(stream);
-                    }
-                }
-                catch (IOException ex)
-                {
-                    return $"{{Error}} {ex.Message}";
-                }
-                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant(); 
+                using var stream = File.OpenRead(filePath);
+
+                hash = md5.ComputeHash(stream);
             }
+            catch (IOException ex)
+            {
+                return $"{{Error}} {ex.Message}";
+            }
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
     }
 }
