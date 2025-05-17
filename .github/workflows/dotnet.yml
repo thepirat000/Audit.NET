@@ -172,7 +172,7 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End
       shell: pwsh
@@ -182,7 +182,7 @@ jobs:
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.Kafka;-Audit.NET.PostgreSql"
+        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.Kafka;-Audit.NET.PostgreSql;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs;-Audit.NET.AzureCosmos"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4

@@ -147,6 +147,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
         [Test]
         [Category("Integration")]
         [Category("Azure")]
+        [Category("AzureBlobs")]
         public void Test_AzureStorageBlobs_Credential()
         {
             var id = Guid.NewGuid().ToString();
