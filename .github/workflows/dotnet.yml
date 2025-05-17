@@ -43,7 +43,7 @@ jobs:
 
     - name: PostgreSQL (Init)
       run: |
-        psql ${{ steps.postgres.outputs.connection-uri }} -f ""./test/Audit.PostgreSql.UnitTest/SqlScript.sql""
+        psql ${{ steps.postgres.outputs.connection-uri }} -f "./test/Audit.PostgreSql.UnitTest/SqlScript.sql"
 
     # MySql
     - name: MySQL (Setup)
