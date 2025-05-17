@@ -42,7 +42,7 @@ jobs:
 
     - name: PostgreSQL (Init)
       run: |
-        psql ${{ steps.postgres.outputs.connection-uri }} -f ./test/Audit.PostgreSql.UnitTest/SqlScript.sql
+        psql postgresql://postgres:postgres@localhost:5432/postgres -f ./test/Audit.PostgreSql.UnitTest/SqlScript.sql
 
     # MySql
     - name: MySQL (Setup)
@@ -52,19 +52,7 @@ jobs:
     
     - name: MySql (Init)
       run: |
-        mysql -uroot -e "
-          CREATE DATABASE test;
-          CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
-          GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
-          FLUSH PRIVILEGES;
-          CREATE TABLE test.event (
-            id INT unsigned NOT NULL AUTO_INCREMENT,
-            inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-            last_updated_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            data JSON NOT NULL,
-            user VARCHAR(25) NULL,
-            PRIMARY KEY (id)
-          );"
+        mysql -uroot -e "source ./test/Audit.MySql.UnitTest/MySqlScript.mysql"
 
     # Redis
     - name: Redis (Setup)
