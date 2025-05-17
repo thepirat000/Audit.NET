@@ -15,10 +15,9 @@ namespace Audit.WebApi.ConfigurationApi
         {
             _config._logDisabledBuilder = ctx =>
             {
-                var actionDescriptior = ctx.ActionDescriptor as ControllerActionDescriptor;
-                if (actionDescriptior != null)
+                if (ctx.ActionDescriptor is ControllerActionDescriptor actionDescriptor)
                 {
-                    return !controllerActionPredicate.Invoke(actionDescriptior);
+                    return !controllerActionPredicate.Invoke(actionDescriptor);
                 }
                 return true;
             };
@@ -26,13 +25,13 @@ namespace Audit.WebApi.ConfigurationApi
         }
 
 #if ASP_CORE
-        public IAuditApiGlobalConfigurator LogRequestIf(Func<Microsoft.AspNetCore.Http.HttpRequest, bool> requestSelector)
+        public IAuditApiGlobalConfigurator LogRequestIf(Func<Microsoft.AspNetCore.Http.HttpRequest, bool> requestPredicate)
         {
             _config._logDisabledBuilder = ctx =>
             {
                 if (ctx.HttpContext?.Request != null)
                 {
-                    return !requestSelector.Invoke(ctx.HttpContext.Request);
+                    return !requestPredicate.Invoke(ctx.HttpContext.Request);
                 }
                 return true;
             };

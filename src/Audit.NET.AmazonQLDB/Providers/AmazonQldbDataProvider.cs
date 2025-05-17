@@ -178,7 +178,7 @@ namespace Audit.AmazonQLDB.Providers
                       WHERE eid = ?",
                     new ValueFactory().NewString(insertDocumentId))).FirstAsync(cancellationToken);
             }, cancellationToken);
-            var json = selectedEvent.ToPrettyString();
+            var json = selectedEvent!.ToPrettyString();
             var selectedAuditEvent = JsonConvert.DeserializeObject<T>(json, JsonSettings);
             return selectedAuditEvent;
         }

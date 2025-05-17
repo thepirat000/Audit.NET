@@ -830,7 +830,7 @@ namespace Audit.UnitTest
             });
             Core.Configuration.AddOnSavingAction(scope =>
             {
-                Assert.True(false, "This should not be executed");
+                Assert.Fail("This should not be executed");
             });
 
             AuditEvent ev;

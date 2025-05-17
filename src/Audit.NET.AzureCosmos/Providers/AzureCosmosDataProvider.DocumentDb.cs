@@ -87,7 +87,7 @@ namespace Audit.AzureCosmos.Providers
 
         public override object CloneValue<T>(T value, AuditEvent auditEvent)
         {
-            if (value == null)
+            if (value is null)
             {
                 return null;
             }
@@ -124,66 +124,48 @@ namespace Audit.AzureCosmos.Providers
             return doc.Id;
         }
 
-        public override void ReplaceEvent(object docId, AuditEvent auditEvent)
+        public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
             var client = GetClient(auditEvent);
-            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent), docId.ToString());
+            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent), eventId.ToString());
             Document doc;
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
                 doc = JsonSerializable.LoadFrom<Document>(ms);
             }
-            doc.Id = docId.ToString();
+            doc.Id = eventId.ToString();
             client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = JsonSerializerSettings }).Wait();
         }
         
-        public override async Task ReplaceEventAsync(object docId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
+        public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
             var client = GetClient(auditEvent);
-            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent), docId.ToString());
+            var docUri = UriFactory.CreateDocumentUri(Database.GetValue(auditEvent), Container.GetValue(auditEvent), eventId.ToString());
             Document doc;
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(auditEvent.ToJson())))
             {
                 doc = JsonSerializable.LoadFrom<Document>(ms);
             }
-            doc.Id = docId.ToString();
+            doc.Id = eventId.ToString();
             await client.ReplaceDocumentAsync(docUri, doc, new RequestOptions() { JsonSerializerSettings = JsonSerializerSettings }, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
         /// </summary>
-        public override T GetEvent<T>(object id)
+        public override T GetEvent<T>(object eventId)
         {
 #if !NET45
-            if (id is ValueTuple<string, string> vt)
+            if (eventId is ValueTuple<string, string> vt)
             {
                 return GetEvent<T>(vt.Item1, vt.Item2);
             }
 #endif
-            if (id is Tuple<string, string> t)
+            if (eventId is Tuple<string, string> t)
             {
                 return GetEvent<T>(t.Item1, t.Item2);
             }
-            return GetEvent<T>(id?.ToString(), null);
-        }
-
-        /// <summary>
-        /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
-        /// </summary>
-        public override async Task<T> GetEventAsync<T>(object id, CancellationToken cancellationToken = default)
-        {
-#if !NET45
-            if (id is ValueTuple<string, string> vt)
-            {
-                return await GetEventAsync<T>(vt.Item1, vt.Item2, cancellationToken);
-            }
-#endif
-            if (id is Tuple<string, string> t)
-            {
-                return await GetEventAsync<T>(t.Item1, t.Item2, cancellationToken);
-            }
-            return await GetEventAsync<T>(id?.ToString(), null, cancellationToken);
+            return GetEvent<T>(eventId?.ToString(), null);
         }
 
         /// <summary>
@@ -200,6 +182,24 @@ namespace Audit.AzureCosmos.Providers
         public AuditEvent GetEvent(string docId, string partitionKey)
         {
             return GetEvent<AuditEvent>(docId, partitionKey);
+        }
+
+        /// <summary>
+        /// Gets an event stored on cosmos DB from its document id or a Tuple&lt;string, string&gt; / ValueTuple&lt;string, string&gt; of id and partitionKey. 
+        /// </summary>
+        public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
+        {
+#if !NET45
+            if (eventId is ValueTuple<string, string> vt)
+            {
+                return await GetEventAsync<T>(vt.Item1, vt.Item2, cancellationToken);
+            }
+#endif
+            if (eventId is Tuple<string, string> t)
+            {
+                return await GetEventAsync<T>(t.Item1, t.Item2, cancellationToken);
+            }
+            return await GetEventAsync<T>(eventId?.ToString(), null, cancellationToken);
         }
 
         /// <summary>
