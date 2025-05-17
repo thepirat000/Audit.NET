@@ -3,6 +3,10 @@ using Audit.Core;
 using Polly;
 using Polly.Fallback;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable MethodHasAsyncOverload
+#pragma warning disable S6966
+
 namespace Audit.Polly
 {
     public static class FallbackActionArgumentsExtensions
@@ -37,7 +41,7 @@ namespace Audit.Polly
                     }
                 case nameof(fallbackDataProvider.ReplaceEvent):
                     {
-                        var eventId = args.Context.Properties.GetValue<object?>(new ResiliencePropertyKey<object?>("EventId"), null);
+                        var eventId = args.Context.Properties.GetValue(new ResiliencePropertyKey<object?>("EventId"), null);
 
                         fallbackDataProvider.ReplaceEvent(eventId, auditEvent);
 
@@ -45,7 +49,7 @@ namespace Audit.Polly
                     }
                 case nameof(fallbackDataProvider.ReplaceEventAsync):
                     {
-                        var eventId = args.Context.Properties.GetValue<object?>(new ResiliencePropertyKey<object?>("EventId"), null);
+                        var eventId = args.Context.Properties.GetValue(new ResiliencePropertyKey<object?>("EventId"), null);
 
                         await fallbackDataProvider.ReplaceEventAsync(eventId, auditEvent, args.Context.CancellationToken);
 

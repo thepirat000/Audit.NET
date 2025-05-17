@@ -38,7 +38,11 @@
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0' ">
+		<PackageReference Include="System.Threading.Channels" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' AND '$(TargetFramework)' != 'net7.0' ">
 		<PackageReference Include="System.Threading.Channels" Version="9.0.0" />
 	</ItemGroup>
 

@@ -194,7 +194,10 @@ namespace Audit.EntityFramework.ConfigurationApi
                 TargetType = typeof(TAuditEntity),
                 Action = async (ev, entry, entity) =>
                 {
-                    await entityAsyncAction?.Invoke(entry, (TAuditEntity)entity);
+                    if (entityAsyncAction != null)
+                    {
+                        await entityAsyncAction.Invoke(entry, (TAuditEntity)entity);
+                    }
                     return true;
                 }
             }));
@@ -222,7 +225,10 @@ namespace Audit.EntityFramework.ConfigurationApi
                 TargetType = typeof(TAuditEntity),
                 Action = async (ev, entry, entity) =>
                 {
-                    await entityAsyncAction?.Invoke(entry, (TAuditEntity)entity);
+                    if (entityAsyncAction != null)
+                    {
+                        await entityAsyncAction.Invoke(entry, (TAuditEntity)entity);
+                    }
                     return true;
                 }
             }));

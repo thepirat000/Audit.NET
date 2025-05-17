@@ -97,14 +97,14 @@ namespace Audit.MongoDB.Providers
         /// If <c>true</c> the element names are not validated, use this when you know the element names will not contain invalid characters.
         /// If <c>false</c> (default) the element names are validated and fixed to avoid containing invalid characters.
         /// </summary>
-        public bool IgnoreElementNames { get; set; } = false;
+        public bool IgnoreElementNames { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the target object and extra fields should be serialized as Bson.
         /// Default is false to serialize using the default JSON serializer from Audit.Core.Configuration.JsonAdapter
         /// </summary>
         /// <value><c>true</c> if should serialize as Bson; or <c>false</c> to serialize as Json.</value>
-        public bool SerializeAsBson { get; set; } = false;
+        public bool SerializeAsBson { get; set; }
 
         public MongoDataProvider()
         {
@@ -191,7 +191,7 @@ namespace Audit.MongoDB.Providers
         
         public override object CloneValue<T>(T value, AuditEvent auditEvent)
         {
-            if (value == null || value is string)
+            if (value is null || value is string)
             {
                 return value;
             }
@@ -221,7 +221,7 @@ namespace Audit.MongoDB.Providers
                 return auditEvent.ToBsonDocument(auditEvent.GetType());
             }
 
-            return BsonDocument.Parse(Core.Configuration.JsonAdapter.Serialize(auditEvent));
+            return BsonDocument.Parse(Configuration.JsonAdapter.Serialize(auditEvent));
         }
 
         /// <summary>
@@ -247,15 +247,15 @@ namespace Audit.MongoDB.Providers
                 {
                     if (elem.Value.IsBsonDocument)
                     {
-                        FixDocumentElementNames(elem.Value as BsonDocument);
+                        FixDocumentElementNames((BsonDocument)elem.Value);
                     }
                     else if (elem.Value.IsBsonArray)
                     {
-                        foreach (var sub in (elem.Value as BsonArray))
+                        foreach (var sub in ((BsonArray)elem.Value))
                         {
                             if (sub.IsBsonDocument)
                             {
-                                FixDocumentElementNames(sub as BsonDocument);
+                                FixDocumentElementNames((BsonDocument)sub);
                             }
                         }
                     }

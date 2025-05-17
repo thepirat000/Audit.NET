@@ -4,6 +4,10 @@ using Audit.Core;
 using Polly;
 using Polly.Hedging;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable MethodHasAsyncOverload
+#pragma warning disable S6966
+
 namespace Audit.Polly
 {
     public static class HedgingActionGeneratorArgumentsExtensions
@@ -43,7 +47,7 @@ namespace Audit.Polly
                 }
                 case nameof(hedgingDataProvider.ReplaceEvent):
                 {
-                    var eventId = args.PrimaryContext.Properties.GetValue<object?>(new ResiliencePropertyKey<object?>("EventId"), null);
+                    var eventId = args.PrimaryContext.Properties.GetValue(new ResiliencePropertyKey<object?>("EventId"), null);
 
                     hedgingDataProvider.ReplaceEvent(eventId, auditEvent);
 
@@ -51,7 +55,7 @@ namespace Audit.Polly
                 }
                 case nameof(hedgingDataProvider.ReplaceEventAsync):
                 {
-                    var eventId = args.PrimaryContext.Properties.GetValue<object?>(new ResiliencePropertyKey<object?>("EventId"), null);
+                    var eventId = args.PrimaryContext.Properties.GetValue(new ResiliencePropertyKey<object?>("EventId"), null);
 
                     await hedgingDataProvider.ReplaceEventAsync(eventId, auditEvent, args.PrimaryContext.CancellationToken);
 

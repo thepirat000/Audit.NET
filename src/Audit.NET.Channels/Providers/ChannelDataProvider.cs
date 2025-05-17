@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Audit.Channels.Configuration;
 using Audit.Core;
+#pragma warning disable CS8603 // Possible null reference return.
 
 namespace Audit.Channels.Providers
 {
@@ -25,7 +26,7 @@ namespace Audit.Channels.Providers
             _channel = Channel.CreateUnbounded<AuditEvent>();
         }
 
-        public ChannelDataProvider(Action<IChannelProviderConfigurator> config)
+        public ChannelDataProvider(Action<IChannelProviderConfigurator>? config)
         {
             var chConfig = new ChannelProviderConfigurator();
             if (config != null)
@@ -64,7 +65,7 @@ namespace Audit.Channels.Providers
         {
             await _channel.Writer.WriteAsync(auditEvent, cancellationToken).ConfigureAwait(false);
 
-            return Task.FromResult<object>(null);
+            return null;
         }
 
         /// <summary>
@@ -92,10 +93,12 @@ namespace Audit.Channels.Providers
         /// </summary>
         /// <param name="millisecondsTimeout">The number of milliseconds to wait, or (-1) to wait indefinitely.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public async Task<AuditEvent> TryTakeAsync(int millisecondsTimeout, CancellationToken cancellationToken = default)
+        public async Task<AuditEvent?> TryTakeAsync(int millisecondsTimeout, CancellationToken cancellationToken = default)
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, new CancellationTokenSource(millisecondsTimeout).Token);
-            var dataAvailable = false;
+            
+            bool dataAvailable;
+
             try
             {
                 dataAvailable = await _channel.Reader.WaitToReadAsync(cts.Token);
@@ -106,7 +109,7 @@ namespace Audit.Channels.Providers
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Timeout
-                return default;
+                return null;
             }
             
             if (dataAvailable && _channel.Reader.TryRead(out var auditEvent))
@@ -114,7 +117,7 @@ namespace Audit.Channels.Providers
                 return auditEvent;
             }
 
-            return default;
+            return null;
         }
 
         /// <summary>

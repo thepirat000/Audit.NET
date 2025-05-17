@@ -46,10 +46,10 @@ namespace Audit.Udp.Providers
         public Func<byte[], AuditEvent> CustomDeserializer { get; set; }
 
         private UdpClient _clientSend;
-        private object _lockerSend = new object();
+        private readonly object _lockerSend = new object();
 
         private UdpClient _clientReceive;
-        private object _lockReceive = new object();
+        private readonly object _lockReceive = new object();
 
         /// <summary>
         /// Sends an event to the network as an UDP datagram

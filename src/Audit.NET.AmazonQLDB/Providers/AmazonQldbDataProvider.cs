@@ -84,7 +84,7 @@ namespace Audit.AmazonQLDB.Providers
 
         public override object CloneValue<T>(T value, AuditEvent auditEvent)
         {
-            if (value == null)
+            if (value is null)
             {
                 return null;
             }
