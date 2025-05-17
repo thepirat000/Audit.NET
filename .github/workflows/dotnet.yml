@@ -31,6 +31,7 @@ jobs:
 
     # PostgreSQL
     - name: PostgreSQL (Setup) 
+      id: postgres
       uses: ikalnytskyi/action-setup-postgres@v7
       with:
         postgres-version: '17'
@@ -42,7 +43,7 @@ jobs:
 
     - name: PostgreSQL (Init)
       run: |
-        psql postgresql://postgres:postgres@localhost:5432/postgres -f ./test/Audit.PostgreSql.UnitTest/SqlScript.sql
+        psql ${{ steps.postgres.outputs.connection-uri }} -f ""./test/Audit.PostgreSql.UnitTest/SqlScript.sql""
 
     # MySql
     - name: MySQL (Setup)
