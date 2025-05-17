@@ -111,7 +111,7 @@ namespace Audit.WebApi.Template
         {
             Audit.Core.Configuration.JsonSettings.WriteIndented = true;
 
-            services.AddSingleton<AuditDataProvider>(new FileDataProvider(cfg => cfg
+            services.AddSingleton<IAuditDataProvider>(new FileDataProvider(cfg => cfg
                 .Directory(@"C:\Logs")
                 .FilenameBuilder(ev => $"{ev.StartDate:yyyyMMddHHmmssffff}_{ev.EventType}.json")));
 
