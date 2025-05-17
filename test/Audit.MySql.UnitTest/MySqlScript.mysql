@@ -1,6 +1,6 @@
-Drop table event;
+Create Database test;
 
-CREATE TABLE event
+CREATE TABLE test.event
 (
 	id INT unsigned NOT NULL AUTO_INCREMENT, 
 	inserted_date DATETIME DEFAULT CURRENT_TIMESTAMP,
