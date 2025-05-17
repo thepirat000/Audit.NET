@@ -185,16 +185,17 @@ jobs:
         dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.Kafka;-Audit.NET.PostgreSql"
 
     - name: Upload Code Coverage Report artifact
-      continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
         name: coveragereport
         path: ${{ github.workspace }}\Tests\coveragereport
     
     - name: Rename summary coverage file
+      continue-on-error: true
       run: mv -force "${{ github.workspace }}\Tests\coveragereport\Summary.md" "${{ github.workspace }}\CODE_COVERAGE.md"
 
     - name: Commit CODE_COVERAGE.md
+      continue-on-error: true
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: Commit CODE_COVERAGE.md
