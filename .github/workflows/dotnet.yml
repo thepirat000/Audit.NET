@@ -27,15 +27,30 @@ jobs:
     steps:
        
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    # PostgreSQL
+    - name: PostgreSQL (Setup) 
+      uses: ikalnytskyi/action-setup-postgres@v7
+      with:
+        postgres-version: '17'
+        username:       'postgres'
+        password:       'admin'
+        database:       'postgres'
+        port:           '5432'
+        ssl:            'false'
+
+    - name: PostgreSQL (Init)
+      run: |
+        psql ${{ steps.postgres.outputs.connection-uri }} -f ./test/Audit.PostgreSql.UnitTest/SqlScript.sql
 
     # MySql
-    - name: Set up MySQL
+    - name: MySQL (Setup)
       uses: shogo82148/actions-setup-mysql@v1
       with:
         mysql-version: '9.0'
     
-    - name: Create MySql objects
+    - name: MySql (Init)
       run: |
         mysql -uroot -e "
           CREATE DATABASE test;
@@ -52,13 +67,13 @@ jobs:
           );"
 
     # Redis
-    - name: Download Redis for Windows
+    - name: Redis (Setup)
       shell: pwsh
       run: |
         Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
         Expand-Archive redis.zip -DestinationPath redis
 
-    - name: Start Redis
+    - name: Redis (Init)
       shell: pwsh
       run: |
         $args = '--daemonize no'
@@ -70,13 +85,13 @@ jobs:
         netstat -a -n -o | findstr :6379
 
     # ElasticSearch
-    - name: Set up Elasticsearch
+    - name: ElasticSearch (Setup)
       uses: ankane/setup-elasticsearch@v1
       with:
         elasticsearch-version: 9
 
     # OpenSearch
-    - name: Set up OpenSearch
+    - name: OpenSearch (Setup)
       uses: ankane/setup-opensearch@v1
       with:
         opensearch-version: 2.19.2  # Specify a version >= 2.4 for Windows compatibility
@@ -84,16 +99,16 @@ jobs:
             http.port: 9250    
 
     # Mongo DB
-    - name: Start MongoDB service
+    - name: MongoDB (Setup)
       run: |
         Set-Service -Name 'MongoDB' -StartupType Automatic
         Start-Service -Name 'MongoDB'
 
     # RavenDB
-    - name: Install RavenDB 
+    - name: RavenDB (Setup)
       run: choco install -y RavenDB --version=7.0.2
 
-    - name: Start RavenDB on port 8080
+    - name: RavenDB (Init)
       shell: pwsh
       run: |
         $args = '--ServerUrl="http://localhost:8080" --RunInMemory -l'
@@ -105,7 +120,7 @@ jobs:
         netstat -a -n -o | findstr :8080
 
     # # Cosmos 
-    # - name: Start Azure Cosmos DB emulator
+    # - name: Cosmos DB (Setup)
     #   shell: pwsh
     #   run: |
     #     Write-Host "Launching Cosmos DB Emulator"
@@ -113,21 +128,21 @@ jobs:
     #     Start-CosmosDbEmulator
 
     # Azurite
-    - name: Start Azurite
+    - name: Azurite (Setup)
       id: azurite
       uses: potatoqualitee/azuright@v1
       with:
         version: latest
 
     # SQL Server
-    - name: Install SQL Server
+    - name: SQL Server (Setup)
       uses: Particular/install-sql-server-action@v1.0.0
       with:
         connection-string-env-var: SQL_SERVER_CONNECTION_STRING
         catalog: Audit
         extra-params: "Encrypt=False;"
 
-    - name: Setup .NET
+    - name: Install .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
@@ -145,7 +160,7 @@ jobs:
       with:
         nuget-version: '6.x'      
 
-    - name: Install Required Tools
+    - name: Install dotnet Tools
       run: |
         dotnet new tool-manifest
         dotnet tool install dotnet-reportgenerator-globaltool
@@ -172,7 +187,7 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+        dotnet test .\Audit.NET.sln --no-build -c release --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL" --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End
       shell: pwsh
@@ -182,7 +197,7 @@ jobs:
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.Kafka;-Audit.NET.PostgreSql;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs;-Audit.NET.AzureCosmos"
+        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.Kafka;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs;-Audit.NET.AzureCosmos"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4
