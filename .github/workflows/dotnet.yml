@@ -40,12 +40,8 @@ jobs:
 
     # Dynamo DB
     - name: DynamoDB (Setup)
-      uses: rrainn/dynamodb-action@v2.0.1
-      with:
-        port: 8000
-        cors: '*'
-        sharedDb: true
-        inMemory: true
+      run: |
+        docker run -d -p 8000:8000 amazon/dynamodb-local
 
     # PostgreSQL
     - name: PostgreSQL (Setup) 
