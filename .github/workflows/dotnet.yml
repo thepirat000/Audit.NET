@@ -41,7 +41,7 @@ jobs:
     # Dynamo DB
     - name: DynamoDB (Setup)
       run: |
-        docker run --platform linux/amd64 -d -p 8000:8000 amazon/dynamodb-local
+        docker run --platform linux/amd64 -d -p 8000:8000 amazon/dynamodb-local:1.20.0
 
     # PostgreSQL
     - name: PostgreSQL (Setup) 
