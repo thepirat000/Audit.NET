@@ -38,6 +38,15 @@ jobs:
         "PROJECT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         Write-Host "PROJECT_VERSION=$version"
 
+    # Dynamo DB
+    - name: DynamoDB (Setup)
+      uses: rrainn/dynamodb-action@v2.0.1
+      with:
+        port: 8000
+        cors: '*'
+        sharedDb: true
+        inMemory: true
+
     # PostgreSQL
     - name: PostgreSQL (Setup) 
       id: postgres
@@ -187,7 +196,7 @@ jobs:
     - name: Run tests
       run: |
         dotnet test .\Audit.NET.sln --no-build -c release `
-          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL" `
+          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End
@@ -198,7 +207,7 @@ jobs:
 
     - name: Generate Code Coverage Report
       run: |
-        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.DynamoDB;-Audit.NET.Kafka;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs"
+        dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.AmazonQLDB;-Audit.NET.Kafka;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs"
 
     - name: Upload Code Coverage Report artifact
       uses: actions/upload-artifact@v4
