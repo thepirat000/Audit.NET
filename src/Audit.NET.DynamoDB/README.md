@@ -27,20 +27,24 @@ For example:
 ```c#
 Audit.Core.Configuration.DataProvider = new DynamoDataProvider()
 {
-    Client = new Lazy<IAmazonDynamoDB>(() => new AmazonDynamoDBClient(new AmazonDynamoDBConfig() 
-    { 
-        ServiceURL = "http://localhost:8000" 
-    })),
-    TableNameBuilder = ev => "MyTable"
+    Client = new(new AmazonDynamoDBClient(new AmazonDynamoDBConfig() { ServiceURL = "http://localhost:8000" })),
+    TableName = "MyTable",
+    TableBuilderAction = builder  => builder.AddHashKey("Id", DynamoDBEntryType.String),
+    CustomAttributes = new Dictionary<string, Setting<object>>()
+    {
+        { "Id", new(ev => ev.EventType + Guid.NewGuid()) }
+    }
 };
 ```
 
-Or even shorter using the constructor overload that accepts a fluent API:
+Or using the constructor overload that accepts a fluent API:
 
 ```c#
 Audit.Core.Configuration.DataProvider = new DynamoDataProvider(config => config
     .UseUrl("http://localhost:8000")
-    .Table("MyTable"));
+    .Table("MyTable", table => table
+        .AddHashKey("Id", DynamoDBEntryType.String))
+    .SetAttribute("Id", ev => ev.EventType + Guid.NewGuid()));
 ```
 
 
@@ -49,29 +53,33 @@ Or by using the global setup extension `UseDynamoDB()`:
 Audit.Core.Configuration.Setup()
     .UseDynamoDB(config => config
         .UseUrl("http://localhost:8000")
-        .Table(ev => ev.EventType));
+        .Table("MyTable", table => table
+            .AddHashKey("Id", DynamoDBEntryType.String))
+        .SetAttribute("Id", ev => ev.EventType + Guid.NewGuid()));
 ```
 
 > You can provide the table name setting as a string or as a function of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage).
 
+> Note that you need to provide the table builder action to define the table schema, which must include the hash key and optionally a range key.
 
 ### Provider Options
 
-- **Client**: The DynamoDB client creator `AmazonDynamoDBClient`. 
-- **TableNameBuilder**: A function of the audit event that returns the Table Name to use.
-- **CustomAttributes**: A dictionary with additional fields to be included in the document and as custom fields on the audit event.
+- **Client**: The DynamoDB client `AmazonDynamoDBClient`. (required)
+- **TableNameBuilder**: A function of the audit event that returns the Table Name to use. (required)
+- **TableBuilderAction**: A function that receives a `TableBuilder` to define the table schema. This is used to define the hash key and optionally a range key. (required)
+- **CustomAttributes**: A dictionary with additional fields to be included in the document and as custom fields on the audit event. (optional)
 
 ### Fluent API Methods
 
 The provider options can be set with a fluent API described by the following methods:
 
 ##### Connection level
-- **WithClient()**: Use the given DynamoDB client instance (`AmazonDynamoDBClient`).
-- **UseConfig()**: Alternative to `WithClient()`, to use a DynamoDB client with the given settings (`AmazonDynamoDBConfig`).
-- **UseUrl()**: Alternative to use a DynamoDB client only specifying the service URL.
+- **WithClient()**: Uses the provided AmazonDynamoDBClient instance.
+- **UseConfig()**: Configures the DynamoDB client using the specified AmazonDynamoDBConfig, with optional credentials.
+- **UseUrl()**: Sets up the DynamoDB client using only the service URL, with optional credentials.
 
 ##### Table level
-- **Table()**: To specify the table name (as a string or a function of the audit event).
+- **Table()**: To specify the table name (as a string or a function of the audit event) and table configuration.
 
 ##### Attributes level
 - **SetAttribute()**: To specify additional top-level attributes on the document before saving.
@@ -112,38 +120,38 @@ This provider has the following constraints:
 
 The following is an example of a table creation using the [AWSSDK.DynamoDBv2](https://www.nuget.org/packages/AWSSDK.DynamoDBv2/) library:
 
-
 ```c#
 var config = new AmazonDynamoDBConfig() { ServiceURL = "http://localhost:8000" };
 var client = new AmazonDynamoDBClient(config);
 
 await client.CreateTableAsync(new CreateTableRequest()
 {
-    TableName = "AuditEvents",
+    TableName = "MyTable",
     KeySchema = new List<KeySchemaElement>()
     {
-        new KeySchemaElement("EventId", KeyType.HASH),
-        new KeySchemaElement("EventType", KeyType.RANGE)
+        new KeySchemaElement("Id", KeyType.HASH),
+        new KeySchemaElement("Type", KeyType.RANGE)
     },
     AttributeDefinitions = new List<AttributeDefinition>()
     {
-        new AttributeDefinition("EventId", ScalarAttributeType.S),
-        new AttributeDefinition("EventType", ScalarAttributeType.S)
+        new AttributeDefinition("Id", ScalarAttributeType.S),
+        new AttributeDefinition("Type", ScalarAttributeType.S)
     },
     ProvisionedThroughput = new ProvisionedThroughput(1, 1)
 });
 ```
 
-In this case, the primary key is defined as a Hash and a Range key, with `EventId` being the hash, and `EventType` being the range. 
+In this case, the primary key is defined as a Hash and a Range key, with `Id` being the hash, and `Type` being the range. 
 Both must be top-level properties of the [Audit Event](https://github.com/thepirat000/Audit.NET#usage), 
-but since the `EventId` is not a built-in property, you can configure it as a [Custom Field](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments):
+but since the `Id` is not a built-in property, you can configure it as a [Custom Field](https://github.com/thepirat000/Audit.NET#custom-fields-and-comments]:
 
 ```c#
 Audit.Core.Configuration.Setup()
     .UseDynamoDB(config => config
         .UseUrl(url)
-        .Table("AuditEvents")
-        .SetAttribute("EventId", ev => Guid.NewGuid()));
+        .Table("MyTable", table => table
+            .AddHashKey("Id", DynamoDBEntryType.String))
+        .SetAttribute("Id", ev => Guid.NewGuid()));
 ```
 
 Or you can use a global [Custom Action](https://github.com/thepirat000/Audit.NET#custom-actions) instead with the same outcome:
@@ -151,7 +159,7 @@ Or you can use a global [Custom Action](https://github.com/thepirat000/Audit.NET
 ```c#
 Audit.Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, scope =>
 {
-    scope.SetCustomField("EventId", Guid.NewGuid());
+    scope.SetCustomField("Id", Guid.NewGuid());
 });
 ```
 

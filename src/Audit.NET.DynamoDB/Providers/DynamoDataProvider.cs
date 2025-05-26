@@ -1,11 +1,13 @@
 using System;
-using Audit.Core;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Threading;
+
+using Audit.Core;
 
 namespace Audit.DynamoDB.Providers
 {
@@ -30,6 +32,11 @@ namespace Audit.DynamoDB.Providers
         /// The DynamoDB table name to use when saving an audit event. 
         /// </summary>
         public Setting<string> TableName { get; set; }
+
+        /// <summary>
+        /// A function to configure the table to use when saving an audit event. 
+        /// </summary>
+        public Action<TableBuilder> TableBuilderAction { get; set; }
 
         /// <summary>
         /// Creates a new DynamoDB data provider using the given client.
@@ -68,6 +75,7 @@ namespace Audit.DynamoDB.Providers
                 Client = dynaDbConfig._clientFactory;
                 TableName = dynaDbConfig._tableConfigurator?._tableName ?? new Setting<string>();
                 CustomAttributes = dynaDbConfig._tableConfigurator?._attrConfigurator?._attributes;
+                TableBuilderAction = dynaDbConfig._tableConfigurator?._tableBuilderAction;
             }
         }
 
@@ -251,7 +259,9 @@ namespace Audit.DynamoDB.Providers
             {
                 return table;
             }
-            table = Table.LoadTable(Client.Value, tableName);
+            var tableBuilder = new TableBuilder(Client.Value, tableName);
+            TableBuilderAction?.Invoke(tableBuilder);
+            table = tableBuilder.Build();
             TableCache[tableName] = table;
             return table;
         }
