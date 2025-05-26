@@ -38,10 +38,22 @@ jobs:
         "PROJECT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         Write-Host "PROJECT_VERSION=$version"
 
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     # Dynamo DB
     - name: DynamoDB (Setup)
       run: |
-        docker run --platform linux/amd64 -d -p 8000:8000 amazon/dynamodb-local:1.20.0
+        curl -L -o dynamodb_local_latest.zip https://s3.us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.zip
+        powershell -Command "Expand-Archive -Path 'dynamodb_local_latest.zip' -DestinationPath 'dynamodb_local'"
+
+    - name: DynamoDB (Init)
+      run: |
+        cd dynamodb_local
+        java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
 
     # PostgreSQL
     - name: PostgreSQL (Setup) 
