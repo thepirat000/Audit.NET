@@ -56,7 +56,7 @@ jobs:
         Start-Process `
           -FilePath "java" `
           -ArgumentList $args `
-          -NoNewWindow
+          -NoNewWindow &
         Start-Sleep -Seconds 10
         netstat -a -n -o | findstr :8000
         #cd dynamodb_local
