@@ -57,7 +57,7 @@ jobs:
           -FilePath "java" `
           -ArgumentList $args `
           -NoNewWindow &
-        Start-Sleep -Seconds 30
+        Start-Sleep -Seconds 60
         netstat -a -n -o | findstr :8000
 
     # # PostgreSQL
