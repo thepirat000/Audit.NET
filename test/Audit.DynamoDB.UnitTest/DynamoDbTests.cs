@@ -10,6 +10,10 @@ using Audit.Core;
 using Audit.DynamoDB.Providers;
 using NUnit.Framework;
 
+// ReSharper disable RedundantAssignment
+// ReSharper disable RedundantCast
+// ReSharper disable AccessToModifiedClosure
+
 namespace Audit.DynamoDB.UnitTest
 {
     [Category("Integration")]
@@ -20,7 +24,7 @@ namespace Audit.DynamoDB.UnitTest
         private const string TableNameHashOnly = "AuditEventsHashOnly";
         
         private const string ServiceUrl = "http://localhost:8000";
-        private static AWSCredentials Credentials = new BasicAWSCredentials("key", "secret");
+        private static readonly AWSCredentials Credentials = new BasicAWSCredentials("key", "secret");
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -64,7 +68,7 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
+                    .SetAttribute("Id", _ => Guid.NewGuid())
                     .SetAttribute("SortKey", ev => ev.StartDate.Year))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -78,7 +82,7 @@ namespace Audit.DynamoDB.UnitTest
 
             var eventType = "AuditEvents";
             var x = "start";
-            using (var s = new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
+            using (new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
             {
                 x = "end";
             }
@@ -89,9 +93,9 @@ namespace Audit.DynamoDB.UnitTest
             // Assert events
             var hash = hashes.First();
             var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
-            var ev = ddp.GetEvent<AuditEvent>((Primitive)hash, (Primitive)DateTime.Now.Year);
+            var ev = ddp.GetEvent<AuditEvent>(hash, DateTime.Now.Year);
 
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
             Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo(DateTime.Now.Year.ToString()));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
@@ -105,7 +109,7 @@ namespace Audit.DynamoDB.UnitTest
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var hashes = new HashSet<string>();
@@ -118,7 +122,7 @@ namespace Audit.DynamoDB.UnitTest
 
             var eventType = "AuditEvents";
             var x = "start";
-            await using (var s = await new AuditScopeFactory().CreateAsync(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
+            await using (await new AuditScopeFactory().CreateAsync(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
             {
                 x = "end";
             }
@@ -129,9 +133,9 @@ namespace Audit.DynamoDB.UnitTest
             // Assert events
             var hash = hashes.First();
             var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
-            var ev = await ddp.GetEventAsync<AuditEvent>((Primitive)hash, null);
+            var ev = await ddp.GetEventAsync<AuditEvent>(hash, null);
 
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -144,7 +148,7 @@ namespace Audit.DynamoDB.UnitTest
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             var hashes = new HashSet<string>();
@@ -157,7 +161,7 @@ namespace Audit.DynamoDB.UnitTest
 
             var eventType = "AuditEvents";
             var x = "start";
-            using (var s = new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
+            using (new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
             {
                 x = "end";
             }
@@ -168,9 +172,9 @@ namespace Audit.DynamoDB.UnitTest
             // Assert events
             var hash = hashes.First();
             var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
-            var ev = ddp.GetEvent<AuditEvent>((Primitive)hash, null);
+            var ev = ddp.GetEvent<AuditEvent>(hash, null);
 
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -184,7 +188,7 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
+                    .SetAttribute("Id", _ => Guid.NewGuid())
                     .SetAttribute("SortKey", ev => ev.StartDate.Year))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
@@ -198,8 +202,8 @@ namespace Audit.DynamoDB.UnitTest
 
             var eventType = "AuditEvents";
             var x = "start";
-            await using (var s = await new AuditScopeFactory().CreateAsync(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
-            {
+            await using (await new AuditScopeFactory().CreateAsync(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
+            { 
                 x = "end";
             }
 
@@ -209,9 +213,9 @@ namespace Audit.DynamoDB.UnitTest
             // Assert events
             var hash = hashes.First();
             var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
-            var ev = await ddp.GetEventAsync<AuditEvent>((Primitive)hash, (Primitive)DateTime.Now.Year);
+            var ev = await ddp.GetEventAsync<AuditEvent>(hash, DateTime.Now.Year);
 
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
             Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo(DateTime.Now.Year.ToString()));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
@@ -229,11 +233,11 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(TableName, builder => builder
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
+                    .SetAttribute("Id", _ => Guid.NewGuid())
                     .SetAttribute("SortKey", ev => ev.StartDate.Year))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
-            int N = 16;
+            int n = 16;
             var hashes = new HashSet<string>();
             int count = 0;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
@@ -242,24 +246,22 @@ namespace Audit.DynamoDB.UnitTest
                 hashes.Add((scope.EventId as object[])![0].ToString());
             });
 
-            var rnd = new Random();
-
             //Parallel random insert into event1, event2 and event3 containers
-            Parallel.ForEach(Enumerable.Range(1, N), i =>
+            Parallel.ForEach(Enumerable.Range(1, n), _ =>
             {
                 var eventType = "AuditEvents";
                 var x = "start";
-                using (var s = new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
+                using (new AuditScopeFactory().Create(eventType, () => x, EventCreationPolicy.InsertOnStartReplaceOnEnd, null))
                 {
                     x = "end";
                 }
             });
 
-            Assert.That(hashes.Count, Is.EqualTo(N));
-            Assert.That(count, Is.EqualTo(N * 2));
+            Assert.That(hashes.Count, Is.EqualTo(n));
+            Assert.That(count, Is.EqualTo(n * 2));
 
             // Assert events
-            int maxCheck = N / 4;
+            int maxCheck = n / 4;
             int check = 0;
             foreach (var hash in hashes)
             {
@@ -268,9 +270,9 @@ namespace Audit.DynamoDB.UnitTest
                     break;
                 }
                 var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
-                var ev = ddp.GetEvent<AuditEvent>((Primitive)hash, (Primitive)DateTime.Now.Year);
+                var ev = ddp.GetEvent<AuditEvent>(hash, DateTime.Now.Year);
 
-                Assert.NotNull(ev);
+                Assert.That(ev, Is.Not.Null);
                 Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
                 Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo(DateTime.Now.Year.ToString()));
                 Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
@@ -285,29 +287,29 @@ namespace Audit.DynamoDB.UnitTest
                 .UseDynamoDB(config => config
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t.AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            using (new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
             // Act
             var ev1 = ddp.GetEvent<AuditEvent>(new Primitive(hash));
-            var ev2 = ddp.GetEvent<AuditEvent>(new Primitive(hash) as DynamoDBEntry);
+            var ev2 = ddp.GetEvent<AuditEvent>((DynamoDBEntry)new Primitive(hash));
 
 
             // Assert
-            Assert.NotNull(ev1);
+            Assert.That(ev1, Is.Not.Null);
             Assert.That(ev1.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev1.CustomFields["Id"].ToString(), Is.EqualTo(hash));
-            Assert.NotNull(ev2);
+            Assert.That(ev2, Is.Not.Null);
             Assert.That(ev2.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev2.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -322,30 +324,30 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
-                    .SetAttribute("SortKey", ev => 2025))
+                    .SetAttribute("Id", _ => Guid.NewGuid())
+                    .SetAttribute("SortKey", _ => 2025))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            using (new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
             // Act
-            var ev1 = ddp.GetEvent<AuditEvent>(new Primitive[] { new Primitive(hash), (Primitive)2025 });
-            var ev2 = ddp.GetEvent<AuditEvent>(new Primitive(hash), (Primitive)2025);
+            var ev1 = ddp.GetEvent<AuditEvent>(new[] { new Primitive(hash), 2025 });
+            var ev2 = ddp.GetEvent<AuditEvent>(new Primitive(hash), 2025);
 
             // Assert
-            Assert.NotNull(ev1);
+            Assert.That(ev1, Is.Not.Null);
             Assert.That(ev1.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev1.CustomFields["Id"].ToString(), Is.EqualTo(hash));
             Assert.That(ev1.CustomFields["SortKey"].ToString(), Is.EqualTo("2025"));
-            Assert.NotNull(ev2);
+            Assert.That(ev2, Is.Not.Null);
             Assert.That(ev2.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev2.CustomFields["Id"].ToString(), Is.EqualTo(hash));
             Assert.That(ev2.CustomFields["SortKey"].ToString(), Is.EqualTo("2025"));
@@ -359,16 +361,16 @@ namespace Audit.DynamoDB.UnitTest
                 .UseDynamoDB(cfg => cfg
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t.AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            using (new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
@@ -376,7 +378,7 @@ namespace Audit.DynamoDB.UnitTest
             var ev = ddp.GetEvent<AuditEvent>(new Primitive(hash));
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -391,25 +393,25 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
-                    .SetAttribute("SortKey", ev => 2025))
+                    .SetAttribute("Id", _ => Guid.NewGuid())
+                    .SetAttribute("SortKey", _ => 2025))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            using (new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
             // Act
-            var ev = ddp.GetEvent<AuditEvent>(new Primitive[] { new Primitive(hash), (Primitive)2025 });
+            var ev = ddp.GetEvent<AuditEvent>(new[] { new Primitive(hash), 2025 });
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
             Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo("2025"));
@@ -423,16 +425,16 @@ namespace Audit.DynamoDB.UnitTest
                 .UseDynamoDB(cfg => cfg
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t.AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            using (new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
@@ -440,7 +442,7 @@ namespace Audit.DynamoDB.UnitTest
             var ev = ddp.GetEvent<AuditEvent>(new Primitive(hash) as DynamoDBEntry);
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -455,17 +457,17 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
-                    .SetAttribute("SortKey", ev => 2025))
+                    .SetAttribute("Id", _ => Guid.NewGuid())
+                    .SetAttribute("SortKey", _ => 2025))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            using (new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
@@ -473,7 +475,7 @@ namespace Audit.DynamoDB.UnitTest
             var ev = ddp.GetEvent<AuditEvent>(new DynamoDBEntry[] { new Primitive(hash), (Primitive)2025 });
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
             Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo("2025"));
@@ -484,7 +486,7 @@ namespace Audit.DynamoDB.UnitTest
         {
             var ddp = new DynamoDataProvider();
             var ev = ddp.GetEvent<AuditEvent>(null);
-            Assert.IsNull(ev);
+            Assert.That(ev, Is.Not.Null);
         }
 
         [Test]
@@ -492,6 +494,7 @@ namespace Audit.DynamoDB.UnitTest
         {
             var ddp = new DynamoDataProvider();
             var ex = Assert.Throws<ArgumentException>(() => ddp.GetEvent<AuditEvent>(12345));
+            Assert.That(ex, Is.Not.Null);
             Assert.That(ex.Message, Does.Contain("Parameter must be convertible"));
         }
 
@@ -503,16 +506,16 @@ namespace Audit.DynamoDB.UnitTest
                 .UseDynamoDB(cfg => cfg
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t.AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            await using (await new AuditScopeFactory().CreateAsync("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
@@ -520,7 +523,7 @@ namespace Audit.DynamoDB.UnitTest
             var ev = await ddp.GetEventAsync<AuditEvent>(new Primitive(hash));
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -535,25 +538,25 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
-                    .SetAttribute("SortKey", ev => 2025))
+                    .SetAttribute("Id", _ => Guid.NewGuid())
+                    .SetAttribute("SortKey", _ => 2025))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            await using (await new AuditScopeFactory().CreateAsync("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
             // Act
-            var ev = await ddp.GetEventAsync<AuditEvent>(new Primitive[] { new Primitive(hash), (Primitive)2025 });
+            var ev = await ddp.GetEventAsync<AuditEvent>(new[] { new Primitive(hash), 2025 });
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
             Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo("2025"));
@@ -567,16 +570,16 @@ namespace Audit.DynamoDB.UnitTest
                 .UseDynamoDB(cfg => cfg
                     .UseUrl(ServiceUrl, Credentials)
                     .Table(_ => TableNameHashOnly, t => t.AddHashKey("Id", DynamoDBEntryType.String))
-                    .SetAttribute("Id", ev => Guid.NewGuid()))
+                    .SetAttribute("Id", _ => Guid.NewGuid()))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            await using (await new AuditScopeFactory().CreateAsync("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
@@ -584,7 +587,7 @@ namespace Audit.DynamoDB.UnitTest
             var ev = await ddp.GetEventAsync<AuditEvent>(new Primitive(hash) as DynamoDBEntry);
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
         }
@@ -599,17 +602,17 @@ namespace Audit.DynamoDB.UnitTest
                     .Table(_ => TableName, t => t
                         .AddHashKey("Id", DynamoDBEntryType.String)
                         .AddRangeKey("SortKey", DynamoDBEntryType.Numeric))
-                    .SetAttribute("Id", ev => Guid.NewGuid())
-                    .SetAttribute("SortKey", ev => 2025))
+                    .SetAttribute("Id", _ => Guid.NewGuid())
+                    .SetAttribute("SortKey", _ => 2025))
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             string hash = null;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
             {
-                hash = (scope.EventId as object[])[0].ToString();
+                hash = (scope.EventId as object[])![0].ToString();
             });
 
-            using (var s = new AuditScopeFactory().Create("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
+            await using (await new AuditScopeFactory().CreateAsync("TestEvent", () => "x", EventCreationPolicy.InsertOnStartReplaceOnEnd, null)) { }
 
             var ddp = Audit.Core.Configuration.DataProviderAs<DynamoDataProvider>();
 
@@ -617,7 +620,7 @@ namespace Audit.DynamoDB.UnitTest
             var ev = await ddp.GetEventAsync<AuditEvent>(new DynamoDBEntry[] { new Primitive(hash), (Primitive)2025 });
 
             // Assert
-            Assert.NotNull(ev);
+            Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
             Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo("2025"));
@@ -628,7 +631,7 @@ namespace Audit.DynamoDB.UnitTest
         {
             var ddp = new DynamoDataProvider();
             var ev = await ddp.GetEventAsync<AuditEvent>(null);
-            Assert.IsNull(ev);
+            Assert.That(ev, Is.Not.Null);
         }
 
         [Test]
