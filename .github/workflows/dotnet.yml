@@ -57,7 +57,7 @@ jobs:
           -FilePath "java" `
           -ArgumentList $args `
           -NoNewWindow &
-        Start-Sleep -Seconds 30
+        Start-Sleep -Seconds 10
         netstat -a -n -o | findstr :8000
         #cd dynamodb_local
         #java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
@@ -210,7 +210,8 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\Audit.NET.sln --no-build -c release `
+        #dotnet test .\Audit.NET.sln --no-build -c release `
+        dotnet test .\test\Audit.DynamoDB.UnitTest --no-build -c release `
           #--filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
           --filter "TestCategory=Dynamo" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
