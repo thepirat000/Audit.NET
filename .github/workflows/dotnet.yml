@@ -57,8 +57,8 @@ jobs:
           -FilePath "java" `
           -ArgumentList $args `
           -NoNewWindow &
-        Start-Sleep -Seconds 10
-        netstat -a -n -o | findstr :8000
+        Start-Sleep -Seconds 30
+        netstat -a -n -o
         #cd dynamodb_local
         #java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
 
