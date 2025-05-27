@@ -57,7 +57,7 @@ jobs:
           -FilePath "java" `
           -ArgumentList $args `
           -NoNewWindow &
-        Start-Sleep -Seconds 60
+        Start-Sleep -Seconds 45
         netstat -a -n -o | findstr :8000
 
     # # PostgreSQL
@@ -204,13 +204,11 @@ jobs:
       run: dotnet restore
       
     - name: Dotnet Build Audit.NET.sln
-      run: dotnet build .\Audit.NET.sln --no-restore -c release
+      run: dotnet build .\test\Audit.DynamoDB.UnitTest --no-restore -c release
 
     - name: Run tests
       run: |
-        #dotnet test .\Audit.NET.sln --no-build -c release `
         dotnet test .\test\Audit.DynamoDB.UnitTest --no-build -c release `
-          #--filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
           --filter "TestCategory=Dynamo" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
