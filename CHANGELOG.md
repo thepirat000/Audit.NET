@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [30.0.0] - 2025-05-26:
+- **Audit.NET.DynamoDB (Breaking change)**: Upgrading the client to use the latest AWS SDK for .NET (`AWSSDK.DynamoDBv2` Version 4.0.1). 
+This change require adjustments in your code to accommodate the new client API, specifically you have to provide the Hash key when configuring the Dynamo DB table in the audit config. (#758)
+
 ## [29.0.1] - 2025-05-08:
 - **Audit.NET**: Change in ActivityDataProvider to set the current Activity to the AuditScope activity when present. This ensures the use of the AusitScope Activity as a parent for the child activity created by the data provider.
 - **Audit.NET**: Introducing interface IAuditDataProvider
