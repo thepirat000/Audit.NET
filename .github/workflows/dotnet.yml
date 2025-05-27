@@ -52,21 +52,15 @@ jobs:
 
     - name: DynamoDB (Init)
       run: |
-        PUSHD dynamodb_local
-        $args = '-Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb'
+        $args = '-Djava.library.path=./dynamodb_local/DynamoDBLocal_lib -jar ./dynamodb_local/DynamoDBLocal.jar -sharedDb -port 8000'
         Start-Process `
           -FilePath "java" `
           -ArgumentList $args `
-          -NoNewWindow &
-        POPD
+          -NoNewWindow
+        Start-Sleep -Seconds 10
+        netstat -a -n -o | findstr :8000
         #cd dynamodb_local
         #java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
-
-    - name: Wait for DynamoDB to start
-      shell: pwsh
-      run: |
-        Start-Sleep -Seconds 40
-        netstat -a -n -o | findstr :8000
 
     # # PostgreSQL
     # - name: PostgreSQL (Setup) 
