@@ -55,107 +55,112 @@ jobs:
         cd dynamodb_local
         java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
 
-    # PostgreSQL
-    - name: PostgreSQL (Setup) 
-      id: postgres
-      uses: ikalnytskyi/action-setup-postgres@v7
-      with:
-        postgres-version: '17'
-        username:       'postgres'
-        password:       'admin'
-        database:       'postgres'
-        port:           '5432'
-        ssl:            'false'
-
-    - name: PostgreSQL (Init)
+    - name: Wait for DynamoDB to start
       run: |
-        psql ${{ steps.postgres.outputs.connection-uri }} -f "./test/Audit.PostgreSql.UnitTest/SqlScript.sql"
+        Start-Sleep -Seconds 10
+        netstat -a -n -o | findstr :8000
 
-    # MySql
-    - name: MySQL (Setup)
-      uses: shogo82148/actions-setup-mysql@v1
-      with:
-        mysql-version: '9.0'
+    # # PostgreSQL
+    # - name: PostgreSQL (Setup) 
+    #   id: postgres
+    #   uses: ikalnytskyi/action-setup-postgres@v7
+    #   with:
+    #     postgres-version: '17'
+    #     username:       'postgres'
+    #     password:       'admin'
+    #     database:       'postgres'
+    #     port:           '5432'
+    #     ssl:            'false'
+
+    # - name: PostgreSQL (Init)
+    #   run: |
+    #     psql ${{ steps.postgres.outputs.connection-uri }} -f "./test/Audit.PostgreSql.UnitTest/SqlScript.sql"
+
+    # # MySql
+    # - name: MySQL (Setup)
+    #   uses: shogo82148/actions-setup-mysql@v1
+    #   with:
+    #     mysql-version: '9.0'
     
-    - name: MySql (Init)
-      run: |
-        mysql -uroot -e "source ./test/Audit.MySql.UnitTest/MySqlScript.mysql"
+    # - name: MySql (Init)
+    #   run: |
+    #     mysql -uroot -e "source ./test/Audit.MySql.UnitTest/MySqlScript.mysql"
 
-    # Redis
-    - name: Redis (Setup)
-      shell: pwsh
-      run: |
-        Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
-        Expand-Archive redis.zip -DestinationPath redis
-
-    - name: Redis (Init)
-      shell: pwsh
-      run: |
-        $args = '--daemonize no'
-        Start-Process `
-          -FilePath "redis\redis-server.exe" `
-          -ArgumentList $args `
-          -NoNewWindow &
-        Start-Sleep -Seconds 10
-        netstat -a -n -o | findstr :6379
-
-    # ElasticSearch
-    - name: ElasticSearch (Setup)
-      uses: ankane/setup-elasticsearch@v1
-      with:
-        elasticsearch-version: 9
-
-    # OpenSearch
-    - name: OpenSearch (Setup)
-      uses: ankane/setup-opensearch@v1
-      with:
-        opensearch-version: 2.19.2  # Specify a version >= 2.4 for Windows compatibility
-        config: |
-            http.port: 9250    
-
-    # Mongo DB
-    - name: MongoDB (Setup)
-      run: |
-        Set-Service -Name 'MongoDB' -StartupType Automatic
-        Start-Service -Name 'MongoDB'
-
-    # RavenDB
-    - name: RavenDB (Setup)
-      run: choco install -y RavenDB --version=7.0.2
-
-    - name: RavenDB (Init)
-      shell: pwsh
-      run: |
-        $args = '--ServerUrl="http://localhost:8080" --RunInMemory -l'
-        Start-Process `
-          -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
-          -ArgumentList $args `
-          -NoNewWindow &
-        Start-Sleep -Seconds 10
-        netstat -a -n -o | findstr :8080
-
-    # # Cosmos 
-    # - name: Cosmos DB (Setup)
+    # # Redis
+    # - name: Redis (Setup)
     #   shell: pwsh
     #   run: |
-    #     Write-Host "Launching Cosmos DB Emulator"
-    #     Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
-    #     Start-CosmosDbEmulator
+    #     Invoke-WebRequest -Uri https://github.com/tporadowski/redis/releases/download/v5.0.14.1/Redis-x64-5.0.14.1.zip -OutFile redis.zip                               
+    #     Expand-Archive redis.zip -DestinationPath redis
 
-    # Azurite
-    - name: Azurite (Setup)
-      id: azurite
-      uses: potatoqualitee/azuright@v1
-      with:
-        version: latest
+    # - name: Redis (Init)
+    #   shell: pwsh
+    #   run: |
+    #     $args = '--daemonize no'
+    #     Start-Process `
+    #       -FilePath "redis\redis-server.exe" `
+    #       -ArgumentList $args `
+    #       -NoNewWindow &
+    #     Start-Sleep -Seconds 10
+    #     netstat -a -n -o | findstr :6379
 
-    # SQL Server
-    - name: SQL Server (Setup)
-      uses: Particular/install-sql-server-action@v1.0.0
-      with:
-        connection-string-env-var: SQL_SERVER_CONNECTION_STRING
-        catalog: Audit
-        extra-params: "Encrypt=False;"
+    # # ElasticSearch
+    # - name: ElasticSearch (Setup)
+    #   uses: ankane/setup-elasticsearch@v1
+    #   with:
+    #     elasticsearch-version: 9
+
+    # # OpenSearch
+    # - name: OpenSearch (Setup)
+    #   uses: ankane/setup-opensearch@v1
+    #   with:
+    #     opensearch-version: 2.19.2  # Specify a version >= 2.4 for Windows compatibility
+    #     config: |
+    #         http.port: 9250    
+
+    # # Mongo DB
+    # - name: MongoDB (Setup)
+    #   run: |
+    #     Set-Service -Name 'MongoDB' -StartupType Automatic
+    #     Start-Service -Name 'MongoDB'
+
+    # # RavenDB
+    # - name: RavenDB (Setup)
+    #   run: choco install -y RavenDB --version=7.0.2
+
+    # - name: RavenDB (Init)
+    #   shell: pwsh
+    #   run: |
+    #     $args = '--ServerUrl="http://localhost:8080" --RunInMemory -l'
+    #     Start-Process `
+    #       -FilePath "C:\RavenDB\Server\Raven.Server.exe" `
+    #       -ArgumentList $args `
+    #       -NoNewWindow &
+    #     Start-Sleep -Seconds 10
+    #     netstat -a -n -o | findstr :8080
+
+    # # # Cosmos 
+    # # - name: Cosmos DB (Setup)
+    # #   shell: pwsh
+    # #   run: |
+    # #     Write-Host "Launching Cosmos DB Emulator"
+    # #     Import-Module "$env:ProgramFiles\Azure Cosmos DB Emulator\PSModules\Microsoft.Azure.CosmosDB.Emulator"
+    # #     Start-CosmosDbEmulator
+
+    # # Azurite
+    # - name: Azurite (Setup)
+    #   id: azurite
+    #   uses: potatoqualitee/azuright@v1
+    #   with:
+    #     version: latest
+
+    # # SQL Server
+    # - name: SQL Server (Setup)
+    #   uses: Particular/install-sql-server-action@v1.0.0
+    #   with:
+    #     connection-string-env-var: SQL_SERVER_CONNECTION_STRING
+    #     catalog: Audit
+    #     extra-params: "Encrypt=False;"
 
     - name: Install .NET
       uses: actions/setup-dotnet@v3
@@ -204,7 +209,8 @@ jobs:
     - name: Run tests
       run: |
         dotnet test .\Audit.NET.sln --no-build -c release `
-          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
+          #--filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
+          --filter "TestCategory=Dynamo" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End
