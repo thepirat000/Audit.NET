@@ -208,8 +208,8 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test .\test\Audit.DynamoDB.UnitTest --no-build -c release `
-          --filter "TestCategory=Dynamo" `
+        dotnet test .\Audit.NET.sln --no-build -c release `
+          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End
