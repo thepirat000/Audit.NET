@@ -486,7 +486,7 @@ namespace Audit.DynamoDB.UnitTest
         {
             var ddp = new DynamoDataProvider();
             var ev = ddp.GetEvent<AuditEvent>(null);
-            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev, Is.Null);
         }
 
         [Test]
@@ -631,7 +631,7 @@ namespace Audit.DynamoDB.UnitTest
         {
             var ddp = new DynamoDataProvider();
             var ev = await ddp.GetEventAsync<AuditEvent>(null);
-            Assert.That(ev, Is.Not.Null);
+            Assert.That(ev, Is.Null);
         }
 
         [Test]
