@@ -43,7 +43,7 @@ jobs:
         $version = 'v1.9.6'
         $url = "https://github.com/codenotary/immudb/releases/download/$version/immudb-$version-windows-amd64.exe"
         Invoke-WebRequest -Uri $url -OutFile 'immudb.exe'
-        Start-Process -FilePath "immudb.exe" -ArgumentList "-d" -NoNewWindow
+        Start-Process -FilePath "immudb.exe" -ArgumentList "--pgsql-server-port 5438 -d" -NoNewWindow
 
     - name: Set up Java
       uses: actions/setup-java@v3
