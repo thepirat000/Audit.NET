@@ -37,6 +37,14 @@ jobs:
         $version = $csproj.Project.PropertyGroup.Version
         "PROJECT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         Write-Host "PROJECT_VERSION=$version"
+        
+    - name: ImmuDB (Setup)
+      run: |
+        $version = 'v1.9.6'  # Replace with the desired version
+        $url = "https://github.com/codenotary/immudb/releases/download/$version/immudb-$version-windows-amd64.zip"
+        Invoke-WebRequest -Uri $url -OutFile 'immudb.zip'
+        Expand-Archive -Path 'immudb.zip' -DestinationPath 'immudb'
+        Start-Process -FilePath ".\immudb\immudb.exe" -ArgumentList "-d" -NoNewWindow
 
     - name: Set up Java
       uses: actions/setup-java@v3
@@ -209,7 +217,7 @@ jobs:
     - name: Run tests
       run: |
         dotnet test .\Audit.NET.sln --no-build -c release `
-          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo" `
+          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo|TestCategory=ImmuDB" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End
