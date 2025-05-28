@@ -42,6 +42,7 @@ del "Audit.NET.Channels\bin\release\*.symbols.nupkg"
 del "Audit.EntityFramework.Abstractions\bin\release\*.symbols.nupkg"
 del "Audit.NET.OpenSearch\bin\release\*.symbols.nupkg"
 del "Audit.NET.AzureEventHubs\bin\release\*.symbols.nupkg"
+del "Audit.NET.ImmuDB\bin\release\*.symbols.nupkg"
 
 nuget push "audit.net\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.nupkg" -NoSymbols -source %1
@@ -84,3 +85,4 @@ nuget push "Audit.NET.Channels\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.EntityFramework.Abstractions\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.OpenSearch\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureEventHubs\bin\release\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.NET.ImmuDB\bin\release\*.nupkg" -NoSymbols -source %1

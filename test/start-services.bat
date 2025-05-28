@@ -5,6 +5,7 @@ start "DYNAMO" /D D:\DynamoDb "D:\DynamoDb\Run.bat"
 start "RavenDB" /D D:\RavenDB powershell D:\RavenDB\run.ps1
 start "OpenSearch" /D D:\opensearch-2.19.1-windows-x64\opensearch-2.19.1\bin "D:\opensearch-2.19.1-windows-x64\opensearch-2.19.1\bin\opensearch.bat"
 start "Azurite" /D "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator" azurite.exe
+start "ImmuDB" /D "D:\ImmuDB" immu.exe
 docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmos-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview --protocol https
 
 net start mongodb

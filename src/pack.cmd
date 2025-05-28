@@ -42,6 +42,7 @@ del "Audit.NET.Polly\bin\release\*.nupkg"
 del "Audit.NET.Channels\bin\release\*.nupkg"
 del "Audit.NET.OpenSearch\bin\release\*.nupkg"
 del "Audit.NET.AzureEventHubs\bin\release\*.nupkg"
+del "Audit.NET.ImmuDB\bin\release\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -90,6 +91,7 @@ dotnet pack "Audit.NET.Polly/" -c Release
 dotnet pack "Audit.NET.Channels/" -c Release
 dotnet pack "Audit.NET.OpenSearch/" -c Release
 dotnet pack "Audit.NET.AzureEventHubs/" -c Release
+dotnet pack "Audit.NET.ImmuDB/" -c Release
 
 type ..\Directory.Build.props
 

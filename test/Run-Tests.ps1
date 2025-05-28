@@ -40,6 +40,7 @@ StartDotnetUnitTests 'Audit.Elasticsearch.UnitTest' 'Elasticsearch';
 StartDotnetUnitTests 'Audit.FileSystem.UnitTest' 'FileSystem';
 StartDotnetUnitTests 'Audit.HttpClient.UnitTest' 'HttpClient';
 StartDotnetUnitTests 'Audit.JsonAdapter.UnitTest' 'JsonAdapter';
+StartDotnetUnitTests 'Audit.ImmuDB.UnitTest' 'ImmuDB';
 StartDotnetUnitTests 'Audit.Kafka.UnitTest' 'Kafka';
 StartDotnetUnitTests 'Audit.MongoClient.UnitTest' 'MongoClient';
 StartDotnetUnitTests 'Audit.MongoDB.UnitTest' 'MongoDB';
@@ -55,7 +56,6 @@ StartDotnetUnitTests 'Audit.SqlServer.UnitTest' 'SqlServer';
 StartDotnetUnitTests 'Audit.WebApi.UnitTest' 'WebApi';
 StartDotnetUnitTests 'Audit.Wcf.Client.UnitTest' 'Wcf.Client';
 StartDotnetUnitTests 'Audit.Wcf.UnitTest' 'Wcf.Server';
-
 
 # Run sequential tests
 $hasFailed = $false;
