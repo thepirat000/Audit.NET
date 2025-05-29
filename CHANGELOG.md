@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [30.0.1] - 2025-05-28:
+- **Audit.NET.ImmuDB**: A new data provider for ImmuDB, a distributed immutable database. This provider allows you to store audit events in an ImmuDB database, ensuring that the audit logs are tamper-proof and verifiable.
+
 ## [30.0.0] - 2025-05-26:
 - **Audit.NET.DynamoDB (Breaking change)**: Upgrading the client to use the latest AWS SDK for .NET (`AWSSDK.DynamoDBv2` Version 4.0.1). 
 This change require adjustments in your code to accommodate the new client API, specifically you have to provide the Hash key when configuring the Dynamo DB table in the audit config. (#758)
