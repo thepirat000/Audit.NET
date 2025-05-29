@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 5/27/2025 - 4:43:53 AM |
-| Coverage date: | 5/27/2025 - 4:20:34 AM - 5/27/2025 - 4:42:53 AM |
-| Parser: | MultiReport (92x Cobertura) |
-| Assemblies: | 36 |
-| Classes: | 309 |
-| Files: | 266 |
-| **Line coverage:** | 80.2% (8107 of 10096) |
-| Covered lines: | 8107 |
-| Uncovered lines: | 1989 |
-| Coverable lines: | 10096 |
-| Total lines: | 25924 |
-| **Branch coverage:** | 71.4% (2956 of 4140) |
-| Covered branches: | 2956 |
-| Total branches: | 4140 |
+| Generated on: | 5/29/2025 - 12:02:39 AM |
+| Coverage date: | 5/28/2025 - 11:38:56 PM - 5/29/2025 - 12:01:35 AM |
+| Parser: | MultiReport (94x Cobertura) |
+| Assemblies: | 37 |
+| Classes: | 312 |
+| Files: | 269 |
+| **Line coverage:** | 80.3% (8208 of 10213) |
+| Covered lines: | 8208 |
+| Uncovered lines: | 2005 |
+| Coverable lines: | 10213 |
+| Total lines: | 26293 |
+| **Branch coverage:** | 71.4% (2980 of 4168) |
+| Covered branches: | 2980 |
+| Total branches: | 4168 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -225,6 +225,10 @@
 |**Audit.NET.EventLog.Core**|**26**|**11**|**37**|**109**|**70.2%**|**7**|**10**|**70%**|
 |Audit.Core.EvenLogProviderConfigurator|0|10|10|27|0%|0|0||
 |Audit.Core.Providers.EventLogDataProvider|26|1|27|82|96.2%|7|10|70%|
+|**Audit.NET.ImmuDB**|**101**|**16**|**117**|**369**|**86.3%**|**24**|**28**|**85.7%**|
+|Audit.Core.ImmuDbConfiguratorExtensions|0|2|2|22|0%|0|0||
+|Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator|18|10|28|98|64.2%|0|0||
+|Audit.ImmuDB.Providers.ImmuDbDataProvider|83|4|87|249|95.4%|24|28|85.7%|
 |**Audit.NET.JsonNewtonsoftAdapter**|**79**|**17**|**96**|**225**|**82.2%**|**33**|**42**|**78.5%**|
 |Audit.Core.ConfiguratorExtensions|4|0|4|32|100%|0|0||
 |Audit.Core.JsonNewtonsoftAdapter|17|17|34|91|50%|2|10|20%|
