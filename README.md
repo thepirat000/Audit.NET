@@ -717,6 +717,7 @@ The Data Providers included are summarized in the following table:
 | NoSQL    | Azure Tables      | [Audit.NET.AzureStorageTables](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.AzureStorageTables) / [AzureStorageTableDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.AzureStorageTables/Providers/AzureTableDataProvider.cs)                                        | Store the events in an **Azure Table Storage**.                                                                              | `.UseAzureTableStorage()`                              |
 | NoSQL    | Dynamo DB         | [Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md) / [DynamoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/Providers/DynamoDataProvider.cs)                                                                           | Store audit events in [Amazon DynamoDB™](https://aws.amazon.com/dynamodb/) tables.                                           | `.UseDynamoDB()`                                       |
 | NoSQL    | Elasticsearch     | [Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md) / [ElasticsearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/Providers/ElasticsearchDataProvider.cs)                                              | Store audit events in Elasticsearch indices.                                                                                 | `.UseElasticsearch()`                                  |
+| NoSQL    | Firestore         | [Audit.NET.Firestore](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.Firestore#auditnetfirestore) / [FirestoreDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Firestore/Providers/FirestoreDataProvider.cs)                                                        | Store the events in a **Google Cloud Firestore** collection, in JSON format.                                                 | `.UseFirestore()`                                      |
 | NoSQL    | Kafka             | [Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md) / [KafkaDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/Providers/KafkaDataProvider.cs)                                                                                      | Stream the audit events to [Apache Kafka](https://kafka.apache.org/) topics.                                                 | `.UseKafka()` / `.UseKafka<TKey>()`                    |
 | NoSQL    | Mongo DB          | [Audit.NET.MongoDB](https://github.com/thepirat000/Audit.NET/tree/master/src/Audit.NET.MongoDB#auditnetmongodb) / [MongoDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.MongoDB/Providers/MongoDataProvider.cs)                                                                          | Store the events in a **Mongo DB** collection, in BSON format.                                                               | `.UseMongoDB()`                                        |
 | NoSQL    | OpenSearch        | [Audit.NET.OpenSearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.OpenSearch/README.md) / [OpenSearchDataProvider](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.OpenSearch/Providers/OpenSearchDataProvider.cs)                                                             | Store audit events in OpenSearch indices.                                                                                    | `.UseOpenSearch()`                                  |
@@ -1052,6 +1053,16 @@ Audit.Core.Configuration.Setup()
 
 ```
 
+##### Firestore data provider:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UseFirestore(config => config
+        .ProjectId("my-project-id")
+        .Collection("audit-events")
+        .CredentialsFilePath("path/to/credentials.json"));
+```
+
 -----------
 
 # Extensions
@@ -1092,6 +1103,7 @@ In addition, a variety of other Data Providers are available through separate pa
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.Channels](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Channels/README.md)** | Store the audit events in a Channel (from System.Threading.Channels) that can be accessed to consume the events.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/amazondynamodb.svg" /> | **[Audit.NET.DynamoDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.DynamoDB/README.md)** | Store the audit events in Amazon DynamoDB tables.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/elasticsearch.svg" /> | **[Audit.NET.Elasticsearch](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ElasticSearch/README.md)** | Store the audit events in Elasticsearch indices.
+<img width="80" src="https://unpkg.com/simple-icons@v11/icons/firebase.svg" /> | **[Audit.NET.Firestore](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Firestore/README.md)** | Store the audit events in Google Cloud Firestore collections.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.ImmuDB](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.ImmuDB/README.md)** | Store audit events in an [ImmuDB](https://immudb.io/) immutable database.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/apachekafka.svg" /> | **[Audit.NET.Kafka](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.Kafka/README.md)** | Stream the audit events to an **Apache Kafka** server.
 <img width="80" src="https://unpkg.com/simple-icons@v11/icons/csharp.svg" /> | **[Audit.NET.log4net](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET.log4net/README.md)** | Store the audit events using Apache log4net™.
