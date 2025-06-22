@@ -334,7 +334,7 @@ namespace Audit.EntityFramework
 
                 var entityName = GetEntityName(dbContext, entry);
 
-                if (context.ReloadDatabaseValues && (entry.State == EntityState.Modified || entry.State == EntityState.Deleted))
+                if (context.ReloadDatabaseValues && entry.State is EntityState.Modified or EntityState.Deleted)
                 {
                     var dbValues = entry.GetDatabaseValues();
                     if (dbValues != null)
