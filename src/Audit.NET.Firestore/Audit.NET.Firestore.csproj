@@ -5,7 +5,7 @@
 		<Copyright>Copyright 2024</Copyright>
 		<AssemblyTitle>Audit.Firestore</AssemblyTitle>
 		<Authors>Karl Smith</Authors>
-		<TargetFrameworks>net462;net472;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
 		<NoWarn>$(NoWarn);1591;NU1903</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AssemblyName>Audit.NET.Firestore</AssemblyName>

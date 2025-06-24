@@ -9,15 +9,14 @@ namespace Audit.Firestore.ConfigurationApi
     /// </summary>
     public class FirestoreProviderConfigurator : IFirestoreProviderConfigurator
     {
-        internal Setting<string> _projectId;
-        internal Setting<string> _database = "(default)";
+        internal string _projectId;
+        internal string _database = "(default)";
         internal Setting<string> _collection = "AuditEvents";
         internal string _credentialsFilePath;
         internal string _credentialsJson;
         internal FirestoreDb _firestoreDb;
-        internal Func<FirestoreDb> _firestoreDbBuilder;
         internal Func<AuditEvent, string> _idBuilder;
-        internal bool _ignoreElementNameRestrictions = true;
+        internal bool _sanitizeFieldNames = false;
 
         public IFirestoreProviderConfigurator ProjectId(string projectId)
         {
@@ -25,21 +24,9 @@ namespace Audit.Firestore.ConfigurationApi
             return this;
         }
 
-        public IFirestoreProviderConfigurator ProjectId(Func<AuditEvent, string> projectIdBuilder)
-        {
-            _projectId = projectIdBuilder;
-            return this;
-        }
-
         public IFirestoreProviderConfigurator Database(string database)
         {
             _database = database;
-            return this;
-        }
-
-        public IFirestoreProviderConfigurator Database(Func<AuditEvent, string> databaseBuilder)
-        {
-            _database = databaseBuilder;
             return this;
         }
 
@@ -72,14 +59,6 @@ namespace Audit.Firestore.ConfigurationApi
         public IFirestoreProviderConfigurator FirestoreDb(FirestoreDb firestoreDb)
         {
             _firestoreDb = firestoreDb;
-            _firestoreDbBuilder = null;
-            return this;
-        }
-
-        public IFirestoreProviderConfigurator FirestoreDb(Func<FirestoreDb> firestoreDbBuilder)
-        {
-            _firestoreDbBuilder = firestoreDbBuilder;
-            _firestoreDb = null;
             return this;
         }
 
@@ -89,9 +68,9 @@ namespace Audit.Firestore.ConfigurationApi
             return this;
         }
 
-        public IFirestoreProviderConfigurator IgnoreElementNameRestrictions(bool ignoreRestrictions)
+        public IFirestoreProviderConfigurator SanitizeFieldNames(bool sanitizeFieldNames)
         {
-            _ignoreElementNameRestrictions = ignoreRestrictions;
+            _sanitizeFieldNames = sanitizeFieldNames;
             return this;
         }
     }

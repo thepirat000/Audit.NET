@@ -96,9 +96,8 @@ Audit.Core.Configuration.Setup()
 - **CredentialsFilePath**: Path to the service account credentials JSON file.
 - **CredentialsJson**: Service account credentials as a JSON string.
 - **FirestoreDb**: A custom pre-configured FirestoreDb instance.
-- **FirestoreDbBuilder**: A function that returns a FirestoreDb instance.
 - **IdBuilder**: A function that returns the document ID to use for a given audit event. By default, Firestore generates the ID automatically.
-- **IgnoreElementNameRestrictions**: Whether to automatically fix field names that contain dots (replaced with underscores). Default is true.
+- **SanitizeFieldNames**: Whether to sanitize field names by replacing dots with underscores. Default is false.
 
 ### Advanced Configuration
 
@@ -171,13 +170,13 @@ var snapshot = await query.GetSnapshotAsync();
 
 ## Field Name Restrictions
 
-Firestore has restrictions on field names (cannot contain dots). By default, the provider automatically replaces dots with underscores. You can disable this behavior:
+Firestore has restrictions on field names (cannot contain dots). You can enable automatic sanitization to replace dots with underscores:
 
 ```c#
 Audit.Core.Configuration.Setup()
     .UseFirestore(config => config
         .ProjectId("your-project-id")
-        .IgnoreElementNameRestrictions(false)); // Will throw exception if field names contain dots
+        .SanitizeFieldNames(true)); // Automatically replace dots with underscores
 ```
 
 ## Output Sample
@@ -229,7 +228,7 @@ Audit events are stored as Firestore documents with the following structure:
    - Implementing a retention policy to delete old events
    - Using batch operations for bulk inserts
 
-4. **Field Names**: The automatic field name fixing (dots to underscores) adds a small overhead. If your field names don't contain dots, you can disable this feature.
+4. **Field Names**: Field name sanitization (dots to underscores) adds a small overhead. Enable it only if your field names contain dots.
 
 ## Connection Testing
 

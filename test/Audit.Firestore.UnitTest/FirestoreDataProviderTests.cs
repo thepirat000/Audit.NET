@@ -31,15 +31,15 @@ namespace Audit.Firestore.UnitTest
                 .Collection("test-collection")
                 .CredentialsFromFile("test.json")
                 .IdBuilder(ev => $"custom-{ev.EventType}")
-                .IgnoreElementNameRestrictions(false));
+                .SanitizeFieldNames(false));
 
             // Assert
-            Assert.AreEqual("test-project", provider.ProjectId.GetDefault());
-            Assert.AreEqual("test-database", provider.Database.GetDefault());
+            Assert.AreEqual("test-project", provider.ProjectId);
+            Assert.AreEqual("test-database", provider.Database);
             Assert.AreEqual("test-collection", provider.Collection.GetDefault());
             Assert.AreEqual("test.json", provider.CredentialsFilePath);
             Assert.NotNull(provider.IdBuilder);
-            Assert.IsFalse(provider.IgnoreElementNameRestrictions);
+            Assert.IsFalse(provider.SanitizeFieldNames);
         }
 
         [Test]
@@ -49,9 +49,9 @@ namespace Audit.Firestore.UnitTest
             var provider = new FirestoreDataProvider();
 
             // Assert
-            Assert.AreEqual("(default)", provider.Database.GetDefault());
+            Assert.AreEqual("(default)", provider.Database);
             Assert.AreEqual("AuditEvents", provider.Collection.GetDefault());
-            Assert.IsTrue(provider.IgnoreElementNameRestrictions);
+            Assert.IsFalse(provider.SanitizeFieldNames);
             Assert.IsNull(provider.IdBuilder);
         }
 
@@ -67,7 +67,7 @@ namespace Audit.Firestore.UnitTest
             // Assert
             var provider = Configuration.DataProvider as FirestoreDataProvider;
             Assert.NotNull(provider);
-            Assert.AreEqual("global-project", provider.ProjectId.GetDefault());
+            Assert.AreEqual("global-project", provider.ProjectId);
             Assert.AreEqual("global-collection", provider.Collection.GetDefault());
         }
 
@@ -81,9 +81,9 @@ namespace Audit.Firestore.UnitTest
             // Assert
             var provider = Configuration.DataProvider as FirestoreDataProvider;
             Assert.NotNull(provider);
-            Assert.AreEqual("simple-project", provider.ProjectId.GetDefault());
+            Assert.AreEqual("simple-project", provider.ProjectId);
             Assert.AreEqual("simple-collection", provider.Collection.GetDefault());
-            Assert.AreEqual("simple-database", provider.Database.GetDefault());
+            Assert.AreEqual("simple-database", provider.Database);
         }
 
         [Test]
@@ -177,15 +177,15 @@ namespace Audit.Firestore.UnitTest
         {
             // Arrange
             var provider = new FirestoreDataProvider(config => config
-                .ProjectId(ev => $"project-{ev.EventType}")
-                .Database(ev => $"db-{ev.EventType}")
+                .ProjectId("project-Test")
+                .Database("db-Test")
                 .Collection(ev => $"collection-{ev.EventType}"));
 
             var auditEvent = new AuditEvent { EventType = "Test" };
 
             // Assert
-            Assert.AreEqual("project-Test", provider.ProjectId.GetValue(auditEvent));
-            Assert.AreEqual("db-Test", provider.Database.GetValue(auditEvent));
+            Assert.AreEqual("project-Test", provider.ProjectId);
+            Assert.AreEqual("db-Test", provider.Database);
             Assert.AreEqual("collection-Test", provider.Collection.GetValue(auditEvent));
         }
 
@@ -288,36 +288,17 @@ namespace Audit.Firestore.UnitTest
         }
 
         [Test]
-        public void Configurator_FirestoreDb_ClearsBuilder()
+        public void Configurator_FirestoreDb_SetsInstance()
         {
             // Arrange
             var configurator = new FirestoreProviderConfigurator();
             FirestoreDb firestoreDb = null; // Can't mock sealed class
 
             // Act
-            configurator.FirestoreDb(() => firestoreDb);
             configurator.FirestoreDb(firestoreDb);
 
             // Assert
             Assert.AreEqual(firestoreDb, configurator._firestoreDb);
-            Assert.IsNull(configurator._firestoreDbBuilder);
-        }
-
-        [Test]
-        public void Configurator_FirestoreDbBuilder_ClearsInstance()
-        {
-            // Arrange
-            var configurator = new FirestoreProviderConfigurator();
-            FirestoreDb firestoreDb = null; // Can't mock sealed class
-            Func<FirestoreDb> builder = () => firestoreDb;
-
-            // Act
-            configurator.FirestoreDb(firestoreDb);
-            configurator.FirestoreDb(builder);
-
-            // Assert
-            Assert.AreEqual(builder, configurator._firestoreDbBuilder);
-            Assert.IsNull(configurator._firestoreDb);
         }
     }
 } 

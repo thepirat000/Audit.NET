@@ -16,22 +16,10 @@ namespace Audit.Firestore.ConfigurationApi
         IFirestoreProviderConfigurator ProjectId(string projectId);
         
         /// <summary>
-        /// Specifies the Google Cloud Project ID using a function.
-        /// </summary>
-        /// <param name="projectIdBuilder">The project ID builder function.</param>
-        IFirestoreProviderConfigurator ProjectId(Func<AuditEvent, string> projectIdBuilder);
-        
-        /// <summary>
         /// Specifies the Firestore database name. Default is "(default)".
         /// </summary>
         /// <param name="database">The database name.</param>
         IFirestoreProviderConfigurator Database(string database);
-        
-        /// <summary>
-        /// Specifies the Firestore database name using a function.
-        /// </summary>
-        /// <param name="databaseBuilder">The database name builder function.</param>
-        IFirestoreProviderConfigurator Database(Func<AuditEvent, string> databaseBuilder);
         
         /// <summary>
         /// Specifies the Firestore collection name.
@@ -64,12 +52,6 @@ namespace Audit.Firestore.ConfigurationApi
         IFirestoreProviderConfigurator FirestoreDb(FirestoreDb firestoreDb);
         
         /// <summary>
-        /// Specifies a custom FirestoreDb builder to use.
-        /// </summary>
-        /// <param name="firestoreDbBuilder">The FirestoreDb builder function.</param>
-        IFirestoreProviderConfigurator FirestoreDb(Func<FirestoreDb> firestoreDbBuilder);
-        
-        /// <summary>
         /// Specifies a function that returns the document ID to use for a given audit event.
         /// By default, it will generate a new document ID automatically.
         /// </summary>
@@ -77,11 +59,10 @@ namespace Audit.Firestore.ConfigurationApi
         IFirestoreProviderConfigurator IdBuilder(Func<AuditEvent, string> idBuilder);
         
         /// <summary>
-        /// Specifies whether to ignore element name restrictions (dots in field names).
-        /// If true, dots in field names will be replaced with underscores.
-        /// Default is true.
+        /// Specifies whether to sanitize field names by replacing dots with underscores.
+        /// Default is false.
         /// </summary>
-        /// <param name="ignoreRestrictions">Whether to ignore element name restrictions.</param>
-        IFirestoreProviderConfigurator IgnoreElementNameRestrictions(bool ignoreRestrictions);
+        /// <param name="sanitizeFieldNames">Whether to sanitize field names.</param>
+        IFirestoreProviderConfigurator SanitizeFieldNames(bool sanitizeFieldNames);
     }
 } 

@@ -45,9 +45,8 @@ namespace Audit.Core
                 CredentialsFilePath = firestoreConfig._credentialsFilePath,
                 CredentialsJson = firestoreConfig._credentialsJson,
                 FirestoreDb = firestoreConfig._firestoreDb,
-                FirestoreDbBuilder = firestoreConfig._firestoreDbBuilder,
                 IdBuilder = firestoreConfig._idBuilder,
-                IgnoreElementNameRestrictions = firestoreConfig._ignoreElementNameRestrictions
+                SanitizeFieldNames = firestoreConfig._sanitizeFieldNames
             };
 
             return new CreationPolicyConfigurator();

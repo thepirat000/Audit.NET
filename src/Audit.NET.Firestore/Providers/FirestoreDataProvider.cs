@@ -23,19 +23,19 @@ namespace Audit.Firestore.Providers
     /// - CredentialsJson: JSON string with credentials (optional)
     /// - FirestoreDb: Custom FirestoreDb instance (optional)
     /// - IdBuilder: Function to generate document IDs (optional)
-    /// - IgnoreElementNameRestrictions: Whether to fix field names with dots (default: true)
+    /// - SanitizeFieldNames: Whether to fix field names with dots (default: false)
     /// </remarks>
     public class FirestoreDataProvider : AuditDataProvider
     {
         /// <summary>
         /// Gets or sets the Google Cloud project ID.
         /// </summary>
-        public Setting<string> ProjectId { get; set; }
+        public string ProjectId { get; set; }
 
         /// <summary>
         /// Gets or sets the Firestore database name. Default is "(default)".
         /// </summary>
-        public Setting<string> Database { get; set; } = "(default)";
+        public string Database { get; set; } = "(default)";
 
         /// <summary>
         /// Gets or sets the Firestore collection name.
@@ -58,28 +58,22 @@ namespace Audit.Firestore.Providers
         public FirestoreDb FirestoreDb { get; set; }
 
         /// <summary>
-        /// Gets or sets a function to build the FirestoreDb instance.
-        /// </summary>
-        public Func<FirestoreDb> FirestoreDbBuilder { get; set; }
-
-        /// <summary>
         /// Gets or sets a function that returns the document ID to use for a given audit event.
         /// By default, it will generate a new document ID automatically.
         /// </summary>
         public Func<AuditEvent, string> IdBuilder { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to ignore element name restrictions.
-        /// If true, dots in field names will be replaced with underscores.
-        /// Default is true.
+        /// Gets or sets a value indicating whether to sanitize field names by replacing dots with underscores.
+        /// Default is false.
         /// </summary>
-        public bool IgnoreElementNameRestrictions { get; set; } = true;
+        public bool SanitizeFieldNames { get; set; } = false;
 
-        private FirestoreDb _firestoreDb;
-        private readonly object _firestoreDbLock = new object();
+        private Lazy<FirestoreDb> _firestoreDb;
 
         public FirestoreDataProvider()
         {
+            InitializeLazyFirestoreDb();
         }
 
         public FirestoreDataProvider(Action<ConfigurationApi.IFirestoreProviderConfigurator> config)
@@ -89,15 +83,63 @@ namespace Audit.Firestore.Providers
                 var firestoreConfig = new ConfigurationApi.FirestoreProviderConfigurator();
                 config.Invoke(firestoreConfig);
                 ProjectId = firestoreConfig._projectId;
-                Database = firestoreConfig._database;
+                Database = firestoreConfig._database ?? "(default)";
                 Collection = firestoreConfig._collection;
                 CredentialsFilePath = firestoreConfig._credentialsFilePath;
                 CredentialsJson = firestoreConfig._credentialsJson;
                 FirestoreDb = firestoreConfig._firestoreDb;
-                FirestoreDbBuilder = firestoreConfig._firestoreDbBuilder;
                 IdBuilder = firestoreConfig._idBuilder;
-                IgnoreElementNameRestrictions = firestoreConfig._ignoreElementNameRestrictions;
+                SanitizeFieldNames = firestoreConfig._sanitizeFieldNames;
             }
+            InitializeLazyFirestoreDb();
+        }
+
+        private void InitializeLazyFirestoreDb()
+        {
+            _firestoreDb = new Lazy<FirestoreDb>(() =>
+            {
+                if (FirestoreDb != null)
+                {
+                    return FirestoreDb;
+                }
+
+                if (string.IsNullOrEmpty(ProjectId))
+                {
+                    throw new InvalidOperationException("Project ID is required for Firestore connection");
+                }
+
+                FirestoreDbBuilder builder;
+                var database = Database ?? "(default)";
+
+                if (!string.IsNullOrEmpty(CredentialsFilePath))
+                {
+                    builder = new FirestoreDbBuilder
+                    {
+                        ProjectId = ProjectId,
+                        DatabaseId = database,
+                        CredentialsPath = CredentialsFilePath
+                    };
+                }
+                else if (!string.IsNullOrEmpty(CredentialsJson))
+                {
+                    builder = new FirestoreDbBuilder
+                    {
+                        ProjectId = ProjectId,
+                        DatabaseId = database,
+                        JsonCredentials = CredentialsJson
+                    };
+                }
+                else
+                {
+                    builder = new FirestoreDbBuilder
+                    {
+                        ProjectId = ProjectId,
+                        DatabaseId = database
+                    };
+                }
+
+                return builder.Build();
+            }, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
@@ -304,68 +346,7 @@ namespace Audit.Firestore.Providers
 
         private FirestoreDb GetFirestoreDb(AuditEvent auditEvent)
         {
-            if (FirestoreDb != null)
-            {
-                return FirestoreDb;
-            }
-
-            if (FirestoreDbBuilder != null)
-            {
-                return FirestoreDbBuilder();
-            }
-
-            if (_firestoreDb != null)
-            {
-                return _firestoreDb;
-            }
-
-            lock (_firestoreDbLock)
-            {
-                if (_firestoreDb != null)
-                {
-                    return _firestoreDb;
-                }
-
-                var projectId = ProjectId.GetValue(auditEvent);
-                var database = Database.GetValue(auditEvent) ?? "(default)";
-
-                if (string.IsNullOrEmpty(projectId))
-                {
-                    throw new InvalidOperationException("Project ID is required for Firestore connection");
-                }
-
-                FirestoreDbBuilder builder;
-
-                if (!string.IsNullOrEmpty(CredentialsFilePath))
-                {
-                    builder = new FirestoreDbBuilder
-                    {
-                        ProjectId = projectId,
-                        DatabaseId = database,
-                        CredentialsPath = CredentialsFilePath
-                    };
-                }
-                else if (!string.IsNullOrEmpty(CredentialsJson))
-                {
-                    builder = new FirestoreDbBuilder
-                    {
-                        ProjectId = projectId,
-                        DatabaseId = database,
-                        JsonCredentials = CredentialsJson
-                    };
-                }
-                else
-                {
-                    builder = new FirestoreDbBuilder
-                    {
-                        ProjectId = projectId,
-                        DatabaseId = database
-                    };
-                }
-
-                _firestoreDb = builder.Build();
-                return _firestoreDb;
-            }
+            return _firestoreDb.Value;
         }
 
         private CollectionReference GetCollection(FirestoreDb db, AuditEvent auditEvent)
@@ -392,7 +373,7 @@ namespace Audit.Firestore.Providers
             
             data = SanitizeDictionary(data);
 
-            if (IgnoreElementNameRestrictions)
+            if (SanitizeFieldNames)
             {
                 data = FixFieldNames(data);
             }
