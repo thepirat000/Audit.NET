@@ -29,6 +29,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
        
     - name: Authenticate to GCP
       uses: google-github-actions/auth@v2
@@ -70,9 +72,6 @@ jobs:
             --database="${{ env.FIRESTORE_DATABASE_ID }}" `
             --project="${{ env.FIRESTORE_PROJECT_ID }}" `
             --quiet
-
-    - name: Checkout
-      uses: actions/checkout@v4
 
     - name: Extract version from Directory.Build.props
       shell: pwsh
