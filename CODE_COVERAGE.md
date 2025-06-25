@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 6/22/2025 - 9:01:35 PM |
-| Coverage date: | 6/22/2025 - 8:39:16 PM - 6/22/2025 - 9:00:32 PM |
-| Parser: | MultiReport (94x Cobertura) |
-| Assemblies: | 37 |
-| Classes: | 312 |
-| Files: | 269 |
-| **Line coverage:** | 80.3% (8208 of 10213) |
-| Covered lines: | 8208 |
-| Uncovered lines: | 2005 |
-| Coverable lines: | 10213 |
-| Total lines: | 26293 |
-| **Branch coverage:** | 71.4% (2980 of 4168) |
-| Covered branches: | 2980 |
-| Total branches: | 4168 |
+| Generated on: | 6/25/2025 - 10:58:46 PM |
+| Coverage date: | 6/25/2025 - 10:35:57 PM - 6/25/2025 - 10:57:32 PM |
+| Parser: | MultiReport (97x Cobertura) |
+| Assemblies: | 38 |
+| Classes: | 315 |
+| Files: | 272 |
+| **Line coverage:** | 79.7% (8351 of 10476) |
+| Covered lines: | 8351 |
+| Uncovered lines: | 2125 |
+| Coverable lines: | 10476 |
+| Total lines: | 26980 |
+| **Branch coverage:** | 70.8% (3024 of 4269) |
+| Covered branches: | 3024 |
+| Total branches: | 4269 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -225,6 +225,10 @@
 |**Audit.NET.EventLog.Core**|**26**|**11**|**37**|**109**|**70.2%**|**7**|**10**|**70%**|
 |Audit.Core.EvenLogProviderConfigurator|0|10|10|27|0%|0|0||
 |Audit.Core.Providers.EventLogDataProvider|26|1|27|82|96.2%|7|10|70%|
+|**Audit.NET.Firestore**|**143**|**120**|**263**|**687**|**54.3%**|**44**|**101**|**43.5%**|
+|Audit.Core.FirestoreConfiguratorExtensions|21|0|21|55|100%|0|0||
+|Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator|22|2|24|84|91.6%|0|0||
+|Audit.Firestore.Providers.FirestoreDataProvider|100|118|218|548|45.8%|44|101|43.5%|
 |**Audit.NET.ImmuDB**|**101**|**16**|**117**|**369**|**86.3%**|**24**|**28**|**85.7%**|
 |Audit.Core.ImmuDbConfiguratorExtensions|0|2|2|22|0%|0|0||
 |Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator|18|10|28|98|64.2%|0|0||
