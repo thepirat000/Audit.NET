@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Firestore.ConfigurationApi;
 using Audit.Firestore.Providers;
 using Google.Cloud.Firestore;
-using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Audit.Firestore.UnitTest
 {
@@ -228,12 +226,8 @@ namespace Audit.Firestore.UnitTest
             // Arrange
             var provider = new FirestoreDataProvider();
 
-            // Act & Assert - Using reflection to test private method
-            var getFirestoreDbMethod = typeof(FirestoreDataProvider).GetMethod("GetFirestoreDb", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            
-            Assert.Throws<System.Reflection.TargetInvocationException>(() => 
-                getFirestoreDbMethod.Invoke(provider, new object[] { null }));
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => provider.GetFirestoreDb());
         }
 
         [Test]
@@ -292,13 +286,36 @@ namespace Audit.Firestore.UnitTest
         {
             // Arrange
             var configurator = new FirestoreProviderConfigurator();
-            FirestoreDb firestoreDb = null; // Can't mock sealed class
+            var builder = new FirestoreDbBuilder()
+            {
+                ProjectId = "test"
+            };
+            var firestoreDb = builder.Build();
 
             // Act
             configurator.FirestoreDb(firestoreDb);
 
             // Assert
-            Assert.AreEqual(firestoreDb, configurator._firestoreDb);
+            Assert.AreEqual(firestoreDb, configurator._firestoreDbFactory.Invoke());
+        }
+
+        [Test]
+        public void Configurator_FirestoreDb_CreatedOnlyOnce()
+        {
+            // Arrange
+            var dp = new FirestoreDataProvider()
+            {
+                ProjectId = "test"
+            };
+
+            // Act
+            var firestoreDb1 = dp.GetFirestoreDb();
+            dp.ProjectId = "changed";
+            var firestoreDb2 = dp.GetFirestoreDb();
+
+            // Act
+            Assert.That(firestoreDb1, Is.SameAs(firestoreDb2));
+            Assert.That(firestoreDb1.ProjectId, Is.EqualTo("test"));
         }
     }
 } 

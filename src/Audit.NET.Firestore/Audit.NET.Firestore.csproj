@@ -6,9 +6,13 @@
 		<AssemblyTitle>Audit.Firestore</AssemblyTitle>
 		<Authors>Karl Smith</Authors>
 		<TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
+		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NU1903</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AssemblyName>Audit.NET.Firestore</AssemblyName>
+		<AssemblyOriginatorKeyFile>../StrongName/Audit.NET.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<PackageId>Audit.NET.Firestore</PackageId>
 		<PackageTags>Audit;Trail;Log;Firestore;Google;Cloud;GCP</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>

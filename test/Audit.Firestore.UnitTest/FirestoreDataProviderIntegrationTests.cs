@@ -1,8 +1,10 @@
-using System;
-using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Firestore.Providers;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Audit.Firestore.UnitTest
 {
@@ -16,7 +18,8 @@ namespace Audit.Firestore.UnitTest
     ///    - Running on Google Cloud Platform with appropriate permissions
     /// </summary>
     [TestFixture]
-    [Ignore("Integration tests - require Firestore connection")]
+    [Category("Integration")]
+    [Category("Firestore")]
     public class FirestoreDataProviderIntegrationTests
     {
         private string _projectId;
@@ -26,16 +29,32 @@ namespace Audit.Firestore.UnitTest
         public void Setup()
         {
             // Set your project ID here or via environment variable
-            _projectId = Environment.GetEnvironmentVariable("FIRESTORE_PROJECT_ID") ?? "your-project-id";
-            _testCollection = $"audit-test-{Guid.NewGuid():N}";
+            _projectId = Environment.GetEnvironmentVariable("FIRESTORE_PROJECT_ID") ?? "audit-net";
+            _testCollection = "audit-test";
         }
 
-        [TearDown]
-        public async Task Cleanup()
+        [OneTimeTearDown]
+        public async Task OneTimeTearDown()
         {
-            // Clean up test collection if needed
-            // Note: This would require admin SDK or manual cleanup
-            await Task.CompletedTask;
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection(_testCollection));
+
+            try
+            {
+                var col = provider.GetFirestoreCollection();
+
+                var documents = col.ListDocumentsAsync();
+
+                await foreach (var document in documents)
+                {
+                    await document.DeleteAsync();
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore errors during cleanup
+            }
         }
 
         [Test]
@@ -55,7 +74,7 @@ namespace Audit.Firestore.UnitTest
                     UserName = "TestUser",
                     MachineName = "TestMachine"
                 },
-                CustomFields = 
+                CustomFields = new Dictionary<string, object>
                 {
                     ["TestField"] = "TestValue",
                     ["NumericField"] = 123
@@ -74,8 +93,8 @@ namespace Audit.Firestore.UnitTest
             Assert.IsNotNull(retrievedEvent);
             Assert.AreEqual("TestEvent", retrievedEvent.EventType);
             Assert.AreEqual("TestUser", retrievedEvent.Environment.UserName);
-            Assert.AreEqual("TestValue", retrievedEvent.CustomFields["TestField"]);
-            Assert.AreEqual(123L, retrievedEvent.CustomFields["NumericField"]); // Firestore stores as long
+            Assert.AreEqual("TestValue", retrievedEvent.CustomFields["TestField"].ToString());
+            Assert.AreEqual("123", retrievedEvent.CustomFields["NumericField"].ToString()); // Firestore stores as long
         }
 
         [Test]
@@ -119,27 +138,30 @@ namespace Audit.Firestore.UnitTest
                 .ProjectId(_projectId)
                 .Collection(_testCollection));
 
+            var typeA = $"TypeA-{Guid.NewGuid()}";
+            var typeB = $"TypeB-{Guid.NewGuid()}";
+
             // Insert test events
             for (int i = 0; i < 5; i++)
             {
                 await provider.InsertEventAsync(new AuditEvent
                 {
-                    EventType = i < 3 ? "TypeA" : "TypeB",
+                    EventType = i < 3 ? typeA : typeB,
                     StartDate = DateTime.UtcNow.AddMinutes(-i),
-                    CustomFields = { ["Index"] = i }
+                    CustomFields = new Dictionary<string, object> { ["Index"] = i }
                 });
             }
 
             // Act
             var results = await provider.QueryEventsAsync(query => query
-                .WhereEqualTo("EventType", "TypeA")
+                .WhereEqualTo("EventType", typeA)
                 .OrderBy("StartDate"));
 
             // Assert
             Assert.AreEqual(3, results.Count);
             foreach (var evt in results)
             {
-                Assert.AreEqual("TypeA", evt.EventType);
+                Assert.AreEqual(typeA, evt.EventType);
             }
         }
 

@@ -44,7 +44,7 @@ namespace Audit.Core
                 Collection = firestoreConfig._collection,
                 CredentialsFilePath = firestoreConfig._credentialsFilePath,
                 CredentialsJson = firestoreConfig._credentialsJson,
-                FirestoreDb = firestoreConfig._firestoreDb,
+                FirestoreDbFactory = firestoreConfig._firestoreDbFactory,
                 IdBuilder = firestoreConfig._idBuilder,
                 SanitizeFieldNames = firestoreConfig._sanitizeFieldNames
             };

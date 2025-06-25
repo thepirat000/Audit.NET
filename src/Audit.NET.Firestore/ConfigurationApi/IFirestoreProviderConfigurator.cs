@@ -50,7 +50,13 @@ namespace Audit.Firestore.ConfigurationApi
         /// </summary>
         /// <param name="firestoreDb">The FirestoreDb instance.</param>
         IFirestoreProviderConfigurator FirestoreDb(FirestoreDb firestoreDb);
-        
+
+        /// <summary>
+        /// Specifies a factory function that returns a FirestoreDb instance to use.
+        /// </summary>
+        /// <param name="firestoreDbFactory">The FirestoreDb factory function.</param>
+        IFirestoreProviderConfigurator FirestoreDb(Func<FirestoreDb> firestoreDbFactory);
+
         /// <summary>
         /// Specifies a function that returns the document ID to use for a given audit event.
         /// By default, it will generate a new document ID automatically.

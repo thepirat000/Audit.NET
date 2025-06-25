@@ -1,6 +1,7 @@
 using System;
 using Audit.Core;
 using Google.Cloud.Firestore;
+// ReSharper disable InconsistentNaming
 
 namespace Audit.Firestore.ConfigurationApi
 {
@@ -14,7 +15,7 @@ namespace Audit.Firestore.ConfigurationApi
         internal Setting<string> _collection = "AuditEvents";
         internal string _credentialsFilePath;
         internal string _credentialsJson;
-        internal FirestoreDb _firestoreDb;
+        internal Func<FirestoreDb> _firestoreDbFactory;
         internal Func<AuditEvent, string> _idBuilder;
         internal bool _sanitizeFieldNames = false;
 
@@ -58,7 +59,13 @@ namespace Audit.Firestore.ConfigurationApi
 
         public IFirestoreProviderConfigurator FirestoreDb(FirestoreDb firestoreDb)
         {
-            _firestoreDb = firestoreDb;
+            _firestoreDbFactory = () => firestoreDb;
+            return this;
+        }
+
+        public IFirestoreProviderConfigurator FirestoreDb(Func<FirestoreDb> firestoreDbFactory)
+        {
+            _firestoreDbFactory = firestoreDbFactory;
             return this;
         }
 

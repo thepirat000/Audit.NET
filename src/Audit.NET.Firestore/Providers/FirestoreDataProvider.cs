@@ -1,13 +1,11 @@
+using Audit.Core;
+using Google.Cloud.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Audit.Core;
-using Google.Api.Gax;
-using Google.Cloud.Firestore;
-using Google.Cloud.Firestore.V1;
 
 namespace Audit.Firestore.Providers
 {
@@ -53,9 +51,9 @@ namespace Audit.Firestore.Providers
         public string CredentialsJson { get; set; }
 
         /// <summary>
-        /// Gets or sets a custom FirestoreDb instance to use.
+        /// Gets or sets a custom FirestoreDb factory to use.
         /// </summary>
-        public FirestoreDb FirestoreDb { get; set; }
+        public Func<FirestoreDb> FirestoreDbFactory { get; set; }
 
         /// <summary>
         /// Gets or sets a function that returns the document ID to use for a given audit event.
@@ -67,13 +65,20 @@ namespace Audit.Firestore.Providers
         /// Gets or sets a value indicating whether to sanitize field names by replacing dots with underscores.
         /// Default is false.
         /// </summary>
-        public bool SanitizeFieldNames { get; set; } = false;
+        public bool SanitizeFieldNames { get; set; }
 
         private Lazy<FirestoreDb> _firestoreDb;
 
         public FirestoreDataProvider()
         {
-            InitializeLazyFirestoreDb();
+            InitializeFirestoreDb();
+        }
+
+        public FirestoreDataProvider(FirestoreDb firestoreDb)
+        {
+            FirestoreDbFactory = () => firestoreDb;
+
+            InitializeFirestoreDb();
         }
 
         public FirestoreDataProvider(Action<ConfigurationApi.IFirestoreProviderConfigurator> config)
@@ -87,64 +92,67 @@ namespace Audit.Firestore.Providers
                 Collection = firestoreConfig._collection;
                 CredentialsFilePath = firestoreConfig._credentialsFilePath;
                 CredentialsJson = firestoreConfig._credentialsJson;
-                FirestoreDb = firestoreConfig._firestoreDb;
+                FirestoreDbFactory = firestoreConfig._firestoreDbFactory;
                 IdBuilder = firestoreConfig._idBuilder;
                 SanitizeFieldNames = firestoreConfig._sanitizeFieldNames;
             }
-            InitializeLazyFirestoreDb();
+
+            InitializeFirestoreDb();
         }
 
-        private void InitializeLazyFirestoreDb()
+        private void InitializeFirestoreDb()
         {
-            _firestoreDb = new Lazy<FirestoreDb>(() =>
+            _firestoreDb = new Lazy<FirestoreDb>(CreateFirestoreDb, LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        private FirestoreDb CreateFirestoreDb()
+        {
+            if (FirestoreDbFactory != null)
             {
-                if (FirestoreDb != null)
-                {
-                    return FirestoreDb;
-                }
+                return FirestoreDbFactory.Invoke();
+            }
 
-                if (string.IsNullOrEmpty(ProjectId))
-                {
-                    throw new InvalidOperationException("Project ID is required for Firestore connection");
-                }
+            if (string.IsNullOrEmpty(ProjectId))
+            {
+                throw new InvalidOperationException("Project ID is required for Firestore connection");
+            }
 
-                FirestoreDbBuilder builder;
-                var database = Database ?? "(default)";
+            FirestoreDbBuilder builder;
+            var database = Database ?? "(default)";
 
-                if (!string.IsNullOrEmpty(CredentialsFilePath))
+            if (!string.IsNullOrEmpty(CredentialsFilePath))
+            {
+                builder = new FirestoreDbBuilder
                 {
-                    builder = new FirestoreDbBuilder
-                    {
-                        ProjectId = ProjectId,
-                        DatabaseId = database,
-                        CredentialsPath = CredentialsFilePath
-                    };
-                }
-                else if (!string.IsNullOrEmpty(CredentialsJson))
+                    ProjectId = ProjectId,
+                    DatabaseId = database,
+                    CredentialsPath = CredentialsFilePath
+                };
+            }
+            else if (!string.IsNullOrEmpty(CredentialsJson))
+            {
+                builder = new FirestoreDbBuilder
                 {
-                    builder = new FirestoreDbBuilder
-                    {
-                        ProjectId = ProjectId,
-                        DatabaseId = database,
-                        JsonCredentials = CredentialsJson
-                    };
-                }
-                else
+                    ProjectId = ProjectId,
+                    DatabaseId = database,
+                    JsonCredentials = CredentialsJson
+                };
+            }
+            else
+            {
+                builder = new FirestoreDbBuilder
                 {
-                    builder = new FirestoreDbBuilder
-                    {
-                        ProjectId = ProjectId,
-                        DatabaseId = database
-                    };
-                }
+                    ProjectId = ProjectId,
+                    DatabaseId = database
+                };
+            }
 
-                return builder.Build();
-            }, LazyThreadSafetyMode.ExecutionAndPublication);
+            return builder.Build();
         }
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            var db = GetFirestoreDb(auditEvent);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, auditEvent);
             var documentData = ConvertToFirestoreData(auditEvent);
             var id = GetDocumentId(auditEvent);
@@ -166,7 +174,7 @@ namespace Audit.Firestore.Providers
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var db = GetFirestoreDb(auditEvent);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, auditEvent);
             var documentData = ConvertToFirestoreData(auditEvent);
             var id = GetDocumentId(auditEvent);
@@ -188,7 +196,7 @@ namespace Audit.Firestore.Providers
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            var db = GetFirestoreDb(auditEvent);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, auditEvent);
             var documentData = ConvertToFirestoreData(auditEvent);
             var id = eventId?.ToString() ?? GetDocumentId(auditEvent);
@@ -204,7 +212,7 @@ namespace Audit.Firestore.Providers
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            var db = GetFirestoreDb(auditEvent);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, auditEvent);
             var documentData = ConvertToFirestoreData(auditEvent);
             var id = eventId?.ToString() ?? GetDocumentId(auditEvent);
@@ -220,7 +228,7 @@ namespace Audit.Firestore.Providers
 
         public override T GetEvent<T>(object eventId)
         {
-            var db = GetFirestoreDb(null);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, null);
             var id = eventId?.ToString();
 
@@ -243,7 +251,7 @@ namespace Audit.Firestore.Providers
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
-            var db = GetFirestoreDb(null);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, null);
             var id = eventId?.ToString();
 
@@ -282,7 +290,7 @@ namespace Audit.Firestore.Providers
         /// <typeparam name="T">The AuditEvent type</typeparam>
         public IQueryable<T> QueryEvents<T>() where T : AuditEvent
         {
-            var db = GetFirestoreDb(null);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, null);
             var snapshots = collection.GetSnapshotAsync().GetAwaiter().GetResult();
 
@@ -313,7 +321,7 @@ namespace Audit.Firestore.Providers
         /// <param name="whereClause">The where clause to apply. Example: q => q.WhereEqualTo("EventType", "Login")</param>
         public async Task<IList<T>> QueryEventsAsync<T>(Func<Query, Query> whereClause = null) where T : AuditEvent
         {
-            var db = GetFirestoreDb(null);
+            var db = GetFirestoreDb();
             var collection = GetCollection(db, null);
             Query query = collection;
 
@@ -340,13 +348,16 @@ namespace Audit.Firestore.Providers
         /// </summary>
         public CollectionReference GetFirestoreCollection()
         {
-            var db = GetFirestoreDb(null);
+            var db = GetFirestoreDb();
             return GetCollection(db, null);
         }
 
-        private FirestoreDb GetFirestoreDb(AuditEvent auditEvent)
+        /// <summary>
+        /// Gets the FirestoreDb instance used by this provider.
+        /// </summary>
+        public FirestoreDb GetFirestoreDb()
         {
-            return _firestoreDb.Value;
+            return _firestoreDb?.Value;
         }
 
         private CollectionReference GetCollection(FirestoreDb db, AuditEvent auditEvent)
@@ -529,8 +540,8 @@ namespace Audit.Firestore.Providers
         /// </summary>
         public async Task TestConnectionAsync()
         {
-            var db = GetFirestoreDb(null);
-            var collections = await db.ListRootCollectionsAsync().Take(1).ToListAsync();
+            var db = GetFirestoreDb();
+            await db.ListRootCollectionsAsync().Take(1).ToListAsync();
             // If we get here without exception, the connection is working
         }
     }

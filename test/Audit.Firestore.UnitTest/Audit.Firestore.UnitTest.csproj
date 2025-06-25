@@ -1,9 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net472;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
+    <TargetFrameworks>net462;netcoreapp3.1;net9.0</TargetFrameworks>
+	  <NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
+	  <IsPackable>false</IsPackable>
+	  <IsTestProject>true</IsTestProject>
+	  <DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+	  <SignAssembly>true</SignAssembly>
+	  <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+	  <AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+	  <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
