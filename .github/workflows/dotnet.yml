@@ -20,8 +20,6 @@ env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
   FIRESTORE_PROJECT_ID: audit-net
-  FIRESTORE_DATABASE_ID: "(default)"
-  FIRESTORE_LOCATION: nam5
   ACCEPT_EULA: 'Y'
 
 jobs:
@@ -32,47 +30,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
        
-    - name: Authenticate to GCP
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: ${{ env.FIRESTORE_CREDENTIALS }}
-
-    - name: Install gcloud CLI
-      uses: google-github-actions/setup-gcloud@v2
-      with:
-        version: ">=416.0.0"
-
-    - name: Create Firestore database if missing
-      shell: pwsh
-      run: |
-        $project = '${{ env.FIRESTORE_PROJECT_ID }}'
-        $databaseId = '${{ env.FIRESTORE_DATABASE_ID }}'
-        $location = '${{ env.FIRESTORE_LOCATION }}'
-        # Check if default database exists
-        if (-not (gcloud firestore databases list `
-            --project=$project `
-            --format="value(name)" `
-            | Select-String -Pattern "projects/$project/databases/$databaseId")) {
-                # Create the default database
-                gcloud firestore databases create `
-                --database="$databaseId" `
-                --location=$location `
-                --type=firestore-native `
-                --project=$project `
-                --quiet
-            }
-
-    - name: Create composite index
-      run: |
-          gcloud firestore indexes composite create `
-            --collection-group="audit-test" `
-            --query-scope=COLLECTION `
-            --field-config="field-path=EventType,order=ASCENDING" `
-            --field-config="field-path=StartDate,order=ASCENDING" `
-            --database="${{ env.FIRESTORE_DATABASE_ID }}" `
-            --project="${{ env.FIRESTORE_PROJECT_ID }}" `
-            --quiet
-
     - name: Extract version from Directory.Build.props
       shell: pwsh
       run: |
@@ -81,7 +38,14 @@ jobs:
         $version = $csproj.Project.PropertyGroup.Version
         "PROJECT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         Write-Host "PROJECT_VERSION=$version"
-        
+
+    # Google Cloud
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ env.FIRESTORE_CREDENTIALS }}
+
+    # ImmuDB        
     - name: ImmuDB (Setup)
       run: |
         $version = 'v1.9.6'
