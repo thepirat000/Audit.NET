@@ -38,6 +38,7 @@ StartDotnetUnitTests 'Audit.DynamicProxy.UnitTest' 'DynamicProxy';
 StartDotnetUnitTests 'Audit.DynamoDB.UnitTest' 'DynamoDB';
 StartDotnetUnitTests 'Audit.Elasticsearch.UnitTest' 'Elasticsearch';
 StartDotnetUnitTests 'Audit.FileSystem.UnitTest' 'FileSystem';
+StartDotnetUnitTests 'Audit.Firestore.UnitTest' 'Firestore';
 StartDotnetUnitTests 'Audit.HttpClient.UnitTest' 'HttpClient';
 StartDotnetUnitTests 'Audit.JsonAdapter.UnitTest' 'JsonAdapter';
 StartDotnetUnitTests 'Audit.ImmuDB.UnitTest' 'ImmuDB';
