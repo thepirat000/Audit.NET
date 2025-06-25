@@ -39,7 +39,7 @@ jobs:
         "PROJECT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         Write-Host "PROJECT_VERSION=$version"
 
-    # Google Cloud
+    # Google Cloud (Firestore)
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
@@ -224,7 +224,7 @@ jobs:
     - name: Run tests
       run: |
         dotnet test .\Audit.NET.sln --no-build -c release `
-          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo|TestCategory=ImmuDB" `
+          --filter "TestCategory!=Integration|TestCategory=AzureBlobs|TestCategory=AzureTables|TestCategory=RavenDB|TestCategory=Mongo|TestCategory=OpenSearch|TestCategory=Elasticsearch|TestCategory=Redis|TestCategory=MySql|TestCategory=SqlServer|TestCategory=EventLog|TestCategory=PostgreSQL|TestCategory=Dynamo|TestCategory=ImmuDB|TestCategory=Firestore" `
           --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
 
     - name: SonarScanner End

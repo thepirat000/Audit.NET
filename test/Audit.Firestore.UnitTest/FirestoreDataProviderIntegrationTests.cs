@@ -16,6 +16,8 @@ namespace Audit.Firestore.UnitTest
     ///    - Application Default Credentials configured (gcloud auth application-default login)
     ///    - GOOGLE_APPLICATION_CREDENTIALS environment variable pointing to a service account key file
     ///    - Running on Google Cloud Platform with appropriate permissions
+    /// 3. A collection named "audit-test" in Firestore
+    /// 4. A composite index on the "EventType" and "StartDate" fields in the "audit-test" collection
     /// </summary>
     [TestFixture]
     [Category("Integration")]
