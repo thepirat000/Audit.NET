@@ -18,6 +18,10 @@ env:
   AUDIT_NET_AZUREBLOBACCOUNTNAME: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTNAME }}
   AUDIT_NET_AZUREBLOBACCOUNTKEY: ${{ secrets.AUDIT_NET_AZUREBLOBACCOUNTKEY }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
+  FIRESTORE_PROJECT_ID: audit-net
+  FIRESTORE_DATABASE_ID: "(default)"
+  FIRESTORE_LOCATION: nam5
   ACCEPT_EULA: 'Y'
 
 jobs:
@@ -26,6 +30,40 @@ jobs:
 
     steps:
        
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ env.FIRESTORE_CREDENTIALS }}
+
+    - name: Install gcloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        version: ">=416.0.0"
+
+    - name: Create Firestore database if missing
+      run: |
+        gcloud firestore databases list \
+            --project="${{ env.FIRESTORE_PROJECT_ID }}" \
+            --format="value(name)" \
+            | grep "projects/${{ env.FIRESTORE_PROJECT_ID }}/databases/(${env:FIRESTORE_DATABASE_ID})" \
+        || gcloud firestore databases create \
+            --database="${{ env.FIRESTORE_DATABASE_ID }}" \
+            --location="${{ env.FIRESTORE_LOCATION }}" \
+            --type=firestore-native \
+            --project="${{ env.FIRESTORE_PROJECT_ID }}" \
+            --quiet
+
+    - name: Create composite index
+      run: |
+          gcloud firestore indexes composite create \
+            --collection-group="audit-test" \
+            --query-scope=COLLECTION \
+            --field-config="field-path=EventType,order=ASCENDING" \
+            --field-config="field-path=StartDate,order=ASCENDING" \
+            --database="${{ env.FIRESTORE_DATABASE_ID }}" \
+            --project="${{ env.FIRESTORE_PROJECT_ID }}" \
+            --quiet
+
     - name: Checkout
       uses: actions/checkout@v4
 
