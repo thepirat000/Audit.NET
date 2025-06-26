@@ -19,7 +19,7 @@ namespace Audit.Firestore.Providers
     /// - Collection: The Firestore collection name
     /// - CredentialsFilePath: Path to the credentials JSON file (optional)
     /// - CredentialsJson: JSON string with credentials (optional)
-    /// - FirestoreDb: Custom FirestoreDb instance (optional)
+    /// - FirestoreDbFactory: Custom FirestoreDb factory (optional)
     /// - IdBuilder: Function to generate document IDs (optional)
     /// - SanitizeFieldNames: Whether to fix field names with dots (default: false)
     /// </remarks>

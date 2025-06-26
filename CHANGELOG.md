@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [30.0.2] - 2025-06-25:
+- **Audit.NET.Firestore**: A new data provider for Google Firestore (#761)
+
 ## [30.0.1] - 2025-05-28:
 - **Audit.NET.ImmuDB**: A new data provider for ImmuDB, a distributed immutable database. This provider allows you to store audit events in an ImmuDB database, ensuring that the audit logs are tamper-proof and verifiable.
 
