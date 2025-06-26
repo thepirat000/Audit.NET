@@ -262,3 +262,6 @@ __pycache__/
 Docs/
 /src/StrongName/Audit.NET.snk
 .sonarqube
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
