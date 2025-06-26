@@ -1,9 +1,10 @@
 using Audit.Core;
+using Audit.Firestore.ConfigurationApi;
 using Audit.Firestore.Providers;
+using Google.Cloud.Firestore;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Audit.Firestore.UnitTest
@@ -24,6 +25,7 @@ namespace Audit.Firestore.UnitTest
     [Category("Firestore")]
     public class FirestoreDataProviderIntegrationTests
     {
+        private const string GoogleAppCredentialsVariable = "GOOGLE_APPLICATION_CREDENTIALS";
         private string _projectId;
         private string _testCollection;
 
@@ -60,7 +62,48 @@ namespace Audit.Firestore.UnitTest
         }
 
         [Test]
-        public async Task InsertEvent_StoresEventInFirestore()
+        public void InsertEvent_StoresEventInFirestore()
+        {
+            // Arrange
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection(_testCollection));
+
+            var auditEvent = new AuditEvent
+            {
+                EventType = "TestEvent",
+                StartDate = DateTime.UtcNow,
+                Environment = new AuditEventEnvironment
+                {
+                    UserName = "TestUser",
+                    MachineName = "TestMachine"
+                },
+                CustomFields = new Dictionary<string, object>
+                {
+                    ["TestField"] = "TestValue",
+                    ["NumericField"] = 123
+                }
+            };
+
+            // Act
+            var eventId = provider.InsertEvent(auditEvent);
+
+            // Assert
+            Assert.IsNotNull(eventId);
+            Assert.IsNotEmpty(eventId.ToString());
+
+            // Verify we can retrieve it
+            var retrievedEvent = provider.GetEvent<AuditEvent>(eventId);
+
+            Assert.IsNotNull(retrievedEvent);
+            Assert.AreEqual("TestEvent", retrievedEvent.EventType);
+            Assert.AreEqual("TestUser", retrievedEvent.Environment.UserName);
+            Assert.AreEqual("TestValue", retrievedEvent.CustomFields["TestField"].ToString());
+            Assert.AreEqual("123", retrievedEvent.CustomFields["NumericField"].ToString()); // Firestore stores as long
+        }
+
+        [Test]
+        public async Task InsertEventAsync_StoresEventInFirestore()
         {
             // Arrange
             var provider = new FirestoreDataProvider(config => config
@@ -100,7 +143,40 @@ namespace Audit.Firestore.UnitTest
         }
 
         [Test]
-        public async Task ReplaceEvent_UpdatesExistingEvent()
+        public void ReplaceEvent_UpdatesExistingEvent()
+        {
+            // Arrange
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection(_testCollection));
+
+            var originalEvent = new AuditEvent
+            {
+                EventType = "OriginalEvent",
+                StartDate = DateTime.UtcNow
+            };
+
+            var eventId = provider.InsertEvent(originalEvent);
+
+            // Act
+            var updatedEvent = new AuditEvent
+            {
+                EventType = "UpdatedEvent",
+                StartDate = originalEvent.StartDate,
+                EndDate = DateTime.UtcNow,
+                Duration = 1000
+            };
+
+            provider.ReplaceEvent(eventId, updatedEvent);
+
+            // Assert
+            var retrievedEvent = provider.GetEvent<AuditEvent>(eventId);
+            Assert.AreEqual("UpdatedEvent", retrievedEvent.EventType);
+            Assert.AreEqual(1000, retrievedEvent.Duration);
+        }
+
+        [Test]
+        public async Task ReplaceEventAsync_UpdatesExistingEvent()
         {
             // Arrange
             var provider = new FirestoreDataProvider(config => config
@@ -148,23 +224,26 @@ namespace Audit.Firestore.UnitTest
             {
                 await provider.InsertEventAsync(new AuditEvent
                 {
-                    EventType = i < 3 ? typeA : typeB,
+                    EventType = i < 4 ? typeA : typeB,
                     StartDate = DateTime.UtcNow.AddMinutes(-i),
                     CustomFields = new Dictionary<string, object> { ["Index"] = i }
                 });
             }
 
             // Act
-            var results = await provider.QueryEventsAsync(query => query
+            var results = provider.QueryEventsAsync(query => query
                 .WhereEqualTo("EventType", typeA)
-                .OrderBy("StartDate"));
+                .OrderBy("StartDate")
+                .Limit(3));
 
             // Assert
-            Assert.AreEqual(3, results.Count);
-            foreach (var evt in results)
+            int count = 0;
+            await foreach (var evt in results)
             {
-                Assert.AreEqual(typeA, evt.EventType);
+                count++;
+                Assert.That(evt.EventType, Is.EqualTo(typeA));
             }
+            Assert.That(count, Is.EqualTo(3)); // Should return 3 events of typeA
         }
 
         [Test]
@@ -204,7 +283,29 @@ namespace Audit.Firestore.UnitTest
         }
 
         [Test]
-        public async Task CustomIdBuilder_UsesSpecifiedIds()
+        public void CustomIdBuilder_UsesSpecifiedIds()
+        {
+            // Arrange
+            var customId = $"custom-{Guid.NewGuid():N}";
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection(_testCollection)
+                .IdBuilder(ev => customId));
+
+            var auditEvent = new AuditEvent { EventType = "TestEvent" };
+
+            // Act
+            var eventId = provider.InsertEvent(auditEvent);
+
+            // Assert
+            Assert.AreEqual(customId, eventId);
+            
+            var retrievedEvent = provider.GetEvent<AuditEvent>(customId);
+            Assert.IsNotNull(retrievedEvent);
+        }
+
+        [Test]
+        public async Task CustomIdBuilder_UsesSpecifiedIdsAsync()
         {
             // Arrange
             var customId = $"custom-{Guid.NewGuid():N}";
@@ -220,9 +321,138 @@ namespace Audit.Firestore.UnitTest
 
             // Assert
             Assert.AreEqual(customId, eventId);
-            
+
             var retrievedEvent = await provider.GetEventAsync<AuditEvent>(customId);
             Assert.IsNotNull(retrievedEvent);
+        }
+
+        [Test]
+        public void Configurator_FirestoreDb_CreatedOnlyOnce()
+        {
+            // Arrange
+            var dp = new FirestoreDataProvider()
+            {
+                ProjectId = "test"
+            };
+
+            // Act
+            var firestoreDb1 = dp.GetFirestoreDb();
+            dp.ProjectId = "changed";
+            var firestoreDb2 = dp.GetFirestoreDb();
+
+            // Act
+            Assert.That(firestoreDb1, Is.SameAs(firestoreDb2));
+            Assert.That(firestoreDb1.ProjectId, Is.EqualTo("test"));
+        }
+
+        [Test]
+        public void ReplaceEvent_WithNullEventId_ThrowsException()
+        {
+            // Arrange
+            var provider = new FirestoreDataProvider(config => config.ProjectId("test-project"));
+            var auditEvent = new AuditEvent();
+
+            // Act & Assert
+            Assert.Throws<NullReferenceException>(() => provider.ReplaceEvent(null, auditEvent));
+        }
+
+        [Test]
+        public void ReplaceEventAsync_WithNullEventId_ThrowsException()
+        {
+            // Arrange
+            var provider = new FirestoreDataProvider(config => config.ProjectId("test-project"));
+            var auditEvent = new AuditEvent();
+
+            // Act & Assert
+            Assert.ThrowsAsync<NullReferenceException>(async () =>
+                await provider.ReplaceEventAsync(null, auditEvent));
+        }
+
+        [Test]
+        public void GetEvent_WithNullEventId_ThrowsException()
+        {
+            // Arrange
+            var provider = new FirestoreDataProvider(config => config.ProjectId("test-project"));
+
+            // Act & Assert
+            Assert.Throws<NullReferenceException>(() => provider.GetEvent<AuditEvent>(null));
+        }
+
+        [Test]
+        public void Configurator_FirestoreDb_SetsInstance()
+        {
+            // Arrange
+            var configurator = new FirestoreProviderConfigurator();
+            var builder = new FirestoreDbBuilder()
+            {
+                ProjectId = "test"
+            };
+            var firestoreDb = builder.Build();
+
+            // Act
+            configurator.FirestoreDb(firestoreDb);
+
+            // Assert
+            Assert.AreEqual(firestoreDb, configurator._firestoreDbFactory.Invoke());
+        }
+
+        [Test]
+        public void Constructor_FirestoreDb_SetsDefaultValues()
+        {
+            // Arrange 
+            var firestoreDb = FirestoreDb.Create("test-project");
+            var provider = new FirestoreDataProvider(firestoreDb);
+
+            // Act
+            var firestoreDbFromProvider = provider.GetFirestoreDb();
+
+            // Assert
+            Assert.That(firestoreDbFromProvider, Is.SameAs(firestoreDb));
+        }
+
+        [Test]
+        public async Task CredentialsFromFile_StoresEventInFirestore()
+        {
+            // Arrange
+            var filePath = Environment.GetEnvironmentVariable(GoogleAppCredentialsVariable);
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection(_testCollection)
+                .CredentialsFromFile(filePath));
+
+            var auditEvent = new AuditEvent { EventType = "TestEvent" };
+
+            // Act
+            var eventId = await provider.InsertEventAsync(auditEvent);
+            
+            // Assert
+            Assert.That(eventId, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task CredentialsFromJson_StoresEventInFirestore()
+        {
+            // Arrange
+            var filePath = Environment.GetEnvironmentVariable(GoogleAppCredentialsVariable);
+
+#if NET462
+            var json = System.IO.File.ReadAllText(filePath!);
+#else
+            var json = await System.IO.File.ReadAllTextAsync(filePath!);
+#endif
+
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection(_testCollection)
+                .CredentialsFromJson(json));
+
+            var auditEvent = new AuditEvent { EventType = "TestEvent" };
+
+            // Act
+            var eventId = await provider.InsertEventAsync(auditEvent);
+
+            // Assert
+            Assert.That(eventId, Is.Not.Null);
         }
     }
 } 

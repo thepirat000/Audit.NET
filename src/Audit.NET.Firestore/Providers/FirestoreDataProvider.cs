@@ -196,15 +196,11 @@ namespace Audit.Firestore.Providers
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
+            var id = eventId.ToString();
+
             var db = GetFirestoreDb();
             var collection = GetCollection(db, auditEvent);
             var documentData = ConvertToFirestoreData(auditEvent);
-            var id = eventId?.ToString() ?? GetDocumentId(auditEvent);
-
-            if (string.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("Event ID cannot be null or empty for replace operation");
-            }
 
             var docRef = collection.Document(id);
             docRef.SetAsync(documentData, SetOptions.MergeAll).GetAwaiter().GetResult();
@@ -212,15 +208,11 @@ namespace Audit.Firestore.Providers
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
+            var id = eventId.ToString();
+
             var db = GetFirestoreDb();
             var collection = GetCollection(db, auditEvent);
             var documentData = ConvertToFirestoreData(auditEvent);
-            var id = eventId?.ToString() ?? GetDocumentId(auditEvent);
-
-            if (string.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("Event ID cannot be null or empty for replace operation");
-            }
 
             var docRef = collection.Document(id);
             await docRef.SetAsync(documentData, SetOptions.MergeAll, cancellationToken);
@@ -228,14 +220,10 @@ namespace Audit.Firestore.Providers
 
         public override T GetEvent<T>(object eventId)
         {
+            var id = eventId.ToString();
+
             var db = GetFirestoreDb();
             var collection = GetCollection(db, null);
-            var id = eventId?.ToString();
-
-            if (string.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("Event ID cannot be null or empty");
-            }
 
             var docRef = collection.Document(id);
             var snapshot = docRef.GetSnapshotAsync().GetAwaiter().GetResult();
@@ -251,14 +239,10 @@ namespace Audit.Firestore.Providers
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
+            var id = eventId.ToString();
+
             var db = GetFirestoreDb();
             var collection = GetCollection(db, null);
-            var id = eventId?.ToString();
-
-            if (string.IsNullOrEmpty(id))
-            {
-                throw new ArgumentException("Event ID cannot be null or empty");
-            }
 
             var docRef = collection.Document(id);
             var snapshot = await docRef.GetSnapshotAsync(cancellationToken);
@@ -271,76 +255,40 @@ namespace Audit.Firestore.Providers
             var json = Configuration.JsonAdapter.Serialize(snapshot.ToDictionary());
             return Configuration.JsonAdapter.Deserialize<T>(json);
         }
-
-        /// <summary>
-        /// Returns an IQueryable that enables querying against the audit events stored in Firestore.
-        /// Note: This creates an in-memory query after fetching all documents. For large collections,
-        /// consider using QueryEvents with filters instead.
-        /// </summary>
-        public IQueryable<AuditEvent> QueryEvents()
-        {
-            return QueryEvents<AuditEvent>();
-        }
-
-        /// <summary>
-        /// Returns an IQueryable that enables querying against the audit events stored in Firestore.
-        /// Note: This creates an in-memory query after fetching all documents. For large collections,
-        /// consider using QueryEvents with filters instead.
-        /// </summary>
-        /// <typeparam name="T">The AuditEvent type</typeparam>
-        public IQueryable<T> QueryEvents<T>() where T : AuditEvent
-        {
-            var db = GetFirestoreDb();
-            var collection = GetCollection(db, null);
-            var snapshots = collection.GetSnapshotAsync().GetAwaiter().GetResult();
-
-            var events = new List<T>();
-            foreach (var doc in snapshots.Documents)
-            {
-                var json = Configuration.JsonAdapter.Serialize(doc.ToDictionary());
-                var auditEvent = Configuration.JsonAdapter.Deserialize<T>(json);
-                events.Add(auditEvent);
-            }
-
-            return events.AsQueryable();
-        }
-
+        
         /// <summary>
         /// Queries events with specific filters applied to Firestore query.
         /// </summary>
-        /// <param name="whereClause">The where clause to apply. Example: q => q.WhereEqualTo("EventType", "Login")</param>
-        public async Task<IList<AuditEvent>> QueryEventsAsync(Func<Query, Query> whereClause = null)
+        /// <param name="queryBuilder">The query builder to apply. Example: q => q.WhereEqualTo("EventType", "Login")</param>
+        public IAsyncEnumerable<AuditEvent> QueryEventsAsync(Func<Query, Query> queryBuilder = null)
         {
-            return await QueryEventsAsync<AuditEvent>(whereClause);
+            return QueryEventsAsync<AuditEvent>(queryBuilder);
         }
 
         /// <summary>
         /// Queries events with specific filters applied to Firestore query.
         /// </summary>
         /// <typeparam name="T">The AuditEvent type</typeparam>
-        /// <param name="whereClause">The where clause to apply. Example: q => q.WhereEqualTo("EventType", "Login")</param>
-        public async Task<IList<T>> QueryEventsAsync<T>(Func<Query, Query> whereClause = null) where T : AuditEvent
+        /// <param name="queryBuilder">The where clause to apply. Example: q => q.WhereEqualTo("EventType", "Login")</param>
+        public async IAsyncEnumerable<T> QueryEventsAsync<T>(Func<Query, Query> queryBuilder = null) where T : AuditEvent
         {
             var db = GetFirestoreDb();
-            var collection = GetCollection(db, null);
-            Query query = collection;
+            Query query = GetCollection(db, null);
 
-            if (whereClause != null)
+            if (queryBuilder != null)
             {
-                query = whereClause(query);
+                query = queryBuilder.Invoke(query);
             }
 
             var snapshots = await query.GetSnapshotAsync();
-            var events = new List<T>();
 
             foreach (var doc in snapshots.Documents)
             {
                 var json = Configuration.JsonAdapter.Serialize(doc.ToDictionary());
                 var auditEvent = Configuration.JsonAdapter.Deserialize<T>(json);
-                events.Add(auditEvent);
-            }
 
-            return events;
+                yield return auditEvent;
+            }
         }
 
         /// <summary>
@@ -363,20 +311,16 @@ namespace Audit.Firestore.Providers
         private CollectionReference GetCollection(FirestoreDb db, AuditEvent auditEvent)
         {
             var collectionName = Collection.GetValue(auditEvent) ?? "AuditEvents";
+
             return db.Collection(collectionName);
         }
 
-        private string GetDocumentId(AuditEvent auditEvent)
+        internal string GetDocumentId(AuditEvent auditEvent)
         {
-            if (IdBuilder != null)
-            {
-                return IdBuilder(auditEvent);
-            }
-
-            return null; // Let Firestore generate the ID
+            return IdBuilder?.Invoke(auditEvent);
         }
 
-        private Dictionary<string, object> ConvertToFirestoreData(AuditEvent auditEvent)
+        internal Dictionary<string, object> ConvertToFirestoreData(AuditEvent auditEvent)
         {
             // Serialize to JSON first, then deserialize to Dictionary to ensure proper conversion
             var json = Configuration.JsonAdapter.Serialize(auditEvent);
@@ -395,42 +339,36 @@ namespace Audit.Firestore.Providers
             return data;
         }
 
-        private Dictionary<string, object> SanitizeDictionary(Dictionary<string, object> data)
+        internal Dictionary<string, object> SanitizeDictionary(Dictionary<string, object> data)
         {
             if (data == null)
             {
                 return null;
             }
+
             var sanitized = new Dictionary<string, object>();
+
             foreach (var kvp in data)
             {
                 sanitized[kvp.Key] = SanitizeValue(kvp.Value);
             }
+
             return sanitized;
         }
 
         private object SanitizeValue(object value)
         {
-            if (value is JsonElement jElement)
+            return value switch
             {
-                return SanitizeValue(jElement);
-            }
-            if (value is Dictionary<string, object> dict)
-            {
-                return SanitizeDictionary(dict);
-            }
-            if (value is List<object> list)
-            {
-                return list.Select(SanitizeValue).ToList();
-            }
-            if (value is object[] array)
-            {
-                return array.Select(SanitizeValue).ToList();
-            }
-            return value;
+                JsonElement jElement => SanitizeValue(jElement),
+                Dictionary<string, object> dict => SanitizeDictionary(dict),
+                List<object> list => list.Select(SanitizeValue).ToList(),
+                object[] array => array.Select(SanitizeValue).ToList(),
+                _ => value
+            };
         }
 
-        private object SanitizeValue(JsonElement jElement)
+        internal object SanitizeValue(JsonElement jElement)
         {
             switch (jElement.ValueKind)
             {
@@ -454,14 +392,13 @@ namespace Audit.Firestore.Providers
                 case JsonValueKind.False:
                     return false;
                 case JsonValueKind.Null:
-                    return null;
                 case JsonValueKind.Undefined:
                 default:
                     return null;
             }
         }
 
-        private Dictionary<string, object> FixFieldNames(Dictionary<string, object> data)
+        internal Dictionary<string, object> FixFieldNames(Dictionary<string, object> data)
         {
             var result = new Dictionary<string, object>();
 
@@ -470,53 +407,47 @@ namespace Audit.Firestore.Providers
                 var key = FixFieldName(kvp.Key);
                 var value = kvp.Value;
 
-                if (value is Dictionary<string, object> nestedDict)
+                value = value switch
                 {
-                    value = FixFieldNames(nestedDict);
-                }
-                else if (value is List<object> list)
-                {
-                    value = FixFieldNamesInList(list);
-                }
-                else if (value is object[] array)
-                {
-                    value = FixFieldNamesInList(array.ToList());
-                }
-
+                    Dictionary<string, object> nestedDict => FixFieldNames(nestedDict),
+                    List<object> list => FixFieldNamesInList(list),
+                    object[] array => FixFieldNamesInList(array.ToList()),
+                    _ => value
+                };
+                
                 result[key] = value;
             }
 
             return result;
         }
 
-        private List<object> FixFieldNamesInList(List<object> list)
+        internal List<object> FixFieldNamesInList(List<object> list)
         {
             var result = new List<object>();
 
             foreach (var item in list)
             {
-                if (item is Dictionary<string, object> dict)
+                switch (item)
                 {
-                    result.Add(FixFieldNames(dict));
-                }
-                else if (item is List<object> nestedList)
-                {
-                    result.Add(FixFieldNamesInList(nestedList));
-                }
-                else if (item is object[] array)
-                {
-                    result.Add(FixFieldNamesInList(array.ToList()));
-                }
-                else
-                {
-                    result.Add(item);
+                    case Dictionary<string, object> dict:
+                        result.Add(FixFieldNames(dict));
+                        break;
+                    case List<object> nestedList:
+                        result.Add(FixFieldNamesInList(nestedList));
+                        break;
+                    case object[] array:
+                        result.Add(FixFieldNamesInList(array.ToList()));
+                        break;
+                    default:
+                        result.Add(item);
+                        break;
                 }
             }
 
             return result;
         }
 
-        private string FixFieldName(string fieldName)
+        internal static string FixFieldName(string fieldName)
         {
             if (string.IsNullOrEmpty(fieldName))
             {
