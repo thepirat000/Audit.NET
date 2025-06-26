@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 6/25/2025 - 10:58:46 PM |
-| Coverage date: | 6/25/2025 - 10:35:57 PM - 6/25/2025 - 10:57:32 PM |
+| Generated on: | 6/26/2025 - 12:47:16 AM |
+| Coverage date: | 6/26/2025 - 12:24:32 AM - 6/26/2025 - 12:46:05 AM |
 | Parser: | MultiReport (97x Cobertura) |
 | Assemblies: | 38 |
 | Classes: | 315 |
 | Files: | 272 |
-| **Line coverage:** | 79.7% (8351 of 10476) |
-| Covered lines: | 8351 |
-| Uncovered lines: | 2125 |
+| **Line coverage:** | 80.1% (8399 of 10476) |
+| Covered lines: | 8399 |
+| Uncovered lines: | 2077 |
 | Coverable lines: | 10476 |
 | Total lines: | 26980 |
-| **Branch coverage:** | 70.8% (3024 of 4269) |
-| Covered branches: | 3024 |
+| **Branch coverage:** | 71.1% (3038 of 4269) |
+| Covered branches: | 3038 |
 | Total branches: | 4269 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -225,10 +225,10 @@
 |**Audit.NET.EventLog.Core**|**26**|**11**|**37**|**109**|**70.2%**|**7**|**10**|**70%**|
 |Audit.Core.EvenLogProviderConfigurator|0|10|10|27|0%|0|0||
 |Audit.Core.Providers.EventLogDataProvider|26|1|27|82|96.2%|7|10|70%|
-|**Audit.NET.Firestore**|**143**|**120**|**263**|**687**|**54.3%**|**44**|**101**|**43.5%**|
+|**Audit.NET.Firestore**|**191**|**72**|**263**|**687**|**72.6%**|**58**|**101**|**57.4%**|
 |Audit.Core.FirestoreConfiguratorExtensions|21|0|21|55|100%|0|0||
 |Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator|22|2|24|84|91.6%|0|0||
-|Audit.Firestore.Providers.FirestoreDataProvider|100|118|218|548|45.8%|44|101|43.5%|
+|Audit.Firestore.Providers.FirestoreDataProvider|148|70|218|548|67.8%|58|101|57.4%|
 |**Audit.NET.ImmuDB**|**101**|**16**|**117**|**369**|**86.3%**|**24**|**28**|**85.7%**|
 |Audit.Core.ImmuDbConfiguratorExtensions|0|2|2|22|0%|0|0||
 |Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator|18|10|28|98|64.2%|0|0||
