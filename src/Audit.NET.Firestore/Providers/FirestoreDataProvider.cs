@@ -350,7 +350,12 @@ namespace Audit.Firestore.Providers
 
             foreach (var kvp in data)
             {
-                sanitized[kvp.Key] = SanitizeValue(kvp.Value);
+                var sanitizedValue = SanitizeValue(kvp.Value);
+                // Only add if not null and not an empty dictionary or list
+                if (sanitizedValue != null)
+                {
+                    sanitized[kvp.Key] = sanitizedValue;
+                }
             }
 
             return sanitized;
@@ -358,14 +363,47 @@ namespace Audit.Firestore.Providers
 
         private object SanitizeValue(object value)
         {
-            return value switch
+            switch (value)
             {
-                JsonElement jElement => SanitizeValue(jElement),
-                Dictionary<string, object> dict => SanitizeDictionary(dict),
-                List<object> list => list.Select(SanitizeValue).ToList(),
-                object[] array => array.Select(SanitizeValue).ToList(),
-                _ => value
-            };
+                case JsonElement jElement:
+                    return SanitizeValue(jElement);
+                case Dictionary<string, object> dict:
+                    var sanitizedDict = SanitizeDictionary(dict);
+                    // Remove empty dictionaries
+                    return sanitizedDict is { Count: > 0 } ? sanitizedDict : null;
+                case List<object> list:
+                    var sanitizedList = list.Select(SanitizeValue)
+                                           .Where(v => v != null)
+                                           .ToList();
+                    // Remove empty lists or lists containing arrays (nested arrays)
+                    if (sanitizedList.Count == 0 || sanitizedList.Any(v => v is List<object>))
+                        return null;
+                    return sanitizedList;
+                case object[] array:
+                    var sanitizedArray = array.Select(SanitizeValue)
+                                             .Where(v => v != null)
+                                             .ToList();
+                    if (sanitizedArray.Count == 0 || sanitizedArray.Any(v => v is List<object>))
+                        return null;
+                    return sanitizedArray;
+                case null:
+                    return null;
+                // Allow only Firestore-supported primitives
+                case string _:
+                case int _:
+                case long _:
+                case double _:
+                case float _:
+                case bool _:
+                    return value;
+                case DateTime dt:
+                    return dt.ToUniversalTime();
+                case Guid guid:
+                    return guid.ToString();
+                default:
+                    // Fallback: serialize to string
+                    return value.ToString();
+            }
         }
 
         internal object SanitizeValue(JsonElement jElement)
