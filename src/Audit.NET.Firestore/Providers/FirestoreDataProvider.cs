@@ -351,7 +351,6 @@ namespace Audit.Firestore.Providers
             foreach (var kvp in data)
             {
                 var sanitizedValue = SanitizeValue(kvp.Value);
-                // Only add if not null and not an empty dictionary or list
                 if (sanitizedValue != null)
                 {
                     sanitized[kvp.Key] = sanitizedValue;
@@ -369,22 +368,22 @@ namespace Audit.Firestore.Providers
                     return SanitizeValue(jElement);
                 case Dictionary<string, object> dict:
                     var sanitizedDict = SanitizeDictionary(dict);
-                    // Remove empty dictionaries
-                    return sanitizedDict is { Count: > 0 } ? sanitizedDict : null;
+                    // If empty, serialize as string to avoid data loss
+                    if (sanitizedDict == null || sanitizedDict.Count == 0)
+                        return JsonSerializer.Serialize(dict);
+                    return sanitizedDict;
                 case List<object> list:
                     var sanitizedList = list.Select(SanitizeValue)
-                                           .Where(v => v != null)
                                            .ToList();
-                    // Remove empty lists or lists containing arrays (nested arrays)
+                    // If contains arrays (nested arrays) or is empty, serialize as string
                     if (sanitizedList.Count == 0 || sanitizedList.Any(v => v is List<object>))
-                        return null;
+                        return JsonSerializer.Serialize(list);
                     return sanitizedList;
                 case object[] array:
                     var sanitizedArray = array.Select(SanitizeValue)
-                                             .Where(v => v != null)
                                              .ToList();
                     if (sanitizedArray.Count == 0 || sanitizedArray.Any(v => v is List<object>))
-                        return null;
+                        return JsonSerializer.Serialize(array);
                     return sanitizedArray;
                 case null:
                     return null;
@@ -401,8 +400,8 @@ namespace Audit.Firestore.Providers
                 case Guid guid:
                     return guid.ToString();
                 default:
-                    // Fallback: serialize to string
-                    return value.ToString();
+                    // Fallback: serialize to string (JSON)
+                    return JsonSerializer.Serialize(value);
             }
         }
 
