@@ -5,6 +5,7 @@ using Google.Cloud.Firestore;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Audit.Firestore.UnitTest
@@ -35,6 +36,7 @@ namespace Audit.Firestore.UnitTest
             // Set your project ID here or via environment variable
             _projectId = Environment.GetEnvironmentVariable("FIRESTORE_PROJECT_ID") ?? "audit-net";
             _testCollection = "audit-test";
+            Audit.Core.Configuration.Reset();
         }
 
         [OneTimeTearDown]
@@ -453,6 +455,121 @@ namespace Audit.Firestore.UnitTest
 
             // Assert
             Assert.That(eventId, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task Test_AuditEvent_Serialization()
+        {
+            var auditEvent = new MyAuditEvent()
+            {
+                Dictionary = new Dictionary<string, object>
+                {
+                    ["__key1"] = "double underscore",
+                    ["key.1"] = "key with dot",
+                    ["key2"] = 123,
+                    ["key3"] = new List<string> { "item1", "item2" }
+                },
+                List = new List<object>
+                {
+                    "string1",
+                    456,
+                    new Dictionary<string, object>
+                    {
+                        ["nested.Key"] = "nestedValue with dot",
+                        ["nested.Key.2"] = new { __DoubleUndersore = "test double"},
+                    },
+                    new { __DoubleUndersore = "Test DoubleUndersore"}
+                },
+                ListOfInts = [1,2,3],
+                Enumerable = new List<object>
+                {
+                    "enum1", 
+                    789, 
+                    new Dictionary<string, object>
+                    {
+                        ["enum.Key"] = "enumValue"
+                    }
+                },
+                Environment = new AuditEventEnvironment()
+                {
+                    AssemblyName = "Assembly",
+                    CustomFields = new Dictionary<string, object>()
+                    {
+                        ["__Test"] = "value",
+                        ["Test.Nested"] = new AuditActivityTag() { Key = "MyKey", Value = "MyValue"}
+                    }
+                },
+                ListOfObject = new List<AuditActivityTag>
+                {
+                    new AuditActivityTag { Key = "Tag1", Value = "Value1" },
+                    new AuditActivityTag { Key = "Tag2", Value = 123 }
+                },
+                Byte = 255,
+                Boolean = true,
+                __DoubleUnderscore = "test double underscore",
+                EmptyList = [],
+                NullDictionary = null
+            };
+
+            var provider = new FirestoreDataProvider(config => config
+                .ProjectId(_projectId)
+                .Collection("audit-break-it")
+                .SanitizeFieldNames()
+                .ExcludeNullValues());
+
+            var eventId = await provider.InsertEventAsync(auditEvent);
+
+            var auditEventFromDb = await provider.GetEventAsync<MyAuditEvent>(eventId);
+            
+            Assert.IsNotNull(eventId);
+            
+            Assert.That(auditEventFromDb, Is.Not.Null);
+            Assert.That(auditEventFromDb.Boolean, Is.True);
+            
+            // _DoubleUnderscore and _timestamp will be deserialized as custom properties
+            Assert.That(auditEventFromDb.CustomFields, Has.Count.EqualTo(2));
+            Assert.That(auditEventFromDb.CustomFields, Does.ContainKey("_DoubleUnderscore"));
+
+            Assert.That(auditEventFromDb.CustomFields["_DoubleUnderscore"].ToString(), Is.EqualTo("test double underscore"));
+            Assert.That(auditEventFromDb.CustomFields, Does.ContainKey("_timestamp"));
+            Assert.That(auditEventFromDb.Dictionary, Has.Count.EqualTo(4));
+            Assert.That(auditEventFromDb.Dictionary, Does.ContainKey("_key1"));
+            Assert.That(auditEventFromDb.Dictionary["_key1"].ToString(), Is.EqualTo("double underscore"));
+            Assert.That(auditEventFromDb.Dictionary, Does.ContainKey("key_1"));
+            Assert.That(auditEventFromDb.Dictionary["key_1"].ToString(), Is.EqualTo("key with dot"));
+            Assert.That(auditEventFromDb.Dictionary, Does.ContainKey("key2"));
+            Assert.That(auditEventFromDb.Dictionary, Does.ContainKey("key3"));
+            Assert.That(auditEventFromDb.Dictionary["key3"].ToString(), Does.Contain("item1").And.Contain("item2"));
+            Assert.That(auditEventFromDb.EmptyList, Is.Empty);
+            Assert.That(auditEventFromDb.Enumerable.ToList(), Has.Count.EqualTo(3));
+            Assert.That(auditEventFromDb.Enumerable.ToList()[2].ToString(), Does.Contain("enum_Key").And.Contain("enumValue"));
+            Assert.That(auditEventFromDb.Environment.AssemblyName, Is.EqualTo("Assembly"));
+            Assert.That(auditEventFromDb.Environment.CustomFields, Has.Count.EqualTo(2));
+            Assert.That(auditEventFromDb.Environment.CustomFields, Does.ContainKey("_Test"));
+            Assert.That(auditEventFromDb.Environment.CustomFields, Does.ContainKey("Test_Nested"));
+            Assert.That(auditEventFromDb.List, Has.Count.EqualTo(4));
+            Assert.That(auditEventFromDb.List[2].ToString(), Does.Contain("_DoubleUndersore").And.Contain("nested_Key").And.Contain("nested_Key_2"));
+            Assert.That(auditEventFromDb.List[3].ToString(), Does.Contain("_DoubleUndersore"));
+            Assert.That(auditEventFromDb.ListOfInts, Has.Count.EqualTo(3));
+            Assert.That(auditEventFromDb.ListOfInts[0], Is.EqualTo(1));
+            Assert.That(auditEventFromDb.ListOfObject, Has.Count.EqualTo(2));
+            Assert.That(auditEventFromDb.NullDictionary, Is.Null);
+        }
+
+        public class MyAuditEvent : AuditEvent
+        {
+            public IDictionary<string, object> Dictionary { get; set; }
+            public IList<object> List { get; set; }
+            public IEnumerable<object> Enumerable { get; set; }
+            public List<AuditActivityTag> ListOfObject { get; set; }
+            public byte Byte { get; set; }
+            public bool Boolean { get; set; }
+            public List<int> ListOfInts { get; set; }
+            public List<string> EmptyList { get; set; } = [];
+            public Dictionary<int, List<List<int>>> NullDictionary { get; set; }
+#pragma warning disable CA1822
+            public string __DoubleUnderscore { get; set; }
+#pragma warning restore CA1822
         }
     }
 } 

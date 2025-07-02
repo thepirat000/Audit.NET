@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [30.1.0] - 2025-07-01:
+- **Audit.NET**: Configuration.Reset() method to reset the JsonAdapter as well.
+- **Audit.NET.Firestore**: Better serialization of the AuditEvent when using the Firestore data provider. Added `ExcludeNullValues` setting. (#762)
+
 ## [30.0.2] - 2025-06-25:
 - **Audit.NET.Firestore**: A new data provider for Google Firestore (#761)
 

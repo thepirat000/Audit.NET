@@ -67,6 +67,11 @@ namespace Audit.Firestore.Providers
         /// </summary>
         public bool SanitizeFieldNames { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether null values should be excluded from serialization.
+        /// </summary>
+        public bool ExcludeNullValues { get; set; }
+
         private Lazy<FirestoreDb> _firestoreDb;
 
         public FirestoreDataProvider()
@@ -95,6 +100,7 @@ namespace Audit.Firestore.Providers
                 FirestoreDbFactory = firestoreConfig._firestoreDbFactory;
                 IdBuilder = firestoreConfig._idBuilder;
                 SanitizeFieldNames = firestoreConfig._sanitizeFieldNames;
+                ExcludeNullValues = firestoreConfig._excludeNullValues;
             }
 
             InitializeFirestoreDb();
@@ -233,8 +239,7 @@ namespace Audit.Firestore.Providers
                 return null;
             }
 
-            var json = Configuration.JsonAdapter.Serialize(snapshot.ToDictionary());
-            return Configuration.JsonAdapter.Deserialize<T>(json);
+            return DeserializeAuditEvent<T>(snapshot.ToDictionary());
         }
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
@@ -252,10 +257,15 @@ namespace Audit.Firestore.Providers
                 return null;
             }
 
-            var json = Configuration.JsonAdapter.Serialize(snapshot.ToDictionary());
-            return Configuration.JsonAdapter.Deserialize<T>(json);
+            return DeserializeAuditEvent<T>(snapshot.ToDictionary());
         }
-        
+
+        private static T DeserializeAuditEvent<T>(Dictionary<string, object> dictionary) where T : AuditEvent
+        {
+            var doc = JsonSerializer.SerializeToDocument(dictionary);
+            return doc.Deserialize<T>();
+        }
+
         /// <summary>
         /// Queries events with specific filters applied to Firestore query.
         /// </summary>
@@ -284,10 +294,7 @@ namespace Audit.Firestore.Providers
 
             foreach (var doc in snapshots.Documents)
             {
-                var json = Configuration.JsonAdapter.Serialize(doc.ToDictionary());
-                var auditEvent = Configuration.JsonAdapter.Deserialize<T>(json);
-
-                yield return auditEvent;
+                yield return DeserializeAuditEvent<T>(doc.ToDictionary());
             }
         }
 
@@ -322,71 +329,76 @@ namespace Audit.Firestore.Providers
 
         internal Dictionary<string, object> ConvertToFirestoreData(AuditEvent auditEvent)
         {
-            // Serialize to JSON first, then deserialize to Dictionary to ensure proper conversion
-            var json = Configuration.JsonAdapter.Serialize(auditEvent);
-            var data = Configuration.JsonAdapter.Deserialize<Dictionary<string, object>>(json);
-            
-            data = SanitizeDictionary(data);
+            var jsonDocument = JsonSerializer.SerializeToDocument(auditEvent, auditEvent.GetType());
 
-            if (SanitizeFieldNames)
-            {
-                data = FixFieldNames(data);
-            }
+            var data = ToSanitizedDictionary(jsonDocument.RootElement);
 
-            // Add server timestamp
             data["_timestamp"] = FieldValue.ServerTimestamp;
 
             return data;
         }
 
-        internal Dictionary<string, object> SanitizeDictionary(Dictionary<string, object> data)
+        private Dictionary<string, object> ToSanitizedDictionary(JsonElement elem)
         {
-            if (data == null)
+            var result = new Dictionary<string, object>();
+            foreach (var prop in elem.EnumerateObject())
             {
-                return null;
+                var fixedName = SanitizeFieldNames ? FixFieldName(prop.Name) : prop.Name;
+
+                switch (prop.Value.ValueKind)
+                {
+                    case JsonValueKind.Object:
+                    {
+                        // Recursively process nested objects
+                        var nested = ToSanitizedDictionary(prop.Value);
+                        result[fixedName] = nested;
+                        break;
+                    }
+                    case JsonValueKind.Array:
+                    {
+                        // Process arrays, converting each element
+                        var array = prop.Value.EnumerateArray().Select(SanitizeJsonElement).ToList();
+                        result[fixedName] = array;
+                        break;
+                    }
+                    default:
+                    {
+                        var value = SanitizeJsonElement(prop.Value);
+                        if (!ExcludeNullValues || value != null)
+                        {
+                            result[fixedName] = value;
+                        }
+
+                        break;
+                    }
+                }
             }
 
-            var sanitized = new Dictionary<string, object>();
-
-            foreach (var kvp in data)
-            {
-                sanitized[kvp.Key] = SanitizeValue(kvp.Value);
-            }
-
-            return sanitized;
+            return result;
         }
 
-        private object SanitizeValue(object value)
+        internal object SanitizeJsonElement(JsonElement jsonElement)
         {
-            return value switch
-            {
-                JsonElement jElement => SanitizeValue(jElement),
-                Dictionary<string, object> dict => SanitizeDictionary(dict),
-                List<object> list => list.Select(SanitizeValue).ToList(),
-                object[] array => array.Select(SanitizeValue).ToList(),
-                _ => value
-            };
-        }
-
-        internal object SanitizeValue(JsonElement jElement)
-        {
-            switch (jElement.ValueKind)
+            switch (jsonElement.ValueKind)
             {
                 case JsonValueKind.Object:
                     var dict = new Dictionary<string, object>();
-                    foreach (var prop in jElement.EnumerateObject())
+                    foreach (var prop in jsonElement.EnumerateObject())
                     {
-                        dict[prop.Name] = SanitizeValue(prop.Value);
+                        var fixedName = SanitizeFieldNames ? FixFieldName(prop.Name) : prop.Name;
+                        dict[fixedName] = SanitizeJsonElement(prop.Value);
                     }
                     return dict;
                 case JsonValueKind.Array:
-                    return jElement.EnumerateArray().Select(SanitizeValue).ToList();
+                    return jsonElement.EnumerateArray().Select(SanitizeJsonElement).ToList();
                 case JsonValueKind.String:
-                    return jElement.GetString();
+                    return jsonElement.GetString();
                 case JsonValueKind.Number:
-                    if (jElement.TryGetInt64(out var l))
+                    if (jsonElement.TryGetInt64(out var l))
+                    {
                         return l;
-                    return jElement.GetDouble();
+                    }
+                    return jsonElement.GetDouble();
                 case JsonValueKind.True:
                     return true;
                 case JsonValueKind.False:
@@ -398,56 +410,11 @@ namespace Audit.Firestore.Providers
             }
         }
 
-        internal Dictionary<string, object> FixFieldNames(Dictionary<string, object> data)
-        {
-            var result = new Dictionary<string, object>();
-
-            foreach (var kvp in data)
-            {
-                var key = FixFieldName(kvp.Key);
-                var value = kvp.Value;
-
-                value = value switch
-                {
-                    Dictionary<string, object> nestedDict => FixFieldNames(nestedDict),
-                    List<object> list => FixFieldNamesInList(list),
-                    object[] array => FixFieldNamesInList(array.ToList()),
-                    _ => value
-                };
-                
-                result[key] = value;
-            }
-
-            return result;
-        }
-
-        internal List<object> FixFieldNamesInList(List<object> list)
-        {
-            var result = new List<object>();
-
-            foreach (var item in list)
-            {
-                switch (item)
-                {
-                    case Dictionary<string, object> dict:
-                        result.Add(FixFieldNames(dict));
-                        break;
-                    case List<object> nestedList:
-                        result.Add(FixFieldNamesInList(nestedList));
-                        break;
-                    case object[] array:
-                        result.Add(FixFieldNamesInList(array.ToList()));
-                        break;
-                    default:
-                        result.Add(item);
-                        break;
-                }
-            }
-
-            return result;
-        }
-
-        internal static string FixFieldName(string fieldName)
+        /// <summary>
+        /// Fixes field names to ensure they are valid Firestore field names.
+        /// </summary>
+        /// <param name="fieldName">The field name to fix.</param>
+        protected internal virtual string FixFieldName(string fieldName)
         {
             if (string.IsNullOrEmpty(fieldName))
             {
@@ -473,7 +440,6 @@ namespace Audit.Firestore.Providers
         {
             var db = GetFirestoreDb();
             await db.ListRootCollectionsAsync().Take(1).ToListAsync();
-            // If we get here without exception, the connection is working
         }
     }
 } 

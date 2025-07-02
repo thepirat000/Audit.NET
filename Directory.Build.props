@@ -1,6 +1,6 @@
 <Project>
 	 <PropertyGroup>
-		 <Version>30.0.2</Version>
+		 <Version>30.1.0</Version>
 		 <PackageReleaseNotes></PackageReleaseNotes>
 		 <CheckEolTargetFramework>false</CheckEolTargetFramework>
 		 <LangVersion>latest</LangVersion>

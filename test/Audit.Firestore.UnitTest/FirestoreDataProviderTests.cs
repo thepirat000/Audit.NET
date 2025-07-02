@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using Google.Cloud.Firestore;
 
 namespace Audit.Firestore.UnitTest
 {
@@ -96,49 +97,16 @@ namespace Audit.Firestore.UnitTest
                 Assert.That(provider.Database, Is.EqualTo("simple-database"));
             });
         }
-
-        [Test]
-        public void FieldNameFixer_ReplacesDotsWithUnderscores()
-        {
-            // Arrange
-            var provider = new FirestoreDataProvider();
-            var data = new Dictionary<string, object>
-            {
-                ["field.with.dots"] = "value",
-                ["nested"] = new Dictionary<string, object>
-                {
-                    ["inner.field"] = "inner value"
-                },
-                ["array"] = new List<object>
-                {
-                    new Dictionary<string, object> { ["item.field"] = "item value" }
-                }
-            };
-
-            // Act
-            var result = provider.FixFieldNames(data);
-
-            // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.ContainsKey("field_with_dots"), Is.True);
-                Assert.That(result.ContainsKey("field.with.dots"), Is.False);
-
-                var nested = result["nested"] as Dictionary<string, object>;
-                Assert.That(nested, Is.Not.Null);
-                Assert.That(nested.ContainsKey("inner_field"), Is.True);
-                Assert.That(nested.ContainsKey("inner.field"), Is.False);
-            });
-        }
-
+        
         [Test]
         public void FieldNameFixer_HandlesReservedPrefixes()
         {
             // Arrange
             var fieldName = "__reserved";
+            var provider = new FirestoreDataProvider();
 
             // Act
-            var result = FirestoreDataProvider.FixFieldName(fieldName);
+            var result = provider.FixFieldName(fieldName);
 
             // Assert
             Assert.That(result, Is.EqualTo("_reserved"));
@@ -149,9 +117,10 @@ namespace Audit.Firestore.UnitTest
         {
             // Arrange
             var fieldName = string.Empty;
+            var provider = new FirestoreDataProvider();
 
             // Act
-            var result = FirestoreDataProvider.FixFieldName(fieldName);
+            var result = provider.FixFieldName(fieldName);
 
             // Assert
             Assert.That(result, Is.EqualTo(string.Empty));
@@ -311,19 +280,6 @@ namespace Audit.Firestore.UnitTest
         }
 
         [Test]
-        public void SanitizeDictionary_Returns_Null()
-        {
-            // Arrange
-            var provider = new FirestoreDataProvider();
-
-            // Act
-            var result = provider.SanitizeDictionary(null);
-
-            // Assert
-            Assert.That(result, Is.Null);
-        }
-
-        [Test]
         public void SanitizeValue_JsonElement_Object_ReturnsDictionary()
         {
             var provider = new FirestoreDataProvider();
@@ -331,7 +287,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element) as Dictionary<string, object>;
+            var result = provider.SanitizeJsonElement(element) as Dictionary<string, object>;
 
             Assert.Multiple(() =>
             {
@@ -350,7 +306,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element) as List<object>;
+            var result = provider.SanitizeJsonElement(element) as List<object>;
 
             Assert.Multiple(() =>
             {
@@ -369,7 +325,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element);
+            var result = provider.SanitizeJsonElement(element);
 
             Assert.That(result, Is.EqualTo("abc"));
         }
@@ -382,7 +338,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element);
+            var result = provider.SanitizeJsonElement(element);
 
             Assert.That(result, Is.EqualTo(42));
         }
@@ -395,7 +351,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element);
+            var result = provider.SanitizeJsonElement(element);
 
             Assert.That(result, Is.EqualTo(42.5));
         }
@@ -408,7 +364,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element);
+            var result = provider.SanitizeJsonElement(element);
 
             Assert.That(result, Is.EqualTo(true));
         }
@@ -421,7 +377,7 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element);
+            var result = provider.SanitizeJsonElement(element);
 
             Assert.That(result, Is.EqualTo(false));
         }
@@ -434,122 +390,9 @@ namespace Audit.Firestore.UnitTest
             using var doc = JsonDocument.Parse(json);
             var element = doc.RootElement;
 
-            var result = provider.SanitizeValue(element);
+            var result = provider.SanitizeJsonElement(element);
 
             Assert.That(result, Is.Null);
-        }
-
-        [Test]
-        public void FixFieldNamesInList_Handles_Dictionaries_And_Primitives()
-        {
-            var provider = new FirestoreDataProvider();
-            var input = new List<object>
-            {
-                new Dictionary<string, object> { ["a.b"] = 1, ["__c"] = 2 },
-                42,
-                "test"
-            };
-
-            var result = provider.FixFieldNamesInList(input);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count, Is.EqualTo(3));
-
-                // First item: dictionary with fixed keys
-                var dict = result[0] as Dictionary<string, object>;
-                Assert.That(dict, Is.Not.Null);
-                Assert.That(dict.ContainsKey("a_b"), Is.True);
-                Assert.That(dict.ContainsKey("_c"), Is.True);
-                Assert.That(dict["a_b"], Is.EqualTo(1));
-                Assert.That(dict["_c"], Is.EqualTo(2));
-
-                // Second item: primitive
-                Assert.That(result[1], Is.EqualTo(42));
-
-                // Third item: primitive
-                Assert.That(result[2], Is.EqualTo("test"));
-            });
-        }
-
-        [Test]
-        public void FixFieldNamesInList_Handles_Nested_Lists()
-        {
-            var provider = new FirestoreDataProvider();
-            var input = new List<object>
-            {
-                new List<object>
-                {
-                    new Dictionary<string, object> { ["x.y"] = 5 }
-                }
-            };
-
-            var result = provider.FixFieldNamesInList(input);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count, Is.EqualTo(1));
-
-                var nestedList = result[0] as List<object>;
-                Assert.That(nestedList, Is.Not.Null);
-                Assert.That(nestedList.Count, Is.EqualTo(1));
-
-                var dict = nestedList[0] as Dictionary<string, object>;
-                Assert.That(dict, Is.Not.Null);
-                Assert.That(dict.ContainsKey("x_y"), Is.True);
-                Assert.That(dict["x_y"], Is.EqualTo(5));
-            });
-        }
-
-        [Test]
-        public void FixFieldNamesInList_Handles_Arrays()
-        {
-            var provider = new FirestoreDataProvider();
-            var input = new List<object>
-            {
-                new object[]
-                {
-                    new Dictionary<string, object> { ["foo.bar"] = 7 }
-                }
-            };
-
-            var result = provider.FixFieldNamesInList(input);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count, Is.EqualTo(1));
-
-                var nestedList = result[0] as List<object>;
-                Assert.That(nestedList, Is.Not.Null);
-                Assert.That(nestedList.Count, Is.EqualTo(1));
-
-                var dict = nestedList[0] as Dictionary<string, object>;
-                Assert.That(dict, Is.Not.Null);
-                Assert.That(dict.ContainsKey("foo_bar"), Is.True);
-                Assert.That(dict["foo_bar"], Is.EqualTo(7));
-            });
-        }
-
-        [Test]
-        public void FixFieldNamesInList_Leaves_NonCollections_Unchanged()
-        {
-            var provider = new FirestoreDataProvider();
-            var input = new List<object> { 1, "abc", true, null };
-
-            var result = provider.FixFieldNamesInList(input);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count, Is.EqualTo(4));
-                Assert.That(result[0], Is.EqualTo(1));
-                Assert.That(result[1], Is.EqualTo("abc"));
-                Assert.That(result[2], Is.EqualTo(true));
-                Assert.That(result[3], Is.Null);
-            });
         }
     }
 } 

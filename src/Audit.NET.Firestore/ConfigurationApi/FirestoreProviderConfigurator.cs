@@ -18,6 +18,7 @@ namespace Audit.Firestore.ConfigurationApi
         internal Func<FirestoreDb> _firestoreDbFactory;
         internal Func<AuditEvent, string> _idBuilder;
         internal bool _sanitizeFieldNames = false;
+        internal bool _excludeNullValues = false;
 
         public IFirestoreProviderConfigurator ProjectId(string projectId)
         {
@@ -75,10 +76,17 @@ namespace Audit.Firestore.ConfigurationApi
             return this;
         }
 
-        public IFirestoreProviderConfigurator SanitizeFieldNames(bool sanitizeFieldNames)
+        public IFirestoreProviderConfigurator SanitizeFieldNames(bool sanitizeFieldNames = true)
         {
             _sanitizeFieldNames = sanitizeFieldNames;
             return this;
         }
+
+        public IFirestoreProviderConfigurator ExcludeNullValues(bool excludeNullValues = true)
+        {
+            _excludeNullValues = excludeNullValues;
+            return this;
+        }
+        
     }
 } 

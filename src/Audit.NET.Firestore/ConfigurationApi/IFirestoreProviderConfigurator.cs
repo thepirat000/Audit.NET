@@ -66,9 +66,14 @@ namespace Audit.Firestore.ConfigurationApi
         
         /// <summary>
         /// Specifies whether to sanitize field names by replacing dots with underscores.
-        /// Default is false.
         /// </summary>
         /// <param name="sanitizeFieldNames">Whether to sanitize field names.</param>
-        IFirestoreProviderConfigurator SanitizeFieldNames(bool sanitizeFieldNames);
+        IFirestoreProviderConfigurator SanitizeFieldNames(bool sanitizeFieldNames = true);
+
+        /// <summary>
+        /// Specifies whether to exclude null values from the stored events.
+        /// </summary>
+        /// <param name="excludeNullValues">Whether to exclude null values.</param>
+        IFirestoreProviderConfigurator ExcludeNullValues(bool excludeNullValues = true);
     }
 } 

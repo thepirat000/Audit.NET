@@ -127,6 +127,7 @@ namespace Audit.Core
             ExcludeEnvironmentInfo = false;
             IncludeActivityTrace = false;
             StartActivityTrace = false;
+            JsonAdapter = new JsonAdapter();
             ResetCustomActions();
         }
 

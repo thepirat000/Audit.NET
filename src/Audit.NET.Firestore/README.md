@@ -98,6 +98,7 @@ Audit.Core.Configuration.Setup()
 - **FirestoreDb**: A custom pre-configured FirestoreDb instance.
 - **IdBuilder**: A function that returns the document ID to use for a given audit event. By default, Firestore generates the ID automatically.
 - **SanitizeFieldNames**: Whether to sanitize field names by replacing dots with underscores. Default is false.
+- **ExcludeNullValues**: Whether to exclude null values from the stored audit event data. Default is false.
 
 ### Advanced Configuration
 
