@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 6/26/2025 - 4:35:57 AM |
-| Coverage date: | 6/26/2025 - 4:12:09 AM - 6/26/2025 - 4:34:48 AM |
+| Generated on: | 7/2/2025 - 6:12:40 AM |
+| Coverage date: | 7/2/2025 - 5:49:01 AM - 7/2/2025 - 6:11:32 AM |
 | Parser: | MultiReport (97x Cobertura) |
 | Assemblies: | 38 |
 | Classes: | 315 |
 | Files: | 272 |
-| **Line coverage:** | 80.7% (8437 of 10451) |
-| Covered lines: | 8437 |
-| Uncovered lines: | 2014 |
-| Coverable lines: | 10451 |
-| Total lines: | 26911 |
-| **Branch coverage:** | 71.6% (3049 of 4253) |
-| Covered branches: | 3049 |
-| Total branches: | 4253 |
+| **Line coverage:** | 80.7% (8420 of 10429) |
+| Covered lines: | 8420 |
+| Uncovered lines: | 2009 |
+| Coverable lines: | 10429 |
+| Total lines: | 26886 |
+| **Branch coverage:** | 71.7% (3041 of 4237) |
+| Covered branches: | 3041 |
+| Total branches: | 4237 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -151,7 +151,7 @@
 |Audit.Mvc.AuditPageFilter|115|28|143|304|80.4%|77|142|54.2%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1298**|**131**|**1429**|**4684**|**90.8%**|**319**|**378**|**84.3%**|
+|**Audit.NET**|**1299**|**131**|**1430**|**4685**|**90.8%**|**319**|**378**|**84.3%**|
 |Audit.Core.AuditActivityEvent|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|78|100%|0|0||
@@ -163,7 +163,7 @@
 |Audit.Core.AuditScopeOptions|38|0|38|129|100%|2|2|100%|
 |Audit.Core.AuditScopeOptionsConfigurator|28|5|33|107|84.8%|1|2|50%|
 |Audit.Core.AuditTarget|3|0|3|26|100%|0|0||
-|Audit.Core.Configuration|218|41|259|601|84.1%|9|10|90%|
+|Audit.Core.Configuration|219|41|260|602|84.2%|9|10|90%|
 |Audit.Core.ConfigurationApi.ActionConfigurator|5|0|5|19|100%|0|0||
 |Audit.Core.ConfigurationApi.ActionEventSelector|14|2|16|48|87.5%|0|0||
 |Audit.Core.ConfigurationApi.ActivityProviderConfigurator|19|19|38|121|50%|0|0||
@@ -225,10 +225,10 @@
 |**Audit.NET.EventLog.Core**|**26**|**11**|**37**|**109**|**70.2%**|**7**|**10**|**70%**|
 |Audit.Core.EvenLogProviderConfigurator|0|10|10|27|0%|0|0||
 |Audit.Core.Providers.EventLogDataProvider|26|1|27|82|96.2%|7|10|70%|
-|**Audit.NET.Firestore**|**229**|**9**|**238**|**618**|**96.2%**|**69**|**85**|**81.1%**|
+|**Audit.NET.Firestore**|**211**|**4**|**215**|**592**|**98.1%**|**61**|**69**|**88.4%**|
 |Audit.Core.FirestoreConfiguratorExtensions|21|0|21|55|100%|0|0||
-|Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator|22|2|24|84|91.6%|0|0||
-|Audit.Firestore.Providers.FirestoreDataProvider|186|7|193|479|96.3%|69|85|81.1%|
+|Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator|24|2|26|92|92.3%|0|0||
+|Audit.Firestore.Providers.FirestoreDataProvider|166|2|168|445|98.8%|61|69|88.4%|
 |**Audit.NET.ImmuDB**|**101**|**16**|**117**|**369**|**86.3%**|**24**|**28**|**85.7%**|
 |Audit.Core.ImmuDbConfiguratorExtensions|0|2|2|22|0%|0|0||
 |Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator|18|10|28|98|64.2%|0|0||
