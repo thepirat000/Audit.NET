@@ -98,6 +98,10 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
             using (var ctx = new AuditPerTableContext())
             {
                 ctx.Database.EnsureCreated();
+
+                ctx.Order.Add(new Order() { Number = "1", OrderLines = [new Orderline { Product = "Test", Quantity = 2 }] });
+
+                ctx.SaveChanges();
             }
         }
 

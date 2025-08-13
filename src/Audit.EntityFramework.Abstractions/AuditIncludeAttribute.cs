@@ -3,9 +3,9 @@ using System;
 namespace Audit.EntityFramework
 {
     /// <summary>
-    /// Used with OptIn AnnotationMode to include the entity on the Audit logs.
+    /// Used with OptIn Mode to include the entity or property on the Audit logs.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public sealed class AuditIncludeAttribute : Attribute
     {
 

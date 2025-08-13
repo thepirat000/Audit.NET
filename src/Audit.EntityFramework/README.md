@@ -352,6 +352,23 @@ public class Post
 }
 ```
 
+You can also use the `AuditInclude` attribute on the properties (when using OptIn Mode):
+```c#
+[AuditInclude]
+public class Post
+{
+    public int Id { get; set; }
+    [AuditInclude]
+    public string Name { get; set; }
+    ...
+}
+```
+
+> **Note**
+> 
+> When using opt-in mode, if an entity is included and none of its properties have the `[AuditInclude]` attribute, then all its properties will be included in the audit output by default. 
+> Otherwise, if an entity is included and at least one of its properties has the `[AuditInclude]` attribute, then only those properties will be included in the audit output.
+
 #### Exclude properties (columns)
 
 The `AuditIgnore` attribute can be used on the entity's properties to indicate that its value should

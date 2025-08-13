@@ -29,11 +29,12 @@ namespace Audit.EntityFramework
         private static readonly ConcurrentDictionary<Type, bool?> EntitiesIncludeIgnoreAttrCache = new ConcurrentDictionary<Type, bool?>();
         // Ignored properties per entity type attribute cache
         private static readonly ConcurrentDictionary<Type, HashSet<string>> PropertiesIgnoreAttrCache = new ConcurrentDictionary<Type, HashSet<string>>();
+        // Included properties per entity type attribute cache
+        private static readonly ConcurrentDictionary<Type, HashSet<string>> PropertiesIncludeAttrCache = new ConcurrentDictionary<Type, HashSet<string>>();
         // Overriden properties per entity type attribute cache
         private static readonly ConcurrentDictionary<Type, Dictionary<string, AuditOverrideAttribute>> PropertiesOverrideAttrCache = new ConcurrentDictionary<Type, Dictionary<string, AuditOverrideAttribute>>();
-
         // AuditDbContext Attribute cache
-        private static readonly ConcurrentDictionary<Type, AuditDbContextAttribute> _auditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
+        private static readonly ConcurrentDictionary<Type, AuditDbContextAttribute> AuditAttributeCache = new ConcurrentDictionary<Type, AuditDbContextAttribute>();
 
         /// <summary>
         /// Sets the configuration values from attribute, local and global
@@ -41,13 +42,13 @@ namespace Audit.EntityFramework
         public void SetConfig(IAuditDbContext context)
         {
             var type = context.DbContext.GetType();
-            if (!_auditAttributeCache.ContainsKey(type))
+            if (!AuditAttributeCache.ContainsKey(type))
             {
-                _auditAttributeCache[type] = type.GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute;
+                AuditAttributeCache[type] = type.GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute;
             }
-            var attrConfig = _auditAttributeCache[type]?.InternalConfig;
-            var localConfig = Audit.EntityFramework.Configuration.GetConfigForType(type);
-            var globalConfig = Audit.EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
+            var attrConfig = AuditAttributeCache[type]?.InternalConfig;
+            var localConfig = Configuration.GetConfigForType(type);
+            var globalConfig = Configuration.GetConfigForType(typeof(AuditDbContext));
 
             context.Mode = attrConfig?.Mode ?? localConfig?.Mode ?? globalConfig?.Mode ?? AuditOptionMode.OptOut;
             context.IncludeEntityObjects = attrConfig?.IncludeEntityObjects ?? localConfig?.IncludeEntityObjects ?? globalConfig?.IncludeEntityObjects ?? false;
@@ -121,17 +122,13 @@ namespace Audit.EntityFramework
         /// </summary>
         public static string GetStateName(EntityState state)
         {
-            switch (state)
+            return state switch
             {
-                case EntityState.Added:
-                    return "Insert";
-                case EntityState.Modified:
-                    return "Update";
-                case EntityState.Deleted:
-                    return "Delete";
-                default:
-                    return "Unknown";
-            }
+                EntityState.Added => "Insert",
+                EntityState.Modified => "Update",
+                EntityState.Deleted => "Delete",
+                _ => "Unknown"
+            };
         }
 
         /// <summary>
@@ -159,66 +156,103 @@ namespace Audit.EntityFramework
         }
 
         // Determines whether to include the entity on the audit log or not
-        private bool IncludeEntity(IAuditDbContext context, object entity, AuditOptionMode mode)
+        private static bool IncludeEntity(IAuditDbContext context, object entity, AuditOptionMode mode)
         {
             var type = entity.GetType();
 #if EF_FULL
             type = ObjectContext.GetObjectType(type);
 #else
-            if (type.FullName.StartsWith("Castle.Proxies."))
+            if (type.FullName != null && type.FullName.StartsWith("Castle.Proxies."))
             {
                 type = type.GetTypeInfo().BaseType;
             }
 #endif
-            bool ? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false=ignored null=unknown
+            bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false:ignored null:unknown
             if (result == null)
             {
                 // No static attributes, check the filters
-                var localConfig = EntityFramework.Configuration.GetConfigForType(context.DbContext.GetType());
-                var globalConfig = EntityFramework.Configuration.GetConfigForType(typeof(AuditDbContext));
+                var localConfig = Configuration.GetConfigForType(context.DbContext.GetType());
+                var globalConfig = Configuration.GetConfigForType(typeof(AuditDbContext));
                 var included = EvalIncludeFilter(type, localConfig, globalConfig);
                 var ignored = EvalIgnoreFilter(type, localConfig, globalConfig);
-                result = included ? true : ignored ? false : (bool?)null;
+                result = included ? true : ignored ? false : null;
             }
+
             if (mode == AuditOptionMode.OptIn)
             {
                 // Include only explicitly included entities
                 return result.GetValueOrDefault();
             }
+
             // Include all, except the explicitly ignored entities
             return result == null || result.Value;
         }
 
-        private bool? EnsureEntitiesIncludeIgnoreAttrCache(Type type)
+        private static bool? EnsureEntitiesIncludeIgnoreAttrCache(Type type)
         {
             if (!EntitiesIncludeIgnoreAttrCache.ContainsKey(type))
             {
-                var includeAttr = type.GetTypeInfo().GetCustomAttribute(typeof(AuditIncludeAttribute), true);
-                if (includeAttr != null)
+                var includedAttribute = Attribute.IsDefined(type, typeof(AuditIncludeAttribute), true);
+                
+                if (includedAttribute)
                 {
-                    EntitiesIncludeIgnoreAttrCache[type] = true; // Type Included by IncludeAttribute
+                    // The type has the AuditIncludeAttribute, entity is included
+                    EntitiesIncludeIgnoreAttrCache[type] = true; 
                 }
-                else if (type.GetTypeInfo().GetCustomAttribute(typeof(AuditIgnoreAttribute), true) != null)
+                else 
                 {
-                    EntitiesIncludeIgnoreAttrCache[type] = false; // Type Ignored by IgnoreAttribute
-                }
-                else
-                {
-                    EntitiesIncludeIgnoreAttrCache[type] = null; // No attribute
+                    var ignoredAttribute = Attribute.IsDefined(type, typeof(AuditIgnoreAttribute), true);
+                    
+                    // Type explicitly Ignored by AuditIgnoreAttribute, or no attributes found (NULL)
+                    EntitiesIncludeIgnoreAttrCache[type] = ignoredAttribute ? false : null; 
                 }
             }
             return EntitiesIncludeIgnoreAttrCache[type];
         }
 
-        private HashSet<string> EnsurePropertiesIgnoreAttrCache(Type type)
+        // Determines if the property should be included or is ignored
+        private static bool IncludeProperty(IAuditDbContext context, Type entityType, string propName)
+        {
+            var ignoredProperties = EnsurePropertiesIgnoreAttrCache(entityType);
+            if (ignoredProperties != null && ignoredProperties.Contains(propName))
+            {
+                // Property marked with AuditIgnore attribute
+                return false;
+            }
+            if (context.EntitySettings != null && context.EntitySettings.TryGetValue(entityType, out EfEntitySettings settings))
+            {
+                if (settings.IgnoredProperties.Contains(propName))
+                {
+                    // Property ignored by configuration
+                    return false;
+                }
+            }
+
+            if (context.Mode == AuditOptionMode.OptIn)
+            {
+                var includedProperties = EnsurePropertiesIncludeAttrCache(entityType);
+                if (includedProperties == null)
+                {
+                    // No properties have the AuditInclude attribute (but the entity does), so all properties are included
+                    // This is for backward compatibility from before the attribute was applicable to properties
+                    return true;
+                }
+
+                return includedProperties.Contains(propName);
+            }
+
+            return true;
+        }
+
+        private static HashSet<string> EnsurePropertiesIgnoreAttrCache(Type type)
         {
             if (!PropertiesIgnoreAttrCache.ContainsKey(type))
             {
                 var ignoredProps = new HashSet<string>();
                 foreach(var prop in type.GetTypeInfo().GetProperties())
                 {
-                    var ignoreAttr = prop.GetCustomAttribute(typeof(AuditIgnoreAttribute), true);
-                    if (ignoreAttr != null)
+                    var ignored = Attribute.IsDefined(prop, typeof(AuditIgnoreAttribute), true); 
+                    if (ignored)
                     {
                         ignoredProps.Add(prop.Name);
                     }
@@ -235,7 +269,32 @@ namespace Audit.EntityFramework
             return PropertiesIgnoreAttrCache[type];
         }
 
-        private Dictionary<string, AuditOverrideAttribute> EnsurePropertiesOverrideAttrCache(Type type)
+        private static HashSet<string> EnsurePropertiesIncludeAttrCache(Type type)
+        {
+            if (!PropertiesIncludeAttrCache.ContainsKey(type))
+            {
+                var includedProps = new HashSet<string>();
+                foreach (var prop in type.GetTypeInfo().GetProperties())
+                {
+                    var included = Attribute.IsDefined(prop, typeof(AuditIncludeAttribute), true);
+                    if (included)
+                    {
+                        includedProps.Add(prop.Name);
+                    }
+                }
+                if (includedProps.Count > 0)
+                {
+                    PropertiesIncludeAttrCache[type] = includedProps;
+                }
+                else
+                {
+                    PropertiesIncludeAttrCache[type] = null;
+                }
+            }
+            return PropertiesIncludeAttrCache[type];
+        }
+
+        private static Dictionary<string, AuditOverrideAttribute> EnsurePropertiesOverrideAttrCache(Type type)
         {
             if (!PropertiesOverrideAttrCache.ContainsKey(type))
             {
@@ -263,7 +322,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the include value for a given entity type.
         /// </summary>
-        private bool EvalIncludeFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
+        internal static bool EvalIncludeFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
         {
             var includedExplicit = localConfig?.IncludedTypes.Contains(type) ?? globalConfig?.IncludedTypes.Contains(type) ?? false;
             if (includedExplicit)
@@ -281,7 +340,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the exclude value for a given entity type.
         /// </summary>
-        private bool EvalIgnoreFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
+        internal static bool EvalIgnoreFilter(Type type, EfSettings localConfig, EfSettings globalConfig)
         {
             var ignoredExplicit = localConfig?.IgnoredTypes.Contains(type) ?? globalConfig?.IgnoredTypes.Contains(type) ?? false;
             if (ignoredExplicit)
@@ -403,9 +462,9 @@ namespace Audit.EntityFramework
         /// Gets the modified entries to process.
         /// </summary>
 #if EF_CORE
-        public List<EntityEntry> GetModifiedEntries(IAuditDbContext context)
+        public static List<EntityEntry> GetModifiedEntries(IAuditDbContext context)
 #else
-        public List<DbEntityEntry> GetModifiedEntries(IAuditDbContext context)
+        public static List<DbEntityEntry> GetModifiedEntries(IAuditDbContext context)
 #endif
         {
             return context.DbContext.ChangeTracker.Entries()
@@ -414,8 +473,7 @@ namespace Audit.EntityFramework
                          && IncludeEntity(context, x.Entity, context.Mode))
                 .ToList();
         }
-
-
+        
         /// <summary>
         /// Gets a unique ID for the current SQL transaction.
         /// </summary>
@@ -425,10 +483,10 @@ namespace Audit.EntityFramework
         private static string GetTransactionId(DbTransaction transaction, string clientConnectionId)
         {
             var propIntTran = transaction.GetType().GetTypeInfo().GetProperty("InternalTransaction", BindingFlags.NonPublic | BindingFlags.Instance);
-            object intTran = propIntTran?.GetValue(transaction);
+            var intTran = propIntTran?.GetValue(transaction);
             var propTranId = intTran?.GetType().GetTypeInfo().GetProperty("TransactionId", BindingFlags.NonPublic | BindingFlags.Instance);
             var tranId = propTranId?.GetValue(intTran);
-            return string.Format("{0}_{1}", clientConnectionId, tranId ?? 0);
+            return $"{clientConnectionId}_{tranId ?? 0}";
         }
 
         public string TryGetClientConnectionId(DbContext dbContext)

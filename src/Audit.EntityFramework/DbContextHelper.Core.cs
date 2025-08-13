@@ -160,9 +160,10 @@ namespace Audit.EntityFramework
         }
 
         // Determines if the property should be included or is ignored
-        private bool IncludeProperty(IAuditDbContext context, EntityEntry entry, string propName)
+        private static bool IncludeProperty(IAuditDbContext context, EntityEntry entry, string propName)
         {
             var entityType = GetDefiningType(context.DbContext, entry)?.ClrType;
+
             if (entityType == null)
             {
                 return true;
@@ -170,24 +171,7 @@ namespace Audit.EntityFramework
 
             return IncludeProperty(context, entityType, propName);
         }
-
-        // Determines if the property should be included or is ignored
-        private bool IncludeProperty(IAuditDbContext context, Type entityType, string propName)
-        {
-            var ignoredProperties = EnsurePropertiesIgnoreAttrCache(entityType);
-            if (ignoredProperties != null && ignoredProperties.Contains(propName))
-            {
-                // Property marked with AuditIgnore attribute
-                return false;
-            }
-            if (context.EntitySettings != null && context.EntitySettings.TryGetValue(entityType, out EfEntitySettings settings))
-            {
-                // Check if its ignored from the configuration 
-                return !settings.IgnoredProperties.Contains(propName);
-            }
-            return true;
-        }
-
+        
         // Determines if a property value should be overriden with a pre-configured value
         private bool HasPropertyValue(IAuditDbContext context, EntityEntry entry, string propName, object currentValue, out object value)
         {

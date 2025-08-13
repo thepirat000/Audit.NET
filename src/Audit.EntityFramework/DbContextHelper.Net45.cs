@@ -76,29 +76,15 @@ namespace Audit.EntityFramework
         }
 
         // Determines if a property should be included or is ignored
-        private bool IncludeProperty(IAuditDbContext context, DbEntityEntry entry, string propName)
+        private static bool IncludeProperty(IAuditDbContext context, DbEntityEntry entry, string propName)
         {
             var entityType = ObjectContext.GetObjectType(entry.Entity?.GetType());
-            if (entityType == null)
-            {
-                return true;
-            }
-            var ignoredProperties = EnsurePropertiesIgnoreAttrCache(entityType);
-            if (ignoredProperties != null && ignoredProperties.Contains(propName))
-            {
-                // Property ignored by AuditIgnore attribute
-                return false;
-            }
-            if (entityType != null && context.EntitySettings != null && context.EntitySettings.TryGetValue(entityType, out EfEntitySettings settings))
-            {
-                // Property ignored by configuration
-                return !settings.IgnoredProperties.Contains(propName);
-            }
-            return true;
+            
+            return IncludeProperty(context, entityType, propName);
         }
 
         // Determines if a property value should be overriden with a pre-configured value
-        private bool HasPropertyValue(IAuditDbContext context, DbEntityEntry entry, string propName, object currentValue, out object value)
+        private static bool HasPropertyValue(IAuditDbContext context, DbEntityEntry entry, string propName, object currentValue, out object value)
         {
             value = null;
             var entityType = ObjectContext.GetObjectType(entry.Entity?.GetType());
@@ -134,7 +120,7 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Gets the name of the table/entity.
         /// </summary>
-        private EntityName GetEntityName(DbContext dbContext, object entity)
+        private static EntityName GetEntityName(DbContext dbContext, object entity)
         {
             return EntityKeyHelper.Instance.GetTableName(entity.GetType(), dbContext);
         }
@@ -144,7 +130,7 @@ namespace Audit.EntityFramework
         /// </summary>
         /// <param name="dbContext">The DB Context.</param>
         /// <param name="clientConnectionId">The client ConnectionId.</param>
-        private string GetCurrentTransactionId(DbContext dbContext, string clientConnectionId)
+        private static string GetCurrentTransactionId(DbContext dbContext, string clientConnectionId)
         {
             var curr = dbContext.Database.CurrentTransaction;
             if (curr == null)
