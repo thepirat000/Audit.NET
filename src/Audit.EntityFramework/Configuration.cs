@@ -22,7 +22,6 @@ namespace Audit.EntityFramework
         }
         
         internal static void SetContextEntitySetting<TContext, TEntity>(Action<IContextEntitySetting<TEntity>> config)
-            
         {
             var entitySettings = new ContextEntitySetting<TEntity>();
             config.Invoke(entitySettings);
@@ -76,8 +75,9 @@ namespace Audit.EntityFramework
 
         internal static void IncludedProperties<TContext, TEntity>(HashSet<string> propertyNames)
         {
-            EnsureConfigFor<TContext>().IncludedPropertyNames ??= [];
-            EnsureConfigFor<TContext>().IncludedPropertyNames[typeof(TEntity)] = propertyNames;
+            var efConfig = EnsureConfigFor<TContext>();
+            efConfig.IncludedPropertyNames ??= [];
+            efConfig.IncludedPropertyNames[typeof(TEntity)] = propertyNames;
         }
 
         internal static void IgnoreEntity<TContext>(Type entityType)
