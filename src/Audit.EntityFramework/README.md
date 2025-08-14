@@ -427,6 +427,19 @@ Audit.EntityFramework.Configuration.Setup()
             .Format(user => user.Password, pass => new String('*', pass.Length))));
 ```
 
+Another one, configuring a context that uses the OptIn mode, including the entities `Order` and `Orderline` in the audit.
+Explicitly including the `Id` and `Status` properties of the `Order` entity and all properties of the `Orderline` entity.
+
+```c#
+Audit.EntityFramework.Configuration.Setup()
+    .ForContext<MyContext>()
+    .UseOptIn()
+        .Include<Order>(orderConfig => orderConfig
+            .IncludeProperty("Id")
+            .IncludeProperty(o => o.Status))
+        .Include<Orderline>();
+```
+
 In summary, you have three ways to configure the audit for the contexts:
 - By accessing the properties on the `AuditDbContext` base class.
 - By decorating your context classes with `AuditDbContext` attribute and your entity classes with `AuditIgnore`/`AuditInclude` attributes.

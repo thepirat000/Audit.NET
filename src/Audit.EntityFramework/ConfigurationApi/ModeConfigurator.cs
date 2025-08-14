@@ -2,10 +2,10 @@ namespace Audit.EntityFramework.ConfigurationApi
 {
     public class ModeConfigurator<T> : IModeConfigurator<T>
     {
-        public IIncludeConfigurator<T> UseOptIn()
+        public IIncludeEntityConfigurator<T> UseOptIn()
         {
             Configuration.SetMode<T>(AuditOptionMode.OptIn);
-            return new IncludeConfigurator<T>();
+            return new IncludeEntityConfigurator<T>();
         }
         public IExcludeConfigurator<T> UseOptOut()
         {

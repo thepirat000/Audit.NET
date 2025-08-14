@@ -15,7 +15,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// Uses the opt-in mode.
         /// No entity is tracked by default, except those explicitly included.
         /// </summary>
-        IIncludeConfigurator<T> UseOptIn();
+        IIncludeEntityConfigurator<T> UseOptIn();
         /// <summary>
         /// Resets the previous configuration for this type.
         /// </summary>

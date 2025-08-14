@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [30.1.2] - 2025-08-13:
+- **Audit.EntityFramework** / **Audit.EntityFramework.Core**: Adding ability to configure the included properties with fluent configuration (#763)
+
 ## [30.1.1] - 2025-08-13:
 - **Audit.EntityFramework** / **Audit.EntityFramework.Core**: Modified `AuditIncludeAttribute` to support properties. (#763)
 - **Audit.NET**: Configuration.Reset() method to reset the JsonAdapter as well.

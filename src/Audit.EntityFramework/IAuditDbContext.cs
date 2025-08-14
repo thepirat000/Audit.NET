@@ -92,5 +92,10 @@ namespace Audit.EntityFramework
         /// Default is false.
         /// </summary>
         bool ReloadDatabaseValues { get; set; }
+
+        /// <summary>
+        /// A collection of property names to include on the audit event for each entity type when using Opt-In mode.
+        /// </summary>
+        Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }
     }
 }

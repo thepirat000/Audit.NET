@@ -1,7 +1,8 @@
 ﻿using Audit.EntityFramework.ConfigurationApi;
+
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Audit.EntityFramework
 {
@@ -20,57 +21,63 @@ namespace Audit.EntityFramework
             return new ContextConfigurator();
         }
         
-        internal static void SetContextEntitySetting<T, TEntity>(Action<IContextEntitySetting<TEntity>> config)
+        internal static void SetContextEntitySetting<TContext, TEntity>(Action<IContextEntitySetting<TEntity>> config)
             
         {
             var entitySettings = new ContextEntitySetting<TEntity>();
             config.Invoke(entitySettings);
-            var entityConfig = EnsureConfigForEntity<T, TEntity>();
+            var entityConfig = EnsureConfigForEntity<TContext, TEntity>();
             entityConfig.IgnoredProperties = entitySettings.IgnoredProperties;
             entityConfig.OverrideProperties = entitySettings.OverrideProperties;
             entityConfig.FormatProperties = entitySettings.FormatProperties;
         }
 
-        internal static void SetAuditEventType<T>(string eventType)
+        internal static void SetAuditEventType<TContext>(string eventType)
         {
-            EnsureConfigFor<T>().AuditEventType = eventType;
+            EnsureConfigFor<TContext>().AuditEventType = eventType;
         }
 
-        internal static void SetIncludeEntityObjects<T>(bool include)
+        internal static void SetIncludeEntityObjects<TContext>(bool include)
         {
-            EnsureConfigFor<T>().IncludeEntityObjects = include;
+            EnsureConfigFor<TContext>().IncludeEntityObjects = include;
         }
 
-        internal static void SetExcludeValidationResults<T>(bool exclude)
+        internal static void SetExcludeValidationResults<TContext>(bool exclude)
         {
-            EnsureConfigFor<T>().ExcludeValidationResults = exclude;
+            EnsureConfigFor<TContext>().ExcludeValidationResults = exclude;
         }
 
-        internal static void SetExcludeTransactionId<T>(bool exclude)
+        internal static void SetExcludeTransactionId<TContext>(bool exclude)
         {
-            EnsureConfigFor<T>().ExcludeTransactionId = exclude;
+            EnsureConfigFor<TContext>().ExcludeTransactionId = exclude;
         }
 
 #if EF_FULL
-        internal static void SetIncludeIndependantAssociations<T>(bool include)
+        internal static void SetIncludeIndependantAssociations<TContext>(bool include)
         {
-            EnsureConfigFor<T>().IncludeIndependantAssociations = include;
+            EnsureConfigFor<TContext>().IncludeIndependantAssociations = include;
         }
 #endif
 
-        internal static void SetReloadDatabaseValues<T>(bool reloadDatabaseValues)
+        internal static void SetReloadDatabaseValues<TContext>(bool reloadDatabaseValues)
         {
-            EnsureConfigFor<T>().ReloadDatabaseValues = reloadDatabaseValues;
+            EnsureConfigFor<TContext>().ReloadDatabaseValues = reloadDatabaseValues;
         }
 
-        internal static void SetMode<T>(AuditOptionMode mode)
+        internal static void SetMode<TContext>(AuditOptionMode mode)
         {
-            EnsureConfigFor<T>().Mode = mode;
+            EnsureConfigFor<TContext>().Mode = mode;
         }
 
         internal static void IncludeEntity<TContext>(Type entityType)
         {
             EnsureConfigFor<TContext>().IncludedTypes.Add(entityType);
+        }
+
+        internal static void IncludedProperties<TContext, TEntity>(HashSet<string> propertyNames)
+        {
+            EnsureConfigFor<TContext>().IncludedPropertyNames ??= [];
+            EnsureConfigFor<TContext>().IncludedPropertyNames[typeof(TEntity)] = propertyNames;
         }
 
         internal static void IgnoreEntity<TContext>(Type entityType)
@@ -88,14 +95,14 @@ namespace Audit.EntityFramework
             EnsureConfigFor<TContext>().IncludedTypesFilter = predicate;
         }
 
-        internal static void Reset<T>()
+        internal static void Reset<TContext>()
         {
-            _currentConfig.TryRemove(typeof(T), out _);
+            _currentConfig.TryRemove(typeof(TContext), out _);
         }
 
-        internal static EfSettings EnsureConfigFor<T>()
+        internal static EfSettings EnsureConfigFor<TContext>()
         {
-            var t = typeof(T);
+            var t = typeof(TContext);
             EfSettings config;
             if (_currentConfig.TryGetValue(t, out config))
             {
@@ -105,10 +112,10 @@ namespace Audit.EntityFramework
             return _currentConfig[t];
         }
 
-        internal static EfEntitySettings EnsureConfigForEntity<T, TEntity>()
+        internal static EfEntitySettings EnsureConfigForEntity<TContext, TEntity>()
         {
             var tEntity = typeof(TEntity);
-            var efSettings = EnsureConfigFor<T>();
+            var efSettings = EnsureConfigFor<TContext>();
             if (efSettings.EntitySettings.TryGetValue(tEntity, out EfEntitySettings value))
             {
                 return value;

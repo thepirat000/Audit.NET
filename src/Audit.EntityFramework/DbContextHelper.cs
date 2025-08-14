@@ -56,6 +56,7 @@ namespace Audit.EntityFramework
             context.AuditEventType = attrConfig?.AuditEventType ?? localConfig?.AuditEventType ?? globalConfig?.AuditEventType;
             context.EntitySettings = MergeEntitySettings(attrConfig?.EntitySettings, localConfig?.EntitySettings, globalConfig?.EntitySettings);
             context.ExcludeTransactionId = attrConfig?.ExcludeTransactionId ?? localConfig?.ExcludeTransactionId ?? globalConfig?.ExcludeTransactionId ?? false;
+            context.IncludedPropertyNames = attrConfig?.IncludedPropertyNames ?? localConfig?.IncludedPropertyNames ?? globalConfig?.IncludedPropertyNames;
 #if EF_FULL
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
@@ -167,7 +168,7 @@ namespace Audit.EntityFramework
                 type = type.GetTypeInfo().BaseType;
             }
 #endif
-            bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:excluded false:ignored null:unknown
+            bool? result = EnsureEntitiesIncludeIgnoreAttrCache(type); //true:included false:ignored null:unknown
             if (result == null)
             {
                 // No static attributes, check the filters
@@ -230,11 +231,23 @@ namespace Audit.EntityFramework
 
             if (context.Mode == AuditOptionMode.OptIn)
             {
-                var includedProperties = EnsurePropertiesIncludeAttrCache(entityType);
-                if (includedProperties == null)
+                // Check if the property is explicitly Included by attribute or configuration
+                var includedProperties = new HashSet<string>();
+                
+                if (context.IncludedPropertyNames?.TryGetValue(entityType, out var includedPropertiesByConfig) == true)
                 {
-                    // No properties have the AuditInclude attribute (but the entity does), so all properties are included
-                    // This is for backward compatibility from before the attribute was applicable to properties
+                    includedProperties.UnionWith(includedPropertiesByConfig);
+                }
+
+                var includedPropertiesByAttribute = EnsurePropertiesIncludeAttrCache(entityType);
+                if (includedPropertiesByAttribute != null)
+                {
+                    includedProperties.UnionWith(includedPropertiesByAttribute);
+                }
+
+                if (includedProperties.Count == 0)
+                {
+                    // No included properties explicitly set, so all properties are included (for backward compatibility).
                     return true;
                 }
 

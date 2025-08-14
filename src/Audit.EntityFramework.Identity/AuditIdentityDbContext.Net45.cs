@@ -200,6 +200,11 @@ namespace Audit.EntityFramework
         public bool ReloadDatabaseValues { get; set; }
 
         /// <summary>
+        /// A collection of property names to include in the audit event for each entity type when using Opt-In mode.
+        /// </summary>
+        public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }
+
+        /// <summary>
         /// Called after the audit scope is created.
         /// Override to specify custom logic.
         /// </summary>
