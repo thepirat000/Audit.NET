@@ -18,12 +18,6 @@ namespace Audit.EntityFramework
         public bool Valid { get; set; }
         public List<string> ValidationResults { get; set; }
 
-        /// <summary>
-        /// The source entity type (not included on the output)
-        /// </summary>
-        [JsonIgnore]
-        public Type EntityType { get; set; }
-
         [JsonExtensionData]
         public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
 
@@ -42,6 +36,12 @@ namespace Audit.EntityFramework
         {
             return Core.Configuration.JsonAdapter.Deserialize<EventEntry>(json);
         }
+
+        /// <summary>
+        /// The source entity type (not included on the output)
+        /// </summary>
+        [JsonIgnore]
+        internal Type EntityType { get; set; }
 
         [JsonIgnore]
 #if EF_CORE
