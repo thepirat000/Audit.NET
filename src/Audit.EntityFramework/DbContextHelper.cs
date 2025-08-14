@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Threading;
+#pragma warning disable S3011
 
 namespace Audit.EntityFramework
 {
@@ -44,7 +45,7 @@ namespace Audit.EntityFramework
             var type = context.DbContext.GetType();
             if (!AuditAttributeCache.ContainsKey(type))
             {
-                AuditAttributeCache[type] = type.GetTypeInfo().GetCustomAttribute(typeof(AuditDbContextAttribute)) as AuditDbContextAttribute;
+                AuditAttributeCache[type] = type.GetTypeInfo().GetCustomAttribute<AuditDbContextAttribute>();
             }
             var attrConfig = AuditAttributeCache[type]?.InternalConfig;
             var localConfig = Configuration.GetConfigForType(type);

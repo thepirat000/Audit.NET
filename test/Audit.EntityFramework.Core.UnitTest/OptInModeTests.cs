@@ -126,11 +126,14 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(events, Has.Count.EqualTo(1));
             Assert.That(events[0].EntityFrameworkEvent.Entries, Has.Count.EqualTo(1));
             var entry = events[0].EntityFrameworkEvent.Entries[0];
-            Assert.That(entry.ColumnValues, Has.Count.EqualTo(2)); // Name, Name2
-            Assert.That(entry.ColumnValues["Name"], Is.EqualTo("Test Entity"));
-            Assert.That(entry.ColumnValues["Name2"], Is.EqualTo("Test Entity 2"));
-            Assert.That(entry.ColumnValues.ContainsKey("Id"), Is.False);
-            Assert.That(entry.ColumnValues.ContainsKey("IgnoredProp"), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(entry.ColumnValues, Has.Count.EqualTo(2)); // Name, Name2
+                Assert.That(entry.ColumnValues["Name"], Is.EqualTo("Test Entity"));
+                Assert.That(entry.ColumnValues["Name2"], Is.EqualTo("Test Entity 2"));
+                Assert.That(entry.ColumnValues.ContainsKey("Id"), Is.False);
+                Assert.That(entry.ColumnValues.ContainsKey("IgnoredProp"), Is.False);
+            });
 
             entity.Name = "Updated Entity";
             entity.Name2 = "Updated Entity 2";
@@ -142,16 +145,19 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(events, Has.Count.EqualTo(2));
             Assert.That(events[1].EntityFrameworkEvent.Entries, Has.Count.EqualTo(1));
             entry = events[1].EntityFrameworkEvent.Entries[0];
-            Assert.That(entry.Changes, Has.Count.EqualTo(2)); // Name, Name2
-            Assert.That(entry.Changes[0].ColumnName, Is.EqualTo("Name"));
-            Assert.That(entry.Changes[0].OriginalValue, Is.EqualTo("Test Entity"));
-            Assert.That(entry.Changes[0].NewValue, Is.EqualTo("Updated Entity"));
-            Assert.That(entry.Changes[1].ColumnName, Is.EqualTo("Name2"));
-            Assert.That(entry.Changes[1].OriginalValue, Is.EqualTo("Test Entity 2"));
-            Assert.That(entry.Changes[1].NewValue, Is.EqualTo("Updated Entity 2"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(entry.Changes, Has.Count.EqualTo(2)); // Name, Name2
+                Assert.That(entry.Changes[0].ColumnName, Is.EqualTo("Name"));
+                Assert.That(entry.Changes[0].OriginalValue, Is.EqualTo("Test Entity"));
+                Assert.That(entry.Changes[0].NewValue, Is.EqualTo("Updated Entity"));
+                Assert.That(entry.Changes[1].ColumnName, Is.EqualTo("Name2"));
+                Assert.That(entry.Changes[1].OriginalValue, Is.EqualTo("Test Entity 2"));
+                Assert.That(entry.Changes[1].NewValue, Is.EqualTo("Updated Entity 2"));
+            });
         }
 
-        [Test]
+            [Test]
         public void Test_OptIn_ByGlobalConfig_EntityIncluded_OnePropertyExplicitlyIncluded()
         {
             Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
@@ -181,11 +187,14 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(events, Has.Count.EqualTo(1));
             Assert.That(events[0].EntityFrameworkEvent.Entries, Has.Count.EqualTo(1));
             var entry = events[0].EntityFrameworkEvent.Entries[0];
-            Assert.That(entry.ColumnValues, Has.Count.EqualTo(2)); // Name, Name2
-            Assert.That(entry.ColumnValues["Name"], Is.EqualTo("Test Entity"));
-            Assert.That(entry.ColumnValues["Name2"], Is.EqualTo("Test Entity 2"));
-            Assert.That(entry.ColumnValues.ContainsKey("Id"), Is.False);
-            Assert.That(entry.ColumnValues.ContainsKey("IgnoredProp"), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(entry.ColumnValues, Has.Count.EqualTo(2)); // Name, Name2
+                Assert.That(entry.ColumnValues["Name"], Is.EqualTo("Test Entity"));
+                Assert.That(entry.ColumnValues["Name2"], Is.EqualTo("Test Entity 2"));
+                Assert.That(entry.ColumnValues.ContainsKey("Id"), Is.False);
+                Assert.That(entry.ColumnValues.ContainsKey("IgnoredProp"), Is.False);
+            });
 
             entity.Name = "Updated Entity";
             entity.Name2 = "Updated Entity 2";
@@ -197,13 +206,16 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(events, Has.Count.EqualTo(2));
             Assert.That(events[1].EntityFrameworkEvent.Entries, Has.Count.EqualTo(1));
             entry = events[1].EntityFrameworkEvent.Entries[0];
-            Assert.That(entry.Changes, Has.Count.EqualTo(2)); // Name, Name2
-            Assert.That(entry.Changes[0].ColumnName, Is.EqualTo("Name"));
-            Assert.That(entry.Changes[0].OriginalValue, Is.EqualTo("Test Entity"));
-            Assert.That(entry.Changes[0].NewValue, Is.EqualTo("Updated Entity"));
-            Assert.That(entry.Changes[1].ColumnName, Is.EqualTo("Name2"));
-            Assert.That(entry.Changes[1].OriginalValue, Is.EqualTo("Test Entity 2"));
-            Assert.That(entry.Changes[1].NewValue, Is.EqualTo("Updated Entity 2"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(entry.Changes, Has.Count.EqualTo(2)); // Name, Name2
+                Assert.That(entry.Changes[0].ColumnName, Is.EqualTo("Name"));
+                Assert.That(entry.Changes[0].OriginalValue, Is.EqualTo("Test Entity"));
+                Assert.That(entry.Changes[0].NewValue, Is.EqualTo("Updated Entity"));
+                Assert.That(entry.Changes[1].ColumnName, Is.EqualTo("Name2"));
+                Assert.That(entry.Changes[1].OriginalValue, Is.EqualTo("Test Entity 2"));
+                Assert.That(entry.Changes[1].NewValue, Is.EqualTo("Updated Entity 2"));
+            });
         }
     }
 

@@ -21,7 +21,7 @@ public class IncludePropertyConfigurator<TEntity> : IIncludePropertyConfigurator
         return this;
     }
 
-    private string GetMemberName<T, TS>(Expression<Func<T, TS>> expression)
+    private static string GetMemberName<T, TS>(Expression<Func<T, TS>> expression)
     {
         if (!(expression.Body is MemberExpression me))
         {
