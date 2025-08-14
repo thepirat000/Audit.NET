@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 8/14/2025 - 4:37:41 AM |
-| Coverage date: | 8/14/2025 - 4:14:33 AM - 8/14/2025 - 4:36:50 AM |
+| Generated on: | 8/14/2025 - 6:32:40 PM |
+| Coverage date: | 8/14/2025 - 6:09:43 PM - 8/14/2025 - 6:31:39 PM |
 | Parser: | MultiReport (97x Cobertura) |
 | Assemblies: | 38 |
 | Classes: | 317 |
 | Files: | 273 |
-| **Line coverage:** | 80.7% (8486 of 10515) |
-| Covered lines: | 8486 |
-| Uncovered lines: | 2029 |
+| **Line coverage:** | 80.8% (8505 of 10515) |
+| Covered lines: | 8505 |
+| Uncovered lines: | 2010 |
 | Coverable lines: | 10515 |
-| Total lines: | 26993 |
-| **Branch coverage:** | 72.1% (3109 of 4311) |
-| Covered branches: | 3109 |
+| Total lines: | 26994 |
+| **Branch coverage:** | 72.5% (3129 of 4311) |
+| Covered branches: | 3129 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -27,7 +27,7 @@
 |Audit.DynamicProxy.AuditProxy|11|0|11|59|100%|4|4|100%|
 |Audit.DynamicProxy.InterceptEvent|12|0|12|59|100%|0|0||
 |Audit.DynamicProxy.InterceptionSettings|7|0|7|48|100%|0|0||
-|**Audit.EntityFramework**|**1017**|**321**|**1338**|**3561**|**76%**|**476**|**624**|**76.2%**|
+|**Audit.EntityFramework**|**1017**|**321**|**1338**|**3562**|**76%**|**476**|**624**|**76.2%**|
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AssociationEntry|0|3|3|18|0%|0|0||
 |Audit.EntityFramework.AssociationEntryRecord|0|5|5|19|0%|0|0||
@@ -48,7 +48,7 @@
 |Audit.EntityFramework.ConfigurationApi.IncludePropertyConfigurator`1|0|11|11|36|0%|0|4|0%|
 |Audit.EntityFramework.ConfigurationApi.MappingInfo|4|0|4|31|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.ModeConfigurator`1|6|0|6|21|100%|0|0||
-|Audit.EntityFramework.DbContextHelper|336|103|439|1014|76.5%|313|398|78.6%|
+|Audit.EntityFramework.DbContextHelper|336|103|439|1015|76.5%|313|398|78.6%|
 |Audit.EntityFramework.DefaultAuditContext|18|4|22|46|81.8%|0|0||
 |Audit.EntityFramework.EntityFrameworkEvent|11|3|14|81|78.5%|0|0||
 |Audit.EntityFramework.EntityKeyHelper|114|0|114|295|100%|65|68|95.5%|
@@ -58,14 +58,14 @@
 |Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|396|87.1%|80|100|80%|
 |**Audit.EntityFramework.Abstractions**|**4**|**2**|**6**|**20**|**66.6%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditOverrideAttribute|4|2|6|20|66.6%|0|0||
-|**Audit.EntityFramework.Core**|**1515**|**339**|**1854**|**5187**|**81.7%**|**729**|**886**|**82.2%**|
+|**Audit.EntityFramework.Core**|**1534**|**320**|**1854**|**5188**|**82.7%**|**749**|**886**|**84.5%**|
 |Audit.Core.DbContextConfiguratorExtensions|2|2|4|37|50%|0|0||
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AuditDbContext|33|0|33|250|100%|0|0||
-|Audit.EntityFramework.AuditDbContextAttribute|9|10|19|124|47.3%|0|8|0%|
+|Audit.EntityFramework.AuditDbContextAttribute|19|0|19|124|100%|8|8|100%|
 |Audit.EntityFramework.AuditEventCommandEntityFramework|1|0|1|14|100%|0|0||
 |Audit.EntityFramework.AuditEventEntityFramework|1|0|1|15|100%|0|0||
-|Audit.EntityFramework.AuditEventExtensions|9|9|18|82|50%|6|18|33.3%|
+|Audit.EntityFramework.AuditEventExtensions|18|0|18|82|100%|18|18|100%|
 |Audit.EntityFramework.AuditEventTransactionEntityFramework|1|0|1|14|100%|0|0||
 |Audit.EntityFramework.AuditSaveChangesInterceptor|21|0|21|61|100%|0|0||
 |Audit.EntityFramework.CommandEvent|7|1|8|58|87.5%|0|0||
@@ -87,7 +87,7 @@
 |Audit.EntityFramework.ConfigurationApi.MappingInfo|4|0|4|31|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.ModeConfigurator`1|6|0|6|21|100%|0|0||
 |Audit.EntityFramework.DbContextExtensions|3|0|3|24|100%|0|0||
-|Audit.EntityFramework.DbContextHelper|450|18|468|1124|96.1%|393|436|90.1%|
+|Audit.EntityFramework.DbContextHelper|450|18|468|1125|96.1%|393|436|90.1%|
 |Audit.EntityFramework.DefaultAuditContext|17|4|21|46|80.9%|0|0||
 |Audit.EntityFramework.EntityFrameworkEvent|13|1|14|81|92.8%|0|0||
 |Audit.EntityFramework.EntityName|2|0|2|11|100%|0|0||
