@@ -41,7 +41,7 @@ namespace Audit.EntityFramework
         /// The source entity type (not included on the output)
         /// </summary>
         [JsonIgnore]
-        internal Type EntityType { get; set; }
+        public Type EntityType { get; set; }
 
         [JsonIgnore]
 #if EF_CORE
