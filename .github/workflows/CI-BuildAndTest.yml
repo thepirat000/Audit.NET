@@ -126,14 +126,14 @@ jobs:
             /v:"${{ env.PROJECT_VERSION }}"
 
       - name: Dotnet Restore 
-        run: dotnet restore .\Audit.NET.sln
+        run: dotnet restore ./Audit.NET.sln
         
       - name: Dotnet Build Audit.NET.sln
-        run: dotnet build .\Audit.NET.sln --no-restore -c release
+        run: dotnet build ./Audit.NET.sln --no-restore -c release
      
       - name: Run tests
         run: |
-          dotnet test .\Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"      
+          dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"      
   
       - name: Tear down containers
         if: always()
@@ -147,17 +147,17 @@ jobs:
 
       - name: Generate Code Coverage Report
         run: |
-          dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.Kafka;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs"
+          dotnet reportgenerator -reports:${{ github.workspace }}/test/TestResult/**/*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest"
   
       - name: Upload Code Coverage Report artifact
         uses: actions/upload-artifact@v4
         with:
           name: coveragereport
-          path: ${{ github.workspace }}\Tests\coveragereport
+          path: ${{ github.workspace }}/Tests/coveragereport
       
       - name: Rename summary coverage file
         continue-on-error: true
-        run: mv -force "${{ github.workspace }}\Tests\coveragereport\Summary.md" "${{ github.workspace }}\CODE_COVERAGE.md"
+        run: mv -force "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
   
       - name: Commit CODE_COVERAGE.md
         continue-on-error: true
