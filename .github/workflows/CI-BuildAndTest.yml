@@ -15,17 +15,17 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04   #Can't use a newer version due to Mono requirements
     timeout-minutes: 60
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Mono
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mono-complete
+      # - name: Install Mono
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y mono-complete
 
       - name: List directory
         shell: bash
@@ -44,53 +44,53 @@ jobs:
         with:
           credentials_json: ${{ env.FIRESTORE_CREDENTIALS }}
 
-      - name: Show docker versions
-        run: |
-          docker --version
-          docker compose version
+      # - name: Show docker versions
+      #   run: |
+      #     docker --version
+      #     docker compose version
 
-      - name: Docker pull
-        run: docker compose -f ./Docker/docker-compose.yml pull
+      # - name: Docker pull
+      #   run: docker compose -f ./Docker/docker-compose.yml pull
 
-      - name: Docker compose
-        run: |
-          docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
+      # - name: Docker compose
+      #   run: |
+      #     docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
-      - name: Wait for services
-        run: |
-          set -e
+      # - name: Wait for services
+      #   run: |
+      #     set -e
 
-          wait_for_port() {
-            host=$1
-            port=$2
-            retries=${3:-60}
-            echo "Waiting for $host:$port ..."
-            for i in $(seq 1 $retries); do
-              if timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
-                echo "$host:$port is available"
-                return 0
-              fi
-              sleep 1
-            done
-            echo "Timeout waiting for $host:$port" >&2
-            return 1
-          }
+      #     wait_for_port() {
+      #       host=$1
+      #       port=$2
+      #       retries=${3:-60}
+      #       echo "Waiting for $host:$port ..."
+      #       for i in $(seq 1 $retries); do
+      #         if timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
+      #           echo "$host:$port is available"
+      #           return 0
+      #         fi
+      #         sleep 1
+      #       done
+      #       echo "Timeout waiting for $host:$port" >&2
+      #       return 1
+      #     }
 
-          # List of host:port pairs to check. Adjust or expand as needed.
-          wait_for_port localhost 3322    # immudb
-          wait_for_port localhost 8000    # dynamodb
-          wait_for_port localhost 5432    # postgresql
-          wait_for_port localhost 3306    # mysql
-          wait_for_port localhost 6379    # redis
-          wait_for_port localhost 9200    # elasticsearch
-          wait_for_port localhost 9250    # opensearch
-          wait_for_port localhost 27017   # mongodb
-          wait_for_port localhost 8080    # ravendb
-          wait_for_port localhost 5672    # eventhubs-emulator (AMQP)
-          wait_for_port localhost 8082    # cosmosdb-emulator
-          wait_for_port localhost 10000   # azurite blob
-          wait_for_port localhost 1433    # sqlserver
-          wait_for_port localhost 9094    # kafka
+      #     # List of host:port pairs to check. Adjust or expand as needed.
+      #     wait_for_port localhost 3322    # immudb
+      #     wait_for_port localhost 8000    # dynamodb
+      #     wait_for_port localhost 5432    # postgresql
+      #     wait_for_port localhost 3306    # mysql
+      #     wait_for_port localhost 6379    # redis
+      #     wait_for_port localhost 9200    # elasticsearch
+      #     wait_for_port localhost 9250    # opensearch
+      #     wait_for_port localhost 27017   # mongodb
+      #     wait_for_port localhost 8080    # ravendb
+      #     wait_for_port localhost 5672    # eventhubs-emulator (AMQP)
+      #     wait_for_port localhost 8082    # cosmosdb-emulator
+      #     wait_for_port localhost 10000   # azurite blob
+      #     wait_for_port localhost 1433    # sqlserver
+      #     wait_for_port localhost 9094    # kafka
 
       - name: Install .NET
         uses: actions/setup-dotnet@v3
