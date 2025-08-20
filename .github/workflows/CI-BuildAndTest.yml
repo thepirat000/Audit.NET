@@ -1,0 +1,79 @@
+name: CI - Build and Tests
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show docker versions
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Start docker compose services
+        run: |
+          docker compose -f ./docker/docker-compose.yml up -d --remove-orphans
+
+      - name: Wait for services to accept connections
+        run: |
+          set -e
+
+          wait_for_port() {
+            host=$1
+            port=$2
+            retries=${3:-60}
+            echo "Waiting for $host:$port ..."
+            for i in $(seq 1 $retries); do
+              if timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
+                echo "$host:$port is available"
+                return 0
+              fi
+              sleep 1
+            done
+            echo "Timeout waiting for $host:$port" >&2
+            return 1
+          }
+
+          # List of host:port pairs to check. Adjust or expand as needed.
+          wait_for_port localhost 3322    # immudb
+          wait_for_port localhost 8000    # dynamodb
+          wait_for_port localhost 5432    # postgresql
+          wait_for_port localhost 3306    # mysql
+          wait_for_port localhost 6379    # redis
+          wait_for_port localhost 9200    # elasticsearch
+          wait_for_port localhost 9250    # opensearch
+          wait_for_port localhost 27017   # mongodb
+          wait_for_port localhost 8080    # ravendb
+          wait_for_port localhost 5672    # eventhubs-emulator (AMQP)
+          wait_for_port localhost 8082    # cosmosdb-emulator
+          wait_for_port localhost 10000   # azurite blob
+          wait_for_port localhost 1433    # sqlserver
+          wait_for_port localhost 9094    # kafka
+
+      # - name: Setup .NET SDK
+      #   uses: actions/setup-dotnet@v3
+      #   with:
+      #     dotnet-version: '8.0.x' # change to the SDK you use
+
+      # - name: Restore and build
+      #   run: dotnet restore
+
+      # - name: Run unit tests
+      #   run: |
+      #     # Replace this with your exact test command if different
+      #     dotnet test --no-build --verbosity normal
+
+      - name: Tear down containers
+        if: always()
+        run: docker compose -f ./docker/docker-compose.yml down -v --remove-orphans
