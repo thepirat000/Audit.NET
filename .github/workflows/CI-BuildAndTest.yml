@@ -21,22 +21,14 @@ jobs:
           docker --version
           docker compose version
 
-      # Pull the latest image to build, and avoid caching pull-only images.
-      # (docker pull is faster than caching in most cases.)
-      - run: docker compose -f ./Docker/docker-compose.yml pull
+      - name: Docker pull
+        run: docker compose -f ./Docker/docker-compose.yml pull
 
-      # In this step, this action saves a list of existing images,
-      # the cache is created without them in the post run.
-      # It also restores the cache if it exists.
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
-
-      - name: Start docker compose services
+      - name: Docker compose
         run: |
           docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
-      - name: Wait for services to accept connections
+      - name: Wait for services
         run: |
           set -e
 
