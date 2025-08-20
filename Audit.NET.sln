@@ -111,7 +111,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.NET.JsonNewtonsoftAda
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.JsonAdapter.UnitTest", "test\Audit.JsonAdapter.UnitTest\Audit.JsonAdapter.UnitTest.csproj", "{D4F8D570-565F-45FA-8313-42984E88258D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WCF.Client", "src\Audit.WCF.Client\Audit.WCF.Client.csproj", "{7EDB1EC7-D0C4-4A4E-BB64-57205101936D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.WCF.Client", "src\Audit.WCF.Client\Audit.Wcf.Client.csproj", "{7EDB1EC7-D0C4-4A4E-BB64-57205101936D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audit.Wcf.UnitTest", "test\Audit.Wcf.UnitTest\Audit.Wcf.UnitTest.csproj", "{E659C62F-FFFC-4C79-BF2B-ADF94628AC96}"
 EndProject
