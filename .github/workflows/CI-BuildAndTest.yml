@@ -23,7 +23,7 @@ jobs:
 
       - name: Start docker compose services
         run: |
-          docker compose -f ./docker/docker-compose.yml up -d --remove-orphans
+          docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
       - name: Wait for services to accept connections
         run: |
@@ -76,4 +76,4 @@ jobs:
 
       - name: Tear down containers
         if: always()
-        run: docker compose -f ./docker/docker-compose.yml down -v --remove-orphans
+        run: docker compose -f ./Docker/docker-compose.yml down -v --remove-orphans
