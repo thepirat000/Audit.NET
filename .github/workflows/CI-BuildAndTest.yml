@@ -60,6 +60,7 @@ jobs:
           wait_for_port localhost 10000   # azurite blob
           wait_for_port localhost 1433    # sqlserver
           wait_for_port localhost 9094    # kafka
+          wait_for_port localhost 6666    # SHOULD TIME OUT
 
       # - name: Setup .NET SDK
       #   uses: actions/setup-dotnet@v3
