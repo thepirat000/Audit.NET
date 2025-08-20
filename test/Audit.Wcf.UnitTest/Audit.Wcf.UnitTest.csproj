@@ -18,7 +18,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Audit.Wcf\Audit.Wcf.csproj" />
+		<ProjectReference Include="..\..\src\Audit.WCF\Audit.WCF.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 		<PackageReference Include="Polly.RateLimiting" Version="8.5.0" />
 	</ItemGroup>

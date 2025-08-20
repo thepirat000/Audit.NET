@@ -17,7 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Audit.Wcf.Client\Audit.Wcf.Client.csproj" />
+		<ProjectReference Include="..\..\src\Audit.WCF.Client\Audit.Wcf.Client.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
