@@ -22,6 +22,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Mono
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mono-complete
+
       - name: List directory
         shell: bash
         run: ls -R
@@ -135,10 +140,6 @@ jobs:
         run: |
           dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"      
   
-      - name: Tear down containers
-        if: always()
-        run: docker compose -f ./Docker/docker-compose.yml down -v --remove-orphans
-
       - name: SonarScanner End
         shell: bash
         run: |
@@ -165,3 +166,7 @@ jobs:
         with:
           commit_message: Commit CODE_COVERAGE.md
           file_pattern: 'CODE_COVERAGE.md'
+
+      - name: Tear down containers
+        if: always()
+        run: docker compose -f ./Docker/docker-compose.yml down -v --remove-orphans
