@@ -22,17 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Install xmllint
-      #   run: |
-      #     sudo apt-get update -qq
-      #     sudo apt-get install -y libxml2-utils
-
-      # - name: Extract version from Directory.Build.props (with xmllint)
-      #   run: |
-      #     version=$(xmllint --xpath 'string(//Project/PropertyGroup/Version)' Directory.Build.props)
-      #     echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
-      #     echo "PROJECT_VERSION=$version"
-
       - name: Extract version from Directory.Build.props
         shell: bash
         run: |
@@ -133,7 +122,7 @@ jobs:
             /v:"${{ env.PROJECT_VERSION }}"
 
       - name: Dotnet Restore 
-        run: dotnet restore
+        run: dotnet restore .\Audit.NET.sln
         
       - name: Dotnet Build Audit.NET.sln
         run: dotnet build .\Audit.NET.sln --no-restore -c release
