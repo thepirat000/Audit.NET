@@ -7,6 +7,12 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  FIRESTORE_CREDENTIALS: ${{ secrets.FIRESTORE_CREDENTIALS }}
+  FIRESTORE_PROJECT_ID: audit-net
+  ACCEPT_EULA: 'Y'
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,6 +21,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Extract version from Directory.Build.props (with xmllint)
+        run: |
+          version=$(xmllint --xpath 'string(//Project/PropertyGroup/Version)' Directory.Build.props)
+          echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
+          echo "PROJECT_VERSION=$version"
 
       - name: Show docker versions
         run: |
