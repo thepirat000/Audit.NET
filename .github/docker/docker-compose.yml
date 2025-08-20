@@ -1,0 +1,160 @@
+﻿services:
+  immudb:
+    image: codenotary/immudb:latest
+    container_name: immudb
+    ports:
+      - "3322:3322"  # ImmuDB default port
+      - "9497:9497"  # Metrics port
+    volumes:
+      - immudb-data:/var/lib/immudb
+
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    ports:
+      - "8000:8000"
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-port", "8000"]
+
+  postgresql:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../../test/Audit.PostgreSql.UnitTest/SqlScript.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+
+  mysql:
+    image: mysql:9.0
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../../test/Audit.MySql.UnitTest/MySqlScript.mysql:/docker-entrypoint-initdb.d/init.sql:ro
+      - mysqldata:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+    ports:
+      - "9200:9200"
+
+  opensearch:
+    image: opensearchproject/opensearch:2.19.2
+    environment:
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Messi1708!!!
+      - plugins.security.disabled=true
+      - http.port=9250
+      - discovery.type=single-node
+      - network.host=0.0.0.0
+    ports:
+      - "9250:9250"
+
+  mongodb:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  ravendb:
+    image: ravendb/ravendb:latest
+    environment:
+      - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
+    ports:
+      - "8080:8080"
+
+  eventhubs-emulator:
+    container_name: "eventhubs-emulator"
+    image: "mcr.microsoft.com/azure-messaging/eventhubs-emulator:latest"
+    ports:
+      - "5672:5672"
+      - "9092:9092"
+      - "8081:8081"
+    environment:
+      BLOB_SERVER: azurite
+      METADATA_SERVER: azurite
+      ACCEPT_EULA: Y
+    depends_on:
+      - azurite
+    networks:
+      eh-emulator:
+        aliases:
+          - "eventhubs-emulator"
+
+  cosmosdb-emulator:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+    ports:
+      - "8082:8082"
+      - "10250-10255:10250-10255"
+      - "1234:1234"
+    environment:
+      - PORT=8082
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+    networks:
+      - cosmos-network
+ 
+  azurite:
+    container_name: "azurite"
+    image: "mcr.microsoft.com/azure-storage/azurite:latest"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    networks:
+      eh-emulator:
+        aliases:
+          - "azurite"
+ 
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1'"]
+      interval: 10s
+      retries: 5
+
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - 9094:9094
+    networks:
+      - kafka-network 
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
+volumes:
+  pgdata:
+  mysqldata:
+  mongodata:
+  immudb-data:
+
+networks:
+  cosmos-network:
+    driver: bridge
+  eh-emulator:
+  kafka-network:

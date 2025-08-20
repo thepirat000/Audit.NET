@@ -32,7 +32,6 @@ del "Audit.NET.EventLog.Core\bin\release\*.symbols.nupkg"
 del "Audit.NET.DynamoDB\bin\release\*.symbols.nupkg"
 del "Audit.HttpClient\bin\release\*.symbols.nupkg"
 del "Audit.NET.NLog\bin\release\*.symbols.nupkg"
-del "Audit.NET.AmazonQLDB\bin\release\*.symbols.nupkg"
 del "Audit.NET.Kafka\bin\release\*.symbols.nupkg"
 del "Audit.NET.AzureStorageTables\bin\release\*.symbols.nupkg"
 del "Audit.NET.Serilog\bin\release\*.symbols.nupkg"
@@ -76,7 +75,6 @@ nuget push "Audit.NET.EventLog.Core\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.DynamoDB\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.HttpClient\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.NLog\bin\release\*.nupkg" -NoSymbols -source %1
-nuget push "Audit.NET.AmazonQLDB\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Kafka\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.AzureStorageTables\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.Serilog\bin\release\*.nupkg" -NoSymbols -source %1

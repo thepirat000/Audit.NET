@@ -1,8 +1,8 @@
 CREATE DATABASE test;
 
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
 
-GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;
 
 FLUSH PRIVILEGES;
 

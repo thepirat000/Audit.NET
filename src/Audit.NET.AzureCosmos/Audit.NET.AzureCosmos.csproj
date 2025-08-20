@@ -27,14 +27,6 @@
 		<RootNamespace>Audit.AzureCosmos</RootNamespace>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' != 'net462' ">
-		<DefineConstants>$(DefineConstants);IS_COSMOS</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net462' ">
-		<DefineConstants>$(DefineConstants);IS_DOCDB</DefineConstants>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
 		<None Include="README.md" Pack="true" PackagePath="\"/>
@@ -44,15 +36,8 @@
 		<ProjectReference Include="..\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' != 'net462' ">
-		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.46.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
-		<PackageReference Include="Microsoft.Azure.DocumentDB" Version="2.20.0" />
-		<ProjectReference Include="..\Audit.NET.JsonNewtonsoftAdapter\Audit.NET.JsonNewtonsoftAdapter.csproj" />
-		<Reference Include="System" />
-		<Reference Include="Microsoft.CSharp" />
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.53.0" />
 	</ItemGroup>
 
 	<ItemGroup>

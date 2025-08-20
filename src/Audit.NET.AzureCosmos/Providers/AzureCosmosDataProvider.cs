@@ -1,5 +1,4 @@
-﻿#if IS_COSMOS
-using System;
+﻿using System;
 using Audit.Core;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
@@ -265,4 +264,3 @@ namespace Audit.AzureCosmos.Providers
 
     }
 }
-#endif

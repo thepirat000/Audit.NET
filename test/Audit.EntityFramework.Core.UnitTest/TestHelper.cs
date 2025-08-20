@@ -1,4 +1,5 @@
 ﻿using System;
+using Audit.IntegrationTest;
 #if EF_CORE
 using Microsoft.Data.SqlClient;
 #else
@@ -11,11 +12,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     {
         public static string GetConnectionString(string database)
         {
-            var env = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING");
-            if (env == null)
-            {
-                throw new Exception("Environment variable 'SQL_SERVER_CONNECTION_STRING' not set.");
-            }
+            var env = AzureSettings.SqlServerConnectionString;
             return new SqlConnectionStringBuilder(env) { InitialCatalog = database }.ConnectionString;
 
         }

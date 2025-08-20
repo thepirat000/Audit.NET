@@ -33,7 +33,6 @@ del "Audit.NET.EventLog.Core\bin\release\*.nupkg"
 del "Audit.NET.DynamoDB\bin\release\*.nupkg"
 del "Audit.HttpClient\bin\release\*.nupkg"
 del "Audit.NET.NLog\bin\release\*.nupkg"
-del "Audit.NET.AmazonQLDB\bin\release\*.nupkg"
 del "Audit.NET.Kafka\bin\release\*.nupkg"
 del "Audit.NET.AzureStorageTables\bin\release\*.nupkg"
 del "Audit.NET.Serilog\bin\release\*.nupkg"
@@ -83,7 +82,6 @@ dotnet pack "Audit.NET.EventLog.Core/" -c Release
 dotnet pack "Audit.NET.DynamoDB/" -c Release
 dotnet pack "Audit.HttpClient/" -c Release
 dotnet pack "Audit.NET.NLog/" -c Release
-dotnet pack "Audit.NET.AmazonQLDB/" -c Release
 dotnet pack "Audit.NET.Kafka/" -c Release
 dotnet pack "Audit.NET.AzureStorageTables/" -c Release
 dotnet pack "Audit.NET.Serilog/" -c Release

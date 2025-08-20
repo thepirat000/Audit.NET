@@ -1,12 +1,17 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Audit.AzureEventHubs.Providers;
+﻿using Audit.AzureEventHubs.Providers;
 using Audit.Core;
 using Audit.IntegrationTest;
+
 using Azure.Messaging.EventHubs.Consumer;
 using Azure.Messaging.EventHubs.Producer;
+
 using NUnit.Framework;
+
+using System;
+using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 #pragma warning disable S1751
 #pragma warning disable S6966
 
@@ -18,6 +23,43 @@ namespace Audit.AzureEventHubs.UnitTest
     [Category("AzureEventHubs")]
     public class AzureEventHubsTests
     {
+        private static readonly CancellationTokenSource TokenSource = new CancellationTokenSource();
+        private static Task _readTask;
+        private static readonly ConcurrentDictionary<string, PartitionEvent> Events = new();
+
+        [OneTimeSetUp]
+        public void OneTimeSetup()
+        {
+            _readTask = ReadEvents(TokenSource.Token);
+            Thread.Sleep(3000);
+        }
+
+        [OneTimeTearDown]
+        public async Task OneTimeTearDown()
+        {
+            TokenSource.Cancel();
+            try
+            {
+                await _readTask.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when cancellation occurs.
+            }
+            finally
+            {
+                TokenSource.Dispose();
+            }
+            _readTask.Dispose();
+        }
+
+
+        [SetUp]
+        public void Setup()
+        {
+            Configuration.Reset();
+        }
+
         [Test]
         public void Test_AzureEventHubs_Configuration_ConnectionString()
         {
@@ -60,12 +102,10 @@ namespace Audit.AzureEventHubs.UnitTest
         }
 
         [Test]
-        public async Task Test_AzureEventHubs_HappyPath()
+        public void Test_AzureEventHubs_HappyPathSync()
         {
             var msgId = Guid.NewGuid().ToString();
             var evType = Guid.NewGuid().ToString();
-
-            var readTask = ReadOneEvent();
 
             var dp = new AzureEventHubsDataProvider(cfg => cfg
                 .WithConnectionString(AzureSettings.AzureEventHubCnnString)
@@ -75,24 +115,28 @@ namespace Audit.AzureEventHubs.UnitTest
                     eventData.Properties["Test"] = "Test property";
                 }));
 
-            var scope = AuditScope.Create(new AuditScopeOptions()
+            using (var scope = AuditScope.Create(new AuditScopeOptions()
+                   {
+                       EventType = evType,
+                       DataProvider = dp,
+                       CreationPolicy = EventCreationPolicy.Manual
+                   }))
             {
-                EventType = evType,
-                DataProvider = dp,
-                CreationPolicy = EventCreationPolicy.Manual
-            });
+                scope.Save();
+            }
 
-            scope.Save();
+            Thread.Sleep(2000);
 
-            var result = await readTask;
+            Assert.That(Events, Does.ContainKey(msgId));
 
-            Assert.That(result, Is.Not.Null);
+            var result = Events[msgId];
+
             Assert.Multiple(() =>
             {
-                Assert.That(result.Value.Data.MessageId, Is.EqualTo(msgId));
-                Assert.That(result.Value.Data.ContentType, Is.EqualTo("application/json"));
+                Assert.That(result.Data.MessageId, Is.EqualTo(msgId));
+                Assert.That(result.Data.ContentType, Is.EqualTo("application/json"));
             });
-            var ev = await JsonSerializer.DeserializeAsync<AuditEvent>(result.Value.Data.BodyAsStream, Configuration.JsonSettings);
+            var ev = JsonSerializer.Deserialize<AuditEvent>(result.Data.BodyAsStream, Configuration.JsonSettings);
             Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo(evType));
         }
@@ -103,8 +147,6 @@ namespace Audit.AzureEventHubs.UnitTest
             var msgId = Guid.NewGuid().ToString();
             var evType = Guid.NewGuid().ToString();
 
-            var readTask = ReadOneEvent();
-
             var dp = new AzureEventHubsDataProvider(cfg => cfg
                 .WithConnectionString(AzureSettings.AzureEventHubCnnString)
                 .CustomizeEventData(eventData =>
@@ -113,7 +155,7 @@ namespace Audit.AzureEventHubs.UnitTest
                     eventData.Properties["Test"] = "Test property";
                 }));
 
-            var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
+            await using var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
             {
                 EventType = evType,
                 DataProvider = dp,
@@ -122,15 +164,18 @@ namespace Audit.AzureEventHubs.UnitTest
 
             await scope.SaveAsync();
 
-            var result = await readTask;
+            await Task.Delay(2000);
 
-            Assert.That(result, Is.Not.Null);
+            Assert.That(Events, Does.ContainKey(msgId));
+
+            var result = Events[msgId];
+
             Assert.Multiple(() =>
             {
-                Assert.That(result.Value.Data.MessageId, Is.EqualTo(msgId));
-                Assert.That(result.Value.Data.ContentType, Is.EqualTo("application/json"));
+                Assert.That(result.Data.MessageId, Is.EqualTo(msgId));
+                Assert.That(result.Data.ContentType, Is.EqualTo("application/json"));
             });
-            var ev = await JsonSerializer.DeserializeAsync<AuditEvent>(result.Value.Data.BodyAsStream, Configuration.JsonSettings);
+            var ev = await JsonSerializer.DeserializeAsync<AuditEvent>(result.Data.BodyAsStream, Configuration.JsonSettings);
             Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo(evType));
         }
@@ -146,16 +191,22 @@ namespace Audit.AzureEventHubs.UnitTest
             Assert.That(client1, Is.SameAs(client2));
         }
 
-        private static async Task<PartitionEvent?> ReadOneEvent()
+        private static async Task ReadEvents(CancellationToken cancellationToken)
         {
-            var consumer = new EventHubConsumerClient("$Default", AzureSettings.AzureEventHubCnnString);
+            var consumer = new EventHubConsumerClient(EventHubConsumerClient.DefaultConsumerGroupName, AzureSettings.AzureEventHubCnnString);
 
-            await foreach (var partitionEvent in consumer.ReadEventsFromPartitionAsync("0", EventPosition.Latest))
+            var readOptions = new ReadEventOptions
             {
-                return partitionEvent;
-            }
+                MaximumWaitTime = TimeSpan.FromSeconds(10)
+            };
 
-            return null;
+            await foreach (var partitionEvent in consumer.ReadEventsAsync(readOptions, cancellationToken))
+            {
+                if (partitionEvent.Data != null)
+                {
+                    Events[partitionEvent.Data.MessageId] = partitionEvent;
+                }
+            }
         }
     }
 }

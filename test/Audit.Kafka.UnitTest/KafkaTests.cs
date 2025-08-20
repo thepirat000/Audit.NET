@@ -17,7 +17,7 @@ namespace Audit.Kafka.UnitTest
     [TestFixture]
     public class KafkaTests
     {
-		private const string BootstrapHost = "127.0.0.1:52062";
+		private const string BootstrapHost = "127.0.0.1:9094";
 		
         [Test]
         public void Test_KafkaDataProvider_FluentApi()
@@ -46,7 +46,9 @@ namespace Audit.Kafka.UnitTest
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = BootstrapHost,
-                ClientId = Dns.GetHostName()
+                ClientId = Dns.GetHostName(),
+                AllowAutoCreateTopics = true,
+                SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka(_ => _
@@ -97,7 +99,9 @@ namespace Audit.Kafka.UnitTest
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = BootstrapHost,
-                ClientId = Dns.GetHostName()
+                ClientId = Dns.GetHostName(),
+                AllowAutoCreateTopics = true,
+                SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka(_ => _
@@ -146,7 +150,8 @@ namespace Audit.Kafka.UnitTest
             {
                 BootstrapServers = BootstrapHost,
                 ClientId = Dns.GetHostName(), 
-                AllowAutoCreateTopics = true
+                AllowAutoCreateTopics = true,
+                SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka(_ => _
@@ -200,7 +205,9 @@ namespace Audit.Kafka.UnitTest
             var pConfig = new ProducerConfig()
             {
                 BootstrapServers = BootstrapHost,
-                ClientId = Dns.GetHostName()
+                ClientId = Dns.GetHostName(),
+                AllowAutoCreateTopics = true,
+                SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
                 .UseKafka<string>(_ => _

@@ -1,12 +1,6 @@
 using System;
 using Audit.Core;
-#if IS_COSMOS
 using Microsoft.Azure.Cosmos;
-#else
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Newtonsoft.Json;
-#endif
 
 namespace Audit.AzureCosmos.ConfigurationApi
 {
@@ -17,13 +11,8 @@ namespace Audit.AzureCosmos.ConfigurationApi
         internal Setting<string> _database = "Audit";
         internal Setting<string> _container = "Events";
         internal Func<AuditEvent, string> _idBuilder;
-#if IS_COSMOS
         internal CosmosClient _cosmosClient;
         internal Action<CosmosClientOptions> _cosmosClientOptionsAction;
-#else
-        internal Setting<ConnectionPolicy> _connectionPolicy;
-        internal IDocumentClient _documentClient = null;
-#endif
 
         public IAzureCosmosProviderConfigurator Endpoint(Func<AuditEvent, string> endpointBuilder)
         {
@@ -80,7 +69,6 @@ namespace Audit.AzureCosmos.ConfigurationApi
         }
 
 
-#if IS_COSMOS
         public IAzureCosmosProviderConfigurator CosmosClient(CosmosClient cosmosClient)
         {
             _cosmosClient = cosmosClient;
@@ -91,22 +79,5 @@ namespace Audit.AzureCosmos.ConfigurationApi
             _cosmosClientOptionsAction = cosmosClientOptionsAction;
             return this;
         }
-#else
-        public IAzureCosmosProviderConfigurator ConnectionPolicy(Func<AuditEvent, ConnectionPolicy> connectionPolicyBuilder)
-        {
-            _connectionPolicy = connectionPolicyBuilder;
-            return this;
-        }
-        public IAzureCosmosProviderConfigurator ConnectionPolicy(ConnectionPolicy connectionPolicy)
-        {
-            _connectionPolicy = connectionPolicy;
-            return this;
-        }
-        public IAzureCosmosProviderConfigurator DocumentClient(IDocumentClient documentClient)
-        {
-            _documentClient = documentClient;
-            return this;
-        }
-#endif
     }
 }

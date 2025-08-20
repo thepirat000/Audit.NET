@@ -1,5 +1,4 @@
-﻿#if IS_COSMOS
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Microsoft.Azure.Cosmos;
 
@@ -35,4 +34,3 @@ namespace Audit.AzureCosmos.Providers
         }
     }
 }
-#endif
