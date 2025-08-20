@@ -22,6 +22,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: ls
+        shell: bash
+        run: ls
+
       - name: Extract version from Directory.Build.props
         shell: bash
         run: |
