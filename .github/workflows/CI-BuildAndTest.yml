@@ -22,14 +22,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install xmllint
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y libxml2-utils
+      # - name: Install xmllint
+      #   run: |
+      #     sudo apt-get update -qq
+      #     sudo apt-get install -y libxml2-utils
 
-      - name: Extract version from Directory.Build.props (with xmllint)
+      # - name: Extract version from Directory.Build.props (with xmllint)
+      #   run: |
+      #     version=$(xmllint --xpath 'string(//Project/PropertyGroup/Version)' Directory.Build.props)
+      #     echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
+      #     echo "PROJECT_VERSION=$version"
+
+      - name: Extract version from Directory.Build.props
+        shell: bash
         run: |
-          version=$(xmllint --xpath 'string(//Project/PropertyGroup/Version)' Directory.Build.props)
+          version=$(grep -oP '<Version>\K[\d\.]+(?:-[\w\-\.]+)?' Directory.Build.props)
           echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
           echo "PROJECT_VERSION=$version"
 
