@@ -21,6 +21,10 @@ jobs:
           docker --version
           docker compose version
 
+      - name: Cache Docker layers
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
       - name: Start docker compose services
         run: |
           docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
@@ -60,7 +64,6 @@ jobs:
           wait_for_port localhost 10000   # azurite blob
           wait_for_port localhost 1433    # sqlserver
           wait_for_port localhost 9094    # kafka
-          wait_for_port localhost 6666    # SHOULD TIME OUT
 
       # - name: Setup .NET SDK
       #   uses: actions/setup-dotnet@v3
