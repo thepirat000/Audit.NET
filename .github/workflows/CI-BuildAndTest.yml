@@ -33,6 +33,12 @@ jobs:
           echo "PROJECT_VERSION=$version" >> $GITHUB_ENV
           echo "PROJECT_VERSION=$version"
 
+      # Google Cloud (Firestore)
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.FIRESTORE_CREDENTIALS }}
+
       - name: Show docker versions
         run: |
           docker --version
@@ -81,19 +87,81 @@ jobs:
           wait_for_port localhost 1433    # sqlserver
           wait_for_port localhost 9094    # kafka
 
-      # - name: Setup .NET SDK
-      #   uses: actions/setup-dotnet@v3
-      #   with:
-      #     dotnet-version: '8.0.x' # change to the SDK you use
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            2.1.x
+            3.1.x
+            6.0.x
+            7.0.x 
+            8.0.x
+            9.0.x
 
-      # - name: Restore and build
-      #   run: dotnet restore
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.2
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'      
+        with:
+          nuget-version: '6.x'      
+  
+      - name: Install dotnet Tools
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-reportgenerator-globaltool
+          dotnet tool install --global dotnet-sonarscanner --version 10.1.2
 
-      # - name: Run unit tests
-      #   run: |
-      #     # Replace this with your exact test command if different
-      #     dotnet test --no-build --verbosity normal
+      - name: SonarScanner Begin
+        shell: bash
+        run: |
+          dotnet sonarscanner begin \
+            /o:"thepirat000" \
+            /k:"Audit.NET" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.login="${{ env.SONAR_TOKEN }}" \
+            /d:sonar.cs.vstest.reportsPaths="/test/TestResult/**/*.trx" \
+            /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.opencover.xml" \
+            /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**,**/Tests/**" \
+            /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**" \
+            /v:"${{ env.PROJECT_VERSION }}"
 
+      - name: Dotnet Restore 
+        run: dotnet restore
+        
+      - name: Dotnet Build Audit.NET.sln
+        run: dotnet build .\Audit.NET.sln --no-restore -c release
+     
+      - name: Run tests
+        run: |
+          dotnet test .\Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"      
+  
       - name: Tear down containers
         if: always()
         run: docker compose -f ./Docker/docker-compose.yml down -v --remove-orphans
+
+      - name: SonarScanner End
+        shell: bash
+        run: |
+          dotnet sonarscanner end \
+            /d:sonar.login="${{ env.SONAR_TOKEN }}"
+
+      - name: Generate Code Coverage Report
+        run: |
+          dotnet reportgenerator -reports:${{ github.workspace }}\test\TestResult\**\*.cobertura.xml -targetdir:"${{ github.workspace }}\Tests\coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest;-Audit.NET.Kafka;-Audit.NET.AzureCosmos;-Audit.NET.AzureEventHubs"
+  
+      - name: Upload Code Coverage Report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coveragereport
+          path: ${{ github.workspace }}\Tests\coveragereport
+      
+      - name: Rename summary coverage file
+        continue-on-error: true
+        run: mv -force "${{ github.workspace }}\Tests\coveragereport\Summary.md" "${{ github.workspace }}\CODE_COVERAGE.md"
+  
+      - name: Commit CODE_COVERAGE.md
+        continue-on-error: true
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Commit CODE_COVERAGE.md
+          file_pattern: 'CODE_COVERAGE.md'
