@@ -4,6 +4,8 @@
 		<TargetFrameworks>net462;net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
