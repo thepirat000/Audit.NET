@@ -4,17 +4,16 @@
 		<TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
-		<AssemblyName>Audit.Wcf.UnitTest</AssemblyName>
+		<AssemblyName>Audit.Elasticsearch.UnitTest</AssemblyName>
 		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
 		<SignAssembly>true</SignAssembly>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-		<PackageId>Audit.Wcf.UnitTest</PackageId>
+		<PackageId>Audit.Elasticsearch.UnitTest</PackageId>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
 		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<DebugType>Full</DebugType>
-		<WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
 	</PropertyGroup>
 
 	<ItemGroup>
