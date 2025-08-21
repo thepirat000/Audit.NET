@@ -68,12 +68,15 @@ jobs:
         run: |
           docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
-      - name: Sleep for 60 seconds
-        run: sleep 60s
+      - name: Sleep for 100 seconds
+        run: sleep 100s
         shell: bash
 
       - name: Show Elasticsearch logs
-        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=100
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
+
+      - name: Show postgresql logs
+        run: docker compose -f ./Docker/docker-compose.yml logs postgresql --tail=300
       
       - name: Wait for services
         run: |
