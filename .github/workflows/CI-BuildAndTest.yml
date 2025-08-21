@@ -71,6 +71,9 @@ jobs:
       - name: Install librdkafka-dev
         run: sudo apt-get install -y librdkafka-dev
      
+      - name: DEBUG - Show Elasticsearch logs
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
+
       - name: Wait for services
         run: |
           set -e
