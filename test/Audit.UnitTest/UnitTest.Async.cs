@@ -350,7 +350,7 @@ namespace Audit.UnitTest
                 await scope.DisposeAsync();
             }
 
-            var fileFromProvider = await Core.Configuration.DataProviderAs<FileDataProvider>().GetEventAsync($@"{dir}\evt-1.json");
+            var fileFromProvider = await Core.Configuration.DataProviderAs<FileDataProvider>().GetEventAsync($@"{dir}{Path.DirectorySeparatorChar}evt-1.json");
 
             var ev = JsonAdapter.Deserialize<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
             var fileCount = Directory.EnumerateFiles(dir).Count();
