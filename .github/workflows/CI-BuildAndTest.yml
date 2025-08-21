@@ -142,9 +142,23 @@ jobs:
       #   run: curl -XGET http://localhost:9200/_cluster/health?pretty
       #   continue-on-error: true
 
-      - name: DEBUG - Create index with primary shard
+      - name: DEBUG - Create index with primary shard (auto_index)
         run: |
           curl -X PUT http://localhost:9200/auto_index -H \
+            'Content-Type: application/json' -d\
+            '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
+        continue-on-error: true
+
+      - name: DEBUG - Create index with primary shard (auditevent_test)
+        run: |
+          curl -X PUT http://localhost:9200/auditevent_test -H \
+            'Content-Type: application/json' -d\
+            '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
+        continue-on-error: true
+
+      - name: DEBUG - Create index with primary shard (auditevent_test)
+        run: |
+          curl -X PUT http://localhost:9200/auditevent_test2 -H \
             'Content-Type: application/json' -d\
             '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
         continue-on-error: true
