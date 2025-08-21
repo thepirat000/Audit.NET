@@ -22,9 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install librdkafka-dev
-        run: sudo apt-get install -y librdkafka-dev
-
       # #Step needed when using ubuntu > 22.04
       # - name: Install Mono
       #   run: |
@@ -71,13 +68,13 @@ jobs:
         run: |
           docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
-      - name: Sleep for 30 seconds
-        run: sleep 30s
-        shell: bash
+      - name: Install librdkafka-dev
+        run: sudo apt-get install -y librdkafka-dev
 
-      # - name: Show postgresql logs
-      #   run: docker compose -f ./Docker/docker-compose.yml logs postgresql --tail=300
-      
+      # - name: Sleep for 30 seconds
+      #   run: sleep 30s
+      #   shell: bash
+     
       - name: Wait for services
         run: |
           set -e
@@ -153,7 +150,8 @@ jobs:
       - name: Run tests
         run: |
           dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
-            --filter "TestCategory!=MonoIncompatible" 
+            --filter "TestCategory=PostgreSQL" 
+            #--filter "TestCategory!=MonoIncompatible" 
   
       - name: SonarScanner End
         shell: bash
