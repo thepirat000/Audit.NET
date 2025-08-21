@@ -61,6 +61,11 @@ jobs:
           docker --version
           docker compose version
 
+      - name: DEBUG - ElasticSearch from action
+        uses: ankane/setup-elasticsearch@v1
+        with:
+          elasticsearch-version: 9
+
       - name: Docker pull
         run: docker compose -f ./Docker/docker-compose.yml pull
 
@@ -87,12 +92,12 @@ jobs:
             echo "Waiting for $host:$port ..."
             for i in $(seq 1 $retries); do
               if timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
-                echo "$host:$port '$name' is available"
+                echo "$host:$port $name is available"
                 return 0
               fi
               sleep 1
             done
-            echo "Timeout waiting for $host:$port '$name'" >&2
+            echo "Timeout waiting for $host:$port $name" >&2
             return 1
           }
 
@@ -171,7 +176,7 @@ jobs:
      
       - name: Run tests
         run: |
-          dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" --results-directory "./test/TestResult" \
+          dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
             --filter "TestCategory!=MonoIncompatible" 
   
       - name: SonarScanner End
