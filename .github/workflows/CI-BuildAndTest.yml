@@ -88,7 +88,7 @@ jobs:
             host=$1
             port=$2
             name=$3
-            retries=${3:-60}
+            retries=${4:-60}
             echo "Waiting for $host:$port ..."
             for i in $(seq 1 $retries); do
               if timeout 1 bash -c "cat < /dev/null > /dev/tcp/$host/$port" 2>/dev/null; then
