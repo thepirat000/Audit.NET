@@ -69,7 +69,7 @@ namespace Audit.MongoClient.UnitTest
         }
 
         [Test]
-        public void Test_Command_Failed()
+        public void Test_Command_Failure()
         {
             // Arrange
             Audit.Core.Configuration.Setup().UseInMemoryProvider();

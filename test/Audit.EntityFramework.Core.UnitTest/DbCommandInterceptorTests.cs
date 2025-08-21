@@ -162,7 +162,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
-        public void Test_DbCommandInterceptor_Failed()
+        public void Test_DbCommandInterceptor_Failure()
         {
             var inserted = new List<AuditEventCommandEntityFramework>();
             var replaced = new List<AuditEventCommandEntityFramework>();
@@ -205,7 +205,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
-        public async Task Test_DbCommandInterceptor_FailedAsync()
+        public async Task Test_DbCommandInterceptor_FailureAsync()
         {
             var inserted = new List<AuditEventCommandEntityFramework>();
             var replaced = new List<AuditEventCommandEntityFramework>();
