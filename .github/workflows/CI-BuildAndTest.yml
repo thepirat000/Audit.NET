@@ -126,7 +126,7 @@ jobs:
 
       - name: DEBUG - get elasticsearch health
         shell: bash
-        run: curl -XGET http://127.0.0.1:9200/_cluster/health?pretty
+        run: curl -XGET http://localhost:9200/_cluster/health?pretty
 
       - name: Create index with primary shard
         run: |

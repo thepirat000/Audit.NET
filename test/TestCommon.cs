@@ -42,8 +42,8 @@ namespace Audit.IntegrationTest
         public static string AzureDocDbAuthKey => "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         public static string AzureEventHubCnnString => "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;EntityPath=eh1;UseDevelopmentEmulator=true;";
 
-        public static string ElasticSearchUrl => "http://elastic:elastic@127.0.0.1:9200";
-        public static string OpenSearchUrl => "http://admin:Messi1708!!!@127.0.0.1:9250";
+        public static string ElasticSearchUrl => "http://elastic:elastic@localhost:9200";
+        public static string OpenSearchUrl => "http://admin:Messi1708!!!@localhost:9250";
         public static string PostgreSqlConnectionString => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
         public static string SqlServerConnectionString => "Server=localhost,1433;Initial Catalog=Audit;User Id=sa;Password=YourStrong!Passw0rd;Encrypt=False;TrustServerCertificate=True;";
 
