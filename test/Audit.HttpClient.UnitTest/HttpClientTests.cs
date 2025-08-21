@@ -12,10 +12,15 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Audit.IntegrationTest;
 
 // ReSharper disable once CheckNamespace
 namespace Audit.HttpClientUnitTest
 {
+    [TestFixture]
+#if NET462
+    [Category(TestCommon.Category.MonoIncompatible)]
+#endif
     public class HttpClientTests
     {
         private static JsonAdapter JsonAdapter = new JsonAdapter();

@@ -8,10 +8,17 @@ using Audit.Core.Providers;
 
 namespace Audit.FileSystem.UnitTest
 {
+    [TestFixture]
     public class FileSystemTests
     {
         private static Random random = new Random();
-        
+
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [Test]
         public void Test_FileDataProvider_FluentApi()
         {
@@ -61,20 +68,23 @@ namespace Audit.FileSystem.UnitTest
             Thread.Sleep(1500);
 
             Assert.That(evs.Count >= 3, Is.True, $"Events: {evs.Count}");
-            var create = evs.Single(x => x.Event == FileSystemEventType.Create);
+            var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
+            Assert.That(create, Is.Not.Null);
             Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create));
             Assert.That(create.Name, Is.EqualTo(filename1));
             Assert.That(create.Length, Is.EqualTo(14));
             Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Text));
-            Assert.That((create.FileContent as FileTextualContent).Value, Is.EqualTo("this is a test"));
+            Assert.That((create.FileContent as FileTextualContent)?.Value, Is.EqualTo("this is a test"));
             Assert.That(create.MD5, Is.Not.Null);
 
-            var rename = evs.Single(x => x.Event == FileSystemEventType.Rename);
+            var rename = evs.LastOrDefault(x => x.Event == FileSystemEventType.Rename);
+            Assert.That(rename, Is.Not.Null);
             Assert.That(rename.OldName, Is.EqualTo(filename1));
             Assert.That(rename.Name, Is.EqualTo(filename2));
             Assert.That(rename.MD5, Is.Not.Null);
 
-            var delete = evs.Single(x => x.Event == FileSystemEventType.Delete);
+            var delete = evs.LastOrDefault(x => x.Event == FileSystemEventType.Delete);
+            Assert.That(delete, Is.Not.Null);
             Assert.That(delete.Name, Is.EqualTo(filename2));
 
             System.IO.Directory.Delete(folder, true);

@@ -7,12 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Audit.Core;
-
+using Audit.IntegrationTest;
 using NUnit.Framework;
 
 
 namespace Audit.WCF.UnitTest
 {
+    [TestFixture]
+    [Category(TestCommon.Category.MonoIncompatible)]
     public class WCFTests
     {
         [SetUp]

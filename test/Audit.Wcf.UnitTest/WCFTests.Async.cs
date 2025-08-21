@@ -14,6 +14,8 @@ using Polly;
 
 namespace Audit.WCF.UnitTest
 {
+    [TestFixture]
+    [Category(TestCommon.Category.MonoIncompatible)]
     public class WCFTests_Async
     {
         [SetUp]

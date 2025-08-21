@@ -31,6 +31,8 @@ namespace Audit.IntegrationTest
             public const string MySql = "MySql";
             public const string RavenDb = "RavenDB";
             public const string EventLog = "EventLog";
+
+            public const string MonoIncompatible = "MonoIncompatible";
         }
         public static string AzureBlobAccountName => "devstoreaccount1";
         public static string AzureBlobAccountKey => "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="; // Well-known development storage account key to use with Azurite Emulator
