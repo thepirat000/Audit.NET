@@ -18,10 +18,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\AzureSettings.cs" Link="AzureSettings.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\..\src\Audit.NET.ElasticSearch\Audit.NET.Elasticsearch.csproj" />
 		<ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System;
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.MongoDB.Providers;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -11,8 +12,8 @@ using NUnit.Framework;
 namespace Audit.MongoDb.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Mongo")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.MongoDb)]
     public class MongoDbTests
     {
         [OneTimeSetUp]

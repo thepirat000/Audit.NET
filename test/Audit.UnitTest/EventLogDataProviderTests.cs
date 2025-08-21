@@ -1,13 +1,14 @@
 ﻿using System;
 using Audit.Core;
 using Audit.Core.Providers;
+using Audit.IntegrationTest;
 using NUnit.Framework;
 
 namespace Audit.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("EventLog")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.EventLog)]
     public class EventLogDataProviderTests
     {
         [SetUp]

@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audit.Core;
 using System.Threading;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class SaveChangesDisposalTests
     {
         [SetUp]

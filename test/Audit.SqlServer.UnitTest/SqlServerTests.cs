@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.SqlServer.Providers;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,8 @@ using NUnit.Framework;
 namespace Audit.SqlServer.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class SqlServerTests
     {
         [OneTimeSetUp]

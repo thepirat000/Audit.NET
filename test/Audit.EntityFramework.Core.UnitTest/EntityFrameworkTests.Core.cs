@@ -14,12 +14,13 @@ using System.Threading.Tasks;
 using static System.Linq.Queryable;
 using static System.Linq.Enumerable; // You only need this if you're using LINQ to Objects
 using System.Threading;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Core.UnitTest.Context
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class EntityFrameworkTests_Core
     {
         [OneTimeSetUp]

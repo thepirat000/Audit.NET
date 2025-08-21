@@ -4,12 +4,13 @@ using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Threading;
 using System.Threading.Tasks;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class InheritanceTests
     {
         [SetUp]

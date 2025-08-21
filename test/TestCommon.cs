@@ -2,8 +2,36 @@
 
 namespace Audit.IntegrationTest
 {
+    /// <summary>
+    /// Common test utilities and constants used across unit tests.
+    /// </summary>
     public static class TestCommon
     {
+        /// <summary>
+        /// Test categories used for categorizing tests in the test framework.
+        /// </summary>
+        public static class Category
+        {
+            public const string Integration = "Integration";
+            public const string Azure = "Azure";
+            public const string AzureBlobs = "AzureBlobs";
+            public const string AzureCosmos = "AzureCosmos";
+            public const string AzureEventHubs = "AzureEventHubs";
+            public const string AzureTables = "AzureTables";
+            public const string Elasticsearch = "Elasticsearch";
+            public const string OpenSearch = "OpenSearch";
+            public const string PostgreSql = "PostgreSQL";
+            public const string SqlServer = "SqlServer";
+            public const string DynamoDb = "Dynamo";
+            public const string Firestore = "Firestore";
+            public const string MongoDb = "Mongo";
+            public const string Redis = "Redis";
+            public const string ImmuDb = "ImmuDB";
+            public const string Kafka = "Kafka";
+            public const string MySql = "MySql";
+            public const string RavenDb = "RavenDB";
+            public const string EventLog = "EventLog";
+        }
         public static string AzureBlobAccountName => "devstoreaccount1";
         public static string AzureBlobAccountKey => "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="; // Well-known development storage account key to use with Azurite Emulator
         public static string AzureBlobCnnString => "UseDevelopmentStorage=true";

@@ -1,11 +1,10 @@
 <Project>
-
-	<PropertyGroup Label="Default Versions">
-
-	</PropertyGroup>
-
 	<Choose>
 		<When Condition="$(MSBuildProjectName.Contains('UnitTest'))">
+			<ItemGroup>
+				<Compile Include="..\TestCommon.cs" Link="TestCommon.cs" />
+			</ItemGroup>
+
 			<ItemGroup>
 				<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 				<PackageReference Include="Moq" Version="4.20.70" />

@@ -10,12 +10,13 @@ using System.Data.Entity.ModelConfiguration;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class InheritanceMultipleMappingTests
     {
         [SetUp]

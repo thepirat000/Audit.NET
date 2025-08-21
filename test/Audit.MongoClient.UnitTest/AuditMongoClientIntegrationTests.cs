@@ -3,12 +3,13 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NUnit.Framework;
 using System;
+using Audit.IntegrationTest;
 
 namespace Audit.MongoClient.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Mongo")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.MongoDb)]
     public class AuditMongoClientIntegrationTests
     {
         [SetUp]

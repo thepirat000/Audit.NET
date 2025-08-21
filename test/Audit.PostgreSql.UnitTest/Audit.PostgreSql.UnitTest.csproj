@@ -12,10 +12,6 @@
 		<SignAssembly>true</SignAssembly>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="..\AzureSettings.cs" Link="AzureSettings.cs" />
-	</ItemGroup>
-
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>

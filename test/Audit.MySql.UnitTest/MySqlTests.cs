@@ -1,5 +1,6 @@
 ﻿using System;
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.MySql.Providers;
 using NUnit.Framework;
 
@@ -29,8 +30,8 @@ namespace Audit.MySql.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("MySql")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.MySql)]
         public void Test_MySqlDataProvider_Insert()
         {
             Audit.Core.Configuration.Setup()

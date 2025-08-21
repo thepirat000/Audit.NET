@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Text.Json;
+using Audit.IntegrationTest;
 using Polly;
 
 namespace Audit.WCF.UnitTest
@@ -180,7 +181,7 @@ namespace Audit.WCF.UnitTest
             Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
-        [Category("Integration")]
+        [Category(TestCommon.Category.Integration)]
         [TestCase(2, 10)]
         [TestCase(6, 10)]
         public async Task WCFTest_Concurrency_AuditScopeAsync(int threads, int callsPerThread)

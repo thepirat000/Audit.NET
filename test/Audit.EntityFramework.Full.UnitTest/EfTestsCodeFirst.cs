@@ -9,12 +9,13 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class EfTestsCodeFirst
     {
         [SetUp]

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Audit.Core;
 using Audit.ImmuDB.Providers;
-
+using Audit.IntegrationTest;
 using ImmuDB;
 using ImmuDB.Iam;
 
@@ -16,8 +16,8 @@ namespace Audit.ImmuDB.UnitTest
 {
     [TestFixture]
     [NonParallelizable]
-    [Category("Integration")]
-    [Category("ImmuDB")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.ImmuDb)]
     public class ImmuDbDataProviderTests
     {
         private const string ServerUrl = "localhost";

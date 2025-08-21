@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Audit.IntegrationTest;
 
 namespace Audit.Firestore.UnitTest
 {
@@ -22,8 +23,8 @@ namespace Audit.Firestore.UnitTest
     /// 4. A composite index on the "EventType" and "StartDate" fields in the "audit-test" collection
     /// </summary>
     [TestFixture]
-    [Category("Integration")]
-    [Category("Firestore")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.Firestore)]
     public class FirestoreDataProviderIntegrationTests
     {
         private const string GoogleAppCredentialsVariable = "GOOGLE_APPLICATION_CREDENTIALS";

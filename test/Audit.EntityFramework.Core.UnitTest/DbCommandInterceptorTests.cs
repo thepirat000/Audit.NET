@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Core.Providers;
 using Audit.EntityFramework.Interceptors;
-
+using Audit.IntegrationTest;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -20,8 +20,8 @@ using NUnit.Framework;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class DbCommandInterceptorTests
     {
         private static Random _rnd = new Random();

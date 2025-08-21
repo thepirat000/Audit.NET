@@ -7,12 +7,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Audit.Core.Providers;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class EfCoreInMemoryTests
     {
         private static readonly Random Rnd = new Random();

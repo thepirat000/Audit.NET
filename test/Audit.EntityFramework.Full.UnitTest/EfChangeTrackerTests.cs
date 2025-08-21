@@ -6,13 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Core.Providers;
+using Audit.IntegrationTest;
 using NUnit.Framework;
 
 namespace Audit.EntityFramework.Full.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class EfChangeTrackerTests
     {
         [SetUp]

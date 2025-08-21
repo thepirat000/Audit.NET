@@ -12,12 +12,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core.Providers;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class DbTransactionInterceptorTests
     {
         [SetUp]

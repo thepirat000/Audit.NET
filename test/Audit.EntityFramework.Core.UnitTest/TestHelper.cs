@@ -12,7 +12,7 @@ namespace Audit.EntityFramework.Core.UnitTest
     {
         public static string GetConnectionString(string database)
         {
-            var env = AzureSettings.SqlServerConnectionString;
+            var env = TestCommon.SqlServerConnectionString;
             return new SqlConnectionStringBuilder(env) { InitialCatalog = database }.ConnectionString;
 
         }

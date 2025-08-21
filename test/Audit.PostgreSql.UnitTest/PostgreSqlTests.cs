@@ -9,8 +9,8 @@ using Audit.PostgreSql.Providers;
 namespace Audit.PostgreSql.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("PostgreSQL")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.PostgreSql)]
     public class PostgreSqlTests
     {
         [OneTimeSetUp]
@@ -165,7 +165,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             // Arrange
             var dp = new CustomPostgreSqlDataProvider(config => config
-                .ConnectionString(AzureSettings.PostgreSqlConnectionString)
+                .ConnectionString(TestCommon.PostgreSqlConnectionString)
                 .TableName("event_text")
                 .IdColumnName("id")
                 .DataColumn("data", Configuration.DataType.String)
@@ -211,7 +211,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             Audit.Core.Configuration.Setup()
                 .UseCustomProvider(new CustomPostgreSqlDataProvider(config => config
-                    .ConnectionString(AzureSettings.PostgreSqlConnectionString)
+                    .ConnectionString(TestCommon.PostgreSqlConnectionString)
                     .TableName("event")
                     .IdColumnName(_ => "id")
                     .DataColumn("data", Configuration.DataType.JSONB, auditEvent =>

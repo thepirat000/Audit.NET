@@ -17,10 +17,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Include="..\AzureSettings.cs" Link="AzureSettings.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\..\src\Audit.NET.SqlServer\Audit.NET.SqlServer.csproj" />
 	  <ProjectReference Include="..\..\src\Audit.NET\Audit.NET.csproj" />
 	</ItemGroup>

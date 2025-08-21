@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 using Audit.Core;
 using Audit.EntityFramework.Full.UnitTest;
-
+using Audit.IntegrationTest;
 using NUnit.Framework;
 
 namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class EntityFrameworkTests
     {
         [OneTimeSetUp]

@@ -11,9 +11,9 @@ using NUnit.Framework;
 namespace Audit.AzureStorageBlobs.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Azure")]
-    [Category("AzureBlobs")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.Azure)]
+    [Category(TestCommon.Category.AzureBlobs)]
     public class AzureStorageBlobsTests
     {
         [Test]
@@ -22,7 +22,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var id = Guid.NewGuid().ToString();
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -55,7 +55,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -88,7 +88,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -122,7 +122,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
-                .WithConnectionString(AzureSettings.AzureBlobCnnString)
+                .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)
@@ -145,9 +145,9 @@ namespace Audit.AzureStorageBlobs.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("Azure")]
-        [Category("AzureBlobs")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Azure)]
+        [Category(TestCommon.Category.AzureBlobs)]
         public void Test_AzureStorageBlobs_Credential()
         {
             var id = Guid.NewGuid().ToString();
@@ -155,8 +155,8 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
                 .WithCredentials(_ => _
-                    .Url("http://127.0.0.1:10000/devstoreaccount1" /*AzureSettings.AzureBlobServiceUrl*/)
-                    .Credential(new StorageSharedKeyCredential(AzureSettings.AzureBlobAccountName, AzureSettings.AzureBlobAccountKey)))
+                    .Url("http://127.0.0.1:10000/devstoreaccount1" /*TestCommon.AzureBlobServiceUrl*/)
+                    .Credential(new StorageSharedKeyCredential(TestCommon.AzureBlobAccountName, TestCommon.AzureBlobAccountKey)))
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
                 .ContainerName(ev => containerName)

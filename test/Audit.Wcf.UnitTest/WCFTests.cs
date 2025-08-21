@@ -19,6 +19,11 @@ namespace Audit.WCF.UnitTest
         public void Setup()
         {
             Audit.Core.Configuration.Reset();
+
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                Assert.Ignore("WCF is unsupported on non-Windows platforms.");
+            }
         }
 
         [Test]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.Redis.Providers;
 using NUnit.Framework;
 using StackExchange.Redis;
@@ -10,8 +11,8 @@ using StackExchange.Redis;
 namespace Audit.Redis.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Redis")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.Redis)]
     public class RedisTests
     {
         private const string RedisCnnString = "127.0.0.1:6379,allowAdmin=true";

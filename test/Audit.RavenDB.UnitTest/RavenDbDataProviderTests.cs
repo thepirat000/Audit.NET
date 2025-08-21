@@ -1,4 +1,5 @@
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.RavenDB.ConfigurationApi;
 using Audit.RavenDB.Providers;
 using Newtonsoft.Json.Linq;
@@ -12,8 +13,8 @@ using Raven.Client.ServerWide.Operations;
 namespace Audit.RavenDB.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("RavenDB")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.RavenDb)]
     public class RavenDbDataProviderTests
     {
         private const string ravenServerUrl = "http://127.0.0.1:8080";

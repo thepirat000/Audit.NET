@@ -18,9 +18,9 @@ using System.Threading.Tasks;
 namespace Audit.AzureEventHubs.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Azure")]
-    [Category("AzureEventHubs")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.Azure)]
+    [Category(TestCommon.Category.AzureEventHubs)]
     public class AzureEventHubsTests
     {
         private static readonly CancellationTokenSource TokenSource = new CancellationTokenSource();
@@ -83,7 +83,7 @@ namespace Audit.AzureEventHubs.UnitTest
         [Test]
         public async Task Test_AzureEventHubs_Configuration_Client()
         {
-            var client = new EventHubProducerClient(AzureSettings.AzureEventHubCnnString);
+            var client = new EventHubProducerClient(TestCommon.AzureEventHubCnnString);
             
             var dp = new AzureEventHubsDataProvider(cfg => cfg
                 .WithClient(client)
@@ -108,7 +108,7 @@ namespace Audit.AzureEventHubs.UnitTest
             var evType = Guid.NewGuid().ToString();
 
             var dp = new AzureEventHubsDataProvider(cfg => cfg
-                .WithConnectionString(AzureSettings.AzureEventHubCnnString)
+                .WithConnectionString(TestCommon.AzureEventHubCnnString)
                 .CustomizeEventData(eventData =>
                 {
                     eventData.MessageId = msgId;
@@ -148,7 +148,7 @@ namespace Audit.AzureEventHubs.UnitTest
             var evType = Guid.NewGuid().ToString();
 
             var dp = new AzureEventHubsDataProvider(cfg => cfg
-                .WithConnectionString(AzureSettings.AzureEventHubCnnString)
+                .WithConnectionString(TestCommon.AzureEventHubCnnString)
                 .CustomizeEventData(eventData =>
                 {
                     eventData.MessageId = msgId;
@@ -183,7 +183,7 @@ namespace Audit.AzureEventHubs.UnitTest
         [Test]
         public void Test_AzureEventHubs_ClientCreatedOnlyOnce()
         {
-            var dp = new AzureEventHubsDataProvider(cfg => cfg.WithConnectionString(AzureSettings.AzureEventHubCnnString));
+            var dp = new AzureEventHubsDataProvider(cfg => cfg.WithConnectionString(TestCommon.AzureEventHubCnnString));
 
             var client1 = dp.EnsureProducerClient();
             var client2 = dp.EnsureProducerClient();
@@ -193,7 +193,7 @@ namespace Audit.AzureEventHubs.UnitTest
 
         private static async Task ReadEvents(CancellationToken cancellationToken)
         {
-            var consumer = new EventHubConsumerClient(EventHubConsumerClient.DefaultConsumerGroupName, AzureSettings.AzureEventHubCnnString);
+            var consumer = new EventHubConsumerClient(EventHubConsumerClient.DefaultConsumerGroupName, TestCommon.AzureEventHubCnnString);
 
             var readOptions = new ReadEventOptions
             {

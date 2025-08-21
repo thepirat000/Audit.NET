@@ -1,11 +1,12 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class InheritanceTests
     {
         [SetUp]

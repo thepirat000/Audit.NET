@@ -19,7 +19,7 @@ namespace Audit.AzureCosmos.UnitTest
         [OneTimeSetUp]
         public async Task Setup()
         {
-            var cosmosClient = new CosmosClient(AzureSettings.AzureDocDbUrl, AzureSettings.AzureDocDbAuthKey, new CosmosClientOptions()
+            var cosmosClient = new CosmosClient(TestCommon.AzureDocDbUrl, TestCommon.AzureDocDbAuthKey, new CosmosClientOptions()
             {
                 HttpClientFactory = () => new HttpClient(new HttpClientHandler()
                 {
@@ -33,18 +33,18 @@ namespace Audit.AzureCosmos.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("Azure")]
-        [Category("AzureCosmos")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Azure)]
+        [Category(TestCommon.Category.AzureCosmos)]
         public void TestAzureCosmos_CustomId()
         {
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureSettings.AzureDocDbUrl,
+                Endpoint = TestCommon.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey,
+                AuthKey = TestCommon.AzureDocDbAuthKey,
                 IdBuilder = _ => id,
                 CosmosClientOptionsAction = options =>
                 {
@@ -77,18 +77,18 @@ namespace Audit.AzureCosmos.UnitTest
         }
         
         [Test]
-        [Category("Integration")]
-        [Category("Azure")]
-        [Category("AzureCosmos")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Azure)]
+        [Category(TestCommon.Category.AzureCosmos)]
         public async Task TestAzureCosmos_CustomIdAsync()
         {
             var id = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             var dp = new AzureCosmos.Providers.AzureCosmosDataProvider()
             {
-                Endpoint = AzureSettings.AzureDocDbUrl,
+                Endpoint = TestCommon.AzureDocDbUrl,
                 Database = "Audit",
                 Container = "AuditTest",
-                AuthKey = AzureSettings.AzureDocDbAuthKey,
+                AuthKey = TestCommon.AzureDocDbAuthKey,
                 IdBuilder = _ => id,
                 CosmosClientOptionsAction = options =>
                 {

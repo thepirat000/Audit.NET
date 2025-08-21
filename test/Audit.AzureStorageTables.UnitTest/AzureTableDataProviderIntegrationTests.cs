@@ -5,13 +5,14 @@ using Azure.Data.Tables;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using Audit.IntegrationTest;
 
 namespace Audit.AzureStorageTables.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Azure")]
-    [Category("AzureTables")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.Azure)]
+    [Category(TestCommon.Category.AzureTables)]
     public class AzureTableDataProviderIntegrationTests
     {
         #region Sync
@@ -20,7 +21,7 @@ namespace Audit.AzureStorageTables.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var provider = new AzureTableDataProvider(_ => _
-                .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                 .TableName("AuditTest")
                 .EntityBuilder(b => b
                     .PartitionKey("Part")
@@ -55,7 +56,7 @@ namespace Audit.AzureStorageTables.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var provider = new AzureTableDataProvider(_ => _
-                .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                 .TableName("AuditTest")
                 .EntityMapper(ev => new TableEntity("Part", ev.EventType)
                 {
@@ -92,7 +93,7 @@ namespace Audit.AzureStorageTables.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var provider = new AzureTableDataProvider(_ => _
-                .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                 .TableName("AuditTest"));
             var auditEvent = new Core.AuditEvent()
             {
@@ -124,7 +125,7 @@ namespace Audit.AzureStorageTables.UnitTest
             var id = Guid.NewGuid().ToString();
             Audit.Core.Configuration.Setup()
                 .UseAzureTableStorage(cfg => cfg
-                    .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                    .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                     .TableName("AuditTest")
                     .EntityBuilder(b => b
                         .PartitionKey("Part")
@@ -166,7 +167,7 @@ namespace Audit.AzureStorageTables.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var provider = new AzureTableDataProvider(_ => _
-                .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                 .TableName("AuditTest")
                 .EntityBuilder(b => b
                     .PartitionKey("Part")
@@ -201,7 +202,7 @@ namespace Audit.AzureStorageTables.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var provider = new AzureTableDataProvider(_ => _
-                .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                 .TableName("AuditTest")
                 .EntityMapper(ev => new TableEntity("Part", ev.EventType)
                 {
@@ -238,7 +239,7 @@ namespace Audit.AzureStorageTables.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var provider = new AzureTableDataProvider(_ => _
-                .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                 .TableName("AuditTest"));
             var auditEvent = new Core.AuditEvent()
             {
@@ -270,7 +271,7 @@ namespace Audit.AzureStorageTables.UnitTest
             var id = Guid.NewGuid().ToString();
             Audit.Core.Configuration.Setup()
                 .UseAzureTableStorage(cfg => cfg
-                    .ConnectionString(IntegrationTest.AzureSettings.AzureTableCnnString)
+                    .ConnectionString(IntegrationTest.TestCommon.AzureTableCnnString)
                     .TableName("AuditTest")
                     .EntityBuilder(b => b
                         .PartitionKey("Part")

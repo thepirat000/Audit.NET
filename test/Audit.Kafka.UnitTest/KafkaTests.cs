@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Audit.Core;
+using Audit.IntegrationTest;
 using Audit.Kafka.Providers;
 
 using Confluent.Kafka;
@@ -35,8 +36,8 @@ namespace Audit.Kafka.UnitTest
 
         
         [Test]
-        [Category("Integration")]
-        [Category("Kafka")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Kafka)]
         public async Task Test_KafkaDataProvider_Stress()
         {
             var locker = new object();
@@ -89,8 +90,8 @@ namespace Audit.Kafka.UnitTest
 
 
         [Test]
-        [Category("Integration")]
-        [Category("Kafka")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Kafka)]
         public async Task Test_KafkaDataProvider_HappyPath_Async()
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
@@ -139,8 +140,8 @@ namespace Audit.Kafka.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("Kafka")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Kafka)]
         public void Test_KafkaDataProvider_HappyPath()
         {
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
@@ -195,8 +196,8 @@ namespace Audit.Kafka.UnitTest
         }
 
         [Test]
-        [Category("Integration")]
-        [Category("Kafka")]
+        [Category(TestCommon.Category.Integration)]
+        [Category(TestCommon.Category.Kafka)]
         public void Test_KafkaDataProvider_KeyedHappyPath()
         {
             var reports = new List<DeliveryResult<string, AuditEvent>>();

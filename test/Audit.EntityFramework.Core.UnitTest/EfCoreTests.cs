@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Audit.Core;
-
+using Audit.IntegrationTest;
 using Microsoft.EntityFrameworkCore;
 
 using NUnit.Framework;
@@ -11,8 +11,8 @@ using NUnit.Framework;
 namespace Audit.EntityFramework.Core.UnitTest
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("SqlServer")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.SqlServer)]
     public class EfCoreTests
     {
         [OneTimeSetUp]

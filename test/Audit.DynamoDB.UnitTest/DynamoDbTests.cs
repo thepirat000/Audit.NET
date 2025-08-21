@@ -8,6 +8,7 @@ using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
 using Audit.Core;
 using Audit.DynamoDB.Providers;
+using Audit.IntegrationTest;
 using NUnit.Framework;
 
 // ReSharper disable RedundantAssignment
@@ -16,8 +17,8 @@ using NUnit.Framework;
 
 namespace Audit.DynamoDB.UnitTest
 {
-    [Category("Integration")]
-    [Category("Dynamo")]
+    [Category(TestCommon.Category.Integration)]
+    [Category(TestCommon.Category.DynamoDb)]
     public class DynamoDbTests
     {
         private const string TableName = "AuditEvents";
