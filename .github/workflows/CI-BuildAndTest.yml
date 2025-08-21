@@ -70,10 +70,6 @@ jobs:
 
       - name: Install librdkafka-dev
         run: sudo apt-get install -y librdkafka-dev
-
-      # - name: Sleep for 30 seconds
-      #   run: sleep 30s
-      #   shell: bash
      
       - name: Wait for services
         run: |
@@ -124,7 +120,11 @@ jobs:
           dotnet tool install dotnet-reportgenerator-globaltool
           dotnet tool install --global dotnet-sonarscanner --version 10.1.2
 
-      - name: Show Elasticsearch logs
+      - name: DEBUG - Sleep for 120 seconds
+        run: sleep 120s
+        shell: bash
+
+      - name: DEBUG - Show Elasticsearch logs
         run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
 
       - name: DEBUG - get elasticsearch health
