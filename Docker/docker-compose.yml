@@ -23,7 +23,7 @@
     ports:
       - "5432:5432"
     volumes:
-      - ../../test/Audit.PostgreSql.UnitTest/SqlScript.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../test/Audit.PostgreSql.UnitTest/SqlScript.sql:/docker-entrypoint-initdb.d/init.sql
       - pgdata:/var/lib/postgresql/data
 
   mysql:
@@ -33,7 +33,7 @@
     ports:
       - "3306:3306"
     volumes:
-      - ../../test/Audit.MySql.UnitTest/MySqlScript.mysql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ../test/Audit.MySql.UnitTest/MySqlScript.mysql:/docker-entrypoint-initdb.d/init.sql:ro
       - mysqldata:/var/lib/mysql
 
   redis:
