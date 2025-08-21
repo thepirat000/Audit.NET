@@ -124,6 +124,9 @@ jobs:
           dotnet tool install dotnet-reportgenerator-globaltool
           dotnet tool install --global dotnet-sonarscanner --version 10.1.2
 
+      - name: DEBUG - get elasticsearch health
+        run: curl -XGET http://localhost:9200/_cluster/health?pretty
+
       - name: Show Elasticsearch logs
         run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
 
@@ -150,7 +153,8 @@ jobs:
       - name: Run tests
         run: |
           dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
-            --filter "TestCategory!=MonoIncompatible" 
+            --filter "TestCategory=Elasticsearch" -f netcoreapp3.1
+            #--filter "TestCategory!=MonoIncompatible" 
   
       - name: SonarScanner End
         shell: bash
