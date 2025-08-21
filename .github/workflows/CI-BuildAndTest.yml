@@ -108,8 +108,11 @@ jobs:
       #   shell: bash
       #   run: curl http://localhost:9200/
 
-      - name: Debug inside container
-        run: docker exec docker-elasticsearch-1 ss -tulpn | grep 9200
+      - name: DEBUG Dump Elasticsearch logs 
+        uses: step-security/gh-docker-logs@v2.2.4
+        with:
+          images: 'elasticsearch'
+          tail: '200'           # or 'all' for full logs
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
