@@ -75,8 +75,8 @@ jobs:
         run: sleep 60s
         shell: bash
 
-      - name: DEBUG - Show Elasticsearch logs
-        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
+      - name: DEBUG - Show opensearch logs
+        run: docker compose -f ./Docker/docker-compose.yml logs opensearch --tail=500
 
       - name: Wait for services
         run: |
