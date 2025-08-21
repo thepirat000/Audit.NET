@@ -130,7 +130,7 @@ namespace Audit.UnitTest
             Configuration.JsonSettings = prevSettings;
 
             Assert.That(fileContents, Is.Not.Null);
-            Assert.That(fileContents.StartsWith("{\r\n"), Is.True);
+            Assert.That(fileContents.StartsWith("{" + Environment.NewLine), Is.True);
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace Audit.UnitTest
             Configuration.JsonSettings = prevSettings;
 
             Assert.That(fileContents, Is.Not.Null);
-            Assert.That(fileContents.StartsWith("{\r\n"), Is.True);
+            Assert.That(fileContents.StartsWith("{" + Environment.NewLine), Is.True);
         }
 
         [Test]
