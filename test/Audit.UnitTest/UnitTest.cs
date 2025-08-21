@@ -534,7 +534,7 @@ namespace Audit.UnitTest
             {
                 target = "end";
             }
-            var fileFromProvider = Core.Configuration.DataProviderAs<FileDataProvider>().GetEvent($@"{dir}\evt-1.json");
+            var fileFromProvider = Core.Configuration.DataProviderAs<FileDataProvider>().GetEvent($@"{dir}{Path.DirectorySeparatorChar}evt-1.json");
 
             var ev = JsonAdapter.Deserialize<AuditEvent>(File.ReadAllText(Path.Combine(dir, "evt-1.json")));
             var fileCount = Directory.EnumerateFiles(dir).Count();
