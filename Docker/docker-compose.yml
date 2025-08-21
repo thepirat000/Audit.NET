@@ -56,10 +56,7 @@
       timeout: 5s  
     volumes:
       - ./init-elasticsearch.sh:/usr/local/bin/init-elasticsearch.sh
-    command: >
-      bash -c "
-        /usr/local/bin/init-elasticsearch.sh && 
-        /usr/share/elasticsearch/bin/elasticsearch"
+    entrypoint: ["/usr/local/bin/init-elasticsearch.sh"]
 
   opensearch:
     image: opensearchproject/opensearch:2.19.2
