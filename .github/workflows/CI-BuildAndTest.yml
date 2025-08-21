@@ -227,3 +227,9 @@ jobs:
       - name: Tear down containers
         if: always()
         run: docker compose -f ./Docker/docker-compose.yml down -v --remove-orphans
+
+      - name: Clean up Docker images and containers
+        if: always()
+        run: |
+          docker system prune -af
+          docker builder prune -af
