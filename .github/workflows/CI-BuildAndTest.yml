@@ -76,9 +76,9 @@ jobs:
       - name: Install librdkafka-dev
         run: sudo apt-get install -y librdkafka-dev
      
-      - name: DEBUG - Sleep for 60 seconds
-        run: sleep 60s
-        shell: bash
+      # - name: DEBUG - Sleep for 60 seconds
+      #   run: sleep 60s
+      #   shell: bash
 
       - name: Wait for services
         run: |
