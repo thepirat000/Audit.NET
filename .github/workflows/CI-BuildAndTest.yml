@@ -139,6 +139,11 @@ jobs:
             '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
         continue-on-error: true
 
+      - name: DEBUG - get elasticsearch health
+        shell: bash
+        run: curl -XGET http://localhost:9200/_cluster/health?pretty
+        continue-on-error: true
+
       - name: SonarScanner Begin
         shell: bash
         run: |
