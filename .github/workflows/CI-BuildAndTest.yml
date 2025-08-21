@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install librdkafka-dev
+        run: sudo apt-get install -y librdkafka-dev
+
       # #Step needed when using ubuntu > 22.04
       # - name: Install Mono
       #   run: |
