@@ -68,6 +68,10 @@ jobs:
         run: |
           docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash
+      
       - name: Wait for services
         run: |
           set -e
