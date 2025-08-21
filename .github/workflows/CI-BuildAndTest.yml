@@ -124,18 +124,12 @@ jobs:
           dotnet tool install dotnet-reportgenerator-globaltool
           dotnet tool install --global dotnet-sonarscanner --version 10.1.2
 
+      - name: Show Elasticsearch logs
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
+
       - name: DEBUG - get elasticsearch health
         shell: bash
         run: curl -XGET http://localhost:9200/_cluster/health?pretty
-
-      - name: Create index with primary shard
-        run: |
-          curl -X PUT http://localhost:9200/auto_index -H \
-            'Content-Type: application/json' -d\
-            '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
-
-      - name: Show Elasticsearch logs
-        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
 
       - name: SonarScanner Begin
         shell: bash
