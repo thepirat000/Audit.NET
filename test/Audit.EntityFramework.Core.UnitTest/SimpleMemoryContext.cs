@@ -38,7 +38,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=SimpleMemoryContext.InMemory;Trusted_Connection=True;ConnectRetryCount=0");
+                optionsBuilder.UseInMemoryDatabase("SimpleMemoryContext.InMemory");
             }
         }
     }

@@ -15,6 +15,9 @@
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<DebugType>Full</DebugType>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="..\AzureSettings.cs" Link="AzureSettings.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" Version="6.5.0" />

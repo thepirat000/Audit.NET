@@ -75,7 +75,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=OrderMemoryContext.InMemory;Trusted_Connection=True;ConnectRetryCount=0");
+                optionsBuilder.UseSqlServer(TestHelper.GetConnectionString("OrderMemoryContext.InMemory"));
             }
         }
     }

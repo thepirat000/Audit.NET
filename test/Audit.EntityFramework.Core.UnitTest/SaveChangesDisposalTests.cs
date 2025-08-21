@@ -100,7 +100,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemoryContext;Trusted_Connection=True;ConnectRetryCount=0");
+                optionsBuilder.UseInMemoryDatabase("EFProviders.InMemoryContext");
             }
         }
 

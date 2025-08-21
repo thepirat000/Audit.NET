@@ -164,7 +164,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 evs.Add(ev.GetEntityFrameworkEvent());
             }));
 
-            var cfg = new DbContextOptionsBuilder<TptConfigContext>().UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=TptConfigTests;Trusted_Connection=True;ConnectRetryCount=0");
+            var cfg = new DbContextOptionsBuilder<TptConfigContext>().UseSqlServer(TestHelper.GetConnectionString("TptConfigTests"));
             var ctx = new TptConfigContext(cfg.Options);
             var guid = Guid.NewGuid().ToString();
 

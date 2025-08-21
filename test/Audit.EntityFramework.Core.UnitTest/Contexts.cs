@@ -92,7 +92,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@$"Server=(localdb)\mssqllocaldb;Database={nameof(Context_OwnedEntity_ToJson)};Trusted_Connection=True;ConnectRetryCount=0").UseLazyLoadingProxies();
+                optionsBuilder.UseInMemoryDatabase(nameof(Context_OwnedEntity_ToJson)).UseLazyLoadingProxies();
             }
         }
 
@@ -133,7 +133,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0").UseLazyLoadingProxies();
+                optionsBuilder.UseInMemoryDatabase("EFProviders.InMemory").UseLazyLoadingProxies();
             }
         }
 
@@ -170,7 +170,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemory;Trusted_Connection=True;ConnectRetryCount=0").UseLazyLoadingProxies();
+                optionsBuilder.UseSqlServer(TestHelper.GetConnectionString("EFProviders.InMemory")).UseLazyLoadingProxies();
             }
         }
 
