@@ -156,7 +156,7 @@ jobs:
             '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
         continue-on-error: true
 
-      - name: DEBUG - Create index with primary shard (auditevent_test)
+      - name: DEBUG - Create index with primary shard (auditevent_test2)
         run: |
           curl -X PUT http://localhost:9200/auditevent_test2 -H \
             'Content-Type: application/json' -d\
@@ -188,6 +188,9 @@ jobs:
       - name: Dotnet Build Audit.NET.sln
         run: dotnet build ./Audit.NET.sln --no-restore -c release
      
+      - name: Check available disk space
+        run: df -h
+
       - name: Run tests
         run: |
           dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
