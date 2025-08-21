@@ -14,6 +14,9 @@ namespace Audit.AzureCosmos.UnitTest
 {
 
     [TestFixture]
+#if NET462
+    [Category(TestCommon.Category.MonoIncompatible)]
+#endif
     public class AzureCosmosTests
     {
         [OneTimeSetUp]

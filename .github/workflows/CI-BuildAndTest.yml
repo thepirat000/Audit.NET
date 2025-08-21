@@ -75,9 +75,6 @@ jobs:
         run: sleep 30s
         shell: bash
 
-      # - name: Show Elasticsearch logs
-      #   run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
-
       # - name: Show postgresql logs
       #   run: docker compose -f ./Docker/docker-compose.yml logs postgresql --tail=300
       
@@ -129,6 +126,9 @@ jobs:
           dotnet new tool-manifest
           dotnet tool install dotnet-reportgenerator-globaltool
           dotnet tool install --global dotnet-sonarscanner --version 10.1.2
+
+      - name: Show Elasticsearch logs
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
 
       - name: SonarScanner Begin
         shell: bash

@@ -7,6 +7,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading;
 using Audit.Core.Providers;
+using Audit.IntegrationTest;
 #if NETCOREAPP3_1
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +16,10 @@ using CoreWCF.Configuration;
 
 namespace Audit.Wcf.UnitTest
 {
+    [TestFixture]
+#if NET462
+    [Category(TestCommon.Category.MonoIncompatible)]
+#endif
     public class WcfClientTests
     {
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
