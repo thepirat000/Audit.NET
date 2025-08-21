@@ -171,8 +171,7 @@ namespace Audit.WCF.UnitTest
                 SendTimeout = TimeSpan.FromSeconds(55)
             };
 
-            binding.Security.Mode = BasicHttpSecurityMode.TransportCredentialOnly;
-            binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Windows;
+            binding.Security.Transport.ClientCredentialType = HttpClientCredentialType.Basic;
             return binding;
         }
     }
