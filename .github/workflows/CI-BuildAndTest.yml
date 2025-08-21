@@ -104,9 +104,12 @@ jobs:
           wait_for_port localhost 1433    # sqlserver
           wait_for_port localhost 9094    # kafka
 
-      - name: DEBUG -> curl http://localhost:9200/
-        shell: bash
-        run: curl http://localhost:9200/
+      # - name: DEBUG -> curl http://localhost:9200/
+      #   shell: bash
+      #   run: curl http://localhost:9200/
+
+      - name: Debug inside container
+        run: docker exec docker-elasticsearch-1 ss -tulpn | grep 9200
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
