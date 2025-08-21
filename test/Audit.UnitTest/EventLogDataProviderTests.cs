@@ -16,10 +16,15 @@ namespace Audit.UnitTest
             Core.Configuration.Reset();
         }
 
-#if !NETCOREAPP3_1
+#if NET6_0_OR_GREATER
         [Test]
         public void TestEventLogDataProvider_InsertReplaceEvent()
         {
+            if (!OperatingSystem.IsWindows())
+            {
+                Assert.Ignore("Skipping test: EventLog is unsupported on non-Windows platforms.");
+            }
+
             // Arrange
             var dataProvider = new EventLogDataProvider()
             {
