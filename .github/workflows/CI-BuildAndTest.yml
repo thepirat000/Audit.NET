@@ -177,7 +177,8 @@ jobs:
       - name: Run tests
         run: |
           dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
-            --filter "TestCategory!=MonoIncompatible" 
+            --filter "TestCategory=Elasticsearch" 
+            #--filter "TestCategory!=MonoIncompatible" 
   
       - name: SonarScanner End
         shell: bash
