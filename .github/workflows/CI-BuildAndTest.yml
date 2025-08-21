@@ -109,7 +109,7 @@ jobs:
       #   run: curl http://localhost:9200/
 
       - name: Show Elasticsearch logs
-        run: docker compose logs elasticsearch --tail=100
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=100
       
 
       - name: Setup NuGet
