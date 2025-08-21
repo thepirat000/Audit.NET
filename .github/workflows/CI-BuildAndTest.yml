@@ -71,6 +71,9 @@ jobs:
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash
+
+      - name: Show Elasticsearch logs
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=100
       
       - name: Wait for services
         run: |
@@ -111,10 +114,6 @@ jobs:
       # - name: DEBUG -> curl http://localhost:9200/
       #   shell: bash
       #   run: curl http://localhost:9200/
-
-      - name: Show Elasticsearch logs
-        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=100
-      
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
