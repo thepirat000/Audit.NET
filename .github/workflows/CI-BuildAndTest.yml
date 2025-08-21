@@ -68,15 +68,15 @@ jobs:
         run: |
           docker compose -f ./Docker/docker-compose.yml up -d --remove-orphans
 
-      - name: Sleep for 100 seconds
-        run: sleep 100s
+      - name: Sleep for 30 seconds
+        run: sleep 30s
         shell: bash
 
-      - name: Show Elasticsearch logs
-        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
+      # - name: Show Elasticsearch logs
+      #   run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=300
 
-      - name: Show postgresql logs
-        run: docker compose -f ./Docker/docker-compose.yml logs postgresql --tail=300
+      # - name: Show postgresql logs
+      #   run: docker compose -f ./Docker/docker-compose.yml logs postgresql --tail=300
       
       - name: Wait for services
         run: |
@@ -113,10 +113,6 @@ jobs:
           wait_for_port localhost 10000   # azurite blob
           wait_for_port localhost 1433    # sqlserver
           wait_for_port localhost 9094    # kafka
-
-      # - name: DEBUG -> curl http://localhost:9200/
-      #   shell: bash
-      #   run: curl http://localhost:9200/
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2

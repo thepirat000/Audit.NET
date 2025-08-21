@@ -246,11 +246,7 @@ namespace Audit.SqlServer.UnitTest
             {
             }
 
-#if NET462
-            public override async Task<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
-#else
             public override async ValueTask<InterceptionResult> ConnectionOpeningAsync(DbConnection connection, ConnectionEventData eventData, InterceptionResult result, CancellationToken cancellationToken = default)
-#endif
             {
                 await Task.Delay(0);
                 Count++;
