@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
@@ -242,12 +244,11 @@ namespace Audit.DynamoDB.UnitTest
                 .WithCreationPolicy(EventCreationPolicy.InsertOnStartReplaceOnEnd);
 
             int n = 16;
-            var hashes = new HashSet<string>();
+            var hashes = new ConcurrentDictionary<string, string>();
             int count = 0;
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaved, scope =>
-            {
-                count++;
-                hashes.Add((scope.EventId as object[])![0].ToString());
+            { Interlocked.Increment(ref count);
+                hashes.TryAdd((scope.EventId as object[])![0].ToString(), null);
             });
 
             //Parallel random insert into event1, event2 and event3 containers
@@ -274,12 +275,12 @@ namespace Audit.DynamoDB.UnitTest
                     break;
                 }
                 var ddp = Core.Configuration.DataProviderAs<DynamoDataProvider>();
-                var ev = ddp.GetEvent<AuditEvent>(hash, DateTime.Now.Year);
+                var ev = ddp.GetEvent<AuditEvent>(hash.Key, DateTime.Now.Year);
 
                 Assert.That(ev, Is.Not.Null);
                 Assert.That(ev.EventType, Is.EqualTo("AuditEvents"));
                 Assert.That(ev.CustomFields["SortKey"].ToString(), Is.EqualTo(DateTime.Now.Year.ToString()));
-                Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
+                Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash.Key));
             }
         }
         
