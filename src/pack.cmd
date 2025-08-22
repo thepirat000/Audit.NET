@@ -18,7 +18,6 @@ del "audit.entityframework.Identity\bin\release\*.nupkg"
 del "audit.entityframework.Identity.core\bin\release\*.nupkg"
 del "audit.WCF\bin\release\*.nupkg"
 del "audit.WCF.Client\bin\release\*.nupkg"
-del "audit.net.azurestorage\bin\release\*.nupkg"
 del "audit.net.azurestorageblobs\bin\release\*.nupkg"
 del "audit.dynamicproxy\bin\release\*.nupkg"
 del "audit.net.udp\bin\release\*.nupkg"
@@ -67,7 +66,6 @@ dotnet pack "Audit.EntityFramework.Identity/" -c Release
 dotnet pack "Audit.EntityFramework.Identity.Core/" -c Release
 dotnet pack "Audit.Wcf/" -c Release
 dotnet pack "Audit.Wcf.Client/" -c Release
-dotnet pack "Audit.NET.AzureStorage/" -c Release
 dotnet pack "Audit.NET.AzureStorageBlobs/" -c Release
 dotnet pack "Audit.DynamicProxy/" -c Release
 dotnet pack "Audit.NET.Udp/" -c Release
