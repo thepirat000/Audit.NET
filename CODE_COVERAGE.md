@@ -1,8 +1,8 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 08/22/2025 - 06:04:47 |
-| Coverage date: | 08/22/2025 - 05:42:14 - 08/22/2025 - 06:04:04 |
+| Generated on: | 08/22/2025 - 15:11:55 |
+| Coverage date: | 08/22/2025 - 14:49:38 - 08/22/2025 - 15:11:15 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 41 |
 | Classes: | 330 |
