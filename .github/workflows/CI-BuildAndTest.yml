@@ -193,6 +193,10 @@ jobs:
           dotnet sonarscanner end \
             /d:sonar.login="${{ env.SONAR_TOKEN }}"
 
+      - name: List directory
+        shell: bash
+        run: ls -R
+
       - name: Generate Code Coverage Report
         run: |
           dotnet reportgenerator -reports:${{ github.workspace }}/test/TestResult/**/*.cobertura.xml -targetdir:"${{ github.workspace }}/Tests/coveragereport" -reporttypes:"MarkdownSummary;Html" "-assemblyfilters:+Audit.*;-*UnitTest"
