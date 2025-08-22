@@ -33,11 +33,8 @@ jobs:
         with:
           android: true
           dotnet: true
-          haskell: true
-          large-packages: true
           swap-storage: true
           docker-images: true
-          tools-cache: true
 
       - name: Check available disk space before build
         run: df -h
