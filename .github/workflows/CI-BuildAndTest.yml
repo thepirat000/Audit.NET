@@ -28,6 +28,9 @@ jobs:
       #     sudo apt-get update
       #     sudo apt-get install -y mono-complete
 
+      - name: Check available disk space before build
+        run: df -h
+
       - name: List directory
         shell: bash
         run: ls -R
@@ -142,22 +145,14 @@ jobs:
       #   run: curl -XGET http://localhost:9200/_cluster/health?pretty
       #   continue-on-error: true
 
-      - name: DEBUG - Create index with primary shard (auditevent_test)
+      - name: Elasticsearch - Create Indexes and configure
         run: |
           curl -X PUT http://localhost:9200/auditevent_test -H \
             'Content-Type: application/json' -d\
             '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
-        continue-on-error: true
-
-      - name: DEBUG - Create index with primary shard (auditevent_test2)
-        run: |
           curl -X PUT http://localhost:9200/auditevent_test2 -H \
             'Content-Type: application/json' -d\
             '{ "settings": { "index": { "number_of_shards": 1, "number_of_replicas": 0 } } }'
-        continue-on-error: true
-
-      - name: DEBUG - Increase watermark settings 
-        run: |
           curl -X PUT http://localhost:9200/_cluster/settings -H \
             'Content-Type: application/json' -d\
             '{ "persistent": { "cluster.routing.allocation.disk.threshold_enabled": false } }'
@@ -193,9 +188,8 @@ jobs:
 
       - name: Run tests
         run: |
-          dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
-            --filter "TestCategory=Elasticsearch" 
-            #--filter "TestCategory!=MonoIncompatible" 
+          dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" --results-directory "./test/TestResult" \
+            --filter "TestCategory!=MonoIncompatible" 
   
       - name: SonarScanner End
         shell: bash
@@ -215,7 +209,7 @@ jobs:
       
       - name: Rename summary coverage file
         continue-on-error: true
-        run: mv -force "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
+        run: mv -f "${{ github.workspace }}/Tests/coveragereport/Summary.md" "${{ github.workspace }}/CODE_COVERAGE.md"
   
       - name: Commit CODE_COVERAGE.md
         continue-on-error: true
