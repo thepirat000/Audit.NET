@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.0.0] - 2025-08-21:
+- **Audit.NET.AzureCosmos**: Deprecating support for the old Azure DocumentDB. Upgrading the Azure Cosmos DB client to latest. 
+- **Audit.NET.AmazonQLDB**: Deprecating support for Amazon QLDB. Amazon has fully retired QLDB on July 31, 2025.
+
 ## [30.1.3] - 2025-08-19:
 - **Audit.EntityFramework** / **Audit.EntityFramework.Core**: Change EntityType to public in EventEntry class (#766)
 
