@@ -167,8 +167,8 @@ jobs:
             /k:"Audit.NET" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.login="${{ env.SONAR_TOKEN }}" \
-            /d:sonar.cs.vstest.reportsPaths="/test/TestResult/**/*.trx" \
-            /d:sonar.cs.opencover.reportsPaths="/test/TestResult/**/*.opencover.xml" \
+            /d:sonar.cs.vstest.reportsPaths="test/TestResult/**/*.trx" \
+            /d:sonar.cs.opencover.reportsPaths="test/TestResult/**/*.opencover.xml" \
             /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**,**/Tests/**" \
             /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**" \
             /v:"${{ env.PROJECT_VERSION }}"
