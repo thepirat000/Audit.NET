@@ -33,8 +33,11 @@ jobs:
         with:
           android: true
           dotnet: true
+          haskell: false
+          large-packages: false
           swap-storage: true
           docker-images: true
+          tools-cache: false
 
       - name: Check available disk space before build
         run: df -h
@@ -72,10 +75,10 @@ jobs:
           docker --version
           docker compose version
 
-      - name: DEBUG - ElasticSearch from action
-        uses: ankane/setup-elasticsearch@v1
-        with:
-          elasticsearch-version: 9
+      # - name: DEBUG - ElasticSearch from action
+      #   uses: ankane/setup-elasticsearch@v1
+      #   with:
+      #     elasticsearch-version: 9
 
       - name: Docker pull
         run: docker compose -f ./Docker/docker-compose.yml pull
@@ -87,9 +90,12 @@ jobs:
       - name: Install librdkafka-dev
         run: sudo apt-get install -y librdkafka-dev
      
-      # - name: DEBUG - Sleep for 60 seconds
-      #   run: sleep 60s
-      #   shell: bash
+      - name: DEBUG - Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash
+
+      - name: DEBUG - Show Elasticsearch logs
+        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
 
       - name: Wait for services
         run: |
@@ -141,18 +147,6 @@ jobs:
           dotnet tool install dotnet-reportgenerator-globaltool
           dotnet tool install --global dotnet-sonarscanner --version 10.1.2
 
-      # - name: DEBUG - Sleep for 120 seconds
-      #   run: sleep 120s
-      #   shell: bash
-
-      # - name: DEBUG - Show Elasticsearch logs
-      #   run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
-
-      # - name: DEBUG - get elasticsearch health
-      #   shell: bash
-      #   run: curl -XGET http://localhost:9200/_cluster/health?pretty
-      #   continue-on-error: true
-
       - name: Elasticsearch - Create Indexes and configure
         run: |
           curl -X PUT http://localhost:9200/auditevent_test -H \
@@ -164,12 +158,6 @@ jobs:
           curl -X PUT http://localhost:9200/_cluster/settings -H \
             'Content-Type: application/json' -d\
             '{ "persistent": { "cluster.routing.allocation.disk.threshold_enabled": false } }'
-        continue-on-error: true
-
-      # - name: DEBUG - get elasticsearch health
-      #   shell: bash
-      #   run: curl -XGET http://localhost:9200/_cluster/health?pretty
-      #   continue-on-error: true
 
       - name: SonarScanner Begin
         shell: bash
@@ -197,7 +185,8 @@ jobs:
       - name: Run tests
         run: |
           dotnet test ./Audit.NET.sln --no-build -c release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult" \
-            --filter "TestCategory!=MonoIncompatible" 
+            --filter "TestCategory=Elasticsearch" 
+            #--filter "TestCategory!=MonoIncompatible" 
   
       - name: SonarScanner End
         shell: bash
