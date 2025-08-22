@@ -17,6 +17,12 @@ namespace Audit.UnitTest
 {
     public class SignalrTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Configuration.Reset();
+        }
+
         [Test]
         public void Test_Signalr_AuditDisabled()
         {
@@ -183,6 +189,275 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void GetSignalrEvent_Returns_Event_From_AuditEventSignalr()
+        {
+            var expectedEvent = new TestSignalrEvent();
+            var auditEvent = new AuditEventSignalr { Event = expectedEvent };
+
+            var result = auditEvent.GetSignalrEvent();
+
+            Assert.That(expectedEvent, Is.SameAs(result));
+        }
+
+
+        [Test]
+        public void GetSignalrEvent_Returns_Null_For_NonSignalrEvent()
+        {
+            var auditEvent = new AuditEvent();
+
+            var result = auditEvent.GetSignalrEvent();
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void GetSignalrEvent_Generic_Returns_Event_As_T()
+        {
+            var expectedEvent = new TestSignalrEvent();
+            var auditEvent = new AuditEventSignalr { Event = expectedEvent };
+
+            var result = auditEvent.GetSignalrEvent<TestSignalrEvent>();
+
+            Assert.That(expectedEvent, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetSignalrEvent_Generic_Returns_Null_If_Not_T()
+        {
+            var auditEvent = new AuditEventSignalr { Event = new SignalrEventBase() };
+
+            var result = auditEvent.GetSignalrEvent<TestSignalrEvent>();
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void GetSignalrEvent_From_AuditScope_Returns_Event()
+        {
+            Configuration.Setup().UseNullProvider();
+
+            var expectedEvent = new TestSignalrEvent();
+            var auditEventSignalr = new AuditEventSignalr { Event = expectedEvent };
+            var scope = AuditScope.Create(new AuditScopeOptions()
+            {
+                AuditEvent = auditEventSignalr
+            });
+
+            var result = scope.GetSignalrEvent();
+
+            Assert.That(expectedEvent, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetSignalrEvent_Generic_From_AuditScope_Returns_Event_As_T()
+        {
+            Configuration.Setup().UseNullProvider();
+
+            var expectedEvent = new TestSignalrEvent();
+            var auditEventSignalr = new AuditEventSignalr { Event = expectedEvent };
+            var scope = AuditScope.Create(new AuditScopeOptions()
+            {
+                AuditEvent = auditEventSignalr
+            });
+
+            var result = scope.GetSignalrEvent<TestSignalrEvent>();
+
+            Assert.That(expectedEvent, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetIncomingAuditScope_Returns_Scope_If_Exists()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { AuditPipelineModule.AuditScopeIncomingEnvironmentKey, expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetIncomingAuditScope();
+
+            Assert.That(expectedScope, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetIncomingAuditScope_Returns_Null_If_Not_Found()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { "wrong-key", expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetIncomingAuditScope();
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void GetConnectAuditScope_Returns_Scope_If_Exists()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { AuditPipelineModule.AuditScopeConnectEnvironmentKey, expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetConnectAuditScope();
+
+            Assert.That(expectedScope, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetConnectAuditScope_Returns_Null_If_Not_Found()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { "wrong-key", expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetConnectAuditScope();
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void GetDisconnectAuditScope_Returns_Scope_If_Exists()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { AuditPipelineModule.AuditScopeDisconnectEnvironmentKey, expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetDisconnectAuditScope();
+
+            Assert.That(expectedScope, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetDisconnectAuditScope_Returns_Null_If_Not_Found()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { "wrong-key", expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetDisconnectAuditScope();
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void GetReconnectAuditScope_Returns_Scope_If_Exists()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { AuditPipelineModule.AuditScopeReconnectEnvironmentKey, expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetReconnectAuditScope();
+
+            Assert.That(expectedScope, Is.SameAs(result));
+        }
+
+        [Test]
+        public void GetReconnectAuditScope_Returns_Null_If_Not_Found()
+        {
+            Configuration.Setup().UseNullProvider();
+            var expectedScope = AuditScope.Create(new AuditScopeOptions()
+            {
+
+            });
+            var env = new Dictionary<string, object>
+            {
+                { "wrong-key", expectedScope }
+            };
+            var mockRequest = new Mock<IRequest>();
+            mockRequest.Setup(r => r.Environment).Returns(env);
+            var mockContext = new Mock<HubCallerContext>();
+            mockContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            var mockHub = new Mock<IHub>();
+            mockHub.Setup(h => h.Context).Returns(mockContext.Object);
+
+            var result = mockHub.Object.GetReconnectAuditScope();
+
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
         public void Test_Signalr_Stress()
         {
             var ids = new List<string>();
@@ -251,9 +526,7 @@ namespace Audit.UnitTest
 
             return cnnId;
         }
-
-
-
+        
         private void SimulateConnectReconnectDisconnect(TestAuditPipelineModule module)
         {
             SimulateConnect(module, "x");
@@ -360,6 +633,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
     }
+    public class TestSignalrEvent : SignalrEventBase { }
 
     public class TestAuditPipelineModule : AuditPipelineModule
     {

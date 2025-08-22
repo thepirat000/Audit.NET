@@ -12,10 +12,10 @@ namespace Audit.SignalR
     /// </summary>
     public partial class AuditPipelineModule : HubPipelineModule
     {
-        internal const string AuditScopeIncomingEnvironmentKey = "AuditScope_Incoming";
-        internal const string AuditScopeConnectEnvironmentKey = "AuditScope_Connect";
-        internal const string AuditScopeDisconnectEnvironmentKey = "AuditScope_Disconnect";
-        internal const string AuditScopeReconnectEnvironmentKey = "AuditScope_Reconnect";
+        public const string AuditScopeIncomingEnvironmentKey = "AuditScope_Incoming";
+        public const string AuditScopeConnectEnvironmentKey = "AuditScope_Connect";
+        public const string AuditScopeDisconnectEnvironmentKey = "AuditScope_Disconnect";
+        public const string AuditScopeReconnectEnvironmentKey = "AuditScope_Reconnect";
 
         public Func<SignalrEventIncoming, bool> IncomingEventsFilter { get; set; }
         public Func<SignalrEventOutgoing, bool> OutgoingEventsFilter { get; set; }
