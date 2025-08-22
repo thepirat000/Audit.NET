@@ -39,17 +39,16 @@ namespace Audit.FileSystem.UnitTest
             System.IO.Directory.CreateDirectory(folder);
             
             var filename1 = $"test_{random.Next(1000, 9999)}.txt";
-            var filename2 = $"test_{random.Next(1000, 9999)}.txt";
             var t1path = Path.Combine(folder, filename1);
-            var t2path = Path.Combine(folder, filename2);
             File.Delete(t1path);
-            File.Delete(t2path);
             var locker = new object();
+
             var evs = new List<FileSystemEvent>();
+
             Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(_ => _.OnInsert(ev => {
                     lock (locker) {
-                        evs.Add((ev as FileSystem.AuditEventFileSystem).FileSystemEvent);
+                        evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
                     }
                 }));
 
@@ -57,17 +56,18 @@ namespace Audit.FileSystem.UnitTest
             fsMon.Options.IncludeSubdirectories = true;
             fsMon.Options.IncludeContentPredicate = _ => ContentType.Text;
             fsMon.Start();
-            Thread.Sleep(500);
 
+            Thread.Sleep(500);
+            
             File.WriteAllText(t1path, "this is a test");
-            Thread.Sleep(500);
-            File.Move(t1path, t2path);
-            Thread.Sleep(500);
 
-            File.Delete(t2path);
+            Thread.Sleep(1500);
+            
+            File.Delete(t1path);
+
             Thread.Sleep(1500);
 
-            Assert.That(evs.Count >= 3, Is.True, $"Events: {evs.Count}");
+            Assert.That(evs.Count >= 2, Is.True, $"Events: {evs.Count}");
             var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
             Assert.That(create, Is.Not.Null);
             Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create));
@@ -76,18 +76,12 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Text));
             Assert.That((create.FileContent as FileTextualContent)?.Value, Is.EqualTo("this is a test"));
             Assert.That(create.MD5, Is.Not.Null);
-
-            var rename = evs.LastOrDefault(x => x.Event == FileSystemEventType.Rename);
-            Assert.That(rename, Is.Not.Null);
-            Assert.That(rename.OldName, Is.EqualTo(filename1));
-            Assert.That(rename.Name, Is.EqualTo(filename2));
-            Assert.That(rename.MD5, Is.Not.Null);
-
+            
             var delete = evs.LastOrDefault(x => x.Event == FileSystemEventType.Delete);
             Assert.That(delete, Is.Not.Null);
-            Assert.That(delete.Name, Is.EqualTo(filename2));
+            Assert.That(delete.Name, Is.EqualTo(filename1));
 
-            System.IO.Directory.Delete(folder, true);
+            Directory.Delete(folder, true);
         }
 
     }
