@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 08/22/2025 - 15:11:55 |
-| Coverage date: | 08/22/2025 - 14:49:38 - 08/22/2025 - 15:11:15 |
+| Generated on: | 08/22/2025 - 18:05:26 |
+| Coverage date: | 08/22/2025 - 17:42:50 - 08/22/2025 - 18:04:42 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 41 |
 | Classes: | 330 |
 | Files: | 285 |
-| **Line coverage:** | 78.3% (8468 of 10802) |
-| Covered lines: | 8468 |
-| Uncovered lines: | 2334 |
+| **Line coverage:** | 78.5% (8486 of 10802) |
+| Covered lines: | 8486 |
+| Uncovered lines: | 2316 |
 | Coverable lines: | 10802 |
 | Total lines: | 27969 |
-| **Branch coverage:** | 70.8% (3118 of 4399) |
-| Covered branches: | 3118 |
-| Total branches: | 4399 |
+| **Branch coverage:** | 71.1% (3130 of 4397) |
+| Covered branches: | 3130 |
+| Total branches: | 4397 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -109,12 +109,12 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|33|1|34|339|97%|0|0||
-|**Audit.FileSystem**|**137**|**27**|**164**|**410**|**83.5%**|**41**|**52**|**78.8%**|
+|**Audit.FileSystem**|**140**|**24**|**164**|**410**|**85.3%**|**41**|**52**|**78.8%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|0|2|2|12|0%|0|0||
 |Audit.FileSystem.FileContent|0|1|1|11|0%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|103|22|125|245|82.4%|41|52|78.8%|
+|Audit.FileSystem.FileSystemMonitor|106|19|125|245|84.8%|41|52|78.8%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**181**|**26**|**207**|**604**|**87.4%**|**78**|**86**|**90.6%**|
@@ -195,10 +195,10 @@
 |Audit.Core.Providers.Wrappers.DeferredDataProvider|22|0|22|92|100%|9|18|50%|
 |Audit.Core.Providers.Wrappers.LazyDataProvider|22|0|22|89|100%|7|14|50%|
 |Audit.Core.Setting`1|14|0|14|81|100%|2|2|100%|
-|**Audit.NET.AzureCosmos**|**94**|**29**|**123**|**406**|**76.4%**|**23**|**48**|**47.9%**|
+|**Audit.NET.AzureCosmos**|**109**|**14**|**123**|**406**|**88.6%**|**35**|**46**|**76%**|
 |Audit.AzureCosmos.ConfigurationApi.AzureCosmosProviderConfigurator|15|10|25|83|60%|0|0||
 |Audit.AzureCosmos.Providers.AuditCosmosSerializer|9|2|11|36|81.8%|4|6|66.6%|
-|Audit.AzureCosmos.Providers.AzureCosmosDataProvider|70|15|85|266|82.3%|19|42|45.2%|
+|Audit.AzureCosmos.Providers.AzureCosmosDataProvider|85|0|85|266|100%|31|40|77.5%|
 |Audit.Core.AzureCosmosConfiguratorExtensions|0|2|2|21|0%|0|0||
 |**Audit.NET.AzureEventHubs**|**51**|**16**|**67**|**234**|**76.1%**|**7**|**14**|**50%**|
 |Audit.AzureEventHubs.ConfigurationApi.AzureEventHubsConnectionConfigurator|9|4|13|39|69.2%|0|0||
