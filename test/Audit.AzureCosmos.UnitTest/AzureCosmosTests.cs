@@ -1,14 +1,19 @@
-﻿using Audit.Core;
+﻿using Audit.AzureCosmos.Providers;
+using Audit.Core;
 using Audit.IntegrationTest;
 
 using Microsoft.Azure.Cosmos;
 
+using Moq;
+
 using NUnit.Framework;
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using PartitionKey = Microsoft.Azure.Cosmos.PartitionKey;
 
 namespace Audit.AzureCosmos.UnitTest
 {
@@ -120,6 +125,180 @@ namespace Audit.AzureCosmos.UnitTest
             Assert.That(auditEvent.CustomFields["id"].ToString(), Is.EqualTo(id));
             Assert.That(ev.CustomFields["value"].ToString(), Is.EqualTo(auditEvent.CustomFields["value"].ToString()));
             Assert.That(auditEvent.EventType, Is.EqualTo(eventType));
+        }
+        
+        [Test]
+        public void GetEventT_ObjectId_CallsCorrectOverload()
+        {
+            // Arrange
+            var expected = new AuditEvent();
+            var mockClient = new Mock<CosmosClient>(MockBehavior.Strict);
+            var mockContainer = new Mock<Container>(MockBehavior.Strict);
+            var mockItemResponse = new Mock<ItemResponse<AuditEvent>>(MockBehavior.Strict);
+
+            mockClient.Setup(c => c.GetContainer(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockContainer.Object);
+
+            mockContainer.Setup(c => c.ReadItemAsync<AuditEvent>(It.IsAny<string>(), It.IsAny<PartitionKey>(), It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockItemResponse.Object);
+
+            mockItemResponse.Setup(i => i.Resource).Returns(expected);
+
+            var provider = new AzureCosmosDataProvider()
+            {
+                CosmosClient = mockClient.Object
+            };
+            
+            // Act
+            var result = provider.GetEvent<AuditEvent>("id");
+
+            // Assert
+            Assert.That(result, Is.SameAs(expected));
+        }
+
+        [Test]
+        public void GetEventT_ValueTuple_CallsCorrectOverload()
+        {
+            // Arrange
+            var expected = new AuditEvent();
+            var mockClient = new Mock<CosmosClient>(MockBehavior.Strict);
+            var mockContainer = new Mock<Container>(MockBehavior.Strict);
+            var mockItemResponse = new Mock<ItemResponse<AuditEvent>>(MockBehavior.Strict);
+
+            mockClient.Setup(c => c.GetContainer(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockContainer.Object);
+
+            mockContainer.Setup(c => c.ReadItemAsync<AuditEvent>(It.IsAny<string>(), It.IsAny<PartitionKey>(), It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockItemResponse.Object);
+
+            mockItemResponse.Setup(i => i.Resource).Returns(expected);
+
+            var provider = new AzureCosmosDataProvider()
+            {
+                CosmosClient = mockClient.Object
+            };
+
+            // Act
+            var result = provider.GetEvent<AuditEvent>(new ValueTuple<string, string>("id", "pk"));
+
+            // Assert
+            Assert.That(result, Is.SameAs(expected));
+        }
+
+        [Test]
+        public void GetEventT_Tuple_CallsCorrectOverload()
+        {
+            // Arrange
+            var expected = new AuditEvent();
+            var mockClient = new Mock<CosmosClient>(MockBehavior.Strict);
+            var mockContainer = new Mock<Container>(MockBehavior.Strict);
+            var mockItemResponse = new Mock<ItemResponse<AuditEvent>>(MockBehavior.Strict);
+
+            mockClient.Setup(c => c.GetContainer(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockContainer.Object);
+
+            mockContainer.Setup(c => c.ReadItemAsync<AuditEvent>(It.IsAny<string>(), It.IsAny<PartitionKey>(), It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockItemResponse.Object);
+
+            mockItemResponse.Setup(i => i.Resource).Returns(expected);
+
+            var provider = new AzureCosmosDataProvider()
+            {
+                CosmosClient = mockClient.Object
+            };
+
+            // Act
+            var result = provider.GetEvent<AuditEvent>(new Tuple<string, string>("id", "pk"));
+
+            // Assert
+            Assert.That(result, Is.SameAs(expected));
+        }
+        
+        [Test]
+        public async Task GetEventT_ObjectId_CallsCorrectOverloadAsync()
+        {
+            // Arrange
+            var expected = new AuditEvent();
+            var mockClient = new Mock<CosmosClient>(MockBehavior.Strict);
+            var mockContainer = new Mock<Container>(MockBehavior.Strict);
+            var mockItemResponse = new Mock<ItemResponse<AuditEvent>>(MockBehavior.Strict);
+
+            mockClient.Setup(c => c.GetContainer(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockContainer.Object);
+
+            mockContainer.Setup(c => c.ReadItemAsync<AuditEvent>(It.IsAny<string>(), It.IsAny<PartitionKey>(), It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockItemResponse.Object);
+
+            mockItemResponse.Setup(i => i.Resource).Returns(expected);
+
+            var provider = new AzureCosmosDataProvider()
+            {
+                CosmosClient = mockClient.Object
+            };
+
+            // Act
+            var result = await provider.GetEventAsync<AuditEvent>("id");
+
+            // Assert
+            Assert.That(result, Is.SameAs(expected));
+        }
+
+        [Test]
+        public async Task GetEventT_ValueTuple_CallsCorrectOverloadAsync()
+        {
+            // Arrange
+            var expected = new AuditEvent();
+            var mockClient = new Mock<CosmosClient>(MockBehavior.Strict);
+            var mockContainer = new Mock<Container>(MockBehavior.Strict);
+            var mockItemResponse = new Mock<ItemResponse<AuditEvent>>(MockBehavior.Strict);
+
+            mockClient.Setup(c => c.GetContainer(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockContainer.Object);
+
+            mockContainer.Setup(c => c.ReadItemAsync<AuditEvent>(It.IsAny<string>(), It.IsAny<PartitionKey>(), It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockItemResponse.Object);
+
+            mockItemResponse.Setup(i => i.Resource).Returns(expected);
+
+            var provider = new AzureCosmosDataProvider()
+            {
+                CosmosClient = mockClient.Object
+            };
+
+            // Act
+            var result = await provider.GetEventAsync<AuditEvent>(new ValueTuple<string, string>("id", "pk"));
+
+            // Assert
+            Assert.That(result, Is.SameAs(expected));
+        }
+
+        [Test]
+        public async Task GetEventT_Tuple_CallsCorrectOverloadAsync()
+        {
+            // Arrange
+            var expected = new AuditEvent();
+            var mockClient = new Mock<CosmosClient>(MockBehavior.Strict);
+            var mockContainer = new Mock<Container>(MockBehavior.Strict);
+            var mockItemResponse = new Mock<ItemResponse<AuditEvent>>(MockBehavior.Strict);
+
+            mockClient.Setup(c => c.GetContainer(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockContainer.Object);
+
+            mockContainer.Setup(c => c.ReadItemAsync<AuditEvent>(It.IsAny<string>(), It.IsAny<PartitionKey>(), It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockItemResponse.Object);
+
+            mockItemResponse.Setup(i => i.Resource).Returns(expected);
+
+            var provider = new AzureCosmosDataProvider()
+            {
+                CosmosClient = mockClient.Object
+            };
+
+            // Act
+            var result = await provider.GetEventAsync<AuditEvent>(new Tuple<string, string>("id", "pk"));
+
+            // Assert
+            Assert.That(result, Is.SameAs(expected));
         }
     }
 }

@@ -25,6 +25,7 @@
 		<PackageReference Include="System.Runtime" Version="4.1.0" />
 		<Reference Include="System" />
 		<Reference Include="Microsoft.CSharp" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netcoreapp3.1' ">

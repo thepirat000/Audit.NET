@@ -80,6 +80,18 @@
       - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork
     ports:
       - "8080:8080"
+ 
+  azurite:
+    container_name: "azurite"
+    image: "mcr.microsoft.com/azure-storage/azurite:latest"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    networks:
+      eh-emulator:
+        aliases:
+          - "azurite"
 
   eventhubs-emulator:
     container_name: "eventhubs-emulator"
@@ -111,18 +123,6 @@
       - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
     networks:
       - cosmos-network
- 
-  azurite:
-    container_name: "azurite"
-    image: "mcr.microsoft.com/azure-storage/azurite:latest"
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-    networks:
-      eh-emulator:
-        aliases:
-          - "azurite"
  
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
