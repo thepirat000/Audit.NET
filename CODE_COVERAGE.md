@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 08/22/2025 - 18:05:26 |
-| Coverage date: | 08/22/2025 - 17:42:50 - 08/22/2025 - 18:04:42 |
+| Generated on: | 08/22/2025 - 19:52:34 |
+| Coverage date: | 08/22/2025 - 19:30:07 - 08/22/2025 - 19:51:47 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 41 |
 | Classes: | 330 |
 | Files: | 285 |
-| **Line coverage:** | 78.5% (8486 of 10802) |
-| Covered lines: | 8486 |
-| Uncovered lines: | 2316 |
+| **Line coverage:** | 78.6% (8497 of 10802) |
+| Covered lines: | 8497 |
+| Uncovered lines: | 2305 |
 | Coverable lines: | 10802 |
 | Total lines: | 27969 |
-| **Branch coverage:** | 71.1% (3130 of 4397) |
-| Covered branches: | 3130 |
+| **Branch coverage:** | 71.4% (3141 of 4397) |
+| Covered branches: | 3141 |
 | Total branches: | 4397 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -109,12 +109,12 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|33|1|34|339|97%|0|0||
-|**Audit.FileSystem**|**140**|**24**|**164**|**410**|**85.3%**|**41**|**52**|**78.8%**|
+|**Audit.FileSystem**|**137**|**27**|**164**|**410**|**83.5%**|**41**|**52**|**78.8%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|0|2|2|12|0%|0|0||
 |Audit.FileSystem.FileContent|0|1|1|11|0%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|106|19|125|245|84.8%|41|52|78.8%|
+|Audit.FileSystem.FileSystemMonitor|103|22|125|245|82.4%|41|52|78.8%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**181**|**26**|**207**|**604**|**87.4%**|**78**|**86**|**90.6%**|
@@ -328,7 +328,7 @@
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|2|2|100%|
 |Audit.Udp.Providers.UdpDataProvider|60|2|62|196|96.7%|14|16|87.5%|
-|**Audit.SignalR**|**340**|**103**|**443**|**1125**|**76.7%**|**132**|**256**|**51.5%**|
+|**Audit.SignalR**|**354**|**89**|**443**|**1125**|**79.9%**|**143**|**256**|**55.8%**|
 |Audit.SignalR.AuditEventSignalr|1|0|1|15|100%|0|0||
 |Audit.SignalR.AuditHubFilter|98|10|108|196|90.7%|48|86|55.8%|
 |Audit.SignalR.AuditPipelineModule|159|48|207|348|76.8%|79|146|54.1%|
@@ -341,7 +341,7 @@
 |Audit.SignalR.SignalrEventIncoming|13|1|14|49|92.8%|0|0||
 |Audit.SignalR.SignalrEventOutgoing|7|0|7|25|100%|0|0||
 |Audit.SignalR.SignalrEventReconnect|7|0|7|25|100%|0|0||
-|Audit.SignalR.SignalrExtensions|8|20|28|169|28.5%|5|24|20.8%|
+|Audit.SignalR.SignalrExtensions|22|6|28|169|78.5%|16|24|66.6%|
 |**Audit.WCF**|**0**|**227**|**227**|**626**|**0%**|**0**|**60**|**0%**|
 |Audit.WCF.AuditBehavior|0|8|8|72|0%|0|0||
 |Audit.WCF.AuditBehaviorAttribute|0|20|20|90|0%|0|6|0%|
