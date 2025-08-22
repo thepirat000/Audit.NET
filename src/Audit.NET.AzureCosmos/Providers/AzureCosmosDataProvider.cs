@@ -188,24 +188,24 @@ namespace Audit.AzureCosmos.Providers
             return client.GetContainer(Database.GetValue(auditEvent), Container.GetValue(auditEvent));
         }
 
-        private string GetSetId(AuditEvent auditEvent)
+        internal string GetSetId(AuditEvent auditEvent)
         {
             string id;
             if (IdBuilder != null)
             {
-                id = IdBuilder?.Invoke(auditEvent);
+                id = IdBuilder.Invoke(auditEvent);
                 auditEvent.CustomFields["id"] = id;
             }
             else
             {
-                if (!auditEvent.CustomFields.ContainsKey("id"))
+                if (auditEvent.CustomFields.TryGetValue("id", out var field))
                 {
-                    id = Guid.NewGuid().ToString().Replace("-", "");
-                    auditEvent.CustomFields["id"] = id;
+                    id = field?.ToString();
                 }
                 else
                 {
-                    id = auditEvent.CustomFields["id"]?.ToString();
+                    id = Guid.NewGuid().ToString().Replace("-", "");
+                    auditEvent.CustomFields["id"] = id;
                 }
             }
             return id;
