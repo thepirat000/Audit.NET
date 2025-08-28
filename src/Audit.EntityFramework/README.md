@@ -307,6 +307,8 @@ The following settings for the high-level interceptor can be configured per DbCo
  > Note: EF Core <= 3 does not support many-to-many relations without a join entity, and for EF Core 5 the many-to-many relations are normally included on the audit event entries. 
 - **ExcludeTransactionId**: Value to indicate if the Transaction IDs should be excluded from the output and not be retrieved (default is false to include the Transaction IDs).
 - **ExcludeValidationResults**: Value to indicate if the entity validations should be avoided and excluded from the audit output. (Default is false)
+- **MapChangesByColumn**: Value to indicate whether the `ChangesByColumn` dictionary is used in the audit entry output instead of the `Changes` list. The default value is false.
+> The `ChangesByColumn` dictionary keeps each column’s values separate, reducing type conflicts in systems that infer data types automatically (e.g., Elasticsearch indexing). In contrast, the `Changes` list may group values of different types together.
 - **ReloadDatabaseValues**: Value to indicate if the original values of the audited entities should be queried from database before saving the audit event.
 > The *ReloadDatabaseValues* configuration is beneficial for making modifications without explicitly retrieving the entity first. 
 It can be enabled when using DbSet.Update or DbSet.Remove with an object that wasn't retrieved from the database. When enabled, it queries the database prior to any entity modification to record the original values in the audit event.

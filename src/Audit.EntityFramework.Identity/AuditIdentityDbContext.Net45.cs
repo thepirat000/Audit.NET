@@ -200,6 +200,11 @@ namespace Audit.EntityFramework
         public bool ReloadDatabaseValues { get; set; }
 
         /// <summary>
+        /// Value to indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the changes.
+        /// </summary>
+        public bool MapChangesByColumn { get; set; }
+
+        /// <summary>
         /// A collection of property names to include in the audit event for each entity type when using Opt-In mode.
         /// </summary>
         public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }

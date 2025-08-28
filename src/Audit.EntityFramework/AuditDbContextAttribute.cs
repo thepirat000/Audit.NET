@@ -16,14 +16,8 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool ExcludeTransactionId
         {
-            get
-            {
-                return InternalConfig.ExcludeTransactionId.HasValue && InternalConfig.ExcludeTransactionId.Value;
-            }
-            set
-            {
-                InternalConfig.ExcludeTransactionId = value;
-            }
+            get => InternalConfig.ExcludeTransactionId.HasValue && InternalConfig.ExcludeTransactionId.Value;
+            set => InternalConfig.ExcludeTransactionId = value;
         }
 #if EF_FULL
         /// <summary>
@@ -31,14 +25,8 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool IncludeIndependantAssociations
         { 
-            get
-            {
-                return InternalConfig.IncludeIndependantAssociations.HasValue && InternalConfig.IncludeIndependantAssociations.Value;
-            }
-            set
-            {
-                InternalConfig.IncludeIndependantAssociations = value;
-            }
+            get => InternalConfig.IncludeIndependantAssociations.HasValue && InternalConfig.IncludeIndependantAssociations.Value;
+            set => InternalConfig.IncludeIndependantAssociations = value;
         }
 #endif
 
@@ -47,26 +35,14 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool IncludeEntityObjects
         {
-            get
-            {
-                return InternalConfig.IncludeEntityObjects.HasValue && InternalConfig.IncludeEntityObjects.Value;
-            }
-            set
-            {
-                InternalConfig.IncludeEntityObjects = value;
-            }
+            get => InternalConfig.IncludeEntityObjects.HasValue && InternalConfig.IncludeEntityObjects.Value;
+            set => InternalConfig.IncludeEntityObjects = value;
         }
 
         public bool ExcludeValidationResults
         {
-            get
-            {
-                return InternalConfig.ExcludeValidationResults.HasValue && InternalConfig.ExcludeValidationResults.Value;
-            }
-            set
-            {
-                InternalConfig.ExcludeValidationResults = value;
-            }
+            get => InternalConfig.ExcludeValidationResults.HasValue && InternalConfig.ExcludeValidationResults.Value;
+            set => InternalConfig.ExcludeValidationResults = value;
         }
 
         /// <summary>
@@ -76,14 +52,8 @@ namespace Audit.EntityFramework
         /// </summary>
         public AuditOptionMode Mode
         {
-            get
-            {
-                return InternalConfig.Mode.HasValue ? InternalConfig.Mode.Value : AuditOptionMode.OptOut;
-            }
-            set
-            {
-                InternalConfig.Mode = value;
-            }
+            get => InternalConfig.Mode ?? AuditOptionMode.OptOut;
+            set => InternalConfig.Mode = value;
         }
 
         /// <summary>
@@ -94,14 +64,8 @@ namespace Audit.EntityFramework
         /// </summary>
         public string AuditEventType
         {
-            get
-            {
-                return InternalConfig.AuditEventType;
-            }
-            set
-            {
-                InternalConfig.AuditEventType = value;
-            }
+            get => InternalConfig.AuditEventType;
+            set => InternalConfig.AuditEventType = value;
         }
 
         /// <summary>
@@ -110,14 +74,18 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool ReloadDatabaseValues
         {
-            get
-            {
-                return InternalConfig.ReloadDatabaseValues.GetValueOrDefault();
-            }
-            set
-            {
-                InternalConfig.ReloadDatabaseValues = value;
-            }
+            get => InternalConfig.ReloadDatabaseValues.GetValueOrDefault();
+            set => InternalConfig.ReloadDatabaseValues = value;
+        }
+
+        /// <summary>
+        /// To indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the changes.
+        /// Default is false.
+        /// </summary>
+        public bool MapChangesByColumn
+        {
+            get => InternalConfig.MapChangesByColumn.HasValue && InternalConfig.MapChangesByColumn.Value;
+            set => InternalConfig.MapChangesByColumn = value;
         }
 
     }

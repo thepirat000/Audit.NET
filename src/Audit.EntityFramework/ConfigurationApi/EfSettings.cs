@@ -25,5 +25,7 @@ namespace Audit.EntityFramework.ConfigurationApi
         public bool? ReloadDatabaseValues { get; set; }
 
         public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; } = null;
+
+        public bool? MapChangesByColumn { get; set; }
     }
 }

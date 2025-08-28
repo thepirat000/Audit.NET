@@ -49,6 +49,13 @@ namespace Audit.EntityFramework
             return result;
         }
 
+        private Dictionary<string, ColumnValueChange> GetChangesByColumn(IAuditDbContext context, EntityEntry entry)
+        {
+            var changes = GetChanges(context, entry);
+
+            return changes.ToDictionary(k => k.ColumnName, v => new ColumnValueChange { OriginalValue = v.OriginalValue, NewValue = v.NewValue });
+        }
+
 #if EF_CORE_8_OR_GREATER
         /// <summary>
         /// Adds the change values from the complex properties recursively
@@ -333,8 +340,9 @@ namespace Audit.EntityFramework
                     ValidationResults = validationResults?.Select(x => x.ErrorMessage).ToList(),
                     Entity = context.IncludeEntityObjects ? entity : null,
                     Entry = entry,
-                    Action = DbContextHelper.GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
+                    Action = GetStateName(entry.State),
+                    Changes = entry.State == EntityState.Modified && !context.MapChangesByColumn ? GetChanges(context, entry) : null,
+                    ChangesByColumn = entry.State == EntityState.Modified && context.MapChangesByColumn ? GetChangesByColumn(context, entry) : null,
                     Table = entityName.Table,
                     Schema = entityName.Schema,
 #if EF_CORE_5_OR_GREATER

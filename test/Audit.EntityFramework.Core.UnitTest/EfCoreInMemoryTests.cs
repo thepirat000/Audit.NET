@@ -925,8 +925,8 @@ namespace Audit.EntityFramework.Core.UnitTest
             var guid = Guid.NewGuid().ToString().Substring(0, 6);
             var evs = new List<AuditEvent>();
             Audit.EntityFramework.Configuration.Setup()
-                .ForContext<BlogsContext>(x => x
-                    .IncludeEntityObjects(true));
+                .ForContext<BlogsMemoryContext>(x => x
+                    .MapChangesByColumn(false));
             Audit.Core.Configuration.Setup()
                 .AuditDisabled(false)
                 .UseDynamicProvider(x => x
@@ -966,6 +966,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(evs.Count, Is.EqualTo(2));
             Assert.That(evs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
             var entry = evs[0].GetEntityFrameworkEvent().Entries[0];
+            Assert.That(entry.ChangesByColumn, Is.Null);
             Assert.That(entry.Changes.Count, Is.EqualTo(1));
             var changeToken = entry.Changes.First(_ => _.ColumnName == "Token");
             Assert.That(changeToken.OriginalValue, Is.EqualTo("***"));
@@ -1208,6 +1209,57 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(entityType1, Is.EqualTo(typeof(User)));
             Assert.That(entityType2, Is.Not.Null);
             Assert.That(entityType2, Is.EqualTo(typeof(User)));
+        }
+
+        [Test]
+        public void Test_EF_ChangesByColumn_IsPopulated()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<BlogsMemoryContext>(x => x
+                    .MapChangesByColumn());
+            
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseInMemoryProvider(out var dp)
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var options = new DbContextOptionsBuilder<BlogsMemoryContext>()
+                .UseInMemoryDatabase(databaseName: "database_test")
+                .Options;
+
+            var id = Rnd.Next();
+            using (var ctx = new BlogsMemoryContext(options))
+            {
+                ctx.AuditDisabled = true;
+                var user = new User()
+                {
+                    Id = id,
+                    Name = "fede",
+                    Password = "142857",
+                    Token = "aaabbb",
+                    Name2 = "original"
+                };
+                ctx.Users.Add(user);
+                
+                ctx.SaveChanges();
+                ctx.AuditDisabled = false;
+
+                var usr = ctx.Users.First(u => u.Id == id);
+                usr.Name2 = "updated";
+                ctx.SaveChanges();
+            }
+
+            var evs = dp.GetAllEvents();
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            var entry = evs[0].GetEntityFrameworkEvent().Entries[0];
+            Assert.That(entry.Changes, Is.Null);
+            Assert.That(entry.ChangesByColumn, Has.Count.EqualTo(1));
+            Assert.That(entry.ChangesByColumn, Does.ContainKey("NAME_2"));
+            var name = entry.ChangesByColumn["NAME_2"];
+            Assert.That(name.OriginalValue, Is.EqualTo("original"));
+            Assert.That(name.NewValue, Is.EqualTo("updated"));
         }
     }
 }

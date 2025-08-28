@@ -62,6 +62,7 @@ namespace Audit.EntityFramework
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
             context.ReloadDatabaseValues = attrConfig?.ReloadDatabaseValues ?? localConfig?.ReloadDatabaseValues ?? globalConfig?.ReloadDatabaseValues ?? false;
+            context.MapChangesByColumn = attrConfig?.MapChangesByColumn ?? localConfig?.MapChangesByColumn ?? globalConfig?.MapChangesByColumn ?? false;
         }
 
         internal Dictionary<Type, EfEntitySettings> MergeEntitySettings(Dictionary<Type, EfEntitySettings> attr, Dictionary<Type, EfEntitySettings> local, Dictionary<Type, EfEntitySettings> global)
@@ -487,7 +488,7 @@ namespace Audit.EntityFramework
                          && IncludeEntity(context, x.Entity, context.Mode))
                 .ToList();
         }
-        
+
         /// <summary>
         /// Gets a unique ID for the current SQL transaction.
         /// </summary>

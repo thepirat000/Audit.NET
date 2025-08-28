@@ -97,5 +97,10 @@ namespace Audit.EntityFramework
         /// A collection of property names to include on the audit event for each entity type when using Opt-In mode.
         /// </summary>
         Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }
+
+        /// <summary>
+        /// Value to indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the modified column values.
+        /// </summary>
+        bool MapChangesByColumn { get; set; }
     }
 }

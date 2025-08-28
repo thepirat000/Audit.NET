@@ -122,6 +122,9 @@ namespace Audit.EntityFramework
 
         /// <inheritdoc/>
         public bool ReloadDatabaseValues { get; set; }
+        
+        /// <inheritdoc/>
+        public bool MapChangesByColumn { get; set; }
 
         /// <inheritdoc/>
         public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }

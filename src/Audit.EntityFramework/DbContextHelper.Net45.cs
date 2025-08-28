@@ -1,6 +1,5 @@
 ﻿#if EF_FULL
 using Audit.EntityFramework.ConfigurationApi;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core;
@@ -45,6 +44,13 @@ namespace Audit.EntityFramework
                 }
             }
             return result;
+        }
+
+        private Dictionary<string, ColumnValueChange> GetChangesByColumn(IAuditDbContext context, DbEntityEntry entry)
+        {
+            var changes = GetChanges(context, entry);
+
+            return changes.ToDictionary(k => k.ColumnName, v => new ColumnValueChange { OriginalValue = v.OriginalValue, NewValue = v.NewValue });
         }
 
         /// <summary>
@@ -208,7 +214,8 @@ namespace Audit.EntityFramework
                     Entity = context.IncludeEntityObjects ? entity : null,
                     Entry = entry,
                     Action = GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified ? GetChanges(context, entry) : null,
+                    Changes = entry.State == EntityState.Modified && !context.MapChangesByColumn ? GetChanges(context, entry) : null,
+                    ChangesByColumn = entry.State == EntityState.Modified && context.MapChangesByColumn ? GetChangesByColumn(context, entry) : null,
                     Table = entityName.Table,
                     Schema = entityName.Schema,
                     ColumnValues = GetColumnValues(context, entry)

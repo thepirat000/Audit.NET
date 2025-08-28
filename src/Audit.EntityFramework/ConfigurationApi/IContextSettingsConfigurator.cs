@@ -52,6 +52,12 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         /// <param name="reloadDatabaseValues">if set to <c>true</c> the original values will be queried from database.</param>
         IContextSettingsConfigurator<T> ReloadDatabaseValues(bool reloadDatabaseValues = true);
+
+        /// <summary>
+        /// Value to indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the changes.
+        /// </summary>
+        /// <param name="mapChangesByColumn">if set to <c>true</c> the ChangesByColumn dictionary will be used.</param>
+        IContextSettingsConfigurator<T> MapChangesByColumn(bool mapChangesByColumn = true);
     }
 }
  

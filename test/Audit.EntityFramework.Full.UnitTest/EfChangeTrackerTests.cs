@@ -125,5 +125,64 @@ namespace Audit.EntityFramework.Full.UnitTest
             Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Delete"));
             Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]?.ToString(), Is.EqualTo("UpdatedName"));
         }
+
+        [Test]
+        public async Task EF_Update_ReloadFromDatabase_ChangesByColumn()
+        {
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<SimpleContext>(x => x
+                    .ReloadDatabaseValues(true)
+                    .IncludeEntityObjects()
+                    .MapChangesByColumn(true));
+
+            Audit.Core.Configuration.Setup()
+                .AuditDisabled(false)
+                .UseInMemoryProvider()
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEvents();
+
+            var car = new SimpleContext.Car()
+            {
+                Name = "OriginalName"
+            };
+
+            using (var context = new SimpleContext())
+            {
+                context.Cars.Add(car);
+                await context.SaveChangesAsync();
+            }
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent()?.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[0].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"], Is.EqualTo("OriginalName"));
+
+            using (var context = new SimpleContext())
+            {
+                context.Cars.AddOrUpdate(new SimpleContext.Car() { Id = car.Id, Name = "UpdatedName" });
+                await context.SaveChangesAsync();
+            }
+
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].Changes, Is.Null);
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].ChangesByColumn["Name"].OriginalValue?.ToString(), Is.EqualTo("OriginalName"));
+            Assert.That(evs[1].GetEntityFrameworkEvent()?.Entries[0].ChangesByColumn["Name"].NewValue?.ToString(), Is.EqualTo("UpdatedName"));
+
+            using (var context = new SimpleContext())
+            {
+                var carToDelete = new SimpleContext.Car() { Id = car.Id };
+                context.Entry(carToDelete).State = EntityState.Deleted;
+                await context.SaveChangesAsync();
+
+            }
+
+            Assert.That(evs.Count, Is.EqualTo(3));
+            Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries.Count, Is.EqualTo(1));
+            Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries[0].Action, Is.EqualTo("Delete"));
+            Assert.That(evs[2].GetEntityFrameworkEvent()?.Entries[0].ColumnValues["Name"]?.ToString(), Is.EqualTo("UpdatedName"));
+        }
     }
 }

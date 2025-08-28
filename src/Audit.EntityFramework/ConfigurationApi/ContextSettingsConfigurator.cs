@@ -47,5 +47,11 @@ namespace Audit.EntityFramework.ConfigurationApi
             Configuration.SetReloadDatabaseValues<T>(reloadDatabaseValues);
             return this;
         }
+
+        public IContextSettingsConfigurator<T> MapChangesByColumn(bool mapChangesByColumn = true)
+        {
+            Configuration.SetMapChangesByColumn<T>(mapChangesByColumn);
+            return this;
+        }
     }
 }

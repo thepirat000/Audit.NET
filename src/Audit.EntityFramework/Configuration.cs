@@ -63,6 +63,11 @@ namespace Audit.EntityFramework
             EnsureConfigFor<TContext>().ReloadDatabaseValues = reloadDatabaseValues;
         }
 
+        internal static void SetMapChangesByColumn<TContext>(bool mapChangesByColumn)
+        {
+            EnsureConfigFor<TContext>().MapChangesByColumn = mapChangesByColumn;
+        }
+
         internal static void SetMode<TContext>(AuditOptionMode mode)
         {
             EnsureConfigFor<TContext>().Mode = mode;
