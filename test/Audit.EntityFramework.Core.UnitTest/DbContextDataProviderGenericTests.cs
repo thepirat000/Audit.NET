@@ -19,6 +19,29 @@ namespace Audit.EntityFramework.Core.UnitTest
             var ctx = new MyDbContext();
 
             var dp = new DbContextDataProvider<MyDbContext, AuditLog>(c => c
+                .DbContext(ctx)
+                .Mapper((ev, auditLog) =>
+                {
+                    auditLog.JsonData = ev.ToJson();
+                    auditLog.CreatedDate = DateTime.Now;
+                })
+                .DisposeDbContext());
+
+            var log = new AuditLog();
+
+            Assert.That(ctx, Is.EqualTo(dp.DbContextBuilder(null)));
+            Assert.That(dp.DisposeDbContext, Is.True);
+            Assert.That(dp.Mapper, Is.Not.Null);
+            dp.Mapper.Invoke(new AuditEvent(), log);
+            Assert.That(log.JsonData, Is.Not.Null);
+        }
+
+        [Test]
+        public void Test_DbContextDataProvider_Configuration_DbContext()
+        {
+            var ctx = new MyDbContext();
+
+            var dp = new DbContextDataProvider<MyDbContext, AuditLog>(c => c
                 .DbContextBuilder(ev => ctx)
                 .Mapper((ev, auditLog) =>
                 {
@@ -34,6 +57,65 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(dp.Mapper, Is.Not.Null);
             dp.Mapper.Invoke(new AuditEvent(), log);
             Assert.That(log.JsonData, Is.Not.Null);
+        }
+
+        [Test]
+        public void Test_DbContextDataProvider_Configuration_DbContext_NonGeneric()
+        {
+            var ctx = new MyDbContext();
+
+            var dp = new DbContextDataProvider(c => c
+                .DbContext(ctx)
+                .DisposeDbContext());
+
+            Assert.That(ctx, Is.EqualTo(dp.DbContextBuilder(null)));
+            Assert.That(dp.DisposeDbContext, Is.True);
+        }
+
+        [Test]
+        public void Test_DbContextDataProvider_Configuration_UseDbContextOptions()
+        {
+            var options = new DbContextOptionsBuilder<MyDbContext>().Options;
+            var dp = new DbContextDataProvider<MyDbContext, AuditLog>(c => c
+                .UseDbContextOptions(options)
+                .Mapper((ev, auditLog) =>
+                {
+                    auditLog.JsonData = ev.ToJson();
+                    auditLog.CreatedDate = DateTime.Now;
+                })
+                .DisposeDbContext());
+
+            var log = new AuditLog();
+
+            Assert.That(dp.DbContextOptions.GetDefault(), Is.SameAs(options));
+            Assert.That(dp.DisposeDbContext, Is.True);
+            Assert.That(dp.Mapper, Is.Not.Null);
+            dp.Mapper.Invoke(new AuditEvent(), log);
+            Assert.That(log.JsonData, Is.Not.Null);
+        }
+
+        [Test]
+        public void Test_DbContextDataProvider_Configuration_UseDbContextOptions_Event_NonGeneric()
+        {
+            var options = new DbContextOptionsBuilder<MyDbContext>().Options;
+            var dp = new DbContextDataProvider(c => c
+                .UseDbContextOptions(ev => options)
+                .DisposeDbContext());
+
+            Assert.That(dp.DbContextOptions.GetDefault(), Is.SameAs(options));
+            Assert.That(dp.DisposeDbContext, Is.True);
+        }
+
+        [Test]
+        public void Test_DbContextDataProvider_Configuration_UseDbContextOptions_NonGeneric()
+        {
+            var options = new DbContextOptionsBuilder<MyDbContext>().Options;
+            var dp = new DbContextDataProvider(c => c
+                .UseDbContextOptions(options)
+                .DisposeDbContext());
+
+            Assert.That(dp.DbContextOptions.GetDefault(), Is.SameAs(options));
+            Assert.That(dp.DisposeDbContext, Is.True);
         }
 
         [Test]

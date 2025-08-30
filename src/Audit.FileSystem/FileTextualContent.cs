@@ -2,10 +2,10 @@
 
 namespace Audit.FileSystem
 {
-    public class FileTextualContent : FileContent
+    public class FileTextualContent : IFileContent
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public override ContentType Type { get; set; } = ContentType.Text;
+        public ContentType Type { get; set; } = ContentType.Text;
         public string Value { get; set; }
     }
 }

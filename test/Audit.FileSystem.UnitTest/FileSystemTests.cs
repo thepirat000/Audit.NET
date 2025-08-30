@@ -1,17 +1,19 @@
-﻿using NUnit.Framework;
+﻿using Audit.Core.Providers;
+
+using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Audit.Core.Providers;
 
 namespace Audit.FileSystem.UnitTest
 {
     [TestFixture]
     public class FileSystemTests
     {
-        private static Random random = new Random();
+        private static readonly Random Random = new Random();
 
         [SetUp]
         public void Setup()
@@ -33,20 +35,20 @@ namespace Audit.FileSystem.UnitTest
         }
 
         [Test]
-        public void Test_FileSystem_1()
+        public void Test_FileSystem_Text()
         {
-            var folder = Path.Combine(Path.GetTempPath(), random.Next(1000, 9999).ToString());
-            System.IO.Directory.CreateDirectory(folder);
+            var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
+            Directory.CreateDirectory(folder);
             
-            var filename1 = $"test_{random.Next(1000, 9999)}.txt";
-            var t1path = Path.Combine(folder, filename1);
-            File.Delete(t1path);
+            var filename1 = $"test_{Random.Next(1000, 9999)}.txt";
+            var t1Path = Path.Combine(folder, filename1);
+            File.Delete(t1Path);
             var locker = new object();
 
             var evs = new List<FileSystemEvent>();
 
-            Audit.Core.Configuration.Setup()
-                .UseDynamicProvider(_ => _.OnInsert(ev => {
+            Core.Configuration.Setup()
+                .UseDynamicProvider(d => d.OnInsert(ev => {
                     lock (locker) {
                         evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
                     }
@@ -59,11 +61,11 @@ namespace Audit.FileSystem.UnitTest
 
             Thread.Sleep(500);
             
-            File.WriteAllText(t1path, "this is a test");
+            File.WriteAllText(t1Path, "this is a test");
 
             Thread.Sleep(1500);
             
-            File.Delete(t1path);
+            File.Delete(t1Path);
 
             Thread.Sleep(1500);
 
@@ -80,6 +82,51 @@ namespace Audit.FileSystem.UnitTest
             var delete = evs.LastOrDefault(x => x.Event == FileSystemEventType.Delete);
             Assert.That(delete, Is.Not.Null);
             Assert.That(delete.Name, Is.EqualTo(filename1));
+
+            Directory.Delete(folder, true);
+        }
+
+        [Test]
+        public void Test_FileSystem_Binary()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
+            Directory.CreateDirectory(folder);
+
+            var filename1 = $"test_{Random.Next(1000, 9999)}.txt";
+            var t1Path = Path.Combine(folder, filename1);
+            File.Delete(t1Path);
+            var locker = new object();
+
+            var evs = new List<FileSystemEvent>();
+
+            Core.Configuration.Setup()
+                .UseDynamicProvider(d => d.OnInsert(ev => {
+                    lock (locker)
+                    {
+                        evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
+                    }
+                }));
+
+            var fsMon = new FileSystemMonitor(folder);
+            fsMon.Options.IncludeSubdirectories = true;
+            fsMon.Options.IncludeContentPredicate = _ => ContentType.Binary;
+            fsMon.Start();
+
+            Thread.Sleep(500);
+
+            File.WriteAllBytes(t1Path, "MZ123"u8.ToArray());
+
+            Thread.Sleep(1500);
+
+            Assert.That(evs.Count >= 1, Is.True, $"Events: {evs.Count}");
+            var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
+            Assert.That(create, Is.Not.Null);
+            Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create));
+            Assert.That(create.Name, Is.EqualTo(filename1));
+            Assert.That(create.Length, Is.EqualTo(5));
+            Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Binary));
+            Assert.That((create.FileContent as FileBinaryContent)?.Value, Is.EqualTo("MZ123"u8.ToArray()));
+            Assert.That(create.MD5, Is.Not.Null);
 
             Directory.Delete(folder, true);
         }

@@ -7,12 +7,19 @@ using Audit.Channels.Configuration;
 using Audit.Core;
 using NUnit.Framework;
 using Audit.Channels.Providers;
+using Audit.Core.ConfigurationApi;
 
 namespace Audit.UnitTest
 {
     [TestFixture]
     public class ChannelDataProviderTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [Test]
         public void Test_ChannelDataProvider_FluentApi()
         {
@@ -29,6 +36,54 @@ namespace Audit.UnitTest
             Assert.That(dpDefault3.GetChannel().GetType().Name, Contains.Substring("Unbounded"));
         }
 
+        [Test]
+        public void Test_ChannelDataProvider_UseInMemoryChannelProvider_NoParams()
+        {
+            // Arrange & Act
+            var result = Configuration.Setup().UseInMemoryChannelProvider();
+
+            // Assert
+            Assert.That(result, Is.TypeOf<CreationPolicyConfigurator>());
+            Assert.That(Configuration.DataProvider, Is.TypeOf<ChannelDataProvider>());
+        }
+
+        [Test]
+        public void Test_ChannelDataProvider_UseInMemoryChannelProvider_Config()
+        {
+            // Arrange & Act
+            var result = Configuration.Setup().UseInMemoryChannelProvider(cfg => cfg.Unbounded());
+
+            // Assert
+            Assert.That(result, Is.TypeOf<CreationPolicyConfigurator>());
+            Assert.That(Configuration.DataProvider, Is.TypeOf<ChannelDataProvider>());
+            var channelProvider = (ChannelDataProvider)Configuration.DataProvider;
+            Assert.That(channelProvider.GetChannel().GetType().Name, Contains.Substring("Unbounded"));
+        }
+
+        [Test]
+        public void Test_ChannelDataProvider_UseInMemoryChannelProvider_Config_GetChannel()
+        {
+            // Arrange & Act
+            var result = Configuration.Setup().UseInMemoryChannelProvider(cfg => cfg.Unbounded(), out var channel);
+
+            // Assert
+            Assert.That(result, Is.TypeOf<CreationPolicyConfigurator>());
+            Assert.That(Configuration.DataProvider, Is.TypeOf<ChannelDataProvider>());
+            Assert.That(channel.GetType().Name, Contains.Substring("Unbounded"));
+        }
+
+        [Test]
+        public void Test_ChannelDataProvider_UseInMemoryChannelProvider_GetChannel()
+        {
+            // Arrange & Act
+            var result = Configuration.Setup().UseInMemoryChannelProvider(out var channel);
+
+            // Assert
+            Assert.That(result, Is.TypeOf<CreationPolicyConfigurator>());
+            Assert.That(Configuration.DataProvider, Is.TypeOf<ChannelDataProvider>());
+            Assert.That(channel.GetType().Name, Contains.Substring("Unbounded"));
+        }
+        
         [Test]
         public void Test_ChannelDataProvider_Take()
         {

@@ -22,6 +22,6 @@ namespace Audit.FileSystem
         public DateTime LastWriteTime { get; set; }
         public bool ReadOnly { get; set; }
         public string MD5 { get; set; }
-        public FileContent FileContent { get; set; }
+        public IFileContent FileContent { get; set; }
     }
 }

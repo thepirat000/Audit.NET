@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Audit.Core;
 using Audit.IntegrationTest;
+using Audit.PostgreSql.Configuration;
 using Audit.PostgreSql.Providers;
 
 namespace Audit.PostgreSql.UnitTest
@@ -19,6 +20,31 @@ namespace Audit.PostgreSql.UnitTest
             Audit.Core.Configuration.Reset();
             SetupConfiguredPostgreSqlDataProvider();
             AuditScope.Log("test", null);
+        }
+
+        [Test]
+        public void Test_PostgreDataProvider_FluentApi_DataColumnType()
+        {
+            var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                .ConnectionString("c")
+                .DataColumn("dc", DataType.JSON, null)
+                .IdColumnName("id")
+                .LastUpdatedColumnName("lud")
+                .Schema("sc")
+                .TableName("t")
+                .CustomColumn("c1", ev => 1)
+                .CustomColumn("c2", ev => 2));
+            Assert.That(x.ConnectionString.GetValue(null), Is.EqualTo("c"));
+            Assert.That(x.DataColumnName.GetValue(null), Is.EqualTo("dc"));
+            Assert.That(x.IdColumnName.GetValue(null), Is.EqualTo("id"));
+            Assert.That(x.LastUpdatedDateColumnName.GetValue(null), Is.EqualTo("lud"));
+            Assert.That(x.Schema.GetValue(null), Is.EqualTo("sc"));
+            Assert.That(x.TableName.GetValue(null), Is.EqualTo("t"));
+            Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
+            Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
+            Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));
+            Assert.That(x.CustomColumns[1].Name, Is.EqualTo("c2"));
+            Assert.That(x.CustomColumns[1].Value.Invoke(null), Is.EqualTo(2));
         }
 
         [Test]
@@ -39,6 +65,31 @@ namespace Audit.PostgreSql.UnitTest
             Assert.That(x.LastUpdatedDateColumnName.GetValue(null), Is.EqualTo("lud"));
             Assert.That(x.Schema.GetValue(null), Is.EqualTo("sc"));
             Assert.That(x.TableName.GetValue(null), Is.EqualTo("t"));
+            Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
+            Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
+            Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));
+            Assert.That(x.CustomColumns[1].Name, Is.EqualTo("c2"));
+            Assert.That(x.CustomColumns[1].Value.Invoke(null), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Test_PostgreDataProvider_FluentApiBuilder_DataColumnType()
+        {
+            var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
+                .ConnectionString(ev => "c")
+                .DataColumn(ev => "dc", DataType.JSON, null)
+                .IdColumnName(ev => "id")
+                .LastUpdatedColumnName(ev => "lud")
+                .Schema(ev => "sc")
+                .TableName(ev => "t")
+                .CustomColumn("c1", ev => 1)
+                .CustomColumn("c2", ev => 2));
+            Assert.That(x.ConnectionString.GetDefault(), Is.EqualTo("c"));
+            Assert.That(x.DataColumnName.GetDefault(), Is.EqualTo("dc"));
+            Assert.That(x.IdColumnName.GetDefault(), Is.EqualTo("id"));
+            Assert.That(x.LastUpdatedDateColumnName.GetDefault(), Is.EqualTo("lud"));
+            Assert.That(x.Schema.GetDefault(), Is.EqualTo("sc"));
+            Assert.That(x.TableName.GetDefault(), Is.EqualTo("t"));
             Assert.That(x.CustomColumns.Count, Is.EqualTo(2));
             Assert.That(x.CustomColumns[0].Name, Is.EqualTo("c1"));
             Assert.That(x.CustomColumns[0].Value.Invoke(null), Is.EqualTo(1));
@@ -70,7 +121,7 @@ namespace Audit.PostgreSql.UnitTest
             Assert.That(x.CustomColumns[1].Name, Is.EqualTo("c2"));
             Assert.That(x.CustomColumns[1].Value.Invoke(null), Is.EqualTo(2));
         }
-        
+
         [Test]
         public void Test_PostgreDataProvider_CustomDataColumn()
         {

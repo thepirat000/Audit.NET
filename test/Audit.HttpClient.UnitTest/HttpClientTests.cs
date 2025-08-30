@@ -2,8 +2,14 @@
 using Audit.Core.Providers;
 using Audit.Http;
 using Audit.Http.ConfigurationApi;
+using Audit.IntegrationTest;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using Moq;
+
 using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -12,7 +18,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Audit.IntegrationTest;
 
 // ReSharper disable once CheckNamespace
 namespace Audit.HttpClientUnitTest
@@ -538,6 +543,22 @@ namespace Audit.HttpClientUnitTest
             Assert.That(events, Is.Not.Null);
             Assert.That(events, Has.Count.EqualTo(1));
             Assert.That(events[0], Is.TypeOf<AuditEventHttpClient>());
+        }
+
+        [Test]
+        public void AddAuditHandler_Should_Add_AuditHttpClientHandler()
+        {
+            // Arrange
+            var svcCollection = new Mock<IServiceCollection>(MockBehavior.Loose);
+            var clientBuilder = new Mock<IHttpClientBuilder>(MockBehavior.Loose);
+            clientBuilder.Setup(c => c.Services).Returns(svcCollection.Object).Verifiable(Times.Once);
+
+            // Act
+            var result = clientBuilder.Object.AddAuditHandler(cfg => cfg.EventType("Test"));
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<IHttpClientBuilder>());
+            clientBuilder.VerifyAll();
         }
     }
 }

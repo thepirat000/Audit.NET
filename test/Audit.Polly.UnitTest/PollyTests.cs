@@ -9,6 +9,8 @@ using Moq;
 using NUnit.Framework;
 using Polly;
 using System.Collections.Generic;
+using Polly.Hedging;
+#pragma warning disable S5034
 
 namespace Audit.UnitTest
 {
@@ -169,6 +171,136 @@ namespace Audit.UnitTest
 
             Assert.That(primaryDataProvider.FailCountInsert, Is.EqualTo(1));
             Assert.That(primaryDataProvider.SuccessCountInserted, Is.Zero);
+        }
+
+        [Test]
+        public void HedgingActionGeneratorArgumentsExtensions_FallbackToDataProvider_NoAuditEvent()
+        {
+            var dp = new NullDataProvider();
+
+            var rc = ResilienceContextPool.Shared.Get();
+
+            var hedging = new HedgingActionGeneratorArguments<object>(rc, rc, 1, r => new ValueTask<Outcome<object>>());
+
+            var function = hedging.FallbackToDataProvider(dp);
+
+            var result = function.Invoke();
+
+            Assert.That(result.Result.Result, Is.TypeOf<object>());
+        }
+
+        [Test]
+        public void HedgingActionGeneratorArgumentsExtensions_FallbackToDataProvider_InsertEvent()
+        {
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
+            var expectedResult = new object();
+            dp.Setup(d => d.InsertEvent(It.IsAny<AuditEvent>())).Returns(expectedResult).Verifiable(Times.Once);
+
+            var ev = new AuditEvent();
+
+            var rc = ResilienceContextPool.Shared.Get("InsertEvent", false, CancellationToken.None);
+
+            rc.Properties.Set(new ResiliencePropertyKey<AuditEvent>("AuditEvent"), ev);
+            
+            var hedging = new HedgingActionGeneratorArguments<object>(rc, rc, 1, r => new ValueTask<Outcome<object>>());
+
+            var function = hedging.FallbackToDataProvider(dp.Object);
+
+            var result = function.Invoke();
+
+            Assert.That(result.IsCompletedSuccessfully, Is.True);
+            Assert.That(result.Result.Result, Is.SameAs(expectedResult));
+            dp.Verify();
+        }
+
+        [Test]
+        public void HedgingActionGeneratorArgumentsExtensions_FallbackToDataProvider_InsertEventAsync()
+        {
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
+            var expectedResult = new object();
+            dp.Setup(d => d.InsertEventAsync(It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).ReturnsAsync(expectedResult).Verifiable(Times.Once);
+
+            var ev = new AuditEvent();
+
+            var rc = ResilienceContextPool.Shared.Get("InsertEventAsync", false, CancellationToken.None);
+
+            rc.Properties.Set(new ResiliencePropertyKey<AuditEvent>("AuditEvent"), ev);
+
+            var hedging = new HedgingActionGeneratorArguments<object>(rc, rc, 1, r => new ValueTask<Outcome<object>>());
+
+            var function = hedging.FallbackToDataProvider(dp.Object);
+
+            var result = function.Invoke();
+
+            Assert.That(result.IsCompletedSuccessfully, Is.True);
+            Assert.That(result.Result.Result, Is.SameAs(expectedResult));
+            dp.Verify();
+        }
+
+        [Test]
+        public void HedgingActionGeneratorArgumentsExtensions_FallbackToDataProvider_ReplaceEvent()
+        {
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
+
+            dp.Setup(d => d.ReplaceEvent(It.IsAny<object>(), It.IsAny<AuditEvent>())).Verifiable(Times.Once);
+
+            var ev = new AuditEvent();
+
+            var rc = ResilienceContextPool.Shared.Get("ReplaceEvent", false, CancellationToken.None);
+
+            rc.Properties.Set(new ResiliencePropertyKey<AuditEvent>("AuditEvent"), ev);
+
+            var hedging = new HedgingActionGeneratorArguments<object>(rc, rc, 1, r => new ValueTask<Outcome<object>>());
+
+            var function = hedging.FallbackToDataProvider(dp.Object);
+
+            var result = function.Invoke();
+
+            Assert.That(result.IsCompletedSuccessfully, Is.True);
+            dp.Verify();
+        }
+
+        [Test]
+        public void HedgingActionGeneratorArgumentsExtensions_FallbackToDataProvider_ReplaceEventAsync()
+        {
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
+
+            dp.Setup(d => d.ReplaceEventAsync(It.IsAny<object>(), It.IsAny<AuditEvent>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Verifiable(Times.Once);
+
+            var ev = new AuditEvent();
+
+            var rc = ResilienceContextPool.Shared.Get("ReplaceEventAsync", false, CancellationToken.None);
+
+            rc.Properties.Set(new ResiliencePropertyKey<AuditEvent>("AuditEvent"), ev);
+
+            var hedging = new HedgingActionGeneratorArguments<object>(rc, rc, 1, r => new ValueTask<Outcome<object>>());
+
+            var function = hedging.FallbackToDataProvider(dp.Object);
+
+            var result = function.Invoke();
+
+            Assert.That(result.IsCompletedSuccessfully, Is.True);
+            dp.Verify();
+        }
+
+        [Test]
+        public void HedgingActionGeneratorArgumentsExtensions_FallbackToDataProvider_Default()
+        {
+            var dp = new Mock<IAuditDataProvider>(MockBehavior.Strict);
+
+            var ev = new AuditEvent();
+
+            var rc = ResilienceContextPool.Shared.Get("Default", false, CancellationToken.None);
+
+            rc.Properties.Set(new ResiliencePropertyKey<AuditEvent>("AuditEvent"), ev);
+
+            var hedging = new HedgingActionGeneratorArguments<object>(rc, rc, 1, r => new ValueTask<Outcome<object>>());
+
+            var function = hedging.FallbackToDataProvider(dp.Object);
+
+            var result = function.Invoke();
+
+            Assert.That(result.IsCompletedSuccessfully, Is.True);
         }
 
         public class DelayedDataProvider : InMemoryDataProvider

@@ -3,10 +3,10 @@ using StringEnumConverter = System.Text.Json.Serialization.JsonStringEnumConvert
 
 namespace Audit.FileSystem
 {
-    public class FileBinaryContent : FileContent
+    public class FileBinaryContent : IFileContent
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public override ContentType Type { get; set; } = ContentType.Binary;
+        public ContentType Type { get; set; } = ContentType.Binary;
         public byte[] Value { get; set; }
     }
 }

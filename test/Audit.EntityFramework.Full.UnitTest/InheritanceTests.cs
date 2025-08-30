@@ -136,6 +136,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyOne"], Is.EqualTo("one"));
             Assert.That(evs[0].EntityFrameworkEvent.Entries[0].ColumnValues["PropertyTwo"], Is.EqualTo("two"));
 
+
         }
 
     }

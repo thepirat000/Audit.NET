@@ -1,4 +1,5 @@
 using Audit.Core;
+using Audit.Core.ConfigurationApi;
 using Audit.ImmuDB.Providers;
 using Moq;
 using NUnit.Framework;
@@ -27,6 +28,17 @@ namespace Audit.ImmuDB.UnitTest
             Assert.That(dp.ValueSelector(new AuditEvent()), Is.EqualTo("value"));
             Assert.That(dp.ClientBuilderAction, Is.Not.Null);
             Assert.That(dp.UseVerifiedMethods, Is.True);
+        }
+
+        [Test]
+        public void UseImmuDb_SetsDataProvider()
+        {
+            var mockConfigurator = new Mock<IConfigurator>(MockBehavior.Loose);
+            
+            var result = mockConfigurator.Object.UseImmuDb(cfg => cfg.Database("Test"));
+
+            Assert.That(result, Is.InstanceOf<ICreationPolicyConfigurator>());
+            Assert.That(Configuration.DataProvider, Is.TypeOf<ImmuDbDataProvider>());
         }
     }
 }
