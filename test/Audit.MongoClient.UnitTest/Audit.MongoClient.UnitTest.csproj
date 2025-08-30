@@ -4,9 +4,6 @@
 		<TargetFrameworks>net472;netcoreapp3.1;net8.0</TargetFrameworks>
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
-		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
-		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
-		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<DebugType>Full</DebugType>
 		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
