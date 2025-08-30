@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 08/28/2025 - 05:10:04 |
-| Coverage date: | 08/28/2025 - 04:47:37 - 08/28/2025 - 05:09:24 |
+| Generated on: | 08/30/2025 - 03:56:26 |
+| Coverage date: | 08/30/2025 - 03:33:50 - 08/30/2025 - 03:55:41 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 41 |
-| Classes: | 332 |
-| Files: | 286 |
-| **Line coverage:** | 78.7% (8520 of 10824) |
-| Covered lines: | 8520 |
-| Uncovered lines: | 2304 |
-| Coverable lines: | 10824 |
-| Total lines: | 28040 |
-| **Branch coverage:** | 71.5% (3171 of 4429) |
-| Covered branches: | 3171 |
+| Classes: | 331 |
+| Files: | 285 |
+| **Line coverage:** | 79.5% (8608 of 10823) |
+| Covered lines: | 8608 |
+| Uncovered lines: | 2215 |
+| Coverable lines: | 10823 |
+| Total lines: | 28029 |
+| **Branch coverage:** | 71.9% (3188 of 4429) |
+| Covered branches: | 3188 |
 | Total branches: | 4429 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -59,7 +59,7 @@
 |Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|396|87.1%|80|100|80%|
 |**Audit.EntityFramework.Abstractions**|**4**|**2**|**6**|**20**|**66.6%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditOverrideAttribute|4|2|6|20|66.6%|0|0||
-|**Audit.EntityFramework.Core**|**1544**|**320**|**1864**|**5242**|**82.8%**|**764**|**902**|**84.7%**|
+|**Audit.EntityFramework.Core**|**1564**|**300**|**1864**|**5242**|**83.9%**|**764**|**902**|**84.7%**|
 |Audit.Core.DbContextConfiguratorExtensions|2|2|4|37|50%|0|0||
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AuditDbContext|34|0|34|253|100%|0|0||
@@ -76,8 +76,8 @@
 |Audit.EntityFramework.ConfigurationApi.ContextConfigurator|8|0|8|35|100%|4|4|100%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting`1|20|8|28|85|71.4%|3|8|37.5%|
 |Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator`1|14|0|14|57|100%|0|0||
-|Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator|5|12|17|86|29.4%|0|0||
-|Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator`2|5|8|13|86|38.4%|0|0||
+|Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator|17|0|17|86|100%|0|0||
+|Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator`2|13|0|13|86|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.DbContextProviderEntityConfigurator|4|2|6|50|66.6%|1|2|50%|
 |Audit.EntityFramework.ConfigurationApi.DbContextProviderEntityConfigurator`1|4|0|4|50|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.EfEntitySettings|3|0|3|30|100%|0|0||
@@ -111,15 +111,14 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**135**|**29**|**164**|**410**|**82.3%**|**41**|**52**|**78.8%**|
+|**Audit.FileSystem**|**143**|**20**|**163**|**399**|**87.7%**|**42**|**52**|**80.7%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
-|Audit.FileSystem.FileBinaryContent|0|2|2|12|0%|0|0||
-|Audit.FileSystem.FileContent|0|1|1|11|0%|0|0||
+|Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|101|24|125|245|80.8%|41|52|78.8%|
+|Audit.FileSystem.FileSystemMonitor|107|18|125|245|85.6%|42|52|80.7%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
-|**Audit.HttpClient**|**181**|**26**|**207**|**604**|**87.4%**|**78**|**86**|**90.6%**|
+|**Audit.HttpClient**|**182**|**25**|**207**|**604**|**87.9%**|**78**|**86**|**90.6%**|
 |Audit.Http.AuditEventExtensions|3|3|6|32|50%|2|6|33.3%|
 |Audit.Http.AuditEventHttpClient|1|0|1|12|100%|0|0||
 |Audit.Http.AuditHttpClientHandler|130|1|131|282|99.2%|73|76|96%|
@@ -127,7 +126,7 @@
 |Audit.Http.ConfigurationApi.AuditClientHandlerConfigurator|18|20|38|136|47.3%|0|0||
 |Audit.Http.Content|2|0|2|10|100%|0|0||
 |Audit.Http.HttpAction|14|0|14|55|100%|3|4|75%|
-|Audit.Http.HttpClientBuilderAuditExtensions|0|1|1|19|0%|0|0||
+|Audit.Http.HttpClientBuilderAuditExtensions|1|0|1|19|100%|0|0||
 |Audit.Http.Request|6|0|6|16|100%|0|0||
 |Audit.Http.Response|6|0|6|14|100%|0|0||
 |**Audit.MongoClient**|**98**|**19**|**117**|**448**|**83.7%**|**27**|**30**|**90%**|
@@ -221,10 +220,10 @@
 |Audit.AzureStorageTables.ConfigurationApi.AzureTableRowConfigurator|8|2|10|38|80%|0|0||
 |Audit.AzureStorageTables.Providers.AzureTableDataProvider|71|17|88|218|80.6%|18|32|56.2%|
 |Audit.Core.AzureTableConfiguratorExtensions|2|0|2|21|100%|0|0||
-|**Audit.NET.Channels**|**41**|**19**|**60**|**227**|**68.3%**|**9**|**12**|**75%**|
+|**Audit.NET.Channels**|**53**|**7**|**60**|**227**|**88.3%**|**9**|**12**|**75%**|
 |Audit.Channels.Configuration.ChannelProviderConfigurator|6|6|12|34|50%|0|0||
 |Audit.Channels.Providers.ChannelDataProvider|35|1|36|131|97.2%|9|12|75%|
-|Audit.Core.ChannelConfiguratorExtensions|0|12|12|62|0%|0|0||
+|Audit.Core.ChannelConfiguratorExtensions|12|0|12|62|100%|0|0||
 |**Audit.NET.DynamoDB**|**109**|**16**|**125**|**428**|**87.2%**|**49**|**68**|**72%**|
 |Audit.Core.DynamoConfiguratorExtensions|2|6|8|38|25%|0|0||
 |Audit.DynamoDB.Configuration.DynamoProviderAttributeConfigurator|3|0|3|17|100%|0|0||
@@ -243,8 +242,8 @@
 |Audit.Core.FirestoreConfiguratorExtensions|21|0|21|55|100%|0|0||
 |Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator|24|2|26|92|92.3%|0|0||
 |Audit.Firestore.Providers.FirestoreDataProvider|166|2|168|445|98.8%|61|69|88.4%|
-|**Audit.NET.ImmuDB**|**101**|**16**|**117**|**369**|**86.3%**|**24**|**28**|**85.7%**|
-|Audit.Core.ImmuDbConfiguratorExtensions|0|2|2|22|0%|0|0||
+|**Audit.NET.ImmuDB**|**103**|**14**|**117**|**369**|**88%**|**24**|**28**|**85.7%**|
+|Audit.Core.ImmuDbConfiguratorExtensions|2|0|2|22|100%|0|0||
 |Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator|18|10|28|98|64.2%|0|0||
 |Audit.ImmuDB.Providers.ImmuDbDataProvider|83|4|87|249|95.4%|24|28|85.7%|
 |**Audit.NET.JsonNewtonsoftAdapter**|**79**|**17**|**96**|**225**|**82.2%**|**33**|**42**|**78.5%**|
@@ -279,12 +278,12 @@
 |Audit.OpenSearch.Configuration.OpenSearchProviderConfigurator|13|2|15|54|86.6%|0|0||
 |Audit.OpenSearch.Providers.OpenSearchAuditEventId|2|0|2|13|100%|0|0||
 |Audit.OpenSearch.Providers.OpenSearchDataProvider|57|11|68|189|83.8%|25|38|65.7%|
-|**Audit.NET.Polly**|**64**|**23**|**87**|**325**|**73.5%**|**12**|**22**|**54.5%**|
+|**Audit.NET.Polly**|**74**|**13**|**87**|**325**|**85%**|**20**|**22**|**90.9%**|
 |Audit.Core.PollyConfiguratorExtensions|2|0|2|19|100%|0|0||
 |Audit.Polly.Configuration.PollyProviderConfigurator|5|0|5|19|100%|0|0||
 |Audit.Polly.Configuration.PollyResilienceConfigurator|4|0|4|19|100%|0|0||
 |Audit.Polly.FallbackActionArgumentsExtensions|14|2|16|63|87.5%|8|10|80%|
-|Audit.Polly.HedgingActionGeneratorArgumentsExtensions|7|10|17|69|41.1%|2|10|20%|
+|Audit.Polly.HedgingActionGeneratorArgumentsExtensions|17|0|17|69|100%|10|10|100%|
 |Audit.Polly.Providers.PollyDataProvider|31|11|42|120|73.8%|2|2|100%|
 |Audit.Polly.ResilienceContextExtensions|1|0|1|16|100%|0|0||
 |**Audit.NET.PostgreSql**|**147**|**63**|**210**|**568**|**70%**|**36**|**64**|**56.2%**|
@@ -363,23 +362,23 @@
 |Audit.Wcf.Client.AuditEventWcfClient|0|1|1|12|0%|0|0||
 |Audit.Wcf.Client.AuditMessageInspector|0|60|60|115|0%|0|38|0%|
 |Audit.Wcf.Client.WcfClientAction|0|10|10|50|0%|0|0||
-|**Audit.WebApi**|**190**|**142**|**332**|**1193**|**57.2%**|**97**|**212**|**45.7%**|
-|Audit.WebApi.ApiControllerExtensions|1|3|4|92|25%|0|0||
+|**Audit.WebApi**|**218**|**114**|**332**|**1193**|**65.6%**|**104**|**212**|**49%**|
+|Audit.WebApi.ApiControllerExtensions|4|0|4|92|100%|0|0||
 |Audit.WebApi.AuditApiAction|21|2|23|74|91.3%|0|0||
 |Audit.WebApi.AuditApiAdapter|99|29|128|250|77.3%|59|106|55.6%|
 |Audit.WebApi.AuditApiAttribute|30|3|33|133|90.9%|14|18|77.7%|
-|Audit.WebApi.AuditApiGlobalFilter|0|39|39|140|0%|0|28|0%|
+|Audit.WebApi.AuditApiGlobalFilter|17|22|39|140|43.5%|1|28|3.5%|
 |Audit.WebApi.AuditApiHelper|8|4|12|139|66.6%|6|12|50%|
 |Audit.WebApi.AuditEventExtensions|2|4|6|32|33.3%|1|6|16.6%|
 |Audit.WebApi.AuditEventWebApi|1|0|1|16|100%|0|0||
 |Audit.WebApi.BodyContent|3|0|3|9|100%|0|0||
-|Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|0|21|21|63|0%|0|4|0%|
-|Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|0|26|26|109|0%|0|0||
-|Audit.WebApi.ContextWrapper|25|11|36|136|69.4%|17|38|44.7%|
-|**Audit.WebApi.Core**|**406**|**82**|**488**|**1444**|**83.1%**|**198**|**284**|**69.7%**|
-|Audit.WebApi.ApiControllerExtensions|1|5|6|92|16.6%|0|0||
+|Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|3|18|21|63|14.2%|0|4|0%|
+|Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|2|24|26|109|7.6%|0|0||
+|Audit.WebApi.ContextWrapper|28|8|36|136|77.7%|23|38|60.5%|
+|**Audit.WebApi.Core**|**413**|**75**|**488**|**1444**|**84.6%**|**199**|**284**|**70%**|
+|Audit.WebApi.ApiControllerExtensions|6|0|6|92|100%|0|0||
 |Audit.WebApi.AuditApiAction|22|2|24|74|91.6%|0|0||
-|Audit.WebApi.AuditApiAdapter|116|27|143|308|81.1%|89|136|65.4%|
+|Audit.WebApi.AuditApiAdapter|116|27|143|308|81.1%|90|136|66.1%|
 |Audit.WebApi.AuditApiAttribute|35|2|37|130|94.5%|15|16|93.7%|
 |Audit.WebApi.AuditApiGlobalFilter|32|1|33|140|96.9%|18|20|90%|
 |Audit.WebApi.AuditApiHelper|47|5|52|139|90.3%|23|36|63.8%|
@@ -389,6 +388,6 @@
 |Audit.WebApi.AuditMiddleware|97|2|99|181|97.9%|47|60|78.3%|
 |Audit.WebApi.AuditMiddlewareExtensions|3|0|3|24|100%|0|0||
 |Audit.WebApi.BodyContent|3|0|3|9|100%|0|0||
-|Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|9|12|21|63|42.8%|1|6|16.6%|
+|Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|11|10|21|63|52.3%|1|6|16.6%|
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|12|14|26|109|46.1%|0|0||
 |Audit.WebApi.ConfigurationApi.AuditMiddlewareConfigurator|22|8|30|104|73.3%|4|4|100%|
