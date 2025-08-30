@@ -37,7 +37,7 @@ namespace Audit.UnitTest
             Configuration.StartActivityTrace = true;
             Configuration.DataProvider = new InMemoryDataProvider();
             Configuration.AuditDisabled = true;
-            Configuration.AddOnCreatedAction(s => { });
+            Configuration.AddOnCreatedAction(s => true);
             Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
             
             Configuration.Reset();
@@ -109,6 +109,7 @@ namespace Audit.UnitTest
             {
                 await Task.Delay(500);
                 scope.Comment("OnScopeCreated");
+                return true;
             });
             Audit.Core.Configuration.AddCustomAction(ActionType.OnEventSaving, async scope =>
             {
@@ -706,6 +707,8 @@ namespace Audit.UnitTest
                     {
                         //do nothing, just bother
                         var d = ev.Event.Duration * 1234567;
+
+                        return true;
                     });
                     factory.Create(new AuditScopeOptions() { EventType = "LoginFailed", ExtraFields = new { username = "adriano", id = i * -1 }, IsCreateAndSave = true });
                 }));

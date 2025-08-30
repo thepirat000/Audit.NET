@@ -47,7 +47,7 @@ namespace Audit.UnitTest
                 scope.Save();
             }
             Assert.That(getProviderCount, Is.EqualTo(5));
-            Audit.Core.Configuration.DataProvider = new DeferredDataProvider(ev => GetProvider());
+            Audit.Core.Configuration.DataProviderFactory = () => new DeferredDataProvider(ev => GetProvider());
             Audit.Core.Configuration.CreationPolicy = EventCreationPolicy.InsertOnEnd;
             using (var scope = AuditScope.Create("Test", null, new { custom = "value" }))
             {

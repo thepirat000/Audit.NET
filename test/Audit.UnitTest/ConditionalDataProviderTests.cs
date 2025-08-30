@@ -37,7 +37,7 @@ namespace Audit.UnitTest
             var conditionalDataProvider = new ConditionalDataProvider(config => config
                 .When(ev => ev.EventType == "A", dp_1.Object)
                 .When(ev => ev.EventType == "B", dp_2.Object)
-                .Otherwise(dp_3.Object));
+                .Otherwise(_ => dp_3.Object));
             
             // Act
             conditionalDataProvider.InsertEvent(auditEvent);
@@ -131,7 +131,7 @@ namespace Audit.UnitTest
             var conditionalDataProvider = new ConditionalDataProvider(config => config
                 .When(ev => ev.EventType == "A", dp_1.Object)
                 .When(ev => ev.EventType == "B", dp_2.Object)
-                .Otherwise(dp_3.Object));
+                .Otherwise(() => dp_3.Object));
 
             // Act
             await conditionalDataProvider.ReplaceEventAsync(null, auditEvent);

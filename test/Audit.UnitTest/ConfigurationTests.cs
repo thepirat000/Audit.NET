@@ -64,6 +64,26 @@ namespace Audit.UnitTest
         }
 
         [Test]
+        public void TestConfiguration_AddOnSavingAction_AsFunc()
+        {
+            // Arrange
+            int test = 0;
+
+            // Act
+            Core.Configuration.AddOnSavingAction(scope => 
+            { 
+                test++;
+                return true;
+            });
+
+            var scope = AuditScope.Create("test", null);
+            scope.Save();
+
+            // Assert
+            Assert.That(test, Is.EqualTo(1));
+        }
+
+        [Test]
         public async Task TestConfiguration_AddOnSavingActionAsync()
         {
             // Arrange
@@ -182,6 +202,7 @@ namespace Audit.UnitTest
             {
                 await Task.Yield();
                 onDisposed++;
+                return true;
             });
 
             var scope = AuditScope.Create(new AuditScopeOptions() { DataProvider = new NullDataProvider() });
