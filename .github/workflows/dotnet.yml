@@ -1,4 +1,8 @@
-﻿# This workflow will build a .NET project
+﻿#
+# This workflow is deprecated, use the CI-BuildAndTest.yml workflow instead.
+#
+
+# This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: BUILD & RUN TESTS

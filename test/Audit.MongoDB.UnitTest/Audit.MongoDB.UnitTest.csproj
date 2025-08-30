@@ -12,7 +12,7 @@
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 		<DebugType>Full</DebugType>
-		<SignAssembly>true</SignAssembly>
+		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
 
 	<ItemGroup>

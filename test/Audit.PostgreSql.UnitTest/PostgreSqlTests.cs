@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Audit.Core;
 using Audit.IntegrationTest;
 using Audit.PostgreSql.Configuration;
@@ -245,6 +246,120 @@ namespace Audit.PostgreSql.UnitTest
             Assert.That(auditEventLoaded.CustomFields, Is.Not.Null);
             Assert.That(auditEventLoaded.CustomFields.Count, Is.EqualTo(1));
             Assert.That(auditEventLoaded.CustomFields["Field1"].ToString(), Is.EqualTo("Value1"));
+        }
+
+        [Test]
+        public async Task Test_AuditEventData_AsTextAsync()
+        {
+            // Arrange
+            var dp = new CustomPostgreSqlDataProvider(config => config
+                .ConnectionString(TestCommon.PostgreSqlConnectionString)
+                .TableName("event_text")
+                .IdColumnName("id")
+                .DataColumn("data", Configuration.DataType.String)
+                .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
+                .CustomColumn("event_type", ev => ev.EventType)
+                .CustomColumn("some_date", ev => DateTime.UtcNow)
+                .CustomColumn("some_null", ev => null));
+
+            var auditEvent = new AuditEvent()
+            {
+                EventType = "EventType",
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"Field1", "Value1"}
+                }
+            };
+
+            // Act
+            var id = (long) await dp.InsertEventAsync(auditEvent);
+            var auditEventLoaded = await dp.GetEventAsync<AuditEvent>(id);
+
+            // Assert
+            Assert.That(id, Is.TypeOf<long>());
+            Assert.That(auditEventLoaded, Is.Not.Null);
+            Assert.That(auditEventLoaded.EventType, Is.EqualTo("EventType"));
+            Assert.That(auditEventLoaded.CustomFields, Is.Not.Null);
+            Assert.That(auditEventLoaded.CustomFields.Count, Is.EqualTo(1));
+            Assert.That(auditEventLoaded.CustomFields["Field1"].ToString(), Is.EqualTo("Value1"));
+        }
+
+        [Test]
+        public void Test_AuditEventData_Replace()
+        {
+            // Arrange
+            var dp = new CustomPostgreSqlDataProvider(config => config
+                .ConnectionString(TestCommon.PostgreSqlConnectionString)
+                .TableName("event_text")
+                .IdColumnName("id")
+                .DataColumn("data", Configuration.DataType.String)
+                .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
+                .CustomColumn("event_type", ev => ev.EventType)
+                .CustomColumn("some_date", ev => DateTime.UtcNow)
+                .CustomColumn("some_null", ev => null));
+
+            var auditEvent = new AuditEvent()
+            {
+                EventType = "EventType",
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"Field1", "Value1"}
+                }
+            };
+
+            // Act
+            var id = (long)dp.InsertEvent(auditEvent);
+            auditEvent.CustomFields["Field2"] = "Value2";
+            dp.ReplaceEvent(id, auditEvent);
+            var auditEventLoaded = dp.GetEvent<AuditEvent>(id);
+
+            // Assert
+            Assert.That(id, Is.TypeOf<long>());
+            Assert.That(auditEventLoaded, Is.Not.Null);
+            Assert.That(auditEventLoaded.EventType, Is.EqualTo("EventType"));
+            Assert.That(auditEventLoaded.CustomFields, Is.Not.Null);
+            Assert.That(auditEventLoaded.CustomFields.Count, Is.EqualTo(2));
+            Assert.That(auditEventLoaded.CustomFields["Field1"].ToString(), Is.EqualTo("Value1"));
+            Assert.That(auditEventLoaded.CustomFields["Field2"].ToString(), Is.EqualTo("Value2"));
+        }
+
+        [Test]
+        public async Task Test_AuditEventData_ReplaceAsync()
+        {
+            // Arrange
+            var dp = new CustomPostgreSqlDataProvider(config => config
+                .ConnectionString(TestCommon.PostgreSqlConnectionString)
+                .TableName("event_text")
+                .IdColumnName("id")
+                .DataColumn("data", Configuration.DataType.String)
+                .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
+                .CustomColumn("event_type", ev => ev.EventType)
+                .CustomColumn("some_date", ev => DateTime.UtcNow)
+                .CustomColumn("some_null", ev => null));
+
+            var auditEvent = new AuditEvent()
+            {
+                EventType = "EventType",
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"Field1", "Value1"}
+                }
+            };
+
+            // Act
+            var id = (long)await dp.InsertEventAsync(auditEvent);
+            auditEvent.CustomFields["Field2"] = "Value2";
+            await dp.ReplaceEventAsync(id, auditEvent);
+            var auditEventLoaded = await dp.GetEventAsync<AuditEvent>(id);
+
+            // Assert
+            Assert.That(id, Is.TypeOf<long>());
+            Assert.That(auditEventLoaded, Is.Not.Null);
+            Assert.That(auditEventLoaded.EventType, Is.EqualTo("EventType"));
+            Assert.That(auditEventLoaded.CustomFields, Is.Not.Null);
+            Assert.That(auditEventLoaded.CustomFields.Count, Is.EqualTo(2));
+            Assert.That(auditEventLoaded.CustomFields["Field1"].ToString(), Is.EqualTo("Value1"));
+            Assert.That(auditEventLoaded.CustomFields["Field2"].ToString(), Is.EqualTo("Value2"));
         }
 
         private static string GetLastUpdatedColumnNameColumnName()

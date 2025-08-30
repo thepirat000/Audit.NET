@@ -8,7 +8,7 @@
 		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<DebugType>Full</DebugType>
-		<SignAssembly>true</SignAssembly>
+		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
