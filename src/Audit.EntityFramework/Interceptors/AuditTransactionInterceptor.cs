@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Audit.EntityFramework.Interceptors
@@ -300,27 +301,13 @@ namespace Audit.EntityFramework.Interceptors
         {
             var context = tranEvent.TransactionEvent.DbContext as IAuditDbContext;
 
-            var typeName = tranEvent.TransactionEvent.DbContext?.GetType().Name;
-            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{database}:{transaction}")
-                .Replace("{context}", typeName)
-                .Replace("{database}", tranEvent.TransactionEvent.Database)
-                .Replace("{transaction}", tranEvent.TransactionEvent.TransactionId);
-
-            if (context?.ExtraFields?.Count > 0)
+            if (context?.AuditDisabled == true)
             {
-                tranEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+                return null;
             }
 
-            var factory = _dbContextHelper.GetAuditScopeFactory(tranEvent.TransactionEvent.DbContext);
-            var dataProvider = _dbContextHelper.GetDataProvider(tranEvent.TransactionEvent.DbContext);
-
-            var options = new AuditScopeOptions()
-            {
-                EventType = eventType,
-                AuditEvent = tranEvent,
-                SkipExtraFrames = 3,
-                DataProvider = dataProvider
-            };
+            var options = GetAuditScopeOptions(tranEvent);
+            var factory = _dbContextHelper.GetAuditScopeFactory((DbContext)context);
 
             var scope = factory.Create(options);
             context?.OnScopeCreated(scope);
@@ -331,19 +318,36 @@ namespace Audit.EntityFramework.Interceptors
         {
             var context = tranEvent.TransactionEvent.DbContext as IAuditDbContext;
 
-            var typeName = tranEvent.TransactionEvent.DbContext?.GetType().Name;
-            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{database}:{transaction}")
+            if (context?.AuditDisabled == true)
+            {
+                return null;
+            }
+
+            var options = GetAuditScopeOptions(tranEvent);
+            var factory = _dbContextHelper.GetAuditScopeFactory((DbContext)context);
+            
+            var scope = await factory.CreateAsync(options, cancellationToken);
+            context?.OnScopeCreated(scope);
+            return scope;
+        }
+
+        private AuditScopeOptions GetAuditScopeOptions(AuditEventTransactionEntityFramework tranEvent)
+        {
+            var dbContext = tranEvent.TransactionEvent.DbContext;
+            var auditDbContext = dbContext as IAuditDbContext;
+
+            var typeName = dbContext.GetType().Name;
+            var eventType = (this.AuditEventType ?? auditDbContext?.AuditEventType ?? "{database}:{transaction}")
                 .Replace("{context}", typeName)
                 .Replace("{database}", tranEvent.TransactionEvent.Database)
                 .Replace("{transaction}", tranEvent.TransactionEvent.TransactionId);
 
-            if (context?.ExtraFields?.Count > 0)
+            if (auditDbContext?.ExtraFields?.Count > 0)
             {
-                tranEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+                tranEvent.CustomFields = new Dictionary<string, object>(auditDbContext.ExtraFields);
             }
 
-            var factory = _dbContextHelper.GetAuditScopeFactory(tranEvent.TransactionEvent.DbContext);
-            var dataProvider = _dbContextHelper.GetDataProvider(tranEvent.TransactionEvent.DbContext);
+            var dataProvider = _dbContextHelper.GetDataProvider(dbContext);
 
             var options = new AuditScopeOptions()
             {
@@ -353,9 +357,7 @@ namespace Audit.EntityFramework.Interceptors
                 DataProvider = dataProvider
             };
 
-            var scope = await factory.CreateAsync(options, cancellationToken);
-            context?.OnScopeCreated(scope);
-            return scope;
+            return options;
         }
 
         private void EndScope()

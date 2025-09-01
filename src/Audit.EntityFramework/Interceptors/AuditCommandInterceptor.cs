@@ -376,28 +376,10 @@ namespace Audit.EntityFramework.Interceptors
                 return null;
             }
 
-            var typeName = cmdEvent.CommandEvent.DbContext?.GetType().Name;
-            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{method}")
-                .Replace("{context}", typeName)
-                .Replace("{database}", cmdEvent.CommandEvent.Database)
-                .Replace("{method}", cmdEvent.CommandEvent.Method.ToString());
-
-            if (context?.ExtraFields?.Count > 0)
-            {
-                cmdEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
-            }
+            var options = GetAuditScopeOptions(cmdEvent);
 
             var factory = _dbContextHelper.GetAuditScopeFactory(cmdEvent.CommandEvent.DbContext);
-            var dataProvider = _dbContextHelper.GetDataProvider(cmdEvent.CommandEvent.DbContext);
 
-            var options = new AuditScopeOptions()
-            {
-                EventType = eventType,
-                AuditEvent = cmdEvent,
-                SkipExtraFrames = 3,
-                DataProvider = dataProvider
-            };
-            
             var scope = factory.Create(options);
             context?.OnScopeCreated(scope);
             return scope;
@@ -412,18 +394,31 @@ namespace Audit.EntityFramework.Interceptors
                 return null;
             }
 
-            var typeName = cmdEvent.CommandEvent.DbContext?.GetType().Name;
-            var eventType = (this.AuditEventType ?? context?.AuditEventType ?? "{method}")
+            var options = GetAuditScopeOptions(cmdEvent);
+
+            var factory = _dbContextHelper.GetAuditScopeFactory(cmdEvent.CommandEvent.DbContext);
+
+            var scope = await factory.CreateAsync(options, cancellationToken);
+            context?.OnScopeCreated(scope);
+            return scope;
+        }
+
+        private AuditScopeOptions GetAuditScopeOptions(AuditEventCommandEntityFramework cmdEvent)
+        {
+            var dbContext = cmdEvent.CommandEvent.DbContext;
+            var auditDbContext = cmdEvent.CommandEvent.DbContext as IAuditDbContext;
+
+            var typeName = dbContext.GetType().Name;
+            var eventType = (this.AuditEventType ?? auditDbContext?.AuditEventType ?? "{method}")
                 .Replace("{context}", typeName)
                 .Replace("{database}", cmdEvent.CommandEvent.Database)
                 .Replace("{method}", cmdEvent.CommandEvent.Method.ToString());
-            
-            if (context?.ExtraFields?.Count > 0)
+
+            if (auditDbContext?.ExtraFields?.Count > 0)
             {
-                cmdEvent.CustomFields = new Dictionary<string, object>(context.ExtraFields);
+                cmdEvent.CustomFields = new Dictionary<string, object>(auditDbContext.ExtraFields);
             }
-            
-            var factory = _dbContextHelper.GetAuditScopeFactory(cmdEvent.CommandEvent.DbContext);
+
             var dataProvider = _dbContextHelper.GetDataProvider(cmdEvent.CommandEvent.DbContext);
 
             var options = new AuditScopeOptions()
@@ -434,9 +429,7 @@ namespace Audit.EntityFramework.Interceptors
                 DataProvider = dataProvider
             };
 
-            var scope = await factory.CreateAsync(options, cancellationToken);
-            context?.OnScopeCreated(scope);
-            return scope;
+            return options;
         }
 
         private void EndScope()
