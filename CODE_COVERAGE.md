@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 08/30/2025 - 05:48:28 |
-| Coverage date: | 08/30/2025 - 05:25:31 - 08/30/2025 - 05:47:42 |
+| Generated on: | 08/31/2025 - 00:20:51 |
+| Coverage date: | 08/30/2025 - 23:57:54 - 08/31/2025 - 00:20:13 |
 | Parser: | MultiReport (96x Cobertura) |
-| Assemblies: | 41 |
-| Classes: | 331 |
-| Files: | 285 |
-| **Line coverage:** | 80.1% (8675 of 10823) |
-| Covered lines: | 8675 |
-| Uncovered lines: | 2148 |
-| Coverable lines: | 10823 |
-| Total lines: | 28029 |
-| **Branch coverage:** | 72% (3189 of 4429) |
-| Covered branches: | 3189 |
-| Total branches: | 4429 |
+| Assemblies: | 40 |
+| Classes: | 320 |
+| Files: | 274 |
+| **Line coverage:** | 82.8% (8775 of 10596) |
+| Covered lines: | 8775 |
+| Uncovered lines: | 1821 |
+| Coverable lines: | 10596 |
+| Total lines: | 27403 |
+| **Branch coverage:** | 73.9% (3230 of 4369) |
+| Covered branches: | 3230 |
+| Total branches: | 4369 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -260,10 +260,10 @@
 |Audit.Core.Log4netConfiguratorExtensions|2|2|4|32|50%|0|0||
 |Audit.log4net.Configuration.Log4netConfigurator|6|6|12|47|50%|0|0||
 |Audit.log4net.Providers.Log4netDataProvider|31|7|38|116|81.5%|12|20|60%|
-|**Audit.NET.MongoDB**|**123**|**57**|**180**|**446**|**68.3%**|**30**|**54**|**55.5%**|
+|**Audit.NET.MongoDB**|**171**|**9**|**180**|**446**|**95%**|**51**|**54**|**94.4%**|
 |Audit.Core.MongoConfiguratorExtensions|12|8|20|55|60%|0|0||
 |Audit.MongoDB.ConfigurationApi.MongoProviderConfigurator|15|0|15|50|100%|0|0||
-|Audit.MongoDB.Providers.MongoDataProvider|96|49|145|341|66.2%|30|54|55.5%|
+|Audit.MongoDB.Providers.MongoDataProvider|144|1|145|341|99.3%|51|54|94.4%|
 |**Audit.NET.MySql**|**124**|**26**|**150**|**365**|**82.6%**|**30**|**36**|**83.3%**|
 |Audit.Core.MySqlServerConfiguratorExtensions|14|0|14|49|100%|0|0||
 |Audit.MySql.Configuration.MySqlServerProviderConfigurator|15|0|15|45|100%|0|0||
@@ -286,11 +286,11 @@
 |Audit.Polly.HedgingActionGeneratorArgumentsExtensions|17|0|17|69|100%|10|10|100%|
 |Audit.Polly.Providers.PollyDataProvider|31|11|42|120|73.8%|2|2|100%|
 |Audit.Polly.ResilienceContextExtensions|1|0|1|16|100%|0|0||
-|**Audit.NET.PostgreSql**|**147**|**63**|**210**|**568**|**70%**|**36**|**64**|**56.2%**|
+|**Audit.NET.PostgreSql**|**199**|**11**|**210**|**568**|**94.7%**|**56**|**64**|**87.5%**|
 |Audit.Core.PostgreSqlConfiguratorExtensions|0|2|2|21|0%|0|0||
 |Audit.PostgreSql.Configuration.PostgreSqlProviderConfigurator|34|0|34|102|100%|0|0||
 |Audit.PostgreSql.CustomColumn|6|2|8|24|75%|0|0||
-|Audit.PostgreSql.Providers.PostgreSqlDataProvider|107|59|166|421|64.4%|36|64|56.2%|
+|Audit.PostgreSql.Providers.PostgreSqlDataProvider|159|7|166|421|95.7%|56|64|87.5%|
 |**Audit.NET.RavenDB**|**66**|**22**|**88**|**288**|**75%**|**6**|**8**|**75%**|
 |Audit.RavenDB.ConfigurationApi.RavenDbConfiguratorExtensions|2|0|2|21|100%|0|0||
 |Audit.RavenDB.ConfigurationApi.RavenDbProviderConfigurator|5|10|15|39|33.3%|0|0||
@@ -343,18 +343,6 @@
 |Audit.SignalR.SignalrEventOutgoing|7|0|7|25|100%|0|0||
 |Audit.SignalR.SignalrEventReconnect|7|0|7|25|100%|0|0||
 |Audit.SignalR.SignalrExtensions|22|6|28|169|78.5%|16|24|66.6%|
-|**Audit.WCF**|**0**|**227**|**227**|**626**|**0%**|**0**|**60**|**0%**|
-|Audit.WCF.AuditBehavior|0|8|8|72|0%|0|0||
-|Audit.WCF.AuditBehaviorAttribute|0|20|20|90|0%|0|6|0%|
-|Audit.WCF.AuditEventExtensions|0|6|6|32|0%|0|6|0%|
-|Audit.WCF.AuditEventWcfAction|0|1|1|15|0%|0|0||
-|Audit.WCF.AuditOperationInvoker|0|140|140|260|0%|0|44|0%|
-|Audit.WCF.AuditScopeAsyncResult|0|11|11|27|0%|0|0||
-|Audit.WCF.AuditScopeState|0|3|3|12|0%|0|0||
-|Audit.WCF.AuditWcfEventElement|0|6|6|19|0%|0|2|0%|
-|Audit.WCF.AuditWcfEventFault|0|6|6|15|0%|0|0||
-|Audit.WCF.WcfEvent|0|15|15|26|0%|0|0||
-|Audit.WCF.WcfOperationContext|0|11|11|58|0%|0|2|0%|
 |**Audit.Wcf.Client**|**0**|**105**|**105**|**341**|**0%**|**0**|**44**|**0%**|
 |Audit.Wcf.Client.AuditBehavior|0|11|11|74|0%|0|0||
 |Audit.Wcf.Client.AuditEndpointBehavior|0|17|17|59|0%|0|0||
