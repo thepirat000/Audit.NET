@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/01/2025 - 23:14:36 |
-| Coverage date: | 09/01/2025 - 22:52:16 - 09/01/2025 - 23:13:51 |
+| Generated on: | 09/02/2025 - 05:08:31 |
+| Coverage date: | 09/02/2025 - 04:46:06 - 09/02/2025 - 05:07:54 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 82.7% (8732 of 10550) |
-| Covered lines: | 8732 |
-| Uncovered lines: | 1818 |
-| Coverable lines: | 10550 |
-| Total lines: | 27293 |
-| **Branch coverage:** | 74.1% (3198 of 4313) |
-| Covered branches: | 3198 |
-| Total branches: | 4313 |
+| **Line coverage:** | 83.7% (8836 of 10549) |
+| Covered lines: | 8836 |
+| Uncovered lines: | 1713 |
+| Coverable lines: | 10549 |
+| Total lines: | 27284 |
+| **Branch coverage:** | 74.3% (3206 of 4311) |
+| Covered branches: | 3206 |
+| Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -111,40 +111,40 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**143**|**20**|**163**|**399**|**87.7%**|**42**|**52**|**80.7%**|
+|**Audit.FileSystem**|**140**|**23**|**163**|**399**|**85.8%**|**42**|**52**|**80.7%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|107|18|125|245|85.6%|42|52|80.7%|
+|Audit.FileSystem.FileSystemMonitor|104|21|125|245|83.2%|42|52|80.7%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
-|**Audit.HttpClient**|**182**|**25**|**207**|**604**|**87.9%**|**78**|**86**|**90.6%**|
+|**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
 |Audit.Http.AuditEventExtensions|3|3|6|32|50%|2|6|33.3%|
 |Audit.Http.AuditEventHttpClient|1|0|1|12|100%|0|0||
 |Audit.Http.AuditHttpClientHandler|130|1|131|282|99.2%|73|76|96%|
 |Audit.Http.ClientFactory|1|1|2|28|50%|0|0||
-|Audit.Http.ConfigurationApi.AuditClientHandlerConfigurator|18|20|38|136|47.3%|0|0||
+|Audit.Http.ConfigurationApi.AuditClientHandlerConfigurator|38|0|38|136|100%|0|0||
 |Audit.Http.Content|2|0|2|10|100%|0|0||
 |Audit.Http.HttpAction|14|0|14|55|100%|3|4|75%|
 |Audit.Http.HttpClientBuilderAuditExtensions|1|0|1|19|100%|0|0||
 |Audit.Http.Request|6|0|6|16|100%|0|0||
 |Audit.Http.Response|6|0|6|14|100%|0|0||
-|**Audit.MongoClient**|**98**|**19**|**117**|**448**|**83.7%**|**27**|**30**|**90%**|
+|**Audit.MongoClient**|**113**|**4**|**117**|**448**|**96.5%**|**29**|**30**|**96.6%**|
 |Audit.MongoClient.AuditEventMongoCommand|1|0|1|15|100%|0|0||
 |Audit.MongoClient.ClusterBuilderExtensions|2|0|2|20|100%|0|0||
-|Audit.MongoClient.ConfigurationApi.AuditMongoConfigurator|4|12|16|72|25%|0|0||
-|Audit.MongoClient.MongoAuditEventSubscriber|74|1|75|193|98.6%|27|28|96.4%|
-|Audit.MongoClient.MongoClientSettingsExtensions|0|4|4|28|0%|0|2|0%|
+|Audit.MongoClient.ConfigurationApi.AuditMongoConfigurator|16|0|16|72|100%|0|0||
+|Audit.MongoClient.MongoAuditEventSubscriber|73|2|75|193|97.3%|27|28|96.4%|
+|Audit.MongoClient.MongoClientSettingsExtensions|4|0|4|28|100%|2|2|100%|
 |Audit.MongoClient.MongoCommandEvent|13|2|15|95|86.6%|0|0||
 |Audit.MongoClient.MongoConnection|4|0|4|25|100%|0|0||
-|**Audit.Mvc**|**155**|**34**|**189**|**488**|**82%**|**72**|**130**|**55.3%**|
+|**Audit.Mvc**|**157**|**32**|**189**|**488**|**83%**|**72**|**130**|**55.3%**|
 |Audit.Mvc.AuditAction|22|2|24|65|91.6%|0|0||
 |Audit.Mvc.AuditAttribute|121|20|141|293|85.8%|68|112|60.7%|
 |Audit.Mvc.AuditEventExtensions|2|4|6|32|33.3%|1|6|16.6%|
 |Audit.Mvc.AuditEventMvcAction|1|0|1|16|100%|0|0||
 |Audit.Mvc.AuditHelper|6|6|12|42|50%|3|12|25%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
-|Audit.Mvc.ControllerExtensions|0|2|2|31|0%|0|0||
+|Audit.Mvc.ControllerExtensions|2|0|2|31|100%|0|0||
 |**Audit.Mvc.Core**|**325**|**59**|**384**|**904**|**84.6%**|**191**|**318**|**60%**|
 |Audit.Mvc.AuditAction|23|3|26|65|88.4%|0|0||
 |Audit.Mvc.AuditAttribute|166|18|184|381|90.2%|103|154|66.8%|
@@ -154,7 +154,7 @@
 |Audit.Mvc.AuditPageFilter|115|28|143|304|80.4%|77|142|54.2%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|1|2|3|40|33.3%|0|0||
-|**Audit.NET**|**1329**|**71**|**1400**|**4580**|**94.9%**|**300**|**346**|**86.7%**|
+|**Audit.NET**|**1339**|**61**|**1400**|**4580**|**95.6%**|**300**|**346**|**86.7%**|
 |Audit.Core.AuditActivityEvent|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|78|100%|0|0||
@@ -173,7 +173,7 @@
 |Audit.Core.ConfigurationApi.BlockingCollectionProviderConfigurator|10|0|10|32|100%|0|0||
 |Audit.Core.ConfigurationApi.BlockingCollectionProviderExtraConfigurator|2|0|2|13|100%|0|0||
 |Audit.Core.ConfigurationApi.ConditionalDataProviderConfigurator|37|0|37|77|100%|0|0||
-|Audit.Core.ConfigurationApi.Configurator|59|8|67|195|88%|0|0||
+|Audit.Core.ConfigurationApi.Configurator|67|0|67|195|100%|0|0||
 |Audit.Core.ConfigurationApi.CreationPolicyConfigurator|10|0|10|35|100%|0|0||
 |Audit.Core.ConfigurationApi.DynamicAsyncDataProviderConfigurator|21|2|23|79|91.3%|0|0||
 |Audit.Core.ConfigurationApi.DynamicDataProviderConfigurator|11|2|13|47|84.6%|0|0||
@@ -188,7 +188,7 @@
 |Audit.Core.Providers.BlockingCollectionDataProvider|37|2|39|169|94.8%|18|22|81.8%|
 |Audit.Core.Providers.DynamicAsyncDataProvider|45|2|47|169|95.7%|6|6|100%|
 |Audit.Core.Providers.DynamicDataProvider|28|3|31|106|90.3%|6|6|100%|
-|Audit.Core.Providers.EventLogDataProvider|13|14|27|82|48.1%|2|10|20%|
+|Audit.Core.Providers.EventLogDataProvider|15|12|27|82|55.5%|2|10|20%|
 |Audit.Core.Providers.FileDataProvider|56|0|56|153|100%|12|12|100%|
 |Audit.Core.Providers.InMemoryDataProvider|26|0|26|76|100%|0|0||
 |Audit.Core.Providers.NullDataProvider|6|0|6|36|100%|0|0||
@@ -197,26 +197,26 @@
 |Audit.Core.Providers.Wrappers.LazyDataProvider|7|0|7|31|100%|0|0||
 |Audit.Core.Providers.Wrappers.WrapperDataProvider|15|0|15|68|100%|9|18|50%|
 |Audit.Core.Setting`1|14|0|14|81|100%|2|2|100%|
-|**Audit.NET.AzureCosmos**|**109**|**14**|**123**|**406**|**88.6%**|**35**|**46**|**76%**|
-|Audit.AzureCosmos.ConfigurationApi.AzureCosmosProviderConfigurator|15|10|25|83|60%|0|0||
+|**Audit.NET.AzureCosmos**|**113**|**10**|**123**|**406**|**91.8%**|**35**|**46**|**76%**|
+|Audit.AzureCosmos.ConfigurationApi.AzureCosmosProviderConfigurator|17|8|25|83|68%|0|0||
 |Audit.AzureCosmos.Providers.AuditCosmosSerializer|9|2|11|36|81.8%|4|6|66.6%|
 |Audit.AzureCosmos.Providers.AzureCosmosDataProvider|85|0|85|266|100%|31|40|77.5%|
-|Audit.Core.AzureCosmosConfiguratorExtensions|0|2|2|21|0%|0|0||
-|**Audit.NET.AzureEventHubs**|**51**|**16**|**67**|**234**|**76.1%**|**7**|**14**|**50%**|
+|Audit.Core.AzureCosmosConfiguratorExtensions|2|0|2|21|100%|0|0||
+|**Audit.NET.AzureEventHubs**|**53**|**14**|**67**|**234**|**79.1%**|**7**|**14**|**50%**|
 |Audit.AzureEventHubs.ConfigurationApi.AzureEventHubsConnectionConfigurator|9|4|13|39|69.2%|0|0||
 |Audit.AzureEventHubs.ConfigurationApi.AzureEventHubsCustomConfigurator|2|2|4|20|50%|0|0||
 |Audit.AzureEventHubs.Providers.AzureEventHubsDataProvider|40|8|48|156|83.3%|7|14|50%|
-|Audit.Core.AzureEventHubsConfiguratorExtensions|0|2|2|19|0%|0|0||
-|**Audit.NET.AzureStorageBlobs**|**112**|**37**|**149**|**450**|**75.1%**|**21**|**30**|**70%**|
-|Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobConnectionConfigurator|6|3|9|32|66.6%|0|0||
+|Audit.Core.AzureEventHubsConfiguratorExtensions|2|0|2|19|100%|0|0||
+|**Audit.NET.AzureStorageBlobs**|**117**|**32**|**149**|**450**|**78.5%**|**21**|**30**|**70%**|
+|Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobConnectionConfigurator|9|0|9|32|100%|0|0||
 |Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobContainerConfigurator|8|8|16|66|50%|0|0||
 |Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobCredentialConfiguration|4|4|8|39|50%|0|0||
 |Audit.AzureStorageBlobs.Providers.AzureStorageBlobDataProvider|94|20|114|292|82.4%|21|30|70%|
-|Audit.Core.AzureConfiguratorExtensions|0|2|2|21|0%|0|0||
-|**Audit.NET.AzureStorageTables**|**126**|**35**|**161**|**481**|**78.2%**|**26**|**48**|**54.1%**|
+|Audit.Core.AzureConfiguratorExtensions|2|0|2|21|100%|0|0||
+|**Audit.NET.AzureStorageTables**|**135**|**26**|**161**|**481**|**83.8%**|**26**|**48**|**54.1%**|
 |Audit.AzureStorageTables.ConfigurationApi.AuditEventTableEntity|17|4|21|62|80.9%|0|0||
 |Audit.AzureStorageTables.ConfigurationApi.AzureTableColumnsConfigurator|7|1|8|32|87.5%|3|6|50%|
-|Audit.AzureStorageTables.ConfigurationApi.AzureTableConnectionConfigurator|7|9|16|61|43.7%|0|0||
+|Audit.AzureStorageTables.ConfigurationApi.AzureTableConnectionConfigurator|16|0|16|61|100%|0|0||
 |Audit.AzureStorageTables.ConfigurationApi.AzureTableEntityConfigurator|14|2|16|49|87.5%|5|10|50%|
 |Audit.AzureStorageTables.ConfigurationApi.AzureTableRowConfigurator|8|2|10|38|80%|0|0||
 |Audit.AzureStorageTables.Providers.AzureTableDataProvider|71|17|88|218|80.6%|18|32|56.2%|
@@ -231,14 +231,14 @@
 |Audit.DynamoDB.Configuration.DynamoProviderConfigurator|7|8|15|54|46.6%|0|0||
 |Audit.DynamoDB.Configuration.DynamoProviderTableConfigurator|7|0|7|28|100%|0|0||
 |Audit.DynamoDB.Providers.DynamoDataProvider|90|2|92|291|97.8%|49|68|72%|
-|**Audit.NET.Elasticsearch**|**70**|**20**|**90**|**285**|**77.7%**|**26**|**50**|**52%**|
-|Audit.Core.ElasticsearchConfiguratorExtensions|0|2|2|21|0%|0|0||
+|**Audit.NET.Elasticsearch**|**72**|**18**|**90**|**285**|**80%**|**26**|**50**|**52%**|
+|Audit.Core.ElasticsearchConfiguratorExtensions|2|0|2|21|100%|0|0||
 |Audit.Elasticsearch.Configuration.ElasticsearchProviderConfigurator|13|2|15|54|86.6%|0|0||
 |Audit.Elasticsearch.Providers.ElasticsearchAuditEventId|2|0|2|13|100%|0|0||
 |Audit.Elasticsearch.Providers.ElasticsearchDataProvider|55|16|71|197|77.4%|26|50|52%|
-|**Audit.NET.EventLog.Core**|**13**|**24**|**37**|**109**|**35.1%**|**2**|**10**|**20%**|
-|Audit.Core.EvenLogProviderConfigurator|0|10|10|27|0%|0|0||
-|Audit.Core.Providers.EventLogDataProvider|13|14|27|82|48.1%|2|10|20%|
+|**Audit.NET.EventLog.Core**|**25**|**12**|**37**|**109**|**67.5%**|**2**|**10**|**20%**|
+|Audit.Core.EvenLogProviderConfigurator|10|0|10|27|100%|0|0||
+|Audit.Core.Providers.EventLogDataProvider|15|12|27|82|55.5%|2|10|20%|
 |**Audit.NET.Firestore**|**211**|**4**|**215**|**592**|**98.1%**|**61**|**69**|**88.4%**|
 |Audit.Core.FirestoreConfiguratorExtensions|21|0|21|55|100%|0|0||
 |Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator|24|2|26|92|92.3%|0|0||
@@ -247,9 +247,9 @@
 |Audit.Core.ImmuDbConfiguratorExtensions|2|0|2|22|100%|0|0||
 |Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator|18|10|28|98|64.2%|0|0||
 |Audit.ImmuDB.Providers.ImmuDbDataProvider|83|4|87|249|95.4%|24|28|85.7%|
-|**Audit.NET.JsonNewtonsoftAdapter**|**79**|**17**|**96**|**225**|**82.2%**|**33**|**42**|**78.5%**|
+|**Audit.NET.JsonNewtonsoftAdapter**|**95**|**0**|**95**|**216**|**100%**|**39**|**40**|**97.5%**|
 |Audit.Core.ConfiguratorExtensions|4|0|4|32|100%|0|0||
-|Audit.Core.JsonNewtonsoftAdapter|17|17|34|91|50%|2|10|20%|
+|Audit.Core.JsonNewtonsoftAdapter|33|0|33|82|100%|8|8|100%|
 |Audit.JsonNewtonsoftAdapter.AuditContractResolver|58|0|58|102|100%|31|32|96.8%|
 |**Audit.NET.Kafka**|**73**|**24**|**97**|**532**|**75.2%**|**19**|**26**|**73%**|
 |Audit.Core.KafkaConfiguratorExtensions|4|0|4|34|100%|0|0||
@@ -274,8 +274,8 @@
 |Audit.Core.NLogConfiguratorExtensions|2|2|4|30|50%|0|0||
 |Audit.NLog.Configuration.NLogConfigurator|6|6|12|47|50%|0|0||
 |Audit.NLog.Providers.NLogDataProvider|31|7|38|116|81.5%|12|20|60%|
-|**Audit.NET.OpenSearch**|**72**|**15**|**87**|**277**|**82.7%**|**25**|**38**|**65.7%**|
-|Audit.Core.OpenSearchConfiguratorExtensions|0|2|2|21|0%|0|0||
+|**Audit.NET.OpenSearch**|**74**|**13**|**87**|**277**|**85%**|**25**|**38**|**65.7%**|
+|Audit.Core.OpenSearchConfiguratorExtensions|2|0|2|21|100%|0|0||
 |Audit.OpenSearch.Configuration.OpenSearchProviderConfigurator|13|2|15|54|86.6%|0|0||
 |Audit.OpenSearch.Providers.OpenSearchAuditEventId|2|0|2|13|100%|0|0||
 |Audit.OpenSearch.Providers.OpenSearchDataProvider|57|11|68|189|83.8%|25|38|65.7%|
@@ -287,8 +287,8 @@
 |Audit.Polly.HedgingActionGeneratorArgumentsExtensions|17|0|17|69|100%|10|10|100%|
 |Audit.Polly.Providers.PollyDataProvider|31|11|42|120|73.8%|2|2|100%|
 |Audit.Polly.ResilienceContextExtensions|1|0|1|16|100%|0|0||
-|**Audit.NET.PostgreSql**|**199**|**11**|**210**|**568**|**94.7%**|**56**|**64**|**87.5%**|
-|Audit.Core.PostgreSqlConfiguratorExtensions|0|2|2|21|0%|0|0||
+|**Audit.NET.PostgreSql**|**201**|**9**|**210**|**568**|**95.7%**|**56**|**64**|**87.5%**|
+|Audit.Core.PostgreSqlConfiguratorExtensions|2|0|2|21|100%|0|0||
 |Audit.PostgreSql.Configuration.PostgreSqlProviderConfigurator|34|0|34|102|100%|0|0||
 |Audit.PostgreSql.CustomColumn|6|2|8|24|75%|0|0||
 |Audit.PostgreSql.Providers.PostgreSqlDataProvider|159|7|166|421|95.7%|56|64|87.5%|
@@ -330,12 +330,12 @@
 |Audit.Core.UdpProviderConfiguratorExtensions|13|0|13|48|100%|0|0||
 |Audit.Udp.Configuration.UdpProviderConfigurator|8|8|16|64|50%|2|2|100%|
 |Audit.Udp.Providers.UdpDataProvider|60|2|62|196|96.7%|14|16|87.5%|
-|**Audit.SignalR**|**354**|**89**|**443**|**1125**|**79.9%**|**143**|**256**|**55.8%**|
+|**Audit.SignalR**|**360**|**83**|**443**|**1125**|**81.2%**|**143**|**256**|**55.8%**|
 |Audit.SignalR.AuditEventSignalr|1|0|1|15|100%|0|0||
 |Audit.SignalR.AuditHubFilter|98|10|108|196|90.7%|48|86|55.8%|
 |Audit.SignalR.AuditPipelineModule|159|48|207|348|76.8%|79|146|54.1%|
 |Audit.SignalR.Configuration.AuditHubConfigurator|11|4|15|58|73.3%|0|0||
-|Audit.SignalR.Configuration.AuditHubFilterConfigurator|6|18|24|90|25%|0|0||
+|Audit.SignalR.Configuration.AuditHubFilterConfigurator|12|12|24|90|50%|0|0||
 |Audit.SignalR.SignalrEventBase|1|2|3|33|33.3%|0|0||
 |Audit.SignalR.SignalrEventConnect|7|0|7|41|100%|0|0||
 |Audit.SignalR.SignalrEventDisconnect|9|0|9|43|100%|0|0||
