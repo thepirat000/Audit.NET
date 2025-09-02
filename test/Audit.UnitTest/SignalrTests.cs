@@ -456,6 +456,15 @@ namespace Audit.UnitTest
 
             Assert.That(result, Is.Null);
         }
+        
+        [Test]
+        public void AuditPipelineModule_Factory()
+        {
+            var result = AuditPipelineModule.Create(c => c.DisableAudit());
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.AuditDisabled, Is.True);
+        }
 
         [Test]
         public void Test_Signalr_Stress()

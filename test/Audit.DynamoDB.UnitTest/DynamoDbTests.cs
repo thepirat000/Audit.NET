@@ -1,17 +1,22 @@
-﻿using System;
+﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
+using Amazon.Runtime;
+
+using Audit.Core;
+using Audit.DynamoDB.Providers;
+using Audit.IntegrationTest;
+
+using Moq;
+
+using NUnit.Framework;
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DocumentModel;
-using Amazon.DynamoDBv2.Model;
-using Amazon.Runtime;
-using Audit.Core;
-using Audit.DynamoDB.Providers;
-using Audit.IntegrationTest;
-using NUnit.Framework;
 
 // ReSharper disable RedundantAssignment
 // ReSharper disable RedundantCast
@@ -386,6 +391,20 @@ namespace Audit.DynamoDB.UnitTest
             Assert.That(ev, Is.Not.Null);
             Assert.That(ev.EventType, Is.EqualTo("TestEvent"));
             Assert.That(ev.CustomFields["Id"].ToString(), Is.EqualTo(hash));
+        }
+
+        [Test]
+        public void UseDynamoDB_Extension()
+        {
+            // Arrange
+            var clientMock = new Mock<IAmazonDynamoDB>();
+
+            // Act
+            Audit.Core.Configuration.Setup()
+                .UseDynamoDB(new Lazy<IAmazonDynamoDB>(() => clientMock.Object), ev => ev.EventType);
+            
+            // Assert
+            Assert.That(Core.Configuration.DataProvider, Is.TypeOf<DynamoDataProvider>());
         }
 
         [Test]

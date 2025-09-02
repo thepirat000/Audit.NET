@@ -33,7 +33,6 @@ namespace Audit.Kafka.UnitTest
             Assert.That(x.Partition.GetDefault(), Is.EqualTo(0));
             Assert.That(x.KeySelector.Invoke(null), Is.EqualTo("key"));
         }
-
         
         [Test]
         [Category(TestCommon.Category.Integration)]
@@ -42,7 +41,7 @@ namespace Audit.Kafka.UnitTest
         {
             var locker = new object();
             var reports = new List<DeliveryResult<Null, AuditEvent>>();
-            string topic = "topic-" + Guid.NewGuid();
+            var topic = "topic-" + Guid.NewGuid();
 
             var pConfig = new ProducerConfig()
             {
@@ -52,7 +51,7 @@ namespace Audit.Kafka.UnitTest
                 SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
-                .UseKafka(_ => _
+                .UseKafka(cfg => cfg
                     .ProducerConfig(pConfig)
                     .Topic(topic)
                     .ResultHandler(rpt =>
@@ -88,7 +87,6 @@ namespace Audit.Kafka.UnitTest
             Assert.That(reports.All(r => r.Status == PersistenceStatus.Persisted), Is.True);
         }
 
-
         [Test]
         [Category(TestCommon.Category.Integration)]
         [Category(TestCommon.Category.Kafka)]
@@ -105,7 +103,7 @@ namespace Audit.Kafka.UnitTest
                 SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
-                .UseKafka(_ => _
+                .UseKafka(cfg => cfg
                     .ProducerConfig(pConfig)
                     .Topic(topic)
                     .HeadersSelector(ev => new Headers { { "Type", Encoding.UTF8.GetBytes(ev.EventType) } })
@@ -155,7 +153,7 @@ namespace Audit.Kafka.UnitTest
                 SecurityProtocol = SecurityProtocol.Plaintext
             };
             Audit.Core.Configuration.Setup()
-                .UseKafka(_ => _
+                .UseKafka(cfg => cfg
                     .ProducerConfig(pConfig)
                     .HeadersSelector(ev => new Headers { { "Type", Encoding.UTF8.GetBytes(ev.EventType) } })
                     .Topic(topic)
@@ -190,9 +188,9 @@ namespace Audit.Kafka.UnitTest
             Assert.That(msg1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo(guid.ToString()));
             Assert.That(msg2.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
             Assert.That(msg1.Headers[0].Key, Is.EqualTo("Type"));
-            Assert.That(msg1.Headers[0].GetValueBytes(), Is.EqualTo(Encoding.UTF8.GetBytes("type1")));
+            Assert.That(msg1.Headers[0].GetValueBytes(), Is.EqualTo("type1"u8.ToArray()));
             Assert.That(msg2.Headers[0].Key, Is.EqualTo("Type"));
-            Assert.That(msg2.Headers[0].GetValueBytes(), Is.EqualTo(Encoding.UTF8.GetBytes("type1")));
+            Assert.That(msg2.Headers[0].GetValueBytes(), Is.EqualTo("type1"u8.ToArray()));
         }
 
         [Test]
@@ -238,12 +236,6 @@ namespace Audit.Kafka.UnitTest
             Assert.That(r1.Status, Is.EqualTo(PersistenceStatus.Persisted));
             Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
             Assert.That(r1.Message.Key, Is.EqualTo("key1"));
-        }
-
-        private async Task DeleteTopic(string host, string topic)
-        {
-            var admin = new AdminClientBuilder(new AdminClientConfig() { BootstrapServers = host }).Build();
-            await admin.DeleteTopicsAsync(new string[] { topic });
         }
     }
 

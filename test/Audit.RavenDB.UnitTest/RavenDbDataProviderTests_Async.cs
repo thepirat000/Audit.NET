@@ -144,9 +144,7 @@ namespace Audit.RavenDB.UnitTest
             // Arrange
             var databaseName = "AuditTest";
             var rdb = new RavenDbDataProvider(cfg => cfg
-                .WithSettings(settings => settings
-                    .Urls(ravenServerUrl)
-                    .DatabaseDefault(databaseName)));
+                    .WithSettings(ravenServerUrl, databaseName, null, _ => databaseName));
 
             await TryCreateDatabaseAsync(rdb.DocumentStore, databaseName);
 
@@ -188,9 +186,7 @@ namespace Audit.RavenDB.UnitTest
             // Arrange
             var databaseName = "AuditTest";
             var rdb = new RavenDbDataProvider(cfg => cfg
-                .WithSettings(settings => settings
-                    .Urls(ravenServerUrl)
-                    .DatabaseDefault(databaseName)));
+                .WithSettings([ravenServerUrl], databaseName, null, _ => databaseName));
 
             await TryCreateDatabaseAsync(rdb.DocumentStore, databaseName);
 
