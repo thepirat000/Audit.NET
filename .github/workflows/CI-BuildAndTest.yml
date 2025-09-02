@@ -22,12 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # #Step needed when using ubuntu > 22.04
-      # - name: Install Mono
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y mono-complete
-
       - name: Free Disk Space (Ubuntu)
         uses: insightsengineering/disk-space-reclaimer@v1
         with:
@@ -75,11 +69,6 @@ jobs:
           docker --version
           docker compose version
 
-      # - name: DEBUG - ElasticSearch from action
-      #   uses: ankane/setup-elasticsearch@v1
-      #   with:
-      #     elasticsearch-version: 9
-
       - name: Docker pull
         run: docker compose -f ./Docker/docker-compose.yml pull
 
@@ -90,13 +79,6 @@ jobs:
       - name: Install librdkafka-dev
         run: sudo apt-get install -y librdkafka-dev
      
-      - name: DEBUG - Sleep for 60 seconds
-        run: sleep 60s
-        shell: bash
-
-      - name: DEBUG - Show Elasticsearch logs
-        run: docker compose -f ./Docker/docker-compose.yml logs elasticsearch --tail=500
-
       - name: Wait for services
         run: |
           set -e

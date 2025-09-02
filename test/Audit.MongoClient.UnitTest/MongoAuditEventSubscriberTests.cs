@@ -21,19 +21,15 @@ namespace Audit.MongoClient.UnitTest
         [SetUp]
         public void Setup()
         {
-            Audit.Core.Configuration.Reset();
+            Configuration.Reset();
         }
 
         [Test]
         public void Test_Command_Succeeded()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseInMemoryProvider();
-
-            var sut = new MongoAuditEventSubscriber(cfg => cfg.IncludeReply(false))
-            {
-                IncludeReply = true
-            };
+            var dp = new InMemoryDataProvider();
+            var sut = new MongoAuditEventSubscriber(cfg => cfg.IncludeReply().EventType("test").AuditDataProvider(dp));
 
             var testCommandName = $"name-{Guid.NewGuid()}";
             var testCommandValue = $"value-{Guid.NewGuid()}";
@@ -48,7 +44,7 @@ namespace Audit.MongoClient.UnitTest
             sut.Handle(cmdSuccess);
 
             // Assert
-            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
+            var evs = dp.GetAllEventsOfType<AuditEventMongoCommand>();
 
             Assert.That(evs.Count, Is.EqualTo(1));
             Assert.That(evs[0].Command.CommandName, Is.EqualTo(cmdStart.CommandName));
@@ -72,12 +68,14 @@ namespace Audit.MongoClient.UnitTest
         public void Test_Command_Failure()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseInMemoryProvider();
+            Configuration.Setup().UseInMemoryProvider();
 
-            var sut = new MongoAuditEventSubscriber()
-            {
-                IncludeReply = true
-            };
+            var sut = new MongoAuditEventSubscriber(cfg => cfg
+                .IncludeReply(_ => true)
+                .EventType(_ => "test")
+                .CommandFilter(_ => true)
+                .AuditScopeFactory(new AuditScopeFactory())
+                .CreationPolicy(EventCreationPolicy.InsertOnEnd));
 
             var cnnId = new ConnectionId(new ServerId(new ClusterId(10), new IPEndPoint(IPAddress.Parse("192.168.1.100"), 81)), 20);
             var testCommandName = $"name-{Guid.NewGuid()}";
@@ -94,7 +92,7 @@ namespace Audit.MongoClient.UnitTest
             sut.Handle(cmdFailed);
             
             // Assert
-            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
+            var evs = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
 
             Assert.That(evs.Count, Is.EqualTo(1));
             Assert.That(evs[0].Command.CommandName, Is.EqualTo(cmdStart.CommandName));
@@ -121,7 +119,7 @@ namespace Audit.MongoClient.UnitTest
         public void Test_Creation_Policy(EventCreationPolicy policy, int expectedEventsCount)
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseInMemoryProvider();
+            Configuration.Setup().UseInMemoryProvider();
 
             var sut = new MongoAuditEventSubscriber()
             {
@@ -138,7 +136,7 @@ namespace Audit.MongoClient.UnitTest
             sut.Handle(cmdSuccess);
 
             // Assert
-            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
+            var evs = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
             
             Assert.That(evs, Is.Not.Null);
             Assert.That(evs.Count, Is.EqualTo(expectedEventsCount));
@@ -152,7 +150,7 @@ namespace Audit.MongoClient.UnitTest
         public void Test_Custom_EventTypeName()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseNullProvider();
+            Configuration.Setup().UseNullProvider();
 
             var commandName = Guid.NewGuid().ToString();
 
@@ -175,7 +173,7 @@ namespace Audit.MongoClient.UnitTest
         public void Test_Custom_AuditDataProvider()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseNullProvider();
+            Configuration.Setup().UseNullProvider();
 
             var commandName = Guid.NewGuid().ToString();
 
@@ -198,7 +196,7 @@ namespace Audit.MongoClient.UnitTest
         public void Test_Custom_AuditScopeFactory()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseNullProvider();
+            Configuration.Setup().UseNullProvider();
 
             var eventType = Guid.NewGuid().ToString();
             var commandName = Guid.NewGuid().ToString();
@@ -227,29 +225,29 @@ namespace Audit.MongoClient.UnitTest
         public void Test_Custom_CommandFilter()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseInMemoryProvider();
+            Configuration.Setup().UseInMemoryProvider();
 
             var sut = new MongoAuditEventSubscriber()
             {
                 CommandFilter = cmd => cmd.CommandName == "delete"
             };
 
-            var commandName_1 = Guid.NewGuid().ToString();
-            var commandName_2 = "delete";
+            var commandName1 = Guid.NewGuid().ToString();
+            var commandName2 = "delete";
             
-            var cmdStart_1 = new CommandStartedEvent(commandName_1, new { cmd = 10 }.ToBsonDocument(), DatabaseNamespace.Admin, 1, 2, _connectionId);
-            var cmdStart_2 = new CommandStartedEvent(commandName_2, new { cmd = 20 }.ToBsonDocument(), DatabaseNamespace.Admin, 3, 4, _connectionId);
-            var cmdSuccess_1 = new CommandSucceededEvent(commandName_1, new { value = 1 }.ToBsonDocument(), DatabaseNamespace.Admin, 1, 2, _connectionId, TimeSpan.FromSeconds(1));
-            var cmdSuccess_2 = new CommandSucceededEvent(commandName_2, new { value = 2 }.ToBsonDocument(), DatabaseNamespace.Admin, 3, 4, _connectionId, TimeSpan.FromSeconds(1));
+            var cmdStart1 = new CommandStartedEvent(commandName1, new { cmd = 10 }.ToBsonDocument(), DatabaseNamespace.Admin, 1, 2, _connectionId);
+            var cmdStart2 = new CommandStartedEvent(commandName2, new { cmd = 20 }.ToBsonDocument(), DatabaseNamespace.Admin, 3, 4, _connectionId);
+            var cmdSuccess1 = new CommandSucceededEvent(commandName1, new { value = 1 }.ToBsonDocument(), DatabaseNamespace.Admin, 1, 2, _connectionId, TimeSpan.FromSeconds(1));
+            var cmdSuccess2 = new CommandSucceededEvent(commandName2, new { value = 2 }.ToBsonDocument(), DatabaseNamespace.Admin, 3, 4, _connectionId, TimeSpan.FromSeconds(1));
 
             // Act
-            sut.Handle(cmdStart_1);
-            sut.Handle(cmdStart_2);
-            sut.Handle(cmdSuccess_1);
-            sut.Handle(cmdSuccess_2);
+            sut.Handle(cmdStart1);
+            sut.Handle(cmdStart2);
+            sut.Handle(cmdSuccess1);
+            sut.Handle(cmdSuccess2);
 
             // Assert
-            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
+            var evs = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
             Assert.That(evs, Is.Not.Null);
             Assert.That(evs.Count, Is.EqualTo(1));
             Assert.That(evs[0].Command.CommandName, Is.EqualTo("delete"));
@@ -259,7 +257,7 @@ namespace Audit.MongoClient.UnitTest
         public void Test_IgnoredCommands()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseInMemoryProvider();
+            Configuration.Setup().UseInMemoryProvider();
 
             var ignoredCommands = new[] { "isMaster", "buildInfo", "getLastError", "saslStart", "saslContinue" };
 
@@ -278,7 +276,7 @@ namespace Audit.MongoClient.UnitTest
             }
 
             // Assert
-            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
+            var evs = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
             Assert.That(evs, Is.Not.Null);
             Assert.That(evs.Count, Is.EqualTo(0));
         }
@@ -287,8 +285,8 @@ namespace Audit.MongoClient.UnitTest
         public void Test_AuditDisabled()
         {
             // Arrange
-            Audit.Core.Configuration.Setup().UseInMemoryProvider();
-            Audit.Core.Configuration.AuditDisabled = true;
+            Configuration.Setup().UseInMemoryProvider();
+            Configuration.AuditDisabled = true;
             var sut = new MongoAuditEventSubscriber();
 
             var cmdStart = new CommandStartedEvent("insert", new { cmd = 10 }.ToBsonDocument(), DatabaseNamespace.Admin, 1, 2, _connectionId);
@@ -301,7 +299,7 @@ namespace Audit.MongoClient.UnitTest
             sut.Handle(cmdSuccess);
 
             // Assert
-            var evs = Audit.Core.Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
+            var evs = Configuration.DataProviderAs<InMemoryDataProvider>().GetAllEventsOfType<AuditEventMongoCommand>();
             Assert.That(evs, Is.Not.Null);
             Assert.That(evs.Count, Is.EqualTo(0));
         }

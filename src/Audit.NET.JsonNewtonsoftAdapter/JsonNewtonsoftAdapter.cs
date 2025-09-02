@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Audit.JsonNewtonsoftAdapter;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Audit.JsonNewtonsoftAdapter;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Audit.Core
 {
@@ -28,10 +30,7 @@ namespace Audit.Core
 
         public JsonNewtonsoftAdapter(JsonSerializerSettings settings)
         {
-            if (settings.ContractResolver == null)
-            {
-                settings.ContractResolver = new AuditContractResolver();
-            }
+            settings.ContractResolver ??= new AuditContractResolver();
             Settings = settings;
         }
         
@@ -53,22 +52,16 @@ namespace Audit.Core
         public async Task SerializeAsync(Stream stream, object value, CancellationToken cancellationToken = default)
         {
             var json = JsonConvert.SerializeObject(value, Settings);
-            using (StreamWriter sw = new StreamWriter(stream))
-            {
-                await sw.WriteAsync(json);
-            }
+            using var sw = new StreamWriter(stream);
+            await sw.WriteAsync(json);
         }
 
         public async Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
-            using (var sr = new StreamReader(stream))
-            {
-                using (var jr = new JsonTextReader(sr))
-                {
-                    var jObject = await JObject.LoadAsync(jr, cancellationToken);
-                    return jObject.ToObject<T>(JsonSerializer.Create(Settings));
-                }
-            }
+            using var sr = new StreamReader(stream);
+            using var jr = new JsonTextReader(sr);
+            var jObject = await JObject.LoadAsync(jr, cancellationToken);
+            return jObject.ToObject<T>(JsonSerializer.Create(Settings));
         }
 
         public T ToObject<T>(object value)
@@ -77,15 +70,13 @@ namespace Audit.Core
             {
                 return default;
             }
-            if (value is T || typeof(T).IsAssignableFrom(value.GetType()))
+
+            return value switch
             {
-                return (T)value;
-            }
-			if (value is JContainer container)
-			{
-				return container.ToObject<T>();
-			}
-            return default(T);
+                T value1 => value1,
+                JContainer container => container.ToObject<T>(),
+                _ => default(T)
+            };
         }
     }
 }

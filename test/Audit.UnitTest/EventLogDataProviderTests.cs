@@ -14,8 +14,27 @@ namespace Audit.UnitTest
         [SetUp]
         public void SetUp()
         {
-            Core.Configuration.Reset();
+            Configuration.Reset();
         }
+
+        [Test]
+        public void UseEventLogProvider_Extension()
+        {
+            Configuration.Setup()
+                .UseEventLogProvider(cfg => cfg.LogName("Application").SourcePath("Application"));
+            
+            Assert.That(Configuration.DataProvider, Is.TypeOf<EventLogDataProvider>());
+        }
+
+        [Test]
+        public void UseEventLogProvider_ExtensionOverload()
+        {
+            Configuration.Setup()
+                .UseEventLogProvider("", "", "", ev => "");
+
+            Assert.That(Configuration.DataProvider, Is.TypeOf<EventLogDataProvider>());
+        }
+
 
 #if NET6_0_OR_GREATER
         [Test]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Audit.AzureStorageBlobs.Providers;
 using Audit.Core;
 using Audit.IntegrationTest;
 using Azure.Storage;
@@ -16,12 +17,27 @@ namespace Audit.AzureStorageBlobs.UnitTest
     [Category(TestCommon.Category.AzureBlobs)]
     public class AzureStorageBlobsTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Configuration.Reset();
+        }
+
+        [Test]
+        public void UseAzureStorageBlobs_Extension()
+        {
+            Configuration.Setup()
+                .UseAzureStorageBlobs(cfg => cfg.WithServiceUrl("test"));
+
+            Assert.That(Core.Configuration.DataProvider, Is.TypeOf<AzureStorageBlobDataProvider>());
+        }
+
         [Test]
         public void Test_AzureStorageBlobs_HappyPath()
         {
             var id = Guid.NewGuid().ToString();
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
-            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+            var dp = new AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
@@ -52,7 +68,6 @@ namespace Audit.AzureStorageBlobs.UnitTest
         public async Task Test_AzureStorageBlobs_HappyPathAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
@@ -87,7 +102,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var id = Guid.NewGuid().ToString();
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
-            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+            var dp = new AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
@@ -121,7 +136,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var id = Guid.NewGuid().ToString();
             
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
-            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+            var dp = new AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
                 .BlobName(ev => ev.EventType + "_" + id + ".json")
@@ -153,7 +168,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
             var id = Guid.NewGuid().ToString();
             var originalId = id;
             var containerName = $"events{DateTime.Today:yyyyMMdd}";
-            var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
+            var dp = new AzureStorageBlobDataProvider(config => config
                 .WithCredentials(_ => _
                     .Url("http://127.0.0.1:10000/devstoreaccount1" /*TestCommon.AzureBlobServiceUrl*/)
                     .Credential(new StorageSharedKeyCredential(TestCommon.AzureBlobAccountName, TestCommon.AzureBlobAccountKey)))
@@ -181,6 +196,5 @@ namespace Audit.AzureStorageBlobs.UnitTest
             Assert.That(result.Target.Old.ToString(), Is.EqualTo(originalId));
             Assert.That(result.EventType, Is.EqualTo("Test"));
         }
-
     }
 }

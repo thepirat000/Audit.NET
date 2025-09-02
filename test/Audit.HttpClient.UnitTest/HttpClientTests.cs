@@ -560,5 +560,217 @@ namespace Audit.HttpClientUnitTest
             Assert.That(result, Is.InstanceOf<IHttpClientBuilder>());
             clientBuilder.VerifyAll();
         }
+
+        [Test]
+        public void AuditScopeFactory_SetsAuditScopeFactory()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            var factory = new Mock<IAuditScopeFactory>().Object;
+
+            var result = configurator.AuditScopeFactory(factory);
+
+            Assert.That(configurator._auditScopeFactory, Is.EqualTo(factory));
+            Assert.That(result, Is.EqualTo(configurator));
+        }
+
+        [Test]
+        public void CreationPolicy_SetsEventCreationPolicy()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            var result = configurator.CreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            Assert.That(configurator._eventCreationPolicy, Is.EqualTo(EventCreationPolicy.InsertOnEnd));
+            Assert.That(result, Is.EqualTo(configurator));
+        }
+
+        [Test]
+        public void AuditDataProvider_SetsAuditDataProvider()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            var provider = new Mock<IAuditDataProvider>().Object;
+
+            var result = configurator.AuditDataProvider(provider);
+
+            Assert.That(configurator._auditDataProvider, Is.EqualTo(provider));
+            Assert.That(result, Is.EqualTo(configurator));
+        }
+
+        [Test]
+        public void IncludeRequestHeaders_Bool_SetsIncludeRequestHeaders()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.IncludeRequestHeaders(false);
+
+            Assert.That(configurator._includeRequestHeaders(new HttpRequestMessage()), Is.False);
+        }
+
+        [Test]
+        public void IncludeRequestHeaders_Predicate_SetsIncludeRequestHeaders()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpRequestMessage, bool> predicate = req => req.Method == HttpMethod.Get;
+
+            configurator.IncludeRequestHeaders(predicate);
+
+            var msg = new HttpRequestMessage(HttpMethod.Get, "http://test");
+            Assert.That(configurator._includeRequestHeaders(msg), Is.True);
+        }
+
+        [Test]
+        public void IncludeContentHeaders_Bool_SetsIncludeContentHeaders()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.IncludeContentHeaders(false);
+
+            Assert.That(configurator._includeContentHeaders(new HttpRequestMessage()), Is.False);
+        }
+
+        [Test]
+        public void IncludeContentHeaders_Predicate_SetsIncludeContentHeaders()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpRequestMessage, bool> predicate = req => req.RequestUri.Host == "localhost";
+
+            configurator.IncludeContentHeaders(predicate);
+
+            var msg = new HttpRequestMessage(HttpMethod.Get, "http://localhost");
+            Assert.That(configurator._includeContentHeaders(msg), Is.True);
+        }
+
+        [Test]
+        public void IncludeResponseHeaders_Bool_SetsIncludeResponseHeaders()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.IncludeResponseHeaders(false);
+
+            Assert.That(configurator._includeResponseHeaders(new HttpResponseMessage()), Is.False);
+        }
+
+        [Test]
+        public void IncludeResponseHeaders_Predicate_SetsIncludeResponseHeaders()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpResponseMessage, bool> predicate = resp => resp.StatusCode == System.Net.HttpStatusCode.OK;
+
+            configurator.IncludeResponseHeaders(predicate);
+
+            var msg = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            Assert.That(configurator._includeResponseHeaders(msg), Is.True);
+        }
+
+        [Test]
+        public void IncludeRequestBody_Bool_SetsIncludeRequestBody()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.IncludeRequestBody(false);
+
+            Assert.That(configurator._includeRequestBody(new HttpRequestMessage()), Is.False);
+        }
+
+        [Test]
+        public void IncludeRequestBody_Predicate_SetsIncludeRequestBody()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpRequestMessage, bool> predicate = req => req.Method == HttpMethod.Post;
+
+            configurator.IncludeRequestBody(predicate);
+
+            var msg = new HttpRequestMessage(HttpMethod.Post, "http://test");
+            Assert.That(configurator._includeRequestBody(msg), Is.True);
+        }
+
+        [Test]
+        public void IncludeResponseBody_Bool_SetsIncludeResponseBody()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.IncludeResponseBody(false);
+
+            Assert.That(configurator._includeResponseBody(new HttpResponseMessage()), Is.False);
+        }
+
+        [Test]
+        public void IncludeResponseBody_Predicate_SetsIncludeResponseBody()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpResponseMessage, bool> predicate = resp => resp.StatusCode == System.Net.HttpStatusCode.Created;
+
+            configurator.IncludeResponseBody(predicate);
+
+            var msg = new HttpResponseMessage(System.Net.HttpStatusCode.Created);
+            Assert.That(configurator._includeResponseBody(msg), Is.True);
+        }
+
+        [Test]
+        public void IncludeOptions_Bool_SetsIncludeOptions()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.IncludeOptions(false);
+
+            Assert.That(configurator._includeOptions("any"), Is.False);
+        }
+
+        [Test]
+        public void IncludeOptions_Predicate_SetsIncludeOptions()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<string, bool> predicate = key => key == "test";
+
+            configurator.IncludeOptions(predicate);
+
+            Assert.That(configurator._includeOptions("test"), Is.True);
+        }
+
+        [Test]
+        public void FilterByRequest_SetsRequestFilter()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpRequestMessage, bool> predicate = req => req.Method == HttpMethod.Put;
+
+            configurator.FilterByRequest(predicate);
+
+            var msg = new HttpRequestMessage(HttpMethod.Put, "http://test");
+            Assert.That(configurator._requestFilter(msg), Is.True);
+        }
+
+        [Test]
+        public void FilterByResponse_SetsResponseFilter()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpResponseMessage, bool> predicate = resp => resp.StatusCode == System.Net.HttpStatusCode.Accepted;
+
+            configurator.FilterByResponse(predicate);
+
+            var msg = new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
+            Assert.That(configurator._responseFilter(msg), Is.True);
+        }
+
+        [Test]
+        public void EventType_String_SetsEventTypeName()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+
+            configurator.EventType("MyEventType");
+
+            Assert.That(configurator._eventTypeName(new HttpRequestMessage()), Is.EqualTo("MyEventType"));
+        }
+
+        [Test]
+        public void EventType_Predicate_SetsEventTypeName()
+        {
+            var configurator = new AuditClientHandlerConfigurator();
+            Func<HttpRequestMessage, string> predicate = req => req.Method.Method;
+
+            configurator.EventType(predicate);
+
+            var msg = new HttpRequestMessage(HttpMethod.Delete, "http://test");
+            Assert.That(configurator._eventTypeName(msg), Is.EqualTo("DELETE"));
+        }
     }
 }

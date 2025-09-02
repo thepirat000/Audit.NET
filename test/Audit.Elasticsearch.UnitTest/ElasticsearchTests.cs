@@ -36,7 +36,18 @@ namespace Audit.Elasticsearch.UnitTest
             Assert.That(x.IdBuilder.Invoke(null).Equals(new Id("id")), Is.True);
             Assert.That(x.Index.GetDefault(), Is.EqualTo((IndexName)"ix"));
         }
-        
+
+        [Test]
+        public void Test_UseElasticsearch_Extension()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseElasticsearch(cfg => cfg
+                    .Client(new ElasticsearchClientSettings(new Uri("http://server/")))
+                    .Index("ix"));
+
+            Assert.That(Audit.Core.Configuration.DataProvider, Is.TypeOf<ElasticsearchDataProvider>());
+        }
+
         [Test]
         [Category(TestCommon.Category.Integration)]
         [Category(TestCommon.Category.Elasticsearch)]

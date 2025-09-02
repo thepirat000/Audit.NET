@@ -24,6 +24,14 @@ namespace Audit.PostgreSql.UnitTest
         }
 
         [Test]
+        public void PostgreSqlConfigurator_Extension()
+        {
+            Audit.Core.Configuration.Setup().UsePostgreSql(cfg => cfg.ConnectionString("test"));
+
+            Assert.That(Audit.Core.Configuration.DataProvider, Is.TypeOf<PostgreSqlDataProvider>());
+        }
+
+        [Test]
         public void Test_PostgreDataProvider_FluentApi_DataColumnType()
         {
             var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _

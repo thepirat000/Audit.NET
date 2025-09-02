@@ -1,14 +1,32 @@
-﻿using NUnit.Framework;
+﻿using Audit.AzureCosmos.Providers;
+using Audit.Core;
+
+using NUnit.Framework;
 
 namespace Audit.AzureCosmos.UnitTest
 {
     [TestFixture]
     public class AzureCosmosConfigurationTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Configuration.Reset();
+        }
+
+        [Test]
+        public void UseAzureCosmos_Extension()
+        {
+            Configuration.Setup()
+                .UseAzureCosmos(cfg => cfg.Database("test"));
+
+            Assert.That(Configuration.DataProvider, Is.TypeOf<AzureCosmosDataProvider>());
+        }
+
         [Test]
         public void Test_AzureCosmos_FluentApi()
         {
-            var x = new AzureCosmos.Providers.AzureCosmosDataProvider(_ => _
+            var x = new AzureCosmosDataProvider(_ => _
                 .Endpoint(ev => "Endpoint")
                 .AuthKey(ev => "AuthKey")
                 .Container(ev => "Container")

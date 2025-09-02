@@ -19,6 +19,31 @@ namespace Audit.MongoClient.UnitTest
         }
 
         [Test]
+        public void AddAuditSubscriber_Extension()
+        {
+            var mongoSettings = new MongoClientSettings()
+            {
+                Server = new MongoServerAddress("localhost", 27017)
+            };
+
+            mongoSettings.AddAuditSubscriber(cfg => cfg.EventType("test"));
+
+            Assert.That(mongoSettings.ClusterConfigurator, Is.Not.Null);
+        }
+
+        [Test]
+        public void AddAuditSubscriber_Extension_Throws()
+        {
+            var mongoSettings = new MongoClientSettings()
+            {
+                Server = new MongoServerAddress("localhost", 27017),
+                ClusterConfigurator = cc => { }
+            };
+
+            Assert.Throws<ArgumentException>(() => { mongoSettings.AddAuditSubscriber(cfg => cfg.EventType("test")); });
+        }
+
+        [Test]
         public void AuditMongo_Integration()
         {
             // Arrange

@@ -61,6 +61,15 @@ namespace Audit.AzureEventHubs.UnitTest
         }
 
         [Test]
+        public void UseAzureCosmos_Extension()
+        {
+            Configuration.Setup()
+                .UseAzureEventHubs(cfg => cfg.WithConnectionString("test"));
+
+            Assert.That(Configuration.DataProvider, Is.TypeOf<AzureEventHubsDataProvider>());
+        }
+
+        [Test]
         public void Test_AzureEventHubs_Configuration_ConnectionString()
         {
             var cnnString = "TestCnnString";

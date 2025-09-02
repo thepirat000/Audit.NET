@@ -35,6 +35,14 @@ namespace Audit.OpenSearch.UnitTest
         }
 
         [Test]
+        public void OpenSearchConfigurator_Extension()
+        {
+            Audit.Core.Configuration.Setup().UseOpenSearch(cfg => cfg.Index("ix"));
+
+            Assert.That(Audit.Core.Configuration.DataProvider, Is.TypeOf<OpenSearchDataProvider>());
+        }
+
+        [Test]
         [Category(TestCommon.Category.Integration)]
         [Category(TestCommon.Category.OpenSearch)]
         public void Test_OpenSearch_HappyPath()

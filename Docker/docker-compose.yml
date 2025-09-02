@@ -49,10 +49,6 @@
       - xpack.security.http.ssl.enabled=false
     ports:
       - "9200:9200"
-    # volumes:
-    #   - ./init-elasticsearch.sh:/usr/local/bin/init-elasticsearch.sh
-    # command: >
-    #   bash /usr/local/bin/init-elasticsearch.sh
 
   opensearch:
     image: opensearchproject/opensearch:2.19.2
