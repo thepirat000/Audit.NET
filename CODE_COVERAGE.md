@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/01/2025 - 21:52:02 |
-| Coverage date: | 09/01/2025 - 21:28:57 - 09/01/2025 - 21:51:16 |
+| Generated on: | 09/01/2025 - 23:14:36 |
+| Coverage date: | 09/01/2025 - 22:52:16 - 09/01/2025 - 23:13:51 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 82.8% (8750 of 10566) |
-| Covered lines: | 8750 |
-| Uncovered lines: | 1816 |
-| Coverable lines: | 10566 |
-| Total lines: | 27298 |
-| **Branch coverage:** | 74.1% (3215 of 4337) |
-| Covered branches: | 3215 |
-| Total branches: | 4337 |
+| **Line coverage:** | 82.7% (8732 of 10550) |
+| Covered lines: | 8732 |
+| Uncovered lines: | 1818 |
+| Coverable lines: | 10550 |
+| Total lines: | 27293 |
+| **Branch coverage:** | 74.1% (3198 of 4313) |
+| Covered branches: | 3198 |
+| Total branches: | 4313 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -59,7 +59,7 @@
 |Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|396|87.1%|80|100|80%|
 |**Audit.EntityFramework.Abstractions**|**4**|**2**|**6**|**20**|**66.6%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditOverrideAttribute|4|2|6|20|66.6%|0|0||
-|**Audit.EntityFramework.Core**|**1564**|**300**|**1864**|**5242**|**83.9%**|**764**|**902**|**84.7%**|
+|**Audit.EntityFramework.Core**|**1546**|**302**|**1848**|**5237**|**83.6%**|**747**|**878**|**85%**|
 |Audit.Core.DbContextConfiguratorExtensions|2|2|4|37|50%|0|0||
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AuditDbContext|34|0|34|253|100%|0|0||
@@ -89,15 +89,15 @@
 |Audit.EntityFramework.ConfigurationApi.MappingInfo|4|0|4|31|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.ModeConfigurator`1|6|0|6|21|100%|0|0||
 |Audit.EntityFramework.DbContextExtensions|3|0|3|24|100%|0|0||
-|Audit.EntityFramework.DbContextHelper|454|18|472|1134|96.1%|408|452|90.2%|
+|Audit.EntityFramework.DbContextHelper|454|18|472|1134|96.1%|411|452|90.9%|
 |Audit.EntityFramework.DefaultAuditContext|18|4|22|48|81.8%|0|0||
 |Audit.EntityFramework.EntityFrameworkEvent|13|1|14|81|92.8%|0|0||
 |Audit.EntityFramework.EntityName|2|0|2|11|100%|0|0||
 |Audit.EntityFramework.EventEntry|16|1|17|120|94.1%|0|0||
 |Audit.EntityFramework.EventEntryChange|3|0|3|9|100%|0|0||
 |Audit.EntityFramework.InterceptorEventBase|8|0|8|56|100%|0|0||
-|Audit.EntityFramework.Interceptors.AuditCommandInterceptor|175|38|213|471|82.1%|99|130|76.1%|
-|Audit.EntityFramework.Interceptors.AuditTransactionInterceptor|156|29|185|390|84.3%|51|74|68.9%|
+|Audit.EntityFramework.Interceptors.AuditCommandInterceptor|165|38|203|464|81.2%|86|114|75.4%|
+|Audit.EntityFramework.Interceptors.AuditTransactionInterceptor|148|31|179|392|82.6%|44|66|66.6%|
 |Audit.EntityFramework.Providers.DbContextDataProvider|62|0|62|200|100%|39|46|84.7%|
 |Audit.EntityFramework.Providers.DbContextDataProvider`2|62|8|70|219|88.5%|18|24|75%|
 |Audit.EntityFramework.Providers.EntityFrameworkDataProvider|123|10|133|396|92.4%|96|106|90.5%|
