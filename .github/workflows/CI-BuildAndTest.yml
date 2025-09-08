@@ -14,6 +14,41 @@ env:
   ACCEPT_EULA: 'Y'
 
 jobs:
+  # Run the tests that are not compatible with Mono in a separate job on Windows
+  test-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+  
+    - name: Install .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          2.1.x
+          9.0.x
+                
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'      
+      with:
+        nuget-version: '6.x'      
+
+    - name: Dotnet Restore 
+      run: dotnet restore
+      
+    - name: Dotnet Build Audit.NET.sln
+      run: dotnet build .\Audit.NET.sln --no-restore -c release
+
+    - name: Run tests
+      run: |
+        dotnet test .\Audit.NET.sln --no-build -c release `
+          --filter "TestCategory=MonoIncompatible"  `
+          --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=VSTest" "-m:1" --results-directory "./test/TestResult"
+
+  # Main job to build and test the project
   build-and-test:
     runs-on: ubuntu-22.04   #Can't use a newer version due to Mono requirements
     timeout-minutes: 60
@@ -156,7 +191,7 @@ jobs:
             /d:sonar.cs.vstest.reportsPaths="test/TestResult/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="test/TestResult/**/*.opencover.xml" \
             /d:sonar.exclusions="**/templates/**,**/docs/**,**/documents/**,**/tools/**,**/packages/**,**/Tests/**" \
-            /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**" \
+            /d:sonar.coverage.exclusions="**/templates/**,**/Tests/**,**/Audit.WCF/**,**/Audit.WCF.Client/**" \
             /v:"${{ env.PROJECT_VERSION }}"
 
       - name: Dotnet Restore 
