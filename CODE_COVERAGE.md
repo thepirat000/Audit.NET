@@ -1,15 +1,15 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/02/2025 - 18:58:06 |
-| Coverage date: | 09/02/2025 - 18:35:25 - 09/02/2025 - 18:57:26 |
+| Generated on: | 09/08/2025 - 22:50:34 |
+| Coverage date: | 09/08/2025 - 22:27:57 - 09/08/2025 - 22:49:55 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 84.3% (8894 of 10549) |
-| Covered lines: | 8894 |
-| Uncovered lines: | 1655 |
+| **Line coverage:** | 84.2% (8891 of 10549) |
+| Covered lines: | 8891 |
+| Uncovered lines: | 1658 |
 | Coverable lines: | 10549 |
 | Total lines: | 27284 |
 | **Branch coverage:** | 74.8% (3228 of 4311) |
@@ -111,11 +111,11 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**143**|**20**|**163**|**399**|**87.7%**|**42**|**52**|**80.7%**|
+|**Audit.FileSystem**|**140**|**23**|**163**|**399**|**85.8%**|**42**|**52**|**80.7%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|107|18|125|245|85.6%|42|52|80.7%|
+|Audit.FileSystem.FileSystemMonitor|104|21|125|245|83.2%|42|52|80.7%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
