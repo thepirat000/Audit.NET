@@ -1,9 +1,9 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/08/2025 - 22:50:34 |
-| Coverage date: | 09/08/2025 - 22:27:57 - 09/08/2025 - 22:49:55 |
-| Parser: | MultiReport (96x Cobertura) |
+| Generated on: | 09/09/2025 - 05:20:06 |
+| Coverage date: | 09/09/2025 - 04:57:25 - 09/09/2025 - 05:19:25 |
+| Parser: | MultiReport (95x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
