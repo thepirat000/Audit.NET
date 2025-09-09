@@ -26,9 +26,6 @@ namespace Audit.DynamoDB.UnitTest
 {
     [Category(TestCommon.Category.Integration)]
     [Category(TestCommon.Category.DynamoDb)]
-#if NET462
-    [Category(TestCommon.Category.MonoIncompatible)]
-#endif
     public class DynamoDbTests
     {
         private const string TableName = "AuditEvents";
