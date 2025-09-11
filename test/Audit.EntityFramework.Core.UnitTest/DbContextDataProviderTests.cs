@@ -235,9 +235,51 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(jsonData, Is.EqualTo("Test"));
         }
 
+        [Test]
+        public async Task Test_DbContextDataProvider_MultipleEntities()
+        {
+            // Arrange
+            var dbContext = new MyDbContext(Guid.NewGuid().ToString());
+
+            Audit.Core.Configuration.Setup()
+                .UseDbContext(config => config
+                    .DbContextBuilder(ev => dbContext)
+                    .EntityBuilder(auditEvent =>
+                    {
+                        var auditLog = new AuditLog
+                        {
+                            JsonData = auditEvent.ToJson(),
+                            UpdatedDate = DateTime.Now
+                        };
+
+                        var auditLogSpecial = new AuditLogSpecial()
+                        {
+                            JsonData = auditEvent.ToJson()
+                        };
+
+                        return new List<object>() { auditLog, auditLogSpecial };
+                    })
+                    .DisposeDbContext(false));
+
+            // Act
+            await using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { CreationPolicy = EventCreationPolicy.InsertOnEnd }))
+            {
+                scope.SetCustomField("Test", "1");
+            }
+
+            var auditEvent = JsonSerializer.Deserialize<AuditEvent>(dbContext.AuditLogs.First().JsonData);
+            var auditEventSpecial = JsonSerializer.Deserialize<AuditEvent>(dbContext.AuditLogsSpecial.First().JsonData);
+
+            // Assert
+            Assert.That(auditEvent.EndDate, Is.Not.Null);
+            Assert.That(auditEvent.CustomFields, Does.ContainKey("Test"));
+            Assert.That(auditEventSpecial.EndDate, Is.Not.Null);
+            Assert.That(auditEventSpecial.CustomFields, Does.ContainKey("Test"));
+        }
+
         // Support classes
 
-        public class MyDbContext : DbContext
+        internal class MyDbContext : DbContext
         {
             internal readonly string DbName;
 
@@ -256,7 +298,8 @@ namespace Audit.EntityFramework.Core.UnitTest
                 DbName = null;
             }
 
-            public DbSet<AuditLog> AuditLogs { get; set; }
+            public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+            public DbSet<AuditLogSpecial> AuditLogsSpecial => Set<AuditLogSpecial>();
 
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {
@@ -273,6 +316,12 @@ namespace Audit.EntityFramework.Core.UnitTest
             public string JsonData { get; set; }
             public DateTime CreatedDate { get; set; }
             public DateTime UpdatedDate { get; set; }
+        }
+
+        public class AuditLogSpecial
+        {
+            public int Id { get; set; }
+            public string JsonData { get; set; }
         }
 
     }
