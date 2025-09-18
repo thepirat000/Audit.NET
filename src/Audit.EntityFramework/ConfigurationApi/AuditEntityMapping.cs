@@ -7,9 +7,9 @@ namespace Audit.EntityFramework.ConfigurationApi
 {
     public class AuditEntityMapping : IAuditEntityMapping
     {
-        private Dictionary<Type, MappingInfo> _mapping = new Dictionary<Type, MappingInfo>();
-        private List<KeyValuePair<Func<EventEntry, bool>, MappingInfo>> _explicitMapping = new List<KeyValuePair<Func<EventEntry, bool>, MappingInfo>>();
-        private Func<AuditEvent, EventEntry, object, Task<bool>> _commonAction = null;
+        internal Dictionary<Type, MappingInfo> _mapping = new Dictionary<Type, MappingInfo>();
+        internal List<KeyValuePair<Func<EventEntry, bool>, MappingInfo>> _explicitMapping = new List<KeyValuePair<Func<EventEntry, bool>, MappingInfo>>();
+        internal Func<AuditEvent, EventEntry, object, Task<bool>> _commonAction = null;
 
 
         public IAuditEntityMapping Map<TSourceEntity, TAuditEntity>()

@@ -1,4 +1,16 @@
 ﻿#if EF_CORE_5_OR_GREATER
+using Audit.Core;
+using Audit.Core.Providers;
+using Audit.EntityFramework.Interceptors;
+using Audit.IntegrationTest;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+
+using NUnit.Framework;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,16 +18,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-
-using Audit.Core;
-using Audit.Core.Providers;
-using Audit.EntityFramework.Interceptors;
-using Audit.IntegrationTest;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-
-using NUnit.Framework;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -335,7 +340,8 @@ namespace Audit.EntityFramework.Core.UnitTest
             var interceptor = new AuditCommandInterceptor()
             {
                 LogParameterValues = true,
-                IncludeReaderEventsPredicate = c => c.CommandSource == sourceToInclude
+                IncludeReaderEventsPredicate = c => c.CommandSource == sourceToInclude,
+                ExcludeScalarEvents = false
             };
 
             using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
@@ -344,7 +350,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 var dept = new DbCommandInterceptContext.Department() { Id = newId, Name = "Test", Comments = "Comment" };
                 ctx.Departments.Add(dept);
                 ctx.SaveChanges();
-
+                
                 // intercepted LinqQuery
                 dept = ctx.Departments.FirstOrDefault(d => d.Id == newId);
 
@@ -357,6 +363,102 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(commandEvents[0].Parameters.First().Value, Is.EqualTo(newId));
             Assert.That(commandEvents[0].Result, Is.Null);
             Assert.That(commandEvents[0].CommandSource, Is.EqualTo(sourceToInclude));
+        }
+
+        [TestCase(CommandSource.LinqQuery)]
+        [TestCase(CommandSource.SaveChanges)]
+        public async Task Test_DbCommandInterceptor_IncludeReaderPredicateAsync(CommandSource sourceToInclude)
+        {
+            var commandEvents = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => commandEvents.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            int newId = new Random().Next();
+
+            var interceptor = new AuditCommandInterceptor()
+            {
+                LogParameterValues = true,
+                IncludeReaderEventsPredicate = c => c.CommandSource == sourceToInclude,
+                ExcludeScalarEvents = false
+            };
+
+            using (var ctx = new DbCommandInterceptContext(new DbContextOptionsBuilder().AddInterceptors(interceptor).Options))
+            {
+                // Intercepted SaveChanges
+                var dept = new DbCommandInterceptContext.Department() { Id = newId, Name = "Test", Comments = "Comment" };
+                await ctx.Departments.AddAsync(dept);
+                await ctx.SaveChangesAsync();
+
+                // intercepted LinqQuery
+                dept = await ctx.Departments.FirstOrDefaultAsync(d => d.Id == newId);
+
+                Assert.That(dept, Is.Not.Null);
+            }
+
+            Assert.That(commandEvents.Count, Is.EqualTo(1));
+            Assert.That(commandEvents[0].Parameters, Is.Not.Null);
+            Assert.That(commandEvents[0].Parameters.Any(), Is.True);
+            Assert.That(commandEvents[0].Parameters.First().Value, Is.EqualTo(newId));
+            Assert.That(commandEvents[0].Result, Is.Null);
+            Assert.That(commandEvents[0].CommandSource, Is.EqualTo(sourceToInclude));
+        }
+
+        [Test]
+        public void Test_DbCommandInterceptor_ExecuteScalar()
+        {
+            var commandEvents = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => commandEvents.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var interceptor = new AuditCommandInterceptor()
+            {
+                LogParameterValues = true,
+                ExcludeScalarEvents = false
+            };
+
+            using (var ctx = new DbCommandInterceptContext(interceptor))
+            {
+                var history = ctx.GetService<IHistoryRepository>();
+
+                // This should trigger two events: NonQueryExecuting and ScalarExecuting
+                history.Exists();
+            }
+
+            Assert.That(commandEvents.Count, Is.EqualTo(2));
+            Assert.That(commandEvents[0].Method, Is.EqualTo(DbCommandMethod.ExecuteNonQuery));
+            Assert.That(commandEvents[1].Method, Is.EqualTo(DbCommandMethod.ExecuteScalar));
+        }
+
+        [Test]
+        public async Task Test_DbCommandInterceptor_ExecuteScalarAsync()
+        {
+            var commandEvents = new List<CommandEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(ev => commandEvents.Add(ev.GetCommandEntityFrameworkEvent())))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            var interceptor = new AuditCommandInterceptor()
+            {
+                LogParameterValues = true,
+                ExcludeScalarEvents = false
+            };
+
+            await using (var ctx = new DbCommandInterceptContext(interceptor))
+            {
+                var history = ctx.GetService<IHistoryRepository>();
+
+                // This should trigger two events: NonQueryExecuting and ScalarExecuting
+                await history.ExistsAsync();
+            }
+
+            Assert.That(commandEvents.Count, Is.EqualTo(2));
+            Assert.That(commandEvents[0].Method, Is.EqualTo(DbCommandMethod.ExecuteNonQuery));
+            Assert.That(commandEvents[1].Method, Is.EqualTo(DbCommandMethod.ExecuteScalar));
         }
 #endif
 
@@ -924,16 +1026,27 @@ namespace Audit.EntityFramework.Core.UnitTest
 
     public class DbCommandInterceptContext : DbContext
     {
+        private readonly IInterceptor _interceptor;
+
         public static string CnnString = TestHelper.GetConnectionString("DbCommandIntercept");
 
         public DbSet<Department> Departments { get; set; }
 
         public DbCommandInterceptContext(DbContextOptions opt) : base(opt) { }
 
+        public DbCommandInterceptContext(IInterceptor interceptor)
+        {
+            _interceptor = interceptor;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(CnnString);
             optionsBuilder.EnableSensitiveDataLogging();
+            if (_interceptor != null)
+            {
+                optionsBuilder.AddInterceptors(_interceptor);
+            }
         }
 
         public class Department
