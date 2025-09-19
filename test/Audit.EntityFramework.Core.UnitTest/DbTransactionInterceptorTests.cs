@@ -1,18 +1,19 @@
 ﻿#if EF_CORE_5_OR_GREATER
 using Audit.Core;
+using Audit.Core.Providers;
 using Audit.EntityFramework.Interceptors;
+using Audit.IntegrationTest;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+
 using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Audit.Core.Providers;
-using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Core.UnitTest
 {
@@ -28,7 +29,7 @@ namespace Audit.EntityFramework.Core.UnitTest
                 .ForAnyContext().Reset();
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<DbCommandInterceptContext>().Reset();
-            Audit.Core.Configuration.ResetCustomActions();
+            Audit.Core.Configuration.Reset();
         }
 
         [Test]
@@ -166,6 +167,104 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
+        public void Test_DbTransactionInterceptor_WhenAuditDisabled()
+        {
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(
+                        ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+            }
+
+            var interceptor = new AuditTransactionInterceptor() { AuditEventType = "{database}:{transaction}" };
+            int id = new Random().Next();
+            int uid = new Random().Next();
+            var user = new DbTransactionInterceptContext.User() { Id = uid, UserName = "test" };
+            var dept = new DbTransactionInterceptContext.Department()
+            {
+                Id = id,
+                Comments = "Test",
+                Name = "Name",
+                User = user
+            };
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder()
+                       .AddInterceptors(interceptor).Options))
+            {
+                ctx.Departments.Add(dept);
+                ctx.SaveChanges();
+
+                var deptLoaded = ctx.Departments.FirstOrDefault();
+                Assert.That(deptLoaded, Is.Not.Null);
+            }
+
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Test_DbTransactionInterceptor_WhenAuditDisabledAsync()
+        {
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(
+                        ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+
+            await using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                await ctx.Database.EnsureDeletedAsync();
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            var interceptor = new AuditTransactionInterceptor() { AuditEventType = "{database}:{transaction}" };
+            int id = new Random().Next();
+            int uid = new Random().Next();
+            var user = new DbTransactionInterceptContext.User() { Id = uid, UserName = "test" };
+            var dept = new DbTransactionInterceptContext.Department()
+            {
+                Id = id,
+                Comments = "Test",
+                Name = "Name",
+                User = user
+            };
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            await using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder()
+                             .AddInterceptors(interceptor).Options))
+            {
+                await ctx.Departments.AddAsync(dept);
+                await ctx.SaveChangesAsync();
+
+                var deptLoaded = await ctx.Departments.FirstOrDefaultAsync();
+                Assert.That(deptLoaded, Is.Not.Null);
+            }
+
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public void Test_DbTransactionInterceptor_Rollback()
         {
             var inserted = new List<AuditEventTransactionEntityFramework>();
@@ -273,6 +372,192 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(inserted[1].TransactionEvent.IsAsync, Is.True);
             Assert.That(inserted[1].TransactionEvent.Success, Is.True);
             Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Rollback"));
+        }
+
+        [Test]
+        public void Test_DbTransactionInterceptor_TransactionFailed()
+        {
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(
+                        ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+            }
+
+            int id = new Random().Next();
+
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder()
+                       .AddInterceptors(new AuditTransactionInterceptor()).Options))
+            {
+                using (var tran = ctx.Database.BeginTransaction())
+                {
+                    var user = new DbTransactionInterceptContext.User() { Id = 1, UserName = "test" };
+                    ctx.Users.Add(user);
+                    ctx.Departments.Add(new DbTransactionInterceptContext.Department()
+                    { Id = id, Comments = "Test", Name = "Name", User = user });
+
+                    ctx.SaveChanges();
+
+                    ctx.Database.CloseConnection();
+
+                    Assert.Throws<InvalidOperationException>(() => { tran.Commit(); });
+                }
+            }
+
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+
+            Assert.That(inserted[0].TransactionEvent.Action, Is.EqualTo("Start"));
+            Assert.That(inserted[0].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Commit"));
+            Assert.That(inserted[1].TransactionEvent.Success, Is.False);
+        }
+
+        [Test]
+        public async Task Test_DbTransactionInterceptor_TransactionFailedAsync()
+        {
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(
+                        ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            await using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                await ctx.Database.EnsureDeletedAsync();
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            int id = new Random().Next();
+
+            await using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder()
+                             .AddInterceptors(new AuditTransactionInterceptor()).Options))
+            {
+                await using (var tran = await ctx.Database.BeginTransactionAsync())
+                {
+                    var user = new DbTransactionInterceptContext.User() { Id = 1, UserName = "test" };
+                    await ctx.Users.AddAsync(user);
+                    await ctx.Departments.AddAsync(new DbTransactionInterceptContext.Department()
+                        { Id = id, Comments = "Test", Name = "Name", User = user });
+
+                    await ctx.SaveChangesAsync();
+
+                    await ctx.Database.CloseConnectionAsync();
+
+                    Assert.ThrowsAsync<InvalidOperationException>(async () => { await tran.CommitAsync(); });
+                }
+            }
+
+            Assert.That(inserted.Count, Is.EqualTo(2));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+
+            Assert.That(inserted[0].TransactionEvent.Action, Is.EqualTo("Start"));
+            Assert.That(inserted[0].TransactionEvent.Success, Is.True);
+            Assert.That(inserted[1].TransactionEvent.Action, Is.EqualTo("Commit"));
+            Assert.That(inserted[1].TransactionEvent.Success, Is.False);
+        }
+
+        [Test]
+        public void Test_DbTransactionInterceptor_Rollback_WhenAuditDisabled()
+        {
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(
+                        ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                ctx.Database.EnsureDeleted();
+                ctx.Database.EnsureCreated();
+            }
+
+            int id = new Random().Next();
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder()
+                       .AddInterceptors(new AuditTransactionInterceptor()).Options))
+            {
+                using (var tran = ctx.Database.BeginTransaction())
+                {
+                    var user = new DbTransactionInterceptContext.User() { Id = 1, UserName = "test" };
+                    ctx.Users.Add(user);
+                    ctx.Departments.Add(new DbTransactionInterceptContext.Department()
+                    { Id = id, Comments = "Test", Name = "Name", User = user });
+
+                    ctx.SaveChanges();
+
+                    tran.Rollback();
+                }
+            }
+
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task Test_DbTransactionInterceptor_Rollback_WhenAuditDisabledAsync()
+        {
+            var inserted = new List<AuditEventTransactionEntityFramework>();
+            var replaced = new List<AuditEventTransactionEntityFramework>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _
+                    .OnInsert(
+                        ev => inserted.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson())))
+                    .OnReplace((eventId, ev) =>
+                        replaced.Add(AuditEvent.FromJson<AuditEventTransactionEntityFramework>(ev.ToJson()))))
+                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd);
+
+            await using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder().Options))
+            {
+                // not intercepted
+                await ctx.Database.EnsureDeletedAsync();
+                await ctx.Database.EnsureCreatedAsync();
+            }
+
+            int id = new Random().Next();
+
+            Audit.Core.Configuration.AuditDisabled = true;
+
+            await using (var ctx = new DbTransactionInterceptContext(new DbContextOptionsBuilder()
+                             .AddInterceptors(new AuditTransactionInterceptor()).Options))
+            {
+                await using (var tran = ctx.Database.BeginTransaction())
+                {
+                    var user = new DbTransactionInterceptContext.User() { Id = 1, UserName = "test" };
+                    await ctx.Users.AddAsync(user);
+                    await ctx.Departments.AddAsync(new DbTransactionInterceptContext.Department()
+                        { Id = id, Comments = "Test", Name = "Name", User = user });
+
+                    await ctx.SaveChangesAsync();
+
+                    await tran.RollbackAsync();
+                }
+            }
+
+            Assert.That(inserted.Count, Is.EqualTo(0));
+            Assert.That(replaced.Count, Is.EqualTo(0));
         }
 
         [Test]
