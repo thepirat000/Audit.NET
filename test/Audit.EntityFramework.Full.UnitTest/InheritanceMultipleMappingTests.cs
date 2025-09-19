@@ -1,5 +1,8 @@
 ﻿#if NET462 || NET472
+using Audit.IntegrationTest;
+
 using NUnit.Framework;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,9 +11,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using Audit.IntegrationTest;
 
 namespace Audit.EntityFramework.Full.UnitTest
 {
@@ -83,7 +83,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         }
     }
 
-
+    // context
     public class DataBaseContext : DbContext
     {
         private static DbContextHelper _helper = new DbContextHelper();
@@ -112,15 +112,8 @@ namespace Audit.EntityFramework.Full.UnitTest
         {
             base.OnModelCreating(modelBuilder);
 
-            // Register Entity types
-            List<Type> entityTypesToRegister = Assembly.GetExecutingAssembly().GetTypes().Where(type =>
-                type.BaseType != null && !type.IsAbstract && type.BaseType.IsGenericType &&
-                (type.BaseType.GetGenericTypeDefinition() == typeof(EntityTypeConfiguration<>) ||
-                 type.BaseType.GetGenericTypeDefinition() == typeof(BaseMap<>))).ToList();
-
-            foreach (object configurationInstance in entityTypesToRegister.Select(Activator.CreateInstance))
-                modelBuilder.Configurations.Add((dynamic)configurationInstance);
-
+            modelBuilder.Configurations.Add(new RootMap());
+            modelBuilder.Configurations.Add(new LeafFourMap());
         }
     }
 
@@ -132,6 +125,7 @@ namespace Audit.EntityFramework.Full.UnitTest
         Type3,
         Type4,
     }
+
     [Serializable]
     public abstract class BaseClass
     {
@@ -177,7 +171,7 @@ namespace Audit.EntityFramework.Full.UnitTest
     }
 
     // mapping
-    abstract class BaseMap<T> : EntityTypeConfiguration<T> where T : BaseClass
+    public abstract class BaseMap<T> : EntityTypeConfiguration<T> where T : BaseClass
     {
         protected BaseMap()
         {
@@ -188,7 +182,7 @@ namespace Audit.EntityFramework.Full.UnitTest
                 .IsRowVersion();
         }
     }
-    class RootMap : BaseMap<Root>
+    public class RootMap : BaseMap<Root>
     {
         public RootMap()
         {
@@ -201,7 +195,7 @@ namespace Audit.EntityFramework.Full.UnitTest
             ToTable("TransmissionItems");
         }
     }
-    class LeafFourMap : BaseMap<LeafFour>
+    public class LeafFourMap : BaseMap<LeafFour>
     {
         public LeafFourMap()
         {
