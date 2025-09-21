@@ -1,19 +1,18 @@
-﻿using System.Linq;
-using Audit.Core.Providers;
-using Audit.Core.Providers.Wrappers;
+﻿using Audit.Mvc;
 using Audit.WebApi;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Audit.Mvc;
-using Audit.SignalR;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
+using System.Linq;
 
 namespace Audit.AspNetCore.UnitTest
 {
@@ -60,7 +59,8 @@ namespace Audit.AspNetCore.UnitTest
                         .IncludeHeaders()
                         .IncludeResponseHeaders()
                         .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200)
-                        .IncludeRequestBody()));
+                        .IncludeRequestBody()
+                        .IncludeModelState(false)));
 
                     mvc.Filters.Add(new AuditApiGlobalFilter(config => config
                         .LogActionIf(d => d.ControllerName == "Values" && d.ActionName == "TestSerializeParams")
@@ -124,8 +124,8 @@ namespace Audit.AspNetCore.UnitTest
                     .IncludeResponseBody(ctx =>
                         !ctx.Request.QueryString.HasValue ||
                         !ctx.Request.QueryString.Value.ToLower().Contains("noresponsebody"))
-                    .IncludeHeaders(true)
-                    .IncludeResponseHeaders()
+                    .IncludeHeaders(_ => true)
+                    .IncludeResponseHeaders(_ => true)
                     .WithEventType("{verb}.{url}")
                     .FilterByRequest(
                         r => r.QueryString.HasValue && r.QueryString.Value.ToLower().Contains("middleware")));

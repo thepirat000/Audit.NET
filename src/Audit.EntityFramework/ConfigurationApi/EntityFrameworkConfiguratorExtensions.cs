@@ -20,7 +20,7 @@ namespace Audit.Core
         internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Action<AuditEvent, EventEntry, object> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
             Func<EventEntry, Type> explicitMapper, Func<DbContext, EventEntry, object> auditEntityCreator)
         {
-            var efdp = new EntityFrameworkDataProvider()
+            var dataProvider = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
                 IgnoreMatchedPropertiesFunc = ignoreMatchedPropertiesFunc,
@@ -29,20 +29,20 @@ namespace Audit.Core
             };
             if (auditEntityAction != null)
             {
-                efdp.AuditEntityAction = (auditEvent, entry, auditEntity) =>
+                dataProvider.AuditEntityAction = (auditEvent, entry, auditEntity) =>
                 {
                     auditEntityAction.Invoke(auditEvent, entry, auditEntity);
                     return Task.FromResult(true);
                 };
             }
-            Configuration.DataProvider = efdp;
+            Configuration.DataProvider = dataProvider;
             return new CreationPolicyConfigurator();
         }
 
         internal static ICreationPolicyConfigurator UseEntityFramework(this IConfigurator configurator, Func<Type, EventEntry, Type> auditTypeMapper, Func<AuditEvent, EventEntry, object, Task<bool>> auditEntityAction, Func<Type, bool> ignoreMatchedPropertiesFunc,
             Func<AuditEventEntityFramework, DbContext> dbContextBuilder, Func<EventEntry, Type> explicitMapper, Func<DbContext, EventEntry, object> auditEntityCreator, bool disposeDbContext)
         {
-            var efdp = new EntityFrameworkDataProvider()
+            var dataProvider = new EntityFrameworkDataProvider()
             {
                 AuditTypeMapper = auditTypeMapper,
                 IgnoreMatchedPropertiesFunc = ignoreMatchedPropertiesFunc,
@@ -52,7 +52,7 @@ namespace Audit.Core
                 AuditEntityCreator = auditEntityCreator,
                 DisposeDbContext = disposeDbContext
             };
-            Configuration.DataProvider = efdp;
+            Configuration.DataProvider = dataProvider;
             return new CreationPolicyConfigurator();
         }
 

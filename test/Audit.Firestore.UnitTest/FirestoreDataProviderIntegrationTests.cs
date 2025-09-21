@@ -28,6 +28,7 @@ namespace Audit.Firestore.UnitTest
     public class FirestoreDataProviderIntegrationTests
     {
         private const string GoogleAppCredentialsVariable = "GOOGLE_APPLICATION_CREDENTIALS";
+        private const string GoogleFirestoreProjectIdVariable = "FIRESTORE_PROJECT_ID";
         private string _projectId;
         private string _testCollection;
 
@@ -35,7 +36,7 @@ namespace Audit.Firestore.UnitTest
         public void Setup()
         {
             // Set your project ID here or via environment variable
-            _projectId = Environment.GetEnvironmentVariable("FIRESTORE_PROJECT_ID") ?? "audit-net";
+            _projectId = Environment.GetEnvironmentVariable(GoogleFirestoreProjectIdVariable) ?? "audit-net";
             _testCollection = "audit-test";
             Audit.Core.Configuration.Reset();
         }

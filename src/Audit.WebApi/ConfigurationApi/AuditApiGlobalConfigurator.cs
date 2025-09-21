@@ -13,7 +13,6 @@ using System.Text;
 
 namespace Audit.WebApi.ConfigurationApi
 {
-
     public class AuditApiGlobalConfigurator : IAuditApiGlobalConfigurator
     {
         internal Func<ActionExecutingContext, bool> _logDisabledBuilder;

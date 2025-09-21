@@ -46,12 +46,5 @@ namespace Audit.IntegrationTest
         public static string OpenSearchUrl => "http://admin:Messi1708!!!@localhost:9250";
         public static string PostgreSqlConnectionString => "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=postgres;";
         public static string SqlServerConnectionString => "Server=localhost,1433;Initial Catalog=Audit;User Id=sa;Password=YourStrong!Passw0rd;Encrypt=False;TrustServerCertificate=True;";
-
-        private static string GetFromEnv(string key, string @default = null)
-        {
-            var varName = key.ToUpper();
-            var value = Environment.GetEnvironmentVariable(varName) ?? @default ?? throw new Exception($"No environment variable or default set for variable '{key}'");
-            return value;
-        }
     }
 }

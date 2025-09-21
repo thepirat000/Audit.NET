@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Audit.Core;
 using Audit.EntityFramework.ConfigurationApi;
+using Audit.EntityFramework.Providers;
+
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NUnit.Framework;
 
@@ -9,6 +12,13 @@ namespace Audit.EntityFramework.Core.UnitTest
     [TestFixture]
     public class EFConfigTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Reset();
+            EntityFramework.Configuration.Setup().ForAnyContext().Reset();
+        }
+
         [Test]
         public void Test_EntityFramework_Config_Precedence()
         {
@@ -85,6 +95,18 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(merge.IgnoredProperties.Contains("I3"), Is.True);
             Assert.That(merge.OverrideProperties["C2"].Invoke(null), Is.EqualTo("INT"));
             Assert.That(merge.OverrideProperties["C4"].Invoke(null), Is.EqualTo(null));
+        }
+
+        [Test]
+        public void Test_EntityFramework_UseEntityFramework()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseEntityFramework((t, ee) => typeof(AuditEvent), (e, ee, o) => { }, t => true,
+                    ee => typeof(AuditEvent),
+                    (context, entry) => new object());
+
+            var dataProvider = Audit.Core.Configuration.DataProviderAs<EntityFrameworkDataProvider>();
+            Assert.That(dataProvider, Is.Not.Null);
         }
     }
 
