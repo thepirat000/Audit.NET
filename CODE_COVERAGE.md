@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/19/2025 - 19:32:12 |
-| Coverage date: | 09/19/2025 - 19:08:00 - 09/19/2025 - 19:31:29 |
+| Generated on: | 09/22/2025 - 00:23:20 |
+| Coverage date: | 09/21/2025 - 23:59:12 - 09/22/2025 - 00:22:35 |
 | Parser: | MultiReport (95x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 87.1% (9192 of 10549) |
-| Covered lines: | 9192 |
-| Uncovered lines: | 1357 |
+| **Line coverage:** | 87.4% (9224 of 10549) |
+| Covered lines: | 9224 |
+| Uncovered lines: | 1325 |
 | Coverable lines: | 10549 |
-| Total lines: | 27283 |
-| **Branch coverage:** | 75.9% (3276 of 4311) |
-| Covered branches: | 3276 |
+| Total lines: | 27282 |
+| **Branch coverage:** | 76% (3279 of 4311) |
+| Covered branches: | 3279 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -59,9 +59,9 @@
 |Audit.EntityFramework.Providers.EntityFrameworkDataProvider|115|17|132|396|87.1%|80|100|80%|
 |**Audit.EntityFramework.Abstractions**|**4**|**2**|**6**|**20**|**66.6%**|**0**|**0**|****|
 |Audit.EntityFramework.AuditOverrideAttribute|4|2|6|20|66.6%|0|0||
-|**Audit.EntityFramework.Core**|**1725**|**123**|**1848**|**5236**|**93.3%**|**766**|**878**|**87.2%**|
+|**Audit.EntityFramework.Core**|**1738**|**110**|**1848**|**5236**|**94%**|**768**|**878**|**87.4%**|
 |Audit.Core.DbContextConfiguratorExtensions|2|2|4|37|50%|0|0||
-|Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
+|Audit.Core.EntityFrameworkConfiguratorExtensions|28|2|30|72|93.3%|2|2|100%|
 |Audit.EntityFramework.AuditDbContext|34|0|34|253|100%|0|0||
 |Audit.EntityFramework.AuditDbContextAttribute|15|0|15|92|100%|8|8|100%|
 |Audit.EntityFramework.AuditEventCommandEntityFramework|1|0|1|14|100%|0|0||
@@ -111,11 +111,11 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**138**|**25**|**163**|**399**|**84.6%**|**42**|**52**|**80.7%**|
+|**Audit.FileSystem**|**143**|**20**|**163**|**399**|**87.7%**|**42**|**52**|**80.7%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|102|23|125|245|81.6%|42|52|80.7%|
+|Audit.FileSystem.FileSystemMonitor|107|18|125|245|85.6%|42|52|80.7%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
@@ -351,7 +351,7 @@
 |Audit.Wcf.Client.AuditEventWcfClient|0|1|1|12|0%|0|0||
 |Audit.Wcf.Client.AuditMessageInspector|0|60|60|115|0%|0|38|0%|
 |Audit.Wcf.Client.WcfClientAction|0|10|10|50|0%|0|0||
-|**Audit.WebApi**|**222**|**110**|**332**|**1193**|**66.8%**|**109**|**212**|**51.4%**|
+|**Audit.WebApi**|**222**|**110**|**332**|**1192**|**66.8%**|**109**|**212**|**51.4%**|
 |Audit.WebApi.ApiControllerExtensions|4|0|4|92|100%|0|0||
 |Audit.WebApi.AuditApiAction|21|2|23|74|91.3%|0|0||
 |Audit.WebApi.AuditApiAdapter|99|29|128|250|77.3%|59|106|55.6%|
@@ -362,14 +362,14 @@
 |Audit.WebApi.AuditEventWebApi|1|0|1|16|100%|0|0||
 |Audit.WebApi.BodyContent|3|0|3|9|100%|0|0||
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|3|18|21|63|14.2%|0|4|0%|
-|Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|2|24|26|109|7.6%|0|0||
+|Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|2|24|26|108|7.6%|0|0||
 |Audit.WebApi.ContextWrapper|28|8|36|136|77.7%|23|38|60.5%|
-|**Audit.WebApi.Core**|**417**|**71**|**488**|**1444**|**85.4%**|**204**|**284**|**71.8%**|
+|**Audit.WebApi.Core**|**431**|**57**|**488**|**1443**|**88.3%**|**205**|**284**|**72.1%**|
 |Audit.WebApi.ApiControllerExtensions|6|0|6|92|100%|0|0||
 |Audit.WebApi.AuditApiAction|22|2|24|74|91.6%|0|0||
 |Audit.WebApi.AuditApiAdapter|116|27|143|308|81.1%|90|136|66.1%|
 |Audit.WebApi.AuditApiAttribute|35|2|37|130|94.5%|15|16|93.7%|
-|Audit.WebApi.AuditApiGlobalFilter|32|1|33|140|96.9%|18|20|90%|
+|Audit.WebApi.AuditApiGlobalFilter|32|1|33|140|96.9%|19|20|95%|
 |Audit.WebApi.AuditApiHelper|47|5|52|139|90.3%|23|36|63.8%|
 |Audit.WebApi.AuditEventExtensions|6|0|6|32|100%|6|6|100%|
 |Audit.WebApi.AuditEventWebApi|1|0|1|16|100%|0|0||
@@ -378,5 +378,5 @@
 |Audit.WebApi.AuditMiddlewareExtensions|3|0|3|24|100%|0|0||
 |Audit.WebApi.BodyContent|3|0|3|9|100%|0|0||
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|11|10|21|63|52.3%|1|6|16.6%|
-|Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|12|14|26|109|46.1%|0|0||
+|Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|26|0|26|108|100%|0|0||
 |Audit.WebApi.ConfigurationApi.AuditMiddlewareConfigurator|22|8|30|104|73.3%|4|4|100%|
