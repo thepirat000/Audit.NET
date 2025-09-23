@@ -124,6 +124,8 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(events[0].FileSystemEvent.Errors, Has.Count.EqualTo(1));
             Assert.That(events[0].FileSystemEvent.Errors[0], Does.Contain("test"));
 
+            fsMon.Stop();
+            fsMon.GetWatcher().Dispose();
             Directory.Delete(folder, true);
         }
 
@@ -170,6 +172,8 @@ namespace Audit.FileSystem.UnitTest
             Assert.That((create.FileContent as FileBinaryContent)?.Value, Is.EqualTo("MZ123"u8.ToArray()));
             Assert.That(create.MD5, Is.Not.Null);
 
+            fsMon.Stop();
+            fsMon.GetWatcher().Dispose();
             Directory.Delete(folder, true);
         }
 
@@ -212,6 +216,8 @@ namespace Audit.FileSystem.UnitTest
             var rename = evs.LastOrDefault(x => x.Event == FileSystemEventType.Rename);
             Assert.That(rename, Is.Not.Null);
 
+            fsMon.Stop();
+            fsMon.GetWatcher().Dispose();
             Directory.Delete(folder, true);
         }
 
@@ -252,6 +258,8 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(create, Is.Not.Null);
             Assert.That(create.Object, Is.EqualTo(FileSystemObjectType.Directory));
 
+            fsMon.Stop();
+            fsMon.GetWatcher().Dispose();
             Directory.Delete(folder, true);
         }
 
@@ -285,6 +293,7 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(w.EnableRaisingEvents, Is.True);
             fsMon.Stop();
             Assert.That(w.EnableRaisingEvents, Is.False);
+            fsMon.GetWatcher().Dispose();
         }
 
         [Test]
@@ -304,11 +313,14 @@ namespace Audit.FileSystem.UnitTest
             fsMon.Start();
             var w2 = fsMon.GetWatcher();
             Assert.That(w1, Is.Not.EqualTo(w2));
+            fsMon.GetWatcher().Dispose();
         }
         
         private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 5000)
         {
-            while (true)
+            using var cts = new CancellationTokenSource(milliseconds);
+            
+            while (!cts.IsCancellationRequested)
             {
                 var res = fsMon.GetWatcher().WaitForChanged(WatcherChangeTypes.All, milliseconds);
                 if (res.TimedOut)
