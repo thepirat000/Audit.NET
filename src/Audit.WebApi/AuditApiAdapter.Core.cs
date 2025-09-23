@@ -181,7 +181,7 @@ namespace Audit.WebApi
             }
         }
 
-        private object GetResponseBody(ActionDescriptor descriptor, IActionResult result)
+        internal static object GetResponseBody(ActionDescriptor descriptor, IActionResult result)
         {
             if ((descriptor as ControllerActionDescriptor)?.MethodInfo
                 .ReturnTypeCustomAttributes
