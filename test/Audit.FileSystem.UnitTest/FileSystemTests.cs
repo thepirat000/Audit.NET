@@ -11,6 +11,7 @@ using System.Threading;
 namespace Audit.FileSystem.UnitTest
 {
     [TestFixture]
+    [Timeout(60000)]
     public class FileSystemTests
     {
         private static readonly Random Random = new Random();
