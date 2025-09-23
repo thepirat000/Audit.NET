@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/22/2025 - 00:23:20 |
-| Coverage date: | 09/21/2025 - 23:59:12 - 09/22/2025 - 00:22:35 |
+| Generated on: | 09/23/2025 - 03:10:53 |
+| Coverage date: | 09/23/2025 - 02:46:38 - 09/23/2025 - 03:10:08 |
 | Parser: | MultiReport (95x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 87.4% (9224 of 10549) |
-| Covered lines: | 9224 |
-| Uncovered lines: | 1325 |
+| **Line coverage:** | 87.8% (9270 of 10549) |
+| Covered lines: | 9270 |
+| Uncovered lines: | 1279 |
 | Coverable lines: | 10549 |
 | Total lines: | 27282 |
-| **Branch coverage:** | 76% (3279 of 4311) |
-| Covered branches: | 3279 |
+| **Branch coverage:** | 76.8% (3311 of 4311) |
+| Covered branches: | 3311 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -111,11 +111,11 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**143**|**20**|**163**|**399**|**87.7%**|**42**|**52**|**80.7%**|
+|**Audit.FileSystem**|**140**|**23**|**163**|**399**|**85.8%**|**42**|**52**|**80.7%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|107|18|125|245|85.6%|42|52|80.7%|
+|Audit.FileSystem.FileSystemMonitor|104|21|125|245|83.2%|42|52|80.7%|
 |Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
@@ -265,11 +265,11 @@
 |Audit.Core.MongoConfiguratorExtensions|12|8|20|55|60%|0|0||
 |Audit.MongoDB.ConfigurationApi.MongoProviderConfigurator|15|0|15|50|100%|0|0||
 |Audit.MongoDB.Providers.MongoDataProvider|144|1|145|341|99.3%|51|54|94.4%|
-|**Audit.NET.MySql**|**124**|**26**|**150**|**365**|**82.6%**|**30**|**36**|**83.3%**|
+|**Audit.NET.MySql**|**148**|**2**|**150**|**365**|**98.6%**|**35**|**36**|**97.2%**|
 |Audit.Core.MySqlServerConfiguratorExtensions|14|0|14|49|100%|0|0||
 |Audit.MySql.Configuration.MySqlServerProviderConfigurator|15|0|15|45|100%|0|0||
 |Audit.MySql.CustomColumn|6|2|8|24|75%|0|0||
-|Audit.MySql.Providers.MySqlDataProvider|89|24|113|247|78.7%|30|36|83.3%|
+|Audit.MySql.Providers.MySqlDataProvider|113|0|113|247|100%|35|36|97.2%|
 |**Audit.NET.NLog**|**39**|**15**|**54**|**193**|**72.2%**|**12**|**20**|**60%**|
 |Audit.Core.NLogConfiguratorExtensions|2|2|4|30|50%|0|0||
 |Audit.NLog.Configuration.NLogConfigurator|6|6|12|47|50%|0|0||
@@ -364,10 +364,10 @@
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector|3|18|21|63|14.2%|0|4|0%|
 |Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator|2|24|26|108|7.6%|0|0||
 |Audit.WebApi.ContextWrapper|28|8|36|136|77.7%|23|38|60.5%|
-|**Audit.WebApi.Core**|**431**|**57**|**488**|**1443**|**88.3%**|**205**|**284**|**72.1%**|
+|**Audit.WebApi.Core**|**456**|**32**|**488**|**1443**|**93.4%**|**232**|**284**|**81.6%**|
 |Audit.WebApi.ApiControllerExtensions|6|0|6|92|100%|0|0||
 |Audit.WebApi.AuditApiAction|22|2|24|74|91.6%|0|0||
-|Audit.WebApi.AuditApiAdapter|116|27|143|308|81.1%|90|136|66.1%|
+|Audit.WebApi.AuditApiAdapter|141|2|143|308|98.6%|117|136|86%|
 |Audit.WebApi.AuditApiAttribute|35|2|37|130|94.5%|15|16|93.7%|
 |Audit.WebApi.AuditApiGlobalFilter|32|1|33|140|96.9%|19|20|95%|
 |Audit.WebApi.AuditApiHelper|47|5|52|139|90.3%|23|36|63.8%|
