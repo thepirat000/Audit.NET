@@ -88,6 +88,44 @@ namespace Audit.FileSystem.UnitTest
 
             Directory.Delete(folder, true);
         }
+
+        [Test]
+        public void FileSystemMonitor_OnPredicateException_ReturnsError()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), Random.Next(10000, 99999).ToString());
+            Directory.CreateDirectory(folder);
+
+            var filename1 = $"test_{Random.Next(1000, 9999)}.txt";
+            var t1Path = Path.Combine(folder, filename1);
+            File.Delete(t1Path);
+
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dataProvider);
+
+            var fsMon = new FileSystemMonitor()
+            {
+                Options = new FileSystemMonitorOptions()
+                {
+                    Path = folder,
+                    CustomFilterPredicate = _ => true,
+                    IncludeContentPredicate = _ => throw new Exception("test"),
+                    IncludedEventTypes = [FileSystemEventType.Create, FileSystemEventType.Change, FileSystemEventType.Rename, FileSystemEventType.Delete]
+                }
+            };
+            fsMon.Start();
+
+            File.WriteAllBytes(t1Path, "MZ1234"u8.ToArray());
+
+            WaitForChange(fsMon);
+
+            var events = dataProvider.GetAllEventsOfType<AuditEventFileSystem>();
+
+            Assert.That(events, Has.Count.GreaterThanOrEqualTo(0));
+            Assert.That(events[0].FileSystemEvent.Errors, Has.Count.EqualTo(1));
+            Assert.That(events[0].FileSystemEvent.Errors[0], Does.Contain("test"));
+
+            Directory.Delete(folder, true);
+        }
 #endif
 
         [Test]
@@ -268,45 +306,7 @@ namespace Audit.FileSystem.UnitTest
             var w2 = fsMon.GetWatcher();
             Assert.That(w1, Is.Not.EqualTo(w2));
         }
-
-        [Test]
-        public void FileSystemMonitor_OnPredicateException_ReturnsError()
-        {
-            var folder = Path.Combine(Path.GetTempPath(), Random.Next(10000, 99999).ToString());
-            Directory.CreateDirectory(folder);
-
-            var filename1 = $"test_{Random.Next(1000, 9999)}.txt";
-            var t1Path = Path.Combine(folder, filename1);
-            File.Delete(t1Path);
-
-            Audit.Core.Configuration.Setup()
-                .UseInMemoryProvider(out var dataProvider);
-
-            var fsMon = new FileSystemMonitor()
-            {
-                Options = new FileSystemMonitorOptions()
-                {
-                    Path = folder,
-                    CustomFilterPredicate = _ => true,
-                    IncludeContentPredicate = _ => throw new Exception("test"),
-                    IncludedEventTypes = [FileSystemEventType.Create, FileSystemEventType.Change, FileSystemEventType.Rename, FileSystemEventType.Delete]
-                }
-            };
-            fsMon.Start();
-
-            File.WriteAllBytes(t1Path, "MZ1234"u8.ToArray());
-            
-            WaitForChange(fsMon);
-
-            var events = dataProvider.GetAllEventsOfType<AuditEventFileSystem>();
-
-            Assert.That(events, Has.Count.GreaterThanOrEqualTo(0));
-            Assert.That(events[0].FileSystemEvent.Errors, Has.Count.EqualTo(1));
-            Assert.That(events[0].FileSystemEvent.Errors[0], Does.Contain("test"));
-
-            Directory.Delete(folder, true);
-        }
-
+        
         private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 5000)
         {
             while (true)
