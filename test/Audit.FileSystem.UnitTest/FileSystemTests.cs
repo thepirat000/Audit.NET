@@ -34,7 +34,6 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(x.FilenamePrefix.GetDefault(), Is.EqualTo("px"));
         }
 
-#if !NETCOREAPP3_1
         [Test]
         public void Test_FileSystem_Text()
         {
@@ -126,7 +125,6 @@ namespace Audit.FileSystem.UnitTest
 
             Directory.Delete(folder, true);
         }
-#endif
 
         [Test]
         public void Test_FileSystem_Binary()
