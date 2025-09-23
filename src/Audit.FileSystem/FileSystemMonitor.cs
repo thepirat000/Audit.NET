@@ -13,24 +13,31 @@ namespace Audit.FileSystem
     /// </summary>
     public class FileSystemMonitor
     {
-        private FileSystemMonitorOptions _options;
         /// <summary>
         /// The FileSystemMonitor options.
         /// </summary>
-        public FileSystemMonitorOptions Options { get => _options; set => _options = value; }
+        public FileSystemMonitorOptions Options { get; set; }
+
         private FileSystemWatcher _watcher;
+
+        internal FileSystemWatcher GetWatcher()
+        {
+            return _watcher; 
+        }
 
         public FileSystemMonitor(string path)
         {
-            _options = new FileSystemMonitorOptions(path);
+            Options = new FileSystemMonitorOptions(path);
         }
+
         public FileSystemMonitor(FileSystemMonitorOptions options)
         {
-            _options = options;
+            Options = options;
         }
+
         public FileSystemMonitor()
         {
-            _options = new FileSystemMonitorOptions(Directory.GetCurrentDirectory());
+            Options = new FileSystemMonitorOptions(Directory.GetCurrentDirectory());
         }
 
         /// <summary>
@@ -43,24 +50,24 @@ namespace Audit.FileSystem
                 _watcher.Dispose();
             }
             _watcher = new FileSystemWatcher();
-            _watcher.NotifyFilter = _options.NotifyFilters;
-            _watcher.Filter = _options.Filter;
-            _watcher.IncludeSubdirectories = _options.IncludeSubdirectories;
-            _watcher.Path = _options.Path;
-            _watcher.InternalBufferSize = _options.InternalBufferSize;
-            if (_options.IncludedEventTypes == null || _options.IncludedEventTypes.Contains(FileSystemEventType.Change))
+            _watcher.NotifyFilter = Options.NotifyFilters;
+            _watcher.Filter = Options.Filter;
+            _watcher.IncludeSubdirectories = Options.IncludeSubdirectories;
+            _watcher.Path = Options.Path;
+            _watcher.InternalBufferSize = Options.InternalBufferSize;
+            if (Options.IncludedEventTypes == null || Options.IncludedEventTypes.Contains(FileSystemEventType.Change))
             {
                 _watcher.Changed += _watcher_Changed;
             }
-            if (_options.IncludedEventTypes == null || _options.IncludedEventTypes.Contains(FileSystemEventType.Rename))
+            if (Options.IncludedEventTypes == null || Options.IncludedEventTypes.Contains(FileSystemEventType.Rename))
             {
                 _watcher.Renamed += _watcher_Renamed;
             }
-            if (_options.IncludedEventTypes == null || _options.IncludedEventTypes.Contains(FileSystemEventType.Delete))
+            if (Options.IncludedEventTypes == null || Options.IncludedEventTypes.Contains(FileSystemEventType.Delete))
             {
                 _watcher.Deleted += _watcher_Deleted;
             }
-            if (_options.IncludedEventTypes == null || _options.IncludedEventTypes.Contains(FileSystemEventType.Create))
+            if (Options.IncludedEventTypes == null || Options.IncludedEventTypes.Contains(FileSystemEventType.Create))
             {
                 _watcher.Created += _watcher_Created;
             }
@@ -121,26 +128,26 @@ namespace Audit.FileSystem
 
         private bool IncludeObject(FileSystemEventArgs e)
         {
-            return _options.CustomFilterPredicate == null || _options.CustomFilterPredicate.Invoke(e);
+            return Options.CustomFilterPredicate == null || Options.CustomFilterPredicate.Invoke(e);
         }
 
         private void ProcessEvent(FileSystemEventArgs e, FileSystemEventType type)
         {
             var fsEvent = new FileSystemEvent()
             {
-                Name = System.IO.Path.GetFileName(e.FullPath),
-                Extension = System.IO.Path.GetExtension(e.FullPath),
+                Name = Path.GetFileName(e.FullPath),
+                Extension = Path.GetExtension(e.FullPath),
                 FullPath = e.FullPath,
                 Event = type,
-                OldName = (e is RenamedEventArgs args) ? System.IO.Path.GetFileName(args.OldFullPath) : null
+                OldName = (e is RenamedEventArgs args) ? Path.GetFileName(args.OldFullPath) : null
             };
             var fsAuditEvent = new AuditEventFileSystem()
             {
                 FileSystemEvent = fsEvent
             };
-            var eventType = (_options.EventTypeName ?? "[{type}] {name}").Replace("{name}", fsEvent.Name).Replace("{path}", fsEvent.FullPath).Replace("{type}", e.ChangeType.ToString());
-            var factory = _options.AuditScopeFactory ?? Configuration.AuditScopeFactory;
-            using (var auditScope = factory.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = fsAuditEvent, DataProvider = _options.AuditDataProvider, CreationPolicy = _options.CreationPolicy }))
+            var eventType = (Options.EventTypeName ?? "[{type}] {name}").Replace("{name}", fsEvent.Name).Replace("{path}", fsEvent.FullPath).Replace("{type}", e.ChangeType.ToString());
+            var factory = Options.AuditScopeFactory ?? Configuration.AuditScopeFactory;
+            using (var auditScope = factory.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = fsAuditEvent, DataProvider = Options.AuditDataProvider, CreationPolicy = Options.CreationPolicy }))
             {
                 if (type != FileSystemEventType.Delete)
                 {
@@ -164,7 +171,7 @@ namespace Audit.FileSystem
 
         private void FillEvent(FileSystemEvent fsEvent, FileSystemEventArgs e)
         {
-            FileAttributes attr = FileAttributes.Archive;
+            FileAttributes attr;
             try
             {
                 attr = File.GetAttributes(e.FullPath);
@@ -174,7 +181,7 @@ namespace Audit.FileSystem
                 fsEvent.Errors.Add($"IOException when getting file attributes: {ex.Message}");
                 return;
             }
-            bool isDir = (attr & FileAttributes.Directory) == FileAttributes.Directory;
+            var isDir = (attr & FileAttributes.Directory) == FileAttributes.Directory;
             FileSystemInfo fsInfo;
             if (isDir)
             {
@@ -191,13 +198,13 @@ namespace Audit.FileSystem
                 fsEvent.Object = FileSystemObjectType.File;
                 if (fi.Exists)
                 {
-                    if (!_options.IgnoreMD5)
+                    if (!Options.IgnoreMD5)
                     {
                         fsEvent.MD5 = ComputeMd5(e.FullPath);
                     }
-                    if (_options.IncludeContentPredicate != null)
+                    if (Options.IncludeContentPredicate != null)
                     {
-                        var contentType = _options.IncludeContentPredicate.Invoke(fi);
+                        var contentType = Options.IncludeContentPredicate.Invoke(fi);
                         if (contentType != ContentType.None)
                         {
                             try
