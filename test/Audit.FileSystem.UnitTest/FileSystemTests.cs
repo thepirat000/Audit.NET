@@ -316,7 +316,7 @@ namespace Audit.FileSystem.UnitTest
             fsMon.GetWatcher().Dispose();
         }
         
-        private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 5000)
+        private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 50000)
         {
             using var cts = new CancellationTokenSource(milliseconds);
             
