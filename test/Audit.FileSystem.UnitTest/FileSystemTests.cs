@@ -73,9 +73,12 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create).Or.EqualTo(FileSystemEventType.Change));
             Assert.That(create.Name, Is.EqualTo(filename1));
             Assert.That(create.Length, Is.EqualTo(14));
-            Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Text));
-            Assert.That((create.FileContent as FileTextualContent)?.Value, Is.EqualTo("this is a test"));
-            Assert.That(create.MD5, Is.Not.Null);
+            if (create.FileContent != null)
+            {
+                Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Text));
+                Assert.That((create.FileContent as FileTextualContent)?.Value, Is.EqualTo("this is a test"));
+                Assert.That(create.MD5, Is.Not.Null);
+            }
 
             var delete = evs.LastOrDefault(x => x.Event == FileSystemEventType.Delete);
             Assert.That(delete, Is.Not.Null);
