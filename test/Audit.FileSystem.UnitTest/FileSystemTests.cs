@@ -3,15 +3,16 @@
 using NUnit.Framework;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.FileSystem.UnitTest
 {
     [TestFixture]
     [Timeout(60000)]
+    [NonParallelizable]
     public class FileSystemTests
     {
         private static readonly Random Random = new Random();
@@ -44,18 +45,9 @@ namespace Audit.FileSystem.UnitTest
             var filename1 = $"test_{Random.Next(1000, 9999)}.txt";
             var t1Path = Path.Combine(folder, filename1);
             File.Delete(t1Path);
-            var locker = new object();
-
-            var evs = new List<FileSystemEvent>();
-
+            
             Core.Configuration.Setup()
-                .UseDynamicProvider(d => d.OnInsert(ev =>
-                {
-                    lock (locker)
-                    {
-                        evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
-                    }
-                }));
+                .UseInMemoryProvider(out var dataProvider);
 
             var fsMon = new FileSystemMonitor(folder);
             fsMon.Options.Filter = "*.txt";
@@ -67,11 +59,13 @@ namespace Audit.FileSystem.UnitTest
 
             File.WriteAllText(t1Path, "this is a test");
 
-            WaitForChange(fsMon);
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase));
 
             File.Delete(t1Path);
 
-            WaitForChange(fsMon);
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase) && fs.Event == FileSystemEventType.Delete);
+
+            var evs = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).ToList();
 
             Assert.That(evs.Count >= 2, Is.True, $"Events: {evs.Count}");
             var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
@@ -87,6 +81,8 @@ namespace Audit.FileSystem.UnitTest
             Assert.That(delete, Is.Not.Null);
             Assert.That(delete.Name, Is.EqualTo(filename1));
 
+            fsMon.Stop();
+            fsMon.GetWatcher().Dispose();
             Directory.Delete(folder, true);
         }
 
@@ -118,7 +114,7 @@ namespace Audit.FileSystem.UnitTest
 
             File.WriteAllBytes(t1Path, "MZ1234"u8.ToArray());
 
-            WaitForChange(fsMon);
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase));
 
             var events = dataProvider.GetAllEventsOfType<AuditEventFileSystem>();
 
@@ -140,18 +136,9 @@ namespace Audit.FileSystem.UnitTest
             var filename1 = $"test_{Random.Next(1000, 9999)}.bin";
             var t1Path = Path.Combine(folder, filename1);
             File.Delete(t1Path);
-            var locker = new object();
 
-            var evs = new List<FileSystemEvent>();
-
-            Core.Configuration.Setup()
-                .UseDynamicProvider(d => d.OnInsert(ev =>
-                {
-                    lock (locker)
-                    {
-                        evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
-                    }
-                }));
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dataProvider);
 
             var fsMon = new FileSystemMonitor(folder);
             fsMon.Options.IncludeSubdirectories = true;
@@ -163,7 +150,9 @@ namespace Audit.FileSystem.UnitTest
 
             File.WriteAllBytes(t1Path, "MZ123"u8.ToArray());
 
-            WaitForChange(fsMon);
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase));
+
+            var evs = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).ToList();
 
             Assert.That(evs.Count >= 1, Is.True, $"Events: {evs.Count}");
             var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
@@ -192,18 +181,8 @@ namespace Audit.FileSystem.UnitTest
             File.Delete(t1Path);
             File.WriteAllBytes(t1Path, "MZ1234"u8.ToArray());
 
-            var locker = new object();
-
-            var evs = new List<FileSystemEvent>();
-
-            Core.Configuration.Setup()
-                .UseDynamicProvider(d => d.OnInsert(ev =>
-                {
-                    lock (locker)
-                    {
-                        evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
-                    }
-                }));
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dataProvider);
 
             var fsMon = new FileSystemMonitor(folder);
             fsMon.Options.IncludeSubdirectories = true;
@@ -211,10 +190,13 @@ namespace Audit.FileSystem.UnitTest
             fsMon.Start();
 
             Thread.Sleep(500);
-            
-            File.Move(t1Path, Path.Combine(folder, "renamed.txt"));
 
-            WaitForChange(fsMon);
+            var renamedPath = Path.Combine(folder, "renamed.txt");
+            File.Move(t1Path, renamedPath);
+
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(renamedPath, StringComparison.OrdinalIgnoreCase));
+
+            var evs = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).ToList();
 
             Assert.That(evs.Count >= 1, Is.True, $"Events: {evs.Count}");
             var rename = evs.LastOrDefault(x => x.Event == FileSystemEventType.Rename);
@@ -234,18 +216,8 @@ namespace Audit.FileSystem.UnitTest
             var newDirectory = $"test_{Random.Next(1000, 9999)}";
             var t1Path = Path.Combine(folder, newDirectory);
 
-            var locker = new object();
-
-            var evs = new List<FileSystemEvent>();
-
-            Core.Configuration.Setup()
-                .UseDynamicProvider(d => d.OnInsert(ev =>
-                {
-                    lock (locker)
-                    {
-                        evs.Add(((AuditEventFileSystem)ev).FileSystemEvent);
-                    }
-                }));
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dataProvider);
 
             var fsMon = new FileSystemMonitor(folder);
             fsMon.Options.IncludeSubdirectories = true;
@@ -255,7 +227,9 @@ namespace Audit.FileSystem.UnitTest
 
             Directory.CreateDirectory(t1Path);
 
-            WaitForChange(fsMon);
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase));
+
+            var evs = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).ToList();
 
             Assert.That(evs.Count >= 1, Is.True, $"Events: {evs.Count}");
             var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
@@ -285,6 +259,7 @@ namespace Audit.FileSystem.UnitTest
         public void FileSystemMonitor_Stop_DisableEvents()
         {
             var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
+            Directory.CreateDirectory(folder);
             var fsMon = new FileSystemMonitor()
             {
                 Options = new FileSystemMonitorOptions(folder)
@@ -298,12 +273,14 @@ namespace Audit.FileSystem.UnitTest
             fsMon.Stop();
             Assert.That(w.EnableRaisingEvents, Is.False);
             fsMon.GetWatcher().Dispose();
+            Directory.Delete(folder, true);
         }
 
         [Test]
         public void FileSystemMonitor_DoubleStart_Disposes()
         {
             var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
+            Directory.CreateDirectory(folder);
             var fsMon = new FileSystemMonitor()
             {
                 Options = new FileSystemMonitorOptions(folder)
@@ -318,19 +295,24 @@ namespace Audit.FileSystem.UnitTest
             var w2 = fsMon.GetWatcher();
             Assert.That(w1, Is.Not.EqualTo(w2));
             fsMon.GetWatcher().Dispose();
+            Directory.Delete(folder, true);
         }
         
-        private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 30000)
+        private static void WaitUntil(InMemoryDataProvider dataProvider, Func<FileSystemEvent, bool> condition, int timeout = 30000, int pollInterval = 500)
         {
-            using var cts = new CancellationTokenSource(milliseconds);
-            
-            while (!cts.IsCancellationRequested)
+            var totalWait = 0;
+
+            var conditionMet = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).Any(condition.Invoke);
+
+            while (!conditionMet && totalWait < timeout)
             {
-                var res = fsMon.GetWatcher().WaitForChanged(WatcherChangeTypes.All, milliseconds);
-                if (res.TimedOut)
-                {
-                    break;
-                }
+                Task.Delay(pollInterval).Wait();
+                totalWait += pollInterval;
+                conditionMet = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).Any(condition.Invoke);
+            }
+            if (totalWait >= timeout)
+            {
+                Assert.Fail("The condition was not met within the timeout period.");
             }
         }
     }
