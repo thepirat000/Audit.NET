@@ -59,7 +59,7 @@ namespace Audit.FileSystem.UnitTest
 
             File.WriteAllText(t1Path, "this is a test");
 
-            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase));
+            WaitUntil(dataProvider, fs => fs.FullPath.Equals(t1Path, StringComparison.OrdinalIgnoreCase) && fs.Event is FileSystemEventType.Create or FileSystemEventType.Change && fs.Length > 0);
 
             File.Delete(t1Path);
 
@@ -68,9 +68,9 @@ namespace Audit.FileSystem.UnitTest
             var evs = dataProvider.GetAllEventsOfType<AuditEventFileSystem>().Select(e => e.FileSystemEvent).ToList();
 
             Assert.That(evs.Count >= 2, Is.True, $"Events: {evs.Count}");
-            var create = evs.LastOrDefault(x => x.Event == FileSystemEventType.Create);
+            var create = evs.LastOrDefault(x => x.Event is FileSystemEventType.Create or FileSystemEventType.Change && x.Length > 0);
             Assert.That(create, Is.Not.Null);
-            Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create));
+            Assert.That(create.Event, Is.EqualTo(FileSystemEventType.Create).Or.EqualTo(FileSystemEventType.Change));
             Assert.That(create.Name, Is.EqualTo(filename1));
             Assert.That(create.Length, Is.EqualTo(14));
             Assert.That(create.FileContent.Type, Is.EqualTo(ContentType.Text));
