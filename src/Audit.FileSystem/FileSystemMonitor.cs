@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Audit.FileSystem
 {
     /// <summary>
-    /// Monitor a folder in the file system generating en audit event for each change
+    /// Monitor a folder in the file system generating an audit event for each change
     /// </summary>
     public class FileSystemMonitor
     {
@@ -47,6 +47,10 @@ namespace Audit.FileSystem
         {
             if (_watcher != null)
             {
+                _watcher.Changed -= _watcher_Changed;
+                _watcher.Renamed -= _watcher_Renamed;
+                _watcher.Deleted -= _watcher_Deleted;
+                _watcher.Created -= _watcher_Created;
                 _watcher.Dispose();
             }
             _watcher = new FileSystemWatcher();
@@ -147,25 +151,23 @@ namespace Audit.FileSystem
             };
             var eventType = (Options.EventTypeName ?? "[{type}] {name}").Replace("{name}", fsEvent.Name).Replace("{path}", fsEvent.FullPath).Replace("{type}", e.ChangeType.ToString());
             var factory = Options.AuditScopeFactory ?? Configuration.AuditScopeFactory;
-            using (var auditScope = factory.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = fsAuditEvent, DataProvider = Options.AuditDataProvider, CreationPolicy = Options.CreationPolicy }))
+            using var auditScope = factory.Create(new AuditScopeOptions() { EventType = eventType, AuditEvent = fsAuditEvent, DataProvider = Options.AuditDataProvider, CreationPolicy = Options.CreationPolicy });
+            if (type != FileSystemEventType.Delete)
             {
-                if (type != FileSystemEventType.Delete)
+                fsEvent.Errors = new List<string>();
+                try
                 {
-                    fsEvent.Errors = new List<string>();
-                    try
-                    {
-                        FillEvent(fsEvent, e);
-                    }
-                    catch (Exception ex)
-                    {
-                        fsEvent.Errors.Add($"{ex.GetType().Name}: {ex.Message})");
-                    }
-                    if (fsEvent.Errors.Count == 0)
-                    {
-                        fsEvent.Errors = null;
-                    }
-                    auditScope.EventAs<AuditEventFileSystem>().FileSystemEvent = fsEvent;
+                    FillEvent(fsEvent, e);
                 }
+                catch (Exception ex)
+                {
+                    fsEvent.Errors.Add($"{ex.GetType().Name}: {ex.Message})");
+                }
+                if (fsEvent.Errors.Count == 0)
+                {
+                    fsEvent.Errors = null;
+                }
+                auditScope.EventAs<AuditEventFileSystem>().FileSystemEvent = fsEvent;
             }
         }
 

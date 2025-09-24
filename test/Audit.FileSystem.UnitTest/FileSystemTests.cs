@@ -58,6 +58,7 @@ namespace Audit.FileSystem.UnitTest
                 }));
 
             var fsMon = new FileSystemMonitor(folder);
+            fsMon.Options.Filter = "*.txt";
             fsMon.Options.IncludeSubdirectories = true;
             fsMon.Options.IncludeContentPredicate = _ => ContentType.Text;
             fsMon.Start();
@@ -108,6 +109,7 @@ namespace Audit.FileSystem.UnitTest
                 {
                     Path = folder,
                     CustomFilterPredicate = _ => true,
+                    Filter = "*.txt",
                     IncludeContentPredicate = _ => throw new Exception("test"),
                     IncludedEventTypes = [FileSystemEventType.Create, FileSystemEventType.Change, FileSystemEventType.Rename, FileSystemEventType.Delete]
                 }
@@ -135,7 +137,7 @@ namespace Audit.FileSystem.UnitTest
             var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
             Directory.CreateDirectory(folder);
 
-            var filename1 = $"test_{Random.Next(1000, 9999)}.txt";
+            var filename1 = $"test_{Random.Next(1000, 9999)}.bin";
             var t1Path = Path.Combine(folder, filename1);
             File.Delete(t1Path);
             var locker = new object();
@@ -154,6 +156,7 @@ namespace Audit.FileSystem.UnitTest
             var fsMon = new FileSystemMonitor(folder);
             fsMon.Options.IncludeSubdirectories = true;
             fsMon.Options.IncludeContentPredicate = _ => ContentType.Binary;
+            fsMon.Options.Filter = "*.bin";
             fsMon.Start();
 
             Thread.Sleep(500);
@@ -204,6 +207,7 @@ namespace Audit.FileSystem.UnitTest
 
             var fsMon = new FileSystemMonitor(folder);
             fsMon.Options.IncludeSubdirectories = true;
+            fsMon.Options.Filter = "*.txt";
             fsMon.Start();
 
             Thread.Sleep(500);
@@ -316,7 +320,7 @@ namespace Audit.FileSystem.UnitTest
             fsMon.GetWatcher().Dispose();
         }
         
-        private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 50000)
+        private static void WaitForChange(FileSystemMonitor fsMon, int milliseconds = 30000)
         {
             using var cts = new CancellationTokenSource(milliseconds);
             
