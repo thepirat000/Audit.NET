@@ -284,11 +284,11 @@ namespace Audit.FileSystem.UnitTest
         [Test]
         public void FileSystemMonitor_Stop_DisableEvents()
         {
+            var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
             var fsMon = new FileSystemMonitor()
             {
-                Options = new FileSystemMonitorOptions()
+                Options = new FileSystemMonitorOptions(folder)
                 {
-                    Path = Directory.GetCurrentDirectory(),
                     CustomFilterPredicate = _ => false
                 }
             };
@@ -303,11 +303,11 @@ namespace Audit.FileSystem.UnitTest
         [Test]
         public void FileSystemMonitor_DoubleStart_Disposes()
         {
+            var folder = Path.Combine(Path.GetTempPath(), Random.Next(1000, 9999).ToString());
             var fsMon = new FileSystemMonitor()
             {
-                Options = new FileSystemMonitorOptions()
+                Options = new FileSystemMonitorOptions(folder)
                 {
-                    Path = Directory.GetCurrentDirectory(),
                     CustomFilterPredicate = _ => false,
                     IncludedEventTypes = [FileSystemEventType.Create, FileSystemEventType.Change, FileSystemEventType.Rename, FileSystemEventType.Delete]
                 }
