@@ -180,7 +180,7 @@ namespace Audit.WebApi
             return null;
         }
 
-        private IDictionary<string, object> GetActionParameters(HttpActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
+        internal static IDictionary<string, object> GetActionParameters(HttpActionDescriptor actionDescriptor, IDictionary<string, object> actionArguments, bool serializeParams)
         {
             var args = actionArguments.ToDictionary(k => k.Key, v => v.Value);
             var parameters = actionDescriptor.GetParameters();
@@ -201,7 +201,7 @@ namespace Audit.WebApi
             return args;
         }
 
-        private static IDictionary<string, string> ToDictionary(HttpHeaders col)
+        internal static IDictionary<string, string> ToDictionary(HttpHeaders col)
         {
             if (col == null)
             {
@@ -215,7 +215,7 @@ namespace Audit.WebApi
             return dict;
         }
 
-        private static IDictionary<string, string> ToDictionary(NameValueCollection col)
+        internal static IDictionary<string, string> ToDictionary(NameValueCollection col)
         {
             if (col == null)
             {
