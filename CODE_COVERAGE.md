@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/23/2025 - 03:10:53 |
-| Coverage date: | 09/23/2025 - 02:46:38 - 09/23/2025 - 03:10:08 |
-| Parser: | MultiReport (95x Cobertura) |
+| Generated on: | 09/24/2025 - 15:35:24 |
+| Coverage date: | 09/24/2025 - 15:11:03 - 09/24/2025 - 15:34:35 |
+| Parser: | MultiReport (94x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 87.8% (9270 of 10549) |
-| Covered lines: | 9270 |
-| Uncovered lines: | 1279 |
-| Coverable lines: | 10549 |
-| Total lines: | 27282 |
-| **Branch coverage:** | 76.8% (3311 of 4311) |
-| Covered branches: | 3311 |
+| **Line coverage:** | 88% (9294 of 10552) |
+| Covered lines: | 9294 |
+| Uncovered lines: | 1258 |
+| Coverable lines: | 10552 |
+| Total lines: | 27291 |
+| **Branch coverage:** | 77% (3321 of 4311) |
+| Covered branches: | 3321 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -111,12 +111,12 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**140**|**23**|**163**|**399**|**85.8%**|**42**|**52**|**80.7%**|
+|**Audit.FileSystem**|**164**|**2**|**166**|**408**|**98.7%**|**52**|**52**|**100%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|104|21|125|245|83.2%|42|52|80.7%|
-|Audit.FileSystem.FileSystemMonitorOptions|16|2|18|85|88.8%|0|0||
+|Audit.FileSystem.FileSystemMonitor|126|2|128|254|98.4%|52|52|100%|
+|Audit.FileSystem.FileSystemMonitorOptions|18|0|18|85|100%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
 |Audit.Http.AuditEventExtensions|3|3|6|32|50%|2|6|33.3%|
