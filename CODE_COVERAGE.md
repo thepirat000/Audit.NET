@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/24/2025 - 15:35:24 |
-| Coverage date: | 09/24/2025 - 15:11:03 - 09/24/2025 - 15:34:35 |
+| Generated on: | 09/25/2025 - 04:44:54 |
+| Coverage date: | 09/25/2025 - 04:20:54 - 09/25/2025 - 04:44:11 |
 | Parser: | MultiReport (94x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 88% (9294 of 10552) |
-| Covered lines: | 9294 |
-| Uncovered lines: | 1258 |
+| **Line coverage:** | 88.3% (9318 of 10552) |
+| Covered lines: | 9318 |
+| Uncovered lines: | 1234 |
 | Coverable lines: | 10552 |
 | Total lines: | 27291 |
-| **Branch coverage:** | 77% (3321 of 4311) |
-| Covered branches: | 3321 |
+| **Branch coverage:** | 77.6% (3347 of 4311) |
+| Covered branches: | 3347 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -111,11 +111,11 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**164**|**2**|**166**|**408**|**98.7%**|**52**|**52**|**100%**|
+|**Audit.FileSystem**|**161**|**5**|**166**|**408**|**96.9%**|**52**|**52**|**100%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|126|2|128|254|98.4%|52|52|100%|
+|Audit.FileSystem.FileSystemMonitor|123|5|128|254|96%|52|52|100%|
 |Audit.FileSystem.FileSystemMonitorOptions|18|0|18|85|100%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
@@ -351,10 +351,10 @@
 |Audit.Wcf.Client.AuditEventWcfClient|0|1|1|12|0%|0|0||
 |Audit.Wcf.Client.AuditMessageInspector|0|60|60|115|0%|0|38|0%|
 |Audit.Wcf.Client.WcfClientAction|0|10|10|50|0%|0|0||
-|**Audit.WebApi**|**222**|**110**|**332**|**1192**|**66.8%**|**109**|**212**|**51.4%**|
+|**Audit.WebApi**|**249**|**83**|**332**|**1192**|**75%**|**135**|**212**|**63.6%**|
 |Audit.WebApi.ApiControllerExtensions|4|0|4|92|100%|0|0||
 |Audit.WebApi.AuditApiAction|21|2|23|74|91.3%|0|0||
-|Audit.WebApi.AuditApiAdapter|99|29|128|250|77.3%|59|106|55.6%|
+|Audit.WebApi.AuditApiAdapter|126|2|128|250|98.4%|85|106|80.1%|
 |Audit.WebApi.AuditApiAttribute|30|3|33|133|90.9%|14|18|77.7%|
 |Audit.WebApi.AuditApiGlobalFilter|17|22|39|140|43.5%|1|28|3.5%|
 |Audit.WebApi.AuditApiHelper|8|4|12|139|66.6%|6|12|50%|
