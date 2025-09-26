@@ -46,7 +46,7 @@ namespace Audit.SignalR
             AuditScopeFactory = auditScopeFactory;
         }
 
-        private bool AuditEventEnabled(SignalrEventBase @event)
+        internal bool AuditEventEnabled(SignalrEventBase @event)
         {
             switch(@event.GetType().Name)
             {
@@ -109,10 +109,6 @@ namespace Audit.SignalR
             return @return;
         }
 
-        protected override bool OnBeforeOutgoing(IHubOutgoingInvokerContext context)
-        {
-            return base.OnBeforeOutgoing(context);
-        }
         protected override void OnAfterOutgoing(IHubOutgoingInvokerContext context)
         {
             if (AuditDisabled)
@@ -289,7 +285,7 @@ namespace Audit.SignalR
             }
         }
         
-        private IAuditScope CreateAuditScope(SignalrEventBase signalrEvent)
+        protected internal IAuditScope CreateAuditScope(SignalrEventBase signalrEvent)
         {
             var auditEvent = new AuditEventSignalr()
             {

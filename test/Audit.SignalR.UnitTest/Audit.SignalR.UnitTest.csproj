@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net462;net7.0</TargetFrameworks>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<DefineConstants>$(DefineConstants);STRONG_NAME</DefineConstants>
+		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+		<AssemblyOriginatorKeyFile>../../src/StrongName/Audit.NET.UnitTests.snk</AssemblyOriginatorKeyFile>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+		<DebugType>Full</DebugType>
+		<SignAssembly>true</SignAssembly>
+	</PropertyGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+		<Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\Audit.SignalR\Audit.SignalR.csproj" />
+	</ItemGroup>
+
+</Project>

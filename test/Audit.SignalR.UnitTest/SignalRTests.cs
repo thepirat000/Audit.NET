@@ -8,26 +8,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using Audit.Core;
 using Audit.Core.Providers;
-using Audit.SignalR;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Moq;
 
-namespace Audit.UnitTest
+namespace Audit.SignalR.UnitTest
 {
-    public class SignalrTests
+    public class SignalRTests
     {
         [SetUp]
         public void Setup()
         {
-            Configuration.Reset();
+            Audit.Core.Configuration.Reset();
         }
 
         [Test]
         public void Test_Signalr_AuditDisabled()
         {
             var evs = new List<AuditEvent>();
-            Configuration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -49,7 +48,7 @@ namespace Audit.UnitTest
         public void Test_Signalr_ConnectReconnectDisconnect()
         {
             var evs = new List<AuditEvent>();
-            Configuration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -85,7 +84,7 @@ namespace Audit.UnitTest
         public void Test_Signalr_Incoming()
         {
             var evs = new List<AuditEvent>();
-            Configuration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -96,7 +95,7 @@ namespace Audit.UnitTest
 
             var module = new TestAuditPipelineModule();
 
-            SimulateIncoming(module, "cnn-incoming", "send", new object[]{1, "two"});
+            SimulateIncoming(module, "cnn-incoming", "send", new object[] { 1, "two" });
             Task.Delay(50).Wait();
 
             Assert.That(evs.Count, Is.EqualTo(1));
@@ -112,7 +111,7 @@ namespace Audit.UnitTest
         public void Test_Signalr_Outgoing()
         {
             var evs = new List<AuditEvent>();
-            Configuration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -140,7 +139,7 @@ namespace Audit.UnitTest
         public void Test_Signalr_Error()
         {
             var evs = new List<AuditEvent>();
-            Configuration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -168,14 +167,14 @@ namespace Audit.UnitTest
         public void Test_Signalr_CustomAuditScopeFactory()
         {
             var evs = new List<AuditEvent>();
-            Configuration.DataProvider = null;
-            
+            Audit.Core.Configuration.DataProvider = null;
+
             var dp = new DynamicDataProvider();
             dp.AttachOnInsertAndReplace(ev => { evs.Add(ev); });
 
             var factory = new Mock<IAuditScopeFactory>();
             factory.Setup(_ => _.Create(It.IsAny<AuditScopeOptions>()))
-                .Returns(new AuditScope(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventSignalr() }));
+                .Returns(AuditScope.Create(new AuditScopeOptions() { DataProvider = dp, AuditEvent = new AuditEventSignalr() }));
 
             var module = new TestAuditPipelineModule()
             {
@@ -234,7 +233,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetSignalrEvent_From_AuditScope_Returns_Event()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
 
             var expectedEvent = new TestSignalrEvent();
             var auditEventSignalr = new AuditEventSignalr { Event = expectedEvent };
@@ -251,7 +250,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetSignalrEvent_Generic_From_AuditScope_Returns_Event_As_T()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
 
             var expectedEvent = new TestSignalrEvent();
             var auditEventSignalr = new AuditEventSignalr { Event = expectedEvent };
@@ -268,7 +267,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetIncomingAuditScope_Returns_Scope_If_Exists()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -292,7 +291,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetIncomingAuditScope_Returns_Null_If_Not_Found()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -316,7 +315,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetConnectAuditScope_Returns_Scope_If_Exists()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -340,7 +339,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetConnectAuditScope_Returns_Null_If_Not_Found()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -364,7 +363,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetDisconnectAuditScope_Returns_Scope_If_Exists()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -388,7 +387,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetDisconnectAuditScope_Returns_Null_If_Not_Found()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -412,7 +411,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetReconnectAuditScope_Returns_Scope_If_Exists()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -436,7 +435,7 @@ namespace Audit.UnitTest
         [Test]
         public void GetReconnectAuditScope_Returns_Null_If_Not_Found()
         {
-            Configuration.Setup().UseNullProvider();
+            Audit.Core.Configuration.Setup().UseNullProvider();
             var expectedScope = AuditScope.Create(new AuditScopeOptions()
             {
 
@@ -456,7 +455,7 @@ namespace Audit.UnitTest
 
             Assert.That(result, Is.Null);
         }
-        
+
         [Test]
         public void AuditPipelineModule_Factory()
         {
@@ -471,7 +470,7 @@ namespace Audit.UnitTest
         {
             var ids = new List<string>();
             var evs = new ConcurrentBag<AuditEvent>();
-            Configuration.Setup()
+            Audit.Core.Configuration.Setup()
                 .UseDynamicProvider(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -521,13 +520,13 @@ namespace Audit.UnitTest
             SimulateOutgoing(module, cnnId, "myhub", "mysignal-" + cnnId, null);
             Task.Delay(50).Wait();
 
-            SimulateIncoming(module, cnnId, "method1", new object [] {cnnId});
+            SimulateIncoming(module, cnnId, "method1", new object[] { cnnId });
             Task.Delay(50).Wait();
 
             SimulateReconnect(module, cnnId);
             Task.Delay(50).Wait();
 
-            SimulateIncomingError(module, new ArgumentNullException("p", cnnId), cnnId, "method2", null );
+            SimulateIncomingError(module, new ArgumentNullException("p", cnnId), cnnId, "method2", null);
             Task.Delay(50).Wait();
 
             SimulateDisconnect(module, cnnId);
@@ -535,7 +534,7 @@ namespace Audit.UnitTest
 
             return cnnId;
         }
-        
+
         private void SimulateConnectReconnectDisconnect(TestAuditPipelineModule module)
         {
             SimulateConnect(module, "x");
@@ -546,7 +545,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
 
-        private void SimulateConnect(TestAuditPipelineModule module, string cnnId)
+        private static void SimulateConnect(TestAuditPipelineModule module, string cnnId)
         {
             var dict = new Dictionary<string, object>();
             var request = new Mock<IRequest>();
@@ -560,7 +559,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
 
-        private void SimulateReconnect(TestAuditPipelineModule module, string cnnId)
+        private static void SimulateReconnect(TestAuditPipelineModule module, string cnnId)
         {
             var dict = new Dictionary<string, object>();
             var request = new Mock<IRequest>();
@@ -574,7 +573,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
 
-        private void SimulateDisconnect(TestAuditPipelineModule module, string cnnId)
+        private static void SimulateDisconnect(TestAuditPipelineModule module, string cnnId)
         {
             var dict = new Dictionary<string, object>();
             var request = new Mock<IRequest>();
@@ -588,7 +587,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
 
-        private void SimulateIncoming(TestAuditPipelineModule module, string cnnId, string method, object[] args)
+        private static void SimulateIncoming(TestAuditPipelineModule module, string cnnId, string method, object[] args)
         {
             var dict = new Dictionary<string, object>();
             var hub = new Mock<IHub>();
@@ -597,7 +596,7 @@ namespace Audit.UnitTest
             hub.SetupGet(x => x.Context.Request).Returns(() => request.Object);
             request.Setup(x => x.Environment).Returns(() => dict);
             var ctx = new Mock<IHubIncomingInvokerContext>();
-            ctx.SetupGet(x => x.MethodDescriptor).Returns(() => new MethodDescriptor(){Name = method });
+            ctx.SetupGet(x => x.MethodDescriptor).Returns(() => new MethodDescriptor() { Name = method });
             ctx.SetupGet(x => x.Hub).Returns(() => hub.Object);
             ctx.SetupGet(x => x.Args).Returns(() => args.ToList());
             hub.SetupGet(x => x.Context.Request).Returns(() => request.Object);
@@ -607,7 +606,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
 
-        private void SimulateOutgoing(TestAuditPipelineModule module, string cnnId, string hubName, string signal, object[] args)
+        private static void SimulateOutgoing(TestAuditPipelineModule module, string cnnId, string hubName, string signal, object[] args)
         {
             var dict = new Dictionary<string, object>();
             var hub = new Mock<IHub>();
@@ -617,7 +616,7 @@ namespace Audit.UnitTest
             request.Setup(x => x.Environment).Returns(() => dict);
             var ctx = new Mock<IHubOutgoingInvokerContext>();
             ctx.SetupGet(x => x.Signal).Returns(() => signal);
-            ctx.SetupGet(x => x.Invocation).Returns(() => new ClientHubInvocation(){Method = "receive", Args = args, Hub = hubName});
+            ctx.SetupGet(x => x.Invocation).Returns(() => new ClientHubInvocation() { Method = "receive", Args = args, Hub = hubName });
             hub.SetupGet(x => x.Context.Request).Returns(() => request.Object);
             module.OnBeforeOutgoing(ctx.Object);
             Task.Delay(50).Wait();
@@ -625,7 +624,7 @@ namespace Audit.UnitTest
             Task.Delay(50).Wait();
         }
 
-        private void SimulateIncomingError(TestAuditPipelineModule module, Exception exception, string cnnId, string method, object[] args)
+        private static void SimulateIncomingError(TestAuditPipelineModule module, Exception exception, string cnnId, string method, object[] args)
         {
             var dict = new Dictionary<string, object>();
             var hub = new Mock<IHub>();
@@ -651,7 +650,7 @@ namespace Audit.UnitTest
 
         public new bool OnBeforeIncoming(IHubIncomingInvokerContext context)
         {
-            lock(_locker)
+            lock (_locker)
             {
                 Events.Add(new Tuple<string, object>("OnBeforeIncoming", context));
             }

@@ -9,11 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.runsettings = .runsettings
 		CHANGELOG.md = CHANGELOG.md
+		.github\workflows\CI-BuildAndTest.yml = .github\workflows\CI-BuildAndTest.yml
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
-		README.md = README.md
-		.github\workflows\CI-BuildAndTest.yml = .github\workflows\CI-BuildAndTest.yml
 		Docker\docker-compose.yml = Docker\docker-compose.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A54B4BB6-3439-432B-AFD9-FE62D6528D42}"
@@ -179,6 +179,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.NET.ImmuDB", "src\Audit.NET.ImmuDB\Audit.NET.ImmuDB.csproj", "{D945A16C-FE55-8916-F9D8-DD371D15D0CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.ImmuDB.UnitTest", "test\Audit.ImmuDB.UnitTest\Audit.ImmuDB.UnitTest.csproj", "{5934D98E-8E30-12C5-CD1E-26B223F49A2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.SignalR.UnitTest", "test\Audit.SignalR.UnitTest\Audit.SignalR.UnitTest.csproj", "{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -780,6 +782,14 @@ Global
 		{5934D98E-8E30-12C5-CD1E-26B223F49A2B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5934D98E-8E30-12C5-CD1E-26B223F49A2B}.Release|x64.ActiveCfg = Release|Any CPU
 		{5934D98E-8E30-12C5-CD1E-26B223F49A2B}.Release|x64.Build.0 = Release|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Debug|x64.Build.0 = Debug|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|x64.ActiveCfg = Release|Any CPU
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -861,6 +871,7 @@ Global
 		{94A02D37-2647-2DB2-2FEA-F951692A6A63} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 		{D945A16C-FE55-8916-F9D8-DD371D15D0CF} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{5934D98E-8E30-12C5-CD1E-26B223F49A2B} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
+		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}

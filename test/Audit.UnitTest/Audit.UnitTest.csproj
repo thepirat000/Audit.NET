@@ -41,8 +41,6 @@
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
 		<PackageReference Include="System.Runtime" Version="4.1.0" />
 		<Reference Include="Microsoft.CSharp" />
-		<PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.3" />
-		<ProjectReference Include="..\..\src\Audit.SignalR\Audit.SignalR.csproj" />
 	</ItemGroup>
 
 </Project>
