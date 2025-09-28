@@ -42,7 +42,7 @@ namespace Audit.Mvc.UnitTest
             );
             contextMock.ActionDescriptor.HandlerTypeInfo = typeof(TestModel).GetTypeInfo();
 
-            Assert.IsTrue(AuditPageFilter.IsActionIgnored(contextMock));
+            Assert.That(AuditPageFilter.IsActionIgnored(contextMock), Is.True);
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace Audit.Mvc.UnitTest
             contextMock.HttpContext = httpContextMock.Object;
 
             var result = await AuditPageFilter.GetRequestBody(contextMock, CancellationToken.None);
-            Assert.AreEqual(bodyText, result);
+            Assert.That(result, Is.EqualTo(bodyText));
         }
 
         [Test]
@@ -90,8 +90,8 @@ namespace Audit.Mvc.UnitTest
             );
 
             var result = AuditPageFilter.GetModelObject(contextMock);
-            Assert.IsNotNull(result);
-            Assert.AreEqual("abc", result["TestProp"]);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result["TestProp"], Is.EqualTo("abc"));
         }
 
 
@@ -102,7 +102,7 @@ namespace Audit.Mvc.UnitTest
             var methodInfo = typeof(AuditPageFilterTests).GetMethod(nameof(GetResponseBody_ReturnsExpectedValue_ForObjectResult));
             var result = new ObjectResult("myvalue");
             var response = AuditPageFilter.GetResponseBody(methodInfo, result);
-            Assert.AreEqual("myvalue", response);
+            Assert.That(response, Is.EqualTo("myvalue"));
         }
 
         [Test]
@@ -134,9 +134,9 @@ namespace Audit.Mvc.UnitTest
             );
 
             var result = AuditPageFilter.GetActionParameters(contextMock);
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(123, result["param1"]);
-            Assert.AreEqual("abc", result["param2"]);
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result["param1"], Is.EqualTo(123));
+            Assert.That(result["param2"], Is.EqualTo("abc"));
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace Audit.Mvc.UnitTest
             }
 
             await filter.OnPageHandlerExecutionAsync(contextMock, NextDelegate);
-            Assert.IsTrue(nextCalled);
+            Assert.That(nextCalled, Is.True);
         }
 
         [Test]
@@ -179,7 +179,7 @@ namespace Audit.Mvc.UnitTest
                 new HandlerMethodDescriptor()
             );
             var task = filter.OnPageHandlerSelectionAsync(context);
-            Assert.AreEqual(Task.CompletedTask, task);
+            Assert.That(task, Is.EqualTo(Task.CompletedTask));
         }
 
         [Test]
@@ -235,19 +235,19 @@ namespace Audit.Mvc.UnitTest
 
             await filter.BeforeExecutingAsync(context);
 
-            Assert.IsTrue(httpContext.Items.ContainsKey("__private_AuditAction__"));
-            Assert.IsTrue(httpContext.Items.ContainsKey("__private_AuditScope__"));
+            Assert.That(httpContext.Items.ContainsKey("__private_AuditAction__"), Is.True);
+            Assert.That(httpContext.Items.ContainsKey("__private_AuditScope__"), Is.True);
             var auditAction = httpContext.Items["__private_AuditAction__"] as AuditAction;
-            Assert.AreEqual("username", auditAction.UserName);
-            Assert.AreEqual("127.0.0.1", auditAction.IpAddress);
-            Assert.AreEqual("https://localhost/test?a=1", auditAction.RequestUrl);
-            Assert.AreEqual("POST", auditAction.HttpMethod);
-            Assert.AreEqual("TestAction", auditAction.ActionName);
-            Assert.AreEqual("TestArea", auditAction.ControllerName);
-            Assert.AreEqual("/Pages/Test.cshtml", auditAction.ViewPath);
-            Assert.AreEqual("traceid", auditAction.TraceId);
-            Assert.IsNotNull(auditAction.Headers);
-            Assert.IsNotNull(auditAction.RequestBody.Value);
+            Assert.That(auditAction.UserName, Is.EqualTo("username"));
+            Assert.That(auditAction.IpAddress, Is.EqualTo("127.0.0.1"));
+            Assert.That(auditAction.RequestUrl, Is.EqualTo("https://localhost/test?a=1"));
+            Assert.That(auditAction.HttpMethod, Is.EqualTo("POST"));
+            Assert.That(auditAction.ActionName, Is.EqualTo("TestAction"));
+            Assert.That(auditAction.ControllerName, Is.EqualTo("TestArea"));
+            Assert.That(auditAction.ViewPath, Is.EqualTo("/Pages/Test.cshtml"));
+            Assert.That(auditAction.TraceId, Is.EqualTo("traceid"));
+            Assert.That(auditAction.Headers, Is.Not.Null);
+            Assert.That(auditAction.RequestBody.Value, Is.Not.Null);
         }
 
         [Test]
@@ -293,9 +293,9 @@ namespace Audit.Mvc.UnitTest
             await filter.AfterExecutedAsync(context);
 
             var auditAction = httpContext.Items["__private_AuditAction__"] as AuditAction;
-            Assert.AreEqual("/redirect", auditAction.RedirectLocation);
-            Assert.AreEqual(200, auditAction.ResponseStatusCode);
-            Assert.IsNotNull(auditAction.ResponseBody);
+            Assert.That(auditAction.RedirectLocation, Is.EqualTo("/redirect"));
+            Assert.That(auditAction.ResponseStatusCode, Is.EqualTo(200));
+            Assert.That(auditAction.ResponseBody, Is.Not.Null);
         }
 
         [Test]
@@ -320,7 +320,7 @@ namespace Audit.Mvc.UnitTest
             await filter.AfterExecutedAsync(context);
 
             var auditAction = httpContext.Items["__private_AuditAction__"] as AuditAction;
-            Assert.AreEqual(500, auditAction.ResponseStatusCode);
+            Assert.That(auditAction.ResponseStatusCode, Is.EqualTo(500));
         }
 
         [Test]
@@ -344,7 +344,7 @@ namespace Audit.Mvc.UnitTest
             contextMock.HttpContext = httpContextMock.Object;
 
             var result = await AuditPageFilter.GetRequestBody(contextMock, CancellationToken.None);
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -361,28 +361,28 @@ namespace Audit.Mvc.UnitTest
             );
 
             var result = AuditPageFilter.GetModelObject(contextMock);
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
         
         [Test]
         public void GetResponseBody_ReturnsExpected_ForAllResultTypes()
         {
             var methodInfo = typeof(AuditPageFilterTests).GetMethod(nameof(GetResponseBody_ReturnsExpected_ForAllResultTypes));
-            Assert.AreEqual(null, AuditPageFilter.GetResponseBody(methodInfo, new PageResult()));
-            Assert.AreEqual("myvalue", AuditPageFilter.GetResponseBody(methodInfo, new ObjectResult("myvalue")));
-            Assert.AreEqual(204, AuditPageFilter.GetResponseBody(methodInfo, new StatusCodeResult(204)));
-            Assert.AreEqual("json", AuditPageFilter.GetResponseBody(methodInfo, new JsonResult("json")));
-            Assert.AreEqual("content", AuditPageFilter.GetResponseBody(methodInfo, new ContentResult { Content = "content" }));
-            Assert.AreEqual("file.txt", AuditPageFilter.GetResponseBody(methodInfo, new FileContentResult(new byte[0], "text/plain") { FileDownloadName = "file.txt" }));
-            Assert.AreEqual("/local", AuditPageFilter.GetResponseBody(methodInfo, new LocalRedirectResult("/local")));
-            Assert.AreEqual("/redir", AuditPageFilter.GetResponseBody(methodInfo, new RedirectResult("/redir")));
-            Assert.AreEqual("Action", AuditPageFilter.GetResponseBody(methodInfo, new RedirectToActionResult("Action", "Controller", null)));
-            Assert.AreEqual("Route", AuditPageFilter.GetResponseBody(methodInfo, new RedirectToRouteResult("Route", null)));
-            Assert.AreEqual(null, AuditPageFilter.GetResponseBody(methodInfo, new SignInResult("Scheme", new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity(new[] { new System.Security.Claims.Claim("name", "user") }, "test")))));
-            Assert.AreEqual("Partial", AuditPageFilter.GetResponseBody(methodInfo, new PartialViewResult { ViewName = "Partial" }));
-            Assert.AreEqual("VC", AuditPageFilter.GetResponseBody(methodInfo, new ViewComponentResult { ViewComponentName = "VC" }));
-            Assert.AreEqual("View", AuditPageFilter.GetResponseBody(methodInfo, new ViewResult { ViewName = "View" }));
-            Assert.AreEqual("Page", AuditPageFilter.GetResponseBody(methodInfo, new RedirectToPageResult("Page")));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new PageResult()), Is.EqualTo(null));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new ObjectResult("myvalue")), Is.EqualTo("myvalue"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new StatusCodeResult(204)), Is.EqualTo(204));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new JsonResult("json")), Is.EqualTo("json"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new ContentResult { Content = "content" }), Is.EqualTo("content"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new FileContentResult(new byte[0], "text/plain") { FileDownloadName = "file.txt" }), Is.EqualTo("file.txt"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new LocalRedirectResult("/local")), Is.EqualTo("/local"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new RedirectResult("/redir")), Is.EqualTo("/redir"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new RedirectToActionResult("Action", "Controller", null)), Is.EqualTo("Action"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new RedirectToRouteResult("Route", null)), Is.EqualTo("Route"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new SignInResult("Scheme", new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity(new[] { new System.Security.Claims.Claim("name", "user") }, "test")))), Is.EqualTo(null));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new PartialViewResult { ViewName = "Partial" }), Is.EqualTo("Partial"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new ViewComponentResult { ViewComponentName = "VC" }), Is.EqualTo("VC"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new ViewResult { ViewName = "View" }), Is.EqualTo("View"));
+            Assert.That(AuditPageFilter.GetResponseBody(methodInfo, new RedirectToPageResult("Page")), Is.EqualTo("Page"));
         }
 
         [Test]
@@ -418,8 +418,8 @@ namespace Audit.Mvc.UnitTest
             paramInfoMock2.ParameterInfo = typeof(ParameterInfoWithAuditIgnore).GetMethod(nameof(ParameterInfoWithAuditIgnore.Get))!.GetParameters()[0];
 
             var result = AuditPageFilter.GetActionParameters(contextMock);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(123, result["param1"]);
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result["param1"], Is.EqualTo(123));
         }
 
         public class ParameterInfoWithAuditIgnore 

@@ -163,7 +163,7 @@ namespace Audit.Mvc
             base.OnResultExecuted(filterContext);
         }
 
-        private bool IsActionIgnored(ActionDescriptor actionDescriptor, bool isChildAction)
+        internal bool IsActionIgnored(ActionDescriptor actionDescriptor, bool isChildAction)
         {
             if (Configuration.AuditDisabled || !IncludeChildActions && isChildAction)
             {
@@ -185,7 +185,7 @@ namespace Audit.Mvc
             return actionDescriptor.GetCustomAttributes(typeof(AuditIgnoreAttribute), true).Any();
         }
 
-        private IDictionary<string, object> GetActionParameters(ActionExecutingContext context)
+        internal IDictionary<string, object> GetActionParameters(ActionExecutingContext context)
         {
             var actionArguments = context.ActionDescriptor.GetParameters()
                 .Where(pd => context.ActionParameters.ContainsKey(pd.ParameterName)
@@ -198,7 +198,7 @@ namespace Audit.Mvc
             return actionArguments;
         }
 
-        private static IDictionary<string, string> ToDictionary(NameValueCollection col)
+        internal static IDictionary<string, string> ToDictionary(NameValueCollection col)
         {
             if (col == null)
             {
@@ -232,14 +232,14 @@ namespace Audit.Mvc
             return null;
         }
 
-        private BodyContent GetResponseBody(ActionResult result)
+        internal BodyContent GetResponseBody(ActionResult result)
         {
             var content = new BodyContent() { Type = result.GetType().Name };
-            if (result is ContentResult or)
+            if (result is ContentResult cr)
             {
-                content.Length = or.Content?.Length;
-                content.Type = or.ContentType;
-                content.Value = or.Content;
+                content.Length = cr.Content?.Length;
+                content.Type = cr.ContentType;
+                content.Value = cr.Content;
             }
             else if (result is EmptyResult er)
             {
@@ -256,10 +256,6 @@ namespace Audit.Mvc
             else if (result is JavaScriptResult jsr)
             {
                 content.Value = jsr.Script;
-            }
-            else if (result is ContentResult cr)
-            {
-                content.Value = cr.Content;
             }
             else if (result is RedirectResult rr)
             {
