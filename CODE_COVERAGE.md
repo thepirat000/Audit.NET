@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/26/2025 - 16:36:27 |
-| Coverage date: | 09/26/2025 - 16:12:02 - 09/26/2025 - 16:35:50 |
+| Generated on: | 09/28/2025 - 04:18:07 |
+| Coverage date: | 09/28/2025 - 03:53:32 - 09/28/2025 - 04:17:28 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 88.5% (9338 of 10551) |
-| Covered lines: | 9338 |
-| Uncovered lines: | 1213 |
+| **Line coverage:** | 88.7% (9365 of 10551) |
+| Covered lines: | 9365 |
+| Uncovered lines: | 1186 |
 | Coverable lines: | 10551 |
-| Total lines: | 27287 |
-| **Branch coverage:** | 78.4% (3381 of 4311) |
-| Covered branches: | 3381 |
-| Total branches: | 4311 |
+| Total lines: | 27285 |
+| **Branch coverage:** | 79.1% (3414 of 4313) |
+| Covered branches: | 3414 |
+| Total branches: | 4313 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -145,13 +145,13 @@
 |Audit.Mvc.AuditHelper|6|6|12|42|50%|3|12|25%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|2|0|2|31|100%|0|0||
-|**Audit.Mvc.Core**|**331**|**53**|**384**|**904**|**86.1%**|**196**|**318**|**61.6%**|
+|**Audit.Mvc.Core**|**358**|**26**|**384**|**902**|**93.2%**|**229**|**320**|**71.5%**|
 |Audit.Mvc.AuditAction|23|3|26|65|88.4%|0|0||
 |Audit.Mvc.AuditAttribute|166|18|184|381|90.2%|103|154|66.8%|
 |Audit.Mvc.AuditEventExtensions|6|0|6|32|100%|6|6|100%|
 |Audit.Mvc.AuditEventMvcAction|1|0|1|16|100%|0|0||
 |Audit.Mvc.AuditHelper|14|4|18|57|77.7%|10|16|62.5%|
-|Audit.Mvc.AuditPageFilter|115|28|143|304|80.4%|77|142|54.2%|
+|Audit.Mvc.AuditPageFilter|142|1|143|302|99.3%|110|144|76.3%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|3|0|3|40|100%|0|0||
 |**Audit.NET**|**1339**|**61**|**1400**|**4580**|**95.6%**|**309**|**346**|**89.3%**|
