@@ -1,13 +1,13 @@
 ﻿#if ASP_CORE
 using Audit.Core;
 using Audit.Core.Extensions;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,9 +35,9 @@ namespace Audit.Mvc
         /// Gets or sets a value indicating whether the Request Body content should be read and incuded.
         /// </summary>
         /// <remarks>
-        /// When IncludeResquestBody is set to true and you are not using a [FromBody] parameter (i.e.reading the request body directly from the Request)
+        /// When IncludeRequestBody is set to true, and you are not using a [FromBody] parameter (i.e.reading the request body directly from the Request)
         /// make sure you enable rewind on the request body stream, otherwise the controller won't be able to read the request body since, by default, 
-        /// it's a forwand-only stream that can be read only once. 
+        /// it's a forward-only stream that can be read only once. 
         /// </remarks>
         public bool IncludeRequestBody { get; set; }
         /// <summary>
@@ -54,7 +54,7 @@ namespace Audit.Mvc
         /// - {path}: replaced with the complete view path.
         /// - {area}: replaced with the area name.
         /// - {action}: replaced with the action display name.
-        /// - {verb}: replaced with the HTTP verb used (GET, POST, etc).
+        /// - {verb}: replaced with the HTTP verb used (GET, POST, etc.).
         /// </summary>
         public string EventTypeName { get; set; }
 
@@ -79,10 +79,10 @@ namespace Audit.Mvc
 
         #endregion
 
-        private bool IsActionIgnored(PageHandlerExecutingContext context)
+        internal static bool IsActionIgnored(PageHandlerExecutingContext context)
         {
             return context.ActionDescriptor?.HandlerTypeInfo.GetCustomAttribute<AuditIgnoreAttribute>() != null
-                || context.HandlerMethod.MethodInfo.GetCustomAttribute<AuditIgnoreAttribute>() != null;
+                || context.HandlerMethod?.MethodInfo.GetCustomAttribute<AuditIgnoreAttribute>() != null;
         }
 
         public virtual async Task BeforeExecutingAsync(PageHandlerExecutingContext context)
@@ -179,33 +179,31 @@ namespace Audit.Mvc
             }
         }
 
-        private async Task<string> GetRequestBody(PageHandlerExecutingContext context, CancellationToken cancellationToken)
+        internal static async Task<string> GetRequestBody(PageHandlerExecutingContext context, CancellationToken cancellationToken)
         {
             var body = context.HttpContext.Request.Body;
-            if (body != null && body.CanRead)
+            if (body is { CanRead: true })
             {
-                using (var stream = new MemoryStream())
+                using var stream = new MemoryStream();
+                int bufferSize = DefaultCopyBufferSize;
+                if (body.CanSeek)
                 {
-                    int bufferSize = DefaultCopyBufferSize;
-                    if (body.CanSeek)
-                    {
-                        body.Seek(0, SeekOrigin.Begin);
-                        bufferSize = (int)Math.Min(bufferSize, body.Length < 2 ? 1 : body.Length);
-                    }
-                    await body.CopyToAsync(stream, bufferSize, cancellationToken);
-                    if (body.CanSeek)
-                    {
-                        body.Seek(0, SeekOrigin.Begin);
-                    }
-                    return Encoding.UTF8.GetString(stream.ToArray());
+                    body.Seek(0, SeekOrigin.Begin);
+                    bufferSize = (int)Math.Min(bufferSize, body.Length < 2 ? 1 : body.Length);
                 }
+                await body.CopyToAsync(stream, bufferSize, cancellationToken);
+                if (body.CanSeek)
+                {
+                    body.Seek(0, SeekOrigin.Begin);
+                }
+                return Encoding.UTF8.GetString(stream.ToArray());
             }
             return null;
         }
 
-        private Dictionary<string, object> GetModelObject(PageHandlerExecutedContext context)
+        internal static Dictionary<string, object> GetModelObject(PageHandlerExecutedContext context)
         {
-            if (context.ActionDescriptor.BoundProperties == null || context.ActionDescriptor.BoundProperties.Count == 0)
+            if (context.ActionDescriptor.BoundProperties.Count == 0)
             {
                 return null;
             }
@@ -220,7 +218,7 @@ namespace Audit.Mvc
             return model;
         }
 
-        private object GetResponseBody(MethodInfo method, IActionResult result)
+        internal static object GetResponseBody(MethodInfo method, IActionResult result)
         {
             if (method?.ReturnTypeCustomAttributes
                 .GetCustomAttributes(typeof(AuditIgnoreAttribute), true)
@@ -291,10 +289,10 @@ namespace Audit.Mvc
             return result.ToString();
         }
 
-        private IDictionary<string, object> GetActionParameters(PageHandlerExecutingContext context)
+        internal static IDictionary<string, object> GetActionParameters(PageHandlerExecutingContext context)
         {
             var actionArguments = context.HandlerArguments
-                .Where(pi => context.HandlerMethod.Parameters?.FirstOrDefault(pp => pp.Name == pi.Key)?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) == null)
+                .Where(pi => context.HandlerMethod?.Parameters?.FirstOrDefault(pp => pp.Name == pi.Key)?.ParameterInfo.GetCustomAttribute<AuditIgnoreAttribute>(true) == null)
                 .ToDictionary(k => k.Key, v => v.Value);
 
             return actionArguments;
