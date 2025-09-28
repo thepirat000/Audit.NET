@@ -1,20 +1,20 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/28/2025 - 04:18:07 |
-| Coverage date: | 09/28/2025 - 03:53:32 - 09/28/2025 - 04:17:28 |
+| Generated on: | 09/28/2025 - 05:35:22 |
+| Coverage date: | 09/28/2025 - 05:11:27 - 09/28/2025 - 05:34:43 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 88.7% (9365 of 10551) |
-| Covered lines: | 9365 |
-| Uncovered lines: | 1186 |
-| Coverable lines: | 10551 |
-| Total lines: | 27285 |
-| **Branch coverage:** | 79.1% (3414 of 4313) |
-| Covered branches: | 3414 |
-| Total branches: | 4313 |
+| **Line coverage:** | 88.9% (9386 of 10549) |
+| Covered lines: | 9386 |
+| Uncovered lines: | 1163 |
+| Coverable lines: | 10549 |
+| Total lines: | 27281 |
+| **Branch coverage:** | 79.9% (3447 of 4311) |
+| Covered branches: | 3447 |
+| Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|
@@ -137,12 +137,12 @@
 |Audit.MongoClient.MongoClientSettingsExtensions|4|0|4|28|100%|2|2|100%|
 |Audit.MongoClient.MongoCommandEvent|13|2|15|95|86.6%|0|0||
 |Audit.MongoClient.MongoConnection|4|0|4|25|100%|0|0||
-|**Audit.Mvc**|**161**|**28**|**189**|**488**|**85.1%**|**77**|**130**|**59.2%**|
+|**Audit.Mvc**|**182**|**5**|**187**|**484**|**97.3%**|**110**|**128**|**85.9%**|
 |Audit.Mvc.AuditAction|22|2|24|65|91.6%|0|0||
-|Audit.Mvc.AuditAttribute|121|20|141|293|85.8%|68|112|60.7%|
+|Audit.Mvc.AuditAttribute|139|0|139|289|100%|97|110|88.1%|
 |Audit.Mvc.AuditEventExtensions|6|0|6|32|100%|6|6|100%|
 |Audit.Mvc.AuditEventMvcAction|1|0|1|16|100%|0|0||
-|Audit.Mvc.AuditHelper|6|6|12|42|50%|3|12|25%|
+|Audit.Mvc.AuditHelper|9|3|12|42|75%|7|12|58.3%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|2|0|2|31|100%|0|0||
 |**Audit.Mvc.Core**|**358**|**26**|**384**|**902**|**93.2%**|**229**|**320**|**71.5%**|
