@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/28/2025 - 05:35:22 |
-| Coverage date: | 09/28/2025 - 05:11:27 - 09/28/2025 - 05:34:43 |
+| Generated on: | 09/30/2025 - 23:35:12 |
+| Coverage date: | 09/30/2025 - 23:11:14 - 09/30/2025 - 23:34:35 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 88.9% (9386 of 10549) |
-| Covered lines: | 9386 |
-| Uncovered lines: | 1163 |
+| **Line coverage:** | 89.1% (9403 of 10549) |
+| Covered lines: | 9403 |
+| Uncovered lines: | 1146 |
 | Coverable lines: | 10549 |
 | Total lines: | 27281 |
-| **Branch coverage:** | 79.9% (3447 of 4311) |
-| Covered branches: | 3447 |
+| **Branch coverage:** | 80% (3453 of 4311) |
+| Covered branches: | 3453 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -27,7 +27,7 @@
 |Audit.DynamicProxy.AuditProxy|11|0|11|59|100%|4|4|100%|
 |Audit.DynamicProxy.InterceptEvent|12|0|12|59|100%|0|0||
 |Audit.DynamicProxy.InterceptionSettings|7|0|7|48|100%|0|0||
-|**Audit.EntityFramework**|**1077**|**270**|**1347**|**3615**|**79.9%**|**511**|**640**|**79.8%**|
+|**Audit.EntityFramework**|**1084**|**263**|**1347**|**3615**|**80.4%**|**512**|**640**|**80%**|
 |Audit.Core.EntityFrameworkConfiguratorExtensions|15|15|30|72|50%|0|2|0%|
 |Audit.EntityFramework.AssociationEntry|3|0|3|18|100%|0|0||
 |Audit.EntityFramework.AssociationEntryRecord|5|0|5|19|100%|0|0||
@@ -36,7 +36,7 @@
 |Audit.EntityFramework.AuditEventEntityFramework|1|0|1|15|100%|0|0||
 |Audit.EntityFramework.AuditEventExtensions|2|4|6|82|33.3%|1|6|16.6%|
 |Audit.EntityFramework.ColumnValueChange|2|0|2|7|100%|0|0||
-|Audit.EntityFramework.Configuration|42|11|53|142|79.2%|5|8|62.5%|
+|Audit.EntityFramework.Configuration|44|9|53|142|83%|5|8|62.5%|
 |Audit.EntityFramework.ConfigurationApi.AuditEntityMapping|186|53|239|363|77.8%|2|8|25%|
 |Audit.EntityFramework.ConfigurationApi.ContextConfigurator|8|0|8|35|100%|4|4|100%|
 |Audit.EntityFramework.ConfigurationApi.ContextEntitySetting`1|20|8|28|85|71.4%|4|8|50%|
@@ -44,12 +44,12 @@
 |Audit.EntityFramework.ConfigurationApi.EfEntitySettings|3|0|3|30|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.EfSettings|14|0|14|31|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.EntityFrameworkProviderConfigurator|62|25|87|184|71.2%|2|6|33.3%|
-|Audit.EntityFramework.ConfigurationApi.ExcludeConfigurator`1|2|4|6|26|33.3%|0|0||
+|Audit.EntityFramework.ConfigurationApi.ExcludeConfigurator`1|6|0|6|26|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.IncludeEntityConfigurator`1|2|8|10|33|20%|0|2|0%|
 |Audit.EntityFramework.ConfigurationApi.IncludePropertyConfigurator`1|0|11|11|36|0%|0|4|0%|
 |Audit.EntityFramework.ConfigurationApi.MappingInfo|4|0|4|31|100%|0|0||
 |Audit.EntityFramework.ConfigurationApi.ModeConfigurator`1|6|0|6|21|100%|0|0||
-|Audit.EntityFramework.DbContextHelper|379|64|443|1023|85.5%|348|414|84%|
+|Audit.EntityFramework.DbContextHelper|380|63|443|1023|85.7%|349|414|84.2%|
 |Audit.EntityFramework.DefaultAuditContext|19|4|23|48|82.6%|0|0||
 |Audit.EntityFramework.EntityFrameworkEvent|11|3|14|81|78.5%|0|0||
 |Audit.EntityFramework.EntityKeyHelper|114|0|114|295|100%|65|68|95.5%|
@@ -251,10 +251,10 @@
 |Audit.Core.ConfiguratorExtensions|4|0|4|32|100%|0|0||
 |Audit.Core.JsonNewtonsoftAdapter|33|0|33|82|100%|8|8|100%|
 |Audit.JsonNewtonsoftAdapter.AuditContractResolver|58|0|58|102|100%|31|32|96.8%|
-|**Audit.NET.Kafka**|**73**|**24**|**97**|**532**|**75.2%**|**19**|**26**|**73%**|
+|**Audit.NET.Kafka**|**74**|**23**|**97**|**532**|**76.2%**|**20**|**26**|**76.9%**|
 |Audit.Core.KafkaConfiguratorExtensions|4|0|4|34|100%|0|0||
 |Audit.Kafka.Configuration.KafkaProviderConfigurator`1|12|10|22|85|54.5%|0|0||
-|Audit.Kafka.Providers.DefaultJsonSerializer`1|1|1|2|19|50%|0|2|0%|
+|Audit.Kafka.Providers.DefaultJsonSerializer`1|2|0|2|19|100%|1|2|50%|
 |Audit.Kafka.Providers.KafkaDataProvider|1|1|2|197|50%|0|0||
 |Audit.Kafka.Providers.KafkaDataProvider`1|55|12|67|197|82%|19|24|79.1%|
 |**Audit.NET.log4net**|**39**|**15**|**54**|**195**|**72.2%**|**12**|**20**|**60%**|
@@ -287,11 +287,11 @@
 |Audit.Polly.HedgingActionGeneratorArgumentsExtensions|17|0|17|69|100%|10|10|100%|
 |Audit.Polly.Providers.PollyDataProvider|31|11|42|120|73.8%|2|2|100%|
 |Audit.Polly.ResilienceContextExtensions|1|0|1|16|100%|0|0||
-|**Audit.NET.PostgreSql**|**201**|**9**|**210**|**568**|**95.7%**|**56**|**64**|**87.5%**|
+|**Audit.NET.PostgreSql**|**210**|**0**|**210**|**568**|**100%**|**60**|**64**|**93.7%**|
 |Audit.Core.PostgreSqlConfiguratorExtensions|2|0|2|21|100%|0|0||
 |Audit.PostgreSql.Configuration.PostgreSqlProviderConfigurator|34|0|34|102|100%|0|0||
-|Audit.PostgreSql.CustomColumn|6|2|8|24|75%|0|0||
-|Audit.PostgreSql.Providers.PostgreSqlDataProvider|159|7|166|421|95.7%|56|64|87.5%|
+|Audit.PostgreSql.CustomColumn|8|0|8|24|100%|0|0||
+|Audit.PostgreSql.Providers.PostgreSqlDataProvider|166|0|166|421|100%|60|64|93.7%|
 |**Audit.NET.RavenDB**|**76**|**12**|**88**|**288**|**86.3%**|**6**|**8**|**75%**|
 |Audit.RavenDB.ConfigurationApi.RavenDbConfiguratorExtensions|2|0|2|21|100%|0|0||
 |Audit.RavenDB.ConfigurationApi.RavenDbProviderConfigurator|15|0|15|39|100%|0|0||
