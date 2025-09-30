@@ -24,6 +24,22 @@ namespace Audit.PostgreSql.UnitTest
         }
 
         [Test]
+        public void PostgreSqlDataProvider_CustomColumn_Constructor()
+        {
+            var column = new CustomColumn();
+
+            Assert.That(column.Name, Is.Null);
+        }
+
+        [Test]
+        public void PostgreSqlDataProvider_Constructor()
+        {
+            var dp = new PostgreSqlDataProvider();
+
+            Assert.That(dp.DataType, Is.EqualTo("JSON"));
+        }
+
+        [Test]
         public void PostgreSqlConfigurator_Extension()
         {
             Audit.Core.Configuration.Setup().UsePostgreSql(cfg => cfg.ConnectionString("test"));
@@ -148,6 +164,32 @@ namespace Audit.PostgreSql.UnitTest
         }
 
         [Test]
+        public void Test_PostgreDataProvider_GetEventNotFound()
+        {
+            var overrideEventType = Guid.NewGuid().ToString();
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+
+            object id = -555;
+
+            var getEvent = dp?.GetEvent<AuditEvent>(id);
+
+            Assert.That(getEvent, Is.Null);
+        }
+
+        [Test]
+        public async Task Test_PostgreDataProvider_GetEventNotFoundAsync()
+        {
+            var overrideEventType = Guid.NewGuid().ToString();
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+
+            object id = -555;
+
+            var getEvent = await dp.GetEventAsync<AuditEvent>(id);
+
+            Assert.That(getEvent, Is.Null);
+        }
+
+        [Test]
         public void Test_PostgreDataProvider_Paging_No_Where()
         {
             const int pageNumberOne = 1;
@@ -199,6 +241,37 @@ namespace Audit.PostgreSql.UnitTest
 
             var whereExpression = @"""" + GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
             var events = dp?.EnumerateEvents(whereExpression);
+            var ev = events?.FirstOrDefault();
+
+            Assert.That(ev, Is.Not.Null);
+        }
+
+        [Test]
+        public void Test_EnumerateEvents_WhereEmptyExpression()
+        {
+            var overrideEventType = Guid.NewGuid().ToString();
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+
+            var events = dp?.EnumerateEvents(string.Empty);
+            var ev = events?.FirstOrDefault();
+
+            Assert.That(ev, Is.Not.Null);
+        }
+
+        [Test]
+        public void Test_EnumerateEventsGeneric_WhereEmptyExpression()
+        {
+            var overrideEventType = Guid.NewGuid().ToString();
+            var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
+
+            var scope = AuditScope.Create("test", null);
+            scope.Dispose();
+
+            var whereExpression = string.Empty;
+            var events = dp?.EnumerateEvents<AuditEvent>(whereExpression, GetLastUpdatedColumnNameColumnName(), "1");
             var ev = events?.FirstOrDefault();
 
             Assert.That(ev, Is.Not.Null);

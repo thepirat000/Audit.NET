@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-using Audit.Core;
+﻿using Audit.Core;
 using Audit.IntegrationTest;
 using Audit.Kafka.Providers;
 
@@ -13,13 +6,27 @@ using Confluent.Kafka;
 
 using NUnit.Framework;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Audit.Kafka.UnitTest
 {
     [TestFixture]
     public class KafkaTests
     {
 		private const string BootstrapHost = "127.0.0.1:9094";
-		
+
+
+        [SetUp]
+        public void Setup()
+        {
+            Audit.Core.Configuration.Reset();
+        }
+
         [Test]
         public void Test_KafkaDataProvider_FluentApi()
         {
@@ -33,7 +40,7 @@ namespace Audit.Kafka.UnitTest
             Assert.That(x.Partition.GetDefault(), Is.EqualTo(0));
             Assert.That(x.KeySelector.Invoke(null), Is.EqualTo("key"));
         }
-        
+
         [Test]
         [Category(TestCommon.Category.Integration)]
         [Category(TestCommon.Category.Kafka)]
@@ -236,6 +243,47 @@ namespace Audit.Kafka.UnitTest
             Assert.That(r1.Status, Is.EqualTo(PersistenceStatus.Persisted));
             Assert.That(r1.Message.Value.CustomFields["custom_field"].ToString(), Is.EqualTo("UPDATED:" + guid));
             Assert.That(r1.Message.Key, Is.EqualTo("key1"));
+        }
+
+        [Test]
+        public void Serialize_ShouldReturnUtf8JsonBytes()
+        {
+            // Arrange
+            var testObj = new TestMessage { Sender = "A", Receiver = "B" };
+            var expectedJson = "{\"Sender\":\"A\",\"Receiver\":\"B\"}";
+
+            var serializer = new DefaultJsonSerializer<TestMessage>();
+
+            // Act
+            var result = serializer.Serialize(testObj, new SerializationContext());
+
+            // Assert
+            Assert.That(result, Is.EqualTo(Encoding.UTF8.GetBytes(expectedJson)));
+        }
+
+        [Test]
+        public void Deserialize_ShouldReturnObject_WhenDataIsNotNull()
+        {
+            // Arrange
+            var expectedObj = new TestMessage { Sender = "A", Receiver = "B" };
+            var json = "{\"Sender\":\"A\",\"Receiver\":\"B\"}";
+            var bytes = Encoding.UTF8.GetBytes(json);
+
+            var serializer = new DefaultJsonSerializer<TestMessage>();
+
+            // Act
+            var result = serializer.Deserialize(bytes, false, new SerializationContext());
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Sender, Is.EqualTo("A"));
+            Assert.That(result.Receiver, Is.EqualTo("B"));
+        }
+
+        public record TestMessage
+        {
+            public string Sender { get; set; }
+            public string Receiver { get; set; }
         }
     }
 

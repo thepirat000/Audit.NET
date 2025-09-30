@@ -841,7 +841,7 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
         }
 
         [Test]
-        public void Test_EF_IncludeIgnoreFilters()
+        public void Test_EF_IncludeIgnoreAnyFilters()
         {
             var logs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
@@ -914,6 +914,153 @@ namespace Audit.EntityFramework.Core.UnitTestIntegrationTest
             Assert.That(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name), Is.True);
         }
 
+        [Test]
+        public void Test_EF_IncludeIgnoreFilters()
+        {
+            var logs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .IncludeStackTrace()
+                .UseDynamicProvider(p => p
+                    .OnInsert(ev =>
+                    {
+                        logs.Add(ev);
+                    }));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>()
+                    .Reset()
+                    .UseOptOut()
+                        .Ignore(typeof(Blog));
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Blogs.Add(new Blog()
+                {
+                    BloggerName = "fede",
+                    Title = "blog1-test",
+                    Posts = new List<Post>()
+                    {
+                        new Post()
+                        {
+                            Title = "post1-test",
+                            Content = "post1 content",
+                            DateCreated = DateTime.Now
+                        }
+                    }
+                });
+                ctx.SaveChanges();
+            }
+
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Posts"));
+
+            logs.Clear();
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>()
+                    .Reset()
+                    .UseOptIn()
+                        .IncludeAny(t => t.Name.StartsWith("Blog"));
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Blogs.Add(new Blog()
+                {
+                    BloggerName = "fede",
+                    Title = "blog1-test",
+                    Posts = new List<Post>()
+                    {
+                        new Post()
+                        {
+                            Title = "post1-test",
+                            Content = "post1 content",
+                            DateCreated = DateTime.Now
+                        }
+                    }
+                });
+                ctx.SaveChanges();
+            }
+
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Blogs"));
+
+            Assert.That(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name), Is.True);
+        }
+
+        [Test]
+        public void Test_EF_IncludeIgnoreGenericFilters()
+        {
+            var logs = new List<AuditEvent>();
+            Audit.Core.Configuration.Setup()
+                .IncludeStackTrace()
+                .UseDynamicProvider(p => p
+                    .OnInsert(ev =>
+                    {
+                        logs.Add(ev);
+                    }));
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>()
+                    .Reset()
+                    .UseOptOut()
+                        .Ignore<Blog>();
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Blogs.Add(new Blog()
+                {
+                    BloggerName = "fede",
+                    Title = "blog1-test",
+                    Posts = new List<Post>()
+                    {
+                        new Post()
+                        {
+                            Title = "post1-test",
+                            Content = "post1 content",
+                            DateCreated = DateTime.Now
+                        }
+                    }
+                });
+                ctx.SaveChanges();
+            }
+
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Posts"));
+
+            logs.Clear();
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<MyTransactionalContext>()
+                    .Reset()
+                    .UseOptIn()
+                        .IncludeAny(t => t.Name.StartsWith("Blog"));
+
+            using (var ctx = new MyTransactionalContext())
+            {
+                ctx.Blogs.Add(new Blog()
+                {
+                    BloggerName = "fede",
+                    Title = "blog1-test",
+                    Posts = new List<Post>()
+                    {
+                        new Post()
+                        {
+                            Title = "post1-test",
+                            Content = "post1 content",
+                            DateCreated = DateTime.Now
+                        }
+                    }
+                });
+                ctx.SaveChanges();
+            }
+
+            Assert.That(logs.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries.Count, Is.EqualTo(1));
+            Assert.That(logs[0].GetEntityFrameworkEvent().Entries[0].Table, Is.EqualTo("Blogs"));
+
+            Assert.That(logs[0].Environment.StackTrace.Contains(new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name), Is.True);
+        }
 
         [Test]
         public void Test_EF_SaveOnSameContext_Transaction()
