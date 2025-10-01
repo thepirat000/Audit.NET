@@ -1,19 +1,19 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 09/30/2025 - 23:35:12 |
-| Coverage date: | 09/30/2025 - 23:11:14 - 09/30/2025 - 23:34:35 |
+| Generated on: | 10/01/2025 - 03:21:47 |
+| Coverage date: | 10/01/2025 - 02:57:30 - 10/01/2025 - 03:21:06 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 89.1% (9403 of 10549) |
-| Covered lines: | 9403 |
-| Uncovered lines: | 1146 |
+| **Line coverage:** | 89.3% (9425 of 10549) |
+| Covered lines: | 9425 |
+| Uncovered lines: | 1124 |
 | Coverable lines: | 10549 |
 | Total lines: | 27281 |
-| **Branch coverage:** | 80% (3453 of 4311) |
-| Covered branches: | 3453 |
+| **Branch coverage:** | 80.2% (3459 of 4311) |
+| Covered branches: | 3459 |
 | Total branches: | 4311 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -111,11 +111,11 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**164**|**2**|**166**|**408**|**98.7%**|**52**|**52**|**100%**|
+|**Audit.FileSystem**|**166**|**0**|**166**|**408**|**100%**|**52**|**52**|**100%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|126|2|128|254|98.4%|52|52|100%|
+|Audit.FileSystem.FileSystemMonitor|128|0|128|254|100%|52|52|100%|
 |Audit.FileSystem.FileSystemMonitorOptions|18|0|18|85|100%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
@@ -207,11 +207,11 @@
 |Audit.AzureEventHubs.ConfigurationApi.AzureEventHubsCustomConfigurator|2|2|4|20|50%|0|0||
 |Audit.AzureEventHubs.Providers.AzureEventHubsDataProvider|40|8|48|156|83.3%|7|14|50%|
 |Audit.Core.AzureEventHubsConfiguratorExtensions|2|0|2|19|100%|0|0||
-|**Audit.NET.AzureStorageBlobs**|**117**|**32**|**149**|**450**|**78.5%**|**21**|**30**|**70%**|
+|**Audit.NET.AzureStorageBlobs**|**137**|**12**|**149**|**450**|**91.9%**|**27**|**30**|**90%**|
 |Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobConnectionConfigurator|9|0|9|32|100%|0|0||
 |Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobContainerConfigurator|8|8|16|66|50%|0|0||
 |Audit.AzureStorageBlobs.ConfigurationApi.AzureBlobCredentialConfiguration|4|4|8|39|50%|0|0||
-|Audit.AzureStorageBlobs.Providers.AzureStorageBlobDataProvider|94|20|114|292|82.4%|21|30|70%|
+|Audit.AzureStorageBlobs.Providers.AzureStorageBlobDataProvider|114|0|114|292|100%|27|30|90%|
 |Audit.Core.AzureConfiguratorExtensions|2|0|2|21|100%|0|0||
 |**Audit.NET.AzureStorageTables**|**135**|**26**|**161**|**481**|**83.8%**|**26**|**48**|**54.1%**|
 |Audit.AzureStorageTables.ConfigurationApi.AuditEventTableEntity|17|4|21|62|80.9%|0|0||
