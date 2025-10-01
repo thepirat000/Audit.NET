@@ -1,13 +1,18 @@
-﻿using System;
+﻿using Audit.AzureStorageBlobs.Providers;
+using Audit.Core;
+using Audit.IntegrationTest;
+
+using Azure;
+using Azure.Identity;
+using Azure.Storage;
+using Azure.Storage.Blobs.Models;
+
+using NUnit.Framework;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Audit.AzureStorageBlobs.Providers;
-using Audit.Core;
-using Audit.IntegrationTest;
-using Azure.Storage;
-using Azure.Storage.Blobs.Models;
-using NUnit.Framework;
 
 namespace Audit.AzureStorageBlobs.UnitTest
 {
@@ -17,6 +22,8 @@ namespace Audit.AzureStorageBlobs.UnitTest
     [Category(TestCommon.Category.AzureBlobs)]
     public class AzureStorageBlobsTests
     {
+        private static readonly Random Random = new Random();
+
         [SetUp]
         public void Setup()
         {
@@ -33,10 +40,18 @@ namespace Audit.AzureStorageBlobs.UnitTest
         }
 
         [Test]
+        public void AzureStorageBlobDataProvider_Constructor()
+        {
+            var dp = new AzureStorageBlobDataProvider();
+            
+            Assert.That(dp.ConnectionString, Is.Null);
+        }
+
+        [Test]
         public void Test_AzureStorageBlobs_HappyPath()
         {
             var id = Guid.NewGuid().ToString();
-            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var containerName = $"events{DateTime.Today:yyyyMMdd}-{Random.Next(100, 999)}";
             var dp = new AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
@@ -59,8 +74,10 @@ namespace Audit.AzureStorageBlobs.UnitTest
 
             var blobName = dp.InsertEvent(efEvent);
             var efEventGet = dp.GetEvent<AuditEvent>(containerName, blobName.ToString());
+            var efEventGetById = dp.GetEvent<AuditEvent>(blobName);
 
             Assert.That(efEventGet.EventType, Is.EqualTo(id));
+            Assert.That(efEventGetById.EventType, Is.EqualTo(id));
             Assert.That(efEventGet.Environment.MachineName, Is.EqualTo("Machine"));
         }
 
@@ -68,7 +85,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
         public async Task Test_AzureStorageBlobs_HappyPathAsync()
         {
             var id = Guid.NewGuid().ToString();
-            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var containerName = $"events{DateTime.Today:yyyyMMdd}-{Random.Next(100, 999)}";
             var dp = new AzureStorageBlobs.Providers.AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
@@ -91,8 +108,10 @@ namespace Audit.AzureStorageBlobs.UnitTest
 
             var blobName = await dp.InsertEventAsync(efEvent);
             var efEventGet = await dp.GetEventAsync<AuditEvent>(containerName, blobName.ToString());
+            var efEventGetById = await dp.GetEventAsync<AuditEvent>(blobName);
 
             Assert.That(efEventGet.EventType, Is.EqualTo(id));
+            Assert.That(efEventGetById.EventType, Is.EqualTo(id));
             Assert.That(efEventGet.Environment.MachineName, Is.EqualTo("Machine"));
         }
 
@@ -101,7 +120,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var originalId = id;
-            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var containerName = $"events{DateTime.Today:yyyyMMdd}-{Random.Next(100, 999)}";
             var dp = new AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
@@ -130,12 +149,45 @@ namespace Audit.AzureStorageBlobs.UnitTest
         }
 
         [Test]
+        public async Task Test_AzureStorageBlobs_ConnectionStringAsync()
+        {
+            var id = Guid.NewGuid().ToString();
+            var originalId = id;
+            var containerName = $"events{DateTime.Today:yyyyMMdd}-{Random.Next(100, 999)}";
+            var dp = new AzureStorageBlobDataProvider(config => config
+                .WithConnectionString(TestCommon.AzureBlobCnnString)
+                .AccessTier(AccessTier.Cool)
+                .BlobName(ev => ev.EventType + "_" + id + ".json")
+                .ContainerName(ev => containerName)
+                .Metadata(ev => new Dictionary<string, string>() { { "user", ev.Environment.UserName }, { "machine", ev.Environment.MachineName } }));
+
+            Configuration.ResetCustomActions();
+            Configuration.CreationPolicy = EventCreationPolicy.InsertOnStartReplaceOnEnd;
+            Configuration.DataProvider = dp;
+
+            await using (var scope = await AuditScope.CreateAsync("Test", () => id, new { custom = 123 }))
+            {
+                id = "changed!";
+            }
+
+            var result = await dp.GetEventAsync<AuditEvent>(containerName, "Test" + "_" + originalId + ".json");
+            var result2 = await dp.GetEventAsync<AuditEvent>(containerName, "NotExists.json");
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result2, Is.Null);
+            Assert.That(result.CustomFields["custom"].ToString(), Is.EqualTo("123"));
+            Assert.That(result.Target.New.ToString(), Is.EqualTo("changed!"));
+            Assert.That(result.Target.Old.ToString(), Is.EqualTo(originalId));
+            Assert.That(result.EventType, Is.EqualTo("Test"));
+        }
+
+        [Test]
         [Ignore("Ignored until https://github.com/Azure/Azurite/issues/1312 is implemented")]
         public void Test_AzureStorageBlobs_Tags()
         {
             var id = Guid.NewGuid().ToString();
             
-            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var containerName = $"events{DateTime.Today:yyyyMMdd}-{Random.Next(100, 999)}";
             var dp = new AzureStorageBlobDataProvider(config => config
                 .WithConnectionString(TestCommon.AzureBlobCnnString)
                 .AccessTier(AccessTier.Cool)
@@ -167,7 +219,7 @@ namespace Audit.AzureStorageBlobs.UnitTest
         {
             var id = Guid.NewGuid().ToString();
             var originalId = id;
-            var containerName = $"events{DateTime.Today:yyyyMMdd}";
+            var containerName = $"events{DateTime.Today:yyyyMMdd}-{Random.Next(100, 999)}";
             var dp = new AzureStorageBlobDataProvider(config => config
                 .WithCredentials(_ => _
                     .Url("http://127.0.0.1:10000/devstoreaccount1" /*TestCommon.AzureBlobServiceUrl*/)
@@ -195,6 +247,79 @@ namespace Audit.AzureStorageBlobs.UnitTest
             Assert.That(result.Target.New.ToString(), Is.EqualTo("changed!"));
             Assert.That(result.Target.Old.ToString(), Is.EqualTo(originalId));
             Assert.That(result.EventType, Is.EqualTo("Test"));
+        }
+
+        [Test]
+        public void AzureStorageBlobDataProvider_CreateBlobServiceClient_ConnectionString()
+        {
+            var dp = new AzureStorageBlobDataProvider()
+            {
+                ConnectionString = TestCommon.AzureBlobCnnString
+            };
+            
+            var client = dp.CreateBlobServiceClient();
+
+            Assert.That(client.Uri.ToString(), Is.EqualTo("http://127.0.0.1:10000/devstoreaccount1"));
+        }
+
+        [Test]
+        public void AzureStorageBlobDataProvider_CreateBlobServiceClient_SasCredential()
+        {
+            var dp = new AzureStorageBlobDataProvider()
+            {
+                SasCredential = new AzureSasCredential("x"),
+                ServiceUrl = "https://test.blob.core.windows.net/"
+            };
+
+            var client = dp.CreateBlobServiceClient();
+
+            Assert.That(client.Uri.ToString(), Is.EqualTo("https://test.blob.core.windows.net/"));
+            Assert.That(client.CanGenerateAccountSasUri, Is.False);
+        }
+
+        [Test]
+        public void AzureStorageBlobDataProvider_CreateBlobServiceClient_SharedKeyCredential()
+        {
+            var key = Convert.ToBase64String("key"u8.ToArray());
+            var dp = new AzureStorageBlobDataProvider()
+            {
+                SharedKeyCredential = new StorageSharedKeyCredential("account", key),
+                ServiceUrl = "https://test.blob.core.windows.net/"
+            };
+
+            var client = dp.CreateBlobServiceClient();
+
+            Assert.That(client.Uri.ToString(), Is.EqualTo("https://test.blob.core.windows.net/"));
+            Assert.That(client.CanGenerateAccountSasUri, Is.True);
+        }
+
+        [Test]
+        public void AzureStorageBlobDataProvider_CreateBlobServiceClient_TokenCredential()
+        {
+            var dp = new AzureStorageBlobDataProvider()
+            {
+                TokenCredential = new DefaultAzureCredential(),
+                ServiceUrl = "https://test.blob.core.windows.net/"
+            };
+
+            var client = dp.CreateBlobServiceClient();
+
+            Assert.That(client.Uri.ToString(), Is.EqualTo("https://test.blob.core.windows.net/"));
+            Assert.That(client.CanGenerateAccountSasUri, Is.False);
+        }
+
+        [Test]
+        public void AzureStorageBlobDataProvider_CreateBlobServiceClient_Url()
+        {
+            var dp = new AzureStorageBlobDataProvider()
+            {
+                ServiceUrl = "https://test.blob.core.windows.net/"
+            };
+
+            var client = dp.CreateBlobServiceClient();
+
+            Assert.That(client.Uri.ToString(), Is.EqualTo("https://test.blob.core.windows.net/"));
+            Assert.That(client.CanGenerateAccountSasUri, Is.False);
         }
     }
 }

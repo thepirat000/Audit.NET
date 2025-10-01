@@ -138,7 +138,7 @@ namespace Audit.AzureStorageBlobs.Providers
             return containerClient;
         }
 
-        private BlobServiceClient CreateBlobServiceClient()
+        internal BlobServiceClient CreateBlobServiceClient()
         {
             BlobServiceClient serviceClient;
             if (ConnectionString != null)
