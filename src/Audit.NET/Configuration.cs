@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Audit.Core.ConfigurationApi;
 using Audit.Core.Providers;
-using Audit.Core.ConfigurationApi;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Audit.Core.Providers.Wrappers;
+
+using System;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Audit.Core.Providers.Wrappers;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.Core
 {
@@ -90,9 +90,7 @@ namespace Audit.Core
         public static JsonSerializerOptions JsonSettings { get; set; }
 
         // Custom actions
-        internal static Dictionary<ActionType, List<Func<AuditScope, CancellationToken, Task<bool>>>> AuditScopeActions { get; private set; }
-
-        internal static readonly object Locker = new object();
+        internal static ConcurrentDictionary<ActionType, ConcurrentQueue<Func<AuditScope, CancellationToken, Task<bool>>>> AuditScopeActions { get; private set; } = new();
 
         private static IAuditScopeFactory _auditScopeFactory;
 
@@ -146,14 +144,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddCustomAction(ActionType when, Action<AuditScope> action)
         {
-            lock (Locker)
+            AuditScopeActions[when].Enqueue((scope, _) =>
             {
-                AuditScopeActions[when].Add((scope, ct) =>
-                {
-                    action.Invoke(scope);
-                    return Task.FromResult(true);
-                });
-            }
+                action.Invoke(scope);
+                return Task.FromResult(true);
+            });
         }
 
         /// <summary>
@@ -163,14 +158,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddCustomAction(ActionType when, Func<AuditScope, bool> action)
         {
-            lock (Locker)
-            {
-                AuditScopeActions[when].Add((scope, ct) =>
-                { 
-                    var result = action.Invoke(scope);
-                    return Task.FromResult(result);
-                });
-            }
+            AuditScopeActions[when].Enqueue((scope, _) =>
+            { 
+                var result = action.Invoke(scope);
+                return Task.FromResult(result);
+            });
         }
 
         /// <summary>
@@ -180,14 +172,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddCustomAction(ActionType when, Func<AuditScope, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[when].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[when].Add(async (scope, _) =>
-                {
-                    await asyncAction.Invoke(scope);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope);
+                return true;
+            });
         }
 
         /// <summary>
@@ -197,14 +186,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddCustomAction(ActionType when, Func<AuditScope, Task<bool>> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[when].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[when].Add(async (scope, _) =>
-                {
-                    var result = await asyncAction.Invoke(scope);
-                    return result;
-                });
-            }
+                var result = await asyncAction.Invoke(scope);
+                return result;
+            });
         }
 
         /// <summary>
@@ -214,14 +200,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddCustomAction(ActionType when, Func<AuditScope, CancellationToken, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[when].Enqueue(async (scope, ct) =>
             {
-                AuditScopeActions[when].Add(async (scope, ct) =>
-                {
-                    await asyncAction.Invoke(scope, ct);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope, ct);
+                return true;
+            });
         }
 
         /// <summary>
@@ -231,14 +214,7 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddCustomAction(ActionType when, Func<AuditScope, CancellationToken, Task<bool>> asyncAction)
         {
-            lock (Locker)
-            {
-                AuditScopeActions[when].Add(async (scope, ct) =>
-                {
-                    var result = await asyncAction.Invoke(scope, ct);
-                    return result;
-                });
-            }
+            AuditScopeActions[when].Enqueue(asyncAction);
         }
 
         /// <summary>
@@ -247,14 +223,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddOnSavingAction(Action<AuditScope> action)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnEventSaving].Enqueue((scope, _) =>
             {
-                AuditScopeActions[ActionType.OnEventSaving].Add((scope, ct) =>
-                {
-                    action.Invoke(scope);
-                    return Task.FromResult(true);
-                });
-            }
+                action.Invoke(scope);
+                return Task.FromResult(true);
+            });
         }
 
         /// <summary>
@@ -263,14 +236,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnSavingAction(Func<AuditScope, bool> action)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnEventSaving].Enqueue((scope, _) =>
             {
-                AuditScopeActions[ActionType.OnEventSaving].Add((scope, ct) =>
-                {
-                    var result = action.Invoke(scope);
-                    return Task.FromResult(result);
-                });
-            }
+                var result = action.Invoke(scope);
+                return Task.FromResult(result);
+            });
         }
 
         /// <summary>
@@ -279,14 +249,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddOnSavingAction(Func<AuditScope, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnEventSaving].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[ActionType.OnEventSaving].Add(async (scope, _) =>
-                {
-                    await asyncAction.Invoke(scope);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope);
+                return true;
+            });
         }
 
         /// <summary>
@@ -295,14 +262,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnSavingAction(Func<AuditScope, Task<bool>> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnEventSaving].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[ActionType.OnEventSaving].Add(async (scope, _) =>
-                {
-                    var result = await asyncAction.Invoke(scope);
-                    return result;
-                });
-            }
+                var result = await asyncAction.Invoke(scope);
+                return result;
+            });
         }
 
         /// <summary>
@@ -311,14 +275,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddOnSavingAction(Func<AuditScope, CancellationToken, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnEventSaving].Enqueue(async (scope, ct) =>
             {
-                AuditScopeActions[ActionType.OnEventSaving].Add(async (scope, ct) =>
-                {
-                    await asyncAction.Invoke(scope, ct);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope, ct);
+                return true;
+            });
         }
 
         /// <summary>
@@ -327,14 +288,7 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnSavingAction(Func<AuditScope, CancellationToken, Task<bool>> asyncAction)
         {
-            lock (Locker)
-            {
-                AuditScopeActions[ActionType.OnEventSaving].Add(async (scope, ct) =>
-                {
-                    var result = await asyncAction.Invoke(scope, ct);
-                    return result;
-                });
-            }
+            AuditScopeActions[ActionType.OnEventSaving].Enqueue(asyncAction);
         }
 
         /// <summary>
@@ -343,14 +297,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddOnCreatedAction(Action<AuditScope> action)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeCreated].Enqueue((scope, _) => 
             {
-                AuditScopeActions[ActionType.OnScopeCreated].Add((scope, ct) => 
-                {
-                    action.Invoke(scope);
-                    return Task.FromResult(true);
-                });
-            }
+                action.Invoke(scope);
+                return Task.FromResult(true);
+            });
         }
 
         /// <summary>
@@ -359,14 +310,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnCreatedAction(Func<AuditScope, bool> action)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeCreated].Enqueue((scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeCreated].Add((scope, ct) =>
-                {
-                    var result = action.Invoke(scope);
-                    return Task.FromResult(result);
-                });
-            }
+                var result = action.Invoke(scope);
+                return Task.FromResult(result);
+            });
         }
 
         /// <summary>
@@ -375,14 +323,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddOnCreatedAction(Func<AuditScope, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeCreated].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeCreated].Add(async (scope, _) =>
-                {
-                    await asyncAction.Invoke(scope);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope);
+                return true;
+            });
         }
 
         /// <summary>
@@ -391,14 +336,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnCreatedAction(Func<AuditScope, Task<bool>> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeCreated].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeCreated].Add(async (scope, _) =>
-                {
-                    var result = await asyncAction.Invoke(scope);
-                    return result;
-                });
-            }
+                var result = await asyncAction.Invoke(scope);
+                return result;
+            });
         }
 
         /// <summary>
@@ -407,14 +349,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddOnCreatedAction(Func<AuditScope, CancellationToken, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeCreated].Enqueue(async (scope, ct) =>
             {
-                AuditScopeActions[ActionType.OnScopeCreated].Add(async (scope, ct) =>
-                {
-                    await asyncAction.Invoke(scope, ct);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope, ct);
+                return true;
+            });
         }
 
 
@@ -424,14 +363,7 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnCreatedAction(Func<AuditScope, CancellationToken, Task<bool>> asyncAction)
         {
-            lock (Locker)
-            {
-                AuditScopeActions[ActionType.OnScopeCreated].Add(async (scope, ct) =>
-                {
-                    var result = await asyncAction.Invoke(scope, ct);
-                    return result;
-                });
-            }
+            AuditScopeActions[ActionType.OnScopeCreated].Enqueue(asyncAction);
         }
 
         /// <summary>
@@ -440,14 +372,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform.</param>
         public static void AddOnDisposedAction(Action<AuditScope> action)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeDisposed].Enqueue((scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeDisposed].Add((scope, ct) =>
-                {
-                    action.Invoke(scope);
-                    return Task.FromResult(true);
-                });
-            }
+                action.Invoke(scope);
+                return Task.FromResult(true);
+            });
         }
 
         /// <summary>
@@ -456,14 +385,11 @@ namespace Audit.Core
         /// <param name="action">The action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnDisposedAction(Func<AuditScope, bool> action)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeDisposed].Enqueue((scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeDisposed].Add((scope, ct) =>
-                {
-                    var result = action.Invoke(scope);
-                    return Task.FromResult(result);
-                });
-            }
+                var result = action.Invoke(scope);
+                return Task.FromResult(result);
+            });
         }
 
         /// <summary>
@@ -472,14 +398,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddOnDisposedAction(Func<AuditScope, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeDisposed].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeDisposed].Add(async (scope, _) =>
-                {
-                    await asyncAction.Invoke(scope);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope);
+                return true;
+            });
         }
 
         /// <summary>
@@ -488,14 +411,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnDisposedAction(Func<AuditScope, Task<bool>> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeDisposed].Enqueue(async (scope, _) =>
             {
-                AuditScopeActions[ActionType.OnScopeDisposed].Add(async (scope, _) =>
-                {
-                    var result = await asyncAction.Invoke(scope);
-                    return result;
-                });
-            }
+                var result = await asyncAction.Invoke(scope);
+                return result;
+            });
         }
 
         /// <summary>
@@ -504,14 +424,11 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform.</param>
         public static void AddOnDisposedAction(Func<AuditScope, CancellationToken, Task> asyncAction)
         {
-            lock (Locker)
+            AuditScopeActions[ActionType.OnScopeDisposed].Enqueue(async (scope, ct) =>
             {
-                AuditScopeActions[ActionType.OnScopeDisposed].Add(async (scope, ct) =>
-                {
-                    await asyncAction.Invoke(scope, ct);
-                    return true;
-                });
-            }
+                await asyncAction.Invoke(scope, ct);
+                return true;
+            });
         }
 
         /// <summary>
@@ -520,14 +437,7 @@ namespace Audit.Core
         /// <param name="asyncAction">The asynchronous action to perform. Return true to continue with the next actions, false to stop executing the subsequent actions.</param>
         public static void AddOnDisposedAction(Func<AuditScope, CancellationToken, Task<bool>> asyncAction)
         {
-            lock (Locker)
-            {
-                AuditScopeActions[ActionType.OnScopeDisposed].Add(async (scope, ct) =>
-                {
-                    var result = await asyncAction.Invoke(scope, ct);
-                    return result;
-                });
-            }
+            AuditScopeActions[ActionType.OnScopeDisposed].Enqueue(asyncAction);
         }
 
         /// <summary>
@@ -535,16 +445,10 @@ namespace Audit.Core
         /// </summary>
         public static void ResetCustomActions()
         {
-            lock (Locker)
-            {
-                AuditScopeActions = new()
-                {
-                    { ActionType.OnScopeCreated, new() },
-                    { ActionType.OnEventSaving, new() },
-                    { ActionType.OnEventSaved, new() },
-                    { ActionType.OnScopeDisposed, new() }
-                };
-            }
+            ResetCustomActions(ActionType.OnScopeCreated);
+            ResetCustomActions(ActionType.OnEventSaving);
+            ResetCustomActions(ActionType.OnEventSaved);
+            ResetCustomActions(ActionType.OnScopeDisposed);
         }
 
         /// <summary>
@@ -552,10 +456,7 @@ namespace Audit.Core
         /// </summary>
         public static void ResetCustomActions(ActionType actionType)
         {
-            lock (Locker)
-            {
-                AuditScopeActions[actionType].Clear();
-            }
+            AuditScopeActions[actionType] = new ConcurrentQueue<Func<AuditScope, CancellationToken, Task<bool>>>();
         }
 
         /// <summary>
@@ -563,12 +464,7 @@ namespace Audit.Core
         /// </summary>
         internal static void InvokeCustomActions(ActionType type, AuditScope auditScope)
         {
-            List<Func<AuditScope, CancellationToken, Task<bool>>> actions;
-            lock (Locker)
-            {
-                actions = AuditScopeActions[type].ToList();
-            }
-            foreach (var action in actions)
+            foreach (var action in AuditScopeActions[type])
             {
                 var @continue = action.Invoke(auditScope, default).GetAwaiter().GetResult();
                 if (!@continue)
@@ -583,12 +479,7 @@ namespace Audit.Core
         /// </summary>
         internal static async Task InvokeCustomActionsAsync(ActionType type, AuditScope auditScope, CancellationToken cancellationToken)
         {
-            List<Func<AuditScope, CancellationToken, Task<bool>>> actions;
-            lock (Locker)
-            {
-                actions = AuditScopeActions[type].ToList();
-            }
-            foreach (var action in actions)
+            foreach (var action in AuditScopeActions[type])
             {
                 var @continue = await action.Invoke(auditScope, cancellationToken);
                 if (!@continue)
@@ -597,6 +488,5 @@ namespace Audit.Core
                 }
             }
         }
-
     }
 }

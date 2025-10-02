@@ -1,8 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using Audit.Core;
+﻿using Audit.Core;
 using Audit.Core.Providers;
+
 using NUnit.Framework;
+
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.UnitTest
 {
@@ -367,6 +369,158 @@ namespace Audit.UnitTest
 
             // Assert
             Assert.That(scope.Event.Environment, exclude ? Is.Null : Is.Not.Null);
+        }
+
+        [TestCase(ActionType.OnScopeCreated)]
+        [TestCase(ActionType.OnEventSaving)]
+        [TestCase(ActionType.OnEventSaved)]
+        [TestCase(ActionType.OnScopeDisposed)]
+        public void TestConfiguration_CustomAction_Stress(ActionType actionType)
+        {
+            Configuration.ResetCustomActions();
+            const int size = 100;
+            var tasks = new Task[size];
+            int addActionCounter = 0;
+
+            for (int i = 0; i < size; i++)
+            {
+                tasks[i] = Task.Run(() =>
+                {
+                    Core.Configuration.AddCustomAction(actionType, async (scope, ct) =>
+                    {
+                        Interlocked.Increment(ref addActionCounter);
+                        await Task.CompletedTask;
+                    });
+                });
+            }
+
+            Task.WaitAll(tasks);
+
+            Assert.That(Core.Configuration.AuditScopeActions[actionType].Count, Is.EqualTo(100));
+
+            int scopeCounter = 0;
+            tasks = new Task[size];
+            for (int i = 0; i < size; i++)
+            {
+                tasks[i] = Task.Run(async () =>
+                {
+                    await using var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { DataProvider = new NullDataProvider() });
+                    {
+                        Interlocked.Increment(ref scopeCounter);
+                        await scope.SaveAsync();
+                    }
+                });
+            }
+
+            Task.WaitAll(tasks);
+
+            Assert.That(addActionCounter, Is.EqualTo(size * size));
+            Assert.That(scopeCounter, Is.EqualTo(100));
+        }
+
+        [TestCase(ActionType.OnScopeCreated)]
+        [TestCase(ActionType.OnEventSaving)]
+        [TestCase(ActionType.OnEventSaved)]
+        [TestCase(ActionType.OnScopeDisposed)]
+        public async Task TestConfiguration_CustomAction_StressAsync(ActionType actionType)
+        {
+            Configuration.ResetCustomActions();
+            const int size = 100;
+            var tasks = new Task[size];
+            int addActionCounter = 0;
+
+            for (int i = 0; i < size; i++)
+            {
+                tasks[i] = Task.Run(() =>
+                {
+                    Core.Configuration.AddCustomAction(actionType, async (scope, ct) =>
+                    {
+                        Interlocked.Increment(ref addActionCounter);
+                        await Task.CompletedTask;
+                    });
+                });
+            }
+            
+            await Task.WhenAll(tasks);
+            
+            Assert.That(Core.Configuration.AuditScopeActions[actionType].Count, Is.EqualTo(100));
+
+            int scopeCounter = 0;
+            tasks = new Task[size];
+            for (int i = 0; i < size; i++)
+            {
+                tasks[i] = Task.Run(async () =>
+                {
+                    await using var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { DataProvider = new NullDataProvider() });
+                    {
+                        Interlocked.Increment(ref scopeCounter);
+                        await scope.SaveAsync();
+                    }
+                });
+            }
+            
+            await Task.WhenAll(tasks);
+
+            Assert.That(addActionCounter, Is.EqualTo(size * size));
+            Assert.That(scopeCounter, Is.EqualTo(100));
+        }
+
+        [TestCase(ActionType.OnScopeCreated)]
+        [TestCase(ActionType.OnEventSaving)]
+        [TestCase(ActionType.OnEventSaved)]
+        [TestCase(ActionType.OnScopeDisposed)]
+        public async Task TestConfiguration_CustomAction_InOrderAsync(ActionType actionType)
+        {
+            Configuration.ResetCustomActions();
+
+            int actionCounter = 0;
+            Core.Configuration.AddCustomAction(actionType, async (scope, ct) =>
+            {
+                Assert.That(actionCounter, Is.EqualTo(0));
+                actionCounter++;
+                await Task.CompletedTask;
+            });
+            Core.Configuration.AddCustomAction(actionType, async (scope, ct) =>
+            {
+                Assert.That(actionCounter, Is.EqualTo(1));
+                actionCounter++;
+                await Task.CompletedTask;
+            });
+            Core.Configuration.AddCustomAction(actionType, async (scope, ct) =>
+            {
+                Assert.That(actionCounter, Is.EqualTo(2));
+                actionCounter++;
+                await Task.CompletedTask;
+            });
+
+            await using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions() { DataProvider = new NullDataProvider() }))
+            {
+                await scope.SaveAsync();
+            }
+
+            Assert.That(actionCounter, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestConfiguration_ResetCustomActions_ResetAllActions()
+        {
+            Core.Configuration.AddCustomAction(ActionType.OnScopeCreated, async (scope, ct) => await Task.CompletedTask);
+            Core.Configuration.AddCustomAction(ActionType.OnEventSaving, async (scope, ct) => await Task.CompletedTask);
+            Core.Configuration.AddCustomAction(ActionType.OnEventSaved, async (scope, ct) => await Task.CompletedTask);
+            Core.Configuration.AddCustomAction(ActionType.OnScopeDisposed, async (scope, ct) => await Task.CompletedTask);
+
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count, Is.EqualTo(1));
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnEventSaving].Count, Is.EqualTo(1));
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnEventSaved].Count, Is.EqualTo(1));
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnScopeDisposed].Count, Is.EqualTo(1));
+
+            Core.Configuration.ResetCustomActions();
+
+            Assert.That(Core.Configuration.AuditScopeActions.Count, Is.EqualTo(4));
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnScopeCreated].Count, Is.Zero);
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnEventSaving].Count, Is.Zero);
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnEventSaved].Count, Is.Zero);
+            Assert.That(Core.Configuration.AuditScopeActions[ActionType.OnScopeDisposed].Count, Is.Zero);
         }
     }
 }
