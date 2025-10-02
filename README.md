@@ -6,8 +6,6 @@ issues | build status | Quality gate | donations
 ------------ | ---------------- | ---------------- |  --------------
 [![issues-open](https://img.shields.io/github/issues-raw/thepirat000/Audit.NET.svg?label=open)](https://github.com/thepirat000/Audit.NET/issues)  [![issues-closed](https://img.shields.io/github/issues-closed-raw/thepirat000/Audit.NET.svg?label=closed)](https://github.com/thepirat000/Audit.NET/issues) | [![build-status](https://img.shields.io/github/actions/workflow/status/thepirat000/audit.net/CI-BuildAndTest.yml)](https://github.com/thepirat000/Audit.NET/actions) | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Audit.NET&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Audit.NET)  [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Audit.NET&metric=coverage)](https://sonarcloud.io/summary/overall?id=Audit.NET) | [![backers](https://opencollective.com/auditnet/tiers/backer/badge.svg?label=backer&color=brightgreen)](https://opencollective.com/auditnet) [![paypal](https://img.shields.io/badge/donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=thepirat000%40hotmail.com&currency_code=USD&source=url)
 
-![Alt](https://repobeats.axiom.co/api/embed/81f877a65a813b88933812fd28671411e71c10b5.svg "Repobeats analytics image")
-
 ### An extensible framework to audit executing operations in .NET and .NET Core.
 
 Generate [audit logs](https://en.wikipedia.org/wiki/Audit_trail) with evidence for reconstruction and examination of activities that have affected specific operations or procedures. 
