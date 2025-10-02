@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.0.2] - 2025-10-01:
+- **Audit.NET**: Refactor custom action handling for thread safety. Replaced `Dictionary` with `ConcurrentDictionary` and `List` with `ConcurrentQueue` in `Configuration.cs` for storing custom actions. Removing explicit locking. (#769)
+
 ## [31.0.1] - 2025-08-28:
 - **Audit.EntityFramework** / **Audit.EntityFramework.Core**: Enhancing EF audit event entries with a `ChangesByColumn` dictionary for original and new values. Adding `MapChangesByColumn` property to support dictionary-based change tracking. (#765)
 
