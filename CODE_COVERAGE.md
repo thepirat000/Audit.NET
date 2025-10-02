@@ -1,17 +1,17 @@
 # Summary
 |||
 |:---|:---|
-| Generated on: | 10/01/2025 - 03:21:47 |
-| Coverage date: | 10/01/2025 - 02:57:30 - 10/01/2025 - 03:21:06 |
+| Generated on: | 10/02/2025 - 03:31:37 |
+| Coverage date: | 10/02/2025 - 03:07:13 - 10/02/2025 - 03:30:46 |
 | Parser: | MultiReport (96x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 89.3% (9425 of 10549) |
-| Covered lines: | 9425 |
-| Uncovered lines: | 1124 |
-| Coverable lines: | 10549 |
-| Total lines: | 27281 |
+| **Line coverage:** | 89.2% (9349 of 10471) |
+| Covered lines: | 9349 |
+| Uncovered lines: | 1122 |
+| Coverable lines: | 10471 |
+| Total lines: | 27171 |
 | **Branch coverage:** | 80.2% (3459 of 4311) |
 | Covered branches: | 3459 |
 | Total branches: | 4311 |
@@ -111,11 +111,11 @@
 |Audit.EntityFramework.AuditIdentityDbContext`1|0|4|4|76|0%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`3|4|0|4|76|100%|0|0||
 |Audit.EntityFramework.AuditIdentityDbContext`8|34|1|35|344|97.1%|0|0||
-|**Audit.FileSystem**|**166**|**0**|**166**|**408**|**100%**|**52**|**52**|**100%**|
+|**Audit.FileSystem**|**164**|**2**|**166**|**408**|**98.7%**|**52**|**52**|**100%**|
 |Audit.FileSystem.AuditEventFileSystem|1|0|1|19|100%|0|0||
 |Audit.FileSystem.FileBinaryContent|2|0|2|12|100%|0|0||
 |Audit.FileSystem.FileSystemEvent|15|0|15|27|100%|0|0||
-|Audit.FileSystem.FileSystemMonitor|128|0|128|254|100%|52|52|100%|
+|Audit.FileSystem.FileSystemMonitor|126|2|128|254|98.4%|52|52|100%|
 |Audit.FileSystem.FileSystemMonitorOptions|18|0|18|85|100%|0|0||
 |Audit.FileSystem.FileTextualContent|2|0|2|11|100%|0|0||
 |**Audit.HttpClient**|**202**|**5**|**207**|**604**|**97.5%**|**78**|**86**|**90.6%**|
@@ -154,7 +154,7 @@
 |Audit.Mvc.AuditPageFilter|142|1|143|302|99.3%|110|144|76.3%|
 |Audit.Mvc.BodyContent|3|0|3|9|100%|0|0||
 |Audit.Mvc.ControllerExtensions|3|0|3|40|100%|0|0||
-|**Audit.NET**|**1339**|**61**|**1400**|**4580**|**95.6%**|**309**|**346**|**89.3%**|
+|**Audit.NET**|**1265**|**57**|**1322**|**4470**|**95.6%**|**309**|**346**|**89.3%**|
 |Audit.Core.AuditActivityEvent|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTag|2|0|2|78|100%|0|0||
 |Audit.Core.AuditActivityTrace|10|0|10|78|100%|0|0||
@@ -166,7 +166,7 @@
 |Audit.Core.AuditScopeOptions|38|0|38|129|100%|2|2|100%|
 |Audit.Core.AuditScopeOptionsConfigurator|28|5|33|107|84.8%|1|2|50%|
 |Audit.Core.AuditTarget|3|0|3|26|100%|0|0||
-|Audit.Core.Configuration|244|16|260|602|93.8%|9|10|90%|
+|Audit.Core.Configuration|170|12|182|492|93.4%|9|10|90%|
 |Audit.Core.ConfigurationApi.ActionConfigurator|5|0|5|19|100%|0|0||
 |Audit.Core.ConfigurationApi.ActionEventSelector|14|2|16|48|87.5%|0|0||
 |Audit.Core.ConfigurationApi.ActivityProviderConfigurator|38|0|38|121|100%|0|0||
