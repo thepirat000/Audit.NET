@@ -11,6 +11,13 @@ It can record detailed information about CRUD operations in your database.
 
 **NuGet Package** 
 
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.svg?style=flat&label=Audit.EntityFramework)](https://www.nuget.org/packages/Audit.EntityFramework/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.EntityFramework.svg)](https://www.nuget.org/packages/Audit.EntityFramework/)
+
+[![NuGet Status](https://img.shields.io/nuget/v/Audit.EntityFramework.Core.svg?style=flat&label=Audit.EntityFramework.Core)](https://www.nuget.org/packages/Audit.EntityFramework.Core/)
+[![NuGet Count](https://img.shields.io/nuget/dt/Audit.EntityFramework.Core.svg)](https://www.nuget.org/packages/Audit.EntityFramework.Core/)
+
+
 To install the package run the following command on the Package Manager Console:
 
 ```
