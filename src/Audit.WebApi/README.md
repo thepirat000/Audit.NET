@@ -143,7 +143,6 @@ public class Startup
                 .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200));
         });
     }
-
 ```
 
 #### 3- Middleware
@@ -200,6 +199,40 @@ You can mix the **Audit Middleware** together with the **Global Action Filter** 
 - If an action is reached, the Action Filter will include specific MVC context info to the Audit Event.
 - Only one Audit Event is generated per request, regardless of an action being processed by the Middleware and multiple Action Filters.
 - The `AuditIgnore` attribute is handled by the Action Filters, there is no need to add the `AuditIgnoreActionFilter` to the MVC filters when using a mixed approach.
+
+Example of configuring both the Middleware and a Global Action Filter:
+
+```c#
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc(mvc =>
+        {
+            mvc.AddAuditFilter(config => config
+                .LogActionIf(d => d.ControllerName == "Orders" && d.ActionName != "GetOrder")
+                .WithEventType("{verb}.{controller}.{action}")
+                .IncludeHeaders()
+                .IncludeResponseHeaders()
+                .IncludeRequestBody()
+                .IncludeResponseBody(ctx => ctx.HttpContext.Response.StatusCode == 200));
+        });
+    }
+
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseAuditMiddleware(_ => _
+            .FilterByRequest(rq => !rq.Path.Value?.StartsWith("health-check") ?? false)
+            .WithEventType("{verb}:{url}")
+            .IncludeHeaders()
+            .IncludeResponseHeaders()
+            .IncludeRequestBody()
+            .IncludeResponseBody(ctx => ctx.Response.StatusCode == 200));
+    }
+}
+```
+
+This will log all requests via the Middleware, and for those requests that reach an MVC action, the Action Filter will add MVC-specific info to the Audit Event.
 
 ## Configuration
 
