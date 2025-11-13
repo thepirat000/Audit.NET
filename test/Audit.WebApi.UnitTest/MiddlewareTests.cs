@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_1 || NET6_0
+﻿#if NETCOREAPP3_1 || NET6_0_OR_GREATER
 using System.Net;
 using System.Threading.Tasks;
 using Audit.Core;
