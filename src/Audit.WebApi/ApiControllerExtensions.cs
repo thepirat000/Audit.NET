@@ -8,7 +8,6 @@ using System.Web;
 using System.Net.Http;
 #endif
 
-
 namespace Audit.WebApi
 {
     public static class ApiControllerExtensions
