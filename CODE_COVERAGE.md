@@ -2,17 +2,17 @@
 
 |||
 |:---|:---|
-| Generated on: | 10/24/2025 - 18:30:01 |
-| Coverage date: | 10/24/2025 - 18:06:04 - 10/24/2025 - 18:29:24 |
-| Parser: | MultiReport (96x Cobertura) |
+| Generated on: | 11/14/2025 - 01:37:25 |
+| Coverage date: | 11/14/2025 - 01:13:06 - 11/14/2025 - 01:36:42 |
+| Parser: | MultiReport (99x Cobertura) |
 | Assemblies: | 40 |
 | Classes: | 321 |
 | Files: | 275 |
-| **Line coverage:** | 89.3% (9351 of 10471) |
-| Covered lines: | 9351 |
-| Uncovered lines: | 1120 |
+| **Line coverage:** | 89.2% (9349 of 10471) |
+| Covered lines: | 9349 |
+| Uncovered lines: | 1122 |
 | Coverable lines: | 10471 |
-| Total lines: | 27171 |
+| Total lines: | 27170 |
 | **Branch coverage:** | 80.2% (3459 of 4311) |
 | Covered branches: | 3459 |
 | Total branches: | 4311 |
@@ -119,11 +119,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.HttpClient** | **202** | **5** | **207** | **604** | **97.5%** | **78** | **86** | **90.6%** |
@@ -359,8 +359,8 @@
 | Audit.Wcf.Client.AuditEventWcfClient | 0 | 1 | 1 | 12 | 0% | 0 | 0 |  |
 | Audit.Wcf.Client.AuditMessageInspector | 0 | 60 | 60 | 115 | 0% | 0 | 38 | 0% |
 | Audit.Wcf.Client.WcfClientAction | 0 | 10 | 10 | 50 | 0% | 0 | 0 |  |
-| **Audit.WebApi** | **249** | **83** | **332** | **1192** | **75%** | **135** | **212** | **63.6%** |
-| Audit.WebApi.ApiControllerExtensions | 4 | 0 | 4 | 92 | 100% | 0 | 0 |  |
+| **Audit.WebApi** | **249** | **83** | **332** | **1191** | **75%** | **135** | **212** | **63.6%** |
+| Audit.WebApi.ApiControllerExtensions | 4 | 0 | 4 | 91 | 100% | 0 | 0 |  |
 | Audit.WebApi.AuditApiAction | 21 | 2 | 23 | 74 | 91.3% | 0 | 0 |  |
 | Audit.WebApi.AuditApiAdapter | 126 | 2 | 128 | 250 | 98.4% | 85 | 106 | 80.1% |
 | Audit.WebApi.AuditApiAttribute | 30 | 3 | 33 | 133 | 90.9% | 14 | 18 | 77.7% |
@@ -372,8 +372,8 @@
 | Audit.WebApi.ConfigurationApi.AuditApiGlobalActionsSelector | 3 | 18 | 21 | 63 | 14.2% | 0 | 4 | 0% |
 | Audit.WebApi.ConfigurationApi.AuditApiGlobalConfigurator | 2 | 24 | 26 | 108 | 7.6% | 0 | 0 |  |
 | Audit.WebApi.ContextWrapper | 28 | 8 | 36 | 136 | 77.7% | 23 | 38 | 60.5% |
-| **Audit.WebApi.Core** | **456** | **32** | **488** | **1443** | **93.4%** | **232** | **284** | **81.6%** |
-| Audit.WebApi.ApiControllerExtensions | 6 | 0 | 6 | 92 | 100% | 0 | 0 |  |
+| **Audit.WebApi.Core** | **456** | **32** | **488** | **1442** | **93.4%** | **232** | **284** | **81.6%** |
+| Audit.WebApi.ApiControllerExtensions | 6 | 0 | 6 | 91 | 100% | 0 | 0 |  |
 | Audit.WebApi.AuditApiAction | 22 | 2 | 24 | 74 | 91.6% | 0 | 0 |  |
 | Audit.WebApi.AuditApiAdapter | 141 | 2 | 143 | 308 | 98.6% | 117 | 136 | 86% |
 | Audit.WebApi.AuditApiAttribute | 35 | 2 | 37 | 130 | 94.5% | 15 | 16 | 93.7% |
