@@ -527,8 +527,13 @@ namespace Audit.EntityFramework.Core.UnitTest
             var entity = new SourceEntity();
             var model = new RuntimeModel();  // EF Core metadata model
 
+#if EF_CORE_10_OR_GREATER
+            var entityType = new RuntimeEntityType("test",
+                typeof(SourceEntity), false, model, null, ChangeTrackingStrategy.ChangedNotifications, null, true, null, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0);
+#else
             var entityType = new RuntimeEntityType("test",
                 typeof(SourceEntity), false, model, null, null, ChangeTrackingStrategy.ChangedNotifications, null, true, null, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0);
+#endif
 
             var stateManagerMock = new Mock<IStateManager>();
 

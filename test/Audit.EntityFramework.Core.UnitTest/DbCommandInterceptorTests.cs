@@ -89,7 +89,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(inserted[0].CommandEvent.ConnectionId, Is.Not.Null);
             Assert.That(inserted[0].CommandEvent.ErrorMessage, Is.Null);
             Assert.IsFalse(inserted[0].CommandEvent.IsAsync);
-            Assert.That(inserted[0].CommandEvent.Parameters, Is.Null);
+            Assert.That(inserted[0].CommandEvent.Parameters, Is.Empty.Or.Null);
             Assert.That(inserted[0].CommandEvent.Result, Is.Null);
             Assert.That(inserted[0].CommandEvent.Success, Is.True);
             Assert.That(inserted[0].EventType, Is.EqualTo("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader"));
@@ -146,7 +146,7 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(inserted[0].CommandEvent.ConnectionId, Is.Not.Null);
             Assert.That(inserted[0].CommandEvent.ErrorMessage, Is.Null);
             Assert.That(inserted[0].CommandEvent.IsAsync, Is.True);
-            Assert.That(inserted[0].CommandEvent.Parameters, Is.Null);
+            Assert.That(inserted[0].CommandEvent.Parameters, Is.Empty.Or.Null);
             Assert.That(inserted[0].CommandEvent.Result, Is.Null);
             Assert.That(inserted[0].CommandEvent.Success, Is.True);
             Assert.That(inserted[0].EventType, Is.EqualTo("DbCommandInterceptContext:DbCommandIntercept:ExecuteReader"));

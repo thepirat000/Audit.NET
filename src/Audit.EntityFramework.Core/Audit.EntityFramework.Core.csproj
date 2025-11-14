@@ -5,7 +5,7 @@
 		<Copyright>Copyright 2016</Copyright>
 		<AssemblyTitle>Audit.EntityFramework.Core</AssemblyTitle>
 		<Authors>Federico Colombo</Authors>
-		<TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants);STRONG_NAME;EF_CORE</DefineConstants>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -39,6 +39,9 @@
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
 		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER;EF_CORE_9_OR_GREATER</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<DefineConstants>$(DefineConstants);EF_CORE_8;EF_CORE_5_OR_GREATER;EF_CORE_6_OR_GREATER;EF_CORE_7_OR_GREATER;EF_CORE_8_OR_GREATER;EF_CORE_9_OR_GREATER;EF_CORE_10_OR_GREATER</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -77,6 +80,10 @@
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
