@@ -19,7 +19,7 @@ With Audit.NET, you can generate detailed tracking information for executed oper
 [File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
 [SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md),
 [MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md),
-[GRPC Client]((https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Client/README.md),
+[GRPC Client](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Client/README.md),
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
 - [**Output extensions**](#data-providers-included) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
