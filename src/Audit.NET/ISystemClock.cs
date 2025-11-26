@@ -12,5 +12,11 @@ namespace Audit.Core
         /// </summary>
         /// <returns></returns>
         DateTime GetCurrentDateTime();
+
+        /// <summary>
+        /// Retrieves the current timestamp to be stored in the audit event.
+        /// </summary>
+        /// <returns></returns>
+        long GetCurrentTimestamp();
     }
 }

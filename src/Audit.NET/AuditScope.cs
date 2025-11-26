@@ -36,6 +36,11 @@ namespace Audit.Core
             
             _event.StartDate = _systemClock.GetCurrentDateTime();
 
+            if (options.IncludeTimestamps ?? Configuration.IncludeTimestamps)
+            {
+                _event.StartTimestamp = _systemClock.GetCurrentTimestamp();
+            }
+
             _event.Environment = GetEnvironmentInfo(options);
             
             if (options.StartActivityTrace ?? Configuration.StartActivityTrace)
@@ -473,7 +478,14 @@ namespace Audit.Core
                 _event.Environment.Exception = exception != null ? $"{exception.GetType().Name}: {exception.Message}" : null;
             }
             _event.EndDate = _systemClock.GetCurrentDateTime();
+
+            if (_event.StartTimestamp.HasValue)
+            {
+                _event.EndTimestamp = _systemClock.GetCurrentTimestamp();
+            }
+
             _event.Duration = Convert.ToInt32((_event.EndDate.Value - _event.StartDate).TotalMilliseconds);
+
             if (_targetGetter != null)
             {
                 _event.Target.New = _dataProvider.CloneValue(_targetGetter.Invoke(), _event);

@@ -50,10 +50,22 @@ namespace Audit.Core
         public DateTime StartDate { get; set; }
 
         /// <summary>
+        /// The timestamp when the event started
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public long? StartTimestamp { get; set; }
+
+        /// <summary>
         /// The date then the event finished
         /// </summary>
         public DateTime? EndDate { get; set; }
 
+        /// <summary>
+        /// The timestamp when the event finished
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public long? EndTimestamp { get; set; }
+        
         ///<summary>
         /// The duration of the operation in milliseconds.
         /// </summary>

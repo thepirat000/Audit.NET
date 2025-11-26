@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Audit.Core
 {
@@ -11,6 +12,12 @@ namespace Audit.Core
         public DateTime GetCurrentDateTime()
         {
             return DateTime.UtcNow;
+        }
+
+        /// <inheritdoc />
+        public long GetCurrentTimestamp()
+        {
+            return Stopwatch.GetTimestamp();
         }
     }
 }

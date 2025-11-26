@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -17,6 +18,28 @@ namespace Audit.UnitTest
         public void Setup()
         {
             Audit.Core.Configuration.Reset();
+        }
+
+        [Test]
+        public async Task AuditScope_Timestamp_IsIncluded()
+        {
+            AuditEvent auditEvent;
+            await using (var scope = await AuditScope.CreateAsync(new AuditScopeOptions()
+            {
+                DataProvider = new NullDataProvider(),
+                IncludeTimestamps = true
+            }))
+            {
+                await Task.Delay(5);
+                auditEvent = scope.Event;
+            }
+
+            var lastTimestamp = Stopwatch.GetTimestamp();
+
+            Assert.That(auditEvent.StartTimestamp, Is.Not.Null);
+            Assert.That(auditEvent.EndTimestamp, Is.Not.Null);
+            Assert.That(auditEvent.StartTimestamp, Is.LessThan(auditEvent.EndTimestamp));
+            Assert.That(auditEvent.EndTimestamp, Is.LessThanOrEqualTo(lastTimestamp));
         }
 
         [Test]

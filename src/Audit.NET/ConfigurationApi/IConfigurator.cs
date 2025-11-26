@@ -29,6 +29,12 @@ namespace Audit.Core.ConfigurationApi
         IConfigurator IncludeStackTrace(bool includeStackTrace = true);
 
         /// <summary>
+        /// Globally include timestamps in the audit events.
+        /// </summary>
+        /// <param name="includeTimestamps">A boolean value indicating whether to include timestamps.</param>
+        IConfigurator IncludeTimestamps(bool includeTimestamps = true);
+
+        /// <summary>
         /// Globally include the activity trace in the audit events.
         /// </summary>
         IConfigurator IncludeActivityTrace(bool includeActivityTrace = true);

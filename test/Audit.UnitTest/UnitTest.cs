@@ -336,6 +336,7 @@ namespace Audit.UnitTest
             Audit.Core.Configuration.SystemClock = new MyClock();
             var evs = new List<AuditEvent>();
             Audit.Core.Configuration.Setup()
+                .IncludeTimestamps()
                 .Use(x => x
                     .OnInsertAndReplace(ev =>
                     {
@@ -353,6 +354,7 @@ namespace Audit.UnitTest
             Assert.That(evs[0].Duration, Is.EqualTo(10000));
             Assert.That(evs[0].StartDate, Is.EqualTo(new DateTime(2020, 1, 1, 0, 0, 0)));
             Assert.That(evs[0].EndDate, Is.EqualTo(new DateTime(2020, 1, 1, 0, 0, 10)));
+            Assert.That(evs[0].StartTimestamp, Is.Not.Null.And.LessThan(evs[0].EndTimestamp));
         }
 
         [Test]

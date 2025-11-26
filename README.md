@@ -18,7 +18,8 @@ With Audit.NET, you can generate detailed tracking information for executed oper
 [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
 [File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
 [SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md),
-[MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md) 
+[MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md),
+[GRPC Client]((https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Client/README.md),
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
 - [**Output extensions**](#data-providers-included) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
@@ -360,7 +361,9 @@ Field Name | Type | Description
 **EventType** | string | User-defined string to group the events 
 **Environment** | [**Environment**](#environment-object) | Contains information about the execution environment 
 **StartDate** | DateTime | Date and time when the event has started 
+**StartTimestamp** | long | Timestamp in ticks when the event has started (only included when IncludeTimestamps is enabled)
 **EndDate** | DateTime | Date and time when the event has ended 
+**EndTimestamp** | long | Timestamp in ticks when the event has ended (only included when IncludeTimestamps is enabled)
 **Duration** | integer | Duration of the event in milliseconds 
 **Target** | [**Target**](#target-object) | User-defined tracked object 
 **Comments** | Array of strings | User-defined comments 
@@ -1071,6 +1074,7 @@ The following packages are extensions to log interactions with different systems
 <img src="https://i.imgur.com/hVMM5WF.png" alt="icon" width="90"/> | **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for **any class** without changing its code by using a proxy.
 <img src="https://i.imgur.com/wdVHFoc.png" alt="icon" width="90"/> | **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)** | Generate detailed audit logs for saving operations on **Entity Framework**, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 <img src="https://i.imgur.com/Fn4thn0.png" alt="icon" width="90"/> | **[Audit.FileSystem](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md)** | Generate audit logs by intercepting **file system** events via FileSystemWatcher.
+<img src="https://i.imgur.com/ulACobW.png" alt="icon" width="90" /> | **[Audit.Grpc.Client](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Client/README.md)** | Generate detailed client-side audit logs for every gRPC client call, including metadata, request/response payload and trailers, by configuring a provided Interceptor.
 <img src="https://i.imgur.com/8lV5DRk.png" alt="icon" width="90" /> | **[Audit.HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md)** | Generate detailed client-side audit logs for **HttpClient** REST calls, by configuring a provided message handler.
 <img src="https://i.imgur.com/ap6CeoG.png" alt="icon" width="90"/> | **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)** | Generate detailed audit logs by decorating **MVC** Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.
 <img src="https://i.imgur.com/GB2e52X.jpg" alt="icon" width="90"/> | **[Audit.SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md)** | Generate audit logs for **SignalR** and **SignalR Core** invocations by intercepting the hub processing

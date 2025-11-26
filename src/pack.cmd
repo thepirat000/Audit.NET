@@ -42,6 +42,7 @@ del "Audit.NET.OpenSearch\bin\release\*.nupkg"
 del "Audit.NET.AzureEventHubs\bin\release\*.nupkg"
 del "Audit.NET.ImmuDB\bin\release\*.nupkg"
 del "Audit.NET.Firestore\bin\release\*.nupkg"
+del "Audit.Grpc.Client\bin\release\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -90,6 +91,7 @@ dotnet pack "Audit.NET.OpenSearch/" -c Release
 dotnet pack "Audit.NET.AzureEventHubs/" -c Release
 dotnet pack "Audit.NET.ImmuDB/" -c Release
 dotnet pack "Audit.NET.Firestore/" -c Release
+dotnet pack "Audit.Grpc.Client/" -c Release
 
 type ..\Directory.Build.props
 

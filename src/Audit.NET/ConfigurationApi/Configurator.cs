@@ -32,6 +32,12 @@ namespace Audit.Core.ConfigurationApi
             return this;
         }
 
+        public IConfigurator IncludeTimestamps(bool includeTimestamps = true)
+        {
+            Configuration.IncludeTimestamps = includeTimestamps;
+            return this;
+        }
+
         public IConfigurator IncludeActivityTrace(bool includeActivityTrace = true)
         {
             Configuration.IncludeActivityTrace = includeActivityTrace;

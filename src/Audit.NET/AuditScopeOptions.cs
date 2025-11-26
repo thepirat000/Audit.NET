@@ -70,6 +70,11 @@ namespace Audit.Core
         public bool? IncludeStackTrace { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the audit event's environment should include the timestamps. When NULL, it will use the static Audit.Core.Configuration.IncludeTimestamps.
+        /// </summary>
+        public bool? IncludeTimestamps { get; set; }
+
+        /// <summary>
         /// Gets or sets the custom items to be included in the audit scope.
         /// </summary>
         public Dictionary<string, object> Items { get; set; } = new();

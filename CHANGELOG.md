@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.1.0] - 2025-11-26:
+- **Audit.Grpc.Client**: A new extension to audit gRPC client calls using interceptors.
+- **Audit.NET**: Adding IncludeTimestamps configuration to the AuditScopeOptions to optionally include start/end timestamps in the AuditEvent.
+
 ## [31.0.2] - 2025-10-01:
 - **Audit.NET**: Refactor custom action handling for thread safety. Replaced `Dictionary` with `ConcurrentDictionary` and `List` with `ConcurrentQueue` in `Configuration.cs` for storing custom actions. Removing explicit locking. (#769)
 

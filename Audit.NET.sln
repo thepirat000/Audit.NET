@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.32014.148
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E62475E8-0BE1-4464-BBD9-FD06CC546593}"
 EndProject
@@ -181,6 +181,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.ImmuDB.UnitTest", "test\Audit.ImmuDB.UnitTest\Audit.ImmuDB.UnitTest.csproj", "{5934D98E-8E30-12C5-CD1E-26B223F49A2B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.SignalR.UnitTest", "test\Audit.SignalR.UnitTest\Audit.SignalR.UnitTest.csproj", "{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.Grpc.Client", "src\Audit.Grpc.Client\Audit.Grpc.Client.csproj", "{80800E6D-FEC8-79F4-161D-770A05DBC337}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audit.Grpc.Client.UnitTest", "test\Audit.Grpc.Client.UnitTest\Audit.Grpc.Client.UnitTest.csproj", "{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -790,6 +794,22 @@ Global
 		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|x64.ActiveCfg = Release|Any CPU
 		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC}.Release|x64.Build.0 = Release|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Debug|x64.Build.0 = Debug|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Release|x64.ActiveCfg = Release|Any CPU
+		{80800E6D-FEC8-79F4-161D-770A05DBC337}.Release|x64.Build.0 = Release|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Debug|x64.Build.0 = Debug|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Release|x64.ActiveCfg = Release|Any CPU
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -872,6 +892,8 @@ Global
 		{D945A16C-FE55-8916-F9D8-DD371D15D0CF} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
 		{5934D98E-8E30-12C5-CD1E-26B223F49A2B} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 		{BA65F0A6-C6B7-2C76-1D84-D34985795CDC} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
+		{80800E6D-FEC8-79F4-161D-770A05DBC337} = {E62475E8-0BE1-4464-BBD9-FD06CC546593}
+		{5FC6D00D-253B-6BD8-2FF1-6A7B8178562D} = {A54B4BB6-3439-432B-AFD9-FE62D6528D42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1989475-43D6-4AA5-9717-6DBF734B0C6E}
