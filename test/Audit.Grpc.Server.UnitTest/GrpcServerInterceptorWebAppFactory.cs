@@ -31,7 +31,7 @@ public class GrpcServerInterceptorWebAppFactory : WebApplicationFactory<Program>
                     .AuditDataProvider(DataProvider)
                     .IncludeRequestHeaders()
                     .IncludeRequestPayload()
-                    .IncludeResponsePayload(ctx => ctx.GetServerCallAction().MethodType == "Unary")
+                    .IncludeResponsePayload()
                     .IncludeTrailers()
                 ));
 
