@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 namespace Audit.Grpc.Client;
 
 /// <summary>
-/// Wrapper for gRPC server stream reader to capture received messages
+/// Wrapper for gRPC server stream reader to capture received messages on the client
 /// </summary>
-internal class ServerStreamWriterWrapper<T> : IAsyncStreamReader<T> where T : class
+internal class ServerStreamReaderWrapper<T> : IAsyncStreamReader<T> where T : class
 {
     private readonly IAsyncStreamReader<T> _inner;
     private readonly Task<IAuditScope> _auditScopeCreationTask;
     private readonly bool _includeResponse;
     private IAuditScope _auditScope = null;
 
-    public ServerStreamWriterWrapper(IAsyncStreamReader<T> inner, Task<IAuditScope> auditScopeCreationTask, bool includeResponse)
+    public ServerStreamReaderWrapper(IAsyncStreamReader<T> inner, Task<IAuditScope> auditScopeCreationTask, bool includeResponse)
     {
         _inner = inner;
         _auditScopeCreationTask = auditScopeCreationTask;

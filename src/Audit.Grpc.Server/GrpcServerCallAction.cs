@@ -1,17 +1,17 @@
 ﻿using Audit.Core;
 
-using Grpc.Core;
-
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Grpc.Core;
 
-namespace Audit.Grpc.Client;
+namespace Audit.Grpc.Server;
+
 
 /// <summary>
-/// Represents an audited gRPC client call action.
+/// Represents an audited gRPC server call action.
 /// </summary>
-public class GrpcClientCallAction : IAuditOutput
+public class GrpcServerCallAction : IAuditOutput
 {
     /// <summary>
     /// Gets the type of the method. "Unary", "ClientStreaming", "ServerStreaming" or "DuplexStreaming".
@@ -19,24 +19,9 @@ public class GrpcClientCallAction : IAuditOutput
     public string MethodType { get; set; }
 
     /// <summary>
-    /// Gets the name of the service to which this method belongs.
-    /// </summary>
-    public string ServiceName { get; set; }
-
-    /// <summary>
     /// Gets the unqualified name of the method.
     /// </summary>
     public string MethodName { get; set; }
-
-    /// <summary>
-    /// Fully qualified name of the method. 
-    /// </summary>
-    public string FullName { get; set; }
-
-    /// <summary>
-    /// Host that the current invocation will be dispatched to.
-    /// </summary>
-    public string Host { get; set; }
 
     /// <summary>
     /// Call deadline.
@@ -49,44 +34,9 @@ public class GrpcClientCallAction : IAuditOutput
     public List<GrpcMetadata> RequestHeaders { get; set; }
 
     /// <summary>
-    /// Response headers metadata.
-    /// </summary>
-    public List<GrpcMetadata> ResponseHeaders { get; set; }
-
-    /// <summary>
     /// Call trailing metadata.
     /// </summary>
     public List<GrpcMetadata> Trailers { get; set; }
-
-    /// <summary>
-    /// Type of the request message.
-    /// </summary>
-    public string RequestType { get; set; }
-
-    /// <summary>
-    /// Type of the response message.
-    /// </summary>
-    public string ResponseType { get; set; }
-
-    /// <summary>
-    /// Request message
-    /// </summary>
-    public object Request { get; set; }
-
-    /// <summary>
-    /// Request stream messages in case of streaming calls.
-    /// </summary>
-    public List<object> RequestStream { get; set; }
-
-    /// <summary>
-    /// Response message
-    /// </summary>
-    public object Response { get; set; }
-
-    /// <summary>
-    /// Response stream messages in case of streaming calls.
-    /// </summary>
-    public List<object> ResponseStream { get; set; }
     
     /// <summary>
     /// Exception message in case of failure.
@@ -108,20 +58,35 @@ public class GrpcClientCallAction : IAuditOutput
     /// </summary>
     public string StatusDetail { get; set; }
 
-    [JsonIgnore]
-    internal CallContext CallContext { get; set; }
+    public string Peer { get; set; }
+    public string Host { get; set; }
+    public object Request { get; set; }
+    public object Response { get; set; }
 
     /// <summary>
-    /// Gets the CallContext related to this action
+    /// Request stream messages in case of streaming calls.
     /// </summary>
-    public CallContext GetCallContext()
+    public List<object> RequestStream { get; set; }
+
+    /// <summary>
+    /// Response stream messages in case of streaming calls.
+    /// </summary>
+    public List<object> ResponseStream { get; set; }
+
+    [JsonIgnore]
+    internal ServerCallContext ServerCallContext { get; set; }
+
+    /// <summary>
+    /// Gets the ServerCallContext related to this action
+    /// </summary>
+    public ServerCallContext GetServerCallContext()
     {
-        return CallContext;
+        return ServerCallContext;
     }
 
     [JsonExtensionData]
     public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
-
+    
     public string ToJson()
     {
         return Configuration.JsonAdapter.Serialize(this);

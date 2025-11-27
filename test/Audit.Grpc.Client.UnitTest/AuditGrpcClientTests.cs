@@ -40,6 +40,12 @@ public class AuditGrpcClientTests
     {
         Configuration.Reset();
         Configuration.DataProvider = new InMemoryDataProvider();
+        Configuration.AddOnSavingAction(scope =>
+        {
+            var action = scope.GetClientCallAction();
+
+            action.CustomFields["TraceId"] = Guid.NewGuid();
+        });
     }
 
     [Test]
@@ -91,6 +97,8 @@ public class AuditGrpcClientTests
         // Response headers and trailers are not captured in blocking calls
         Assert.That(action.ResponseHeaders, Is.Null);
         Assert.That(action.Trailers, Is.Null);
+        Assert.That(action.CustomFields, Does.ContainKey("TraceId"));
+        Assert.That(action.CustomFields["TraceId"], Is.TypeOf<Guid>());
     }
 
     [Test]

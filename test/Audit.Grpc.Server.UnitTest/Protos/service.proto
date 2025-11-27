@@ -1,0 +1,54 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TestGrpcService.Protos";
+
+package demo;
+
+// Messages
+message SimpleRequest {
+  string message = 1;
+}
+
+message SimpleResponse {
+  string reply = 1;
+}
+
+message StreamRequest {
+  int32 number = 1;
+  string name = 2;
+}
+
+message StreamResponse {
+  int32 result = 1;
+}
+
+// For client-streaming
+message SumRequest {
+  int32 value = 1;
+  string name = 2;
+}
+
+message SumResponse {
+  int32 sum = 1;
+}
+
+// For bidirectional streaming
+message ChatMessage {
+  string from = 1;
+  string text = 2;
+}
+
+// Service definition
+service DemoService {
+  // Unary
+  rpc UnaryCall(SimpleRequest) returns (SimpleResponse);
+
+  // Server streaming
+  rpc ServerStream(StreamRequest) returns (stream StreamResponse);
+
+  // Client streaming
+  rpc ClientStream(stream SumRequest) returns (SumResponse);
+
+  // Bidirectional streaming
+  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+}

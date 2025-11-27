@@ -9,13 +9,13 @@ namespace Audit.Grpc.Client;
 internal class ClientStreamWriterWrapper<T> : IClientStreamWriter<T> where T : class
 {
     private readonly IClientStreamWriter<T> _inner;
-    private readonly GrpcClientCallAction _call;
+    private readonly GrpcClientCallAction _action;
 
-    public ClientStreamWriterWrapper(IClientStreamWriter<T> inner, GrpcClientCallAction call)
+    public ClientStreamWriterWrapper(IClientStreamWriter<T> inner, GrpcClientCallAction action)
     {
         _inner = inner;
-        _call = call;
-        _call.RequestStream = [];
+        _action = action;
+        _action.RequestStream = [];
     }
 
     public WriteOptions WriteOptions
@@ -26,7 +26,7 @@ internal class ClientStreamWriterWrapper<T> : IClientStreamWriter<T> where T : c
 
     public async Task WriteAsync(T message)
     {
-        _call.RequestStream.Add(message);
+        _action.RequestStream.Add(message);
 
         await _inner.WriteAsync(message);
     }

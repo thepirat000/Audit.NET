@@ -302,7 +302,7 @@ public class AuditClientInterceptor : Interceptor
 
         var includeResponse = IncludeResponsePayload?.Invoke(CallContext.From(context)) == true;
 
-        var wrappedRequestStream = new ServerStreamWriterWrapper<TResponse>(call.ResponseStream, auditScopeTask, includeResponse);
+        var wrappedRequestStream = new ServerStreamReaderWrapper<TResponse>(call.ResponseStream, auditScopeTask, includeResponse);
 
         return new AsyncServerStreamingCall<TResponse>(
             wrappedRequestStream,
@@ -348,7 +348,7 @@ public class AuditClientInterceptor : Interceptor
 
         var includeResponse = IncludeResponsePayload?.Invoke(CallContext.From(context)) == true;
 
-        var responseStream = new ServerStreamWriterWrapper<TResponse>(call.ResponseStream, auditScopeTask, includeResponse);
+        var responseStream = new ServerStreamReaderWrapper<TResponse>(call.ResponseStream, auditScopeTask, includeResponse);
         
         return new AsyncDuplexStreamingCall<TRequest, TResponse>(
             requestStream,
@@ -485,10 +485,11 @@ public class AuditClientInterceptor : Interceptor
         return auditScope;
     }
 
-
     private AuditEventGrpcClient CreateGrpcClientAuditEvent<TRequest, TResponse>(TRequest request,
         ClientInterceptorContext<TRequest, TResponse> context) where TRequest : class where TResponse : class
     {
+        var callContext = CallContext.From(context);
+
         var action = new GrpcClientCallAction
         {
             MethodType = context.Method.Type.ToString(),
@@ -498,12 +499,12 @@ public class AuditClientInterceptor : Interceptor
             Host = context.Host,
             RequestType = typeof(TRequest).FullName,
             ResponseType = typeof(TResponse).FullName,
-            Deadline = context.Options.Deadline
+            Deadline = context.Options.Deadline,
+
+            CallContext = callContext
         };
-
-        var methodContext = CallContext.From(context);
-
-        if (context.Options.Headers != null && IncludeRequestHeaders?.Invoke(methodContext) == true)
+        
+        if (context.Options.Headers != null && IncludeRequestHeaders?.Invoke(callContext) == true)
         {
             action.RequestHeaders = [];
 
@@ -519,14 +520,14 @@ public class AuditClientInterceptor : Interceptor
             }
         }
 
-        if (IncludeRequestPayload?.Invoke(methodContext) == true)
+        if (IncludeRequestPayload?.Invoke(callContext) == true)
         {
             action.Request = request;
         }
 
-        var eventType = (EventTypeName?.Invoke(methodContext) ?? "/{service}/{method}")
-            .Replace("{service}", methodContext.Method.ServiceName)
-            .Replace("{method}", methodContext.Method.Name);
+        var eventType = (EventTypeName?.Invoke(callContext) ?? "/{service}/{method}")
+            .Replace("{service}", callContext.Method.ServiceName)
+            .Replace("{method}", callContext.Method.Name);
 
         var auditEvent = new AuditEventGrpcClient()
         {
