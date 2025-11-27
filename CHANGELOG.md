@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.2.0] - 2025-11-27:
+- **Audit.Grpc.Server**: A new extension to audit gRPC server calls using interceptors.
+
 ## [31.1.0] - 2025-11-26:
 - **Audit.Grpc.Client**: A new extension to audit gRPC client calls using interceptors.
 - **Audit.NET**: Adding IncludeTimestamps configuration to the AuditScopeOptions to optionally include start/end timestamps in the AuditEvent.
