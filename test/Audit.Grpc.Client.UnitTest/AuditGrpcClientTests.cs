@@ -574,7 +574,7 @@ public class AuditGrpcClientTests
 
         var dp = new InMemoryDataProvider();
         var interceptor = new AuditClientInterceptor(config);
-        interceptor.DataProvider = dp;
+        interceptor.DataProvider = _ => dp;
         interceptor.EventCreationPolicy = creationPolicy;
 
         var channel = _factory.CreateGrpcChannel();

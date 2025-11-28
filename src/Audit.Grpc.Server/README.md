@@ -46,57 +46,70 @@ public void ConfigureServices(IServiceCollection services)
 
 Note The CallFilter in the example above restricts auditing to methods in the `demo.DemoService` service only. Also, response payloads are captured only for unary methods.
 
-## Configuring the interceptor
+## Configuration
+
+### Output
+
+The Audit Events generated are stored via a _Data Provider_. You can either use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own.
+
+The Audit Data Provider can be configured in several ways:
+
+- When creating or registering the `interceptor` instance by setting the `AuditDataProvider` setting.
+  For example:
+```c#
+// Register interceptor 
+```
+
+- Globally, by setting the `AuditDataProvider` instance through the `Audit.Core.Configuration.DataProvider` static property or the `Audit.Core.Configuration.Use()` methods.
+
+  For example:
+```c#
+Audit.Core.Configuration.Setup().UseSqlServer(sql => sql...);
+```
+
+### Settings
 
 Use the constructor overload accepting a configuration action that receives `IAuditServerInterceptorConfigurator`. 
 
 Available options:
 
-- `CallFilter(Func<CallContext, bool>)`: decide which calls to audit (default: audit all).
-- `IncludeRequestHeaders(bool|Func<CallContext,bool>)`: include incoming request metadata headers.
-- `IncludeTrailers(bool|Func<CallContext,bool>)`: include trailing metadata written by the server.
-- `IncludeRequestPayload(bool|Func<CallContext,bool>)`: include request message payload (or stream items).
-- `IncludeResponsePayload(bool|Func<CallContext,bool>)`: include response message payload (or stream items).
-- `EventType(string|Func<CallContext,string>)`: customize event type; placeholders: `{method}`. Default: `"{method}"`.
-- `CreationPolicy(EventCreationPolicy)`: override event creation policy for this interceptor.
-- `AuditDataProvider(IAuditDataProvider)`: override data provider for events created by this interceptor.
-- `AuditScopeFactory(IAuditScopeFactory)`: override the scope factory used to create `AuditScope`.
+- `CallFilter(Func<CallContext, bool>)`: filter which calls to audit; return `true` to audit the call, `false` to skip it. Default: audit all calls.
+- `IncludeRequestHeaders(bool|Func<CallContext,bool>)`: include request metadata headers. Default: `false`.
+- `IncludeTrailers(bool|Func<CallContext,bool>)`: include trailing metadata sent by the server. Default: `false`.
+- `IncludeRequestPayload(bool|Func<CallContext,bool>)`: include request message payload (or stream items). Default: `false`. 
+- `IncludeResponsePayload(bool|Func<CallContext,bool>)`: include response message payload (or stream items). Default: `false`.
+- `EventType(string|Func<CallContext,string>)`: customize event type. Placeholders: `{method}` replaced by the gRPC method full name (e.g., `"/package.Service/Method"`). Default is `"{method}"`.
+- `CreationPolicy(EventCreationPolicy)`: Set event creation policy for this interceptor (overrides global setting). Default: uses global setting.
+- `AuditDataProvider(IAuditDataProvider|Func<CallContext,IAuditDataProvider>))`: override the data provider used to persist events. Default: uses the globally configured `IAuditDataProvider` in `Audit.Core.Configuration`.
+- `AuditScopeFactory(IAuditScopeFactory)`: Override the audit scope factory used to create audit scopes. Default: uses the globally configured `IAuditScopeFactory` in `Audit.Core.Configuration`.
 
 The same properties can be set directly on the `AuditServerInterceptor` instance (`CallFilter`, `IncludeRequestHeaders`, etc.).
 
-## What is captured (Output model)
+## Output
 
-Events produced are of type `AuditEventGrpcServer` (inherits `Audit.Core.AuditEvent`) and contain an `Action` of type `GrpcServerCallAction`. Key fields include:
+Audit Events produced are of type `AuditEventGrpcServer` (inherits `Audit.Core.AuditEvent`) and contain an `Action` of type `GrpcServerCallAction`. 
 
-- `MethodType`: `"Unary"`, `"ClientStreaming"`, `"ServerStreaming"`, `"DuplexStreaming"`.
-- `Method`: fully qualified method name.
-- `Peer`: caller peer/endpoint (e.g., `"ipv4:127.0.0.1:12345"`), when available.
-- `Deadline`: call deadline (if provided).
-- `RequestHeaders`: list of metadata entries (`GrpcMetadata`).
-- `Trailers`: trailing metadata (`GrpcMetadata`) sent by the server.
-- `Request`: request message for unary calls (when enabled).
-- `RequestStream`: captured messages received in client or duplex streaming (list).
-- `Response`: response message for unary or client-streaming response types.
-- `ResponseStream`: captured messages written by the server in server or duplex streaming (list).
-- `Exception`: exception details on failure.
-- `IsSuccess`: indicates success (derived from `Status`).
+Fields included:
+
+- `MethodType`: gRPC method type (`Unary`, `ClientStreaming`, `ServerStreaming`, `DuplexStreaming`).
+- `Method`: Fully qualified method name.
+- `Peer`: Caller peer address (e.g., `"ipv4:127.0.0.1:12345"`).
+- `Deadline`: Call deadline, when available.
+- `RequestHeaders`: Request Header metadata (`GrpcMetadata` list), when enabled. 
+- `Trailers`: Trailing metadata sent by the server (`GrpcMetadata` list), when enabled. 
+- `Request`: Request message for unary or server-streaming request types.
+- `RequestStream`: Captured messages read by the server in client or duplex streaming (list), when enabled.
+- `Response`: Response message for unary or client-streaming response types.
+- `ResponseStream`: Captured messages written by the server in server or duplex streaming (list), when enabled.
+- `Exception`: Exception details on failure.
+- `IsSuccess`: Indicates success (true/false).
 - `StatusCode` / `StatusDetail`: gRPC `Status` details.
 
 `GrpcMetadata` contains:
-- `Key`: metadata key.
-- `Value`: string value (for non-binary entries).
+- `Key`: Metadata key.
+- `Value`: String value (for non-binary entries).
 - `ValueBytes`: byte[] for binary entries.
-- `IsBinary`: whether the entry is binary.
-
-Streaming calls are wrapped to capture individual messages:
-- Client-side request reads are captured into `RequestStream` via `ClientStreamReaderWrapper<T>`.
-- Server-side response writes are captured into `ResponseStream` via `ServerStreamWriterWrapper<T>`.
-
-## Event creation lifecycle
-
-The interceptor uses `AuditScope` to persist events. By default it uses the globally configured `AuditScopeFactory` and `IAuditDataProvider`. You can override them using the configurator or by setting `AuditServerInterceptor.DataProvider` / `AuditServerInterceptor.AuditScopeFactory` directly.
-
-`EventCreationPolicy` controls when events are inserted/updated (e.g., `InsertOnStartInsertOnEnd`, `InsertOnStartReplaceOnEnd`, etc.). If not set, the global policy applies.
+- `IsBinary`: Whether the entry is binary.
 
 ## Output sample
 
@@ -135,6 +148,12 @@ A simplified sample event (unary call):
 
 A streaming call will include `RequestStream` and/or `ResponseStream` arrays with the captured messages if payload capture is enabled.
 
+## Event creation lifecycle
+
+The interceptor uses `AuditScope` to persist events. By default it uses the globally configured `AuditScopeFactory` and `IAuditDataProvider`. You can override them using the configurator or by setting `AuditServerInterceptor.DataProvider` / `AuditServerInterceptor.AuditScopeFactory` directly.
+
+`EventCreationPolicy` controls when events are inserted/updated (e.g., `InsertOnStartInsertOnEnd`, `InsertOnStartReplaceOnEnd`, etc.). If not set, the global policy applies.
+
 ## Custom Action example 
 
 This is an example showing how to enrich `GrpcServerCallAction` with a custom action to add fields during interception. 
@@ -158,3 +177,4 @@ Audit.Core.Configuration.AddOnSavingAction(scope =>
 - Large binary payloads and sensitive data: be careful when enabling payload and metadata capture in production. Use `CallFilter` and predicate-based includes to limit captured data.
 - Respects the global `Configuration.AuditDisabled` flag. If set to `true` no events are produced.
 - Response headers and trailers are captured on server for asynchronous and streaming pipelines. 
+- Blocking unary calls will not capture metadata (headers/trailers) since they are not exposed in the synchronous API. Only calls to asynchronous methods will include headers/trailers on the audit event.

@@ -13,7 +13,7 @@ public class AuditServerInterceptorConfigurator : IAuditServerInterceptorConfigu
     internal Func<ServerCallContext, bool> _includeResponse;
     internal Func<ServerCallContext, string> _eventTypeName;
     internal EventCreationPolicy? _eventCreationPolicy;
-    internal IAuditDataProvider _auditDataProvider;
+    internal Func<ServerCallContext, IAuditDataProvider> _auditDataProvider;
     internal IAuditScopeFactory _auditScopeFactory;
 
     public IAuditServerInterceptorConfigurator CallFilter(Func<ServerCallContext, bool> callPredicate)
@@ -90,7 +90,13 @@ public class AuditServerInterceptorConfigurator : IAuditServerInterceptorConfigu
 
     public IAuditServerInterceptorConfigurator AuditDataProvider(IAuditDataProvider auditDataProvider)
     {
-        _auditDataProvider = auditDataProvider;
+        _auditDataProvider = _ => auditDataProvider;
+        return this;
+    }
+
+    public IAuditServerInterceptorConfigurator AuditDataProvider(Func<ServerCallContext, IAuditDataProvider> auditDataProviderPredicate)
+    {
+        _auditDataProvider = auditDataProviderPredicate;
         return this;
     }
 

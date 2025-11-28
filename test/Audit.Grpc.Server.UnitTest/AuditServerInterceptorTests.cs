@@ -60,7 +60,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeResponsePayload = _ => true,
                 IncludeRequestHeaders = _ => true,
                 IncludeTrailers = _ => true
@@ -96,7 +96,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestHeaders = _ => true,
                 IncludeTrailers = _ => true
             };
@@ -128,7 +128,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 EventCreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 CallFilter = _ => false
             };
@@ -159,7 +159,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestPayload = _ => true,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true,
@@ -205,7 +205,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestPayload = _ => true,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true,
@@ -245,7 +245,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true,
                 IncludeRequestHeaders = _ => true
@@ -288,7 +288,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true,
                 IncludeRequestHeaders = _ => true,
@@ -326,7 +326,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestPayload = _ => true,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true
@@ -376,7 +376,7 @@ namespace Audit.Grpc.Server.UnitTest
 
             var interceptor = new AuditServerInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestPayload = _ => true,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true,

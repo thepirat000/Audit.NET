@@ -24,12 +24,12 @@ namespace Audit.Grpc.Client.UnitTest
         {
             var dp = new InMemoryDataProvider();
 
-            var interceptor = new AuditClientInterceptor()
-            {
-                DataProvider = dp,
-                IncludeResponsePayload = _ => true,
-                IncludeRequestHeaders = _ => true
-            };
+            var interceptor = new AuditClientInterceptor(c => c
+                .AuditDataProvider(dp)
+                .IncludeResponsePayload()
+                .IncludeRequestHeaders()
+                .IncludeResponseHeaders(false)
+            );
 
             var ctx = CreateContext();
             
@@ -61,13 +61,12 @@ namespace Audit.Grpc.Client.UnitTest
         public void AsyncUnaryCall_AuditDisabled_DoNotAudit()
         {
             var dp = new InMemoryDataProvider();
-            
-            var interceptor = new AuditClientInterceptor()
-            {
-                DataProvider = dp,
-                EventCreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
-                CallFilter = ctx => ctx.Method.Type == MethodType.ServerStreaming
-            };
+
+            var interceptor = new AuditClientInterceptor(c => c
+                .AuditDataProvider(dp)
+                .CreationPolicy(EventCreationPolicy.InsertOnStartInsertOnEnd)
+                .CallFilter(ctx => ctx.Method.Type == MethodType.ServerStreaming)
+            );
 
             var ctx = CreateContext(null, null, MethodType.DuplexStreaming);
             var call = new AsyncUnaryCall<string>(Task.FromResult("test"), Task.FromResult(new Metadata()), () => new Status(StatusCode.Unknown, "err"), () => new Metadata(), () => { });
@@ -136,11 +135,9 @@ namespace Audit.Grpc.Client.UnitTest
         {
             var dp = new InMemoryDataProvider();
 
-            var interceptor = new AuditClientInterceptor()
-            {
-                DataProvider = dp,
-                IncludeResponsePayload = _ => true
-            };
+            var interceptor = new AuditClientInterceptor(c => c
+                .AuditDataProvider(dp)
+                .IncludeResponsePayload());
 
             var ctx = CreateContext();
 
@@ -186,7 +183,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 EventCreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 CallFilter = ctx => ctx.Method.Type == MethodType.ServerStreaming
             };
@@ -210,7 +207,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeResponsePayload = _ => true,
                 IncludeResponseHeaders = _ => true,
                 IncludeRequestHeaders = _ => true,
@@ -266,7 +263,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestPayload = _ => true,
                 IncludeResponsePayload = _ => true,
                 IncludeResponseHeaders = _ => true,
@@ -324,7 +321,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 EventCreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 CallFilter = ctx => ctx.Method.Type == MethodType.ServerStreaming
             };
@@ -354,7 +351,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeResponsePayload = _ => true,
                 IncludeTrailers = _ => true,
                 IncludeResponseHeaders = _ => true
@@ -409,7 +406,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 EventCreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 CallFilter = ctx => ctx.Method.Type == MethodType.ServerStreaming
             };
@@ -438,7 +435,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeResponsePayload = _ => true
             };
 
@@ -487,7 +484,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 IncludeRequestPayload = _ => true,
                 IncludeResponsePayload = _ => true,
                 IncludeResponseHeaders = _ => true,
@@ -550,7 +547,7 @@ namespace Audit.Grpc.Client.UnitTest
 
             var interceptor = new AuditClientInterceptor()
             {
-                DataProvider = dp,
+                DataProvider = _ => dp,
                 EventCreationPolicy = EventCreationPolicy.InsertOnStartInsertOnEnd,
                 CallFilter = ctx => ctx.Method.Type == MethodType.ServerStreaming
             };

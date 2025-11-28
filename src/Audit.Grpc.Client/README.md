@@ -56,20 +56,51 @@ services
       .IncludeResponsePayload()));
 ```
 
-## Configuring the interceptor
+## Configuration
 
-You can use the constructor overload accepting a configuration action that receives `IAuditClientInterceptorConfigurator`. Examples of available options:
+### Output
 
-- `CallFilter(Func<CallContext, bool>)`: decide which calls to audit (default: audit all).
-- `IncludeRequestHeaders(bool|Func<CallContext,bool>)`: include request metadata headers.
-- `IncludeResponseHeaders(bool|Func<CallContext,bool>)`: include response headers.
-- `IncludeTrailers(bool|Func<CallContext,bool>)`: include trailing metadata.
-- `IncludeRequestPayload(bool|Func<CallContext,bool>)`: include request message payload.
-- `IncludeResponsePayload(bool|Func<CallContext,bool>)`: include response message payload.
-- `EventType(string|Func<CallContext,string>)`: customize event type; placeholders: `{service}`, `{method}`. Default: `"/{service}/{method}"`.
-- `CreationPolicy(EventCreationPolicy)`: override event creation policy for this interceptor.
-- `AuditDataProvider(IAuditDataProvider)`: override data provider for events created by this interceptor.
-- `AuditScopeFactory(IAuditScopeFactory)`: override the scope factory used to create `AuditScope`.
+The Audit Events are stored via a _Data Provider_. You can either use one of the [available data providers](https://github.com/thepirat000/Audit.NET#data-providers-included) or implement your own.
+
+The Audit Data Provider can be configured in several ways:
+
+- When creating or registering the `interceptor` instance by setting the `AuditDataProvider` setting.
+  For example:
+```c#
+var dataProvider = new FirestoreDataProvider(firestore => firestore
+  .ProjectId("my-project-id")
+  .Collection("AuditEvents"));
+
+services
+  .AddGrpcClient<MyGrpcService.MyGrpcServiceClient>()
+  .AddInterceptor(_ => new AuditClientInterceptor(cfg => cfg
+    .AuditDataProvider(dataProvider)
+    .IncludeRequestHeaders()));
+```
+
+- Globally, by setting the `AuditDataProvider` instance through the `Audit.Core.Configuration.DataProvider` static property or the `Audit.Core.Configuration.Use()` methods.
+
+  For example:
+```c#
+Audit.Core.Configuration.Setup().UseSqlServer(sql => sql...);
+```
+
+### Settings
+
+Use the constructor overload accepting a configuration action that receives `IAuditServerInterceptorConfigurator`. 
+
+Available options:
+
+- `CallFilter(Func<CallContext, bool>)`: Filter which calls to audit; return `true` to audit the call, `false` to skip it. Default: audit all calls.
+- `IncludeRequestHeaders(bool|Func<CallContext,bool>)`: Include request headers. Default: `false`.
+- `IncludeResponseHeaders(bool|Func<CallContext,bool>)`: Include response headers. Default: `false`.
+- `IncludeTrailers(bool|Func<CallContext,bool>)`: Include trailing metadata. Default: `false`.
+- `IncludeRequestPayload(bool|Func<CallContext,bool>)`: Include request message payload. Default: `false`.
+- `IncludeResponsePayload(bool|Func<CallContext,bool>)`: Include response message payload. Default: `false`.
+- `EventType(string|Func<CallContext,string>)`: Customize event type; placeholders: `{service}`, `{method}`. Default: `"/{service}/{method}"`.
+- `CreationPolicy(EventCreationPolicy)`: Set event creation policy for this interceptor (overrides global setting). Default: uses global setting. 
+- `AuditDataProvider(IAuditDataProvider|Func<CallContext,IAuditDataProvider>)`: Override the data provider used to persist events. Default: uses the globally configured `IAuditDataProvider` in `Audit.Core.Configuration`.
+- `AuditScopeFactory(IAuditScopeFactory)`: Override the audit scope factory used to create audit scopes. Default: uses the globally configured `IAuditScopeFactory` in `Audit.Core.Configuration`.
 
 Example using the configurator fluent API:
 
@@ -82,46 +113,37 @@ var interceptor = new Audit.Grpc.Client.AuditClientInterceptor(cfg => cfg
   .CreationPolicy(EventCreationPolicy.InsertOnEnd));
 ```
 
-
 You can also set the same properties directly on the `AuditClientInterceptor` instance (properties like `CallFilter`, `IncludeRequestHeaders`, etc. are exposed).
 
-## What is captured (Output model)
+## Output
 
-Events produced are of type `AuditEventGrpcClient` (inherits `Audit.Core.AuditEvent`) and contain an `Action` of type `GrpcClientCallAction`. The key fields available:
+Events produced are of type `AuditEventGrpcClient` (inherits `Audit.Core.AuditEvent`) and contain an `Action` of type `GrpcClientCallAction`. 
 
-- `MethodType`:  `"Unary"`, `"ClientStreaming"`, `"ServerStreaming"`, or `"DuplexStreaming"`.
-- `ServiceName`:  service name (unqualified).
-- `MethodName`:  method name (unqualified).
-- `FullName`:  fully qualified method name.
-- `Host`:  target host used by the call.
-- `Deadline`:  call deadline (if provided).
-- `RequestHeaders`:  list of metadata entries (`GrpcMetadata`).
-- `ResponseHeaders`:  list of metadata entries (`GrpcMetadata`).
-- `Trailers`:  trailing metadata (`GrpcMetadata`).
-- `RequestType` / `ResponseType`:  CLR type names for request/response.
-- `Request`:  request message (populated if `IncludeRequestPayload`).
-- `RequestStream`:  captured messages sent by client streaming (list).
-- `Response`:  response message for unary or client-streaming response types.
-- `ResponseStream`:  captured messages received in server streaming (list).
-- `Exception`:  exception details on failure.
-- `IsSuccess`:  indicates success (derived from `Status`).
+Fields included:
+
+- `MethodType`: gRPC method type (`Unary`, `ClientStreaming`, `ServerStreaming`, `DuplexStreaming`).
+- `ServiceName`: Service name (unqualified).
+- `MethodName`: Method name (unqualified).
+- `FullName`: Full method name (e.g., `"/package.Service/Method"`).
+- `Host`: Target host.
+- `Deadline`:  Call deadline (if provided).
+- `RequestHeaders`: Request Header metadata (`GrpcMetadata` list), when enabled.  
+- `ResponseHeaders`: Response Header metadata (`GrpcMetadata`), when enabled.
+- `Trailers`: Trailing metadata sent by the server (`GrpcMetadata` list), when enabled.
+- `RequestType` / `ResponseType`: CLR type names of request/response messages. 
+- `Request`: Request message (populated if `IncludeRequestPayload`).
+- `RequestStream`: Captured messages sent by client streaming (populated if `IncludeRequestPayload`).
+- `Response`: Response message (populated if `IncludeResponsePayload`).
+- `ResponseStream`: Captured messages received by server streaming (populated if `IncludeResponsePayload`).
+- `Exception`: Exception details on failure.
+- `IsSuccess`: Indicates success (true/false).
 - `StatusCode` / `StatusDetail`:  gRPC `Status` details.
 
 `GrpcMetadata` contains:
-- `Key`:  metadata key.
-- `Value`:  string value (for non-binary entries).
-- `ValueBytes`:  byte[] for binary entries.
-- `IsBinary`:  whether the entry is binary.
-
-Streaming calls are wrapped to capture individual messages:
-- Client-side streaming writes are captured into `RequestStream` via `ClientStreamWriterWrapper<T>`.
-- Server-side response reads are captured into `ResponseStream` via `ServerStreamWriterWrapper<T>`.
-
-## Event creation lifecycle
-
-The interceptor uses `AuditScope` creation to persist events. By default it uses the globally configured `AuditScopeFactory` and `IAuditDataProvider`. You can override them using the configurator or by setting `AuditClientInterceptor.DataProvider` / `AuditClientInterceptor.AuditScopeFactory` directly.
-
-`EventCreationPolicy` can be set to control when events are inserted/updated (e.g., `InsertOnStartInsertOnEnd`, `InsertOnStartReplaceOnEnd`, etc.). If not set, the global creation policy applies.
+- `Key`: Metadata key.
+- `Value`: String value (for non-binary entries).
+- `ValueBytes`: byte[] for binary entries.
+- `IsBinary`: Whether the entry is binary.
 
 ## Output sample
 
@@ -168,8 +190,13 @@ A simplified sample event (unary call):
 }
 ```
 
-
 A streaming call will include `RequestStream` and/or `ResponseStream` arrays with the captured messages if payload capture is enabled.
+
+## Event creation lifecycle
+
+The interceptor uses `AuditScope` creation to persist events. By default it uses the globally configured `AuditScopeFactory` and `IAuditDataProvider`. You can override them using the configurator or by setting `AuditClientInterceptor.DataProvider` / `AuditClientInterceptor.AuditScopeFactory` directly.
+
+`EventCreationPolicy` can be set to control when events are inserted/updated (e.g., `InsertOnStartInsertOnEnd`, `InsertOnStartReplaceOnEnd`, etc.). If not set, the global creation policy applies.
 
 ## Notes and compatibility
 

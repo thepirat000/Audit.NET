@@ -62,7 +62,7 @@ public class AuditClientInterceptor : Interceptor
     /// <summary>
     /// The audit data provider to use. Default is NULL to use the globally configured data provider.
     /// </summary>
-    public IAuditDataProvider DataProvider { get; set; }
+    public Func<CallContext, IAuditDataProvider> DataProvider { get; set; }
 
     /// <summary>
     /// The Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
@@ -120,7 +120,7 @@ public class AuditClientInterceptor : Interceptor
 
         var action = auditEvent.Action;
 
-        using var auditScope = CreateAuditScope(auditEvent);
+        using var auditScope = CreateAuditScope(auditEvent, context);
 
         try
         {
@@ -160,7 +160,7 @@ public class AuditClientInterceptor : Interceptor
 
         var auditEvent = CreateGrpcClientAuditEvent(request, context);
 
-        var auditScopeTask = CreateAuditScopeAsync(auditEvent);
+        var auditScopeTask = CreateAuditScopeAsync(auditEvent, context);
 
         var call = continuation(request, context);
         
@@ -227,7 +227,7 @@ public class AuditClientInterceptor : Interceptor
 
         var auditEvent = CreateGrpcClientAuditEvent(null, context);
 
-        var auditScopeTask = CreateAuditScopeAsync(auditEvent);
+        var auditScopeTask = CreateAuditScopeAsync(auditEvent, context);
 
         var call = continuation(context);
 
@@ -296,7 +296,7 @@ public class AuditClientInterceptor : Interceptor
 
         var auditEvent = CreateGrpcClientAuditEvent(request, context);
 
-        var auditScopeTask = CreateAuditScopeAsync(auditEvent);
+        var auditScopeTask = CreateAuditScopeAsync(auditEvent, context);
 
         var call = continuation(request, context);
 
@@ -338,7 +338,7 @@ public class AuditClientInterceptor : Interceptor
         }
 
         var auditEvent = CreateGrpcClientAuditEvent(null, context);
-        var auditScopeTask = CreateAuditScopeAsync(auditEvent);
+        var auditScopeTask = CreateAuditScopeAsync(auditEvent, context);
 
         var call = continuation(context);
 
@@ -457,7 +457,9 @@ public class AuditClientInterceptor : Interceptor
         return !CallFilter.Invoke(CallContext.From(context));
     }
 
-    protected virtual IAuditScope CreateAuditScope(AuditEvent auditEvent)
+    protected virtual IAuditScope CreateAuditScope<TRequest, TResponse>(AuditEvent auditEvent, ClientInterceptorContext<TRequest, TResponse> context)
+        where TRequest : class
+        where TResponse : class
     {
         var auditScopeFactory = AuditScopeFactory ?? Configuration.AuditScopeFactory;
 
@@ -465,13 +467,15 @@ public class AuditClientInterceptor : Interceptor
         {
             AuditEvent = auditEvent,
             CreationPolicy = EventCreationPolicy,
-            DataProvider = DataProvider
+            DataProvider = DataProvider?.Invoke(CallContext.From(context))
         });
 
         return auditScope;
     }
 
-    protected virtual Task<IAuditScope> CreateAuditScopeAsync(AuditEvent auditEvent)
+    protected virtual Task<IAuditScope> CreateAuditScopeAsync<TRequest, TResponse>(AuditEvent auditEvent, ClientInterceptorContext<TRequest, TResponse> context)
+        where TRequest : class
+        where TResponse : class
     {
         var auditScopeFactory = AuditScopeFactory ?? Configuration.AuditScopeFactory;
 
@@ -479,7 +483,7 @@ public class AuditClientInterceptor : Interceptor
         {
             AuditEvent = auditEvent,
             CreationPolicy = EventCreationPolicy,
-            DataProvider = DataProvider
+            DataProvider = DataProvider?.Invoke(CallContext.From(context))
         });
 
         return auditScope;

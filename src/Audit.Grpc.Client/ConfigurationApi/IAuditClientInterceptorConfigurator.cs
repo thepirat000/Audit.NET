@@ -80,6 +80,12 @@ public interface IAuditClientInterceptorConfigurator
     IAuditClientInterceptorConfigurator AuditDataProvider(IAuditDataProvider auditDataProvider);
 
     /// <summary>
+    /// Specifies a predicate to determine the audit data provider to use. Default is NULL to use the globally configured data provider.
+    /// </summary>
+    /// <param name="auditDataProviderPredicate">Predicate that receives the CallContext and returns the IAuditDataProvider to use.</param>
+    IAuditClientInterceptorConfigurator AuditDataProvider(Func<CallContext, IAuditDataProvider> auditDataProviderPredicate);
+
+    /// <summary>
     /// Specifies the Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
     /// </summary>
     IAuditClientInterceptorConfigurator AuditScopeFactory(IAuditScopeFactory auditScopeFactory);

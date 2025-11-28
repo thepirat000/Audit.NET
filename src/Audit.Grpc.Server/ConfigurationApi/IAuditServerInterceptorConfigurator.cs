@@ -76,6 +76,12 @@ public interface IAuditServerInterceptorConfigurator
     IAuditServerInterceptorConfigurator AuditDataProvider(IAuditDataProvider auditDataProvider);
 
     /// <summary>
+    /// Specifies a predicate to determine the audit data provider to use for audit scopes created by this interceptor.
+    /// </summary>
+    /// <param name="auditDataProviderPredicate">The predicate function that returns the <see cref="IAuditDataProvider"/> instance to use.</param>
+    IAuditServerInterceptorConfigurator AuditDataProvider(Func<ServerCallContext, IAuditDataProvider> auditDataProviderPredicate);
+
+    /// <summary>
     /// Specifies the Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
     /// </summary>
     /// <remarks>

@@ -57,7 +57,7 @@ public class AuditServerInterceptor : Interceptor
     /// <summary>
     /// The audit data provider to use. Default is NULL to use the globally configured data provider.
     /// </summary>
-    public IAuditDataProvider DataProvider { get; set; }
+    public Func<ServerCallContext, IAuditDataProvider> DataProvider { get; set; }
 
     /// <summary>
     /// The Audit Scope factory to use. Default is NULL to use the default AuditScopeFactory.
@@ -320,7 +320,7 @@ public class AuditServerInterceptor : Interceptor
         {
             AuditEvent = auditEvent,
             CreationPolicy = EventCreationPolicy,
-            DataProvider = DataProvider
+            DataProvider = DataProvider?.Invoke(context)
         });
 
         return auditScope;

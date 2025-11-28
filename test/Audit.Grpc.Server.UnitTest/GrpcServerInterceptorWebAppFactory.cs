@@ -28,7 +28,7 @@ public class GrpcServerInterceptorWebAppFactory : WebApplicationFactory<Program>
             services.AddSingleton(_ =>
                 new AuditServerInterceptor(cfg => cfg
                     .CallFilter(_ => true)
-                    .AuditDataProvider(DataProvider)
+                    .AuditDataProvider(_ => DataProvider)
                     .IncludeRequestHeaders()
                     .IncludeRequestPayload()
                     .IncludeResponsePayload()
