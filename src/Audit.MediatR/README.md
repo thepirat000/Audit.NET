@@ -77,16 +77,15 @@ builder.Services.AddTransient<IPipelineBehavior<LoginRequest, LoginResponse>>(_ 
 
 ## Configuration
 
-Configuration is set via the `AuditMediatROptions` class. There is a fluent helper `AuditMediatRConfigurator` to facilitate configuration creation.
+Configuration is set via the `AuditMediatROptions` class. 
 
 For example:
 ```c#
-var options = new AuditMediatRConfigurator()
+var options = new AuditMediatROptions(c => c
   .CallFilter(ctx => ctx.CallType == MediatRCallType.Request)
   .DataProvider(new FileDataProvider(file => file.Directory(@"C:\LOGS")))
   .IncludeRequest()
-  .IncludeResponse()
-  .Options;
+  .IncludeResponse());
 ```
 
 Or you can create the configuration object directly:

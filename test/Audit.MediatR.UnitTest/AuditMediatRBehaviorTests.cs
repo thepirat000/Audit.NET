@@ -49,14 +49,13 @@ public class AuditMediatRBehaviorTests
     [Test]
     public void OptionsConstructor_Sets_Options()
     {
-        var options = new AuditMediatRConfigurator()
+        var options = new AuditMediatROptions(c => c
             .IncludeRequest()
             .IncludeResponse()
             .DataProvider(new InMemoryDataProvider())
             .AuditScopeFactory(new AuditScopeFactory())
             .CallFilter(_ => true)
-            .EventCreationPolicy(EventCreationPolicy.Manual)
-            .Options;
+            .EventCreationPolicy(EventCreationPolicy.Manual));
 
         var behavior = new AuditMediatRBehavior<PingRequest, PongResponse>(options);
 

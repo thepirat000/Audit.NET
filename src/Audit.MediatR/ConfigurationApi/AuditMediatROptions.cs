@@ -29,6 +29,29 @@ namespace Audit.MediatR.ConfigurationApi;
 /// </remarks>
 public class AuditMediatROptions
 {
+    public AuditMediatROptions()
+    {
+    }
+
+    public AuditMediatROptions(Action<IAuditMediatRConfigurator> configure)
+    {
+        if (configure == null)
+        {
+            return;
+        }
+
+        var cfg = new AuditMediatRConfigurator();
+        configure(cfg);
+
+        var o = cfg.Options;
+        CallFilter = o.CallFilter;
+        IncludeRequest = o.IncludeRequest;
+        IncludeResponse = o.IncludeResponse;
+        EventCreationPolicy = o.EventCreationPolicy;
+        DataProvider = o.DataProvider;
+        AuditScopeFactory = o.AuditScopeFactory;
+    }
+
     /// <summary>
     /// A filter to determine whether a MediatR call should be audited or not. Default is NULL to audit all calls.
     /// </summary>
