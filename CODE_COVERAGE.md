@@ -2,20 +2,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 11/27/2025 - 04:05:41 |
-| Coverage date: | 11/27/2025 - 03:40:38 - 11/27/2025 - 04:04:54 |
+| Generated on: | 11/28/2025 - 23:23:34 |
+| Coverage date: | 11/28/2025 - 22:57:54 - 11/28/2025 - 23:22:44 |
 | Parser: | MultiReport (107x Cobertura) |
 | Assemblies: | 42 |
 | Classes: | 339 |
 | Files: | 293 |
-| **Line coverage:** | 89.4% (9914 of 11081) |
-| Covered lines: | 9914 |
+| **Line coverage:** | 89.4% (9918 of 11085) |
+| Covered lines: | 9918 |
 | Uncovered lines: | 1167 |
-| Coverable lines: | 11081 |
-| Total lines: | 28978 |
-| **Branch coverage:** | 80.1% (3628 of 4527) |
-| Covered branches: | 3628 |
-| Total branches: | 4527 |
+| Coverable lines: | 11085 |
+| Total lines: | 28995 |
+| **Branch coverage:** | 80.1% (3631 of 4533) |
+| Covered branches: | 3631 |
+| Total branches: | 4533 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 # Risk Hotspots
@@ -119,29 +119,29 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
-| **Audit.Grpc.Client** | **314** | **21** | **335** | **988** | **93.7%** | **91** | **110** | **82.7%** |
-| Audit.Grpc.Client.AuditClientInterceptor | 237 | 0 | 237 | 543 | 100% | 79 | 96 | 82.2% |
+| **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
+| Audit.Grpc.Client.AuditClientInterceptor | 237 | 0 | 237 | 547 | 100% | 81 | 100 | 81% |
 | Audit.Grpc.Client.AuditEventExtensions | 3 | 1 | 4 | 30 | 75% | 2 | 4 | 50% |
 | Audit.Grpc.Client.AuditEventGrpcClient | 1 | 0 | 1 | 14 | 100% | 0 | 0 |  |
 | Audit.Grpc.Client.CallContext | 3 | 0 | 3 | 30 | 100% | 0 | 0 |  |
 | Audit.Grpc.Client.ClientStreamWriterWrapper<T> | 9 | 2 | 11 | 38 | 81.8% | 0 | 0 |  |
-| Audit.Grpc.Client.ConfigurationApi.AuditClientInterceptorConfigurator | 16 | 16 | 32 | 114 | 50% | 0 | 0 |  |
+| Audit.Grpc.Client.ConfigurationApi.AuditClientInterceptorConfigurator | 18 | 16 | 34 | 121 | 52.9% | 0 | 0 |  |
 | Audit.Grpc.Client.GrpcClientCallAction | 21 | 2 | 23 | 129 | 91.3% | 0 | 0 |  |
 | Audit.Grpc.Client.GrpcMetadata | 4 | 0 | 4 | 27 | 100% | 0 | 0 |  |
 | Audit.Grpc.Client.ServerStreamReaderWrapper<T> | 20 | 0 | 20 | 63 | 100% | 10 | 10 | 100% |
-| **Audit.Grpc.Server** | **240** | **24** | **264** | **773** | **90.9%** | **72** | **100** | **72%** |
+| **Audit.Grpc.Server** | **240** | **26** | **266** | **779** | **90.2%** | **73** | **102** | **71.5%** |
 | Audit.Grpc.Server.AuditEventExtensions | 3 | 1 | 4 | 30 | 75% | 2 | 4 | 50% |
 | Audit.Grpc.Server.AuditEventGrpcServer | 1 | 0 | 1 | 14 | 100% | 0 | 0 |  |
-| Audit.Grpc.Server.AuditServerInterceptor | 178 | 0 | 178 | 392 | 100% | 68 | 88 | 77.2% |
+| Audit.Grpc.Server.AuditServerInterceptor | 178 | 0 | 178 | 392 | 100% | 69 | 90 | 76.6% |
 | Audit.Grpc.Server.ClientStreamReaderWrapper<T> | 12 | 4 | 16 | 51 | 75% | 2 | 2 | 100% |
-| Audit.Grpc.Server.ConfigurationApi.AuditServerInterceptorConfigurator | 16 | 12 | 28 | 102 | 57.1% | 0 | 0 |  |
+| Audit.Grpc.Server.ConfigurationApi.AuditServerInterceptorConfigurator | 16 | 14 | 30 | 108 | 53.3% | 0 | 0 |  |
 | Audit.Grpc.Server.GrpcMetadata | 4 | 0 | 4 | 27 | 100% | 0 | 0 |  |
 | Audit.Grpc.Server.GrpcServerCallAction | 18 | 1 | 19 | 94 | 94.7% | 0 | 0 |  |
 | Audit.Grpc.Server.ServerStreamWriterWrapper<T> | 8 | 2 | 10 | 34 | 80% | 0 | 0 |  |
