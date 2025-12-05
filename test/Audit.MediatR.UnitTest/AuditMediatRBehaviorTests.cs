@@ -49,11 +49,14 @@ public class AuditMediatRBehaviorTests
     [Test]
     public void OptionsConstructor_Sets_Options()
     {
-        var options = new AuditMediatROptions
-        {
-            IncludeRequest = _ => true,
-            IncludeResponse = _ => true
-        };
+        var options = new AuditMediatRConfigurator()
+            .IncludeRequest()
+            .IncludeResponse()
+            .DataProvider(new InMemoryDataProvider())
+            .AuditScopeFactory(new AuditScopeFactory())
+            .CallFilter(_ => true)
+            .EventCreationPolicy(EventCreationPolicy.Manual)
+            .Options;
 
         var behavior = new AuditMediatRBehavior<PingRequest, PongResponse>(options);
 

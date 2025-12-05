@@ -52,10 +52,14 @@ public class AuditMediatRStreamBehaviorTests
     [Test]
     public void OptionsConstructor_Sets_Options()
     {
-        var options = new AuditMediatROptions
-        {
-            IncludeRequest = _ => true
-        };
+        var options = new AuditMediatRConfigurator()
+            .IncludeRequest(_ => true)
+            .IncludeResponse(_ => true)
+            .DataProvider(_ => new InMemoryDataProvider())
+            .AuditScopeFactory(new AuditScopeFactory())
+            .CallFilter(_ => true)
+            .EventCreationPolicy(EventCreationPolicy.Manual)
+            .Options;
 
         var behavior = new AuditMediatRStreamBehavior<StreamPingRequest, StreamPong>(options);
 
