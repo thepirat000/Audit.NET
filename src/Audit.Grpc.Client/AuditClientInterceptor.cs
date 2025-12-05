@@ -501,8 +501,8 @@ public class AuditClientInterceptor : Interceptor
             FullName = context.Method.FullName,
             ServiceName = context.Method.ServiceName,
             Host = context.Host,
-            RequestType = typeof(TRequest).FullName,
-            ResponseType = typeof(TResponse).FullName,
+            RequestType = typeof(TRequest).GetFullTypeName(),
+            ResponseType = typeof(TResponse).GetFullTypeName(),
             Deadline = context.Options.Deadline,
 
             CallContext = callContext

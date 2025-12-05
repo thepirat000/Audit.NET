@@ -88,8 +88,8 @@ public class AuditGrpcClientTests
         Assert.That(action.Request, Is.TypeOf<SimpleRequest>());
         Assert.That((action.Request as SimpleRequest)?.Message, Is.EqualTo(testMessage));
         Assert.That(action.MethodName, Is.EqualTo(nameof(TestDemoService.UnaryCall)));
-        Assert.That(action.RequestType, Is.EqualTo(typeof(SimpleRequest).FullName));
-        Assert.That(action.ResponseType, Is.EqualTo(typeof(SimpleResponse).FullName));
+        Assert.That(action.RequestType, Is.EqualTo(typeof(SimpleRequest).GetFullTypeName()));
+        Assert.That(action.ResponseType, Is.EqualTo(typeof(SimpleResponse).GetFullTypeName()));
         Assert.That(action.Response, Is.TypeOf<SimpleResponse>());
         Assert.That((action.Response as SimpleResponse)?.Reply, Is.EqualTo(expectedResponse));
         Assert.That(action.StatusCode, Is.EqualTo("OK"));
@@ -141,8 +141,8 @@ public class AuditGrpcClientTests
         Assert.That(action.Request, Is.TypeOf<SimpleRequest>());
         Assert.That((action.Request as SimpleRequest)?.Message, Is.EqualTo(testMessage));
         Assert.That(action.MethodName, Is.EqualTo(nameof(TestDemoService.UnaryCall)));
-        Assert.That(action.RequestType, Is.EqualTo(typeof(SimpleRequest).FullName));
-        Assert.That(action.ResponseType, Is.EqualTo(typeof(SimpleResponse).FullName));
+        Assert.That(action.RequestType, Is.EqualTo(typeof(SimpleRequest).GetFullTypeName()));
+        Assert.That(action.ResponseType, Is.EqualTo(typeof(SimpleResponse).GetFullTypeName()));
         Assert.That(action.Response, Is.TypeOf<SimpleResponse>());
         Assert.That((action.Response as SimpleResponse)?.Reply, Is.EqualTo(expectedResponse));
         Assert.That(action.StatusCode, Is.EqualTo("OK"));
@@ -234,8 +234,8 @@ public class AuditGrpcClientTests
         Assert.That(action.FullName, Is.EqualTo("/demo.DemoService/ClientStream"));
         Assert.That(action.MethodType, Is.EqualTo("ClientStreaming"));
         Assert.That(action.MethodName, Is.EqualTo(nameof(TestDemoService.ClientStream)));
-        Assert.That(action.RequestType, Is.EqualTo(typeof(SumRequest).FullName));
-        Assert.That(action.ResponseType, Is.EqualTo(typeof(SumResponse).FullName));
+        Assert.That(action.RequestType, Is.EqualTo(typeof(SumRequest).GetFullTypeName()));
+        Assert.That(action.ResponseType, Is.EqualTo(typeof(SumResponse).GetFullTypeName()));
         Assert.That(action.Response, Is.TypeOf<SumResponse>());
         Assert.That((action.Response as SumResponse)?.Sum, Is.EqualTo(6));
         Assert.That(action.StatusCode, Is.EqualTo("OK"));
@@ -356,8 +356,8 @@ public class AuditGrpcClientTests
         Assert.That(action.FullName, Is.EqualTo("/demo.DemoService/ServerStream"));
         Assert.That(action.MethodType, Is.EqualTo("ServerStreaming"));
         Assert.That(action.MethodName, Is.EqualTo(nameof(TestDemoService.ServerStream)));
-        Assert.That(action.RequestType, Is.EqualTo(typeof(StreamRequest).FullName));
-        Assert.That(action.ResponseType, Is.EqualTo(typeof(StreamResponse).FullName));
+        Assert.That(action.RequestType, Is.EqualTo(typeof(StreamRequest).GetFullTypeName()));
+        Assert.That(action.ResponseType, Is.EqualTo(typeof(StreamResponse).GetFullTypeName()));
         Assert.That(action.StatusCode, Is.EqualTo("OK"));
         Assert.That(action.StatusDetail, Is.EqualTo(""));
         Assert.That(action.ServiceName, Is.EqualTo("demo.DemoService"));
@@ -481,8 +481,8 @@ public class AuditGrpcClientTests
         Assert.That(action.FullName, Is.EqualTo("/demo.DemoService/Chat"));
         Assert.That(action.MethodType, Is.EqualTo("DuplexStreaming"));
         Assert.That(action.MethodName, Is.EqualTo(nameof(TestDemoService.Chat)));
-        Assert.That(action.RequestType, Is.EqualTo(typeof(ChatMessage).FullName));
-        Assert.That(action.ResponseType, Is.EqualTo(typeof(ChatMessage).FullName));
+        Assert.That(action.RequestType, Is.EqualTo(typeof(ChatMessage).GetFullTypeName()));
+        Assert.That(action.ResponseType, Is.EqualTo(typeof(ChatMessage).GetFullTypeName()));
         Assert.That(action.ServiceName, Is.EqualTo("demo.DemoService"));
 
         // Request stream captured

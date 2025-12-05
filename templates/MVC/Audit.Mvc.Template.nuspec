@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Audit.Mvc.Template</id>
-    <version>1.0.0</version>
-    <description>Audited MVC</description>
+    <version>2.0.0</version>
+    <description>Audit-enabled ASP.NET Core MVC template using Audit.NET</description>
     <authors>Federico Colombo</authors>
     <packageTypes>
       <packageType name="Template" />

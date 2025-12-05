@@ -3,6 +3,10 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.3.0] - 2025-12-04:
+- **Audit.MediatR**: A new extension to audit MediatR requests and streams using pipeline behaviors.
+- **Audit.Grpc.Client** and **Audit.Grpc.Server**: Added predicate-based `AuditDataProvider` configuration in the interceptors `AuditClientInterceptor` and `AuditServerInterceptor` to support setting the AuditDataProvier as a Function of the Call Context. 
+
 ## [31.2.0] - 2025-11-27:
 - **Audit.Grpc.Server**: A new extension to audit gRPC server calls using interceptors.
 

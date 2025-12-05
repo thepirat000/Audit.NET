@@ -2,7 +2,8 @@
 <package>
 	<metadata>
 		<id>Audit.WebApi.Template</id>
-		<version>8.0.0</version>
+		<version>9.0.0</version>
+		<description>Audit-enabled ASP.NET Core Web API template using Audit.NET</description>
 		<title>Audited AspNetCore Web API</title>
 		<authors>Federico Colombo</authors>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
