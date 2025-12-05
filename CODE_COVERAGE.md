@@ -2,20 +2,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 12/05/2025 - 03:52:31 |
-| Coverage date: | 12/05/2025 - 03:27:34 - 12/05/2025 - 03:51:44 |
+| Generated on: | 12/05/2025 - 05:11:43 |
+| Coverage date: | 12/05/2025 - 04:46:06 - 12/05/2025 - 05:10:50 |
 | Parser: | MultiReport (111x Cobertura) |
 | Assemblies: | 43 |
 | Classes: | 350 |
 | Files: | 304 |
-| **Line coverage:** | 89.5% (10081 of 11262) |
-| Covered lines: | 10081 |
-| Uncovered lines: | 1181 |
-| Coverable lines: | 11262 |
-| Total lines: | 29699 |
-| **Branch coverage:** | 79.9% (3671 of 4589) |
-| Covered branches: | 3671 |
-| Total branches: | 4589 |
+| **Line coverage:** | 89.6% (10107 of 11277) |
+| Covered lines: | 10107 |
+| Uncovered lines: | 1170 |
+| Coverable lines: | 11277 |
+| Total lines: | 29722 |
+| **Branch coverage:** | 80% (3676 of 4591) |
+| Covered branches: | 3676 |
+| Total branches: | 4591 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 # Risk Hotspots
@@ -119,11 +119,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
@@ -157,15 +157,15 @@
 | Audit.Http.HttpClientBuilderAuditExtensions | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.Http.Request | 6 | 0 | 6 | 16 | 100% | 0 | 0 |  |
 | Audit.Http.Response | 6 | 0 | 6 | 14 | 100% | 0 | 0 |  |
-| **Audit.MediatR** | **163** | **14** | **177** | **704** | **92%** | **40** | **56** | **71.4%** |
+| **Audit.MediatR** | **191** | **1** | **192** | **727** | **99.4%** | **45** | **58** | **77.5%** |
 | Audit.MediatR.AuditAsyncEnumerable<T> | 29 | 0 | 29 | 95 | 100% | 8 | 10 | 80% |
 | Audit.MediatR.AuditBehaviorBase<T1, T2> | 14 | 0 | 14 | 45 | 100% | 7 | 8 | 87.5% |
-| Audit.MediatR.AuditEventExtensions | 0 | 4 | 4 | 29 | 0% | 0 | 4 | 0% |
+| Audit.MediatR.AuditEventExtensions | 4 | 0 | 4 | 29 | 100% | 4 | 4 | 100% |
 | Audit.MediatR.AuditEventMediatR | 1 | 0 | 1 | 14 | 100% | 0 | 0 |  |
 | Audit.MediatR.AuditMediatRBehavior<T1, T2> | 35 | 0 | 35 | 93 | 100% | 16 | 22 | 72.7% |
 | Audit.MediatR.AuditMediatRStreamBehavior<T1, T2> | 33 | 0 | 33 | 82 | 100% | 9 | 12 | 75% |
-| Audit.MediatR.ConfigurationApi.AuditMediatRConfigurator | 9 | 10 | 19 | 67 | 47.3% | 0 | 0 |  |
-| Audit.MediatR.ConfigurationApi.AuditMediatROptions | 6 | 0 | 6 | 61 | 100% | 0 | 0 |  |
+| Audit.MediatR.ConfigurationApi.AuditMediatRConfigurator | 19 | 0 | 19 | 67 | 100% | 0 | 0 |  |
+| Audit.MediatR.ConfigurationApi.AuditMediatROptions | 20 | 1 | 21 | 84 | 95.2% | 1 | 2 | 50% |
 | Audit.MediatR.MediatRCallAction | 12 | 0 | 12 | 87 | 100% | 0 | 0 |  |
 | Audit.MediatR.MediatRCallContext | 10 | 0 | 10 | 55 | 100% | 0 | 0 |  |
 | Audit.MediatR.ServiceCollectionExtensions | 14 | 0 | 14 | 76 | 100% | 0 | 0 |  |
