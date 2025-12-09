@@ -42,7 +42,8 @@ public class AuditMediatRBehaviorTests
         Assert.Multiple(() =>
         {
             Assert.That(behavior, Is.Not.Null);
-            Assert.That(behavior.Options, Is.Null); 
+            Assert.That(behavior.Options, Is.Not.Null);
+            Assert.That(behavior.Options.DataProvider, Is.Null);
         });
     }
 
