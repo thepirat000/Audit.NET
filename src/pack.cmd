@@ -45,6 +45,7 @@ del "Audit.NET.Firestore\bin\release\*.nupkg"
 del "Audit.Grpc.Client\bin\release\*.nupkg"
 del "Audit.Grpc.Server\bin\release\*.nupkg"
 del "Audit.MediatR\bin\release\*.nupkg"
+del "Audit.Hangfire\bin\release\*.nupkg"
 
 copy ..\docs\Audit.NET.snk .\StrongName\Audit.NET.snk /Y
 
@@ -96,6 +97,7 @@ dotnet pack "Audit.NET.Firestore/" -c Release
 dotnet pack "Audit.Grpc.Client/" -c Release
 dotnet pack "Audit.Grpc.Server/" -c Release
 dotnet pack "Audit.MediatR/" -c Release
+dotnet pack "Audit.Hangfire/" -c Release
 
 type ..\Directory.Build.props
 

@@ -22,6 +22,7 @@ With Audit.NET, you can generate detailed tracking information for executed oper
 [gRPC Client](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Client/README.md),
 [gRPC Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Server/README.md),
 [MediatR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MediatR/README.md),
+[Hangfire](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Hangfire/README.md),
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
 - [**Output extensions**](#data-providers-included) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
@@ -1078,6 +1079,7 @@ The following packages are extensions to log interactions with different systems
 <img src="https://i.imgur.com/Fn4thn0.png" alt="icon" width="90"/> | **[Audit.FileSystem](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md)** | Generate audit logs by intercepting **file system** events via FileSystemWatcher.
 <img src="https://i.imgur.com/ulACobW.png" alt="icon" width="90" /> | **[Audit.Grpc.Client](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Client/README.md)** | Generate detailed client-side audit logs for every gRPC client call, including metadata, request/response payload and trailers, by configuring a provided Interceptor.
 <img src="https://i.imgur.com/ulACobW.png" alt="icon" width="90" /> | **[Audit.Grpc.Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Server/README.md)** | Generate detailed server-side audit logs for every gRPC call, including metadata, request/response payload and trailers, by configuring a provided Interceptor.
+<img src="https://i.imgur.com/ulACobW.png" alt="icon" width="90" /> | **[Audit.Hangfire](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Hangfire/README.md)** | Generate detailed audit logs for **Hangfire** background jobs (client/server) by configuring a provided filter attribute.
 <img src="https://i.imgur.com/8lV5DRk.png" alt="icon" width="90" /> | **[Audit.HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md)** | Generate detailed client-side audit logs for **HttpClient** REST calls, by configuring a provided message handler.
 <img src="https://i.imgur.com/ulACobW.png" alt="icon" width="90" /> | **[Audit.MediatR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MediatR/README.md)** | Generate detailed audit logs for **MediatR** requests by configuring a provided pipeline behavior.
 <img src="https://i.imgur.com/ap6CeoG.png" alt="icon" width="90"/> | **[Audit.MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md)** | Generate detailed audit logs by decorating **MVC** Actions and Controllers with an action filter attribute. Includes support for ASP.NET Core MVC.

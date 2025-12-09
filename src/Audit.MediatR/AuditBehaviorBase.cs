@@ -9,7 +9,7 @@ namespace Audit.MediatR;
 /// </summary>
 public abstract class AuditBehaviorBase<TRequest, TResponse>
 {
-    public AuditMediatROptions Options { get; set; }
+    public AuditMediatROptions Options { get; set; } = new();
 
     protected internal abstract MediatRCallType CallType { get; }
 
@@ -17,9 +17,14 @@ public abstract class AuditBehaviorBase<TRequest, TResponse>
     {
         var auditScopeFactory = Options.AuditScopeFactory ?? Core.Configuration.AuditScopeFactory;
 
+        var eventType = (Options.EventType?.Invoke(callContext) ?? "{requestType}:{responseType}")
+            .Replace("{requestType}", callContext.RequestType.Name)
+            .Replace("{responseType}", callContext.ResponseType.Name);
+
         var auditScope = auditScopeFactory.CreateAsync(new AuditScopeOptions
         {
             AuditEvent = auditEvent,
+            EventType = eventType,
             CreationPolicy = Options.EventCreationPolicy,
             DataProvider = Options.DataProvider?.Invoke(callContext)
         });

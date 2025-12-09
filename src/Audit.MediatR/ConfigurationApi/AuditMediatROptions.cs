@@ -58,6 +58,13 @@ public class AuditMediatROptions
     public Func<MediatRCallContext, bool> CallFilter { get; set; }
 
     /// <summary>
+    /// Delegate that returns the event type string to set in the <see cref="AuditEvent.EventType"/> field.
+    /// Supports placeholders: {requestType} (request type name) and {responseType} (response type name).
+    /// Default is "{requestType}:{responseType}".
+    /// </summary>
+    public Func<MediatRCallContext, string> EventType { get; set; }
+
+    /// <summary>
     /// Whether to include the request in the audit event. Default is NULL to not include the request.
     /// </summary>
     public Func<MediatRCallContext, bool> IncludeRequest { get; set; }

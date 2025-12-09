@@ -64,4 +64,16 @@ public class AuditMediatRConfigurator : IAuditMediatRConfigurator
         Options.AuditScopeFactory = auditScopeFactory;
         return this;
     }
+
+    public IAuditMediatRConfigurator EventType(Func<MediatRCallContext, string> eventType)
+    {
+        Options.EventType = eventType; 
+        return this;
+    }
+
+    public IAuditMediatRConfigurator EventType(string eventTypeTemplate)
+    {
+        Options.EventType = _ => eventTypeTemplate;
+        return this;
+    }
 }

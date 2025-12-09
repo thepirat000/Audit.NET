@@ -45,6 +45,7 @@ del "Audit.NET.Firestore\bin\release\*.symbols.nupkg"
 del "Audit.Grpc.Client\bin\release\*.symbols.nupkg"
 del "Audit.Grpc.Server\bin\release\*.symbols.nupkg"
 del "Audit.MediatR\bin\release\*.symbols.nupkg"
+del "Audit.Hangfire\bin\release\*.symbols.nupkg"
 
 nuget push "audit.net\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.NET.JsonNewtonsoftAdapter\bin\release\*.nupkg" -NoSymbols -source %1
@@ -90,3 +91,5 @@ nuget push "Audit.NET.Firestore\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.Grpc.Client\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.Grpc.Server\bin\release\*.nupkg" -NoSymbols -source %1
 nuget push "Audit.MediatR\bin\release\*.nupkg" -NoSymbols -source %1
+nuget push "Audit.Hangfire\bin\release\*.nupkg" -NoSymbols -source %1
+
