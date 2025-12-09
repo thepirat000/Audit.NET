@@ -28,7 +28,7 @@ Both filters create `AuditScope`s and write Audit.NET events using the configure
 
 ### Basic setup
 
-Add the filters to Hangfire’s global filters and configure the Audit.NET data provider. Examples below show different ways to configure:
+Add the filters to Hangfire global filters and configure the Audit.NET data provider. Examples below show different ways to configure:
 
 - Global registration (Using extensions `AddAuditJobCreationFilter()` and `AddAuditJobExecutionFilter()`):
 
