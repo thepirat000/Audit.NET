@@ -16,6 +16,7 @@ With Audit.NET, you can generate detailed tracking information for executed oper
 [MVC](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Mvc/README.md), 
 [WebAPI](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WebApi/README.md), 
 [WCF](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF/README.md), 
+[WCF Client](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.WCF.Client/README.md),
 [File System](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md), 
 [SignalR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.SignalR/README.md),
 [MongoClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MongoClient/README.md),
@@ -23,6 +24,7 @@ With Audit.NET, you can generate detailed tracking information for executed oper
 [gRPC Server](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Grpc.Server/README.md),
 [MediatR](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.MediatR/README.md),
 [Hangfire](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.Hangfire/README.md),
+[Azure Functions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.AzureFunctions/README.md),
 and [HttpClient](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.HttpClient/README.md).
 
 - [**Output extensions**](#data-providers-included) are provided to log to [JSON Files](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/Providers/FileDataProvider.cs), 
@@ -1074,6 +1076,7 @@ The following packages are extensions to log interactions with different systems
 
 <a></a> | Package | Description 
 ------------ | ------------------- | ------------------
+<img src="https://i.imgur.com/ulACobW.png" alt="icon" width="90" /> | **[Audit.AzureFunctions](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.AzureFunctions/README.md)** | Generate detailed audit logs for **Azure Functions** by using a provided middleware.
 <img src="https://i.imgur.com/hVMM5WF.png" alt="icon" width="90"/> | **[Audit.DynamicProxy](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.DynamicProxy/README.md)** | Generate detailed audit logs for **any class** without changing its code by using a proxy.
 <img src="https://i.imgur.com/wdVHFoc.png" alt="icon" width="90"/> | **[Audit.EntityFramework](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)** | Generate detailed audit logs for saving operations on **Entity Framework**, by inheriting from a provided `DbContext` or `IdentityDbContext`.  Includes support for EF 6 and EF 7 (EF Core).
 <img src="https://i.imgur.com/Fn4thn0.png" alt="icon" width="90"/> | **[Audit.FileSystem](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.FileSystem/README.md)** | Generate audit logs by intercepting **file system** events via FileSystemWatcher.

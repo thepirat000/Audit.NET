@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.3.2] - 2025-12-20:
+- **Audit.AzureFunctions**: A new extension to audit Azure Functions using middleware in the isolated worker model.
+
 ## [31.3.1] - 2025-12-09:
 - **Audit.Hangfire**: A new extension to audit Hangfire jobs using client and server filters. 
 
