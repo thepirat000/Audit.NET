@@ -181,6 +181,35 @@ namespace Audit.Core
             return default;
         }
 
+        /// <inheritdoc/>
+        public void AddTimedEvent(object data, Dictionary<string, object> customFields = null)
+        {
+            var date = _systemClock.GetCurrentDateTime();
+
+            long? timestamp = Configuration.IncludeTimestamps ? _systemClock.GetCurrentTimestamp() : null;
+
+            var offset = (int)(date - Event.StartDate).TotalMilliseconds;
+
+            Event.TimedEvents ??= [];
+
+            Event.TimedEvents.Add(new TimedEvent
+            {
+                Date = date,
+                Timestamp = timestamp,
+                Offset = offset,
+                Data = data,
+                CustomFields = customFields
+            });
+        }
+
+        /// <inheritdoc/>
+        public void AddTimedEvent(object data, object extraFields)
+        {
+            var customFields = GetExtraFields(extraFields);
+
+            AddTimedEvent(data, customFields);
+        }
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -510,15 +539,28 @@ namespace Audit.Core
 
         private void ProcessExtraFields(object extraFields)
         {
+            foreach (var prop in GetExtraFields(extraFields))
+            {
+                SetCustomField(prop.Key, prop.Value);
+            }
+        }
+
+        private static Dictionary<string, object> GetExtraFields(object extraFields)
+        {
+            var results = new Dictionary<string, object>();
+            
             if (extraFields == null)
             {
-                return;
+                return results;
             }
+
             var props = extraFields.GetType().GetRuntimeProperties();
             foreach (var prop in props)
             {
-                SetCustomField(prop.Name, prop.GetValue(extraFields, null));
+                results.Add(prop.Name, prop.GetValue(extraFields, null));
             }
+
+            return results;
         }
 
         private void SaveEvent(bool forceInsert = false)

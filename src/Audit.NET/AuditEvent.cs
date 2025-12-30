@@ -76,6 +76,12 @@ namespace Audit.Core
         /// </summary>
         private readonly WeakReference _auditScope = new WeakReference(null);
 
+        /// <summary>
+        /// Collection of timed events associated with this audit event.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<TimedEvent> TimedEvents { get; set; }
+
         internal void SetScope(IAuditScope auditScope)
         {
             _auditScope.Target = auditScope;

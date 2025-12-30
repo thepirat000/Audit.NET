@@ -373,7 +373,7 @@ Field Name | Type | Description
 **Target** | [**Target**](#target-object) | User-defined tracked object 
 **Comments** | Array of strings | User-defined comments 
 **CustomFields** | Dictionary | User-defined custom fields 
-
+**TimedEvents** | Array of [**TimedEvent**](#timedevent-object) | Intermediate timestamped checkpoints recorded within the audit scope
 
 - ### [Environment object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/AuditEventEnvironment.cs)
 Field Name | Type | Description
@@ -393,48 +393,107 @@ Field Name | Type | Description
 **Old** | Object | Value of the tracked object at the beginning of the event
 **New** | Object | Value of the tracked object at the end of the event
 
-## Custom Fields and Comments
+- ### [TimedEvent object](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.NET/TimedEvent.cs)
+Field Name | Type | Description
+------------ | ---------------- |  --------------
+**Date** | DateTime | UTC date and time when the checkpoint occurred
+**Timestamp** | long | Timestamp in ticks when the checkpoint occurred (only included when IncludeTimestamps is enabled)
+**Offset** | integer | Milliseconds elapsed since the scope started
+**Data** | Object | Optional payload associated with the checkpoint
+**CustomFields** | Dictionary | User-defined custom fields associated with the checkpoint
 
-The `AuditScope` object provides two methods to extend the event output.
+## Custom Fields
+
+The `AuditScope` provides methods to extend the event output with custom fields.
 
 - Use `SetCustomField()` method to add any object as an extra field to the event.
-- Use `Comment()` to add textual comments to the event's `Comments` array.
 
 For example:
 
 ```c#
 Order order = Db.GetOrder(orderId);
-using (var audit = AuditScope.Create("Order:Update", () => order))
+using (var scope = AuditScope.Create("Order:Update", () => order))
 {
-    audit.SetCustomField("ReferenceId", orderId);
+    // Set a custom field
+    scope.SetCustomField("ReferenceId", orderId);
+
     order.Status = -1;
     order = Db.OrderUpdate(order);
-    audit.Comment("Status Updated to Cancelled");
 }
 ```
 
 You can also set Custom Fields when creating the `AuditScope`, by passing an anonymous object with the properties you want as extra fields. For example:
 
 ```c#
-using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+using (var scope = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
 {
     order.Status = -1;
     order = Db.OrderUpdate(order);
-    audit.Comment("Status Updated to Cancelled");
+    scope.Comment("Status Updated to Cancelled");
 }
 ```
 
 You can also access the Custom Fields directly from `Event.CustomFields` property of the scope. For example:
 ```c#
-using (var audit = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
+using (var scope = AuditScope.Create("Order:Update", () => order, new { ReferenceId = orderId }))
 {
-    audit.Event.CustomFields["ReferenceId"] = orderId;
+    scope.Event.CustomFields["ReferenceId"] = orderId;
 }
 ```
 
 > **Note**
 > 
 > Custom fields are not limited to single properties, you can store any object as well, by default they will be JSON serialized.
+
+## Timed sub-events (checkpoints)
+
+You can record intermediate, timestamped checkpoints within an `AuditScope`. These "timed sub-events" help mark steps during execution while keeping everything under the same audit event.
+
+- Use `AddTimedEvent()` to add intermediate timestamped entries into the `TimedEvents` collection.
+
+For example:
+
+```c#
+using var scope = AuditScope.Create(cfg => cfg.EventType("Order:Process").Target(() => order));
+
+scope.AddTimedEvent("Loaded order");
+// ...
+scope.AddTimedEvent("Validated payment", new { Amount = order.Total });
+// ...
+scope.AddTimedEvent("Submitted to warehouse");
+```
+
+Each timed sub-event includes its occurrence time and the offset from the start of the main event. The resulting output would look like:
+
+```javascript
+{
+    "EventType": "Order:Process",
+    "Environment": { ... },
+    "StartDate": "2025-12-01T17:36:52.2256288Z",
+    "EndDate": "2025-12-01T17:37:10.1820786Z",
+    "Duration": 17856,
+    "Target": { ... },
+    "TimedEvents": [
+        {
+            "Date": "2025-12-01T17:36:53.0000000Z",
+            "Offset": 774,
+            "Data": "Loaded order"
+        },
+        {
+            "Date": "2025-12-01T17:36:55.5000000Z",
+            "Offset": 3274,
+            "Data": "Validated payment",
+            "Amount": 150.00
+        },
+        {
+            "Date": "2025-12-01T17:37:00.0000000Z",
+            "Offset": 8774,
+            "Data": "Submitted to warehouse"
+        }
+    ]
+}
+```
+
 
 ### Extending AuditEvent
 

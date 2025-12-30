@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [31.3.3] - 2025-12-30:
+- **Audit.NET**: Adding TimedEvent to the AuditEvent to capture intermediate timed events within an AuditScope.
+
 ## [31.3.2] - 2025-12-20:
 - **Audit.AzureFunctions**: A new extension to audit Azure Functions using middleware in the isolated worker model.
 

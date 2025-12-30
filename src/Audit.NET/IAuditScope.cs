@@ -82,6 +82,20 @@ namespace Audit.Core
         void SetCustomField<TC>(string fieldName, TC value, bool serialize = false);
 
         /// <summary>
+        /// Adds a new timed sub-event to the current AuditEvent, associating the specified data and optional custom fields with the event at the current system time.
+        /// </summary>
+        /// <param name="data">The data object to associate with the timed event.</param>
+        /// <param name="customFields">An optional dictionary of custom fields to include with the timed event.</param>
+        void AddTimedEvent(object data, Dictionary<string, object> customFields = null);
+
+        /// <summary>
+        /// Adds a timed sub-event using the specified data and additional custom fields.
+        /// </summary>
+        /// <param name="data">An object containing the main event data to be recorded.</param>
+        /// <param name="extraFields">An object representing extra custom fields to associate with the timed event. May be null if no additional fields are required.</param>
+        void AddTimedEvent(object data, object extraFields);
+
+        /// <summary>
         /// Replaces the target object getter whose old/new value will be stored on the AuditEvent.Target property
         /// </summary>
         /// <param name="targetGetter">A function that returns the target</param>
