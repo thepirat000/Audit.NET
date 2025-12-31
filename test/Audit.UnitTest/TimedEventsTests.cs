@@ -47,7 +47,7 @@ namespace Audit.UnitTest
         }
 
         [Test]
-        public async Task Test_TimedEvent_EmptyCustomFields_Serialization()
+        public async Task Test_AddTimedEvent_WorksAsExpected()
         {
             var dp = new InMemoryDataProvider();
             
@@ -59,6 +59,7 @@ namespace Audit.UnitTest
                 DataProvider = dp
             });
 
+            await Task.Delay(2);
             auditScope.AddTimedEvent("Test String 1");
             await Task.Delay(2);
             auditScope.AddTimedEvent("Test String 2", new Dictionary<string, object>() { ["#"] = 10 } );
