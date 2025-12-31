@@ -2,20 +2,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 12/30/2025 - 19:07:34 |
-| Coverage date: | 12/30/2025 - 18:41:44 - 12/30/2025 - 19:06:38 |
+| Generated on: | 12/31/2025 - 00:48:03 |
+| Coverage date: | 12/31/2025 - 00:22:13 - 12/31/2025 - 00:47:13 |
 | Parser: | MultiReport (117x Cobertura) |
 | Assemblies: | 45 |
-| Classes: | 375 |
-| Files: | 329 |
-| **Line coverage:** | 89.4% (10517 of 11759) |
-| Covered lines: | 10517 |
-| Uncovered lines: | 1242 |
-| Coverable lines: | 11759 |
-| Total lines: | 31550 |
-| **Branch coverage:** | 80% (3832 of 4789) |
-| Covered branches: | 3832 |
-| Total branches: | 4789 |
+| Classes: | 376 |
+| Files: | 330 |
+| **Line coverage:** | 89.5% (10549 of 11786) |
+| Covered lines: | 10549 |
+| Uncovered lines: | 1237 |
+| Coverable lines: | 11786 |
+| Total lines: | 31647 |
+| **Branch coverage:** | 80% (3837 of 4795) |
+| Covered branches: | 3837 |
+| Total branches: | 4795 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 # Risk Hotspots
@@ -131,11 +131,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **161** | **5** | **166** | **408** | **96.9%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 123 | 5 | 128 | 254 | 96% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
@@ -221,14 +221,14 @@
 | Audit.Mvc.AuditPageFilter | 142 | 1 | 143 | 302 | 99.3% | 110 | 144 | 76.3% |
 | Audit.Mvc.BodyContent | 3 | 0 | 3 | 9 | 100% | 0 | 0 |  |
 | Audit.Mvc.ControllerExtensions | 3 | 0 | 3 | 40 | 100% | 0 | 0 |  |
-| **Audit.NET** | **1276** | **57** | **1333** | **4517** | **95.7%** | **315** | **352** | **89.4%** |
+| **Audit.NET** | **1303** | **57** | **1360** | **4614** | **95.8%** | **320** | **358** | **89.3%** |
 | Audit.Core.AuditActivityEvent | 2 | 0 | 2 | 78 | 100% | 0 | 0 |  |
 | Audit.Core.AuditActivityTag | 2 | 0 | 2 | 78 | 100% | 0 | 0 |  |
 | Audit.Core.AuditActivityTrace | 10 | 0 | 10 | 78 | 100% | 0 | 0 |  |
 | Audit.Core.AuditDataProvider | 20 | 0 | 20 | 128 | 100% | 8 | 8 | 100% |
-| Audit.Core.AuditEvent | 18 | 0 | 18 | 119 | 100% | 0 | 0 |  |
+| Audit.Core.AuditEvent | 19 | 0 | 19 | 125 | 100% | 0 | 0 |  |
 | Audit.Core.AuditEventEnvironment | 11 | 0 | 11 | 74 | 100% | 0 | 0 |  |
-| Audit.Core.AuditScope | 259 | 7 | 266 | 673 | 97.3% | 160 | 174 | 91.9% |
+| Audit.Core.AuditScope | 279 | 7 | 286 | 715 | 97.5% | 165 | 180 | 91.6% |
 | Audit.Core.AuditScopeFactory | 67 | 0 | 67 | 209 | 100% | 2 | 2 | 100% |
 | Audit.Core.AuditScopeOptions | 39 | 0 | 39 | 134 | 100% | 2 | 2 | 100% |
 | Audit.Core.AuditScopeOptionsConfigurator | 28 | 5 | 33 | 107 | 84.8% | 1 | 2 | 50% |
@@ -264,6 +264,7 @@
 | Audit.Core.Providers.Wrappers.LazyDataProvider | 7 | 0 | 7 | 31 | 100% | 0 | 0 |  |
 | Audit.Core.Providers.Wrappers.WrapperDataProvider | 15 | 0 | 15 | 68 | 100% | 18 | 18 | 100% |
 | Audit.Core.Setting<T> | 14 | 0 | 14 | 81 | 100% | 2 | 2 | 100% |
+| Audit.Core.TimedEvent | 6 | 0 | 6 | 49 | 100% | 0 | 0 |  |
 | **Audit.NET.AzureCosmos** | **113** | **10** | **123** | **406** | **91.8%** | **35** | **46** | **76%** |
 | Audit.AzureCosmos.ConfigurationApi.AzureCosmosProviderConfigurator | 17 | 8 | 25 | 83 | 68% | 0 | 0 |  |
 | Audit.AzureCosmos.Providers.AuditCosmosSerializer | 9 | 2 | 11 | 36 | 81.8% | 4 | 6 | 66.6% |
