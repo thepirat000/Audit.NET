@@ -15,10 +15,10 @@ namespace Audit.PostgreSql.Providers
     /// Settings:
     /// - ConnectionString: SQL connection string
     /// - TableName: Table name (default is 'event')
-    /// - JsonColumnName: Column name where the event data will be stored (default is 'data')
+    /// - DataJsonColumnName: Column name where the event data will be stored (default is NULL to ignore)
+    /// - DataJsonType: Data type of the JsonColumn. (JSON, JSONB). (default is 'JSON')
     /// - IdColumnName: Column name with the primary key (default is 'id')
     /// - LastUpdatedDateColumnName: datetime column to update when replacing events (NULL to ignore)
-    /// - DataType: Data type to cast when storing the data. (JSON, JSONB). (default is 'JSON')
     /// - CustomColumns: A collection of custom columns to be added when saving the audit event 
     /// </remarks>
     public class PostgreSqlDataProvider : AuditDataProvider
@@ -40,10 +40,10 @@ namespace Audit.PostgreSql.Providers
         /// </summary>
         public Setting<string> IdColumnName { get; set; } = "id";
         /// <summary>
-        /// Gets or sets the data column name builder.
+        /// Gets or sets the JSON data column name to use for storing the event data. Optional. If not set, the JSON representation of the audit event will not be stored.
         /// </summary>
         /// <value>The data column name builder.</value>
-        public Setting<string> DataColumnName { get; set; } = "data";
+        public Setting<string> DataJsonColumnName { get; set; } = new();
         /// <summary>
         /// Gets or sets the function that returns the JSON string to store in the data column. By default, it's the result of calling AuditEvent.ToJson().
         /// </summary>
@@ -55,14 +55,14 @@ namespace Audit.PostgreSql.Providers
         public Setting<string> LastUpdatedDateColumnName { get; set; }
 
         /// <summary>
-        /// The column data type to cast when inserting/updating the event data.
+        /// The column data type for the JSON column, used to cast when inserting/updating the event data. Default is 'JSON'.
         /// </summary>
-        public string DataType { get; set; } = "JSON";
+        public string DataJsonType { get; set; } = "JSON";
 
         /// <summary>
         /// A collection of custom columns to be added when saving the audit event 
         /// </summary>
-        public List<CustomColumn> CustomColumns { get; set; } = new List<CustomColumn>();
+        public List<CustomColumn> CustomColumns { get; set; } = [];
 
         public PostgreSqlDataProvider()
         {
@@ -75,9 +75,9 @@ namespace Audit.PostgreSql.Providers
             {
                 config.Invoke(pgConfig);
                 ConnectionString = pgConfig._connectionString;
-                DataColumnName = pgConfig._dataColumnName;
+                DataJsonColumnName = pgConfig._dataColumnName;
                 DataJsonStringBuilder = pgConfig._dataJsonStringBuilder ?? (ev => ev.ToJson());
-                DataType = pgConfig._dataColumnType.ToString();
+                DataJsonType = pgConfig._dataColumnType.ToString();
                 IdColumnName = pgConfig._idColumnName;
                 LastUpdatedDateColumnName = pgConfig._lastUpdatedColumnName;
                 Schema = pgConfig._schema;
@@ -88,75 +88,79 @@ namespace Audit.PostgreSql.Providers
 
         public override object InsertEvent(AuditEvent auditEvent)
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
-            {
-                var cmd = GetInsertCommand(cnn, auditEvent);
-                var id = cmd.ExecuteScalar();
-                return id;
-            }
+            using var cnn = GetDbConnection(auditEvent);
+            var cmd = GetInsertCommand(cnn, auditEvent);
+            var id = cmd.ExecuteScalar();
+            return id;
         }
 
         public override async Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
-            {
-                var cmd = GetInsertCommand(cnn, auditEvent);
-                var id = await cmd.ExecuteScalarAsync(cancellationToken);
-                return id;
-            }
+            await using var cnn = GetDbConnection(auditEvent);
+            var cmd = GetInsertCommand(cnn, auditEvent);
+            var id = await cmd.ExecuteScalarAsync(cancellationToken);
+            return id;
         }
 
         public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
-            {
-                var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
-                cmd.ExecuteNonQuery();
-            }
+            using var cnn = GetDbConnection(auditEvent);
+            var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
+            cmd.ExecuteNonQuery();
         }
 
         public override async Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(auditEvent)))
-            {
-                var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
-                await cmd.ExecuteNonQueryAsync(cancellationToken);
-            }
+            await using var cnn = GetDbConnection(auditEvent);
+            var cmd = GetReplaceCommand(cnn, auditEvent, eventId);
+            await cmd.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Creates and returns a new NpgsqlConnection instance configured for the specified audit event.
+        /// </summary>
+        /// <param name="auditEvent">The audit event for which to generate a database connection. Cannot be null.</param>
+        /// <returns>A new NpgsqlConnection initialized with a connection string appropriate for the specified audit event.</returns>
+        public virtual NpgsqlConnection GetDbConnection(AuditEvent auditEvent)
+        {
+            return new NpgsqlConnection(GetConnectionString(auditEvent));
         }
 
         public override T GetEvent<T>(object eventId)
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
+            if (GetDataColumnName(null) == null)
             {
-                var cmd = GetSelectCommand(cnn, eventId);
-                using (var reader = cmd.ExecuteReader())
-                {
-                    if (reader.HasRows)
-                    {
-                        reader.Read();
-                        var json = reader.GetString(0);
-                        return AuditEvent.FromJson<T>(json);
-                    }
-                }
+                return null;
             }
+            using var cnn = new NpgsqlConnection(GetConnectionString(null));
+            var cmd = GetSelectCommand(cnn, eventId);
+            using var reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                var json = reader.GetString(0);
+                return AuditEvent.FromJson<T>(json);
+            }
+
             return null;
         }
 
         public override async Task<T> GetEventAsync<T>(object eventId, CancellationToken cancellationToken = default)
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
+            if (GetDataColumnName(null) == null)
             {
-                var cmd = GetSelectCommand(cnn, eventId);
-                using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
-                {
-                    if (reader.HasRows)
-                    {
-                        await reader.ReadAsync(cancellationToken);
-                        var json = reader.GetString(0);
-                        return AuditEvent.FromJson<T>(json);
-                    }
-                }
+                return null;
             }
+            await using var cnn = new NpgsqlConnection(GetConnectionString(null));
+            var cmd = GetSelectCommand(cnn, eventId);
+            await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+            if (reader.HasRows)
+            {
+                await reader.ReadAsync(cancellationToken);
+                var json = reader.GetString(0);
+                return AuditEvent.FromJson<T>(json);
+            }
+
             return null;
         }
 
@@ -187,6 +191,10 @@ namespace Audit.PostgreSql.Providers
         /// </remarks>
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression) where T : AuditEvent
         {
+            if (GetDataColumnName(null) == null)
+            {
+                return [];
+            }
             var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $"WHERE {whereExpression}";
             var sql = $@"SELECT ""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)} {where}";
             return EnumerateEventsByFullSql<T>(sql);
@@ -206,6 +214,10 @@ namespace Audit.PostgreSql.Providers
         /// </remarks>
         public IEnumerable<T> EnumerateEvents<T>(string whereExpression, string orderByExpression, string limitExpression) where T : AuditEvent
         {
+            if (GetDataColumnName(null) == null)
+            {
+                return [];
+            }
             var selectExpression = $@"""{GetDataColumnName(null)}"" FROM {GetFullTableName(null)}";
             var where = string.IsNullOrWhiteSpace(whereExpression) ? "" : $" WHERE {whereExpression}";
             var orderBy = string.IsNullOrWhiteSpace(orderByExpression) ? "" : $" ORDER BY {orderByExpression}";
@@ -220,13 +232,14 @@ namespace Audit.PostgreSql.Providers
         /// <param name="fullSql">The string with the SELECT expression</param>
         protected IEnumerable<T> EnumerateEventsByFullSql<T>(string fullSql) where T : AuditEvent
         {
-            using (var cnn = new NpgsqlConnection(GetConnectionString(null)))
+            using var cnn = new NpgsqlConnection(GetConnectionString(null));
+            cnn.Open();
+            var cmd = cnn.CreateCommand();
+            cmd.CommandText = fullSql;
+            var dr = cmd.ExecuteReader();
+            while (dr.Read())
             {
-                cnn.Open();
-                var cmd = cnn.CreateCommand();
-                cmd.CommandText = fullSql;
-                var dr = cmd.ExecuteReader();
-                while (dr.Read())
+                if (!dr.IsDBNull(0))
                 {
                     var data = dr.GetFieldValue<string>(0);
                     yield return Core.Configuration.JsonAdapter.Deserialize<T>(data);
@@ -377,9 +390,9 @@ namespace Audit.PostgreSql.Providers
 
         private string GetDataColumnValue()
         {
-            return string.IsNullOrWhiteSpace(DataType) || DataType == Configuration.DataType.String.ToString() 
+            return string.IsNullOrWhiteSpace(DataJsonType) || DataJsonType == Configuration.DataType.String.ToString() 
                 ? "@data" 
-                : $"CAST (@data AS {DataType})";
+                : $"CAST (@data AS {DataJsonType})";
         }
 
         protected string GetConnectionString(AuditEvent auditEvent)
@@ -410,7 +423,7 @@ namespace Audit.PostgreSql.Providers
 
         protected string GetDataColumnName(AuditEvent auditEvent)
         {
-            return DataColumnName.GetValue(auditEvent);
+            return DataJsonColumnName.GetValue(auditEvent);
         }
 
         protected string GetLastUpdatedDateColumnName(AuditEvent auditEvent)

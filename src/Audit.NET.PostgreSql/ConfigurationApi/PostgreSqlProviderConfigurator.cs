@@ -53,7 +53,7 @@ namespace Audit.PostgreSql.Configuration
             return this;
         }
 
-        public IPostgreSqlProviderConfigurator DataColumn(string dataColumnName, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
+        public IPostgreSqlProviderConfigurator DataJsonColumn(string dataColumnName, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
         {
             _dataColumnName = dataColumnName;
             _dataColumnType = dataColumnType;
@@ -61,7 +61,7 @@ namespace Audit.PostgreSql.Configuration
             return this;
         }
 
-        public IPostgreSqlProviderConfigurator DataColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
+        public IPostgreSqlProviderConfigurator DataJsonColumn(Func<AuditEvent, string> dataColumnNameBuilder, DataType dataColumnType = DataType.JSON, Func<AuditEvent, string> jsonStringBuilder = null)
         {
             _dataColumnName = dataColumnNameBuilder;
             _dataColumnType = dataColumnType;

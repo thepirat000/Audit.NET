@@ -21,7 +21,21 @@ Please see the [Audit.NET Readme](https://github.com/thepirat000/Audit.NET#usage
 ## Configuration
 Set the static `Audit.Core.Configuration.DataProvider` property to set the PostgreSQL data provider, or call the `UsePostgreSql` method on the fluent configuration. This should be done before any `AuditScope` creation, i.e. during application startup.
 
-For example:
+For example, using the fluent API:
+
+```c#
+Audit.Core.Configuration.Setup()
+    .UsePostgreSql(config => config
+        .ConnectionString("Server=127.0.0.1;Port=5432;User Id=admin;Password=admin;Database=postgres;")
+        .TableName("event")
+        .IdColumnName("id")
+        .DataJsonColumn("data", DataType.JSONB)
+        .LastUpdatedColumnName("updated_date")
+        .CustomColumn("event_type", ev => ev.EventType)
+        .CustomColumn("user", ev => ev.Environment.UserName));
+```
+
+Or by setting the `DataProvider` properties directly:
 ```c#
 Audit.Core.Configuration.DataProvider = new PostgreSqlDataProvider()
 {
@@ -39,30 +53,19 @@ Audit.Core.Configuration.DataProvider = new PostgreSqlDataProvider()
 };
 ```
 
-Or by using the [fluent configuration API](https://github.com/thepirat000/Audit.NET#configuration-fluent-api):
-```c#
-Audit.Core.Configuration.Setup()
-    .UsePostgreSql(config => config
-        .ConnectionString("Server=127.0.0.1;Port=5432;User Id=admin;Password=admin;Database=postgres;")
-        .TableName("event")
-        .IdColumnName("id")
-        .DataColumn("data", DataType.JSONB)
-        .LastUpdatedColumnName("updated_date")
-        .CustomColumn("event_type", ev => ev.EventType)
-        .CustomColumn("user", ev => ev.Environment.UserName));
-```
-
 ### Provider Options
 
 Mandatory:
 - **ConnectionString**: The PostgreSQL Server connection string. Defaults is `Server=127.0.0.1;Port=5432;User Id=postgres;Password=admin;Database=postgres;`
 - **TableName**: The events table name. If not specified, the default table name is `event`.
-- **DataColumnName**: The column name of the event table where the JSON will be stored. Can be set to NULL to avoid including the JSON column. If not specified, the default column name is `data`.
 - **IdColumnName**: The column name of the event identifier (the primary key). If not specified, the default column name is `id`.
 
 Optional:
 - **Schema**: The PostgreSQL schema to use.
-- **DataType**: The type of the data column that stores the events. Can be JSON, JSONP or STRING. (Default is JSON).
+- **DataJsonColumnName**: The column name of the event table where the JSON representation of the audit event will be stored. 
+Can be ignored or set to NULL to avoid including a JSON column. 
+When not specified, the `GetEvents()` and `EnumerateEvents()` will return empty results.
+- **DataJsonType**: The type of the JSON data column that stores the events. Can be JSON, JSONP or STRING. (Default is JSON).
 - **LastUpdatedDateColumnName**: The datetime column name to update when replacing events.
 - **CustomColumn**: Additional columns to store information from the audit event. (optional)
 
@@ -79,9 +82,9 @@ CREATE TABLE public.event
     id bigserial NOT NULL,
     inserted_date timestamp without time zone NOT NULL DEFAULT now(),
     updated_date timestamp without time zone NOT NULL DEFAULT now(),
-    data jsonb NOT NULL,
+    data jsonb,
     event_type varchar(50),
-    user varchar(50) NULL,
+    user varchar(50),
     CONSTRAINT event_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -92,7 +95,7 @@ TABLESPACE pg_default;
 
 ## Query events
 
-This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id:
+This provider implements `GetEvent` and `GetEventAsync` methods to obtain an audit event by id. 
 
 ```c#
 var event = dataProvider.GetEvent(1000);
@@ -110,10 +113,19 @@ IEnumerable<AuditEvent> events = postgreDataProvider.EnumerateEvents(
 
 Will return the events whose property `Environment.UserName` is equal to 'John'.
 
-This [post](http://schinckel.net/2014/05/25/querying-json-in-postgres/) contains information about the query syntax supported by JSONP data type.
-And [here](https://www.postgresql.org/docs/9.4/static/functions-json.html) is the PostgreSQL documentation about JSON operators.
+> **Note**
+> 
+> The methods `GetEvents()` and `EnumerateEvents()` are only available when the `DataJsonColumnName` property is set.
+
 
 For complex querying capabilities, you should use the [npgsql driver](https://www.nuget.org/packages/Npgsql/) or the [Npgsql EntityFramework provider](http://www.npgsql.org/efcore/) directly.
+
+You can obtain a reference to the underlying `NpgsqlConnection` used by the data provider by calling the `GetDbConnection()` method.
+
+For example:
+```c#
+var npgsqlConnection = Audit.Core.Configuration.DataProviderAs<PostgreSqlDataProvider>().GetDbConnection(auditEvent);
+```
 
 ## ZZZ Projects - Sponsorship
 

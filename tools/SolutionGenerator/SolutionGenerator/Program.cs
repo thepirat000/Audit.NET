@@ -25,6 +25,7 @@ namespace SolutionGenerator
             if (args.Length < 2)
             {
                 Console.WriteLine("Usage: SolutionGenerator <input sln path> <filters> [<output sln path>]");
+                Console.WriteLine("Example: SolutionGenerator \"C:\\Audit.NET\\Audit.NET.sln\" \"entityframework,!core,tests\" \"C:\\Projects\\MyNewSolution.sln\"");
                 return;
             }
 

@@ -11,3 +11,9 @@ This tool is intended exclusively for internal use in troubleshooting and testin
 - Generate a new solution file with the filtered projects.
 - Automatically handle project dependencies.
 
+## Usage
+
+```bash
+> SolutionGenerator.exe "D:\Audit.NET\Audit.NET.sln" "entityframework,!core" "D:\test\Test.sln"
+```` 
+

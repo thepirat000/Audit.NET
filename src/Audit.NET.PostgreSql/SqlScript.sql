@@ -3,7 +3,7 @@
     id bigserial NOT NULL,
     inserted_date timestamp without time zone NOT NULL DEFAULT now(),
     updated_date timestamp without time zone NOT NULL DEFAULT now(),
-    data jsonb NOT NULL,
+    data jsonb,
     event_type varchar(50),
 	some_date timestamp,
 	some_null varchar(10),

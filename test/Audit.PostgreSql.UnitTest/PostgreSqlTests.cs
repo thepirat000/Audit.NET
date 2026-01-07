@@ -1,12 +1,14 @@
-﻿using NUnit.Framework;
+﻿using Audit.Core;
+using Audit.IntegrationTest;
+using Audit.PostgreSql.Configuration;
+using Audit.PostgreSql.Providers;
+
+using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Audit.Core;
-using Audit.IntegrationTest;
-using Audit.PostgreSql.Configuration;
-using Audit.PostgreSql.Providers;
 
 namespace Audit.PostgreSql.UnitTest
 {
@@ -19,8 +21,203 @@ namespace Audit.PostgreSql.UnitTest
         public void Init()
         {
             Audit.Core.Configuration.Reset();
-            SetupConfiguredPostgreSqlDataProvider();
-            AuditScope.Log("test", null);
+        }
+
+        [Test]
+        public void PostgreSqlDataProvider_NoJsonColumn_ShouldInsertCustomColumns()
+        {
+            var efPostgresSqlDataProvider = new PostgreSqlDataProvider()
+            {
+                ConnectionString = TestCommon.PostgreSqlConnectionString,
+                TableName = "event",
+                IdColumnName = "id",
+                CustomColumns =
+                [
+                    new(){Name = "event_type", Value = ev => ev.EventType}
+                ],
+                LastUpdatedDateColumnName = new(),
+                DataJsonType = null,
+                DataJsonStringBuilder = null
+            };
+
+            var eventType = "TEST_123";
+            var ev = new AuditEvent() { EventType = eventType };
+            var eventId = efPostgresSqlDataProvider.InsertEvent(ev);
+
+            Assert.That(eventId, Is.Positive);
+
+            using var cnn = efPostgresSqlDataProvider.GetDbConnection(ev);
+            cnn.Open();
+            var cmd = cnn.CreateCommand();
+            cmd.CommandText = $@"select event_type from ""event"" WHERE ""id"" = @id";
+            var idParameter = cmd.CreateParameter();
+            idParameter.ParameterName = "id";
+            idParameter.Value = eventId;
+            cmd.Parameters.Add(idParameter);
+
+            var eventTypeFromDb = cmd.ExecuteScalar();
+
+            cmd = cnn.CreateCommand();
+            cmd.CommandText = $@"select data from ""event"" WHERE ""id"" = {eventId}";
+            var dataFromDb = cmd.ExecuteScalar();
+
+            Assert.That(eventTypeFromDb, Is.EqualTo(eventType));
+            Assert.That(dataFromDb, Is.EqualTo(DBNull.Value));
+
+            cmd = cnn.CreateCommand();
+            cmd.CommandText = $@"delete from ""event"" WHERE ""id"" = {eventId}";
+            cmd.ExecuteNonQuery();
+        }
+
+        [Test]
+        public void PostgreSqlDataProviderFluent_NoJsonColumn_ShouldInsertCustomColumns()
+        {
+            var efPostgresSqlDataProvider = new PostgreSqlDataProvider(c => c
+                    .ConnectionString(TestCommon.PostgreSqlConnectionString)
+                    .TableName("event")
+                    .IdColumnName("id")
+                    .CustomColumn("event_type", ev => ev.EventType)
+                    .DataJsonColumn((string)null));
+
+            var eventType = "TEST_321";
+            var ev = new AuditEvent() { EventType = eventType };
+            var eventId = efPostgresSqlDataProvider.InsertEvent(ev);
+
+            Assert.That(eventId, Is.Positive);
+
+            using var cnn = efPostgresSqlDataProvider.GetDbConnection(ev);
+            cnn.Open();
+            var cmd = cnn.CreateCommand();
+            cmd.CommandText = $@"select event_type from ""event"" WHERE ""id"" = @id";
+            var idParameter = cmd.CreateParameter();
+            idParameter.ParameterName = "id";
+            idParameter.Value = eventId;
+            cmd.Parameters.Add(idParameter);
+
+            var eventTypeFromDb = cmd.ExecuteScalar();
+
+            cmd = cnn.CreateCommand();
+            cmd.CommandText = $@"select data from ""event"" WHERE ""id"" = {eventId}";
+            var dataFromDb = cmd.ExecuteScalar();
+
+            Assert.That(eventTypeFromDb, Is.EqualTo(eventType));
+            Assert.That(dataFromDb, Is.EqualTo(DBNull.Value));
+
+            cmd = cnn.CreateCommand();
+            cmd.CommandText = $@"delete from ""event"" WHERE ""id"" = {eventId}";
+            cmd.ExecuteNonQuery();
+        }
+
+        [Test]
+        public void PostgreSqlDataProvider_NoJsonColumn_GetEventShouldGetNoEvent()
+        {
+            var efPostgresSqlDataProvider = new PostgreSqlDataProvider()
+            {
+                ConnectionString = TestCommon.PostgreSqlConnectionString,
+                TableName = "event",
+                IdColumnName = "id",
+                CustomColumns =
+                [
+                    new(){Name = "event_type", Value = ev => ev.EventType}
+                ],
+                LastUpdatedDateColumnName = new(),
+                DataJsonType = null,
+                DataJsonStringBuilder = null
+            };
+
+            var eventType = "TEST_123";
+            var ev = new AuditEvent() { EventType = eventType };
+            var eventId = efPostgresSqlDataProvider.InsertEvent(ev);
+
+            Assert.That(eventId, Is.Positive);
+
+            var eventFromDb = efPostgresSqlDataProvider.GetEvent(eventId);
+
+            Assert.That(eventFromDb, Is.Null);
+        }
+
+        [Test]
+        public async Task PostgreSqlDataProvider_NoJsonColumn_GetEventShouldGetNoEventAsync()
+        {
+            var efPostgresSqlDataProvider = new PostgreSqlDataProvider()
+            {
+                ConnectionString = TestCommon.PostgreSqlConnectionString,
+                TableName = "event",
+                IdColumnName = "id",
+                CustomColumns =
+                [
+                    new(){Name = "event_type", Value = ev => ev.EventType}
+                ],
+                LastUpdatedDateColumnName = new(),
+                DataJsonType = null,
+                DataJsonStringBuilder = null
+            };
+
+            var eventType = "TEST_123";
+            var ev = new AuditEvent() { EventType = eventType };
+            var eventId = await efPostgresSqlDataProvider.InsertEventAsync(ev);
+
+            Assert.That(eventId, Is.Positive);
+
+            var eventFromDb = await efPostgresSqlDataProvider.GetEventAsync(eventId);
+
+            Assert.That(eventFromDb, Is.Null);
+        }
+
+        [Test]
+        public void PostgreSqlDataProvider_NoJsonColumn_EnumerateEventShouldGetNoEvents()
+        {
+            var efPostgresSqlDataProvider = new PostgreSqlDataProvider()
+            {
+                ConnectionString = TestCommon.PostgreSqlConnectionString,
+                TableName = "event",
+                IdColumnName = "id",
+                CustomColumns =
+                [
+                    new(){Name = "event_type", Value = ev => ev.EventType}
+                ],
+                LastUpdatedDateColumnName = new(),
+                DataJsonType = null,
+                DataJsonStringBuilder = null
+            };
+
+            var eventType = "TEST_123";
+            var ev = new AuditEvent() { EventType = eventType };
+            var eventId = efPostgresSqlDataProvider.InsertEvent(ev);
+
+            Assert.That(eventId, Is.Positive);
+
+            var eventsFromDb = efPostgresSqlDataProvider.EnumerateEvents(string.Empty);
+
+            Assert.That(eventsFromDb, Is.Empty);
+        }
+
+        [Test]
+        public void PostgreSqlDataProvider_NoJsonColumn_EnumerateEventOverloadShouldGetNoEvents()
+        {
+            var efPostgresSqlDataProvider = new PostgreSqlDataProvider()
+            {
+                ConnectionString = TestCommon.PostgreSqlConnectionString,
+                TableName = "event",
+                IdColumnName = "id",
+                CustomColumns =
+                [
+                    new(){Name = "event_type", Value = ev => ev.EventType}
+                ],
+                LastUpdatedDateColumnName = new(),
+                DataJsonType = null,
+                DataJsonStringBuilder = null
+            };
+
+            var eventType = "TEST_123";
+            var ev = new AuditEvent() { EventType = eventType };
+            var eventId = efPostgresSqlDataProvider.InsertEvent(ev);
+
+            Assert.That(eventId, Is.Positive);
+
+            var eventsFromDb = efPostgresSqlDataProvider.EnumerateEvents<AuditEvent>(string.Empty, string.Empty, string.Empty);
+
+            Assert.That(eventsFromDb, Is.Empty);
         }
 
         [Test]
@@ -36,7 +233,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             var dp = new PostgreSqlDataProvider();
 
-            Assert.That(dp.DataType, Is.EqualTo("JSON"));
+            Assert.That(dp.DataJsonType, Is.EqualTo("JSON"));
         }
 
         [Test]
@@ -52,7 +249,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
                 .ConnectionString("c")
-                .DataColumn("dc", DataType.JSON, null)
+                .DataJsonColumn("dc", DataType.JSON, null)
                 .IdColumnName("id")
                 .LastUpdatedColumnName("lud")
                 .Schema("sc")
@@ -60,7 +257,7 @@ namespace Audit.PostgreSql.UnitTest
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
             Assert.That(x.ConnectionString.GetValue(null), Is.EqualTo("c"));
-            Assert.That(x.DataColumnName.GetValue(null), Is.EqualTo("dc"));
+            Assert.That(x.DataJsonColumnName.GetValue(null), Is.EqualTo("dc"));
             Assert.That(x.IdColumnName.GetValue(null), Is.EqualTo("id"));
             Assert.That(x.LastUpdatedDateColumnName.GetValue(null), Is.EqualTo("lud"));
             Assert.That(x.Schema.GetValue(null), Is.EqualTo("sc"));
@@ -77,7 +274,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
                 .ConnectionString("c")
-                .DataColumn("dc")
+                .DataJsonColumn("dc")
                 .IdColumnName("id")
                 .LastUpdatedColumnName("lud")
                 .Schema("sc")
@@ -85,7 +282,7 @@ namespace Audit.PostgreSql.UnitTest
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
             Assert.That(x.ConnectionString.GetValue(null), Is.EqualTo("c"));
-            Assert.That(x.DataColumnName.GetValue(null), Is.EqualTo("dc"));
+            Assert.That(x.DataJsonColumnName.GetValue(null), Is.EqualTo("dc"));
             Assert.That(x.IdColumnName.GetValue(null), Is.EqualTo("id"));
             Assert.That(x.LastUpdatedDateColumnName.GetValue(null), Is.EqualTo("lud"));
             Assert.That(x.Schema.GetValue(null), Is.EqualTo("sc"));
@@ -102,7 +299,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
                 .ConnectionString(ev => "c")
-                .DataColumn(ev => "dc", DataType.JSON, null)
+                .DataJsonColumn(ev => "dc", DataType.JSON, null)
                 .IdColumnName(ev => "id")
                 .LastUpdatedColumnName(ev => "lud")
                 .Schema(ev => "sc")
@@ -110,7 +307,7 @@ namespace Audit.PostgreSql.UnitTest
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
             Assert.That(x.ConnectionString.GetDefault(), Is.EqualTo("c"));
-            Assert.That(x.DataColumnName.GetDefault(), Is.EqualTo("dc"));
+            Assert.That(x.DataJsonColumnName.GetDefault(), Is.EqualTo("dc"));
             Assert.That(x.IdColumnName.GetDefault(), Is.EqualTo("id"));
             Assert.That(x.LastUpdatedDateColumnName.GetDefault(), Is.EqualTo("lud"));
             Assert.That(x.Schema.GetDefault(), Is.EqualTo("sc"));
@@ -127,7 +324,7 @@ namespace Audit.PostgreSql.UnitTest
         {
             var x = new PostgreSql.Providers.PostgreSqlDataProvider(_ => _
                 .ConnectionString(ev => "c")
-                .DataColumn(ev => "dc")
+                .DataJsonColumn(ev => "dc")
                 .IdColumnName(ev => "id")
                 .LastUpdatedColumnName(ev => "lud")
                 .Schema(ev => "sc")
@@ -135,7 +332,7 @@ namespace Audit.PostgreSql.UnitTest
                 .CustomColumn("c1", ev => 1)
                 .CustomColumn("c2", ev => 2));
             Assert.That(x.ConnectionString.GetDefault(), Is.EqualTo("c"));
-            Assert.That(x.DataColumnName.GetDefault(), Is.EqualTo("dc"));
+            Assert.That(x.DataJsonColumnName.GetDefault(), Is.EqualTo("dc"));
             Assert.That(x.IdColumnName.GetDefault(), Is.EqualTo("id"));
             Assert.That(x.LastUpdatedDateColumnName.GetDefault(), Is.EqualTo("lud"));
             Assert.That(x.Schema.GetDefault(), Is.EqualTo("sc"));
@@ -153,7 +350,7 @@ namespace Audit.PostgreSql.UnitTest
             var overrideEventType = Guid.NewGuid().ToString();
             var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
             
-            var scope = AuditScope.Create("test", null);
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
             scope.Dispose();
 
             var id = scope.EventId;
@@ -195,11 +392,15 @@ namespace Audit.PostgreSql.UnitTest
             const int pageNumberOne = 1;
             const int pageSize = 10;
 
-            var dp = SetupConfiguredPostgreSqlDataProvider();
-            
-            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
-            ICollection<AuditEvent> realizedEvents = events.ToList();
+            var dp = GetConfiguredPostgreSqlDataProvider("test");
+
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
+            scope.Dispose();
+
+            var events = dp?.EnumerateEvents(pageNumberOne, pageSize);
+            var realizedEvents = events?.ToList();
             Assert.That(realizedEvents, Is.Not.Null);
+            Assert.That(realizedEvents, Has.Count.GreaterThan(0));
         }
         
         [Test]
@@ -209,11 +410,15 @@ namespace Audit.PostgreSql.UnitTest
             const int pageNumberOne = -333;
             const int pageSize = -444;
 
-            var dp = SetupConfiguredPostgreSqlDataProvider();
+            var dp = GetConfiguredPostgreSqlDataProvider("test");
 
-            IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumberOne, pageSize);
-            ICollection<AuditEvent> realizedEvents = events.ToList();
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
+            scope.Dispose();
+
+            var events = dp?.EnumerateEvents(pageNumberOne, pageSize);
+            var realizedEvents = events?.ToList();
             Assert.That(realizedEvents, Is.Not.Null);
+            Assert.That(realizedEvents, Has.Count.GreaterThan(0));
         }        
         
         [Test]
@@ -223,11 +428,15 @@ namespace Audit.PostgreSql.UnitTest
             const int pageSize = 10;
 
             string whereExpression = @""""+ GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
-            var dp = SetupConfiguredPostgreSqlDataProvider();
+            var dp = GetConfiguredPostgreSqlDataProvider("test");
+
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
+            scope.Dispose();
 
             IEnumerable<AuditEvent> events = dp?.EnumerateEvents(pageNumber, pageSize, whereExpression);
-            ICollection<AuditEvent> realizedEvents = events.ToList();
+            ICollection<AuditEvent> realizedEvents = events?.ToList();
             Assert.That(realizedEvents, Is.Not.Null);
+            Assert.That(realizedEvents, Has.Count.GreaterThan(0));
         }
         
         [Test]
@@ -236,12 +445,12 @@ namespace Audit.PostgreSql.UnitTest
             var overrideEventType = Guid.NewGuid().ToString();
             var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
 
-            var scope = AuditScope.Create("test", null);
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
             scope.Dispose();
 
-            var whereExpression = @"""" + GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
+            var whereExpression = @"""" + GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900' AND ""data"" IS NOT NULL";
             var events = dp?.EnumerateEvents(whereExpression);
-            var ev = events?.FirstOrDefault();
+            var ev = events?.LastOrDefault();
 
             Assert.That(ev, Is.Not.Null);
         }
@@ -252,11 +461,11 @@ namespace Audit.PostgreSql.UnitTest
             var overrideEventType = Guid.NewGuid().ToString();
             var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
 
-            var scope = AuditScope.Create("test", null);
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
             scope.Dispose();
 
             var events = dp?.EnumerateEvents(string.Empty);
-            var ev = events?.FirstOrDefault();
+            var ev = events?.LastOrDefault();
 
             Assert.That(ev, Is.Not.Null);
         }
@@ -267,12 +476,12 @@ namespace Audit.PostgreSql.UnitTest
             var overrideEventType = Guid.NewGuid().ToString();
             var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
 
-            var scope = AuditScope.Create("test", null);
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
             scope.Dispose();
 
             var whereExpression = string.Empty;
             var events = dp?.EnumerateEvents<AuditEvent>(whereExpression, GetLastUpdatedColumnNameColumnName(), "1");
-            var ev = events?.FirstOrDefault();
+            var ev = events?.LastOrDefault();
 
             Assert.That(ev, Is.Not.Null);
         }
@@ -283,12 +492,12 @@ namespace Audit.PostgreSql.UnitTest
             var overrideEventType = Guid.NewGuid().ToString();
             var dp = GetConfiguredPostgreSqlDataProvider(overrideEventType);
 
-            var scope = AuditScope.Create("test", null);
+            var scope = AuditScope.Create(new AuditScopeOptions { EventType = "test", DataProvider = dp });
             scope.Dispose();
 
             var whereExpression = @"""" + GetLastUpdatedColumnNameColumnName() + @""" > '12/31/1900'";
             var events = dp?.EnumerateEvents<AuditEvent>(whereExpression, GetLastUpdatedColumnNameColumnName(), "1");
-            var ev = events?.FirstOrDefault();
+            var ev = events?.LastOrDefault();
 
             Assert.That(ev, Is.Not.Null);
         }
@@ -301,7 +510,7 @@ namespace Audit.PostgreSql.UnitTest
                 .ConnectionString(TestCommon.PostgreSqlConnectionString)
                 .TableName("event_text")
                 .IdColumnName("id")
-                .DataColumn("data", Configuration.DataType.String)
+                .DataJsonColumn("data", Configuration.DataType.String)
                 .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
                 .CustomColumn("event_type", ev => ev.EventType)
                 .CustomColumn("some_date", ev => DateTime.UtcNow)
@@ -337,7 +546,7 @@ namespace Audit.PostgreSql.UnitTest
                 .ConnectionString(TestCommon.PostgreSqlConnectionString)
                 .TableName("event_text")
                 .IdColumnName("id")
-                .DataColumn("data", Configuration.DataType.String)
+                .DataJsonColumn("data", Configuration.DataType.String)
                 .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
                 .CustomColumn("event_type", ev => ev.EventType)
                 .CustomColumn("some_date", ev => DateTime.UtcNow)
@@ -373,7 +582,7 @@ namespace Audit.PostgreSql.UnitTest
                 .ConnectionString(TestCommon.PostgreSqlConnectionString)
                 .TableName("event_text")
                 .IdColumnName("id")
-                .DataColumn("data", Configuration.DataType.String)
+                .DataJsonColumn("data", Configuration.DataType.String)
                 .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
                 .CustomColumn("event_type", ev => ev.EventType)
                 .CustomColumn("some_date", ev => DateTime.UtcNow)
@@ -412,7 +621,7 @@ namespace Audit.PostgreSql.UnitTest
                 .ConnectionString(TestCommon.PostgreSqlConnectionString)
                 .TableName("event_text")
                 .IdColumnName("id")
-                .DataColumn("data", Configuration.DataType.String)
+                .DataJsonColumn("data", Configuration.DataType.String)
                 .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
                 .CustomColumn("event_type", ev => ev.EventType)
                 .CustomColumn("some_date", ev => DateTime.UtcNow)
@@ -447,21 +656,14 @@ namespace Audit.PostgreSql.UnitTest
         {
             return "updated_date";
         }
-
-        private static CustomPostgreSqlDataProvider SetupConfiguredPostgreSqlDataProvider()
-        {
-            string overrideEventType = Guid.NewGuid().ToString();
-            return GetConfiguredPostgreSqlDataProvider(overrideEventType);
-        }
         
         private static CustomPostgreSqlDataProvider GetConfiguredPostgreSqlDataProvider(string overrideEventType)
         {
-            Audit.Core.Configuration.Setup()
-                .UseCustomProvider(new CustomPostgreSqlDataProvider(config => config
+            return new CustomPostgreSqlDataProvider(config => config
                     .ConnectionString(TestCommon.PostgreSqlConnectionString)
                     .TableName("event")
                     .IdColumnName(_ => "id")
-                    .DataColumn("data", Configuration.DataType.JSONB, auditEvent =>
+                    .DataJsonColumn("data", Configuration.DataType.JSONB, auditEvent =>
                     {
                         auditEvent.EventType = overrideEventType;
                         return auditEvent.ToJson();
@@ -469,12 +671,7 @@ namespace Audit.PostgreSql.UnitTest
                     .LastUpdatedColumnName(GetLastUpdatedColumnNameColumnName())
                     .CustomColumn("event_type", ev => ev.EventType)
                     .CustomColumn("some_date", ev => DateTime.UtcNow)
-                    .CustomColumn("some_null", ev => null)))
-                .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
-                .ResetActions();
-            
-            var dp = Core.Configuration.DataProviderAs<CustomPostgreSqlDataProvider>();
-            return dp;
+                    .CustomColumn("some_null", ev => null));
         }
     }
 

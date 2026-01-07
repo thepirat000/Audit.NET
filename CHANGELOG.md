@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [32.0.0] - 2026-01-07:
+- **Audit.NET.PostgreSql**: **BREAKING CHANGE** Renaming the configuration settings `DataColumnName` and `DataType` to `DataJsonColumnName` and `DataJsonType` respectively.
+Changing the default for the DataJsonColumn (previously it was "data" but now is NULL, this allows to avoid creating the JSON column by default).
+Adding net >= 8.0 support and upgrading Npgsql PostgreSQL driver to latest version. (#777)
+
 ## [31.3.3] - 2025-12-30:
 - **Audit.NET**: Adding TimedEvent to the AuditEvent to capture intermediate timed events within an AuditScope.
 
