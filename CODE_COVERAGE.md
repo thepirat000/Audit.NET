@@ -2,20 +2,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 12/31/2025 - 00:48:03 |
-| Coverage date: | 12/31/2025 - 00:22:13 - 12/31/2025 - 00:47:13 |
-| Parser: | MultiReport (117x Cobertura) |
+| Generated on: | 01/08/2026 - 03:20:04 |
+| Coverage date: | 01/08/2026 - 02:54:11 - 01/08/2026 - 03:19:13 |
+| Parser: | MultiReport (118x Cobertura) |
 | Assemblies: | 45 |
 | Classes: | 376 |
 | Files: | 330 |
-| **Line coverage:** | 89.5% (10549 of 11786) |
-| Covered lines: | 10549 |
-| Uncovered lines: | 1237 |
-| Coverable lines: | 11786 |
-| Total lines: | 31647 |
-| **Branch coverage:** | 80% (3837 of 4795) |
-| Covered branches: | 3837 |
-| Total branches: | 4795 |
+| **Line coverage:** | 89.4% (10550 of 11790) |
+| Covered lines: | 10550 |
+| Uncovered lines: | 1240 |
+| Coverable lines: | 11790 |
+| Total lines: | 31660 |
+| **Branch coverage:** | 80% (3857 of 4817) |
+| Covered branches: | 3857 |
+| Total branches: | 4817 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 # Risk Hotspots
@@ -131,11 +131,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
@@ -355,11 +355,11 @@
 | Audit.Polly.HedgingActionGeneratorArgumentsExtensions | 17 | 0 | 17 | 69 | 100% | 10 | 10 | 100% |
 | Audit.Polly.Providers.PollyDataProvider | 31 | 11 | 42 | 120 | 73.8% | 2 | 2 | 100% |
 | Audit.Polly.ResilienceContextExtensions | 1 | 0 | 1 | 16 | 100% | 0 | 0 |  |
-| **Audit.NET.PostgreSql** | **210** | **0** | **210** | **568** | **100%** | **60** | **64** | **93.7%** |
+| **Audit.NET.PostgreSql** | **213** | **1** | **214** | **581** | **99.5%** | **80** | **86** | **93%** |
 | Audit.Core.PostgreSqlConfiguratorExtensions | 2 | 0 | 2 | 21 | 100% | 0 | 0 |  |
 | Audit.PostgreSql.Configuration.PostgreSqlProviderConfigurator | 34 | 0 | 34 | 102 | 100% | 0 | 0 |  |
 | Audit.PostgreSql.CustomColumn | 8 | 0 | 8 | 24 | 100% | 0 | 0 |  |
-| Audit.PostgreSql.Providers.PostgreSqlDataProvider | 166 | 0 | 166 | 421 | 100% | 60 | 64 | 93.7% |
+| Audit.PostgreSql.Providers.PostgreSqlDataProvider | 169 | 1 | 170 | 434 | 99.4% | 80 | 86 | 93% |
 | **Audit.NET.RavenDB** | **76** | **12** | **88** | **288** | **86.3%** | **6** | **8** | **75%** |
 | Audit.RavenDB.ConfigurationApi.RavenDbConfiguratorExtensions | 2 | 0 | 2 | 21 | 100% | 0 | 0 |  |
 | Audit.RavenDB.ConfigurationApi.RavenDbProviderConfigurator | 15 | 0 | 15 | 39 | 100% | 0 | 0 |  |
