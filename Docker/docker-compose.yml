@@ -133,7 +133,7 @@
       retries: 5
 
   kafka:
-    image: bitnamilegacy/kafka:latest
+    image: soldevelo/kafka:latest
     ports:
       - 9094:9094
     networks:
