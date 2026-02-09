@@ -124,6 +124,12 @@ jobs:
         run: sleep 60s
         shell: bash
 
+      - name: Debug Kafka container
+        if: always()
+        run: |
+          docker ps -a
+          docker logs kafka || true
+
       - name: Wait for services
         run: |
           set -e
@@ -144,7 +150,7 @@ jobs:
             echo "Timeout waiting for $host:$port $name" >&2
             return 1
           }
-
+          
           # List of host:port pairs to check. Adjust or expand as needed.
           wait_for_port localhost 3322 immudb
           wait_for_port localhost 8000 dynamodb
