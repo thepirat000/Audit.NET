@@ -1,4 +1,4 @@
-﻿﻿services:
+﻿services:
   immudb:
     image: codenotary/immudb:latest
     container_name: immudb
