@@ -124,12 +124,6 @@ jobs:
         run: sleep 60s
         shell: bash
 
-      - name: Debug Kafka container
-        if: always()
-        run: |
-          docker compose -f ./Docker/docker-compose.yml ps
-          docker compose -f ./Docker/docker-compose.yml logs --no-color --tail=400 kafka || true
-
       - name: Wait for services
         run: |
           set -e
@@ -165,6 +159,12 @@ jobs:
           wait_for_port localhost 10000 azurite
           wait_for_port localhost 1433 sqlserver
           wait_for_port localhost 9094 kafka 240
+
+      - name: Debug Kafka container
+        if: always()
+        run: |
+          docker compose -f ./Docker/docker-compose.yml ps
+          docker compose -f ./Docker/docker-compose.yml logs --no-color --tail=400 kafka || true
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
