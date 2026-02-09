@@ -2,15 +2,15 @@
 
 |||
 |:---|:---|
-| Generated on: | 01/08/2026 - 04:56:07 |
-| Coverage date: | 01/08/2026 - 04:31:00 - 01/08/2026 - 04:55:21 |
+| Generated on: | 02/09/2026 - 06:31:21 |
+| Coverage date: | 02/09/2026 - 06:05:19 - 02/09/2026 - 06:30:37 |
 | Parser: | MultiReport (118x Cobertura) |
 | Assemblies: | 45 |
 | Classes: | 376 |
 | Files: | 330 |
-| **Line coverage:** | 89.4% (10550 of 11790) |
-| Covered lines: | 10550 |
-| Uncovered lines: | 1240 |
+| **Line coverage:** | 89.4% (10552 of 11790) |
+| Covered lines: | 10552 |
+| Uncovered lines: | 1238 |
 | Coverable lines: | 11790 |
 | Total lines: | 31660 |
 | **Branch coverage:** | 80% (3857 of 4817) |
@@ -131,11 +131,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
