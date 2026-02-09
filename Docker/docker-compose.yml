@@ -133,6 +133,7 @@
       retries: 5
 
   kafka:
+    container_name: kafka
     image: soldevelo/kafka:latest
     ports:
         - "9094:9094"
