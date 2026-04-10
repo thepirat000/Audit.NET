@@ -2,19 +2,19 @@
 
 |||
 |:---|:---|
-| Generated on: | 02/17/2026 - 16:02:17 |
-| Coverage date: | 02/17/2026 - 15:36:24 - 02/17/2026 - 16:01:30 |
+| Generated on: | 04/10/2026 - 18:06:21 |
+| Coverage date: | 04/10/2026 - 17:40:30 - 04/10/2026 - 18:05:27 |
 | Parser: | MultiReport (118x Cobertura) |
 | Assemblies: | 45 |
 | Classes: | 376 |
 | Files: | 330 |
-| **Line coverage:** | 89.4% (10552 of 11790) |
-| Covered lines: | 10552 |
-| Uncovered lines: | 1238 |
+| **Line coverage:** | 89.4% (10550 of 11790) |
+| Covered lines: | 10550 |
+| Uncovered lines: | 1240 |
 | Coverable lines: | 11790 |
 | Total lines: | 31660 |
-| **Branch coverage:** | 80% (3857 of 4817) |
-| Covered branches: | 3857 |
+| **Branch coverage:** | 80% (3855 of 4817) |
+| Covered branches: | 3855 |
 | Total branches: | 4817 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
@@ -131,11 +131,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 34 | 1 | 35 | 344 | 97.1% | 0 | 0 |  |
-| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
@@ -265,10 +265,10 @@
 | Audit.Core.Providers.Wrappers.WrapperDataProvider | 15 | 0 | 15 | 68 | 100% | 18 | 18 | 100% |
 | Audit.Core.Setting<T> | 14 | 0 | 14 | 81 | 100% | 2 | 2 | 100% |
 | Audit.Core.TimedEvent | 6 | 0 | 6 | 49 | 100% | 0 | 0 |  |
-| **Audit.NET.AzureCosmos** | **113** | **10** | **123** | **406** | **91.8%** | **35** | **46** | **76%** |
+| **Audit.NET.AzureCosmos** | **113** | **10** | **123** | **406** | **91.8%** | **34** | **46** | **73.9%** |
 | Audit.AzureCosmos.ConfigurationApi.AzureCosmosProviderConfigurator | 17 | 8 | 25 | 83 | 68% | 0 | 0 |  |
 | Audit.AzureCosmos.Providers.AuditCosmosSerializer | 9 | 2 | 11 | 36 | 81.8% | 4 | 6 | 66.6% |
-| Audit.AzureCosmos.Providers.AzureCosmosDataProvider | 85 | 0 | 85 | 266 | 100% | 31 | 40 | 77.5% |
+| Audit.AzureCosmos.Providers.AzureCosmosDataProvider | 85 | 0 | 85 | 266 | 100% | 30 | 40 | 75% |
 | Audit.Core.AzureCosmosConfiguratorExtensions | 2 | 0 | 2 | 21 | 100% | 0 | 0 |  |
 | **Audit.NET.AzureEventHubs** | **53** | **14** | **67** | **234** | **79.1%** | **7** | **14** | **50%** |
 | Audit.AzureEventHubs.ConfigurationApi.AzureEventHubsConnectionConfigurator | 9 | 4 | 13 | 39 | 69.2% | 0 | 0 |  |
@@ -307,10 +307,10 @@
 | **Audit.NET.EventLog.Core** | **25** | **12** | **37** | **109** | **67.5%** | **2** | **10** | **20%** |
 | Audit.Core.EvenLogProviderConfigurator | 10 | 0 | 10 | 27 | 100% | 0 | 0 |  |
 | Audit.Core.Providers.EventLogDataProvider | 15 | 12 | 27 | 82 | 55.5% | 2 | 10 | 20% |
-| **Audit.NET.Firestore** | **211** | **4** | **215** | **592** | **98.1%** | **61** | **69** | **88.4%** |
+| **Audit.NET.Firestore** | **211** | **4** | **215** | **592** | **98.1%** | **60** | **69** | **86.9%** |
 | Audit.Core.FirestoreConfiguratorExtensions | 21 | 0 | 21 | 55 | 100% | 0 | 0 |  |
 | Audit.Firestore.ConfigurationApi.FirestoreProviderConfigurator | 24 | 2 | 26 | 92 | 92.3% | 0 | 0 |  |
-| Audit.Firestore.Providers.FirestoreDataProvider | 166 | 2 | 168 | 445 | 98.8% | 61 | 69 | 88.4% |
+| Audit.Firestore.Providers.FirestoreDataProvider | 166 | 2 | 168 | 445 | 98.8% | 60 | 69 | 86.9% |
 | **Audit.NET.ImmuDB** | **103** | **14** | **117** | **369** | **88%** | **24** | **28** | **85.7%** |
 | Audit.Core.ImmuDbConfiguratorExtensions | 2 | 0 | 2 | 22 | 100% | 0 | 0 |  |
 | Audit.ImmuDB.ConfigurationApi.ImmuDbProviderConfigurator | 18 | 10 | 28 | 98 | 64.2% | 0 | 0 |  |
