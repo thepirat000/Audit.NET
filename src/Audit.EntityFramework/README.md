@@ -131,6 +131,7 @@ public class MyContext : DbContext
 > **Note**
 > 
 > No other `SaveChanges` override is needed, since all the other overloads will call one of these two.
+> Also be aware of potential (endless) loops when `SaveChanges` or `SaveChangesAsync` returns an exception without implementing reentrancy guard in some form.
 
 #### 3. With the provided save changes interceptor
 
