@@ -318,7 +318,7 @@ namespace Audit.EntityFramework.Providers
             
             foreach (var prop in entityProperties)
             {
-                var colName = DbContextHelper.GetColumnName(prop);
+                var colName = DbContextHelper.GetColumnName(prop, entry.Entry.Metadata);
                 var value = columnValues.TryGetValue(colName, out var columnValue) ? columnValue : prop.PropertyInfo?.GetValue(entity);
                 auditFields[prop.Name].SetValue(auditEntity, value);
             }

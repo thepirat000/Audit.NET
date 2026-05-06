@@ -1,11 +1,13 @@
 ﻿#if EF_CORE
 using Audit.EntityFramework.ConfigurationApi;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +36,7 @@ namespace Audit.EntityFramework
                     {
                         result.Add(new EventEntryChange()
                         {
-                            ColumnName = GetColumnName(prop),
+                            ColumnName = GetColumnName(prop, entry.Metadata),
                             NewValue = HasPropertyValue(context, entry, prop.Name, propEntry.CurrentValue, out var overridenCurrentValue) ? overridenCurrentValue : propEntry.CurrentValue,
                             OriginalValue = HasPropertyValue(context, entry, prop.Name, propEntry.OriginalValue, out var overridenOriginalValue) ? overridenOriginalValue : propEntry.OriginalValue
                         });
@@ -101,7 +103,7 @@ namespace Audit.EntityFramework
                     {
                         value = overrideValue;
                     }
-                    result.Add(GetColumnName(prop), value);
+                    result.Add(GetColumnName(prop, entry.Metadata), value);
                 }
             }
 
@@ -141,28 +143,71 @@ namespace Audit.EntityFramework
         }
 #endif
 
-        /// <summary>
-        /// Gets the name of the column.
-        /// </summary>
-        internal static string GetColumnName(IProperty prop)
+#if EF_CORE_5_OR_GREATER
+        /// <summary>Gets the name of the column.</summary>
+        internal static string GetColumnName(IProperty prop, IEntityType metadata = null)
+        {
+            var declaringType = GetDeclaringType(prop);
+
+            var entityType = metadata ?? declaringType;
+
+            // Try resolving against the runtime entity type (TPC / TPH)
+            var storeObject = StoreObjectIdentifier.Create(entityType, StoreObjectType.Table);
+
+            if (storeObject.HasValue)
+            {
+                var columnName = prop.GetColumnName(storeObject.Value);
+                if (columnName != null)
+                {
+                    return columnName;
+                }
+            }
+
+            // Fallback for TPT: try declaring type table
+            if (metadata != null)
+            {
+                var declaringStoreObject = StoreObjectIdentifier.Create(declaringType, StoreObjectType.Table);
+
+                if (declaringStoreObject.HasValue)
+                {
+                    var columnName = prop.GetColumnName(declaringStoreObject.Value);
+                    if (columnName != null)
+                    {
+                        return columnName;
+                    }
+                }
+            }
+
+            // Final fallback (annotation-based)
+            return GetFallbackColumnName(prop);
+        }
+#else
+        internal static string GetColumnName(IProperty prop, IEntityType metadata = null)
+        {
+            return prop.Relational().ColumnName ?? prop.Name;
+        }
+#endif
+
+#if EF_CORE_8_OR_GREATER
+        private static ITypeBase GetDeclaringType(IProperty prop)
+        {
+            return prop.DeclaringType;
+        }
+#else
+        private static IEntityType GetDeclaringType(IProperty prop)
+        {
+            return prop.DeclaringEntityType;
+        }
+#endif
+
+        private static string GetFallbackColumnName(IProperty prop)
         {
 #if EF_CORE_8_OR_GREATER
-            var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringType, StoreObjectType.Table);
-            return storeObjectIdentifier.HasValue
-                ? (prop.GetColumnName(storeObjectIdentifier.Value) ?? prop.GetDefaultColumnName())
-                : prop.GetDefaultColumnName();
+            return prop.GetColumnName() ?? prop.GetDefaultColumnName();
 #elif EF_CORE_7_OR_GREATER
-            var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringEntityType, StoreObjectType.Table);
-            return storeObjectIdentifier.HasValue
-                ? (prop.GetColumnName(storeObjectIdentifier.Value) ?? prop.GetDefaultColumnName())
-                : prop.GetDefaultColumnName();
-#elif EF_CORE_5_OR_GREATER
-            var storeObjectIdentifier = StoreObjectIdentifier.Create(prop.DeclaringEntityType, StoreObjectType.Table);
-            return storeObjectIdentifier.HasValue 
-                ? prop.GetColumnName(storeObjectIdentifier.Value)
-                : prop.GetDefaultColumnBaseName();
+            return prop.GetColumnName() ?? prop.GetDefaultColumnName();
 #else
-            return prop.Relational().ColumnName ?? prop.Name;
+            return prop.GetColumnName() ?? prop.GetDefaultColumnBaseName();
 #endif
         }
 
@@ -273,7 +318,7 @@ namespace Audit.EntityFramework
                 {
                     foreach (var prop in fk.Properties)
                     {
-                        result[GetColumnName(prop)] = entry.Property(prop.Name).CurrentValue;
+                        result[GetColumnName(prop, entry.Metadata)] = entry.Property(prop.Name).CurrentValue;
                     }
                 }
             }
@@ -288,7 +333,7 @@ namespace Audit.EntityFramework
             var result = new Dictionary<string, object>();
             foreach(var prop in entry.Properties.Where(p => p.Metadata.IsPrimaryKey()))
             {
-                result.Add(GetColumnName(prop.Metadata), prop.CurrentValue); 
+                result.Add(GetColumnName(prop.Metadata, entry.Metadata), prop.CurrentValue); 
             }
             return result;
         }
