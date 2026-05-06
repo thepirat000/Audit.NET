@@ -134,6 +134,31 @@ namespace Audit.EntityFramework.Core.UnitTest
             attr.ReloadDatabaseValues = false;
             Assert.That(attr.ReloadDatabaseValues, Is.False);
         }
+
+#if EF_CORE
+        [Test]
+        public void ReloadDatabaseValuesAfterSave_Default_IsFalse()
+        {
+            var attr = new AuditDbContextAttribute();
+            Assert.That(attr.ReloadDatabaseValuesAfterSave, Is.False);
+        }
+
+        [Test]
+        public void ReloadDatabaseValuesAfterSave_SetTrue_ReflectsValue()
+        {
+            var attr = new AuditDbContextAttribute();
+            attr.ReloadDatabaseValuesAfterSave = true;
+            Assert.That(attr.ReloadDatabaseValuesAfterSave, Is.True);
+        }
+
+        [Test]
+        public void ReloadDatabaseValuesAfterSave_SetFalse_ReflectsValue()
+        {
+            var attr = new AuditDbContextAttribute();
+            attr.ReloadDatabaseValuesAfterSave = false;
+            Assert.That(attr.ReloadDatabaseValuesAfterSave, Is.False);
+        }
+#endif
         
         [Test]
         public void MapChangesByColumn_Default_IsFalse()

@@ -320,6 +320,7 @@ The following settings for the high-level interceptor can be configured per DbCo
 - **ReloadDatabaseValues**: Value to indicate if the original values of the audited entities should be queried from database before saving the audit event.
 > The *ReloadDatabaseValues* configuration is beneficial for making modifications without explicitly retrieving the entity first. 
 It can be enabled when using DbSet.Update or DbSet.Remove with an object that wasn't retrieved from the database. When enabled, it queries the database prior to any entity modification to record the original values in the audit event.
+- **ReloadDatabaseValuesAfterSave**: Value to indicate if the column values of the audited entities should be queried from database after saving the audit event. This is useful when the database generates values on insert or update operations, such as computed columns or values updated by triggers. When enabled, it queries the database after saving the audit event to get the updated column values and update the audit event's ColumnValues.
 
 The following settings can be configured per entity type:
 

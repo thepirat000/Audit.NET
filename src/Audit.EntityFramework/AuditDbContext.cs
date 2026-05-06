@@ -122,14 +122,19 @@ namespace Audit.EntityFramework
 
         /// <inheritdoc/>
         public bool ReloadDatabaseValues { get; set; }
-        
+
+#if EF_CORE
+        /// <inheritdoc/>
+        public bool ReloadDatabaseValuesAfterSave { get; set; }
+#endif
+
         /// <inheritdoc/>
         public bool MapChangesByColumn { get; set; }
 
         /// <inheritdoc/>
         public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }
 
-        #endregion
+#endregion
 
         #region Public methods
         /// <inheritdoc/>
@@ -248,6 +253,6 @@ namespace Audit.EntityFramework
             return base.SaveChangesAsync(true, cancellationToken);
         }
 #endif
-        #endregion
+#endregion
     }
 }

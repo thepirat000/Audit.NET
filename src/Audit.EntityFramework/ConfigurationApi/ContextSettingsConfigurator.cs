@@ -48,6 +48,14 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
+#if EF_CORE
+        public IContextSettingsConfigurator<T> ReloadDatabaseValuesAfterSave(bool reloadDatabaseValuesAfterSave = true)
+        {
+            Configuration.SetReloadDatabaseValuesAfterSave<T>(reloadDatabaseValuesAfterSave);
+            return this;
+        }
+#endif
+
         public IContextSettingsConfigurator<T> MapChangesByColumn(bool mapChangesByColumn = true)
         {
             Configuration.SetMapChangesByColumn<T>(mapChangesByColumn);

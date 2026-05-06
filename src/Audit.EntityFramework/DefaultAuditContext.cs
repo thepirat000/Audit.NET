@@ -33,6 +33,10 @@ namespace Audit.EntityFramework
         public virtual bool IncludeIndependantAssociations { get; set; }
 #endif
         public bool ReloadDatabaseValues { get; set; }
+
+#if EF_CORE
+        public bool ReloadDatabaseValuesAfterSave { get; set; }
+#endif
         public bool MapChangesByColumn { get; set; }
 
         public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; }

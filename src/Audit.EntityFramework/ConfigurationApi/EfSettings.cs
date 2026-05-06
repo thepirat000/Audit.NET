@@ -23,6 +23,9 @@ namespace Audit.EntityFramework.ConfigurationApi
         public bool? IncludeIndependantAssociations { get; set; }
 #endif
         public bool? ReloadDatabaseValues { get; set; }
+#if EF_CORE
+        public bool? ReloadDatabaseValuesAfterSave { get; set; }
+#endif
 
         public Dictionary<Type, HashSet<string>> IncludedPropertyNames { get; set; } = null;
 

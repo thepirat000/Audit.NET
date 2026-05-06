@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [32.1.0] - 2026-05-05:
 - **Audit.EntityFramework.Core**: Refactor column name resolution to accurately handle TPC, TPH, and TPT mapping strategies in EF Core. The `GetColumnName` method now considers the runtime entity type and mapping context, ensuring audit logs use correct column names for all scenarios. (#785)
+- **Audit.EntityFramework.Core**: Added `ReloadDatabaseValuesAfterSave` option to query the database for updated column values after saving the audit event, useful for computed columns or values updated by triggers. (#786, #787)
 
 ## [32.0.0] - 2026-01-07:
 - **Audit.NET.PostgreSql**: **BREAKING CHANGE** Renaming the configuration settings `DataColumnName` and `DataType` to `DataJsonColumnName` and `DataJsonType` respectively.

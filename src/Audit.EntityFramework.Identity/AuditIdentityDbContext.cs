@@ -183,6 +183,15 @@ namespace Audit.EntityFramework
         /// </summary>
         public bool ReloadDatabaseValues { get; set; }
 
+#if EF_CORE
+        /// <summary>
+        /// Value to indicate whether to reload database values after saving changes.
+        /// </summary>
+        /// <remarks>Set this property to <see langword="true"/> to ensure that the entity's values are
+        /// refreshed from the database after saving changes, which may be necessary if the database generates default values or triggers.</remarks>
+        public bool ReloadDatabaseValuesAfterSave { get; set; }
+#endif
+
         /// <summary>
         /// Value to indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the changes.
         /// </summary>

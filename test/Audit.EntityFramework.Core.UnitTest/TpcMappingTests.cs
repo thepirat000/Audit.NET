@@ -101,8 +101,8 @@ public class TpcMappingTests
         public TpcTestContext(DbContextOptions<TpcTestContext> opts, IAuditDataProvider dp) : base(opts)
         {
             this.AuditDataProvider = dp;
-
         }
+
         public DbSet<ThingOne> ThingOnes => Set<ThingOne>();
         public DbSet<ThingTwo> ThingTwos => Set<ThingTwo>();
 

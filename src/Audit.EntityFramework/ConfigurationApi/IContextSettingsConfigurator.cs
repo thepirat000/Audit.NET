@@ -53,6 +53,14 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// <param name="reloadDatabaseValues">if set to <c>true</c> the original values will be queried from database.</param>
         IContextSettingsConfigurator<T> ReloadDatabaseValues(bool reloadDatabaseValues = true);
 
+#if EF_CORE
+        /// <summary>
+        /// Value to indicate if the current column values of the audited entities should be queried from database explicitly, after saving the audit event.
+        /// </summary>
+        /// <param name="reloadDatabaseValuesAfterSave">if set to <c>true</c> the current column values will be queried from database after saving the audit event.</param>
+        IContextSettingsConfigurator<T> ReloadDatabaseValuesAfterSave(bool reloadDatabaseValuesAfterSave = true);
+#endif
+
         /// <summary>
         /// Value to indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the changes.
         /// </summary>

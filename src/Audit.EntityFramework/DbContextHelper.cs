@@ -62,6 +62,9 @@ namespace Audit.EntityFramework
             context.IncludeIndependantAssociations = attrConfig?.IncludeIndependantAssociations ?? localConfig?.IncludeIndependantAssociations ?? globalConfig?.IncludeIndependantAssociations ?? false;
 #endif
             context.ReloadDatabaseValues = attrConfig?.ReloadDatabaseValues ?? localConfig?.ReloadDatabaseValues ?? globalConfig?.ReloadDatabaseValues ?? false;
+#if EF_CORE
+            context.ReloadDatabaseValuesAfterSave = attrConfig?.ReloadDatabaseValuesAfterSave ?? localConfig?.ReloadDatabaseValuesAfterSave ?? globalConfig?.ReloadDatabaseValuesAfterSave ?? false;
+#endif
             context.MapChangesByColumn = attrConfig?.MapChangesByColumn ?? localConfig?.MapChangesByColumn ?? globalConfig?.MapChangesByColumn ?? false;
         }
 

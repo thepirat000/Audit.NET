@@ -78,6 +78,14 @@ namespace Audit.EntityFramework
             set => InternalConfig.ReloadDatabaseValues = value;
         }
 
+#if EF_CORE
+        public bool ReloadDatabaseValuesAfterSave
+        {
+            get => InternalConfig.ReloadDatabaseValuesAfterSave.GetValueOrDefault();
+            set => InternalConfig.ReloadDatabaseValuesAfterSave = value;
+        }
+#endif
+
         /// <summary>
         /// To indicate if the ChangesByColumn dictionary should be used instead of the Changes list to store the changes.
         /// Default is false.

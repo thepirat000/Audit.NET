@@ -63,6 +63,13 @@ namespace Audit.EntityFramework
             EnsureConfigFor<TContext>().ReloadDatabaseValues = reloadDatabaseValues;
         }
 
+#if EF_CORE
+        internal static void SetReloadDatabaseValuesAfterSave<TContext>(bool reloadDatabaseValuesAfterSave)
+        {
+            EnsureConfigFor<TContext>().ReloadDatabaseValuesAfterSave = reloadDatabaseValuesAfterSave;
+        }
+#endif
+
         internal static void SetMapChangesByColumn<TContext>(bool mapChangesByColumn)
         {
             EnsureConfigFor<TContext>().MapChangesByColumn = mapChangesByColumn;

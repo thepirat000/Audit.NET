@@ -430,12 +430,50 @@ namespace Audit.EntityFramework
                         change.NewValue = fk.Value;
                     }
                 }
+
+                if (context.ReloadDatabaseValuesAfterSave)
+                {
+                    ReloadAfterSave(context, entry, efEntry);
+                }
             }
+
             // Update ConnectionId
             var clientConnectionId = TryGetClientConnectionId(context.DbContext);
             if (clientConnectionId != null)
             {
                 efEvent.ConnectionId = clientConnectionId;
+            }
+        }
+
+        private void ReloadAfterSave(IAuditDbContext context, EntityEntry entry, EventEntry efEntry)
+        {
+            var dbValues = entry.GetDatabaseValues();
+
+            if (dbValues == null)
+            {
+                return;
+            }
+
+            foreach (var prop in dbValues.Properties)
+            {
+                if (!IncludeProperty(context, entry, prop.Name))
+                {
+                    continue;
+                }
+
+                var columnName = GetColumnName(prop, entry.Metadata);
+
+                var dbValue = dbValues.GetValue<object>(prop.Name);
+
+                if (HasPropertyValue(context, entry, prop.Name, dbValue, out var overrideValue))
+                {
+                    dbValue = overrideValue;
+                }
+
+                if (efEntry.ColumnValues.ContainsKey(columnName))
+                {
+                    efEntry.ColumnValues[columnName] = dbValue;
+                }
             }
         }
 
