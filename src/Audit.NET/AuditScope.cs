@@ -517,7 +517,13 @@ namespace Audit.Core
 
             if (_targetGetter != null)
             {
-                _event.Target.New = _dataProvider.CloneValue(_targetGetter.Invoke(), _event);
+                var targetValue = _targetGetter.Invoke();
+
+                if (targetValue != null)
+                {
+                    _event.Target.New = _dataProvider.CloneValue(targetValue, _event);
+                    _event.Target.Type = targetValue.GetType().GetFullTypeName();
+                }
             }
         }
 

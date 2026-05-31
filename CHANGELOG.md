@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [32.1.1] - 2026-05-31:
+- **Audit.NET**: Update the AuditEvent.Target.Type when the audit event ends (#791)
+
 ## [32.1.0] - 2026-05-05:
 - **Audit.EntityFramework.Core**: Refactor column name resolution to accurately handle TPC, TPH, and TPT mapping strategies in EF Core. The `GetColumnName` method now considers the runtime entity type and mapping context, ensuring audit logs use correct column names for all scenarios. (#785)
 - **Audit.EntityFramework.Core**: Added `ReloadDatabaseValuesAfterSave` option to query the database for updated column values after saving the audit event, useful for computed columns or values updated by triggers. (#786, #787)
