@@ -102,7 +102,7 @@ namespace Audit.WebApi
                 IpAddress = context.Connection?.RemoteIpAddress?.ToString(),
                 RequestUrl = context.Request.GetDisplayUrl(),
                 HttpMethod = context.Request.Method,
-                FormVariables = await AuditApiHelper.GetFormVariables(context, cancellationToken),
+                FormVariables = includeRequestBody ? await AuditApiHelper.GetFormVariables(context, cancellationToken) : null,
                 Headers = includeHeaders ? AuditApiHelper.ToDictionary(context.Request.Headers) : null,
                 ActionName = null,
                 ControllerName = null,

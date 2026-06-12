@@ -1,11 +1,17 @@
 ﻿#if ASP_CORE
+using Audit.Core;
+
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 using NUnit.Framework;
 
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Audit.WebApi.UnitTest
 {
@@ -70,6 +76,71 @@ namespace Audit.WebApi.UnitTest
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             return new ClaimsPrincipal(identity);
         }
+
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public async Task Test_BeforeExecutingAsync_IncludeRequestBody_ShouldControlFormVariables(bool includeRequestBody, bool expectNullFormVariables)
+        {
+            // Arrange
+            var adapter = new AuditApiAdapter();
+            var httpContext = new DefaultHttpContext();
+            var actionContext = new ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new ControllerActionDescriptor
+            {
+                ControllerName = "Test",
+                ActionName = "Action",
+                MethodInfo = typeof(AuditApiAdapterCoreTests).GetMethod(nameof(GetClaimsPrincipal))!,
+                Parameters = new List<Microsoft.AspNetCore.Mvc.Abstractions.ParameterDescriptor>()
+            });
+
+            // Setup HTTP request properties
+            httpContext.Request.Scheme = "http";
+            httpContext.Request.Host = new HostString("localhost");
+            httpContext.Request.Path = "/test/action";
+            httpContext.Request.ContentType = "application/x-www-form-urlencoded";
+            httpContext.Request.Method = "POST";
+
+            // Setup form data
+            var formCollection = new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+            {
+                { "key1", "value1" },
+                { "key2", "value2" }
+            });
+            httpContext.Request.Form = formCollection;
+
+            var actionExecutingContext = new ActionExecutingContext(
+                actionContext,
+                new List<IFilterMetadata>(),
+                new Dictionary<string, object>(),
+                new object());
+
+            // Act
+            await adapter.BeforeExecutingAsync(actionExecutingContext, includeHeaders: false, includeRequestBody, serializeParams: true, eventTypeName: null);
+
+            // Assert
+            var auditAction = httpContext.Items[AuditApiHelper.AuditApiActionKey] as AuditApiAction;
+            Assert.That(auditAction, Is.Not.Null);
+
+            if (expectNullFormVariables)
+            {
+                Assert.That(auditAction.FormVariables, Is.Null, "FormVariables should be null when IncludeRequestBody is false");
+            }
+            else
+            {
+                Assert.That(auditAction.FormVariables, Is.Not.Null, "FormVariables should not be null when IncludeRequestBody is true");
+                Assert.That(auditAction.FormVariables.ContainsKey("key1"), Is.True);
+                Assert.That(auditAction.FormVariables["key1"], Is.EqualTo("value1"));
+                Assert.That(auditAction.FormVariables.ContainsKey("key2"), Is.True);
+                Assert.That(auditAction.FormVariables["key2"], Is.EqualTo("value2"));
+            }
+
+            // Cleanup
+            var auditScope = httpContext.Items[AuditApiHelper.AuditApiScopeKey] as IAuditScope;
+            if (auditScope != null)
+            {
+                await auditScope.DisposeAsync();
+            }
+        }
     }
 }
 #endif
+

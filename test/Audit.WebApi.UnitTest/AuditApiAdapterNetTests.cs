@@ -117,6 +117,7 @@ namespace Audit.WebApi.UnitTest
             Assert.That(capturedAuditAction, Is.Not.Null);
             Assert.That(capturedAuditAction.UserName, Is.Null); // No principal set
             Assert.That(capturedAuditAction.IpAddress, Is.EqualTo("127.0.0.1"));
+            Assert.That(capturedAuditAction.FormVariables, Is.Not.Null, "FormVariables should not be null when IncludeRequestBody is true");
             Assert.That(capturedAuditAction.FormVariables.ContainsKey("key"), Is.True);
             Assert.That(capturedAuditAction.Headers, Is.Not.Null);
             Assert.That(capturedAuditAction.ActionName, Is.EqualTo("Get"));
@@ -167,6 +168,7 @@ namespace Audit.WebApi.UnitTest
             Assert.That(capturedAuditAction, Is.Not.Null);
             Assert.That(capturedAuditAction.Headers, Is.Null);
             Assert.That(capturedAuditAction.RequestBody, Is.Null);
+            Assert.That(capturedAuditAction.FormVariables, Is.Null, "FormVariables should be null when IncludeRequestBody is false");
             Assert.That(capturedAuditAction.TraceId, Is.Not.Null);
             Assert.That(capturedAuditScope, Is.Not.Null);
         }

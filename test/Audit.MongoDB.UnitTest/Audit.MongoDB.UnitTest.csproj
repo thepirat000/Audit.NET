@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;net472;netcoreapp3.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
 		<NoWarn>$(NoWarn);1591;NETSDK1138</NoWarn>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -19,10 +19,6 @@
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
-		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
 
 </Project>

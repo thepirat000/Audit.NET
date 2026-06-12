@@ -109,7 +109,7 @@ namespace Audit.WebApi
                     UserName = httpContext.User?.Identity.Name,
                     IpAddress = httpContext.Connection?.RemoteIpAddress?.ToString(),
                     HttpMethod = httpContext.Request.Method,
-                    FormVariables = await AuditApiHelper.GetFormVariables(httpContext, cancellationToken),
+                    FormVariables = includeRequestBody ? await AuditApiHelper.GetFormVariables(httpContext, cancellationToken) : null,
                     TraceId = httpContext.TraceIdentifier,
                 };
             }

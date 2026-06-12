@@ -49,11 +49,11 @@ namespace Audit.WebApi
                 IpAddress = contextWrapper.GetClientIp(),
                 RequestUrl = request.RequestUri?.AbsoluteUri,
                 HttpMethod = actionContext.Request.Method?.Method,
-                FormVariables = contextWrapper.GetFormVariables(),
                 Headers = includeHeaders ? ToDictionary(request.Headers) : null,
                 ActionName = actionContext.ActionDescriptor?.ActionName,
                 ControllerName = actionContext.ActionDescriptor?.ControllerDescriptor?.ControllerName,
                 ActionParameters = GetActionParameters(actionContext.ActionDescriptor, actionContext.ActionArguments, serializeParams),
+                FormVariables = includeRequestBody ? contextWrapper.GetFormVariables() : null,
                 RequestBody = includeRequestBody ? GetRequestBody(contextWrapper) : null,
                 TraceId = request.GetCorrelationId().ToString(),
                 HttpActionContext = actionContext

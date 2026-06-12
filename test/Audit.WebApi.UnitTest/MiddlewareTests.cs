@@ -18,6 +18,13 @@ namespace Audit.WebApi.UnitTest
         {
             return Ok(new string('#', length));
         }
+
+        [Route("form")]
+        [HttpPost]
+        public IActionResult PostForm([FromForm] string key, [FromForm] string value)
+        {
+            return Ok(new { Key = key, Value = value });
+        }
     }
 
     [Parallelizable]
@@ -71,6 +78,49 @@ namespace Audit.WebApi.UnitTest
             Assert.That(events[0].CustomFields["TestField2"].ToString(), Is.EqualTo("FromOnScopeCreated"));
             Assert.That(events[0].GetWebApiAuditAction().ResponseBody, expectNullResponseBody ? Is.Null : Is.Not.Null);
             Assert.That(events[0].GetWebApiAuditAction().ResponseBody?.Value, expectNullResponseBodyContent ? Is.Null : Is.Not.Null);
+        }
+
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public async Task Test_IncludeRequestBody_ShouldControlFormVariables(bool includeRequestBody, bool expectNullFormVariables)
+        {
+            var dataProvider = new InMemoryDataProvider();
+
+            using var app = TestHelper.GetTestServer(dataProvider, cfg =>
+            {
+                cfg.FilterByRequest(r => r.Path.Value?.Contains("TestMiddleware") == true);
+                cfg.IncludeRequestBody(includeRequestBody);
+            });
+
+            using var client = app.CreateClient();
+
+            var formContent = new System.Net.Http.FormUrlEncodedContent(new[]
+            {
+                new System.Collections.Generic.KeyValuePair<string, string>("key", "testKey"),
+                new System.Collections.Generic.KeyValuePair<string, string>("value", "testValue")
+            });
+
+            var response = await client.PostAsync("/TestMiddleware/form", formContent);
+
+            var events = dataProvider.GetAllEvents();
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(events, Has.Count.EqualTo(1));
+
+            var auditAction = events[0].GetWebApiAuditAction();
+
+            if (expectNullFormVariables)
+            {
+                Assert.That(auditAction.FormVariables, Is.Null, "FormVariables should be null when IncludeRequestBody is false");
+            }
+            else
+            {
+                Assert.That(auditAction.FormVariables, Is.Not.Null, "FormVariables should not be null when IncludeRequestBody is true");
+                Assert.That(auditAction.FormVariables.ContainsKey("key"), Is.True);
+                Assert.That(auditAction.FormVariables["key"], Is.EqualTo("testKey"));
+                Assert.That(auditAction.FormVariables.ContainsKey("value"), Is.True);
+                Assert.That(auditAction.FormVariables["value"], Is.EqualTo("testValue"));
+            }
         }
     }
 

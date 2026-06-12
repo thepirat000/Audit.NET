@@ -9,7 +9,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using NUnit.Framework;
 
 namespace Audit.MongoDb.UnitTest
@@ -22,12 +21,10 @@ namespace Audit.MongoDb.UnitTest
         [OneTimeSetUp]
         public void Setup()
         {
-#if NET472 || NETCOREAPP3_1 || NET6_0_OR_GREATER
            // Allow BSON serialization on any type starting with Audit
             var objectSerializer = new ObjectSerializer(type =>
             ObjectSerializer.DefaultAllowedTypes(type) || type.FullName.StartsWith("Audit") || type.FullName.StartsWith("MongoDB"));
             BsonSerializer.RegisterSerializer(objectSerializer);
-#endif
         }
 
         [Test]
