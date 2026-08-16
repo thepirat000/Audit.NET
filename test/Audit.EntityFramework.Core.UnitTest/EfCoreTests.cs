@@ -100,6 +100,70 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
+        public void Test_EF_ComplexType_ReloadDatabaseValuesAfterSave()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexTypes>(c => c
+                    .ReloadDatabaseValuesAfterSave()
+                    .ForEntity<Context_ComplexTypes.Person>(p => p.Format(x => x.Name, name => $"#{name}#"))
+                    .ForEntity<Context_ComplexTypes.Address>(a => a.Format(p => p.City, city => $"*{city}*"))
+                    .ForEntity<Context_ComplexTypes.Country>(a => a.Format(p => p.Alias, alias => alias?.ToUpperInvariant())));
+
+            using var context = new Context_ComplexTypes();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var person = new Context_ComplexTypes.Person()
+            {
+                Id = 1,
+                Name = "Initial",
+                Address = new Context_ComplexTypes.Address()
+                {
+                    Country = new Context_ComplexTypes.Country() { Name = "Austria", Alias = "Au" },
+                    City = "Vienna",
+                    Line1 = "Street",
+                    Line2 = "Ignored",
+                    PostCode = "1234"
+                }
+            };
+
+            context.People.Add(person);
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            person.Name = "Updated";
+            person.Address = person.Address with
+            {
+                City = "Madrid",
+                Country = person.Address.Country with { Alias = "es" }
+            };
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            Assert.That(evs.Count, Is.EqualTo(2));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("#Initial#"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Name"], Is.EqualTo("#Updated#"));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.City"], Is.EqualTo("*Vienna*"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address.City"], Is.EqualTo("*Madrid*"));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.Alias"], Is.EqualTo("AU"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address.Country.Alias"], Is.EqualTo("ES"));
+
+            Assert.That(evs[0].Entries[0].ColumnValues.ContainsKey("Address.Line2"), Is.False);
+            Assert.That(evs[1].Entries[0].ColumnValues.ContainsKey("Address.Line2"), Is.False);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
         public void Test_EF_ComplexType_EntityFrameworkDataProvider_PropertyMatching()
         {
             // Arrange

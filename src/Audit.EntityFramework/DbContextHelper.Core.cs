@@ -468,7 +468,7 @@ namespace Audit.EntityFramework
                 return;
             }
 
-            foreach (var prop in dbValues.Properties)
+            foreach (var prop in entry.Metadata.GetProperties())
             {
                 if (!IncludeProperty(context, entry, prop.Name))
                 {
@@ -477,7 +477,7 @@ namespace Audit.EntityFramework
 
                 var columnName = GetColumnName(prop, entry.Metadata);
 
-                var dbValue = dbValues.GetValue<object>(prop.Name);
+                var dbValue = GetDatabaseValue(dbValues, prop);
 
                 if (HasPropertyValue(context, entry, prop.Name, dbValue, out var overrideValue))
                 {
@@ -489,9 +489,56 @@ namespace Audit.EntityFramework
                     efEntry.ColumnValues[columnName] = dbValue;
                 }
             }
+
+#if EF_CORE_8_OR_GREATER
+            ReloadAfterSaveComplexProperties(context, entry, dbValues, entry.ComplexProperties, efEntry.ColumnValues);
+#endif
         }
 
-        private string GetAmbientTransactionId()
+#if EF_CORE_8_OR_GREATER
+        private void ReloadAfterSaveComplexProperties(IAuditDbContext context, EntityEntry entry, PropertyValues dbValues, IEnumerable<ComplexPropertyEntry> complexProperties, IDictionary<string, object> columnValues, string prefix = null)
+        {
+            foreach (var complexEntry in complexProperties)
+            {
+                var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
+
+                foreach (var propEntry in complexEntry.Properties)
+                {
+                    if (!IncludeProperty(context, complexEntry.Metadata.ClrType, propEntry.Metadata.Name))
+                    {
+                        continue;
+                    }
+
+                    var dbValue = GetDatabaseValue(dbValues, propEntry.Metadata);
+
+                    if (HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, dbValue, out var overrideValue))
+                    {
+                        dbValue = overrideValue;
+                    }
+
+                    var columnName = GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath);
+
+                    if (columnValues.ContainsKey(columnName))
+                    {
+                        columnValues[columnName] = dbValue;
+                    }
+                }
+
+                ReloadAfterSaveComplexProperties(context, entry, dbValues, complexEntry.ComplexProperties, columnValues, complexPropertyPath);
+            }
+        }
+#endif
+
+        private static object GetDatabaseValue(PropertyValues dbValues, IProperty prop)
+        {
+#if EF_CORE_8_OR_GREATER
+            return dbValues[prop];
+#else
+            return dbValues.GetValue<object>(prop.Name);
+#endif
+        }
+
+        private static string GetAmbientTransactionId()
         {
 #if EF_CORE_5_OR_GREATER
             var tranInfo = System.Transactions.Transaction.Current?.TransactionInformation;
