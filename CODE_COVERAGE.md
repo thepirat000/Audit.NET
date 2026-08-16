@@ -2,20 +2,20 @@
 
 |||
 |:---|:---|
-| Generated on: | 06/12/2026 - 20:49:32 |
-| Coverage date: | 06/12/2026 - 20:23:45 - 06/12/2026 - 20:48:40 |
+| Generated on: | 08/16/2026 - 02:08:39 |
+| Coverage date: | 08/16/2026 - 01:43:21 - 08/16/2026 - 02:07:45 |
 | Parser: | MultiReport (117x Cobertura) |
 | Assemblies: | 45 |
 | Classes: | 376 |
 | Files: | 330 |
-| **Line coverage:** | 89.4% (10575 of 11816) |
-| Covered lines: | 10575 |
-| Uncovered lines: | 1241 |
-| Coverable lines: | 11816 |
-| Total lines: | 31784 |
-| **Branch coverage:** | 80.2% (3898 of 4855) |
-| Covered branches: | 3898 |
-| Total branches: | 4855 |
+| **Line coverage:** | 89.5% (10581 of 11820) |
+| Covered lines: | 10581 |
+| Uncovered lines: | 1239 |
+| Coverable lines: | 11820 |
+| Total lines: | 31798 |
+| **Branch coverage:** | 80.3% (3901 of 4857) |
+| Covered branches: | 3901 |
+| Total branches: | 4857 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 # Risk Hotspots
@@ -79,7 +79,7 @@
 | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | 115 | 17 | 132 | 396 | 87.1% | 80 | 100 | 80% |
 | **Audit.EntityFramework.Abstractions** | **4** | **2** | **6** | **20** | **66.6%** | **0** | **0** | **** |
 | Audit.EntityFramework.AuditOverrideAttribute | 4 | 2 | 6 | 20 | 66.6% | 0 | 0 |  |
-| **Audit.EntityFramework.Core** | **1768** | **111** | **1879** | **5357** | **94%** | **796** | **908** | **87.6%** |
+| **Audit.EntityFramework.Core** | **1772** | **111** | **1883** | **5371** | **94.1%** | **799** | **910** | **87.8%** |
 | Audit.Core.DbContextConfiguratorExtensions | 2 | 2 | 4 | 37 | 50% | 0 | 0 |  |
 | Audit.Core.EntityFrameworkConfiguratorExtensions | 28 | 2 | 30 | 72 | 93.3% | 2 | 2 | 100% |
 | Audit.EntityFramework.AuditDbContext | 35 | 0 | 35 | 258 | 100% | 0 | 0 |  |
@@ -109,7 +109,7 @@
 | Audit.EntityFramework.ConfigurationApi.MappingInfo | 4 | 0 | 4 | 31 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.ModeConfigurator<T> | 6 | 0 | 6 | 21 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.DbContextExtensions | 3 | 0 | 3 | 24 | 100% | 0 | 0 |  |
-| Audit.EntityFramework.DbContextHelper | 475 | 19 | 494 | 1220 | 96.1% | 439 | 482 | 91% |
+| Audit.EntityFramework.DbContextHelper | 479 | 19 | 498 | 1234 | 96.1% | 442 | 484 | 91.3% |
 | Audit.EntityFramework.DefaultAuditContext | 19 | 4 | 23 | 52 | 82.6% | 0 | 0 |  |
 | Audit.EntityFramework.EntityFrameworkEvent | 13 | 1 | 14 | 81 | 92.8% | 0 | 0 |  |
 | Audit.EntityFramework.EntityName | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
@@ -131,11 +131,11 @@
 | Audit.EntityFramework.AuditIdentityDbContext<T> | 0 | 4 | 4 | 76 | 0% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3> | 4 | 0 | 4 | 76 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AuditIdentityDbContext<T1, T2, T3, T4, T5, T6, T7, T8> | 35 | 1 | 36 | 353 | 97.2% | 0 | 0 |  |
-| **Audit.FileSystem** | **164** | **2** | **166** | **408** | **98.7%** | **52** | **52** | **100%** |
+| **Audit.FileSystem** | **166** | **0** | **166** | **408** | **100%** | **52** | **52** | **100%** |
 | Audit.FileSystem.AuditEventFileSystem | 1 | 0 | 1 | 19 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileBinaryContent | 2 | 0 | 2 | 12 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileSystemEvent | 15 | 0 | 15 | 27 | 100% | 0 | 0 |  |
-| Audit.FileSystem.FileSystemMonitor | 126 | 2 | 128 | 254 | 98.4% | 52 | 52 | 100% |
+| Audit.FileSystem.FileSystemMonitor | 128 | 0 | 128 | 254 | 100% | 52 | 52 | 100% |
 | Audit.FileSystem.FileSystemMonitorOptions | 18 | 0 | 18 | 85 | 100% | 0 | 0 |  |
 | Audit.FileSystem.FileTextualContent | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | **Audit.Grpc.Client** | **316** | **21** | **337** | **999** | **93.7%** | **93** | **114** | **81.5%** |
