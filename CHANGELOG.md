@@ -3,6 +3,9 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [32.3.0] - 2026-08-15:
+- **Audit.EntityFramework.Core**: Added support for nested properties in column values and ensured that column changes preserve the full complex-property path (#796)
+
 ## [32.2.0] - 2026-06-12:
 - **Audit.WebApi** / **Audit.WebApi.Core**: Making the existing `IncludeRequestBody` setting to control whether Form Variables are included (#792)
 - **Audit.NET.MongoDB** / **Audit.MongoClient**: Upgrading MongoDB.Driver to latest version 3.9.0 (#793)

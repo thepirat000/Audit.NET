@@ -67,6 +67,53 @@ namespace Audit.EntityFramework.Core.UnitTest
             modelBuilder.Entity<AuditLog>().ComplexProperty(e => e.Address).ComplexProperty(a => a.Country);
         }
     }
+
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_ComplexTypes_DuplicateNames : AuditDbContext
+    {
+        public class Loan
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string LoanType { get; set; }
+            [Required]
+            public required LoanData LoanData { get; set; }
+        }
+
+        public record LoanData
+        {
+            public string LoanType { get; init; }
+            [Required]
+            public required BorrowerInfo PrimaryBorrower { get; init; }
+            [Required]
+            public required BorrowerInfo CoBorrower1 { get; init; }
+        }
+
+        public record BorrowerInfo
+        {
+            public string Email { get; init; }
+        }
+
+        public DbSet<Loan> Loans { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var cnnString = TestHelper.GetConnectionString(nameof(Context_ComplexTypes_DuplicateNames));
+                optionsBuilder.UseSqlServer(cnnString).UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Loan>().ComplexProperty(e => e.LoanData, loanData =>
+            {
+                loanData.ComplexProperty(e => e.PrimaryBorrower);
+                loanData.ComplexProperty(e => e.CoBorrower1);
+            });
+        }
+    }
 #endif
     
 #if EF_CORE_7_OR_GREATER

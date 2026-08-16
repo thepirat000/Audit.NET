@@ -62,10 +62,12 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Adds the change values from the complex properties recursively
         /// </summary>
-        private void AddChangesFromComplexProperties(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexPropertyEntry> complexProperties, List<EventEntryChange> result)
+        private void AddChangesFromComplexProperties(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexPropertyEntry> complexProperties, List<EventEntryChange> result, string prefix = null)
         {
             foreach (var complexEntry in complexProperties)
             {
+                var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
+
                 // Process the primitive properties
                 foreach (var propEntry in complexEntry.Properties)
                 {
@@ -73,7 +75,7 @@ namespace Audit.EntityFramework
                     {
                         result.Add(new EventEntryChange()
                         {
-                            ColumnName = GetColumnName(propEntry.Metadata),
+                            ColumnName = GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath),
                             NewValue = HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, propEntry.CurrentValue, out var overridenCurrentValue) ? overridenCurrentValue : propEntry.CurrentValue,
                             OriginalValue = HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, propEntry.OriginalValue, out var overridenOriginalValue) ? overridenOriginalValue : propEntry.OriginalValue
                         });
@@ -81,7 +83,7 @@ namespace Audit.EntityFramework
                 }
 
                 // Recursively process complex properties
-                AddChangesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result);
+                AddChangesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result, complexPropertyPath);
             }
         }
 #endif
@@ -117,10 +119,12 @@ namespace Audit.EntityFramework
         /// <summary>
         /// Adds the column values from the complex properties recursively
         /// </summary>
-        private void AddColumnValuesFromComplexProperties(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexPropertyEntry> complexProperties, Dictionary<string, object> result)
+        private void AddColumnValuesFromComplexProperties(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexPropertyEntry> complexProperties, Dictionary<string, object> result, string prefix = null)
         {
             foreach (var complexEntry in complexProperties)
             {
+                var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
+
                 // Process the primitive properties
                 foreach (var propEntry in complexEntry.Properties)
                 {
@@ -132,13 +136,13 @@ namespace Audit.EntityFramework
                             value = overrideValue;
                         }
 
-                        var columnName = GetColumnName(propEntry.Metadata);
+                        var columnName = GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath);
                         result.Add(columnName, value);
                     }
                 }
 
                 // Recursively process complex properties
-                AddColumnValuesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result);
+                AddColumnValuesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result, complexPropertyPath);
             }
         }
 #endif
@@ -189,6 +193,16 @@ namespace Audit.EntityFramework
 #endif
 
 #if EF_CORE_8_OR_GREATER
+        internal static string GetColumnNameFromComplexProperty(IProperty prop, string prefix)
+        {
+            return GetPropertyPath(prefix, GetFallbackColumnName(prop));
+        }
+
+        private static string GetPropertyPath(string prefix, string name)
+        {
+            return string.IsNullOrEmpty(prefix) ? name : $"{prefix}.{name}";
+        }
+
         private static ITypeBase GetDeclaringType(IProperty prop)
         {
             return prop.DeclaringType;
