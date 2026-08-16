@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [32.3.0] - 2026-08-15:
 - **Audit.EntityFramework.Core**: Added support for nested properties in column values and ensured that column changes preserve the full complex-property path (#796)
-- **Audit.EntityFramework.Core**: Refactor ReloadAfterSave  to use metadata-based value access and recursive complex-property handling (instead of string-name lookups) (#797)
+- **Audit.EntityFramework.Core**: Refactor ReloadAfterSave to use metadata-based value access and recursive complex-property handling (instead of string-name lookups) (#797)
 
 ## [32.2.0] - 2026-06-12:
 - **Audit.WebApi** / **Audit.WebApi.Core**: Making the existing `IncludeRequestBody` setting to control whether Form Variables are included (#792)
