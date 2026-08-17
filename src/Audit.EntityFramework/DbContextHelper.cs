@@ -154,7 +154,11 @@ namespace Audit.EntityFramework
         /// </summary>
         public async Task EndAuditScopeAsync(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event, CancellationToken cancellationToken = default)
         {
+#if EF_CORE
             await UpdateAuditEventAsync(@event, context, cancellationToken);
+#else
+            UpdateAuditEvent(@event, context);
+#endif
             scope.EventAs<AuditEventEntityFramework>().EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             await scope.DisposeAsync();

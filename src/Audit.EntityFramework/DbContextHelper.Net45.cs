@@ -6,6 +6,8 @@ using System.Data.Entity.Core;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.EntityFramework
 {
@@ -164,20 +166,18 @@ namespace Audit.EntityFramework
             return EntityKeyHelper.Instance.GetForeignKeysValues(entry.Entity, dbContext);
         }
 
-        /// <summary>
-        /// Creates the Audit Event.
-        /// </summary>
-        public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
+        private bool TryBeginCreateAuditEvent(IAuditDbContext context, out EntityFrameworkEvent efEvent, out IReadOnlyList<DbEntityEntry> modifiedEntries)
         {
             var dbContext = context.DbContext;
-            var modifiedEntries = GetModifiedEntries(context);
+            modifiedEntries = GetModifiedEntries(context);
             if (modifiedEntries.Count == 0 && !context.IncludeIndependantAssociations)
             {
-                return null;
+                efEvent = null;
+                return false;
             }
 
             var clientConnectionId = GetClientConnectionId(dbContext.Database.Connection);
-            var efEvent = new EntityFrameworkEvent()
+            efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
                 Database = dbContext.Database.Connection.Database,
@@ -189,37 +189,90 @@ namespace Audit.EntityFramework
 
             if (modifiedEntries.Count == 0 && efEvent.Associations == null)
             {
-                return null;
+                efEvent = null;
+                return false;
+            }
+            return true;
+        }
+
+        private static void ReloadOriginalValuesIfNeeded(IAuditDbContext context, DbEntityEntry entry)
+        {
+            if (!context.ReloadDatabaseValues || (entry.State != EntityState.Modified && entry.State != EntityState.Deleted))
+            {
+                return;
+            }
+            var dbValues = entry.GetDatabaseValues();
+            if (dbValues != null)
+            {
+                entry.OriginalValues.SetValues(dbValues);
+            }
+        }
+
+        private static async Task ReloadOriginalValuesIfNeededAsync(IAuditDbContext context, DbEntityEntry entry, CancellationToken cancellationToken = default)
+        {
+            if (!context.ReloadDatabaseValues || (entry.State != EntityState.Modified && entry.State != EntityState.Deleted))
+            {
+                return;
             }
             
+            var dbValues = await entry.GetDatabaseValuesAsync(cancellationToken);
+            if (dbValues != null)
+            {
+                entry.OriginalValues.SetValues(dbValues);
+            }
+        }
+
+        private EventEntry CreateEventEntry(IAuditDbContext context, DbEntityEntry entry)
+        {
+            var dbContext = context.DbContext;
+            var entity = entry.Entity;
+            var validationResults = context.ExcludeValidationResults ? null : entry.GetValidationResult();
+            var entityName = GetEntityName(dbContext, entity);
+            return new EventEntry()
+            {
+                Valid = validationResults?.IsValid ?? true,
+                ValidationResults = validationResults?.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
+                Entity = context.IncludeEntityObjects ? entity : null,
+                Entry = entry,
+                Action = GetStateName(entry.State),
+                Changes = entry.State == EntityState.Modified && !context.MapChangesByColumn ? GetChanges(context, entry) : null,
+                ChangesByColumn = entry.State == EntityState.Modified && context.MapChangesByColumn ? GetChangesByColumn(context, entry) : null,
+                Table = entityName.Table,
+                Schema = entityName.Schema,
+                ColumnValues = GetColumnValues(context, entry)
+            };
+        }
+
+        /// <summary>
+        /// Creates the Audit Event.
+        /// </summary>
+        public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
+        {
+            if (!TryBeginCreateAuditEvent(context, out var efEvent, out var modifiedEntries))
+            {
+                return null;
+            }
             foreach (var entry in modifiedEntries)
             {
-                var entity = entry.Entity;
-                var validationResults = context.ExcludeValidationResults ? null : entry.GetValidationResult();
-                var entityName = GetEntityName(dbContext, entity);
+                ReloadOriginalValuesIfNeeded(context, entry);
+                efEvent.Entries.Add(CreateEventEntry(context, entry));
+            }
+            return efEvent;
+        }
 
-                if (context.ReloadDatabaseValues && (entry.State == EntityState.Modified || entry.State == EntityState.Deleted))
-                {
-                    var dbValues = entry.GetDatabaseValues();
-                    if (dbValues != null)
-                    {
-                        entry.OriginalValues.SetValues(dbValues);
-                    }
-                }
-
-                efEvent.Entries.Add(new EventEntry()
-                {
-                    Valid = validationResults?.IsValid ?? true,
-                    ValidationResults = validationResults?.ValidationErrors.Select(x => x.ErrorMessage).ToList(),
-                    Entity = context.IncludeEntityObjects ? entity : null,
-                    Entry = entry,
-                    Action = GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified && !context.MapChangesByColumn ? GetChanges(context, entry) : null,
-                    ChangesByColumn = entry.State == EntityState.Modified && context.MapChangesByColumn ? GetChangesByColumn(context, entry) : null,
-                    Table = entityName.Table,
-                    Schema = entityName.Schema,
-                    ColumnValues = GetColumnValues(context, entry)
-                });
+        /// <summary>
+        /// Creates the Audit Event asynchronously.
+        /// </summary>
+        public async Task<EntityFrameworkEvent> CreateAuditEventAsync(IAuditDbContext context, CancellationToken cancellationToken = default)
+        {
+            if (!TryBeginCreateAuditEvent(context, out var efEvent, out var modifiedEntries))
+            {
+                return null;
+            }
+            foreach (var entry in modifiedEntries)
+            {
+                await ReloadOriginalValuesIfNeededAsync(context, entry, cancellationToken);
+                efEvent.Entries.Add(CreateEventEntry(context, entry));
             }
             return efEvent;
         }
