@@ -47,6 +47,9 @@ namespace Audit.EntityFramework
 #if EF_CORE_8_OR_GREATER
             AddChangesFromComplexProperties(context, entry, entry.ComplexProperties, result);
 #endif
+#if EF_CORE_10_OR_GREATER
+            AddChangesFromComplexCollections(context, entry, entry.ComplexCollections, result);
+#endif
 
             return result;
         }
@@ -82,8 +85,49 @@ namespace Audit.EntityFramework
                     }
                 }
 
+#if EF_CORE_10_OR_GREATER
+                AddChangesFromComplexCollections(context, entry, complexEntry.ComplexCollections, result, complexPropertyPath);
+#endif
                 // Recursively process complex properties
                 AddChangesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result, complexPropertyPath);
+            }
+        }
+#endif
+
+#if EF_CORE_10_OR_GREATER
+        /// <summary>
+        /// Adds the change values from the complex collections.
+        /// </summary>
+        private void AddChangesFromComplexCollections(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexCollectionEntry> complexCollections, List<EventEntryChange> result, string prefix = null)
+        {
+            foreach (var complexCollection in complexCollections)
+            {
+                if (!complexCollection.IsModified || !IncludeProperty(context, entry.Metadata.ClrType, complexCollection.Metadata.Name))
+                {
+                    continue;
+                }
+
+                var complexCollectionPath = GetPropertyPath(prefix, complexCollection.Metadata.Name);
+
+                object originalValue = entry.State == EntityState.Added ? null : entry.OriginalValues[complexCollection.Metadata];
+                object newValue = entry.State == EntityState.Deleted ? null : entry.CurrentValues[complexCollection.Metadata];
+                
+                if (HasPropertyValue(context, entry, complexCollection.Metadata.Name, originalValue, out var overriddenValue))
+                {
+                    originalValue = overriddenValue;
+                }
+
+                if (HasPropertyValue(context, entry, complexCollection.Metadata.Name, newValue, out overriddenValue))
+                {
+                    newValue = overriddenValue;
+                }
+                
+                result.Add(new EventEntryChange()
+                {
+                    ColumnName = complexCollectionPath,
+                    OriginalValue = originalValue,
+                    NewValue = newValue
+                });
             }
         }
 #endif
@@ -111,6 +155,9 @@ namespace Audit.EntityFramework
 
 #if EF_CORE_8_OR_GREATER
             AddColumnValuesFromComplexProperties(context, entry, entry.ComplexProperties, result);
+#endif
+#if EF_CORE_10_OR_GREATER
+            AddColumnValuesFromComplexCollections(context, entry, entry.ComplexCollections, result);
 #endif
             return result;
         }
@@ -141,8 +188,40 @@ namespace Audit.EntityFramework
                     }
                 }
 
+#if EF_CORE_10_OR_GREATER
+                AddColumnValuesFromComplexCollections(context, entry, complexEntry.ComplexCollections, result, complexPropertyPath);
+#endif
                 // Recursively process complex properties
                 AddColumnValuesFromComplexProperties(context, entry, complexEntry.ComplexProperties, result, complexPropertyPath);
+            }
+        }
+#endif
+
+#if EF_CORE_10_OR_GREATER
+        /// <summary>
+        /// Adds the column values from the complex collections recursively
+        /// </summary>
+        private void AddColumnValuesFromComplexCollections(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexCollectionEntry> complexCollections, Dictionary<string, object> result, string prefix = null)
+        {
+            foreach (var complexCollection in complexCollections)
+            {
+                var complexCollectionPath = GetPropertyPath(prefix, complexCollection.Metadata.Name);
+
+                if (!IncludeProperty(context, entry.Metadata.ClrType, complexCollectionPath))
+                {
+                    continue;
+                }
+
+                object value = entry.State == EntityState.Deleted
+                    ? entry.OriginalValues[complexCollection.Metadata]
+                    : entry.CurrentValues[complexCollection.Metadata];
+
+                if (HasPropertyValue(context, entry, entry.Metadata.ClrType, complexCollectionPath, value, out var overrideValue))
+                {
+                    value = overrideValue;
+                }
+
+                result.Add(complexCollectionPath, value);
             }
         }
 #endif
@@ -386,6 +465,8 @@ namespace Audit.EntityFramework
 
                 if (context.ReloadDatabaseValues && entry.State is EntityState.Modified or EntityState.Deleted)
                 {
+                    // Note: GetDatabaseValues() doesn't return complex collections, so SetValues sets them to null. This is an EF Core limitation.
+                    // When ReloadDatabaseValues is true, complex collections will be set to null in the OriginalValues of the event entry.
                     var dbValues = entry.GetDatabaseValues();
                     if (dbValues != null)
                     {

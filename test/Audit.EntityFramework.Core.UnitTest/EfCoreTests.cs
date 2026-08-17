@@ -306,6 +306,366 @@ namespace Audit.EntityFramework.Core.UnitTest
 
 #endif
 
+#if EF_CORE_10_OR_GREATER
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Test_EF_ComplexCollection_Changes(bool reloadDatabaseValues)
+        {
+            var db = nameof(Test_EF_ComplexCollection_Changes);
+
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>(c => c
+                    .ReloadDatabaseValues(reloadDatabaseValues)
+                    .ReloadDatabaseValuesAfterSave(true));
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = new Context_ComplexCollections.Person
+                {
+                    Id = 1,
+                    Name = "Thing3",
+                    Complexes = new List<Context_ComplexCollections.ComplexItem>
+                    {
+                        new() { Title = "Title1" }
+                    }
+                };
+
+                context.People.Add(person);
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+                person.Name = "Thing2-NewTitle";
+                person.Complexes[0] = person.Complexes[0] with { Title = "new title" };
+                person.Complexes.Add(new Context_ComplexCollections.ComplexItem { Title = "Second Title" });
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+                person.Name = "Thing2-NewTitle2";
+                person.Complexes[1] = person.Complexes[1] with { Title = "Second title new" };
+                person.Complexes.Add(new Context_ComplexCollections.ComplexItem { Title = "Third Title" });
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            static List<string> Titles(object value) => ((System.Collections.IEnumerable)value).Cast<Context_ComplexCollections.ComplexItem>().Select(x => x.Title).ToList();
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+
+                Assert.That(person.Complexes.Count, Is.EqualTo(3));
+                Assert.That(Titles(person.Complexes), Is.EqualTo(new[] { "new title", "Second title new", "Third Title" }));
+            }
+                
+            Assert.That(evs, Has.Count.EqualTo(3));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(Titles(evs[0].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "Title1" }));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            if (reloadDatabaseValues)
+            {
+                // When ReloadDatabaseValues is enabled, the original value of the complex collection is not being tracked properly and the changes are not being detected.
+                Assert.That(evs[1].Entries[0].Changes.First(ch => ch.ColumnName == "Complexes").OriginalValue, Is.Null);
+            }
+            else
+            {
+                Assert.That(Titles(evs[1].Entries[0].Changes.First(ch => ch.ColumnName == "Complexes").OriginalValue), Is.EqualTo(new[] { "Title1" }));
+            }
+            Assert.That(Titles(evs[1].Entries[0].Changes.First(ch => ch.ColumnName == "Complexes").NewValue), Is.EqualTo(new[] { "new title", "Second Title" }));
+            Assert.That(Titles(evs[1].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "new title", "Second Title" }));
+
+            Assert.That(evs[2].Entries[0].Action, Is.EqualTo("Update"));
+            if (reloadDatabaseValues)
+            {
+                Assert.That(evs[2].Entries[0].Changes.First(ch => ch.ColumnName == "Complexes").OriginalValue, Is.Null);
+            }
+            else
+            {
+                Assert.That(Titles(evs[2].Entries[0].Changes.First(ch => ch.ColumnName == "Complexes").OriginalValue), Is.EqualTo(new[] { "new title", "Second Title" }));
+            }
+            Assert.That(Titles(evs[2].Entries[0].Changes.First(ch => ch.ColumnName == "Complexes").NewValue), Is.EqualTo(new[] { "new title", "Second title new", "Third Title" }));
+            Assert.That(Titles(evs[2].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "new title", "Second title new", "Third Title" }));
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+            }
+        }
+
+        [Test]
+        public void Test_EF_ComplexCollection_ChangesByColumn()
+        {
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>(c => c
+                    .ReloadDatabaseValues(false)
+                    .ReloadDatabaseValuesAfterSave(true)
+                    .MapChangesByColumn());
+
+            var db = nameof(Test_EF_ComplexCollection_ChangesByColumn);
+            using var context = new Context_ComplexCollections(db);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var person = new Context_ComplexCollections.Person
+            {
+                Id = 2,
+                Name = "Thing3",
+                Complexes = new List<Context_ComplexCollections.ComplexItem>
+                {
+                    new() { Title = "Title1" }
+                }
+            };
+
+            context.People.Add(person);
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            person.Name = "Thing2-NewTitle";
+            person.Complexes[0] = person.Complexes[0] with { Title = "new title" };
+            person.Complexes.Add(new Context_ComplexCollections.ComplexItem { Title = "Second Title" });
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            static List<string> Titles(object value) => ((System.Collections.IEnumerable)value).Cast<Context_ComplexCollections.ComplexItem>().Select(x => x.Title).ToList();
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs, Has.Count.EqualTo(2));
+            Assert.That(Titles(evs[1].Entries[0].ChangesByColumn["Complexes"].OriginalValue), Is.EqualTo(new[] { "Title1" }));
+            Assert.That(Titles(evs[1].Entries[0].ChangesByColumn["Complexes"].NewValue), Is.EqualTo(new[] { "new title", "Second Title" }));
+            Assert.That(Titles(evs[1].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "new title", "Second Title" }));
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
+        public void Test_EF_ComplexCollection_CollectionOverride()
+        {
+            var db = nameof(Test_EF_ComplexCollection_CollectionOverride);
+
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>(c => c
+                    .MapChangesByColumn(false)
+                    .ReloadDatabaseValues(false)
+                    .ReloadDatabaseValuesAfterSave(true)
+                    .ForEntity<Context_ComplexCollections.Person>(p => p
+                        .Override(col => col.Complexes, _ => new List<Context_ComplexCollections.ComplexItem>() { new () { Title = "Override" } })
+                    )
+                );
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = new Context_ComplexCollections.Person
+                {
+                    Id = 1,
+                    Name = "Thing3",
+                    Complexes = new List<Context_ComplexCollections.ComplexItem>
+                    {
+                        new() { Title = "Title1" }
+                    }
+                };
+
+                context.People.Add(person);
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+                person.Complexes[0] = person.Complexes[0] with { Title = "new title" };
+                person.Complexes.Add(new Context_ComplexCollections.ComplexItem { Title = "Second Title" });
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+            
+            static List<string> Titles(object value) => ((System.Collections.IEnumerable)value).Cast<Context_ComplexCollections.ComplexItem>().Select(x => x.Title).ToList();
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+
+                Assert.That(person.Complexes.Count, Is.EqualTo(2));
+                Assert.That(Titles(person.Complexes), Is.EqualTo(new[] { "new title", "Second Title" }));
+            }
+
+            Assert.That(evs, Has.Count.EqualTo(2));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(Titles(evs[0].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "Override" }));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[1].Entries[0].Changes, Is.Not.Null);
+            Assert.That(Titles(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Complexes")?.NewValue), Is.EqualTo(new[] { "Override" }));
+            Assert.That(Titles(evs[1].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "Override" }));
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+            }
+        }
+
+        [Test]
+        public void Test_EF_ComplexCollection_CollectionIgnoreProperty()
+        {
+            var db = nameof(Test_EF_ComplexCollection_CollectionIgnoreProperty);
+
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>(c => c
+                    .MapChangesByColumn(false)
+                    .ReloadDatabaseValues(false)
+                    .ReloadDatabaseValuesAfterSave(true)
+                    .ForEntity<Context_ComplexCollections.Person>(p => p
+                        .Ignore(col => col.Complexes)
+                    )
+                );
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = new Context_ComplexCollections.Person
+                {
+                    Id = 1,
+                    Name = "Thing3",
+                    Complexes = new List<Context_ComplexCollections.ComplexItem>
+                    {
+                        new() { Title = "Title1" }
+                    }
+                };
+
+                context.People.Add(person);
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+                person.Complexes[0] = person.Complexes[0] with { Title = "new title" };
+                person.Complexes.Add(new Context_ComplexCollections.ComplexItem { Title = "Second Title" });
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            static List<string> Titles(object value) => ((System.Collections.IEnumerable)value).Cast<Context_ComplexCollections.ComplexItem>().Select(x => x.Title).ToList();
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+
+                Assert.That(person.Complexes.Count, Is.EqualTo(2));
+                Assert.That(Titles(person.Complexes), Is.EqualTo(new[] { "new title", "Second Title" }));
+            }
+
+            Assert.That(evs, Has.Count.EqualTo(2));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[0].ColumnValues, Does.Not.ContainKey("Complexes"));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[1].Entries[0].Changes, Is.Not.Null);
+            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Complexes"), Is.Null);
+            Assert.That(evs[1].Entries[0].ColumnValues, Does.Not.ContainKey("Complexes"));
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+            }
+        }
+
+        [Test]
+        public void Test_EF_ComplexCollection_CollectionFormat()
+        {
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>(c => c
+                    .MapChangesByColumn(false)
+                    .ReloadDatabaseValues(false)
+                    .ReloadDatabaseValuesAfterSave(true)
+                    .ForEntity<Context_ComplexCollections.Person>(p => p
+                        .Format(x => x.Complexes, list => list.Select(ci => ci).Reverse().ToList())
+                    )
+                );
+
+            var db = nameof(Test_EF_ComplexCollection_CollectionFormat);
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = new Context_ComplexCollections.Person
+                {
+                    Id = 1,
+                    Name = "Thing3",
+                    Complexes = new List<Context_ComplexCollections.ComplexItem>
+                    {
+                        new() { Title = "Title1" }
+                    }
+                };
+
+                context.People.Add(person);
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+                person.Complexes[0] = person.Complexes[0] with { Title = "new title" };
+                person.Complexes.Add(new Context_ComplexCollections.ComplexItem { Title = "Second Title" });
+                Assert.DoesNotThrow(() => context.SaveChanges());
+            }
+
+            static List<string> Titles(object value) => ((System.Collections.IEnumerable)value).Cast<Context_ComplexCollections.ComplexItem>().Select(x => x.Title).ToList();
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+            using (var context = new Context_ComplexCollections(db))
+            {
+                var person = context.People.Single();
+
+                Assert.That(person.Complexes.Count, Is.EqualTo(2));
+                Assert.That(Titles(person.Complexes), Is.EqualTo(new[] { "new title", "Second Title" }));
+            }
+
+            Assert.That(evs, Has.Count.EqualTo(2));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[1].Entries[0].Changes, Is.Not.Null);
+            Assert.That(Titles(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Complexes")?.NewValue), Is.EqualTo(new[] { "Second Title", "new title" }));
+            Assert.That(Titles(evs[1].Entries[0].ColumnValues["Complexes"]), Is.EqualTo(new[] { "Second Title", "new title" }));
+
+            using (var context = new Context_ComplexCollections(db))
+            {
+                context.Database.EnsureDeleted();
+            }
+        }
+#endif
+
 #if EF_CORE_5_OR_GREATER
 
         [Test]
@@ -428,8 +788,6 @@ namespace Audit.EntityFramework.Core.UnitTest
                             ((dynamic)obj).Action = ent.Action;
                         }))
                     .IgnoreMatchedProperties(t => t == typeof(ManyToManyContext.Tag) || t == typeof(ManyToManyContext.Post)));
-
-
 
             using (var context = new ManyToManyContext())
             {
@@ -969,7 +1327,7 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
 
         [Test]
-        public void Test_EFFailureLogging()
+        public void Test_EF_FailureLogging()
         {
             Audit.Core.Configuration.Setup()
                 .UseEntityFramework(_ => _

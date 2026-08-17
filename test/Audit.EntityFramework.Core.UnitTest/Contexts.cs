@@ -265,4 +265,50 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
     }
 #endif
+
+#if EF_CORE_10_OR_GREATER
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_ComplexCollections : AuditDbContext
+    {
+        private string _dbName;
+
+        public Context_ComplexCollections(string dbName)
+        {
+            _dbName = dbName;
+        }
+
+        public class Person
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public List<ComplexItem> Complexes { get; set; }
+        }
+
+        public record ComplexItem
+        {
+            public string Title { get; init; }
+        }
+
+        public DbSet<Person> People { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var cnnString = TestHelper.GetConnectionString(_dbName);
+                optionsBuilder.UseSqlServer(cnnString).UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>().ComplexCollection(e => e.Complexes, c =>
+            {
+                c.ToJson();
+                c.Property(x => x.Title).IsRequired();
+            });
+        }
+    }
+#endif
 }
