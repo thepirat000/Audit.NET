@@ -205,9 +205,9 @@ namespace Audit.EntityFramework
         /// </summary>
         private void AddColumnValuesFromComplexCollections(IAuditDbContext context, EntityEntry entry, IEnumerable<ComplexCollectionEntry> complexCollections, Dictionary<string, object> result, string prefix = null)
         {
-            foreach (var complexCollection in complexCollections)
+            foreach (var complexCollectionMetadata in complexCollections.Select(c => c.Metadata))
             {
-                var complexCollectionPath = GetPropertyPath(prefix, complexCollection.Metadata.Name);
+                var complexCollectionPath = GetPropertyPath(prefix, complexCollectionMetadata.Name);
 
                 if (!IncludeProperty(context, entry.Metadata.ClrType, complexCollectionPath))
                 {
@@ -215,8 +215,8 @@ namespace Audit.EntityFramework
                 }
 
                 object value = entry.State == EntityState.Deleted
-                    ? entry.OriginalValues[complexCollection.Metadata]
-                    : entry.CurrentValues[complexCollection.Metadata];
+                    ? entry.OriginalValues[complexCollectionMetadata]
+                    : entry.CurrentValues[complexCollectionMetadata];
 
                 if (HasPropertyValue(context, entry, entry.Metadata.ClrType, complexCollectionPath, value, out var overrideValue))
                 {
@@ -544,7 +544,7 @@ namespace Audit.EntityFramework
             return efEvent;
         }
 
-        private void UpdateEventEntry(IAuditDbContext context, EventEntry efEntry)
+        private static void UpdateEventEntry(IAuditDbContext context, EventEntry efEntry)
         {
             var entry = efEntry.Entry;
             efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
@@ -663,21 +663,21 @@ namespace Audit.EntityFramework
             {
                 var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
 
-                foreach (var propEntry in complexEntry.Properties)
+                foreach (var propEntryMetadata in complexEntry.Properties.Select(p => p.Metadata))
                 {
-                    if (!IncludeProperty(context, complexEntry.Metadata.ClrType, propEntry.Metadata.Name))
+                    if (!IncludeProperty(context, complexEntry.Metadata.ClrType, propEntryMetadata.Name))
                     {
                         continue;
                     }
 
-                    var dbValue = GetDatabaseValue(dbValues, propEntry.Metadata);
+                    var dbValue = GetDatabaseValue(dbValues, propEntryMetadata);
 
-                    if (HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, dbValue, out var overrideValue))
+                    if (HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntryMetadata.Name, dbValue, out var overrideValue))
                     {
                         dbValue = overrideValue;
                     }
 
-                    var columnName = GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath);
+                    var columnName = GetColumnNameFromComplexProperty(propEntryMetadata, complexPropertyPath);
 
                     if (columnValues.ContainsKey(columnName))
                     {
