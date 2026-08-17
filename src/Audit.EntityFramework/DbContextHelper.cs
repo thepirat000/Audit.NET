@@ -267,7 +267,7 @@ namespace Audit.EntityFramework
             if (!PropertiesIgnoreAttrCache.ContainsKey(type))
             {
                 var ignoredProps = new HashSet<string>();
-                foreach(var prop in type.GetTypeInfo().GetProperties())
+                foreach(var prop in GetEntityProperties(type))
                 {
                     var ignored = Attribute.IsDefined(prop, typeof(AuditIgnoreAttribute), true); 
                     if (ignored)
@@ -292,7 +292,7 @@ namespace Audit.EntityFramework
             if (!PropertiesIncludeAttrCache.ContainsKey(type))
             {
                 var includedProps = new HashSet<string>();
-                foreach (var prop in type.GetTypeInfo().GetProperties())
+                foreach (var prop in GetEntityProperties(type))
                 {
                     var included = Attribute.IsDefined(prop, typeof(AuditIncludeAttribute), true);
                     if (included)
@@ -317,7 +317,7 @@ namespace Audit.EntityFramework
             if (!PropertiesOverrideAttrCache.ContainsKey(type))
             {
                 var overrideProps = new Dictionary<string, AuditOverrideAttribute>();
-                foreach (var prop in type.GetTypeInfo().GetProperties())
+                foreach (var prop in GetEntityProperties(type))
                 {
                     var overrideAttr = prop.GetCustomAttribute<AuditOverrideAttribute>(true);
                     if (overrideAttr != null)
@@ -335,6 +335,12 @@ namespace Audit.EntityFramework
                 }
             }
             return PropertiesOverrideAttrCache[type];
+        }
+
+        private static PropertyInfo[] GetEntityProperties(Type type)
+        {
+            return type.GetTypeInfo()
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         }
 
         /// <summary>
