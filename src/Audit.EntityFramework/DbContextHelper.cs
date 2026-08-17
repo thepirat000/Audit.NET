@@ -154,7 +154,7 @@ namespace Audit.EntityFramework
         /// </summary>
         public async Task EndAuditScopeAsync(IAuditDbContext context, IAuditScope scope, EntityFrameworkEvent @event, CancellationToken cancellationToken = default)
         {
-            UpdateAuditEvent(@event, context);
+            await UpdateAuditEventAsync(@event, context, cancellationToken);
             scope.EventAs<AuditEventEntityFramework>().EntityFrameworkEvent = @event;
             context.OnScopeSaving(scope);
             await scope.DisposeAsync();
@@ -592,7 +592,7 @@ namespace Audit.EntityFramework
             {
                 return new EntityFrameworkEvent() { Result = await baseSaveChanges() };
             }
-            var efEvent = CreateAuditEvent(context);
+            var efEvent = await CreateAuditEventAsync(context, cancellationToken);
             if (efEvent == null)
             {
                 return new EntityFrameworkEvent() { Result = await baseSaveChanges() };
@@ -663,7 +663,7 @@ namespace Audit.EntityFramework
             {
                 return null;
             }
-            var efEvent = CreateAuditEvent(context);
+            var efEvent = await CreateAuditEventAsync(context, cancellationToken);
             if (efEvent == null)
             {
                 return null;

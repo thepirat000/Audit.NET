@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Audit.EntityFramework
 {
@@ -431,20 +433,18 @@ namespace Audit.EntityFramework
             return result;
         }
 
-        /// <summary>
-        /// Creates the Audit Event.
-        /// </summary>
-        public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
+        private bool TryBeginCreateAuditEvent(IAuditDbContext context, out EntityFrameworkEvent efEvent, out IReadOnlyList<EntityEntry> modifiedEntries)
         {
             var dbContext = context.DbContext;
-            var modifiedEntries = GetModifiedEntries(context);
+            modifiedEntries = GetModifiedEntries(context);
             if (modifiedEntries.Count == 0)
             {
-                return null;
+                efEvent = null;
+                return false;
             }
             var dbConnection = IsRelational(dbContext) ? dbContext.Database.GetDbConnection() : null;
             var clientConnectionId = GetClientConnectionId(dbConnection);
-            var efEvent = new EntityFrameworkEvent()
+            efEvent = new EntityFrameworkEvent()
             {
                 Entries = new List<EventEntry>(),
                 Database = dbConnection?.Database,
@@ -456,83 +456,123 @@ namespace Audit.EntityFramework
                 TransactionId = !context.ExcludeTransactionId ? GetCurrentTransactionId(dbContext, clientConnectionId) : null,
                 DbContext = dbContext
             };
+            return true;
+        }
+
+        private static void ReloadOriginalValuesIfNeeded(IAuditDbContext context, EntityEntry entry)
+        {
+            if (!context.ReloadDatabaseValues || entry.State is not (EntityState.Modified or EntityState.Deleted))
+            {
+                return;
+            }
+            // Note: GetDatabaseValues() doesn't return complex collections, so SetValues sets them to null. This is an EF Core limitation.
+            // When ReloadDatabaseValues is true, complex collections will be set to null in the OriginalValues of the event entry.
+            var dbValues = entry.GetDatabaseValues();
+            if (dbValues != null)
+            {
+                entry.OriginalValues.SetValues(dbValues);
+            }
+        }
+
+        private static async Task ReloadOriginalValuesIfNeededAsync(IAuditDbContext context, EntityEntry entry, CancellationToken cancellationToken = default)
+        {
+            if (!context.ReloadDatabaseValues || entry.State is not (EntityState.Modified or EntityState.Deleted))
+            {
+                return;
+            }
+            var dbValues = await entry.GetDatabaseValuesAsync(cancellationToken);
+            if (dbValues != null)
+            {
+                entry.OriginalValues.SetValues(dbValues);
+            }
+        }
+
+        private EventEntry CreateEventEntry(IAuditDbContext context, EntityEntry entry)
+        {
+            var entity = entry.Entity;
+            var validationResults = context.ExcludeValidationResults ? null : DbContextHelper.GetValidationResults(entity);
+            var entityName = GetEntityName(context.DbContext, entry);
+            return new EventEntry()
+            {
+                Valid = validationResults == null,
+                ValidationResults = validationResults?.Select(x => x.ErrorMessage).ToList(),
+                Entity = context.IncludeEntityObjects ? entity : null,
+                Entry = entry,
+                Action = GetStateName(entry.State),
+                Changes = entry.State == EntityState.Modified && !context.MapChangesByColumn ? GetChanges(context, entry) : null,
+                ChangesByColumn = entry.State == EntityState.Modified && context.MapChangesByColumn ? GetChangesByColumn(context, entry) : null,
+                Table = entityName.Table,
+                Schema = entityName.Schema,
+#if EF_CORE_5_OR_GREATER
+                Name = entry.Metadata.DisplayName(),
+#endif
+                ColumnValues = GetColumnValues(context, entry)
+            };
+        }
+
+        /// <summary>
+        /// Creates the Audit Event.
+        /// </summary>
+        public EntityFrameworkEvent CreateAuditEvent(IAuditDbContext context)
+        {
+            if (!TryBeginCreateAuditEvent(context, out var efEvent, out var modifiedEntries))
+            {
+                return null;
+            }
             foreach (var entry in modifiedEntries)
             {
-                var entity = entry.Entity;
-                var validationResults = context.ExcludeValidationResults ? null : DbContextHelper.GetValidationResults(entity);
-
-                var entityName = GetEntityName(dbContext, entry);
-
-                if (context.ReloadDatabaseValues && entry.State is EntityState.Modified or EntityState.Deleted)
-                {
-                    // Note: GetDatabaseValues() doesn't return complex collections, so SetValues sets them to null. This is an EF Core limitation.
-                    // When ReloadDatabaseValues is true, complex collections will be set to null in the OriginalValues of the event entry.
-                    var dbValues = entry.GetDatabaseValues();
-                    if (dbValues != null)
-                    {
-                        entry.OriginalValues.SetValues(dbValues);
-                    }
-                }
-
-                efEvent.Entries.Add(new EventEntry()
-                {
-                    Valid = validationResults == null,
-                    ValidationResults = validationResults?.Select(x => x.ErrorMessage).ToList(),
-                    Entity = context.IncludeEntityObjects ? entity : null,
-                    Entry = entry,
-                    Action = GetStateName(entry.State),
-                    Changes = entry.State == EntityState.Modified && !context.MapChangesByColumn ? GetChanges(context, entry) : null,
-                    ChangesByColumn = entry.State == EntityState.Modified && context.MapChangesByColumn ? GetChangesByColumn(context, entry) : null,
-                    Table = entityName.Table,
-                    Schema = entityName.Schema,
-#if EF_CORE_5_OR_GREATER
-                    Name = entry.Metadata.DisplayName(),
-#endif
-                    ColumnValues = GetColumnValues(context, entry)
-                });
+                ReloadOriginalValuesIfNeeded(context, entry);
+                efEvent.Entries.Add(CreateEventEntry(context, entry));
             }
             return efEvent;
         }
 
         /// <summary>
-        /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
+        /// Creates the Audit Event asynchronously.
         /// </summary>
-        public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
+        public async Task<EntityFrameworkEvent> CreateAuditEventAsync(IAuditDbContext context, CancellationToken cancellationToken = default)
         {
-            // Update PK and FK
-            foreach (var efEntry in efEvent.Entries)
+            if (!TryBeginCreateAuditEvent(context, out var efEvent, out var modifiedEntries))
             {
-                var entry = efEntry.Entry;
-                efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
-                foreach (var pk in efEntry.PrimaryKey)
-                {
-                    if (efEntry.ColumnValues.ContainsKey(pk.Key))
-                    {
-                        efEntry.ColumnValues[pk.Key] = pk.Value;
-                    }
-                }
-                var fks = GetForeignKeys(context.DbContext, entry);
-                foreach (var fk in fks)
-                {
-                    if (efEntry.ColumnValues.ContainsKey(fk.Key))
-                    {
-                        efEntry.ColumnValues[fk.Key] = fk.Value;
-                    }
+                return null;
+            }
+            foreach (var entry in modifiedEntries)
+            {
+                await ReloadOriginalValuesIfNeededAsync(context, entry, cancellationToken);
+                efEvent.Entries.Add(CreateEventEntry(context, entry));
+            }
+            return efEvent;
+        }
 
-                    var change = efEntry.Changes?.FirstOrDefault(e => e.ColumnName == fk.Key);
-                    if (change != null)
-                    {
-                        change.NewValue = fk.Value;
-                    }
-                }
-
-                if (context.ReloadDatabaseValuesAfterSave)
+        private void UpdateEventEntry(IAuditDbContext context, EventEntry efEntry)
+        {
+            var entry = efEntry.Entry;
+            efEntry.PrimaryKey = GetPrimaryKey(context.DbContext, entry);
+            foreach (var pk in efEntry.PrimaryKey)
+            {
+                if (efEntry.ColumnValues.ContainsKey(pk.Key))
                 {
-                    ReloadAfterSave(context, entry, efEntry);
+                    efEntry.ColumnValues[pk.Key] = pk.Value;
                 }
             }
+            var fks = GetForeignKeys(context.DbContext, entry);
+            foreach (var fk in fks)
+            {
+                if (efEntry.ColumnValues.ContainsKey(fk.Key))
+                {
+                    efEntry.ColumnValues[fk.Key] = fk.Value;
+                }
 
-            // Update ConnectionId
+                var change = efEntry.Changes?.FirstOrDefault(e => e.ColumnName == fk.Key);
+                if (change != null)
+                {
+                    change.NewValue = fk.Value;
+                }
+            }
+        }
+
+        private void UpdateAuditEventConnectionId(EntityFrameworkEvent efEvent, IAuditDbContext context)
+        {
             var clientConnectionId = TryGetClientConnectionId(context.DbContext);
             if (clientConnectionId != null)
             {
@@ -540,10 +580,50 @@ namespace Audit.EntityFramework
             }
         }
 
+        /// <summary>
+        /// Updates column values and primary keys on the Audit Event after the EF save operation completes.
+        /// </summary>
+        public void UpdateAuditEvent(EntityFrameworkEvent efEvent, IAuditDbContext context)
+        {
+            foreach (var efEntry in efEvent.Entries)
+            {
+                UpdateEventEntry(context, efEntry);
+                if (context.ReloadDatabaseValuesAfterSave)
+                {
+                    ReloadAfterSave(context, efEntry.Entry, efEntry);
+                }
+            }
+            UpdateAuditEventConnectionId(efEvent, context);
+        }
+
+        /// <summary>
+        /// Updates column values and primary keys on the Audit Event after the EF save operation completes, asynchronously.
+        /// </summary>
+        public async Task UpdateAuditEventAsync(EntityFrameworkEvent efEvent, IAuditDbContext context, CancellationToken cancellationToken = default)
+        {
+            foreach (var efEntry in efEvent.Entries)
+            {
+                UpdateEventEntry(context, efEntry);
+                if (context.ReloadDatabaseValuesAfterSave)
+                {
+                    await ReloadAfterSaveAsync(context, efEntry.Entry, efEntry, cancellationToken);
+                }
+            }
+            UpdateAuditEventConnectionId(efEvent, context);
+        }
+
         private void ReloadAfterSave(IAuditDbContext context, EntityEntry entry, EventEntry efEntry)
         {
-            var dbValues = entry.GetDatabaseValues();
+            ApplyReloadAfterSave(context, entry, efEntry, entry.GetDatabaseValues());
+        }
 
+        private async Task ReloadAfterSaveAsync(IAuditDbContext context, EntityEntry entry, EventEntry efEntry, CancellationToken cancellationToken = default)
+        {
+            ApplyReloadAfterSave(context, entry, efEntry, await entry.GetDatabaseValuesAsync(cancellationToken));
+        }
+
+        private void ApplyReloadAfterSave(IAuditDbContext context, EntityEntry entry, EventEntry efEntry, PropertyValues dbValues)
+        {
             if (dbValues == null)
             {
                 return;
