@@ -232,6 +232,99 @@ namespace Audit.EntityFramework.Core.UnitTest
             });
         }
     }
+
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_ComplexTypes_JsonCustomNames : AuditDbContext
+    {
+        public class Person
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            [Required]
+            public required Address Address { get; set; }
+            [Required]
+            public required Contact Contact { get; set; }
+            public List<Phone> Phones { get; set; }
+        }
+
+        public record Address
+        {
+            public string Street { get; init; }
+            [Required]
+            public required Country Country { get; init; }
+        }
+
+        public record Country
+        {
+            public string Name { get; init; }
+            public string Code { get; init; }
+            [Required]
+            public required CountryInfo CountryInfo { get; init; }
+        }
+
+        public record CountryInfo
+        {
+            public string Info { get; init; }
+        }
+
+        public record Contact
+        {
+            public int Number { get; init; }
+            [Required]
+            public required ContactType ContactType { get; init; }
+        }
+
+        public record ContactType
+        {
+            public int Type { get; init; }
+            public string Description { get; init; }
+        }
+
+        public record Phone
+        {
+            public int Id { get; init; }
+            public string Number { get; init; }
+            public PhoneType PhoneType { get; init; }
+        }
+
+        public record PhoneType
+        {
+            public int Id { get; init; }
+            public string Description { get; init; }
+        }
+
+        public DbSet<Person> People { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var cnnString = TestHelper.GetConnectionString(nameof(Context_ComplexTypes_JsonCustomNames));
+                optionsBuilder.UseSqlServer(cnnString).UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>(e =>
+            {
+                e.Property(p => p.Id).HasColumnName("id");
+
+                e.ComplexProperty(p => p.Address, a =>
+                {
+                    a.ToJson("address");
+                    a.ComplexProperty(x => x.Country, c =>
+                    {
+                        c.HasJsonPropertyName("country");
+                        c.Property(x => x.Code).HasJsonPropertyName("code");
+                    });
+                });
+                e.ComplexProperty(p => p.Contact).ComplexProperty(c => c.ContactType);
+                e.ComplexCollection(p => p.Phones, p => p.ToJson("phones"));
+            });
+        }
+    }
 #endif
     
 #if EF_CORE_7_OR_GREATER

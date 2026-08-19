@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [32.3.1] - 2026-08-18:
 - **Audit.EntityFramework.Core**: Use EF's real flattened column names for regular complex properties, while keeping dot-path keys for JSON-mapped complex properties. (#796)
+- **Audit.EntityFramework.Core**: Change audit column names for complex properties and complex collections to match the real column names and JSON paths from the EF model. (#796)
 
 ## [32.3.0] - 2026-08-17:
 - **Audit.EntityFramework.Core**: Added support for nested properties in column values and ensured that column changes preserve the full complex-property path (#796)

@@ -636,6 +636,61 @@ namespace Audit.EntityFramework.Core.UnitTest
             context.Database.EnsureDeleted();
         }
 
+        [Test]
+        public void Test_EF_ComplexType_Json_CustomPropertyNames_ColumnValues()
+        {
+            using var context = new Context_ComplexTypes_JsonCustomNames();
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            context.People.Add(new Context_ComplexTypes_JsonCustomNames.Person()
+            {
+                Id = 1,
+                Name = "John Doe",
+                Address = new Context_ComplexTypes_JsonCustomNames.Address()
+                {
+                    Street = "123 Main St",
+                    Country = new Context_ComplexTypes_JsonCustomNames.Country()
+                    {
+                        Name = "USA",
+                        Code = "US",
+                        CountryInfo = new Context_ComplexTypes_JsonCustomNames.CountryInfo() { Info = "Some info about USA" }
+                    }
+                },
+                Contact = new Context_ComplexTypes_JsonCustomNames.Contact()
+                {
+                    Number = 1234567890,
+                    ContactType = new Context_ComplexTypes_JsonCustomNames.ContactType() { Type = 1, Description = "ContactId" }
+                },
+                Phones = new List<Context_ComplexTypes_JsonCustomNames.Phone>()
+                {
+                    new() { Number = "123-456-7890", PhoneType = new Context_ComplexTypes_JsonCustomNames.PhoneType() { Description = "Home" } },
+                    new() { Number = "098-765-4321", PhoneType = new Context_ComplexTypes_JsonCustomNames.PhoneType() { Description = "Work" } }
+                }
+            });
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["id"], Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("John Doe"));
+            Assert.That(evs[0].Entries[0].ColumnValues["address.Street"], Is.EqualTo("123 Main St"));
+            Assert.That(evs[0].Entries[0].ColumnValues["address.country.code"], Is.EqualTo("US"));
+            Assert.That(evs[0].Entries[0].ColumnValues["address.country.Name"], Is.EqualTo("USA"));
+            Assert.That(evs[0].Entries[0].ColumnValues["address.country.CountryInfo.Info"], Is.EqualTo("Some info about USA"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_Number"], Is.EqualTo(1234567890));
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_ContactType_Type"], Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_ContactType_Description"], Is.EqualTo("ContactId"));
+            Assert.That(evs[0].Entries[0].ColumnValues["phones"], Is.Not.Null);
+
+            context.Database.EnsureDeleted();
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void Test_EF_ComplexCollection_Changes(bool reloadDatabaseValues)
