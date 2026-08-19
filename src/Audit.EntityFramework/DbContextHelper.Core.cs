@@ -71,16 +71,22 @@ namespace Audit.EntityFramework
         {
             foreach (var complexEntry in complexProperties)
             {
-                var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
+                var isJson = complexEntry.Metadata.ComplexType.GetContainerColumnName() != null;
+
+                var complexPropertyPath = isJson ? GetComplexPropertyPath(prefix, complexEntry.Metadata.Name) : null;
 
                 // Process the primitive properties
                 foreach (var propEntry in complexEntry.Properties)
                 {
                     if (propEntry.IsModified && IncludeProperty(context, complexEntry.Metadata.ClrType, propEntry.Metadata.Name))
                     {
+                        var columnName = isJson
+                            ? GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath)
+                            : GetColumnName(propEntry.Metadata, null);
+
                         result.Add(new EventEntryChange()
                         {
-                            ColumnName = GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath),
+                            ColumnName = columnName,
                             NewValue = HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, propEntry.CurrentValue, out var overridenCurrentValue) ? overridenCurrentValue : propEntry.CurrentValue,
                             OriginalValue = HasPropertyValue(context, entry, complexEntry.Metadata.ClrType, propEntry.Metadata.Name, propEntry.OriginalValue, out var overridenOriginalValue) ? overridenOriginalValue : propEntry.OriginalValue
                         });
@@ -109,7 +115,7 @@ namespace Audit.EntityFramework
                     continue;
                 }
 
-                var complexCollectionPath = GetPropertyPath(prefix, complexCollection.Metadata.Name);
+                var complexCollectionPath = GetComplexPropertyPath(prefix, complexCollection.Metadata.Name);
 
                 object originalValue = entry.State == EntityState.Added ? null : entry.OriginalValues[complexCollection.Metadata];
                 object newValue = entry.State == EntityState.Deleted ? null : entry.CurrentValues[complexCollection.Metadata];
@@ -172,8 +178,10 @@ namespace Audit.EntityFramework
         {
             foreach (var complexEntry in complexProperties)
             {
-                var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
+                var isJson = complexEntry.Metadata.ComplexType.GetContainerColumnName() != null;
 
+                var complexPropertyPath = isJson ? GetComplexPropertyPath(prefix, complexEntry.Metadata.Name) : null;
+                
                 // Process the primitive properties
                 foreach (var propEntry in complexEntry.Properties)
                 {
@@ -185,7 +193,10 @@ namespace Audit.EntityFramework
                             value = overrideValue;
                         }
 
-                        var columnName = GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath);
+                        var columnName = isJson 
+                            ? GetColumnNameFromComplexProperty(propEntry.Metadata, complexPropertyPath)
+                            : GetColumnName(propEntry.Metadata, null);
+
                         result.Add(columnName, value);
                     }
                 }
@@ -207,7 +218,7 @@ namespace Audit.EntityFramework
         {
             foreach (var complexCollectionMetadata in complexCollections.Select(c => c.Metadata))
             {
-                var complexCollectionPath = GetPropertyPath(prefix, complexCollectionMetadata.Name);
+                var complexCollectionPath = GetComplexPropertyPath(prefix, complexCollectionMetadata.Name);
 
                 if (!IncludeProperty(context, entry.Metadata.ClrType, complexCollectionPath))
                 {
@@ -230,7 +241,7 @@ namespace Audit.EntityFramework
 
 #if EF_CORE_5_OR_GREATER
         /// <summary>Gets the name of the column.</summary>
-        internal static string GetColumnName(IProperty prop, IEntityType metadata = null)
+        internal static string GetColumnName(IProperty prop, IEntityType metadata)
         {
             var declaringType = GetDeclaringType(prop);
 
@@ -276,10 +287,10 @@ namespace Audit.EntityFramework
 #if EF_CORE_8_OR_GREATER
         internal static string GetColumnNameFromComplexProperty(IProperty prop, string prefix)
         {
-            return GetPropertyPath(prefix, GetFallbackColumnName(prop));
+            return GetComplexPropertyPath(prefix, GetFallbackColumnName(prop));
         }
 
-        private static string GetPropertyPath(string prefix, string name)
+        private static string GetComplexPropertyPath(string prefix, string name)
         {
             return string.IsNullOrEmpty(prefix) ? name : $"{prefix}.{name}";
         }
@@ -661,7 +672,9 @@ namespace Audit.EntityFramework
         {
             foreach (var complexEntry in complexProperties)
             {
-                var complexPropertyPath = GetPropertyPath(prefix, complexEntry.Metadata.Name);
+                var isJson = complexEntry.Metadata.ComplexType.GetContainerColumnName() != null;
+
+                var complexPropertyPath = isJson ? GetComplexPropertyPath(prefix, complexEntry.Metadata.Name) : null;
 
                 foreach (var propEntryMetadata in complexEntry.Properties.Select(p => p.Metadata))
                 {
@@ -677,7 +690,9 @@ namespace Audit.EntityFramework
                         dbValue = overrideValue;
                     }
 
-                    var columnName = GetColumnNameFromComplexProperty(propEntryMetadata, complexPropertyPath);
+                    var columnName = isJson
+                        ? GetColumnNameFromComplexProperty(propEntryMetadata, complexPropertyPath)
+                        : GetColumnName(propEntryMetadata, null);
 
                     if (columnValues.ContainsKey(columnName))
                     {

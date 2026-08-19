@@ -87,14 +87,14 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("Development"));
             Assert.That(evs[1].Entries[0].ColumnValues["Name"], Is.EqualTo("New Name"));
 
-            Assert.That(evs[0].Entries[0].ColumnValues["Address.City"], Is.EqualTo("*Vienna*"));
-            Assert.That(evs[1].Entries[0].ColumnValues["Address.City"], Is.EqualTo("*NewCity*"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address_City"], Is.EqualTo("*Vienna*"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address_City"], Is.EqualTo("*NewCity*"));
 
-            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.Alias"], Is.EqualTo("AU"));
-            Assert.That(evs[1].Entries[0].ColumnValues["Address.Country.Alias"], Is.EqualTo("NEWALIAS"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address_Country_Alias"], Is.EqualTo("AU"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address_Country_Alias"], Is.EqualTo("NEWALIAS"));
 
-            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address.Country.Alias")?.OriginalValue, Is.EqualTo("AU"));
-            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address.Country.Alias")?.NewValue, Is.EqualTo("NEWALIAS"));
+            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.OriginalValue, Is.EqualTo("AU"));
+            Assert.That(evs[1].Entries[0].Changes.FirstOrDefault(ch => ch.ColumnName == "Address_Country_Alias")?.NewValue, Is.EqualTo("NEWALIAS"));
 
             context.Database.EnsureDeleted();
         }
@@ -151,14 +151,14 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("#Initial#"));
             Assert.That(evs[1].Entries[0].ColumnValues["Name"], Is.EqualTo("#Updated#"));
 
-            Assert.That(evs[0].Entries[0].ColumnValues["Address.City"], Is.EqualTo("*Vienna*"));
-            Assert.That(evs[1].Entries[0].ColumnValues["Address.City"], Is.EqualTo("*Madrid*"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address_City"], Is.EqualTo("*Vienna*"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address_City"], Is.EqualTo("*Madrid*"));
 
-            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.Alias"], Is.EqualTo("AU"));
-            Assert.That(evs[1].Entries[0].ColumnValues["Address.Country.Alias"], Is.EqualTo("ES"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address_Country_Alias"], Is.EqualTo("AU"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address_Country_Alias"], Is.EqualTo("ES"));
 
-            Assert.That(evs[0].Entries[0].ColumnValues.ContainsKey("Address.Line2"), Is.False);
-            Assert.That(evs[1].Entries[0].ColumnValues.ContainsKey("Address.Line2"), Is.False);
+            Assert.That(evs[0].Entries[0].ColumnValues.ContainsKey("Address_Line2"), Is.False);
+            Assert.That(evs[1].Entries[0].ColumnValues.ContainsKey("Address_Line2"), Is.False);
 
             context.Database.EnsureDeleted();
         }
@@ -247,9 +247,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
             Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
             Assert.That(evs[0].Entries[0].ColumnValues["LoanType"], Is.EqualTo("FHA"));
-            Assert.That(evs[0].Entries[0].ColumnValues["LoanData.LoanType"], Is.EqualTo("JsonFHA"));
-            Assert.That(evs[0].Entries[0].ColumnValues["LoanData.PrimaryBorrower.Email"], Is.EqualTo("primary@example.com"));
-            Assert.That(evs[0].Entries[0].ColumnValues["LoanData.CoBorrower1.Email"], Is.EqualTo("coborrower@example.com"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanData_LoanType"], Is.EqualTo("JsonFHA"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanData_PrimaryBorrower_Email"], Is.EqualTo("primary@example.com"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanData_CoBorrower1_Email"], Is.EqualTo("coborrower@example.com"));
 
             context.Database.EnsureDeleted();
         }
@@ -297,9 +297,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(evs[0].Entries.Count, Is.EqualTo(1));
             Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Update"));
             Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanType" && (string)ch.OriginalValue == "FHA" && (string)ch.NewValue == "VA"), Is.True);
-            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData.LoanType" && (string)ch.OriginalValue == "JsonFHA" && (string)ch.NewValue == "JsonVA"), Is.True);
-            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData.PrimaryBorrower.Email" && (string)ch.OriginalValue == "primary@example.com" && (string)ch.NewValue == "updated-primary@example.com"), Is.True);
-            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData.CoBorrower1.Email" && (string)ch.OriginalValue == "coborrower@example.com" && (string)ch.NewValue == "updated-coborrower@example.com"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData_LoanType" && (string)ch.OriginalValue == "JsonFHA" && (string)ch.NewValue == "JsonVA"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData_PrimaryBorrower_Email" && (string)ch.OriginalValue == "primary@example.com" && (string)ch.NewValue == "updated-primary@example.com"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData_CoBorrower1_Email" && (string)ch.OriginalValue == "coborrower@example.com" && (string)ch.NewValue == "updated-coborrower@example.com"), Is.True);
 
             context.Database.EnsureDeleted();
         }
@@ -307,6 +307,335 @@ namespace Audit.EntityFramework.Core.UnitTest
 #endif
 
 #if EF_CORE_10_OR_GREATER
+        [Test]
+        public void Test_EF_ComplexType_Json_ColumnValues()
+        {
+            using var context = new Context_ComplexTypes_Json();
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            context.People.Add(new Context_ComplexTypes_Json.Person()
+            {
+                Id = 1,
+                Name = "John Doe",
+                Address = new Context_ComplexTypes_Json.Address()
+                {
+                    Street = "123 Main St",
+                    Country = new Context_ComplexTypes_Json.Country()
+                    {
+                        Name = "USA",
+                        Code = "US",
+                        CountryInfo = new Context_ComplexTypes_Json.CountryInfo() { Info = "Some info" }
+                    }
+                },
+                Contact = new Context_ComplexTypes_Json.Contact()
+                {
+                    Number = 123456789,
+                    ContactType = new Context_ComplexTypes_Json.ContactType() { Type = 1, Description = "Mobile" }
+                }
+            });
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("John Doe"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Street"], Is.EqualTo("123 Main St"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.Name"], Is.EqualTo("USA"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.Code"], Is.EqualTo("US"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.CountryInfo.Info"], Is.EqualTo("Some info"));
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_Number"], Is.EqualTo(123456789));
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_ContactType_Type"], Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_ContactType_Description"], Is.EqualTo("Mobile"));
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
+        public void Test_EF_ComplexType_Json_Changes()
+        {
+            using var context = new Context_ComplexTypes_Json();
+            context.AuditDisabled = true;
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var person = new Context_ComplexTypes_Json.Person()
+            {
+                Id = 1,
+                Name = "John Doe",
+                Address = new Context_ComplexTypes_Json.Address()
+                {
+                    Street = "123 Main St",
+                    Country = new Context_ComplexTypes_Json.Country()
+                    {
+                        Name = "USA",
+                        Code = "US",
+                        CountryInfo = new Context_ComplexTypes_Json.CountryInfo() { Info = "Some info" }
+                    }
+                },
+                Contact = new Context_ComplexTypes_Json.Contact()
+                {
+                    Number = 123456789,
+                    ContactType = new Context_ComplexTypes_Json.ContactType() { Type = 1, Description = "Mobile" }
+                }
+            };
+
+            context.People.Add(person);
+            context.SaveChanges();
+            context.AuditDisabled = false;
+
+            person.Name = "Jane Doe";
+            person.Address = person.Address with
+            {
+                Street = "456 Oak Ave",
+                Country = person.Address.Country with
+                {
+                    Code = "CA",
+                    CountryInfo = person.Address.Country.CountryInfo with { Info = "Updated info" }
+                }
+            };
+            person.Contact = person.Contact with
+            {
+                Number = 987654321,
+                ContactType = person.Contact.ContactType with { Description = "Work" }
+            };
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Name" && (string)ch.OriginalValue == "John Doe" && (string)ch.NewValue == "Jane Doe"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Address.Street" && (string)ch.OriginalValue == "123 Main St" && (string)ch.NewValue == "456 Oak Ave"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Address.Country.Code" && (string)ch.OriginalValue == "US" && (string)ch.NewValue == "CA"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Address.Country.CountryInfo.Info" && (string)ch.OriginalValue == "Some info" && (string)ch.NewValue == "Updated info"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Contact_Number" && (int)ch.OriginalValue == 123456789 && (int)ch.NewValue == 987654321), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "Contact_ContactType_Description" && (string)ch.OriginalValue == "Mobile" && (string)ch.NewValue == "Work"), Is.True);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
+        public void Test_EF_ComplexType_Json_DuplicateLeafNames_ColumnValues()
+        {
+            using var context = new Context_ComplexTypes_JsonDuplicateNames();
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            context.Loans.Add(new Context_ComplexTypes_JsonDuplicateNames.Loan()
+            {
+                Id = 1,
+                LoanType = "FHA",
+                LoanData = new Context_ComplexTypes_JsonDuplicateNames.LoanData()
+                {
+                    LoanType = "JsonFHA",
+                    PrimaryBorrower = new Context_ComplexTypes_JsonDuplicateNames.BorrowerInfo() { Email = "primary@example.com" },
+                    CoBorrower1 = new Context_ComplexTypes_JsonDuplicateNames.BorrowerInfo() { Email = "coborrower@example.com" }
+                }
+            });
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Insert"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanType"], Is.EqualTo("FHA"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanData.LoanType"], Is.EqualTo("JsonFHA"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanData.PrimaryBorrower.Email"], Is.EqualTo("primary@example.com"));
+            Assert.That(evs[0].Entries[0].ColumnValues["LoanData.CoBorrower1.Email"], Is.EqualTo("coborrower@example.com"));
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
+        public void Test_EF_ComplexType_Json_DuplicateLeafNames_Changes()
+        {
+            Audit.EntityFramework.Configuration.Reset<Context_ComplexTypes_JsonDuplicateNames>();
+            Audit.Core.Configuration.Setup()
+                .UseInMemoryProvider(out var dp);
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexTypes_JsonDuplicateNames>(c => c.MapChangesByColumn(false));
+
+            using var context = new Context_ComplexTypes_JsonDuplicateNames();
+            context.MapChangesByColumn = false;
+            context.AuditDisabled = true;
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var loan = new Context_ComplexTypes_JsonDuplicateNames.Loan()
+            {
+                Id = 1,
+                LoanType = "FHA",
+                LoanData = new Context_ComplexTypes_JsonDuplicateNames.LoanData()
+                {
+                    LoanType = "JsonFHA",
+                    PrimaryBorrower = new Context_ComplexTypes_JsonDuplicateNames.BorrowerInfo() { Email = "primary@example.com" },
+                    CoBorrower1 = new Context_ComplexTypes_JsonDuplicateNames.BorrowerInfo() { Email = "coborrower@example.com" }
+                }
+            };
+
+            context.Loans.Add(loan);
+            context.SaveChanges();
+            context.AuditDisabled = false;
+
+            loan.LoanType = "VA";
+            loan.LoanData = loan.LoanData with
+            {
+                LoanType = "JsonVA",
+                PrimaryBorrower = loan.LoanData.PrimaryBorrower with { Email = "updated-primary@example.com" },
+                CoBorrower1 = loan.LoanData.CoBorrower1 with { Email = "updated-coborrower@example.com" }
+            };
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs.Count, Is.EqualTo(1));
+            Assert.That(evs[0].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanType" && (string)ch.OriginalValue == "FHA" && (string)ch.NewValue == "VA"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData.LoanType" && (string)ch.OriginalValue == "JsonFHA" && (string)ch.NewValue == "JsonVA"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData.PrimaryBorrower.Email" && (string)ch.OriginalValue == "primary@example.com" && (string)ch.NewValue == "updated-primary@example.com"), Is.True);
+            Assert.That(evs[0].Entries[0].Changes.Any(ch => ch.ColumnName == "LoanData.CoBorrower1.Email" && (string)ch.OriginalValue == "coborrower@example.com" && (string)ch.NewValue == "updated-coborrower@example.com"), Is.True);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
+        public void Test_EF_ComplexType_Json_ReloadDatabaseValuesAfterSave()
+        {
+            var evs = new List<EntityFrameworkEvent>();
+            Audit.Core.Configuration.Setup()
+                .UseDynamicProvider(_ => _.OnInsertAndReplace(ev =>
+                {
+                    evs.Add(ev.GetEntityFrameworkEvent());
+                }));
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexTypes_Json>(c => c
+                    .ReloadDatabaseValuesAfterSave()
+                    .ForEntity<Context_ComplexTypes_Json.Person>(p => p.Format(x => x.Name, name => $"#{name}#"))
+                    .ForEntity<Context_ComplexTypes_Json.Address>(a => a.Format(p => p.Street, street => $"*{street}*"))
+                    .ForEntity<Context_ComplexTypes_Json.Country>(c => c.Format(p => p.Code, code => code?.ToUpperInvariant()))
+                    .ForEntity<Context_ComplexTypes_Json.ContactType>(c => c.Format(p => p.Description, d => d?.ToUpperInvariant())));
+
+            using var context = new Context_ComplexTypes_Json();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var person = new Context_ComplexTypes_Json.Person()
+            {
+                Id = 1,
+                Name = "Initial",
+                Address = new Context_ComplexTypes_Json.Address()
+                {
+                    Street = "123 Main St",
+                    Country = new Context_ComplexTypes_Json.Country()
+                    {
+                        Name = "USA",
+                        Code = "us",
+                        CountryInfo = new Context_ComplexTypes_Json.CountryInfo() { Info = "Some info" }
+                    }
+                },
+                Contact = new Context_ComplexTypes_Json.Contact()
+                {
+                    Number = 123456789,
+                    ContactType = new Context_ComplexTypes_Json.ContactType() { Type = 1, Description = "mobile" }
+                }
+            };
+
+            context.People.Add(person);
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            person.Name = "Updated";
+            person.Address = person.Address with
+            {
+                Street = "456 Oak Ave",
+                Country = person.Address.Country with { Code = "ca" }
+            };
+            person.Contact = person.Contact with
+            {
+                ContactType = person.Contact.ContactType with { Description = "work" }
+            };
+
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            Assert.That(evs.Count, Is.EqualTo(2));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Name"], Is.EqualTo("#Initial#"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Name"], Is.EqualTo("#Updated#"));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Street"], Is.EqualTo("*123 Main St*"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address.Street"], Is.EqualTo("*456 Oak Ave*"));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Address.Country.Code"], Is.EqualTo("US"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Address.Country.Code"], Is.EqualTo("CA"));
+
+            Assert.That(evs[0].Entries[0].ColumnValues["Contact_ContactType_Description"], Is.EqualTo("MOBILE"));
+            Assert.That(evs[1].Entries[0].ColumnValues["Contact_ContactType_Description"], Is.EqualTo("WORK"));
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Test]
+        public void Test_EF_ComplexType_Json_ChangesByColumn()
+        {
+            Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexTypes_JsonDuplicateNames>(c => c.MapChangesByColumn());
+
+            using var context = new Context_ComplexTypes_JsonDuplicateNames();
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+
+            var loan = new Context_ComplexTypes_JsonDuplicateNames.Loan()
+            {
+                Id = 1,
+                LoanType = "FHA",
+                LoanData = new Context_ComplexTypes_JsonDuplicateNames.LoanData()
+                {
+                    LoanType = "JsonFHA",
+                    PrimaryBorrower = new Context_ComplexTypes_JsonDuplicateNames.BorrowerInfo() { Email = "primary@example.com" },
+                    CoBorrower1 = new Context_ComplexTypes_JsonDuplicateNames.BorrowerInfo() { Email = "coborrower@example.com" }
+                }
+            };
+
+            context.Loans.Add(loan);
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            loan.LoanData = loan.LoanData with
+            {
+                PrimaryBorrower = loan.LoanData.PrimaryBorrower with { Email = "updated-primary@example.com" },
+                CoBorrower1 = loan.LoanData.CoBorrower1 with { Email = "updated-coborrower@example.com" }
+            };
+            Assert.DoesNotThrow(() => context.SaveChanges());
+
+            var evs = dp.GetAllEventsOfType<AuditEventEntityFramework>().Select(e => e.EntityFrameworkEvent).ToList();
+
+            Assert.That(evs.Count, Is.EqualTo(2));
+            Assert.That(evs[1].Entries[0].Action, Is.EqualTo("Update"));
+            Assert.That(evs[1].Entries[0].ChangesByColumn, Is.Not.Null);
+            Assert.That(evs[1].Entries[0].ChangesByColumn["LoanData.PrimaryBorrower.Email"].OriginalValue, Is.EqualTo("primary@example.com"));
+            Assert.That(evs[1].Entries[0].ChangesByColumn["LoanData.PrimaryBorrower.Email"].NewValue, Is.EqualTo("updated-primary@example.com"));
+            Assert.That(evs[1].Entries[0].ChangesByColumn["LoanData.CoBorrower1.Email"].OriginalValue, Is.EqualTo("coborrower@example.com"));
+            Assert.That(evs[1].Entries[0].ChangesByColumn["LoanData.CoBorrower1.Email"].NewValue, Is.EqualTo("updated-coborrower@example.com"));
+
+            context.Database.EnsureDeleted();
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void Test_EF_ComplexCollection_Changes(bool reloadDatabaseValues)

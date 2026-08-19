@@ -115,6 +115,124 @@ namespace Audit.EntityFramework.Core.UnitTest
         }
     }
 #endif
+
+#if EF_CORE_10_OR_GREATER
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_ComplexTypes_Json : AuditDbContext
+    {
+        public class Person
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            [Required]
+            public required Address Address { get; set; }
+            [Required]
+            public required Contact Contact { get; set; }
+        }
+
+        public record Address
+        {
+            public string Street { get; init; }
+            [Required]
+            public required Country Country { get; init; }
+        }
+
+        public record Country
+        {
+            public string Name { get; init; }
+            public string Code { get; init; }
+            [Required]
+            public required CountryInfo CountryInfo { get; init; }
+        }
+
+        public record CountryInfo
+        {
+            public string Info { get; init; }
+        }
+
+        public record Contact
+        {
+            public int Number { get; init; }
+            [Required]
+            public required ContactType ContactType { get; init; }
+        }
+
+        public record ContactType
+        {
+            public int Type { get; init; }
+            public string Description { get; init; }
+        }
+
+        public DbSet<Person> People { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var cnnString = TestHelper.GetConnectionString(nameof(Context_ComplexTypes_Json));
+                optionsBuilder.UseSqlServer(cnnString).UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>(e =>
+            {
+                e.ComplexProperty(p => p.Address, a => a.ToJson());
+                e.ComplexProperty(p => p.Contact).ComplexProperty(c => c.ContactType);
+            });
+        }
+    }
+
+    [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_ComplexTypes_JsonDuplicateNames : AuditDbContext
+    {
+        public class Loan
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string LoanType { get; set; }
+            [Required]
+            public required LoanData LoanData { get; set; }
+        }
+
+        public record LoanData
+        {
+            public string LoanType { get; init; }
+            [Required]
+            public required BorrowerInfo PrimaryBorrower { get; init; }
+            [Required]
+            public required BorrowerInfo CoBorrower1 { get; init; }
+        }
+
+        public record BorrowerInfo
+        {
+            public string Email { get; init; }
+        }
+
+        public DbSet<Loan> Loans { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var cnnString = TestHelper.GetConnectionString(nameof(Context_ComplexTypes_JsonDuplicateNames));
+                optionsBuilder.UseSqlServer(cnnString).UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Loan>().ComplexProperty(e => e.LoanData, loanData =>
+            {
+                loanData.ToJson();
+                loanData.ComplexProperty(e => e.PrimaryBorrower);
+                loanData.ComplexProperty(e => e.CoBorrower1);
+            });
+        }
+    }
+#endif
     
 #if EF_CORE_7_OR_GREATER
     [AuditDbContext(IncludeEntityObjects = true)]
