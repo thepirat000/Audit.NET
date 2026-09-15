@@ -703,6 +703,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
 
             Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>().Reset();
+
+            Audit.EntityFramework.Configuration.Setup()
                 .ForContext<Context_ComplexCollections>(c => c
                     .ReloadDatabaseValues(reloadDatabaseValues)
                     .ReloadDatabaseValuesAfterSave(true));
@@ -796,6 +799,9 @@ namespace Audit.EntityFramework.Core.UnitTest
         public void Test_EF_ComplexCollection_ChangesByColumn()
         {
             Audit.Core.Configuration.Setup().UseInMemoryProvider(out var dp);
+
+            Audit.EntityFramework.Configuration.Setup()
+                .ForContext<Context_ComplexCollections>().Reset();
 
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<Context_ComplexCollections>(c => c
