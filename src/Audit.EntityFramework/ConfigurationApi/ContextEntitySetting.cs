@@ -12,7 +12,9 @@ namespace Audit.EntityFramework.ConfigurationApi
     public class ContextEntitySetting<TEntity> : IContextEntitySetting<TEntity>
     {
         internal HashSet<string> IgnoredProperties = new HashSet<string>();
-        internal Dictionary<string, Func<EntityEntry, object>> OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>();
+
+        internal Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>> OverrideProperties = new Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>>();
+
         internal Dictionary<string, Func<object, object>> FormatProperties = new Dictionary<string, Func<object, object>>();
 
         public IContextEntitySetting<TEntity> Format<TProp>(Expression<Func<TEntity, TProp>> property, Func<TProp, object> format)
@@ -28,29 +30,46 @@ namespace Audit.EntityFramework.ConfigurationApi
             return this;
         }
 
+        /// <inheritdoc/>
+        public IContextEntitySetting<TEntity> Override<TProp>(Expression<Func<TEntity, TProp>> property, Func<EntityEntry, PropertyOverrideContext, object> valueSelector)
+        {
+            var name = GetMemberName(property);
+            OverrideProperties[name] = (entry, propInfo) => valueSelector?.Invoke(entry, propInfo);
+            return this;
+        }
+
+        /// <inheritdoc/>
         public IContextEntitySetting<TEntity> Override<TProp>(Expression<Func<TEntity, TProp>> property, Func<EntityEntry, object> valueSelector)
         {
             var name = GetMemberName(property);
-            OverrideProperties[name] = entry => valueSelector?.Invoke(entry);
+            OverrideProperties[name] = (entry, propInfo) => valueSelector?.Invoke(entry);
             return this;
         }
-        
+
+        /// <inheritdoc/>
+        public IContextEntitySetting<TEntity> Override(string propertyName, Func<EntityEntry, PropertyOverrideContext, object> valueSelector)
+        {
+            OverrideProperties[propertyName] = (entry, propInfo) => valueSelector?.Invoke(entry, propInfo);
+            return this;
+        }
+
+        /// <inheritdoc/>
         public IContextEntitySetting<TEntity> Override(string propertyName, Func<EntityEntry, object> valueSelector)
         {
-            OverrideProperties[propertyName] = entry => valueSelector?.Invoke(entry);
+            OverrideProperties[propertyName] = (entry, _) => valueSelector?.Invoke(entry);
             return this;
         }
 
         public IContextEntitySetting<TEntity> Override<TProp>(Expression<Func<TEntity, TProp>> property, object value)
         {
             var name = GetMemberName(property);
-            OverrideProperties[name] = _ => value;
+            OverrideProperties[name] = (_, _) => value;
             return this;
         }
 
         public IContextEntitySetting<TEntity> Override(string propertyName, object value)
         {
-            OverrideProperties[propertyName] = _ => value;
+            OverrideProperties[propertyName] = (_, _) => value;
             return this;
         }
 

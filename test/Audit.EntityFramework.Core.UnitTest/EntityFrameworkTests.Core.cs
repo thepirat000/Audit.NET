@@ -131,7 +131,7 @@ namespace Audit.EntityFramework.Core.UnitTest.Context
                     .ForEntity<Blog>(_ => _.Ignore(blog => blog.BloggerName)));
             Audit.EntityFramework.Configuration.Setup()
                 .ForContext<MyBaseContext>(config => config
-                    .ForEntity<Blog>(_ => _.Override("Title", null)));
+                    .ForEntity<Blog>(_ => _.Override(b => b.Title, (object)null)));
 
             var title = Guid.NewGuid().ToString().Substring(0, 25);
             using (var ctx = new MyTransactionalContext())

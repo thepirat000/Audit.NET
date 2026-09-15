@@ -18,9 +18,10 @@ namespace Audit.EntityFramework.ConfigurationApi
         /// </summary>
         public HashSet<string> IgnoredProperties = new HashSet<string>();
         /// <summary>
-        /// To indicate constant values to override properties on the audit logs. Key: property name, Value: constant value.
+        /// Override callbacks for properties on the audit logs. Key: property name.
+        /// Value: a function of the entity entry and <see cref="PropertyOverrideContext"/> that returns the value to store.
         /// </summary>
-        public Dictionary<string, Func<EntityEntry, object>> OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>();
+        public Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>> OverrideProperties = new Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>>();
         /// <summary>
         /// To indicate replacement functions for the property's values on the audit logs. Key: property name, Value: function of the actual value.
         /// </summary>

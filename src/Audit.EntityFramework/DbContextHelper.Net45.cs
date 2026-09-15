@@ -112,7 +112,12 @@ namespace Audit.EntityFramework
                 if (settings.OverrideProperties.ContainsKey(propName))
                 {
                     // property overriden with a func value
-                    value = settings.OverrideProperties[propName].Invoke(entry);
+                    var propContext = new PropertyOverrideContext
+                    {
+                        PropertyName = propName,
+                        SourceValue = currentValue
+                    };
+                    value = settings.OverrideProperties[propName].Invoke(entry, propContext);
                     return true;
                 }
                 if (settings.FormatProperties.ContainsKey(propName))

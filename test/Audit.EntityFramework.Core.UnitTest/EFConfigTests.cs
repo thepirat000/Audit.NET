@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Audit.Core;
+using Audit.EntityFramework;
 using Audit.EntityFramework.ConfigurationApi;
 using Audit.EntityFramework.Providers;
 
@@ -53,23 +54,23 @@ namespace Audit.EntityFramework.Core.UnitTest
             attr[typeof(string)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I1" }),
-                OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>() { { "C1", _ => 1 }, { "C2", _ => "ATTR" } }
+                OverrideProperties = new Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>>() { { "C1", (_, _) => 1 }, { "C2", (_, _) => "ATTR" } }
             };
             local[typeof(string)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I1", "I2" }),
-                OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>() { { "C2", _ => "LOCAL" }, { "C3", _ => now } }
+                OverrideProperties = new Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>>() { { "C2", (_, _) => "LOCAL" }, { "C3", (_, _) => now } }
             };
             global[typeof(string)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I3" }),
-                OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>() { { "C2", _ => "GLOBAL" }, { "C4", _ => null } }
+                OverrideProperties = new Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>>() { { "C2", (_, _) => "GLOBAL" }, { "C4", (_, _) => null } }
             };
 
             attr[typeof(int)] = new EfEntitySettings()
             {
                 IgnoredProperties = new HashSet<string>(new[] { "I3" }),
-                OverrideProperties = new Dictionary<string, Func<EntityEntry, object>>() { { "C2", _ => "INT" }, { "C4", _ => null } }
+                OverrideProperties = new Dictionary<string, Func<EntityEntry, PropertyOverrideContext, object>>() { { "C2", (_, _) => "INT" }, { "C4", (_, _) => null } }
             };
 
             var merged = helper.MergeEntitySettings(attr, local, global);
@@ -86,15 +87,15 @@ namespace Audit.EntityFramework.Core.UnitTest
             Assert.That(merge.IgnoredProperties.Contains("I2"), Is.True);
             Assert.That(merge.IgnoredProperties.Contains("I3"), Is.True);
             Assert.That(merge.OverrideProperties.Count, Is.EqualTo(4));
-            Assert.That(merge.OverrideProperties["C1"].Invoke(null), Is.EqualTo(1));
-            Assert.That(merge.OverrideProperties["C2"].Invoke(null), Is.EqualTo("ATTR"));
-            Assert.That(merge.OverrideProperties["C3"].Invoke(null), Is.EqualTo(now));
-            Assert.That(merge.OverrideProperties["C4"].Invoke(null), Is.EqualTo(null));
+            Assert.That(merge.OverrideProperties["C1"].Invoke(null, null), Is.EqualTo(1));
+            Assert.That(merge.OverrideProperties["C2"].Invoke(null, null), Is.EqualTo("ATTR"));
+            Assert.That(merge.OverrideProperties["C3"].Invoke(null, null), Is.EqualTo(now));
+            Assert.That(merge.OverrideProperties["C4"].Invoke(null, null), Is.EqualTo(null));
             merge = merged[typeof(int)];
             Assert.That(merge.IgnoredProperties.Count, Is.EqualTo(1));
             Assert.That(merge.IgnoredProperties.Contains("I3"), Is.True);
-            Assert.That(merge.OverrideProperties["C2"].Invoke(null), Is.EqualTo("INT"));
-            Assert.That(merge.OverrideProperties["C4"].Invoke(null), Is.EqualTo(null));
+            Assert.That(merge.OverrideProperties["C2"].Invoke(null, null), Is.EqualTo("INT"));
+            Assert.That(merge.OverrideProperties["C4"].Invoke(null, null), Is.EqualTo(null));
         }
 
         [Test]

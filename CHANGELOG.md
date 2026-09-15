@@ -3,6 +3,11 @@ All notable changes to Audit.NET and its extensions will be documented in this f
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## [33.0.0] - 2026-09-14:
+- **Audit.EntityFramework** / **Audit.EntityFramework.Core**: **BREAKING CHANGE** `Override` callbacks and `EfEntitySettings.OverrideProperties` now receive a `PropertyOverrideContext` as a second argument (#801).
+- **Audit.EntityFramework.Core**: Per-usage-site configuration for EF Core complex properties — `Ignore`, `Override` and `Format` on a complex property apply to its direct scalar children; `PropertyOverrideContext.ComplexPropertyPath` enables path-aware overrides (#801).
+- **Audit.EntityFramework.Core**: Complex collections nested inside complex properties use the correct declaring type for include/override resolution (#801).
+
 ## [32.3.1] - 2026-08-18:
 - **Audit.EntityFramework.Core**: Use EF's real flattened column names for regular complex properties, while keeping dot-path keys for JSON-mapped complex properties. (#796)
 - **Audit.EntityFramework.Core**: Change audit column names for complex properties and complex collections to match the real column names and JSON paths from the EF model. (#796)

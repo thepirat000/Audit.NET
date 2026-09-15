@@ -479,6 +479,60 @@ namespace Audit.EntityFramework.Core.UnitTest
 
 #if EF_CORE_10_OR_GREATER
     [AuditDbContext(IncludeEntityObjects = true)]
+    public class Context_ComplexNestedCollection : AuditDbContext
+    {
+        private readonly string _dbName;
+
+        public Context_ComplexNestedCollection(string dbName)
+        {
+            _dbName = dbName;
+        }
+
+        public class Person
+        {
+            [DatabaseGenerated(DatabaseGeneratedOption.None)]
+            public int Id { get; set; }
+            public string Name { get; set; }
+            [Required]
+            public required Address Address { get; set; }
+        }
+
+        public record Address
+        {
+            public string Street { get; init; }
+            public List<Tag> Tags { get; init; }
+        }
+
+        public record Tag
+        {
+            public string Label { get; init; }
+        }
+
+        public DbSet<Person> People { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var cnnString = TestHelper.GetConnectionString(_dbName);
+                optionsBuilder.UseSqlServer(cnnString).UseLazyLoadingProxies();
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Person>(e =>
+            {
+                e.ComplexProperty(p => p.Address, a =>
+                {
+                    a.ToJson("address");
+                    a.ComplexCollection(x => x.Tags, t => t.Property(x => x.Label).IsRequired());
+                });
+            });
+        }
+    }
+
+    [AuditDbContext(IncludeEntityObjects = true)]
     public class Context_ComplexCollections : AuditDbContext
     {
         private string _dbName;

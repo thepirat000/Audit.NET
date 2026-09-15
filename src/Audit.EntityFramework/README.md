@@ -411,6 +411,50 @@ public class User
 
 Note you can also provide a replacement function of the value, please see next section.
 
+#### EF Core complex properties (EF Core 8+)
+
+When using [EF Core complex properties](https://learn.microsoft.com/en-us/ef/core/modeling/complex-types), you can configure **Ignore**, **Override** and **Format** on the complex property itself (usage-site) or on the complex CLR type.
+
+**Usage-site configuration** applies to the **direct scalar children** of that complex property:
+
+```c#
+public class User
+{
+    public int Id { get; set; }
+
+    [AuditIgnore]
+    public StreetAddress ShippingAddress { get; set; }  // all direct scalar children ignored
+
+    [AuditOverride("***")]
+    public StreetAddress BillingAddress { get; set; }     // direct scalar children redacted
+}
+
+Audit.EntityFramework.Configuration.Setup()
+    .ForContext<MyContext>(config => config
+        .ForEntity<User>(u => u
+            .Override(x => x.BillingAddress, (_, ctx) =>
+                ctx.ComplexPropertyPath?.EndsWith("Street") == true ? "***" : ctx.SourceValue)));
+```
+
+**Precedence** (leaf scalar `Person.Address2.Street`):
+
+1. Configuration on the complex CLR type (`Address.Street`) wins.
+2. Otherwise, configuration on the parent complex property (`Person.Address2`) is used.
+
+**Nested complex properties** (for example `Person.Contact2.ContactType.Description`) do **not** inherit from the root usage site (`Person.Contact2`). Configure the nested complex CLR type or its immediate parent (`Contact.ContactType`).
+
+**`PropertyOverrideContext`** is passed to `Override` callbacks and provides:
+
+| Member | Description |
+|--------|-------------|
+| `PropertyName` | Property name used for the matched configuration |
+| `ComplexPropertyPath` | Leaf path (e.g. `Contact2.Number`, `address.city`) |
+| `IsOriginal` | Whether `SourceValue` is the original or new value |
+| `SourceValue` | Value before override/format |
+
+For path-aware redaction on complex properties, prefer `.Override(..., (entry, ctx) => ...)` over `.Format()`.
+`.Format()` on a parent complex property uses the same one-level fallback; the formatter receives each leaf `SourceValue`.
+
 ### Fluent API
 
 You can configure the settings via a convenient Fluent API provided by the method `Audit.EntityFramework.Configuration.Setup()`, this is the most straightforward way to configure the library.

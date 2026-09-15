@@ -26,6 +26,9 @@ namespace Audit.EntityFramework.Core.UnitTest
             Audit.Core.Configuration.Reset();
             Audit.EntityFramework.Configuration.Setup()
                 .ForAnyContext().Reset();
+#if EF_CORE_10_OR_GREATER
+            Audit.EntityFramework.Configuration.Reset<Context_ComplexTypes_Json>();
+#endif
             new BlogsContext().Database.EnsureCreated();
             new DemoContext().Database.EnsureCreated();
         }
