@@ -2,27 +2,27 @@
 
 |||
 |:---|:---|
-| Generated on: | 08/19/2026 - 04:25:03 |
-| Coverage date: | 08/19/2026 - 03:58:48 - 08/19/2026 - 04:24:07 |
+| Generated on: | 09/16/2026 - 04:16:36 |
+| Coverage date: | 09/16/2026 - 03:50:19 - 09/16/2026 - 04:15:35 |
 | Parser: | MultiReport (117x Cobertura) |
 | Assemblies: | 45 |
-| Classes: | 376 |
-| Files: | 330 |
-| **Line coverage:** | 89.5% (10690 of 11938) |
-| Covered lines: | 10690 |
-| Uncovered lines: | 1248 |
-| Coverable lines: | 11938 |
-| Total lines: | 32084 |
-| **Branch coverage:** | 80.3% (3966 of 4933) |
-| Covered branches: | 3966 |
-| Total branches: | 4933 |
+| Classes: | 378 |
+| Files: | 331 |
+| **Line coverage:** | 89.6% (10757 of 11996) |
+| Covered lines: | 10757 |
+| Uncovered lines: | 1239 |
+| Coverable lines: | 11996 |
+| Total lines: | 32241 |
+| **Branch coverage:** | 80.7% (4005 of 4957) |
+| Covered branches: | 4005 |
+| Total branches: | 4957 |
 | **Method coverage:** | [Feature is only available for sponsors](https://reportgenerator.io/pro) |
 
 # Risk Hotspots
 
 | **Assembly** | **Class** | **Method** | **Crap Score** | **Cyclomatic complexity** |
 |:---|:---|:---|---:|---:|
-| Audit.Wcf.Client | Audit.Wcf.Client.AuditMessageInspector | CreateWcfClientAction(...) | 272 | 16 || Audit.Wcf.Client | Audit.Wcf.Client.AuditMessageInspector | AfterReceiveReply(...) | 210 | 14 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | GetResponseBody(...) | 147 | 36 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | SetConfig(...) | 100 | 100 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | SetConfig(...) | 100 | 100 || Audit.NET | Audit.Core.Providers.EventLogDataProvider | InsertEvent(...) | 72 | 8 || Audit.NET.EventLog.Core | Audit.Core.Providers.EventLogDataProvider | InsertEvent(...) | 72 | 8 || Audit.NET.AzureStorageTables | Audit.AzureStorageTables.Providers.AzureTableDataProvider | CreateTableclient(...) | 65 | 10 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | BeginSaveChanges(...) | 42 | 6 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | BeginSaveChangesAsync() | 42 | 6 || Audit.WebApi | Audit.WebApi.AuditApiGlobalFilter | OnActionExecutedAsync() | 42 | 6 || Audit.WebApi | Audit.WebApi.AuditApiGlobalFilter | OnActionExecutingAsync() | 42 | 6 || Audit.Mvc.Core | Audit.Mvc.AuditPageFilter | GetResponseBody(...) | 40 | 40 || Audit.Mvc.Core | Audit.Mvc.AuditPageFilter | BeforeExecutingAsync() | 40 | 40 || Audit.WebApi | Audit.WebApi.AuditApiAdapter | BeforeExecutingAsync() | 40 | 40 || Audit.EntityFramework | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEvent(...) | 36 | 34 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | GetResponseBody(...) | 36 | 36 || Audit.EntityFramework | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEventAsync() | 35 | 34 || Audit.EntityFramework.Core | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEvent(...) | 34 | 34 || Audit.EntityFramework.Core | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEventAsync() | 34 | 34 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | BeforeExecutingAsync() | 34 | 34 || Audit.Mvc.Core | Audit.Mvc.AuditPageFilter | AfterExecutedAsync() | 34 | 34 || Audit.NET | Audit.Core.AuditScope | .ctor(...) | 34 | 34 || Audit.Hangfire | Audit.Hangfire.AuditJobCreationFilterAttribute | OnCreated(...) | 30 | 30 || Audit.DynamicProxy | Audit.DynamicProxy.AuditInterceptor | CreateAuditInterceptEvent(...) | 29 | 28 || Audit.NET.JsonNewtonsoftAdapter | Audit.JsonNewtonsoftAdapter.AuditContractResolver | CreateObjectContract(...) | 28 | 28 || Audit.SignalR | Audit.SignalR.AuditHubFilter | CreateAuditScopeAsync() | 28 | 28 || Audit.WebApi | Audit.WebApi.AuditApiAdapter | AfterExecutedAsync() | 28 | 28 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | AfterExecutedAsync() | 26 | 26 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | AfterExecutedAsync() | 26 | 26 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | MergeEntitySettings(...) | 26 | 24 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | MergeEntitySettings(...) | 24 | 24 || Audit.Mvc | Audit.Mvc.AuditAttribute | OnActionExecuting(...) | 24 | 24 || Audit.Mvc | Audit.Mvc.AuditAttribute | OnActionExecuted(...) | 24 | 24 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | AuditEventEnabled(...) | 25 | 24 || Audit.WebApi.Core | Audit.WebApi.AuditMiddleware | BeforeInvoke() | 24 | 24 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | UpdateAuditEvent(...) | 22 | 22 || Audit.Mvc | Audit.Mvc.AuditAttribute | GetResponseBody(...) | 22 | 22 || Audit.NET | Audit.Core.AuditScope | GetActivityTraceData() | 24 | 22 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeIncoming(...) | 23 | 22 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnIncomingError(...) | 22 | 22 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | CreateOrUpdateAction() | 22 | 22 || Audit.AzureFunctions | Audit.AzureFunctions.AuditAzureFunctionMiddleware | CreateAuditEvent(...) | 20 | 20 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | IncludeProperty(...) | 25 | 20 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | GetAssociationEntries(...) | 20 | 20 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | IncludeProperty(...) | 20 | 20 || Audit.Grpc.Client | Audit.Grpc.Client.AuditClientInterceptor | CreateGrpcClientAuditEvent(...) | 20 | 20 || Audit.Grpc.Server | Audit.Grpc.Server.AuditServerInterceptor | CreateGrpcServerAuditEvent(...) | 20 | 20 || Audit.MediatR | Audit.MediatR.AuditMediatRBehavior<T1, T2> | Handle() | 20 | 20 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | AfterResultAsync() | 20 | 20 || Audit.NET.MongoDB | Audit.MongoDB.Providers.MongoDataProvider | FixDocumentElementNames(...) | 20 | 20 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | GetActionParameters(...) | 20 | 20 || Audit.FileSystem | Audit.FileSystem.FileSystemMonitor | Start() | 18 | 18 || Audit.Hangfire | Audit.Hangfire.AuditJobExecutionFilterAttribute | CreateAuditScope(...) | 18 | 18 || Audit.WebApi.Core | Audit.WebApi.AuditMiddleware | AfterInvoke() | 18 | 18 || Audit.WebApi.Core | Audit.WebApi.AuditMiddleware | InvokeAsync() | 18 | 18 || Audit.AzureFunctions | Audit.AzureFunctions.AuditAzureFunctionMiddleware | Invoke() | 16 | 16 || Audit.DynamicProxy | Audit.DynamicProxy.AuditInterceptor | Intercept(...) | 16 | 16 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | HasPropertyValue(...) | 18 | 16 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | CreateEventEntry(...) | 16 | 16 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | AddChangesFromComplexProperties(...) | 16 | 16 || Audit.HttpClient | Audit.Http.AuditHttpClientHandler | SendAsync() | 16 | 16 || Audit.Mvc | Audit.Mvc.AuditAttribute | OnResultExecuted(...) | 16 | 16 || Audit.NET | Audit.Core.AuditScope | GetEnvironmentInfo(...) | 16 | 16 || Audit.NET.Redis | Audit.Redis.Providers.RedisProviderSortedSet | ExecSortedSetAdd(...) | 16 | 16 || Audit.SignalR | Audit.SignalR.AuditHubFilter | OnDisconnectedAsync() | 17 | 16 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeConnect(...) | 17 | 16 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeDisconnect(...) | 17 | 16 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeReconnect(...) | 17 | 16 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | ActionIgnored(...) | 16 | 16 |
+| Audit.Wcf.Client | Audit.Wcf.Client.AuditMessageInspector | CreateWcfClientAction(...) | 272 | 16 || Audit.Wcf.Client | Audit.Wcf.Client.AuditMessageInspector | AfterReceiveReply(...) | 210 | 14 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | GetResponseBody(...) | 147 | 36 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | SetConfig(...) | 100 | 100 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | SetConfig(...) | 100 | 100 || Audit.NET | Audit.Core.Providers.EventLogDataProvider | InsertEvent(...) | 72 | 8 || Audit.NET.EventLog.Core | Audit.Core.Providers.EventLogDataProvider | InsertEvent(...) | 72 | 8 || Audit.NET.AzureStorageTables | Audit.AzureStorageTables.Providers.AzureTableDataProvider | CreateTableclient(...) | 65 | 10 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | BeginSaveChanges(...) | 42 | 6 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | BeginSaveChangesAsync() | 42 | 6 || Audit.WebApi | Audit.WebApi.AuditApiGlobalFilter | OnActionExecutedAsync() | 42 | 6 || Audit.WebApi | Audit.WebApi.AuditApiGlobalFilter | OnActionExecutingAsync() | 42 | 6 || Audit.Mvc.Core | Audit.Mvc.AuditPageFilter | GetResponseBody(...) | 40 | 40 || Audit.Mvc.Core | Audit.Mvc.AuditPageFilter | BeforeExecutingAsync() | 40 | 40 || Audit.WebApi | Audit.WebApi.AuditApiAdapter | BeforeExecutingAsync() | 40 | 40 || Audit.EntityFramework | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEvent(...) | 36 | 34 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | GetResponseBody(...) | 36 | 36 || Audit.EntityFramework | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEventAsync() | 35 | 34 || Audit.EntityFramework.Core | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEvent(...) | 34 | 34 || Audit.EntityFramework.Core | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | InsertEventAsync() | 34 | 34 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | BeforeExecutingAsync() | 34 | 34 || Audit.Mvc.Core | Audit.Mvc.AuditPageFilter | AfterExecutedAsync() | 34 | 34 || Audit.NET | Audit.Core.AuditScope | .ctor(...) | 34 | 34 || Audit.Hangfire | Audit.Hangfire.AuditJobCreationFilterAttribute | OnCreated(...) | 30 | 30 || Audit.DynamicProxy | Audit.DynamicProxy.AuditInterceptor | CreateAuditInterceptEvent(...) | 29 | 28 || Audit.NET.JsonNewtonsoftAdapter | Audit.JsonNewtonsoftAdapter.AuditContractResolver | CreateObjectContract(...) | 28 | 28 || Audit.SignalR | Audit.SignalR.AuditHubFilter | CreateAuditScopeAsync() | 28 | 28 || Audit.WebApi | Audit.WebApi.AuditApiAdapter | AfterExecutedAsync() | 28 | 28 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | AfterExecutedAsync() | 26 | 26 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | AfterExecutedAsync() | 26 | 26 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | MergeEntitySettings(...) | 26 | 24 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | MergeEntitySettings(...) | 24 | 24 || Audit.Mvc | Audit.Mvc.AuditAttribute | OnActionExecuting(...) | 24 | 24 || Audit.Mvc | Audit.Mvc.AuditAttribute | OnActionExecuted(...) | 24 | 24 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | AuditEventEnabled(...) | 25 | 24 || Audit.WebApi.Core | Audit.WebApi.AuditMiddleware | BeforeInvoke() | 24 | 24 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | UpdateAuditEvent(...) | 22 | 22 || Audit.Mvc | Audit.Mvc.AuditAttribute | GetResponseBody(...) | 22 | 22 || Audit.NET | Audit.Core.AuditScope | GetActivityTraceData() | 24 | 22 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeIncoming(...) | 23 | 22 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnIncomingError(...) | 22 | 22 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | CreateOrUpdateAction() | 22 | 22 || Audit.AzureFunctions | Audit.AzureFunctions.AuditAzureFunctionMiddleware | CreateAuditEvent(...) | 20 | 20 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | IncludeProperty(...) | 25 | 20 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | GetAssociationEntries(...) | 20 | 20 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | IncludeProperty(...) | 20 | 20 || Audit.Grpc.Client | Audit.Grpc.Client.AuditClientInterceptor | CreateGrpcClientAuditEvent(...) | 20 | 20 || Audit.Grpc.Server | Audit.Grpc.Server.AuditServerInterceptor | CreateGrpcServerAuditEvent(...) | 20 | 20 || Audit.MediatR | Audit.MediatR.AuditMediatRBehavior<T1, T2> | Handle() | 20 | 20 || Audit.Mvc.Core | Audit.Mvc.AuditAttribute | AfterResultAsync() | 20 | 20 || Audit.NET.MongoDB | Audit.MongoDB.Providers.MongoDataProvider | FixDocumentElementNames(...) | 20 | 20 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | GetActionParameters(...) | 20 | 20 || Audit.FileSystem | Audit.FileSystem.FileSystemMonitor | Start() | 18 | 18 || Audit.Hangfire | Audit.Hangfire.AuditJobExecutionFilterAttribute | CreateAuditScope(...) | 18 | 18 || Audit.WebApi.Core | Audit.WebApi.AuditMiddleware | AfterInvoke() | 18 | 18 || Audit.WebApi.Core | Audit.WebApi.AuditMiddleware | InvokeAsync() | 18 | 18 || Audit.AzureFunctions | Audit.AzureFunctions.AuditAzureFunctionMiddleware | Invoke() | 16 | 16 || Audit.DynamicProxy | Audit.DynamicProxy.AuditInterceptor | Intercept(...) | 16 | 16 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | HasPropertyValue(...) | 17 | 16 || Audit.EntityFramework | Audit.EntityFramework.DbContextHelper | CreateEventEntry(...) | 16 | 16 || Audit.EntityFramework.Core | Audit.EntityFramework.DbContextHelper | AddChangesFromComplexProperties(...) | 16 | 16 || Audit.HttpClient | Audit.Http.AuditHttpClientHandler | SendAsync() | 16 | 16 || Audit.Mvc | Audit.Mvc.AuditAttribute | OnResultExecuted(...) | 16 | 16 || Audit.NET | Audit.Core.AuditScope | GetEnvironmentInfo(...) | 16 | 16 || Audit.NET.Redis | Audit.Redis.Providers.RedisProviderSortedSet | ExecSortedSetAdd(...) | 16 | 16 || Audit.SignalR | Audit.SignalR.AuditHubFilter | OnDisconnectedAsync() | 17 | 16 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeConnect(...) | 17 | 16 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeDisconnect(...) | 17 | 16 || Audit.SignalR | Audit.SignalR.AuditPipelineModule | OnBeforeReconnect(...) | 17 | 16 || Audit.WebApi.Core | Audit.WebApi.AuditApiAdapter | ActionIgnored(...) | 16 | 16 |
 # Coverage
 
 | **Name** | **Covered** | **Uncovered** | **Coverable** | **Total** | **Line coverage** | **Covered** | **Total** | **Branch coverage** |
@@ -47,7 +47,7 @@
 | Audit.DynamicProxy.AuditProxy | 11 | 0 | 11 | 59 | 100% | 4 | 4 | 100% |
 | Audit.DynamicProxy.InterceptEvent | 12 | 0 | 12 | 59 | 100% | 0 | 0 |  |
 | Audit.DynamicProxy.InterceptionSettings | 7 | 0 | 7 | 48 | 100% | 0 | 0 |  |
-| **Audit.EntityFramework** | **1104** | **269** | **1373** | **3716** | **80.4%** | **519** | **654** | **79.3%** |
+| **Audit.EntityFramework** | **1109** | **276** | **1385** | **3784** | **80%** | **518** | **658** | **78.7%** |
 | Audit.Core.EntityFrameworkConfiguratorExtensions | 15 | 15 | 30 | 72 | 50% | 0 | 2 | 0% |
 | Audit.EntityFramework.AssociationEntry | 3 | 0 | 3 | 18 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.AssociationEntryRecord | 5 | 0 | 5 | 19 | 100% | 0 | 0 |  |
@@ -59,9 +59,9 @@
 | Audit.EntityFramework.Configuration | 44 | 9 | 53 | 149 | 83% | 5 | 8 | 62.5% |
 | Audit.EntityFramework.ConfigurationApi.AuditEntityMapping | 186 | 53 | 239 | 363 | 77.8% | 2 | 8 | 25% |
 | Audit.EntityFramework.ConfigurationApi.ContextConfigurator | 8 | 0 | 8 | 35 | 100% | 4 | 4 | 100% |
-| Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<T> | 20 | 8 | 28 | 85 | 71.4% | 4 | 8 | 50% |
+| Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<T> | 18 | 15 | 33 | 104 | 54.5% | 3 | 12 | 25% |
 | Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator<T> | 14 | 2 | 16 | 65 | 87.5% | 0 | 0 |  |
-| Audit.EntityFramework.ConfigurationApi.EfEntitySettings | 3 | 0 | 3 | 30 | 100% | 0 | 0 |  |
+| Audit.EntityFramework.ConfigurationApi.EfEntitySettings | 3 | 0 | 3 | 31 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.EfSettings | 14 | 0 | 14 | 34 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.EntityFrameworkProviderConfigurator | 62 | 25 | 87 | 184 | 71.2% | 2 | 6 | 33.3% |
 | Audit.EntityFramework.ConfigurationApi.ExcludeConfigurator<T> | 6 | 0 | 6 | 26 | 100% | 0 | 0 |  |
@@ -69,17 +69,18 @@
 | Audit.EntityFramework.ConfigurationApi.IncludePropertyConfigurator<T> | 0 | 11 | 11 | 36 | 0% | 0 | 4 | 0% |
 | Audit.EntityFramework.ConfigurationApi.MappingInfo | 4 | 0 | 4 | 31 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.ModeConfigurator<T> | 6 | 0 | 6 | 21 | 100% | 0 | 0 |  |
-| Audit.EntityFramework.DbContextHelper | 400 | 69 | 469 | 1089 | 85.2% | 356 | 428 | 83.1% |
+| Audit.EntityFramework.DbContextHelper | 405 | 69 | 474 | 1094 | 85.4% | 356 | 428 | 83.1% |
 | Audit.EntityFramework.DefaultAuditContext | 19 | 4 | 23 | 52 | 82.6% | 0 | 0 |  |
 | Audit.EntityFramework.EntityFrameworkEvent | 11 | 3 | 14 | 81 | 78.5% | 0 | 0 |  |
 | Audit.EntityFramework.EntityKeyHelper | 114 | 0 | 114 | 295 | 100% | 65 | 68 | 95.5% |
 | Audit.EntityFramework.EntityName | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.EventEntry | 14 | 3 | 17 | 120 | 82.3% | 0 | 0 |  |
 | Audit.EntityFramework.EventEntryChange | 3 | 0 | 3 | 9 | 100% | 0 | 0 |  |
+| Audit.EntityFramework.PropertyOverrideContext | 2 | 0 | 2 | 43 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | 115 | 17 | 132 | 396 | 87.1% | 80 | 100 | 80% |
 | **Audit.EntityFramework.Abstractions** | **4** | **2** | **6** | **20** | **66.6%** | **0** | **0** | **** |
 | Audit.EntityFramework.AuditOverrideAttribute | 4 | 2 | 6 | 20 | 66.6% | 0 | 0 |  |
-| **Audit.EntityFramework.Core** | **1861** | **114** | **1975** | **5604** | **94.2%** | **857** | **972** | **88.1%** |
+| **Audit.EntityFramework.Core** | **1923** | **98** | **2021** | **5756** | **95.1%** | **897** | **992** | **90.4%** |
 | Audit.Core.DbContextConfiguratorExtensions | 2 | 2 | 4 | 37 | 50% | 0 | 0 |  |
 | Audit.Core.EntityFrameworkConfiguratorExtensions | 28 | 2 | 30 | 72 | 93.3% | 2 | 2 | 100% |
 | Audit.EntityFramework.AuditDbContext | 35 | 0 | 35 | 258 | 100% | 0 | 0 |  |
@@ -94,13 +95,13 @@
 | Audit.EntityFramework.Configuration | 47 | 6 | 53 | 149 | 88.6% | 8 | 8 | 100% |
 | Audit.EntityFramework.ConfigurationApi.AuditEntityMapping | 238 | 1 | 239 | 363 | 99.5% | 3 | 8 | 37.5% |
 | Audit.EntityFramework.ConfigurationApi.ContextConfigurator | 8 | 0 | 8 | 35 | 100% | 4 | 4 | 100% |
-| Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<T> | 20 | 8 | 28 | 85 | 71.4% | 3 | 8 | 37.5% |
+| Audit.EntityFramework.ConfigurationApi.ContextEntitySetting<T> | 21 | 12 | 33 | 104 | 63.6% | 4 | 12 | 33.3% |
 | Audit.EntityFramework.ConfigurationApi.ContextSettingsConfigurator<T> | 16 | 0 | 16 | 65 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator | 17 | 0 | 17 | 86 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.DbContextProviderConfigurator<T1, T2> | 13 | 0 | 13 | 86 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.DbContextProviderEntityConfigurator | 6 | 0 | 6 | 50 | 100% | 1 | 2 | 50% |
 | Audit.EntityFramework.ConfigurationApi.DbContextProviderEntityConfigurator<T> | 4 | 0 | 4 | 50 | 100% | 0 | 0 |  |
-| Audit.EntityFramework.ConfigurationApi.EfEntitySettings | 3 | 0 | 3 | 30 | 100% | 0 | 0 |  |
+| Audit.EntityFramework.ConfigurationApi.EfEntitySettings | 3 | 0 | 3 | 31 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.EfSettings | 14 | 0 | 14 | 34 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.EntityFrameworkProviderConfigurator | 69 | 18 | 87 | 184 | 79.3% | 4 | 6 | 66.6% |
 | Audit.EntityFramework.ConfigurationApi.ExcludeConfigurator<T> | 0 | 6 | 6 | 26 | 0% | 0 | 0 |  |
@@ -109,7 +110,7 @@
 | Audit.EntityFramework.ConfigurationApi.MappingInfo | 4 | 0 | 4 | 31 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.ConfigurationApi.ModeConfigurator<T> | 6 | 0 | 6 | 21 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.DbContextExtensions | 3 | 0 | 3 | 24 | 100% | 0 | 0 |  |
-| Audit.EntityFramework.DbContextHelper | 568 | 22 | 590 | 1467 | 96.2% | 500 | 546 | 91.5% |
+| Audit.EntityFramework.DbContextHelper | 625 | 2 | 627 | 1556 | 99.6% | 539 | 562 | 95.9% |
 | Audit.EntityFramework.DefaultAuditContext | 19 | 4 | 23 | 52 | 82.6% | 0 | 0 |  |
 | Audit.EntityFramework.EntityFrameworkEvent | 13 | 1 | 14 | 81 | 92.8% | 0 | 0 |  |
 | Audit.EntityFramework.EntityName | 2 | 0 | 2 | 11 | 100% | 0 | 0 |  |
@@ -118,6 +119,7 @@
 | Audit.EntityFramework.InterceptorEventBase | 8 | 0 | 8 | 56 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.Interceptors.AuditCommandInterceptor | 192 | 11 | 203 | 464 | 94.5% | 95 | 114 | 83.3% |
 | Audit.EntityFramework.Interceptors.AuditTransactionInterceptor | 173 | 6 | 179 | 391 | 96.6% | 53 | 66 | 80.3% |
+| Audit.EntityFramework.PropertyOverrideContext | 4 | 0 | 4 | 43 | 100% | 0 | 0 |  |
 | Audit.EntityFramework.Providers.DbContextDataProvider | 62 | 0 | 62 | 200 | 100% | 40 | 46 | 86.9% |
 | Audit.EntityFramework.Providers.DbContextDataProvider<T1, T2> | 62 | 8 | 70 | 219 | 88.5% | 18 | 24 | 75% |
 | Audit.EntityFramework.Providers.EntityFrameworkDataProvider | 123 | 10 | 133 | 396 | 92.4% | 96 | 106 | 90.5% |
