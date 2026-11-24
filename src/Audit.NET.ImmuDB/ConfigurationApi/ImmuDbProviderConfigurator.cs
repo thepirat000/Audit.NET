@@ -16,6 +16,7 @@ namespace Audit.ImmuDB.ConfigurationApi
         internal Func<AuditEvent, byte[]> _keySelector;
         internal Func<AuditEvent, byte[]> _valueSelector;
         internal bool _useVerifiedMethods;
+        internal int? _maxConcurrentWrites;
 
         public IImmuDbProviderConfigurator ClientBuilder(Action<ImmuClientBuilder> clientBuilderAction)
         {
@@ -80,6 +81,16 @@ namespace Audit.ImmuDB.ConfigurationApi
         public IImmuDbProviderConfigurator UseVerifiedMethods(bool useVerifiedMethods = true)
         {
             _useVerifiedMethods = useVerifiedMethods;
+            return this;
+        }
+
+        public IImmuDbProviderConfigurator MaxConcurrentWrites(int maxConcurrentWrites)
+        {
+            if (maxConcurrentWrites < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxConcurrentWrites), "Must be greater than zero.");
+            }
+            _maxConcurrentWrites = maxConcurrentWrites;
             return this;
         }
 

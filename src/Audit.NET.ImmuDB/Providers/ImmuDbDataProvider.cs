@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,12 +30,22 @@ namespace Audit.ImmuDB.Providers;
 /// <item><b>ValueSelector</b>: <c>Func&lt;AuditEvent, byte[]&gt;</c> to select the value for the event. Default is the event serialized to JSON and converted to a byte array.</item>
 /// <item><b>UseVerifiedMethods</b>: <c>bool</c> indicating whether to use verified methods for setting values. Default is <c>false</c>.</item>
 /// <item><b>ExpirationTimeout</b>: <c>TimeSpan</c> indicating the expiration timeout for the events stored in ImmuDB. If not set or set to NULL, events will not expire.</item>
+/// <item><b>MaxConcurrentWrites</b>: <c>int</c> maximum number of non-verified writes in flight at once per ImmuDB connection. Default is 16.</item>
 /// </list>
 /// </remarks>
 public class ImmuDbDataProvider : AuditDataProvider
 {
-    private static readonly ConcurrentDictionary<uint, ImmuClient> ClientCache = new();
-    private static readonly ConcurrentDictionary<uint, SemaphoreSlim> ClientLocks = new();
+    /// <summary>
+    /// Default value for <see cref="MaxConcurrentWrites"/>.
+    /// </summary>
+    public const int DefaultMaxConcurrentWrites = 16;
+
+    // One client per server/database/credentials. Lazy ensures that concurrent first calls open a single client (and a single server session).
+    private static readonly ConcurrentDictionary<uint, Lazy<Task<ImmuClient>>> ClientCache = new();
+    // VerifiedSet reads and updates the client's local verified state, so verified writes on one client must not overlap.
+    private static readonly ConcurrentDictionary<uint, SemaphoreSlim> VerifiedLocks = new();
+    // Set and ExpirableSet are stateless calls multiplexed over the client's gRPC channel; they are only bounded so the server's concurrent-write limit is not exceeded.
+    private static readonly ConcurrentDictionary<uint, SemaphoreSlim> WriteSlots = new();
     
     /// <summary>
     /// Action to configure the ImmuDB client.
@@ -75,6 +86,13 @@ public class ImmuDbDataProvider : AuditDataProvider
     /// Indicates whether to use verified methods for setting values in ImmuDB. If true, uses `VerifiedSet`; otherwise, uses `Set`.
     /// </summary>
     public bool UseVerifiedMethods { get; set; }
+
+    /// <summary>
+    /// Maximum number of non-verified writes (<c>Set</c> / <c>ExpirableSet</c>) in flight at once per ImmuDB connection (server, database and credentials).
+    /// The limit is shared by all the providers using the same connection, and is taken from the first one that writes to it.
+    /// Verified writes are always executed one at a time per connection. Default is 16.
+    /// </summary>
+    public int MaxConcurrentWrites { get; set; } = DefaultMaxConcurrentWrites;
     
     static ImmuDbDataProvider()
     {
@@ -118,6 +136,10 @@ public class ImmuDbDataProvider : AuditDataProvider
             ValueSelector = immuConfig._valueSelector;
             UseVerifiedMethods = immuConfig._useVerifiedMethods;
             ExpirationTimeout = immuConfig._timeout;
+            if (immuConfig._maxConcurrentWrites.HasValue)
+            {
+                MaxConcurrentWrites = immuConfig._maxConcurrentWrites.Value;
+            }
         }
     }
 
@@ -164,7 +186,11 @@ public class ImmuDbDataProvider : AuditDataProvider
         var value = ValueSelector?.Invoke(auditEvent) ?? Utils.ToByteArray(auditEvent.ToJson());
         var expiration = ExpirationTimeout.GetValue(auditEvent);
 
-        var semaphore = ClientLocks.GetOrAdd(hash, _ => new SemaphoreSlim(1, 1));
+        var verified = !expiration.HasValue && UseVerifiedMethods;
+
+        var semaphore = verified
+            ? VerifiedLocks.GetOrAdd(hash, _ => new SemaphoreSlim(1, 1))
+            : WriteSlots.GetOrAdd(hash, _ => new SemaphoreSlim(Math.Max(1, MaxConcurrentWrites)));
 
         await semaphore.WaitAsync(cancellationToken);
 
@@ -174,7 +200,7 @@ public class ImmuDbDataProvider : AuditDataProvider
             {
                 await client.ExpirableSet(key, value, DateTime.Now.Add(expiration.Value));
             }
-            else if (UseVerifiedMethods)
+            else if (verified)
             {
                 await client.VerifiedSet(key, value);
             }
@@ -194,12 +220,16 @@ public class ImmuDbDataProvider : AuditDataProvider
     /// </summary>
     internal static async Task ResetClientCacheAsync()
     {
-        foreach (var client in ClientCache.Values)
+        foreach (var lazyClient in ClientCache.Values)
         {
-            await client.Close();
+            if (lazyClient.IsValueCreated && lazyClient.Value.Status == TaskStatus.RanToCompletion)
+            {
+                await lazyClient.Value.Result.Close();
+            }
         }
         ClientCache.Clear();
-        ClientLocks.Clear();
+        VerifiedLocks.Clear();
+        WriteSlots.Clear();
     }
 
     private async Task<(uint Hash, ImmuClient Client)> GetOrCreateClientAsync(AuditEvent auditEvent)
@@ -212,21 +242,30 @@ public class ImmuDbDataProvider : AuditDataProvider
         var username = Username.GetValue(auditEvent) ?? builder.Username;
         var password = Password.GetValue(auditEvent) ?? builder.Password;
 
-        var hash = Fnv1AHash($"{database}|{username}|{password}");
+        // The server address is part of the key: providers pointing to different servers must not share a client
+        var hash = Fnv1AHash($"{builder.ServerUrl}|{builder.ServerPort}|{database}|{username}|{password}");
 
-        if (ClientCache.TryGetValue(hash, out var client))
+        var lazyClient = ClientCache.GetOrAdd(hash, _ => new Lazy<Task<ImmuClient>>(() => OpenClientAsync(builder, username, password, database)));
+
+        try
         {
-            return (hash, client);
+            return (hash, await lazyClient.Value);
         }
+        catch
+        {
+            // Do not cache a failed connection attempt, so the next call retries
+            ((ICollection<KeyValuePair<uint, Lazy<Task<ImmuClient>>>>)ClientCache).Remove(new KeyValuePair<uint, Lazy<Task<ImmuClient>>>(hash, lazyClient));
+            throw;
+        }
+    }
 
-        client = builder.Build();
+    private static async Task<ImmuClient> OpenClientAsync(ImmuClientBuilder builder, string username, string password, string database)
+    {
+        var client = builder.Build();
 
         await client.Open(username, password, database);
-        
-        ClientCache[hash] = client;
-        ClientLocks[hash] = new SemaphoreSlim(1, 1);
 
-        return (hash, client);
+        return client;
     }
 
     /// <summary>
