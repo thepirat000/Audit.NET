@@ -81,6 +81,13 @@ namespace Audit.ImmuDB.ConfigurationApi
         IImmuDbProviderConfigurator UseVerifiedMethods(bool useVerifiedMethods = true);
 
         /// <summary>
+        /// Sets the maximum number of non-verified writes in flight at once per ImmuDB connection. Default is 16.
+        /// Verified writes are always executed one at a time per connection.
+        /// </summary>
+        /// <param name="maxConcurrentWrites">The maximum number of concurrent writes. Must be greater than zero.</param>
+        IImmuDbProviderConfigurator MaxConcurrentWrites(int maxConcurrentWrites);
+
+        /// <summary>
         /// Sets the expiration timeout for the events stored in ImmuDB. If not set, events will not expire.
         /// </summary>
         /// <param name="timespan">The expiration timeout for the events stored in ImmuDB.</param>

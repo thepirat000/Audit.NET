@@ -434,6 +434,100 @@ namespace Audit.ImmuDB.UnitTest
         }
 
         [Test]
+        public async Task TestImmuDbDataProvider_ConcurrentFirstCalls_OpenOneClient()
+        {
+            await ImmuDbDataProvider.ResetClientCacheAsync();
+            var provider = new ImmuDbDataProvider(c => c
+                .Database(DatabaseUnverified)
+                .Username(UsernameUnverified)
+                .Password(Password)
+                .ClientBuilder(b => b.WithServerUrl(ServerUrl)));
+            var start = new TaskCompletionSource<bool>();
+            var tasks = new Task<ImmuClient>[16];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                tasks[i] = Task.Run(async () =>
+                {
+                    await start.Task;
+                    return await provider.GetClientAsync(null);
+                });
+            }
+
+            start.SetResult(true);
+            var clients = await Task.WhenAll(tasks);
+
+            foreach (var client in clients)
+            {
+                Assert.That(client, Is.SameAs(clients[0]), "Concurrent first calls should open a single client (and a single server session).");
+            }
+
+            await ImmuDbDataProvider.ResetClientCacheAsync();
+        }
+
+        [Test]
+        public async Task TestImmuDbDataProvider_ClientCache_KeyIncludesServer()
+        {
+            await ImmuDbDataProvider.ResetClientCacheAsync();
+            var providerA = new ImmuDbDataProvider(c => c
+                .Database(DatabaseUnverified)
+                .Username(UsernameUnverified)
+                .Password(Password)
+                .ClientBuilder(b => b.WithServerUrl(ServerUrl)));
+            // Same database and credentials, different server (no ImmuDB listening on this port)
+            var providerB = new ImmuDbDataProvider(c => c
+                .Database(DatabaseUnverified)
+                .Username(UsernameUnverified)
+                .Password(Password)
+                .ClientBuilder(b => b.WithServerUrl(ServerUrl).WithServerPort(3399)));
+
+            var clientA = await providerA.GetClientAsync(null);
+            ImmuClient clientB = null;
+            try
+            {
+                clientB = await providerB.GetClientAsync(null);
+            }
+            catch (Exception)
+            {
+                // Expected: there is no server on that port
+            }
+
+            Assert.That(clientB, Is.Not.SameAs(clientA), "A provider pointing to a different server must not reuse the cached client.");
+
+            await ImmuDbDataProvider.ResetClientCacheAsync();
+        }
+
+        [Test]
+        public async Task TestImmuDbDataProvider_ConcurrentWrites()
+        {
+            await ImmuDbDataProvider.ResetClientCacheAsync();
+            var provider = new ImmuDbDataProvider(c => c
+                .Database(DatabaseUnverified)
+                .Username(UsernameUnverified)
+                .Password(Password)
+                .ClientBuilder(b => b.WithServerUrl(ServerUrl))
+                .MaxConcurrentWrites(8)
+                .ValueSelector(ev => ev.EventType));
+
+            var events = new AuditEvent[64];
+            var tasks = new Task<object>[events.Length];
+            for (int i = 0; i < events.Length; i++)
+            {
+                events[i] = new AuditEvent() { EventType = $"ConcurrentEvent{i}" };
+                tasks[i] = provider.InsertEventAsync(events[i]);
+            }
+            var keys = await Task.WhenAll(tasks);
+
+            var client = await provider.GetClientAsync(null);
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var entry = await client.Get((byte[])keys[i], 0UL);
+                Assert.That(entry.Value, Is.EqualTo(Encoding.UTF8.GetBytes(events[i].EventType)));
+            }
+
+            await ImmuDbDataProvider.ResetClientCacheAsync();
+        }
+
+        [Test]
         public void TestImmuDbDataProvider_Expiration()
         {
             // Arrange

@@ -1,3 +1,4 @@
+using System;
 using Audit.Core;
 using Audit.Core.ConfigurationApi;
 using Audit.ImmuDB.Providers;
@@ -19,7 +20,8 @@ namespace Audit.ImmuDB.UnitTest
                 .ClientBuilder(b => b.WithServerUrl("server"))
                 .KeySelector(_ => "key")
                 .ValueSelector(_ => "value")
-                .UseVerifiedMethods());
+                .UseVerifiedMethods()
+                .MaxConcurrentWrites(4));
 
             Assert.That(dp.DatabaseName.GetValue(null), Is.EqualTo("database"));
             Assert.That(dp.Username.GetValue(null), Is.EqualTo("username"));
@@ -28,6 +30,21 @@ namespace Audit.ImmuDB.UnitTest
             Assert.That(dp.ValueSelector(new AuditEvent()), Is.EqualTo("value"));
             Assert.That(dp.ClientBuilderAction, Is.Not.Null);
             Assert.That(dp.UseVerifiedMethods, Is.True);
+            Assert.That(dp.MaxConcurrentWrites, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void ImmuDbDataProvider_MaxConcurrentWrites_Default()
+        {
+            var dp = new ImmuDbDataProvider(c => c.Database("database"));
+
+            Assert.That(dp.MaxConcurrentWrites, Is.EqualTo(ImmuDbDataProvider.DefaultMaxConcurrentWrites));
+        }
+
+        [Test]
+        public void ImmuDbDataProvider_MaxConcurrentWrites_MustBePositive()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => new ImmuDbDataProvider(c => c.MaxConcurrentWrites(0)));
         }
 
         [Test]
